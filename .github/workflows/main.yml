@@ -114,7 +114,7 @@ jobs:
         pip3 install wheel
         echo ------------ slither analyzer install
         #pip3 install slither-analyzer==0.8.3
-        pip3 install -r proxy/scripts/requirements.txt
+        pip3 install -r IMA/proxy/scripts/requirements.txt
 
         echo ------------ slither search attempt
         sudo find / -name slither || true
@@ -166,8 +166,15 @@ jobs:
       with:
         python-version: 3.8
 
+    - name: Get IMA contracts
+      run: |
+        git clone https://github.com/skalenetwork/IMA.git --recursive-submodules
+        cd IMA
+        yarn install
+        cd ..
+
     - name: Compile contracts
-      working-directory: ./proxy
+      working-directory: ./IMA/proxy
       run: |
         yarn install
 
@@ -176,8 +183,8 @@ jobs:
         yarn install
 
     - name: Start background ganache
+      working-directory: ./IMA/proxy
       run: |
-        cd proxy
         npx ganache --miner.blockGasLimit 12000000 --logging.quiet --chain.allowUnlimitedContractSize --wallet.defaultBalance 2000000 --wallet.accountKeysPath ../test/accounts.json &
 
     - name: Prepare test (PY part)
