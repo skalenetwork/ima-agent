@@ -167,7 +167,7 @@ jobs:
 
     - name: Get IMA contracts
       run: |
-        git clone https://github.com/skalenetwork/IMA.git --recursive-submodules
+        git clone https://github.com/skalenetwork/IMA.git --recurse-submodules
         cd IMA
         yarn install
         cd ..
