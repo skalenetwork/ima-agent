@@ -112,17 +112,16 @@ jobs:
         sudo apt-get install python3-wheel
         echo ------------ py3 wheel - pip
         pip3 install wheel
-        echo ------------ slither analyzer install
-        #pip3 install slither-analyzer==0.8.3
-        pip3 install -r IMA/proxy/scripts/requirements.txt
-
-        echo ------------ slither search attempt
-        sudo find / -name slither || true
-        echo ------------ slither location detection - after install
-        export PATH=$PATH:/home/$USER/.local/bin
-        which slither || echo "----> Looks like slither was not installed, next command will fail"
-        echo ------------ slither version check - after install
-        slither --version || true
+        # echo ------------ slither analyzer install
+        # #pip3 install slither-analyzer==0.8.3
+        # pip3 install -r IMA/proxy/scripts/requirements.txt
+        # echo ------------ slither search attempt
+        # sudo find / -name slither || true
+        # echo ------------ slither location detection - after install
+        # export PATH=$PATH:/home/$USER/.local/bin
+        # which slither || echo "----> Looks like slither was not installed, next command will fail"
+        # echo ------------ slither version check - after install
+        # slither --version || true
 
     - name: INSTALL ALL NPMs
       run: |
