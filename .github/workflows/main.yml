@@ -21,7 +21,7 @@ jobs:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
 
-    - name: SYSTEM VERSION CHECKS
+    - name: System Version Checks
       run: |
         echo ------------ GIT_CURRENT_BRANCH
         export GIT_CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
@@ -80,22 +80,22 @@ jobs:
         echo ------------ lscpu
         lscpu || true
 
-    - name: ESLINT
+    - name: Install ESLINT
       run: |
         sudo npm install -g eslint
         eslint --version
 
-    - name: INSTALL PREREQUISITES - ROOT - PACKAGES
+    - name: Install all NPMs at root
       run: |
         yarn install
         ls -1
 
-    - name: JS LINT CHECK EVERYTHING IN AGENT AND NPMS WITH ESLINT
+    - name: JS Lint Check everything
       run: |
         yarn run lint-check
         echo "Looks like no JS code formatting errors so far)"
 
-    - name: PY CHECKS
+    - name: Python Version Checks
       run: |
         echo ------------ python version check
         which python || echo "----> Looks like python was not installed, next command will fail"
@@ -104,7 +104,7 @@ jobs:
         which python3 || echo "----> Looks like python3 was not installed, next command will fail"
         python3 --version
 
-    - name: INSTALL PREREQUISITES - PY
+    - name: Install Python Prerequisites
       run: |
         echo ------------ py3 installs
         sudo apt-get install python3-pip python3-setuptools python3-dev
@@ -122,10 +122,6 @@ jobs:
         # which slither || echo "----> Looks like slither was not installed, next command will fail"
         # echo ------------ slither version check - after install
         # slither --version || true
-
-    - name: INSTALL ALL NPMs
-      run: |
-        yarn install
 
   test-integration:
     runs-on: ubuntu-latest
@@ -160,21 +156,15 @@ jobs:
       with:
         node-version: '16'
 
-    - name: Set up Python
+    - name: Install Python 3.8
       uses: actions/setup-python@v2
       with:
         python-version: 3.8
 
-    - name: Install all NPMs in root
+    - name: Install all NPMs in src
+      working-directory: ./src
       run: |
         yarn install
-
-    - name: Get IMA contracts
-      run: |
-        git clone https://github.com/skalenetwork/IMA.git --recurse-submodules
-        cd IMA
-        yarn install
-        cd ..
 
     - name: Compile contracts
       working-directory: ./IMA/proxy
