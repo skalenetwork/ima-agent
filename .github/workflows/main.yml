@@ -20,6 +20,8 @@ jobs:
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
+      with:
+          submodules: recursive
 
     - name: System Version Checks
       run: |
@@ -131,6 +133,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      with:
+          submodules: recursive
 
     - name: Get yarn cache directory path
       id: yarn-cache-dir-path

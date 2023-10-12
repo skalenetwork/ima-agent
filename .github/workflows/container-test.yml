@@ -22,6 +22,8 @@ jobs:
         sudo rm -rf comprehensive-test || true
 
     - uses: actions/checkout@v2
+      with:
+          submodules: recursive
 
     - name: INFO - github environment variable checks
       run: |
