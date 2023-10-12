@@ -165,6 +165,10 @@ jobs:
       with:
         python-version: 3.8
 
+    - name: Install all NPMs in root
+      run: |
+        yarn install
+
     - name: Get IMA contracts
       run: |
         git clone https://github.com/skalenetwork/IMA.git --recurse-submodules
@@ -177,7 +181,8 @@ jobs:
       run: |
         yarn install
 
-    - name: Install all NPMs
+    - name: Install all NPMs in test
+      working-directory: ./test
       run: |
         yarn install
 
