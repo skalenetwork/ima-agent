@@ -25,7 +25,7 @@
 
 import * as path from "path";
 import * as url from "url";
-import * as networkLayer from ".t/socket.mjs";
+import * as networkLayer from "./socket.mjs";
 import * as threadInfo from "./threadInfo.mjs";
 import * as owaspUtils from "./owaspUtils.mjs";
 import * as cc from "./cc.mjs";
@@ -33,7 +33,7 @@ import * as log from "./log.mjs";
 import * as rpcCall from "./rpcCall.mjs";
 
 import { UniversalDispatcherEvent, EventDispatcher }
-    from ".t/eventDispatcher.mjs";
+    from "./eventDispatcher.mjs";
 
 import * as EMC from "ethereum-multicall";
 import { clearTimeout } from "timers";

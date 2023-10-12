@@ -26,8 +26,8 @@
 import {
     parentPort
 } from "worker_threads";
-import * as networkLayer from ".t/socket.mjs";
-import { SocketServer } from ".t/socketServer.mjs";
+import * as networkLayer from "./socket.mjs";
+import { SocketServer } from "./socketServer.mjs";
 import * as cc from "./cc.mjs";
 import * as owaspUtils from "./owaspUtils.mjs";
 import * as skaleObserver from "./observer.mjs";

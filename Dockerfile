@@ -31,10 +31,11 @@ RUN which python3
 RUN mkdir /ima
 WORKDIR /ima
 
-COPY proxy proxy
-COPY agent agent
-COPY npms npms
-COPY postinstall.sh postinstall.sh
+COPY src src
+RUN mkdir IMA
+COPY IMA/proxy IMA/proxy
+COPY IMA/package.json IMA/package.json
+COPY IMA/VERSION IMA/VERSION
 COPY package.json package.json
 COPY VERSION VERSION
 
@@ -52,4 +53,4 @@ RUN node-gyp --version
 WORKDIR /ima
 RUN yarn install
 
-CMD ["bash", "/ima/agent/run.sh"]
+CMD ["bash", "/ima/src/run.sh"]
