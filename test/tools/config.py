@@ -33,9 +33,9 @@ class Config:
     schain_rpc_url = 'http://localhost:8545'
     schain_name = 'd2'
     schain_name_2 = 'd3'
-    abi_mainnet = 'IMA/data/proxyMainnet.json'
-    abi_schain = 'IMA/data/proxySchain_'
-    abi_schain_2 = 'IMA/data/proxySchain_'
+    abi_mainnet = 'proxyMainnet.json'
+    abi_schain = 'proxySchain_'
+    abi_schain_2 = 'proxySchain_'
     user_key = ''
 
     def __init__(self, src_root, config_json):
