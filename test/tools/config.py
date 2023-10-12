@@ -61,8 +61,8 @@ class Config:
         if 'user_key' in config_json:
             self.user_key = config_json['user_key']
 
-        self.abi_mainnet = self.proxy_root + '/' + self.abi_mainnet
-        self.abi_schain = self.proxy_root + '/' + self.abi_schain + self.schain_name + '.json'
-        self.abi_schain_2 = self.proxy_root + '/' + self.abi_schain_2 + self.schain_name_2 + '.json'
+        self.abi_mainnet = self.proxy_root + '/data/' + self.abi_mainnet
+        self.abi_schain = self.proxy_root + '/data/' + self.abi_schain + self.schain_name + '.json'
+        self.abi_schain_2 = self.proxy_root + '/data/' + self.abi_schain_2 + self.schain_name_2 + '.json'
 
 
