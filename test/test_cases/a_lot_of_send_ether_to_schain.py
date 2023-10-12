@@ -38,7 +38,7 @@ class ALotOfTransactionsSendEtherToSchain(TestCase):
         amount = 2 * 10 ** 18
         #
         for x in range(range_int):
-            self.   .transfer_eth_from_mainnet_to_schain(self.config.mainnet_key,
+            self.agent.transfer_eth_from_mainnet_to_schain(self.config.mainnet_key,
                                                            self.config.schain_key,
                                                            amount,
                                                            self.timeout)

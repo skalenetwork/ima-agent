@@ -20,9 +20,8 @@
 
 class Config:
     src_root = '.'
-    agent_root = 'agent'
-    skale_ima_root = 'npms/skale-ima'
-    proxy_root = 'proxy'
+    agent_src = 'src'
+    proxy_root = 'IMA/proxy'
     test_root = 'test'
     test_working_dir = 'working'
     test_resource_dir = 'resources'
@@ -34,16 +33,15 @@ class Config:
     schain_rpc_url = 'http://localhost:8545'
     schain_name = 'd2'
     schain_name_2 = 'd3'
-    abi_mainnet = 'data/proxyMainnet.json'
-    abi_schain = 'data/proxySchain_'
-    abi_schain_2 = 'data/proxySchain_'
+    abi_mainnet = 'IMA/data/proxyMainnet.json'
+    abi_schain = 'IMA/data/proxySchain_'
+    abi_schain_2 = 'IMA/data/proxySchain_'
     user_key = ''
 
     def __init__(self, src_root, config_json):
         self.src_root = src_root
         self.proxy_root = src_root + '/' + self.proxy_root
-        self.agent_root = src_root + '/' + self.agent_root
-        self.skale_ima_root = src_root + '/' + self.skale_ima_root
+        self.agent_root = src_root + '/src'
         self.test_root = src_root + '/' + self.test_root
         self.test_working_dir = self.test_root + '/' + self.test_working_dir
         self.test_resource_dir = self.test_root + '/' + self.test_resource_dir
