@@ -39,7 +39,7 @@ class Config:
     user_key = ''
 
     def __init__(self, src_root, config_json):
-        self.src_root = src_root + '/' + self.src_root
+        self.agent_src = agent_src + '/' + self.agent_src
         self.proxy_root = src_root + '/' + self.proxy_root
         self.agent_root = src_root + '/src'
         self.test_root = src_root + '/' + self.test_root
