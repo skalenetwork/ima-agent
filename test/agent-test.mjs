@@ -29,13 +29,13 @@ import * as os from "os";
 import * as path from "path";
 import * as url from "url";
 
-import * as owaspUtils from "../npms/skale-owasp/owaspUtils.mjs";
-import * as imaTx from "../npms/skale-ima/imaTx.mjs";
-import * as log from "../npms/skale-log/log.mjs";
-import * as imaUtils from "../agent/utils.mjs";
-import * as imaCLI from "../agent/cli.mjs";
+import * as owaspUtils from "../src/owaspUtils.mjs";
+import * as imaTx from "../src/imaTx.mjs";
+import * as log from "../src/log.mjs";
+import * as imaUtils from "../src/utils.mjs";
+import * as imaCLI from "../src/cli.mjs";
 
-import * as state from "../agent/state.mjs";
+import * as state from "../src/state.mjs";
 
 const __dirname = path.dirname( url.fileURLToPath( import.meta.url ) );
 const __filename = new URL( "", import.meta.url ).pathname;
