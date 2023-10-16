@@ -4,21 +4,6 @@
 
 [![Discord](https://img.shields.io/discord/534485763354787851.svg)](https://discord.gg/vvUtWJB)
 
-## A critical note about production readiness
-
-The IMA is still in active development and therefore should be regarded as _alpha software_. The development is still subject to further security hardening, testing, and breaking changes.
-
-## Software Architecture
-
-IMA consists of the following three parts:
-
-1)  `Mainnet` smart contracts.
-2)  `SKALE Chain` smart contracts.
-3)  A containerized Agent application.
-
-Smart contracts are interfaces for any software working with `Mainnet` and `SKALE Chain` like other smart contracts deployed there or software connecting these Ethereum networks.
-The Agent is a Node JS application connecting the smart contracts on Mainnet with SKALE Chains.
-
 ## Components Structure
 
 ### Message Transferring Agent App
@@ -35,7 +20,7 @@ Data validity verifier module. See [OWASP document](https://www.gitbook.com/down
 
 #### SKALE Observer
 
-[SKALE Network Browser](npms/skale-observer/README.md). Responsible for providing description of all SKALE chains.
+[SKALE Network Browser](src/SNB.md). Responsible for providing description of all SKALE chains.
 
 #### IMA Log
 

@@ -1,6 +1,6 @@
 <!-- SPDX-License-Identifier: (AGPL-3.0-only OR CC-BY-4.0) -->
 
-# IMA Agemt Core module
+# IMA Agent Core module
 
 Implements **SKALE Interchain Messaging Agent** APIs.
 
