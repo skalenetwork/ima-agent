@@ -114,14 +114,13 @@ export function createStandardOutputStream() {
             "objStream": null,
             "haveOwnTimestamps": false,
             "strOwnIndent": "",
-            "write": function( s ) {
-                const x =
-                    this.strOwnIndent +
-                    ( this.haveOwnTimestamps ? generateTimestampPrefix( null, true ) : "" ) +
-                    s;
+            "write": function() {
+                let s = ( this.strOwnIndent ? this.strOwnIndent : "" ) +
+                    ( this.haveOwnTimestamps ? generateTimestampPrefix( null, true ) : "" );
+                s += formatArgs( arguments );
                 try {
-                    if( this.objStream )
-                        this.objStream.write( x );
+                    if( this.objStream && s.length > 0 )
+                        this.objStream.write( s );
                 } catch ( err ) { }
             },
             "close": function() { this.objStream = null; },
@@ -129,7 +128,56 @@ export function createStandardOutputStream() {
             "size": function() { return 0; },
             "rotate": function( nBytesToWrite ) { },
             "toString": function() { return "" + strFilePath; },
-            "exposeDetailsTo": function( otherStream, strTitle, isSuccess ) { }
+            "exposeDetailsTo": function( otherStream, strTitle, isSuccess ) { },
+            // high-level formatters
+            "fatal": function() {
+                if( verboseGet() >= verboseReversed().fatal )
+                    this.write( formatArgs( arguments, cc.error ) + "\n" );
+            },
+            "critical": function() {
+                if( verboseGet() >= verboseReversed().critical )
+                    this.write( formatArgs( arguments, cc.error ) + "\n" );
+            },
+            "error": function() {
+                if( verboseGet() >= verboseReversed().error )
+                    this.write( formatArgs( arguments, cc.error ) + "\n" );
+            },
+            "warning": function() {
+                if( verboseGet() >= verboseReversed().warning )
+                    this.write( formatArgs( arguments, cc.warning ) + "\n" );
+            },
+            "attention": function() {
+                if( verboseGet() >= verboseReversed().attention )
+                    this.write( formatArgs( arguments, cc.attention ) + "\n" );
+            },
+            "information": function() {
+                if( verboseGet() >= verboseReversed().information )
+                    this.write( formatArgs( arguments, cc.info ) + "\n" );
+            },
+            "info": function() {
+                if( verboseGet() >= verboseReversed().information )
+                    this.write( formatArgs( arguments, cc.info ) + "\n" );
+            },
+            "notice": function() {
+                if( verboseGet() >= verboseReversed().notice )
+                    this.write( formatArgs( arguments, cc.notice ) + "\n" );
+            },
+            "note": function() {
+                if( verboseGet() >= verboseReversed().notice )
+                    this.write( formatArgs( arguments, cc.note ) + "\n" );
+            },
+            "debug": function() {
+                if( verboseGet() >= verboseReversed().debug )
+                    this.write( formatArgs( arguments, cc.debug ) + "\n" );
+            },
+            "trace": function() {
+                if( verboseGet() >= verboseReversed().trace )
+                    this.write( formatArgs( arguments, cc.trace ) + "\n" );
+            },
+            "success": function() {
+                if( verboseGet() >= verboseReversed().information )
+                    this.write( formatArgs( arguments, cc.success ) + "\n" );
+            }
         };
         objEntry.open();
         return objEntry;
@@ -159,11 +207,12 @@ export function createMemoryOutputStream() {
             "strAccumulatedLogText": "",
             "haveOwnTimestamps": true,
             "strOwnIndent": "    ",
-            "write": function( s ) {
+            "write": function() {
+                const s = formatArgs( arguments );
                 if( this.strAccumulatedLogText.length == 0 ||
                     this.strAccumulatedLogText[this.strAccumulatedLogText.length - 1] == "\n"
                 ) {
-                    this.strAccumulatedLogText += this.strOwnIndent;
+                    this.strAccumulatedLogText += ( this.strOwnIndent ? this.strOwnIndent : "" );
                     if( this.haveOwnTimestamps )
                         this.strAccumulatedLogText += generateTimestampPrefix( null, true );
                 }
@@ -196,6 +245,55 @@ export function createMemoryOutputStream() {
                     cc.bright( ") --- --- --- --- ---\n"
                     )
                 );
+            },
+            // high-level formatters
+            "fatal": function() {
+                if( verboseGet() >= verboseReversed().fatal )
+                    this.write( formatArgs( arguments, cc.error ) + "\n" );
+            },
+            "critical": function() {
+                if( verboseGet() >= verboseReversed().critical )
+                    this.write( formatArgs( arguments, cc.error ) + "\n" );
+            },
+            "error": function() {
+                if( verboseGet() >= verboseReversed().error )
+                    this.write( formatArgs( arguments, cc.error ) + "\n" );
+            },
+            "warning": function() {
+                if( verboseGet() >= verboseReversed().warning )
+                    this.write( formatArgs( arguments, cc.warning ) + "\n" );
+            },
+            "attention": function() {
+                if( verboseGet() >= verboseReversed().attention )
+                    this.write( formatArgs( arguments, cc.attention ) + "\n" );
+            },
+            "information": function() {
+                if( verboseGet() >= verboseReversed().information )
+                    this.write( formatArgs( arguments, cc.info ) + "\n" );
+            },
+            "info": function() {
+                if( verboseGet() >= verboseReversed().information )
+                    this.write( formatArgs( arguments, cc.info ) + "\n" );
+            },
+            "notice": function() {
+                if( verboseGet() >= verboseReversed().notice )
+                    this.write( formatArgs( arguments, cc.notice ) + "\n" );
+            },
+            "note": function() {
+                if( verboseGet() >= verboseReversed().notice )
+                    this.write( formatArgs( arguments, cc.note ) + "\n" );
+            },
+            "debug": function() {
+                if( verboseGet() >= verboseReversed().debug )
+                    this.write( formatArgs( arguments, cc.debug ) + "\n" );
+            },
+            "trace": function() {
+                if( verboseGet() >= verboseReversed().trace )
+                    this.write( formatArgs( arguments, cc.trace ) + "\n" );
+            },
+            "success": function() {
+                if( verboseGet() >= verboseReversed().information )
+                    this.write( formatArgs( arguments, cc.success ) + "\n" );
             }
         };
         objEntry.open();
@@ -226,14 +324,15 @@ export function createFileOutput( strFilePath, nMaxSizeBeforeRotation, nMaxFiles
             "objStream": null,
             "haveOwnTimestamps": false,
             "strOwnIndent": "",
-            "write": function( s ) {
-                const x =
-                    this.strOwnIndent +
-                    ( this.haveOwnTimestamps ? generateTimestampPrefix( null, true ) : "" ) +
-                    s;
+            "write": function() {
+                let s = ( this.strOwnIndent ? this.strOwnIndent : "" ) +
+                    ( this.haveOwnTimestamps ? generateTimestampPrefix( null, true ) : "" );
+                s += formatArgs( arguments );
                 try {
-                    this.rotate( x.length );
-                    fs.appendFileSync( this.objStream, x, "utf8" );
+                    if( s.length > 0 ) {
+                        this.rotate( s.length );
+                        fs.appendFileSync( this.objStream, s, "utf8" );
+                    }
                 } catch ( err ) { }
             },
             "close": function() {
@@ -280,7 +379,56 @@ export function createFileOutput( strFilePath, nMaxSizeBeforeRotation, nMaxFiles
                 }
             },
             "toString": function() { return "" + strFilePath; },
-            "exposeDetailsTo": function( otherStream, strTitle, isSuccess ) { }
+            "exposeDetailsTo": function( otherStream, strTitle, isSuccess ) { },
+            // high-level formatters
+            "fatal": function() {
+                if( verboseGet() >= verboseReversed().fatal )
+                    this.write( formatArgs( arguments, cc.error ) + "\n" );
+            },
+            "critical": function() {
+                if( verboseGet() >= verboseReversed().critical )
+                    this.write( formatArgs( arguments, cc.error ) + "\n" );
+            },
+            "error": function() {
+                if( verboseGet() >= verboseReversed().error )
+                    this.write( formatArgs( arguments, cc.error ) + "\n" );
+            },
+            "warning": function() {
+                if( verboseGet() >= verboseReversed().warning )
+                    this.write( formatArgs( arguments, cc.warning ) + "\n" );
+            },
+            "attention": function() {
+                if( verboseGet() >= verboseReversed().attention )
+                    this.write( formatArgs( arguments, cc.attention ) + "\n" );
+            },
+            "information": function() {
+                if( verboseGet() >= verboseReversed().information )
+                    this.write( formatArgs( arguments, cc.info ) + "\n" );
+            },
+            "info": function() {
+                if( verboseGet() >= verboseReversed().information )
+                    this.write( formatArgs( arguments, cc.info ) + "\n" );
+            },
+            "notice": function() {
+                if( verboseGet() >= verboseReversed().notice )
+                    this.write( formatArgs( arguments, cc.notice ) + "\n" );
+            },
+            "note": function() {
+                if( verboseGet() >= verboseReversed().notice )
+                    this.write( formatArgs( arguments, cc.note ) + "\n" );
+            },
+            "debug": function() {
+                if( verboseGet() >= verboseReversed().debug )
+                    this.write( formatArgs( arguments, cc.debug ) + "\n" );
+            },
+            "trace": function() {
+                if( verboseGet() >= verboseReversed().trace )
+                    this.write( formatArgs( arguments, cc.trace ) + "\n" );
+            },
+            "success": function() {
+                if( verboseGet() >= verboseReversed().information )
+                    this.write( formatArgs( arguments, cc.success ) + "\n" );
+            }
         };
         objEntry.open();
         return objEntry;
@@ -303,30 +451,107 @@ export function insertFileOutput( strFilePath, nMaxSizeBeforeRotation, nMaxFiles
     return true;
 }
 
-export function write() {
-    let s = getPrintTimestamps() ? generateTimestampPrefix( null, true ) : "", i = 0;
+export function formatArgs( arrArgs, fnFormatter ) {
+    fnFormatter = fnFormatter || function( arg ) { return arg; };
+    let s = "";
     try {
-        for( i = 0; i < arguments.length; ++i ) {
+        for( i = 0; i < arrArgs.length; ++i ) {
             try {
-                s += arguments[i];
+                // if( i > 0 && s.length > 0 )
+                //    s += " ";
+                let arg = arrArgs[i];
+                if( arg ) {
+                    const t = typeof arg;
+                    if( t == "string" ) {
+                        if( arg.length > 0 ) {
+                            if( arg == " " || arg == "\n" ) {
+                                // skip
+                            } else if( arg[0] != "\x1b" )
+                                arg = fnFormatter( arg );
+                        }
+                    } else
+                        arg = cc.logArgToString( arg );
+
+                }
+                s += arg;
             } catch ( err ) {
             }
         }
     } catch ( err ) {
     }
+    return s;
+}
+
+export function outputStringToAllStreams( s ) {
     try {
         if( s.length <= 0 )
             return;
-        const cnt = gArrStreams.length;
-        for( i = 0; i < cnt; ++i ) {
+        for( i = 0; i < gArrStreams.length; ++i ) {
             try {
                 const objEntry = gArrStreams[i];
-                objEntry.write( s );
+                if( objEntry && "write" in objEntry && typeof objEntry.write == "function" )
+                    objEntry.write( s );
             } catch ( err ) {
             }
         }
     } catch ( err ) {
     }
+}
+
+export function write() {
+    let s = getPrintTimestamps() ? generateTimestampPrefix( null, true ) : "";
+    s += formatArgs( arguments );
+    outputStringToAllStreams( s );
+}
+
+// high-level formatters
+export function fatal() {
+    if( verboseGet() >= verboseReversed().fatal )
+        write( formatArgs( arguments, cc.error ) + "\n" );
+}
+export function critical() {
+    if( verboseGet() >= verboseReversed().critical )
+        write( formatArgs( arguments, cc.error ) + "\n" );
+}
+export function error() {
+    if( verboseGet() >= verboseReversed().error )
+        write( formatArgs( arguments, cc.error ) + "\n" );
+}
+export function warning() {
+    if( verboseGet() >= verboseReversed().warning )
+        write( formatArgs( arguments, cc.warning ) + "\n" );
+}
+export function attention() {
+    if( verboseGet() >= verboseReversed().attention )
+        write( formatArgs( arguments, cc.attention ) + "\n" );
+}
+export function information() {
+    if( verboseGet() >= verboseReversed().information )
+        write( formatArgs( arguments, cc.info ) + "\n" );
+}
+export function info() {
+    if( verboseGet() >= verboseReversed().information )
+        write( formatArgs( arguments, cc.info ) + "\n" );
+}
+export function notice() {
+    if( verboseGet() >= verboseReversed().notice )
+        write( formatArgs( arguments, cc.notice ) + "\n" );
+}
+export function note() {
+    if( verboseGet() >= verboseReversed().notice )
+        write( formatArgs( arguments, cc.note ) + "\n" );
+}
+export function debug() {
+    if( verboseGet() >= verboseReversed().debug )
+        write( formatArgs( arguments, cc.debug ) + "\n" );
+}
+export function trace() {
+    if( verboseGet() >= verboseReversed().trace )
+        write( formatArgs( arguments, cc.trace ) + "\n" );
+}
+export function success() {
+    if( verboseGet() >= verboseReversed().information )
+        write( formatArgs( arguments, cc.success ) + "\n" );
 }
 
 export function removeAll() {

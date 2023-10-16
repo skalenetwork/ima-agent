@@ -336,11 +336,12 @@ export function logArgToString() {
         if( typeof arg === "object" && typeof arg.valueOf() === "boolean" )
             s += "" + tf( arg.valueOf() );
 
-        if( typeof arg === "number" ) {
+        if( typeof arg === "number" || typeof arg === "bigint" ) {
             s += "" + number( arg );
             continue;
         }
-        if( typeof arg === "object" && typeof arg.valueOf() === "number" ) {
+        if( typeof arg === "object" &&
+            ( typeof arg.valueOf() === "number" || typeof arg.valueOf() === "bigint" ) ) {
             s += "" + number( arg.valueOf() );
             continue;
         }
@@ -559,7 +560,6 @@ export function syntaxHighlightJSON( jo, strKeyNamePrefix ) {
                 return "" + nanval( match );
             case "string":
                 return "" + strval( match );
-            // case "number":
             }
             return logArgToString( match );
         } );
