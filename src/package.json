@@ -1,11 +1,10 @@
 {
     "name": "skale-ima-agent-app",
-    "private": true,
     "license": "AGPL-3.0",
     "author": "SKALE Labs and contributors",
     "scripts": {
-        "lint-check": "eslint ./*.*js ./test/*.*js",
-        "lint-fix": "eslint ./*.*js ./test/*.*js --fix",
+        "lint-check": "eslint ./*.*js",
+        "lint-fix": "eslint ./*.*js --fix",
         "check-outdated": "yarn outdated",
         "upgrade-to-latest": "yarn upgrade --latest"
     },

@@ -29,10 +29,10 @@ import * as httpsModuleLoaded from "https";
 import * as wsModuleLoaded from "ws";
 import * as webRtcModuleLoaded from "wrtc";
 
-import * as networkLayer from "./socket.mjs";
-import { settings } from "./socketSettings.mjs";
-import { UniversalDispatcherEvent, EventDispatcher } from "./eventDispatcher.mjs";
-import * as utils from "./socketUtils.mjs";
+import * as networkLayer from "../../src/socket.mjs";
+import { settings } from "../../src/socketSettings.mjs";
+import { UniversalDispatcherEvent, EventDispatcher } from "../../src/eventDispatcher.mjs";
+import * as utils from "../../src/socketUtils.mjs";
 
 const httpsModule = httpsModuleLoaded; // .default;
 const wsModule = wsModuleLoaded; // .default;

@@ -1,6 +1,5 @@
 {
     "name": "skale-ima-tests",
-    "private": true,
     "license": "AGPL-3.0",
     "author": "SKALE Labs and contributors",
     "scripts": {
