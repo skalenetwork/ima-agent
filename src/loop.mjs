@@ -135,7 +135,7 @@ export function checkTimeFraming( d, strDirection, joRuntimeOpts ) {
             log.write( cc.error( "Exception in time framing check in " ) +
                 threadInfo.threadDescription() + cc.error( ": " ) +
                 cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
+                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) );
         }
     }
     return true;
@@ -186,7 +186,7 @@ async function singleTransferLoopPartOracle( optsLoop, strLogPrefix ) {
                 log.write( strLogPrefix + cc.error( "Oracle operation exception: " ) +
                     cc.warning( owaspUtils.extractErrorMessage( err ) ) +
                     cc.error( " in " ) + threadInfo.threadDescription() +
-                    cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
+                    cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) );
             }
             imaState.loopState.oracle.isInProgress = false;
             await pwa.notifyOnLoopEnd( imaState, "oracle" );
@@ -261,7 +261,7 @@ async function singleTransferLoopPartM2S( optsLoop, strLogPrefix ) {
                 log.write( strLogPrefix + cc.error( "M2S transfer exception in " ) +
                     threadInfo.threadDescription() + cc.error( ": " ) +
                     cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                    cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
+                    cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) );
             }
             imaState.loopState.m2s.isInProgress = false;
             await pwa.notifyOnLoopEnd( imaState, "m2s" );
@@ -341,7 +341,7 @@ async function singleTransferLoopPartS2M( optsLoop, strLogPrefix ) {
                 log.write( strLogPrefix + cc.error( "S2M transfer exception in " ) +
                     threadInfo.threadDescription() + cc.error( ": " ) +
                     cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                    cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
+                    cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) );
             }
             imaState.loopState.s2m.isInProgress = false;
             await pwa.notifyOnLoopEnd( imaState, "s2m" );
@@ -390,7 +390,7 @@ async function singleTransferLoopPartS2S( optsLoop, strLogPrefix ) {
                 log.write( strLogPrefix + cc.error( "S2S transfer exception in " ) +
                     threadInfo.threadDescription() + cc.error( ": " ) +
                     cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                    cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
+                    cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) );
             }
             throw err;
         }
@@ -476,7 +476,7 @@ export async function singleTransferLoop( optsLoop ) {
         if( log.verboseGet() >= log.verboseReversed().error ) {
             log.write( strLogPrefix + cc.fatal( "Exception in transfer loop: " ) +
                 cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
+                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) );
         }
     }
     imaState.loopState.oracle.isInProgress = false;

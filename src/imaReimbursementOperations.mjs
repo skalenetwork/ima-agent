@@ -71,7 +71,7 @@ export async function reimbursementShowBalance(
                 cc.fatal( "CRITICAL ERROR:" ) +
                 cc.error( " Payment error in reimbursementShowBalance(): " ) +
                 cc.error( strError ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n";
+                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
             if( log.id != details.id )
                 log.write( s );
             details.write( s );
@@ -167,7 +167,7 @@ export async function reimbursementEstimateAmount(
             const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
                 cc.error( " Payment error in reimbursementEstimateAmount(): " ) +
                 cc.error( strError ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n";
+                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
             if( log.id != details.id )
                 log.write( s );
             details.write( s );
@@ -245,7 +245,7 @@ export async function reimbursementWalletRecharge(
             const s = strLogPrefix +
                 cc.fatal( "CRITICAL ERROR:" ) + cc.error( " Payment error in " +
                 strActionName + ": " ) + cc.error( strError ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n";
+                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
             if( log.id != details.id )
                 log.write( s );
             details.write( s );
@@ -331,7 +331,7 @@ export async function reimbursementWalletWithdraw(
             const s = strLogPrefix +
                 cc.fatal( "CRITICAL ERROR:" ) + cc.error( " Payment error in " +
                 strActionName + ": " ) + cc.error( strError ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n";
+                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
             if( log.id != details.id )
                 log.write( s );
             details.write( s );
@@ -421,7 +421,7 @@ export async function reimbursementSetRange(
             const strError = owaspUtils.extractErrorMessage( err );
             const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
                 cc.error( " Payment error in " + strActionName + ": " ) + cc.error( strError ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n";
+                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
             if( log.id != details.id )
                 log.write( s );
             details.write( s );

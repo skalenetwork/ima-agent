@@ -61,7 +61,7 @@ export async function getBalanceErc20(
             const strError = owaspUtils.extractErrorMessage( err );
             log.write( strLogPrefix + cc.fatal( "ERROR:" ) + " " +
                 cc.error( strError ) + cc.error( ", stack is: " ) + "\n" +
-                cc.stack( err.stack ) + "\n" );
+                cc.stack( err.stack ) );
         }
     }
     return "<no-data-or-error>";
@@ -96,7 +96,7 @@ export async function getOwnerOfErc721(
         if( log.verboseGet() >= log.verboseReversed().error ) {
             const strError = owaspUtils.extractErrorMessage( err );
             log.write( strLogPrefix + cc.fatal( "ERROR:" ) + " " + cc.error( strError ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
+                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) );
         }
     }
     return "<no-data-or-error>";
@@ -132,7 +132,7 @@ export async function getBalanceErc1155(
         if( log.verboseGet() >= log.verboseReversed().error ) {
             const strError = owaspUtils.extractErrorMessage( err );
             log.write( strLogPrefix + cc.fatal( "ERROR:" ) + " " + cc.error( strError ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
+                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) );
         }
     }
     return "<no-data-or-error>";
@@ -303,7 +303,7 @@ export async function doErc721PaymentFromMainNet(
             const s = strLogPrefix +
                 cc.fatal( "CRITICAL ERROR:" ) + cc.error( " Payment error in " +
                 strActionName + ": " ) + cc.error( strError ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n";
+                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
             if( log.id != details.id )
                 log.write( s );
             details.write( s );
@@ -483,7 +483,7 @@ export async function doErc20PaymentFromMainNet(
             const strError = owaspUtils.extractErrorMessage( err );
             const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
                 cc.error( " Payment error in " + strActionName + ": " ) + cc.error( strError ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n";
+                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
             if( log.id != details.id )
                 log.write( s );
             details.write( s );
@@ -657,7 +657,7 @@ export async function doErc1155PaymentFromMainNet(
             const strError = owaspUtils.extractErrorMessage( err );
             const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
                 cc.error( " Payment error in " + strActionName + ": " ) + cc.error( strError ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n";
+                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
             if( log.id != details.id )
                 log.write( s );
             details.write( s );
@@ -827,7 +827,7 @@ export async function doErc1155BatchPaymentFromMainNet(
             const strError = owaspUtils.extractErrorMessage( err );
             const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
                 cc.error( " Payment error in " + strActionName + ": " ) + cc.error( strError ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n";
+                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
             if( log.id != details.id )
                 log.write( s );
             details.write( s );
@@ -1007,7 +1007,7 @@ export async function doErc20PaymentFromSChain(
             const strError = owaspUtils.extractErrorMessage( err );
             const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
                 cc.error( " Payment error in " + strActionName + ": " ) + cc.error( strError ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n";
+                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
             if( log.id != details.id )
                 log.write( s );
             details.write( s );
@@ -1189,7 +1189,7 @@ export async function doErc721PaymentFromSChain(
             const strError = owaspUtils.extractErrorMessage( err );
             const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
                 cc.error( " Payment error in " + strActionName + ": " ) + cc.error( strError ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n";
+                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
             if( log.id != details.id )
                 log.write( s );
             details.write( s );
@@ -1374,7 +1374,7 @@ export async function doErc1155PaymentFromSChain(
             const strError = owaspUtils.extractErrorMessage( err );
             const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
                 cc.error( " Payment error in " + strActionName + ": " ) + cc.error( strError ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n";
+                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
             if( log.id != details.id )
                 log.write( s );
             details.write( s );
@@ -1560,7 +1560,7 @@ export async function doErc1155BatchPaymentFromSChain(
             const strError = owaspUtils.extractErrorMessage( err );
             const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
                 cc.error( " Payment error in " + strActionName + ": " ) + cc.error( strError ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n";
+                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
             if( log.id != details.id )
                 log.write( s );
             details.write( s );
@@ -1735,7 +1735,7 @@ export async function doErc20PaymentS2S(
             const strError = owaspUtils.extractErrorMessage( err );
             const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
                 cc.error( " Payment error in " + strActionName + ": " ) + cc.error( strError ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n";
+                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
             if( log.id != details.id )
                 log.write( s );
             details.write( s );
@@ -1911,7 +1911,7 @@ export async function doErc721PaymentS2S(
             const strError = owaspUtils.extractErrorMessage( err );
             const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
                 cc.error( " Payment error in " + strActionName + ": " ) + cc.error( strError ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n";
+                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
             if( log.id != details.id )
                 log.write( s );
             details.write( s );
@@ -2095,7 +2095,7 @@ export async function doErc1155PaymentS2S(
             const s = strLogPrefix +
                 cc.fatal( "CRITICAL ERROR:" ) + cc.error( " Payment error in " +
                 strActionName + ": " ) + cc.error( strError ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n";
+                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
             if( log.id != details.id )
                 log.write( s );
             details.write( s );
@@ -2279,7 +2279,7 @@ export async function doErc1155BatchPaymentS2S(
             const strError = owaspUtils.extractErrorMessage( err );
             const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
                 cc.error( " Payment error in " + strActionName + ": " ) + cc.error( strError ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n";
+                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
             if( log.id != details.id )
                 log.write( s );
             details.write( s );
@@ -2384,12 +2384,12 @@ export async function mintErc20(
                 log.write( strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
                     cc.error( " Error in mintErc20() during " + strActionName + ": " ) +
                     cc.error( strError ) + cc.error( ", stack is: " ) + "\n" +
-                    cc.stack( err.stack ) + "\n" );
+                    cc.stack( err.stack ) );
             }
             details.write( strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
                 cc.error( " Error in mintErc20() during " + strActionName + ": " ) +
                 cc.error( strError ) + cc.error( ", stack is: " ) + "\n" +
-                cc.stack( err.stack ) + "\n" );
+                cc.stack( err.stack ) );
         }
         details.exposeDetailsTo( log, "mintErc20()", false );
         details.close();
@@ -2483,12 +2483,12 @@ export async function mintErc721(
                 log.write( strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
                     cc.error( " Error in mintErc721() during " + strActionName + ": " ) +
                     cc.error( strError ) + cc.error( ", stack is: " ) + "\n" +
-                    cc.stack( err.stack ) + "\n" );
+                    cc.stack( err.stack ) );
             }
             details.write( strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
                 cc.error( " Error in mintErc721() during " + strActionName + ": " ) +
                 cc.error( strError ) + cc.error( ", stack is: " ) + "\n" +
-                cc.stack( err.stack ) + "\n" );
+                cc.stack( err.stack ) );
         }
         details.exposeDetailsTo( log, "mintErc721()", false );
         details.close();
@@ -2586,12 +2586,12 @@ export async function mintErc1155(
                 log.write( strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
                     cc.error( " Error in mintErc1155() during " + strActionName + ": " ) +
                     cc.error( strError ) + cc.error( ", stack is: " ) + "\n" +
-                    cc.stack( err.stack ) + "\n" );
+                    cc.stack( err.stack ) );
             }
             details.write( strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
                 cc.error( " Error in mintErc1155() during " + strActionName + ": " ) +
                 cc.error( strError ) + cc.error( ", stack is: " ) + "\n" +
-                cc.stack( err.stack ) + "\n" );
+                cc.stack( err.stack ) );
         }
         details.exposeDetailsTo( log, "mintErc1155()", false );
         details.close();
@@ -2684,12 +2684,12 @@ export async function burnErc20(
                 log.write( strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
                     cc.error( " Error in burnErc20() during " + strActionName + ": " ) +
                     cc.error( strError ) + cc.error( ", stack is: " ) + "\n" +
-                    cc.stack( err.stack ) + "\n" );
+                    cc.stack( err.stack ) );
             }
             details.write( strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
                 cc.error( " Error in burnErc20() during " + strActionName + ": " ) +
                     cc.error( strError ) + cc.error( ", stack is: " ) + "\n" +
-                    cc.stack( err.stack ) + "\n" );
+                    cc.stack( err.stack ) );
         }
         details.exposeDetailsTo( log, "burnErc20()", false );
         details.close();
@@ -2779,12 +2779,12 @@ export async function burnErc721(
                 log.write( strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
                     cc.error( " Error in burnErc721() during " + strActionName + ": " ) +
                     cc.error( strError ) + cc.error( ", stack is: " ) +
-                    "\n" + cc.stack( err.stack ) + "\n" );
+                    "\n" + cc.stack( err.stack ) );
             }
             details.write( strLogPrefix +
                 cc.fatal( "CRITICAL ERROR:" ) + cc.error( " Error in burnErc721() during " +
                 strActionName + ": " ) + cc.error( strError ) + cc.error( ", stack is: " ) +
-                "\n" + cc.stack( err.stack ) + "\n" );
+                "\n" + cc.stack( err.stack ) );
         }
         details.exposeDetailsTo( log, "burnErc721()", false );
         details.close();
@@ -2881,12 +2881,12 @@ export async function burnErc1155(
                 log.write( strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
                     cc.error( " Error in burnErc1155() during " + strActionName + ": " ) +
                     cc.error( strError ) + cc.error( ", stack is: " ) + "\n" +
-                    cc.stack( err.stack ) + "\n" );
+                    cc.stack( err.stack ) );
             }
             details.write( strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
                 cc.error( " Error in burnErc1155() during " + strActionName + ": " ) +
                 cc.error( strError ) + cc.error( ", stack is: " ) + "\n" +
-                cc.stack( err.stack ) + "\n" );
+                cc.stack( err.stack ) );
         }
         details.exposeDetailsTo( log, "burnErc1155()", false );
         details.close();

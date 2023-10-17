@@ -282,7 +282,7 @@ export function oracleGetGasPrice( oracleOpts, details ) {
                             cc.attention( "oracle_submitRequest" ) +
                             cc.error( " exception is: " ) +
                             cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                            cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
+                            cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) );
                     }
                     reject( err );
                 }
@@ -293,7 +293,7 @@ export function oracleGetGasPrice( oracleOpts, details ) {
                 details.write( cc.fatal( "CRITICAL ORACLE ERROR:" ) +
                     cc.error( " RPC call object creation failed, error is: " ) +
                     cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                    cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
+                    cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) );
             }
             reject( err );
             return;

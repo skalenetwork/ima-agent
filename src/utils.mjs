@@ -442,7 +442,7 @@ export function checkKeyExistInABI( strName, strFile, joABI, strKey, isExitOnErr
             log.write( cc.fatal( "FATAL, CRITICAL ERROR:" ) + cc.error( "Loaded " ) +
                 cc.warning( strName ) + cc.error( " ABI JSON file " ) + cc.info( strFile ) +
                 cc.error( " does not contain needed key " ) + cc.warning( strKey ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
+                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) );
         }
         process.exit( 126 );
     }

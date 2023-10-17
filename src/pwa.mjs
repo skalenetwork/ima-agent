@@ -184,7 +184,7 @@ export async function checkOnLoopStart( imaState, strLoopWorkType, nIndexS2S ) {
         if( log.verboseGet() >= log.verboseReversed().critical ) {
             log.write( cc.error( "Exception in PWA check on loop start: " ) +
                 cc.error( extractErrorMessage( err ) ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
+                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) );
         }
     }
     return true;
@@ -250,7 +250,7 @@ export async function handleLoopStateArrived(
                 cc.j( ( joNode && "pwaState" in joNode ) ? joNode.pwaState : "N/A" ) +
                 cc.error( ", arrived signature is " ) + cc.j( signature ) +
                 cc.error( ", error is: " ) + cc.error( extractErrorMessage( err ) ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
+                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) );
         }
     }
     return isSuccess;
@@ -344,7 +344,7 @@ async function notifyOnLoopImpl( imaState, strLoopWorkType, nIndexS2S, isStart )
         if( log.verboseGet() >= log.verboseReversed().error ) {
             log.write( cc.error( "Exception in PWA notify on loop " ) + cc.attention( se ) +
                 cc.error( ": " ) + cc.error( extractErrorMessage( err ) ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
+                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) );
         }
     }
     return true;

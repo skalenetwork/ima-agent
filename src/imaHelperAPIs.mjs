@@ -111,7 +111,7 @@ export async function safeGetBlockNumber(
                 cc.error( " to " ) + cc.note( strFnName + "()" ) + cc.error( " via " ) +
                 cc.u( u ) + cc.error( ", error is: " ) +
                 cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
+                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) );
         }
     }
     ++ idxAttempt;
@@ -144,7 +144,7 @@ export async function safeGetBlockNumber(
                     cc.error( " to " ) + cc.note( strFnName + "()" ) + cc.error( " via " ) +
                     cc.u( u ) + cc.error( ", error is: " ) +
                     cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                    cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
+                    cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) );
             }
         }
         ++ idxAttempt;

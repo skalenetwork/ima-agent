@@ -463,7 +463,7 @@ export async function payedCall(
                 optsPayedCall.strLogPrefix + cc.warning( "WARNING: " ) + " " +
                 cc.warning( "TX stats computation error " ) +
                 cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                cc.warning( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
+                cc.warning( ", stack is: " ) + "\n" + cc.stack( err.stack ) );
         }
     }
     return optsPayedCall.joReceipt;
@@ -549,7 +549,7 @@ export async function checkTransactionToSchain(
                 cc.fatal( "CRITICAL PoW-mining ERROR(checkTransactionToSchain):" ) + " " +
                 cc.error( "exception occur before PoW-mining, error is:" ) + " " +
                 cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
+                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) );
         }
     }
     return unsignedTx;
@@ -920,7 +920,7 @@ export class TransactionCustomizer {
                     cc.warning( strError ) +
                     cc.error( ", default recommended gas value " +
                         "will be used instead of estimated" ) +
-                    cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
+                    cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) );
             }
         }
         estimatedGas = owaspUtils.parseIntOrHex( owaspUtils.toBN( estimatedGas ).toString() );

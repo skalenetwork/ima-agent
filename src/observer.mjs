@@ -793,7 +793,7 @@ async function checkWhetherSChainIsConnected( strSChainName, joMessageProxySChai
                         cc.error( " to query connected state of " ) +
                         cc.info( strSChainName ) + cc.debug( " and S-Chain, got error: " ) +
                         cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                        cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
+                        cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) );
                 }
             }
         }
@@ -883,7 +883,7 @@ export async function loadSChainsConnectedOnly( strChainNameConnectedTo, opts ) 
                 if( log.verboseGet() >= log.verboseReversed().error ) {
                     opts.details.write( cc.error( "Got error: " ) +
                         cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                        cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
+                        cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) );
                 }
             }
         }
@@ -929,7 +929,7 @@ export async function checkConnectedSChains( strChainNameConnectedTo, arrSChains
                 if( log.verboseGet() >= log.verboseReversed().error ) {
                     opts.details.write( cc.error( "Got error: " ) +
                         cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                        cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
+                        cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) );
                 }
             }
         }
@@ -1358,7 +1358,7 @@ async function inThreadPeriodicCachingStart( strChainNameConnectedTo, opts ) {
             log.write( cc.error( "Failed to start in-thread periodic SNB refresh in " ) +
                 threadInfo.threadDescription() + cc.error( ", error is: " ) +
                 cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
+                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) );
         }
     }
     return false;
@@ -1422,7 +1422,7 @@ async function parallelPeriodicCachingStart( strChainNameConnectedTo, opts ) {
             log.write( cc.error( "Failed to start parallel periodic SNB refresh in " ) +
                 threadInfo.threadDescription() + cc.error( ", error is: " ) +
                 cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
+                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) );
         }
     }
     return false;
@@ -1470,7 +1470,7 @@ export async function periodicCachingStop() {
                 log.write( cc.error( "Failed to stop parallel periodic SNB refresh in " ) +
                     threadInfo.threadDescription() + cc.error( ", error is: " ) +
                     cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                    cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
+                    cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) );
             }
         }
     }
@@ -1487,7 +1487,7 @@ export async function periodicCachingStop() {
                 log.write( cc.error( "Failed to stop in-thread periodic SNB refresh in " ) +
                     threadInfo.threadDescription() + cc.error( ", error is: " ) +
                     cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                    cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
+                    cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) );
             }
             gIntervalPeriodicCaching = null; // clear it anyway
         }

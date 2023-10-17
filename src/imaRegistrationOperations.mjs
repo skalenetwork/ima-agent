@@ -132,7 +132,7 @@ export async function checkIsRegisteredSChainInDepositBoxes( // step 1
                 cc.error(
                     " Error in checkIsRegisteredSChainInDepositBoxes(reg-step1)() during " +
                 strActionName + ": " ) + cc.error( strError ) + cc.error( ", stack is: " ) +
-                "\n" + cc.stack( err.stack ) + "\n";
+                "\n" + cc.stack( err.stack );
             if( log.id != details.id )
                 log.write( s );
             details.write( s );
@@ -244,7 +244,7 @@ export async function registerSChainInDepositBoxes( // step 1
                 cc.error( " Error in registerSChainInDepositBoxes() during " +
                 strActionName + ": " ) +
                 cc.error( strError ) + cc.error( ", stack is: " ) +
-                "\n" + cc.stack( err.stack ) + "\n";
+                "\n" + cc.stack( err.stack );
             if( log.id != details.id )
                 log.write( s );
             details.write( s );
