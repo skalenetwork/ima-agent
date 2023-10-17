@@ -575,14 +575,11 @@ export async function calculatePowNumber( address, nonce, gas, details, strLogPr
         }
         return res;
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().critical ) {
-            details.write( strLogPrefix +
-                cc.fatal( "CRITICAL PoW-mining ERROR(calculatePowNumber):" ) + " " +
-                cc.error( "exception occur during PoW-mining, error is:" ) + " " +
-                cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) +
-                "\n" );
-        }
+        details.critical( strLogPrefix,
+            cc.fatal( "CRITICAL PoW-mining ERROR(calculatePowNumber):" ),
+            " exception occur during PoW-mining, error is: ",
+            cc.warning( owaspUtils.extractErrorMessage( err ) ),
+            ", stack is: ", "\n", cc.stack( err.stack ) );
         throw err;
     }
 }

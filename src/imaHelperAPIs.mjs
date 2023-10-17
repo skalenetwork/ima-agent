@@ -130,11 +130,8 @@ export async function safeGetBlockNumber(
         ++ idxAttempt;
     }
     if( ( idxAttempt + 1 ) > cntAttempts && ret === "" ) {
-        details.write( cc.fatal( "ERROR:" ) +
-            cc.error( " Failed call to " ) + cc.note( strFnName + "()" ) +
-            + cc.error( " via " ) + cc.u( u ) + cc.error( " after " ) +
-            cc.info( cntAttempts ) + cc.error( " attempts " ) +
-            "\n" );
+        details.error( cc.fatal( "ERROR:" ), " Failed call to ", cc.note( strFnName + "()" ),
+            " via ", cc.u( u ), " after ", cntAttempts, " attempts " );
         throw new Error( "Failed call to " + strFnName + "() via " +
         u.toString() + " after " + cntAttempts + " attempts" );
     }

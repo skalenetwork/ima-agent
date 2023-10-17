@@ -251,13 +251,11 @@ export function oracleGetGasPrice( oracleOpts, details ) {
                                 } );
                             } catch ( err ) {
                                 if( log.verboseGet() >= log.verboseReversed().critical ) {
-                                    details.write( cc.fatal( "CRITICAL ORACLE ERROR:" ) +
-                                        cc.error( " RPC call " ) +
-                                        cc.attention( "oracle_checkResult" ) +
-                                        cc.error( " exception is: " ) +
-                                        cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                                        cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) +
-                                        "\n" );
+                                    details.critical( cc.fatal( "CRITICAL ORACLE ERROR:" ),
+                                        " RPC call ", cc.attention( "oracle_checkResult" ),
+                                        " exception is: ",
+                                        cc.warning( owaspUtils.extractErrorMessage( err ) ),
+                                        ", stack is: ", "\n", cc.stack( err.stack ) );
                                 }
                                 reject( err );
                                 await joCall.disconnect();

@@ -121,13 +121,10 @@ export function jsonFileLoad( strPath, joDefault, bLogOutput ) {
         }
         return jo;
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().error ) {
-            const strError = owaspUtils.extractErrorMessage( err );
-            log.write( cc.fatal( "CRITICAL ERROR:" ) + cc.error( " failed to load JSON file " ) +
-                cc.info( strPath ) + cc.error( ": " ) +
-                cc.warning( strError ) + cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) +
-                "\n" );
-        }
+        const strError = owaspUtils.extractErrorMessage( err );
+        log.error( cc.fatal( "CRITICAL ERROR:" ), " failed to load JSON file ",
+            cc.info( strPath ), ": ", cc.warning( strError ) + ", stack is: ", "\n",
+            cc.stack( err.stack ) );
     }
     return joDefault;
 }
@@ -152,13 +149,10 @@ export function jsonFileSave( strPath, jo, bLogOutput ) {
         }
         return true;
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().error ) {
-            const strError = owaspUtils.extractErrorMessage( err );
-            log.write( cc.fatal( "CRITICAL ERROR:" ) + cc.error( " failed to save JSON file " ) +
-                cc.info( strPath ) + cc.error( ": " ) +
-                cc.warning( strError ) + cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) +
-                "\n" );
-        }
+        const strError = owaspUtils.extractErrorMessage( err );
+        log.error( cc.fatal( "CRITICAL ERROR:" ), " failed to save JSON file ",
+            cc.info( strPath ), ": ", cc.warning( strError ),
+            ", stack is: ", "\n", cc.stack( err.stack ) );
     }
     return false;
 }

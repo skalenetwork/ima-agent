@@ -90,10 +90,8 @@ export async function doConnect( joCall, opts, fn ) {
             } );
             joCall.wsConn.on( "error", async function( err ) {
                 strWsError = err.toString() || "internal web socket error";
-                if( log.verboseGet() >= log.verboseReversed().error ) {
-                    log.write( cc.u( joCall.url ) + cc.error( " web socket error: " ) +
-                        cc.warning( err.toString() ) + "\n" );
-                }
+                log.error( cc.u( joCall.url ), " web socket error: ",
+                    cc.warning( err.toString() ) );
                 const wsConn = joCall.wsConn;
                 joCall.wsConn = null;
                 wsConn.close();
@@ -101,10 +99,8 @@ export async function doConnect( joCall, opts, fn ) {
             } );
             joCall.wsConn.on( "fail", async function( err ) {
                 strWsError = err.toString() || "internal web socket failure";
-                if( log.verboseGet() >= log.verboseReversed().error ) {
-                    log.write( cc.u( joCall.url ) + cc.error( " web socket fail: " ) +
-                        cc.warning( err.toString() ) + "\n" );
-                }
+                log.error( cc.u( joCall.url ), " web socket fail: ",
+                    cc.warning( err.toString() ) );
                 const wsConn = joCall.wsConn;
                 joCall.wsConn = null;
                 wsConn.close();
@@ -128,19 +124,13 @@ export async function doConnect( joCall, opts, fn ) {
                 },
                 async function( nStep ) { // step handler
                     if( strWsError && typeof strWsError == "string" && strWsError.length > 0 ) {
-                        if( log.verboseGet() >= log.verboseReversed().error ) {
-                            log.write( cc.u( joCall.url ) +
-                            cc.error( " web socket wait error detected: " ) +
-                            cc.warning( strWsError ) + "\n" );
-                        }
+                        log.error( cc.u( joCall.url ), " web socket wait error detected: ",
+                            cc.warning( strWsError ) );
                         return false;
                     }
                     if( nStep >= gSecondsConnectionTimeout ) {
                         strWsError = "wait timeout, web socket is connecting too long";
-                        if( log.verboseGet() >= log.verboseReversed().error ) {
-                            log.write( cc.u( joCall.url ) +
-                                cc.error( " web socket wait timeout detected" ) + "\n" );
-                        }
+                        log.error( cc.u( joCall.url ), " web socket wait timeout detected" );
                         const wsConn = joCall.wsConn;
                         joCall.wsConn = null;
                         wsConn.close();
@@ -291,10 +281,7 @@ export async function doCall( joCall, joIn, fn ) {
                     } );
                 } );
                 req.on( "error", err => {
-                    if( log.verboseGet() >= log.verboseReversed().error ) {
-                        log.write( cc.u( joCall.url ) + cc.error( " REST error " ) +
-                            cc.warning( err.toString() ) + "\n" );
-                    }
+                    log.error( cc.u( joCall.url ), " REST error ", cc.warning( err.toString() ) );
                     joOut = null;
                     errCall = "RPC call error: " + err.toString();
                     reject( errCall );
@@ -328,19 +315,13 @@ export async function doCall( joCall, joIn, fn ) {
                 } );
                 const body = response.data.toString( "utf8" );
                 if( response && response.statusCode && response.statusCode !== 200 ) {
-                    if( log.verboseGet() >= log.verboseReversed().warning ) {
-                        log.write( cc.warning( "WARNING:" ) +
-                            cc.warning( " REST call status code is " ) +
-                            cc.info( response.statusCode ) + "\n" );
-                    }
+                    log.warning( cc.error( "WARNING:" ), " REST call status code is ",
+                        cc.info( response.statusCode ) );
                 }
                 joOut = JSON.parse( body );
                 errCall = null;
             } catch ( err ) {
-                if( log.verboseGet() >= log.verboseReversed().error ) {
-                    log.write( cc.u( joCall.url ) + cc.error( " request error " ) +
-                        cc.warning( err.toString() ) + "\n" );
-                }
+                log.error( cc.u( joCall.url ), " request error ", cc.warning( err.toString() ) );
                 joOut = null;
                 errCall = "request error: " + err.toString();
             }
