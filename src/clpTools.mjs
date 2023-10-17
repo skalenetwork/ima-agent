@@ -63,20 +63,16 @@ const gInfoRegistrationCost = {
 export async function registerStep1( isPrintSummaryRegistrationCosts ) {
     const imaState = state.get();
     imaCLI.initContracts();
-    const strLogPrefix = cc.info( "Reg 1:" ) + " ";
-    if( log.verboseGet() >= log.verboseReversed().information )
-        log.write( strLogPrefix + cc.debug( "Will check chain registration now..." ) + "\n" );
+    const strLogPrefix = cc.attention( "Reg 1:" ) + " ";
+    log.information( strLogPrefix, "Will check chain registration now..." );
     let bSuccess = await imaReg.checkIsRegisteredSChainInDepositBoxes( // step 1
         imaState.chainProperties.mn.ethersProvider,
         imaState.joLinker,
         imaState.chainProperties.mn.joAccount,
         imaState.chainProperties.sc.strChainName
     );
-    if( log.verboseGet() >= log.verboseReversed().information ) {
-        log.write( strLogPrefix + cc.debug( "Chain is " ) +
-            ( bSuccess ? cc.success( "already registered" ) : cc.warning( "not registered yet" ) ) +
-            "\n" );
-    }
+    log.information( strLogPrefix, "Chain is ",
+        ( bSuccess ? cc.success( "already registered" ) : cc.warning( "not registered yet" ) ) );
     if( bSuccess )
         return true;
     const jarrReceipts =
@@ -96,11 +92,8 @@ export async function registerStep1( isPrintSummaryRegistrationCosts ) {
             imaState.chainProperties.mn.transactionCustomizer //,
         );
     bSuccess = ( jarrReceipts != null && jarrReceipts.length > 0 ) ? true : false;
-    if( log.verboseGet() >= log.verboseReversed().information ) {
-        log.write( strLogPrefix + cc.debug( "Chain was " ) +
-            ( bSuccess ? cc.success( "registered successfully" ) : cc.error( "not registered" ) ) +
-            "\n" );
-    }
+    log.information( strLogPrefix, "Chain was ",
+        ( bSuccess ? cc.success( "registered successfully" ) : cc.error( "not registered" ) ) );
     if( bSuccess ) {
         gInfoRegistrationCost.mn =
             gInfoRegistrationCost.mn.concat( gInfoRegistrationCost.mn, jarrReceipts );
@@ -109,11 +102,9 @@ export async function registerStep1( isPrintSummaryRegistrationCosts ) {
         clpTools.printSummaryRegistrationCosts();
     if( !bSuccess ) {
         const nRetCode = 163;
-        if( log.verboseGet() >= log.verboseReversed().fatal ) {
-            log.write( strLogPrefix + cc.fatal( "FATAL, CRITICAL ERROR:" ) +
-                cc.error( " failed to register S-Chain in deposit box, will return code " ) +
-                cc.warning( nRetCode ) + "\n" );
-        }
+        log.fatal( strLogPrefix, cc.fatal( "FATAL, CRITICAL ERROR:" ),
+            " failed to register S-Chain in deposit box, will return code ",
+            cc.warning( nRetCode ) );
         process.exit( nRetCode );
     }
     return true;
@@ -172,7 +163,7 @@ export function commandLineTaskCheckRegistration() {
             const b = await checkRegistrationAll();
             // nExitCode is: 0 - OKay - registered; non-zero -  not registered or error
             const nExitCode = b ? 0 : 150;
-            log.write( cc.notice( "Exiting with code " ) + cc.info( nExitCode ) + "\n" );
+            log.notice( "Exiting with code ", nExitCode );
             process.exit( nExitCode );
         }
     } );
@@ -188,7 +179,7 @@ export function commandLineTaskCheckRegistration1() {
             const b = await checkRegistrationStep1();
             // nExitCode is: 0 - OKay - registered; non-zero -  not registered or error
             const nExitCode = b ? 0 : 152;
-            log.write( cc.notice( "Exiting with code " ) + cc.info( nExitCode ) + "\n" );
+            log.notice( "Exiting with code ", nExitCode );
             process.exit( nExitCode );
         }
     } );
@@ -713,39 +704,39 @@ export function commandLineTaskShowBalance() {
             if( arrBalancesMN.length > 0 || arrBalancesSC.length > 0 || arrBalancesTC.length > 0 ) {
                 if( arrBalancesMN.length > 0 ) {
                     const strAddress = imaState.chainProperties.mn.joAccount.address();
-                    log.write( cc.sunny( "Main Net" ) + " " +
-                        cc.bright( arrBalancesMN.length > 1 ? "balances" : "balance" ) +
-                        cc.bright( " of " ) + cc.notice( strAddress ) + cc.bright( ":" ) + "\n" );
+                    log.information( cc.sunny( "Main Net" ), " ",
+                        ( arrBalancesMN.length > 1 ? "balances" : "balance" ),
+                        " of ", cc.notice( strAddress ), ":" );
                     for( let i = 0; i < arrBalancesMN.length; ++ i ) {
                         const bi = arrBalancesMN[i];
-                        log.write( "    " + discoveryTools.formatBalanceInfo( bi, strAddress ) +
-                        "\n" );
+                        log.information( "    ",
+                            discoveryTools.formatBalanceInfo( bi, strAddress ) );
                     }
                 }
                 if( arrBalancesSC.length > 0 ) {
                     const strAddress = imaState.chainProperties.sc.joAccount.address();
-                    log.write( cc.sunny( "S-Chain" ) + " " +
-                        cc.bright( arrBalancesMN.length > 1 ? "balances" : "balance" ) +
-                        cc.bright( " of " ) + cc.notice( strAddress ) + cc.bright( ":" ) + "\n" );
+                    log.information( cc.sunny( "S-Chain" ), " ",
+                        ( arrBalancesMN.length > 1 ? "balances" : "balance" ),
+                        " of ", cc.notice( strAddress ), ":" );
                     for( let i = 0; i < arrBalancesSC.length; ++ i ) {
                         const bi = arrBalancesSC[i];
-                        log.write( "    " + discoveryTools.formatBalanceInfo( bi, strAddress ) +
-                        "\n" );
+                        log.information( "    ",
+                            discoveryTools.formatBalanceInfo( bi, strAddress ) );
                     }
                 }
                 if( arrBalancesTC.length > 0 ) {
                     const strAddress = imaState.chainProperties.mn.joAccount.address();
-                    log.write( cc.sunny( "Target S-Chain" ) + " " +
-                        cc.bright( arrBalancesTC.length > 1 ? "balances" : "balance" ) +
-                        cc.bright( " of " ) + cc.notice( strAddress ) + cc.bright( ":" ) + "\n" );
+                    log.information( cc.sunny( "Target S-Chain" ), " ",
+                        ( arrBalancesTC.length > 1 ? "balances" : "balance" ),
+                        " of ", cc.notice( strAddress ), ":" );
                     for( let i = 0; i < arrBalancesTC.length; ++ i ) {
                         const bi = arrBalancesTC[i];
-                        log.write( "    " + discoveryTools.formatBalanceInfo( bi, strAddress ) +
-                        "\n" );
+                        log.information( "    ",
+                            discoveryTools.formatBalanceInfo( bi, strAddress ) );
                     }
                 }
             } else
-                log.write( cc.warning( "No balances to scan." ) );
+                log.warning( "No balances to scan." );
             return true;
         }
     } );
@@ -758,10 +749,8 @@ export function commandLineTaskPaymentM2S() {
         "fn": async function() {
             if( imaState.chainProperties.mn.strCoinNameErc721.length > 0 ) {
                 // ERC721 payment
-                if( log.verboseGet() >= log.verboseReversed().information ) {
-                    log.write( cc.info( "one M->S single ERC721 payment: " ) +
-                        cc.sunny( imaState.idToken ) + "\n" );
-                }
+                log.information( "one M->S single ERC721 payment: ",
+                    cc.sunny( imaState.idToken ) );
                 return await imaToken.doErc721PaymentFromMainNet(
                     imaState.chainProperties.mn.ethersProvider,
                     imaState.chainProperties.sc.ethersProvider,
@@ -788,10 +777,8 @@ export function commandLineTaskPaymentM2S() {
             }
             if( imaState.chainProperties.tc.strCoinNameErc20.length > 0 ) {
                 // ERC20 payment
-                if( log.verboseGet() >= log.verboseReversed().information ) {
-                    log.write( cc.info( "one M->S single ERC20 payment: " ) +
-                        cc.sunny( imaState.nAmountOfToken ) + "\n" );
-                }
+                log.information( "one M->S single ERC20 payment: ",
+                    cc.sunny( imaState.nAmountOfToken ) );
                 return await imaToken.doErc20PaymentFromMainNet(
                     imaState.chainProperties.mn.ethersProvider,
                     imaState.chainProperties.sc.ethersProvider,
@@ -828,11 +815,9 @@ export function commandLineTaskPaymentM2S() {
                     imaState.arrAmountsOfTokens === undefined )
             ) {
                 // ERC1155 payment
-                if( log.verboseGet() >= log.verboseReversed().information ) {
-                    log.write( cc.info( "one M->S single ERC1155 payment: " ) +
-                        cc.sunny( imaState.idToken ) + " " +
-                        cc.sunny( imaState.nAmountOfToken ) + "\n" );
-                }
+                log.information( "one M->S single ERC1155 payment: ",
+                    cc.sunny( imaState.idToken ), " ",
+                    cc.sunny( imaState.nAmountOfToken ) );
                 return await imaToken.doErc1155PaymentFromMainNet(
                     imaState.chainProperties.mn.ethersProvider,
                     imaState.chainProperties.sc.ethersProvider,
@@ -870,11 +855,9 @@ export function commandLineTaskPaymentM2S() {
                     imaState.nAmountOfToken === undefined )
             ) {
                 // ERC1155 Batch payment
-                if( log.verboseGet() >= log.verboseReversed().information ) {
-                    log.write( cc.info( "one M->S single ERC1155 Batch payment: " ) +
-                        cc.sunny( imaState.idTokens ) + " " +
-                        cc.sunny( imaState.arrAmountsOfTokens ) + "\n" );
-                }
+                log.information( "one M->S single ERC1155 Batch payment: ",
+                    cc.sunny( imaState.idTokens ), " ",
+                    cc.sunny( imaState.arrAmountsOfTokens ) );
                 return await imaToken.doErc1155BatchPaymentFromMainNet(
                     imaState.chainProperties.mn.ethersProvider,
                     imaState.chainProperties.sc.ethersProvider,
@@ -897,10 +880,8 @@ export function commandLineTaskPaymentM2S() {
                 );
             }
             // ETH payment
-            if( log.verboseGet() >= log.verboseReversed().information ) {
-                log.write( cc.info( "one M->S single ETH payment: " ) +
-                    cc.sunny( imaState.nAmountOfWei ) + "\n" );
-            }
+            log.information( "one M->S single ETH payment: ",
+                cc.sunny( imaState.nAmountOfWei ) );
             return await imaEth.doEthPaymentFromMainNet(
                 imaState.chainProperties.mn.ethersProvider,
                 imaState.chainProperties.mn.chainId,
@@ -923,10 +904,8 @@ export function commandLineTaskPaymentS2M() {
         "fn": async function() {
             if( imaState.chainProperties.sc.strCoinNameErc721.length > 0 ) {
                 // ERC721 payment
-                if( log.verboseGet() >= log.verboseReversed().information ) {
-                    log.write( cc.info( "one S->M single ERC721 payment: " ) +
-                        cc.sunny( imaState.idToken ) + "\n" );
-                }
+                log.information( "one S->M single ERC721 payment: ",
+                    cc.sunny( imaState.idToken ) );
                 return await imaToken.doErc721PaymentFromSChain(
                     imaState.chainProperties.mn.ethersProvider,
                     imaState.chainProperties.sc.ethersProvider,
@@ -952,10 +931,8 @@ export function commandLineTaskPaymentS2M() {
             }
             if( imaState.chainProperties.sc.strCoinNameErc20.length > 0 ) {
                 // ERC20 payment
-                if( log.verboseGet() >= log.verboseReversed().information ) {
-                    log.write( cc.info( "one S->M single ERC20 payment: " ) +
-                        cc.sunny( imaState.nAmountOfToken ) + "\n" );
-                }
+                log.information( "one S->M single ERC20 payment: ",
+                    cc.sunny( imaState.nAmountOfToken ) );
                 return await imaToken.doErc20PaymentFromSChain(
                     imaState.chainProperties.mn.ethersProvider,
                     imaState.chainProperties.sc.ethersProvider,
@@ -991,11 +968,9 @@ export function commandLineTaskPaymentS2M() {
                     imaState.arrAmountsOfTokens === undefined )
             ) {
                 // ERC1155 payment
-                if( log.verboseGet() >= log.verboseReversed().information ) {
-                    log.write( cc.info( "one S->M single ERC1155 payment: " ) +
-                        cc.sunny( imaState.idToken ) + " " +
-                        cc.sunny( imaState.nAmountOfToken ) + "\n" );
-                }
+                log.information( "one S->M single ERC1155 payment: ",
+                    cc.sunny( imaState.idToken ), " ",
+                    cc.sunny( imaState.nAmountOfToken ) );
                 return await imaToken.doErc1155PaymentFromSChain(
                     imaState.chainProperties.mn.ethersProvider,
                     imaState.chainProperties.sc.ethersProvider,
@@ -1032,11 +1007,9 @@ export function commandLineTaskPaymentS2M() {
                     imaState.nAmountOfToken === undefined )
             ) {
                 // ERC1155 payment
-                if( log.verboseGet() >= log.verboseReversed().information ) {
-                    log.write( cc.info( "one S->M single ERC1155 payment: " ) +
-                        cc.sunny( imaState.idTokens ) + " " +
-                        cc.sunny( imaState.arrAmountsOfTokens ) + "\n" );
-                }
+                log.information( "one S->M single ERC1155 payment: ",
+                    cc.sunny( imaState.idTokens ), " ",
+                    cc.sunny( imaState.arrAmountsOfTokens ) );
                 return await imaToken.doErc1155BatchPaymentFromSChain(
                     imaState.chainProperties.mn.ethersProvider,
                     imaState.chainProperties.sc.ethersProvider,
@@ -1058,10 +1031,8 @@ export function commandLineTaskPaymentS2M() {
                 );
             }
             // ETH payment
-            if( log.verboseGet() >= log.verboseReversed().information ) {
-                log.write( cc.info( "one S->M single ETH payment: " ) +
-                    cc.sunny( imaState.nAmountOfWei ) + "\n" );
-            }
+            log.information( "one S->M single ETH payment: ",
+                cc.sunny( imaState.nAmountOfWei ) );
             return await imaEth.doEthPaymentFromSChain(
                 imaState.chainProperties.sc.ethersProvider,
                 imaState.chainProperties.sc.chainId,
@@ -1133,10 +1104,8 @@ export function commandLineTaskPaymentS2S() {
             const tx_customizer = isForward ? sc.transactionCustomizer : tc.transactionCustomizer;
             if( strCoinNameErc721Src.length > 0 ) {
                 // ERC721 payment
-                if( log.verboseGet() >= log.verboseReversed().information ) {
-                    log.write( cc.info( "one S->S single ERC721 payment: " ) +
-                        cc.sunny( imaState.idToken ) + "\n" );
-                }
+                log.information( "one S->S single ERC721 payment: ",
+                    cc.sunny( imaState.idToken ) );
                 return await imaToken.doErc721PaymentS2S(
                     isForward,
                     ethersProviderSrc,
@@ -1154,10 +1123,8 @@ export function commandLineTaskPaymentS2S() {
             }
             if( strCoinNameErc20Src.length > 0 ) {
                 // ERC20 payment
-                if( log.verboseGet() >= log.verboseReversed().information ) {
-                    log.write( cc.info( "one S->S single ERC20 payment: " ) +
-                        cc.sunny( imaState.nAmountOfToken ) + "\n" );
-                }
+                log.information( "one S->S single ERC20 payment: ",
+                    cc.sunny( imaState.nAmountOfToken ) );
                 return await imaToken.doErc20PaymentS2S(
                     isForward,
                     ethersProviderSrc,
@@ -1189,11 +1156,9 @@ export function commandLineTaskPaymentS2S() {
                     imaState.arrAmountsOfTokens === undefined )
             ) {
                 // ERC1155 payment
-                if( log.verboseGet() >= log.verboseReversed().information ) {
-                    log.write( cc.info( "one S->S single ERC1155 payment: " ) +
-                        cc.sunny( imaState.idToken ) + " " +
-                        cc.sunny( imaState.nAmountOfToken ) + "\n" );
-                }
+                log.information( "one S->S single ERC1155 payment: ",
+                    cc.sunny( imaState.idToken ), " ",
+                    cc.sunny( imaState.nAmountOfToken ) );
                 return await imaToken.doErc1155PaymentS2S(
                     isForward,
                     ethersProviderSrc,
@@ -1226,11 +1191,9 @@ export function commandLineTaskPaymentS2S() {
                     imaState.nAmountOfToken === undefined )
             ) {
                 // ERC1155 Batch payment
-                if( log.verboseGet() >= log.verboseReversed().information ) {
-                    log.write( cc.info( "one S->S single ERC1155 Batch payment: " ) +
-                        cc.sunny( imaState.idTokens ) + " " +
-                        cc.sunny( imaState.arrAmountsOfTokens ) + "\n" );
-                }
+                log.information( "one S->S single ERC1155 Batch payment: ",
+                    cc.sunny( imaState.idTokens ), " ",
+                    cc.sunny( imaState.arrAmountsOfTokens ) );
                 return await imaToken.doErc1155BatchPaymentS2S(
                     isForward,
                     ethersProviderSrc,
@@ -1248,14 +1211,10 @@ export function commandLineTaskPaymentS2S() {
                 );
             }
             // ETH payment
-            if( log.verboseGet() >= log.verboseReversed().information ) {
-                log.write( cc.info( "one S->S single ETH payment: " ) +
-                    cc.sunny( imaState.nAmountOfWei ) + "\n" );
-            }
-            if( log.verboseGet() >= log.verboseReversed().fatal ) {
-                lop.write( cc.fatal( "CRITICAL ERROR:" ) +
-                    cc.error( " S->S ETH payment(s) are neither supported nor allowed" ) + "\n" );
-            }
+            log.information( "one S->S single ETH payment: ",
+                cc.sunny( imaState.nAmountOfWei ) );
+            lop.fatal( cc.fatal( "CRITICAL ERROR:" ),
+                " S->S ETH payment(s) are neither supported nor allowed" );
             process.exit( 154 );
         }
     } );
@@ -1266,8 +1225,7 @@ export function commandLineTaskReceiveS2M() {
     imaState.arrActions.push( {
         "name": "receive one S->M single ETH payment",
         "fn": async function() {
-            if( log.verboseGet() >= log.verboseReversed().information )
-                log.write( cc.info( "receive one S->M single ETH payment: " ) + "\n" );
+            log.information( "receive one S->M single ETH payment: " );
             return await imaEth.receiveEthPaymentFromSchainOnMainNet(
                 imaState.chainProperties.mn.ethersProvider,
                 imaState.chainProperties.mn.chainId,
@@ -1284,8 +1242,7 @@ export function commandLineTaskViewS2M() {
     imaState.arrActions.push( {
         "name": "view one S->M single ETH payment",
         "fn": async function() {
-            if( log.verboseGet() >= log.verboseReversed().information )
-                log.write( cc.info( "view one S->M single ETH payment: " ) + "\n" );
+            log.information( "view one S->M single ETH payment: " );
             const xWei = await imaEth.viewEthPaymentFromSchainOnMainNet(
                 imaState.chainProperties.mn.ethersProvider,
                 imaState.chainProperties.mn.joAccount,
@@ -1295,8 +1252,8 @@ export function commandLineTaskViewS2M() {
                 return false;
             const xEth =
                 owaspUtils.ethersMod.ethers.utils.formatEther( owaspUtils.toBN( xWei ) );
-            log.write( cc.success( "Main-net user can receive: " ) + cc.attention( xWei ) +
-                cc.success( " wei = " ) + cc.attention( xEth ) + cc.success( " eth" ) + "\n" );
+            log.success( "Main-net user can receive: ", cc.attention( xWei ),
+                " wei = ", cc.attention( xEth ), " eth" );
             return true;
         }
     } );
@@ -1517,28 +1474,19 @@ export function commandLineTaskBrowseSChain() {
         "fn": async function() {
             const strLogPrefix = cc.info( "S-Chain Browse:" ) + " ";
             if( imaState.chainProperties.sc.strURL.length === 0 ) {
-                if( log.verboseGet() >= log.verboseReversed().fatal ) {
-                    log.write( cc.fatal( "CRITICAL ERROR:" ) +
-                        cc.error( " missing S-Chain URL, please specify " ) +
-                        cc.info( "url-s-chain" ) + "\n" );
-                }
+                log.fatal( cc.fatal( "CRITICAL ERROR:" ), " missing S-Chain URL, please specify ",
+                    cc.info( "url-s-chain" ) );
                 process.exit( 155 );
             }
-            if( log.verboseGet() >= log.verboseReversed().information ) {
-                log.write( strLogPrefix +
-                    cc.normal( "Downloading S-Chain network information " ) +
-                    cc.normal( "..." ) + "\n" );
-            }
+            log.information( strLogPrefix, "Downloading S-Chain network information ..." );
             const rpcCallOpts = null;
             await rpcCall.create(
                 imaState.chainProperties.sc.strURL,
                 rpcCallOpts,
                 async function( joCall, err ) {
                     if( err ) {
-                        if( log.verboseGet() >= log.verboseReversed().fatal ) {
-                            log.write( cc.fatal( "CRITICAL ERROR:" ) +
-                                cc.error( " JSON RPC call to S-Chain failed" ) + "\n" );
-                        }
+                        log.fatal( cc.fatal( "CRITICAL ERROR:" ),
+                            " JSON RPC call to S-Chain failed" );
                         if( joCall )
                             await joCall.disconnect();
                         process.exit( 156 );
@@ -1552,27 +1500,21 @@ export function commandLineTaskBrowseSChain() {
                     await joCall.call( joDataIn, async function( joIn, joOut, err ) {
                         if( err ) {
                             const strError = owaspUtils.extractErrorMessage( err );
-                            if( log.verboseGet() >= log.verboseReversed().fatal ) {
-                                log.write( cc.fatal( "CRITICAL ERROR:" ) +
-                                    cc.error( " JSON RPC call to S-Chain failed, error: " ) +
-                                    cc.warning( strError ) + "\n" );
-                            }
+                            log.fatal( cc.fatal( "CRITICAL ERROR:" ),
+                                " JSON RPC call to S-Chain failed, error: ",
+                                cc.warning( strError ) );
                             await joCall.disconnect();
                             process.exit( 157 );
                         }
-                        log.write( strLogPrefix + cc.normal( "S-Chain network information: " ) +
-                            cc.j( joOut.result ) + "\n" );
+                        log.information( strLogPrefix, "S-Chain network information: "
+                            .cc.j( joOut.result ) );
                         let nCountReceivedImaDescriptions = 0;
                         const jarrNodes = joOut.result.network;
                         for( let i = 0; i < jarrNodes.length; ++ i ) {
                             const joNode = jarrNodes[i];
                             if( ! joNode ) {
-                                if( log.verboseGet() >= log.verboseReversed().critical ) {
-                                    log.write( strLogPrefix + cc.error( "Discovery node " ) +
-                                        cc.info( i ) +
-                                        cc.error( " is completely unknown and will be skipped" ) +
-                                        "\n" );
-                                }
+                                log.critical( strLogPrefix, "Discovery node ", i,
+                                    " is completely unknown and will be skipped" );
                                 continue;
                             }
                             const strNodeURL = imaUtils.composeSChainNodeUrl( joNode );
@@ -1582,11 +1524,8 @@ export function commandLineTaskBrowseSChain() {
                                 rpcCallOpts,
                                 async function( joCall, err ) {
                                     if( err ) {
-                                        if( log.verboseGet() >= log.verboseReversed().fatal ) {
-                                            log.write( cc.fatal( "CRITICAL ERROR:" ) +
-                                                cc.error( " JSON RPC call to S-Chain failed" ) +
-                                                "\n" );
-                                        }
+                                        log.fatal( cc.fatal( "CRITICAL ERROR:" ),
+                                            " JSON RPC call to S-Chain failed" );
                                         await joCall.disconnect();
                                         process.exit( 158 );
                                     }
@@ -1600,19 +1539,15 @@ export function commandLineTaskBrowseSChain() {
                                         joIn, joOut, err ) {
                                         ++ nCountReceivedImaDescriptions;
                                         if( err ) {
-                                            if( log.verboseGet() >= log.verboseReversed().fatal ) {
-                                                const strError =
-                                                    owaspUtils.extractErrorMessage( err );
-                                                log.write( cc.fatal( "CRITICAL ERROR:" ) +
-                                                    cc.error( " JSON RPC call to S-Chain failed, " +
-                                                    "error: " ) + cc.warning( strError ) + "\n" );
-                                            }
+                                            const strError = owaspUtils.extractErrorMessage( err );
+                                            log.fatal( cc.fatal( "CRITICAL ERROR:" ),
+                                                " JSON RPC call to S-Chain failed,error: ",
+                                                cc.warning( strError ) );
                                             process.exit( 159 );
                                         }
-                                        log.write( strLogPrefix +
-                                            cc.normal( "Node " ) + cc.info( joNode.nodeID ) +
-                                            cc.normal( " IMA information: " ) +
-                                            cc.j( joOut.result ) + "\n" );
+                                        log.information( strLogPrefix, "Node ",
+                                            cc.info( joNode.nodeID ), " IMA information: ",
+                                            cc.j( joOut.result ) );
                                         await joCall.disconnect();
                                     } );
                                 } );
@@ -1638,17 +1573,12 @@ export function commandLineTaskBrowseSkaleNetwork() {
         "fn": async function() {
             const strLogPrefix = cc.info( "SKALE NETWORK Browse:" ) + " ";
             if( imaState.strPathAbiJsonSkaleManager.length === 0 ) {
-                if( log.verboseGet() >= log.verboseReversed().fatal ) {
-                    log.write( cc.fatal( "CRITICAL ERROR:" ) +
-                        cc.error( " missing Skale Manager ABI, please specify " ) +
-                        cc.info( "abi-skale-manager" ) + "\n" );
-                }
+                log.fatal( cc.fatal( "CRITICAL ERROR:" ),
+                    " missing Skale Manager ABI, please specify ",
+                    cc.info( "abi-skale-manager" ) );
                 process.exit( 160 );
             }
-            if( log.verboseGet() >= log.verboseReversed().information ) {
-                log.write( strLogPrefix +
-                    cc.debug( "Downloading SKALE network information..." ) + "\n" );
-            }
+            log.information( strLogPrefix, "Downloading SKALE network information..." );
             const opts = {
                 imaState: imaState,
                 "details": log,
@@ -1657,9 +1587,8 @@ export function commandLineTaskBrowseSkaleNetwork() {
             };
             const arrSChains = await skaleObserver.loadSChainsDefault( opts );
             const cnt = arrSChains.length;
-            log.write( strLogPrefix + cc.normal( "Got " ) + cc.info( cnt ) +
-                cc.normal( " S-Chains(s) in SKALE NETWORK information: " ) +
-                cc.j( arrSChains ) + "\n" );
+            log.information( strLogPrefix, "Got ", cnt,
+                " S-Chains(s) in SKALE NETWORK information: ", cc.j( arrSChains ) );
             return true;
         }
     } );
@@ -1672,17 +1601,12 @@ export function commandLineTaskBrowseConnectedSChains() {
         "fn": async function() {
             const strLogPrefix = cc.info( "Browse connected S-Chains:" ) + " ";
             if( imaState.strPathAbiJsonSkaleManager.length === 0 ) {
-                if( log.verboseGet() >= log.verboseReversed().fatal ) {
-                    log.write( cc.fatal( "CRITICAL ERROR:" ) +
-                        cc.error( " missing Skale Manager ABI, please specify " ) +
-                        cc.info( "abi-skale-manager" ) + "\n" );
-                }
+                log.fatal( cc.fatal( "CRITICAL ERROR:" ),
+                    " missing Skale Manager ABI, please specify ",
+                    cc.info( "abi-skale-manager" ) );
                 process.exit( 161 );
             }
-            if( log.verboseGet() >= log.verboseReversed().information ) {
-                log.write( strLogPrefix +
-                    cc.debug( "Downloading SKALE network information..." ) + "\n" );
-            }
+            log.information( strLogPrefix, "Downloading SKALE network information..." );
             const opts = {
                 "imaState": imaState,
                 "details": log,
@@ -1692,8 +1616,8 @@ export function commandLineTaskBrowseConnectedSChains() {
             const arrSChainsCached = await skaleObserver.loadSChainsConnectedOnly(
                 imaState.chainProperties.sc.strChainName, opts );
             const cnt = arrSChainsCached.length;
-            log.write( strLogPrefix + cc.normal( "Got " ) + cc.info( cnt ) +
-                cc.normal( " connected S-Chain(s): " ) + cc.j( arrSChainsCached ) + "\n" );
+            log.information( strLogPrefix, "Got ", cnt, " connected S-Chain(s): ",
+                cc.j( arrSChainsCached ) );
             return true;
         }
     } );
@@ -1743,13 +1667,10 @@ export function commandLineTaskDiscoverChainId() {
                 } );
             }
             if( arrURLsToDiscover.length === 0 ) {
-                if( log.verboseGet() >= log.verboseReversed().fatal ) {
-                    log.write( cc.fatal( "CRITICAL ERROR:" ) +
-                        cc.error( " no URLs provided to discover chain IDs, please specify " ) +
-                        cc.warning( "--url-main-net" ) + cc.error( " and/or " ) +
-                        cc.warning( "--url-s-chain" ) + cc.error( " and/or " ) +
-                        cc.warning( "--url-t-chain" ) + cc.error( "." ) + "\n" );
-                }
+                log.fatal( cc.fatal( "CRITICAL ERROR:" ),
+                    " no URLs provided to discover chain IDs, please specify ",
+                    cc.warning( "--url-main-net" )," and/or ", cc.warning( "--url-s-chain" ),
+                    " and/or ", cc.warning( "--url-t-chain" ), "." );
                 process.exit( 162 );
             }
             for( let i = 0; i < arrURLsToDiscover.length; ++ i ) {
@@ -1757,20 +1678,16 @@ export function commandLineTaskDiscoverChainId() {
                 const chainId = await
                 skaleObserver.discoverChainId( joDiscoverEntry.strURL );
                 if( chainId === null ) {
-                    if( log.verboseGet() >= log.verboseReversed().error ) {
-                        log.write( strLogPrefix + cc.error( "Failed to detect " ) +
-                            cc.note( joDiscoverEntry.name ) + " " + cc.attention( "chain ID" ) +
-                            "\n" );
-                    }
+                    log.error( strLogPrefix, "Failed to detect ",
+                        cc.note( joDiscoverEntry.name ), " ", cc.attention( "chain ID" ) );
                 } else {
                     const cid16 =
                         owaspUtils.ensureStartsWith0x(
                             owaspUtils.toBN( chainId ).toHexString() );
                     const cid10 = "" + owaspUtils.toBN( chainId ).toString();
-                    log.write( strLogPrefix + cc.normal( "Got " ) +
-                        cc.note( joDiscoverEntry.name ) + " " + cc.attention( "chain ID" ) +
-                        cc.normal( "=" ) + cc.note( cid16 ) + cc.normal( "=" ) + cc.note( cid10 ) +
-                        cc.normal( " from URL " ) + cc.u( joDiscoverEntry.strURL ) + "\n" );
+                    log.information( strLogPrefix, "Got ", cc.note( joDiscoverEntry.name ), " ",
+                        cc.attention( "chain ID" ), "=", cc.note( cid16 ), "=", cc.note( cid10 ),
+                        " from URL ", cc.u( joDiscoverEntry.strURL ) );
                     joDiscoverEntry.fnSave( chainId );
                 }
             }
