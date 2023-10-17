@@ -360,7 +360,7 @@ export async function loadSChain( idxSChain, hash, joData, cntSChains, opts ) {
         if( log.verboseGet() >= log.verboseReversed().trace ) {
             opts.details.write( cc.debug( "Loading S-Chain " ) + cc.notice( "#" ) +
                 cc.info( idxSChain + 1 ) + cc.debug( " of " ) + cc.info( cntSChains ) +
-                cc.debug( " in " ) + threadInfo.threadDescription() + cc.debug( "..." ) + "\n" );
+                cc.debug( " in " ) + threadInfo.threadDescription(), "..." );
         }
     }
     hash = hash || await opts.imaState.joSChainsInternal.callStatic.schainsAtSystem( idxSChain );
@@ -417,7 +417,7 @@ export async function loadSChainsWithEMC( opts ) {
         if( log.verboseGet() >= log.verboseReversed().trace ) {
             opts.details.write( cc.debug( "Have " ) + cc.info( cntSChains ) +
                 cc.debug( " S-Chain(s) to EMC-load in " ) +
-                threadInfo.threadDescription() + cc.debug( "..." ) + "\n" );
+                threadInfo.threadDescription(), "..." );
         }
     }
     const isLoadConnectedOnly = ( "isLoadConnectedOnly" in opts )
@@ -604,7 +604,7 @@ export async function loadSChainsOptimal( opts ) {
         if( log.verboseGet() >= log.verboseReversed().trace ) {
             opts.details.write( cc.debug( "Have " ) + cc.info( cntSChains ) +
                 cc.debug( " un-filtered S-Chain(s) to optimal-load in " ) +
-                threadInfo.threadDescription() + cc.debug( "..." ) + "\n" );
+                threadInfo.threadDescription(), "..." );
         }
     }
     const joMessageProxySChain = isLoadConnectedOnly
@@ -718,7 +718,7 @@ export async function loadCachedSChainsSimplified( opts ) {
     if( opts && opts.details ) {
         if( log.verboseGet() >= log.verboseReversed().trace ) {
             opts.details.write( cc.debug( "Will request all S-Chain(s) hashes in " ) +
-                threadInfo.threadDescription() + cc.debug( "..." ) + "\n" );
+                threadInfo.threadDescription(), "..." );
         }
     }
     const isLoadConnectedOnly = ( "isLoadConnectedOnly" in opts )
@@ -821,7 +821,7 @@ export async function loadSChainsConnectedOnly( strChainNameConnectedTo, opts ) 
     if( opts && opts.details ) {
         if( log.verboseGet() >= log.verboseReversed().trace ) {
             opts.details.write( cc.debug( "Will request all S-Chain(s) hashes in " ) +
-                threadInfo.threadDescription() + cc.debug( "..." ) + "\n" );
+                threadInfo.threadDescription(), "..." );
         }
     }
     // NOTICE: we are always check and filter connected status here,
@@ -863,7 +863,7 @@ export async function loadSChainsConnectedOnly( strChainNameConnectedTo, opts ) 
                     opts.details.write(
                         cc.debug( "Querying(1) connected status between S-Chain " ) +
                         cc.info( strSChainName ) + cc.debug( " and S-Chain " ) +
-                        cc.info( strChainNameConnectedTo ) + cc.debug( "..." ) + "\n" );
+                        cc.info( strChainNameConnectedTo ), "..." );
                 }
             }
             let isConnected = false;
@@ -912,7 +912,7 @@ export async function checkConnectedSChains( strChainNameConnectedTo, arrSChains
                     opts.details.write( cc.debug( "Querying(2) via URL " ) + cc.u( url ) +
                         cc.debug( " to S-Chain " ) + cc.info( joSChain.data.name ) +
                         cc.debug( " whether it's connected to S-Chain " ) +
-                        cc.info( strChainNameConnectedTo ) + cc.debug( "..." ) + "\n" );
+                        cc.info( strChainNameConnectedTo ), "..." );
                 }
             }
             const ethersProvider = owaspUtils.getEthersProviderFromURL( url );
@@ -1129,7 +1129,7 @@ export function getLastCachedSChains() {
 export function setLastCachedSChains( arrSChainsCached ) {
     if( log.verboseGet() >= log.verboseReversed().debug ) {
         log.write( cc.debug( "Will set arrSChainsCached in " ) +
-            threadInfo.threadDescription() + cc.debug( "..." ) + "\n" );
+            threadInfo.threadDescription(), "..." );
         log.write( cc.debug( "Value of arrSChainsCached in " ) +
             threadInfo.threadDescription() + cc.debug( " is: " ) +
             cc.j( arrSChainsCached ) + "\n" );
@@ -1145,7 +1145,7 @@ export function setLastCachedSChains( arrSChainsCached ) {
             gArrCacheHistory.shift();
         if( log.verboseGet() >= log.verboseReversed().debug ) {
             log.write( cc.debug( "Will dispatch arrSChainsCached event in " ) +
-                threadInfo.threadDescription() + cc.debug( "..." ) + "\n" );
+                threadInfo.threadDescription(), "..." );
         }
         events.dispatchEvent(
             new UniversalDispatcherEvent(

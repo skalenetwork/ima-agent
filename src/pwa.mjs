@@ -130,7 +130,7 @@ export async function checkOnLoopStart( imaState, strLoopWorkType, nIndexS2S ) {
         if( log.verboseGet() >= log.verboseReversed().information ) {
             if( imaState.isPrintPWA ) {
                 log.write( cc.debug( "PWA will check loop start condition via node(s) sequence " ) +
-                    cc.j( arrBusyNodeIndices ) + cc.debug( "..." ) + "\n" );
+                    cc.j( arrBusyNodeIndices ), "..." );
             }
         }
         const nUtcUnixTimeStamp = Math.floor( ( new Date() ).getTime() / 1000 );

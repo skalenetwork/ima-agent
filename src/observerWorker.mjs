@@ -301,7 +301,7 @@ class ObserverServer extends SocketServer {
                         cc.debug( "SKALE Observer in " ) + threadInfo.threadDescription() +
                         cc.debug( " will do immediate periodic SNB refresh" ) +
                         cc.normal( "(one of each " ) + cc.info( secondsToReDiscoverSkaleNetwork ) +
-                        cc.normal( " second(s))" ) + cc.debug( "..." ) + "\n" );
+                        cc.normal( " second(s))" ), "..." );
                 }
                 while( true ) {
                     const strError =

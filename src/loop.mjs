@@ -147,7 +147,7 @@ async function singleTransferLoopPartOracle( optsLoop, strLogPrefix ) {
     if( optsLoop.enableStepOracle && imaOracleOperations.getEnabledOracle() ) {
         if( log.verboseGet() >= log.verboseReversed().notice ) {
             log.write( strLogPrefix + cc.debug( "Will invoke Oracle gas price setup in " ) +
-            threadInfo.threadDescription() + cc.debug( "..." ) + "\n" );
+            threadInfo.threadDescription(), "..." );
         }
         try {
             if( ! await pwa.checkOnLoopStart( imaState, "oracle" ) ) {
@@ -206,7 +206,7 @@ async function singleTransferLoopPartM2S( optsLoop, strLogPrefix ) {
     if( optsLoop.enableStepM2S ) {
         if( log.verboseGet() >= log.verboseReversed().notice ) {
             log.write( strLogPrefix + cc.debug( "Will invoke M2S transfer in " ) +
-                threadInfo.threadDescription() + cc.debug( "..." ) + "\n" );
+                threadInfo.threadDescription(), "..." );
         }
         try {
             if( ! await pwa.checkOnLoopStart( imaState, "m2s" ) ) {
@@ -286,7 +286,7 @@ async function singleTransferLoopPartS2M( optsLoop, strLogPrefix ) {
     if( optsLoop.enableStepS2M ) {
         if( log.verboseGet() >= log.verboseReversed().notice ) {
             log.write( strLogPrefix + cc.debug( "Will invoke S2M transfer in " ) +
-                threadInfo.threadDescription() + cc.debug( "..." ) + "\n" );
+                threadInfo.threadDescription(), "..." );
         }
         try {
             if( ! await pwa.checkOnLoopStart( imaState, "s2m" ) ) {
@@ -522,7 +522,7 @@ export function notifyCacheChangedSNB( arrSChainsCached ) {
         log.write(
             cc.debug( "Loop module will broadcast arrSChainsCached event to its " ) +
             cc.info( cntWorkers ) + cc.debug( " worker(s) in " ) +
-            threadInfo.threadDescription() + cc.debug( "..." ) + "\n" );
+            threadInfo.threadDescription(), "..." );
     }
     for( let idxWorker = 0; idxWorker < cntWorkers; ++ idxWorker ) {
         const jo = {
@@ -547,7 +547,7 @@ export function notifyCacheChangedSNB( arrSChainsCached ) {
         log.write(
             cc.debug( "Loop module did finished broadcasting arrSChainsCached event to its " ) +
             cc.info( cntWorkers ) + cc.debug( " worker(s) in " ) +
-            threadInfo.threadDescription() + cc.debug( "..." ) + "\n" );
+            threadInfo.threadDescription(), "..." );
     }
 }
 
@@ -676,7 +676,7 @@ export async function ensureHaveWorkers( opts ) {
     if( log.verboseGet() >= log.verboseReversed().debug ) {
         log.write( cc.debug( "Loop module will create its " ) +
             cc.info( cntWorkers ) + cc.debug( " worker(s) in " ) +
-            threadInfo.threadDescription() + cc.debug( "..." ) + "\n" );
+            threadInfo.threadDescription(), "..." );
     }
     for( let idxWorker = 0; idxWorker < cntWorkers; ++ idxWorker ) {
         const workerData = {
@@ -864,7 +864,7 @@ export async function ensureHaveWorkers( opts ) {
         log.write(
             cc.debug( "Loop module will do first initial broadcast of arrSChainsCached to its " ) +
             cc.info( cntWorkers ) + cc.debug( " worker(s) in " ) +
-            threadInfo.threadDescription() + cc.debug( "..." ) + "\n" );
+            threadInfo.threadDescription(), "..." );
     }
     notifyCacheChangedSNB( skaleObserver.getLastCachedSChains() );
 }
@@ -872,7 +872,7 @@ export async function ensureHaveWorkers( opts ) {
 export async function runParallelLoops( opts ) {
     if( log.verboseGet() >= log.verboseReversed().notice ) {
         log.write( cc.debug( "Will start parallel IMA transfer loops in " ) +
-            threadInfo.threadDescription() + cc.debug( "..." ) + "\n" );
+            threadInfo.threadDescription(), "..." );
     }
     await ensureHaveWorkers( opts );
     if( log.verboseGet() >= log.verboseReversed().notice ) {

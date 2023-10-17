@@ -40,8 +40,7 @@ export async function invokeHasChain(
     const strLogPrefix = cc.sunny( "Wait for added chain status:" ) + " ";
     const strActionName = "invokeHasChain(hasSchain): joLinker.hasSchain";
     try {
-        details.write( strLogPrefix + cc.debug( "Will call " ) + cc.notice( strActionName ) +
-            cc.debug( "..." ) + "\n" );
+        details.debug( strLogPrefix, "Will call ", cc.notice( strActionName ), "..." );
         const addressFrom = joAccount.address();
         const bHasSchain =
             await joLinker.callStatic.hasSchain( chainIdSChain, { from: addressFrom } );

@@ -116,7 +116,7 @@ async function prepareOracleGasPriceSetup( optsGasPriseSetup ) {
             optsGasPriseSetup.details.write( cc.debug( "Will fetch " ) +
                 cc.info( "Main Net gas price" ) + cc.debug( " via call to " ) +
                 cc.info( "Oracle" ) + cc.debug( " with options " ) +
-                cc.j( oracleOpts ) + cc.debug( "..." ) + "\n" );
+                cc.j( oracleOpts ), "..." );
         }
         try {
             optsGasPriseSetup.gasPriceOnMainNet = owaspUtils.ensureStartsWith0x(

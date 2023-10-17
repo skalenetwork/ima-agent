@@ -194,7 +194,7 @@ export async function reimbursementWalletRecharge(
     const strLogPrefix = cc.info( "Gas Reimbursement - Wallet Recharge" ) + " ";
     try {
         details.write( strLogPrefix + cc.debug( "Recharging wallet " ) +
-            cc.notice( strReimbursementChain ) + cc.debug( "..." ) + "\n" );
+            cc.notice( strReimbursementChain ), "..." );
         strActionName = "Recharge reimbursement wallet on Main Net";
         const addressReceiver = joAccountMN.address();
         const arrArguments = [
@@ -278,7 +278,7 @@ export async function reimbursementWalletWithdraw(
     const strLogPrefix = cc.info( "Gas Reimbursement - Wallet Withdraw" ) + " ";
     try {
         details.write( strLogPrefix + cc.debug( "Withdrawing wallet " ) +
-            cc.notice( strReimbursementChain ) + cc.debug( "..." ) + "\n" );
+            cc.notice( strReimbursementChain ), "..." );
         strActionName = "Withdraw reimbursement wallet";
         const arrArguments = [
             strReimbursementChain,
@@ -365,7 +365,7 @@ export async function reimbursementSetRange(
         cc.info( "Gas Reimbursement - Set Minimal time interval from S2M transfers" ) + " ";
     try {
         details.write( strLogPrefix + cc.debug( "Setting minimal S2M interval to " ) +
-            cc.notice( nReimbursementRange ) + cc.debug( "..." ) + "\n" );
+            cc.notice( nReimbursementRange ), "..." );
         strActionName = "Set reimbursement range";
         const arrArguments = [
             strChainNameOriginChain,
