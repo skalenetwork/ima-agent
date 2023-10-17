@@ -89,36 +89,23 @@ export function jsonFileLoad( strPath, joDefault, bLogOutput ) {
     if( bLogOutput == undefined || bLogOutput == null )
         bLogOutput = false;
     joDefault = joDefault || {};
-    if( bLogOutput ) {
-        if( log.verboseGet() >= log.verboseReversed().debug ) {
-            log.write( cc.normal( "Will load JSON file " ) +
-                cc.info( strPath ) + cc.normal( "..." ) + "\n" );
-        }
-    }
+    if( bLogOutput )
+        log.debug( "Will load JSON file ", cc.info( strPath ), "..." );
+
     if( !fileExists( strPath ) ) {
-        if( bLogOutput ) {
-            if( log.verboseGet() >= log.verboseReversed().error ) {
-                log.write( cc.error( "Cannot load JSON file " ) +
-                    cc.info( strPath ) + cc.error( ", it does not exist" ) + "\n" );
-            }
-        }
+        if( bLogOutput )
+            log.error( "Cannot load JSON file ", cc.info( strPath ), ", it does not exist" );
         return joDefault;
     }
     try {
         const s = fs.readFileSync( strPath );
         if( bLogOutput ) {
-            if( log.verboseGet() >= log.verboseReversed().debug ) {
-                log.write( cc.normal( "Did loaded content of JSON file " ) +
-                    cc.info( strPath ) + cc.normal( ", will parse it..." ) + "\n" );
-            }
+            log.debug( "Did loaded content of JSON file ", cc.info( strPath ),
+                ", will parse it..." );
         }
         const jo = JSON.parse( s );
-        if( bLogOutput ) {
-            if( log.verboseGet() >= log.verboseReversed().debug ) {
-                log.write( cc.success( "Done, loaded content of JSON file " ) +
-                    cc.info( strPath ) + cc.success( "." ) + "\n" );
-            }
-        }
+        if( bLogOutput )
+            log.success( "Done, loaded content of JSON file ", cc.info( strPath ), "." );
         return jo;
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
@@ -132,21 +119,13 @@ export function jsonFileLoad( strPath, joDefault, bLogOutput ) {
 export function jsonFileSave( strPath, jo, bLogOutput ) {
     if( bLogOutput == undefined || bLogOutput == null )
         bLogOutput = false;
-    if( bLogOutput ) {
-        if( log.verboseGet() >= log.verboseReversed().debug ) {
-            log.write( cc.normal( "Will save JSON file " ) +
-                cc.info( strPath ) + cc.normal( "..." ) + "\n" );
-        }
-    }
+    if( bLogOutput )
+        log.debug( "Will save JSON file ", cc.info( strPath ), "..." );
     try {
         const s = JSON.stringify( jo, null, 4 );
         fs.writeFileSync( strPath, s );
-        if( bLogOutput ) {
-            if( log.verboseGet() >= log.verboseReversed().debug ) {
-                log.write( cc.success( "Done, saved content of JSON file " ) +
-                    cc.info( strPath ) + cc.success( "." ) + "\n" );
-            }
-        }
+        if( bLogOutput )
+            log.success( "Done, saved content of JSON file ", cc.info( strPath ), "." );
         return true;
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
@@ -173,28 +152,21 @@ export async function waitForClonedTokenToAppear(
     const strTokenSuffixLCshort = owaspUtils.replaceAll( strTokenSuffixLC, "_with_metadata", "" );
     const ts0 = cc.timestampHR();
     let ts1;
-    if( log.verboseGet() >= log.verboseReversed().information ) {
-        log.write( cc.debug( "Waiting for " ) + cc.notice( strTokenSuffixUC ) +
-            cc.debug( " token to appear automatically deployed on S-Chain " ) +
-            cc.attention( sc.chainName ) + cc.debug( "..." ) + "\n" );
-    }
-    if( log.verboseGet() >= log.verboseReversed().debug ) {
-        log.write( cc.debug( "... source chain name is " ) +
-            cc.attention( strMainnetName ) + "\n" );
-        log.write( cc.debug( "... destination " ) + cc.notice( "TokenManager" + strTokenSuffixUC ) +
-            cc.debug( " address is " ) + cc.notice( sc.joABI["token_manager_" +
-            strTokenSuffixLC + "_address"] ) + "\n" );
-    }
+    log.information( "Waiting for ", cc.notice( strTokenSuffixUC ),
+        " token to appear automatically deployed on S-Chain ",
+        cc.attention( sc.chainName ), "..." );
+    log.debug( "... source chain name is ", cc.attention( strMainnetName ) );
+    log.debug( "... destination ", cc.notice( "TokenManager" + strTokenSuffixUC ),
+        " address is ", cc.notice( sc.joABI["token_manager_" +
+        strTokenSuffixLC + "_address"] ) );
     const contractTokenManager = new owaspUtils.ethersMod.ethers.Contract(
         sc.joABI["token_manager_" + strTokenSuffixLC + "_address"],
         sc.joABI["token_manager_" + strTokenSuffixLC + "_abi"],
         sc.ethersProvider
     );
     for( let idxAttempt = 0; idxAttempt < cntAttempts; ++ idxAttempt ) {
-        if( log.verboseGet() >= log.verboseReversed().information ) {
-            log.write( cc.debug( "Discovering " ) + cc.notice( strTokenSuffixUC ) +
-                cc.debug( " step " ) + cc.info( idxAttempt ) + cc.debug( "..." ) + "\n" );
-        }
+        log.information( "Discovering ", cc.notice( strTokenSuffixUC ), " step ", idxAttempt,
+            "..." );
         if( gMillisecondsToSleepStepWaitForClonedTokenToAppear > 0 )
             await imaHelperAPIs.sleep( gMillisecondsToSleepStepWaitForClonedTokenToAppear );
         const addressOnSChain =
@@ -206,23 +178,18 @@ export async function waitForClonedTokenToAppear(
             );
         if( addressOnSChain != "0x0000000000000000000000000000000000000000" ) {
             ts1 = cc.timestampHR();
-            if( log.verboseGet() >= log.verboseReversed().information ) {
-                log.write( cc.success( "Done, duration is " ) +
-                    cc.info( cc.getDurationString( ts0, ts1 ) ) + "\n" );
-                log.write( cc.success( "Discovered " ) + cc.notice( strTokenSuffixUC ) +
-                    cc.success( " instantiated on S-Chain " ) + cc.attention( sc.chainName ) +
-                    cc.success( " at address " ) + cc.notice( addressOnSChain ) + "\n" );
-            }
+            log.success( "Done, duration is ", cc.info( cc.getDurationString( ts0, ts1 ) ) );
+            log.success( "Discovered ", cc.notice( strTokenSuffixUC ),
+                " instantiated on S-Chain ", cc.attention( sc.chainName ),
+                " at address ", cc.notice( addressOnSChain ) );
             return addressOnSChain;
         }
     }
     ts1 = cc.timestampHR();
-    const strError =
-        cc.error( "Failed to discover " ) + cc.notice( strTokenSuffixUC ) +
-        cc.error( " instantiated on S-Chain " ) + cc.attention( sc.chainName );
-    if( log.verboseGet() >= log.verboseReversed().error )
-        log.write( strError + "\n" );
-    throw new Error( strError );
+    log.error( "Failed to discover ", cc.notice( strTokenSuffixUC ),
+        " instantiated on S-Chain ", cc.attention( sc.chainName ) );
+    throw new Error( "Failed to discover \"" + strTokenSuffixUC +
+        "\" instantiated on S-Chain \"" + sc.chainName + "\"" );
 }
 
 export async function waitForClonedTokenAppearErc20(
@@ -231,10 +198,8 @@ export async function waitForClonedTokenAppearErc20(
     if( "abi" in tokenERC20SC && typeof tokenERC20SC.abi == "object" &&
         "address" in tokenERC20SC && typeof tokenERC20SC.address == "string"
     ) {
-        if( log.verboseGet() >= log.verboseReversed().warning ) {
-            log.write( cc.warning( "Skipping automatic " ) + cc.notice( "ERC20" ) +
-                cc.warning( " instantiation discovery, already done before" ) + "\n" );
-        }
+        log.warning( "Skipping automatic ", cc.notice( "ERC20" ),
+            " instantiation discovery, already done before" );
         return;
     }
     const addressCallFrom = joAccountSC.address();
@@ -251,10 +216,8 @@ export async function waitForClonedTokenAppearErc721(
     if( "abi" in tokenERC721SC && typeof tokenERC721SC.abi == "object" &&
         "address" in tokenERC721SC && typeof tokenERC721SC.address == "string"
     ) {
-        if( log.verboseGet() >= log.verboseReversed().warning ) {
-            log.write( cc.warning( "Skipping automatic " ) + cc.notice( "ERC721" ) +
-                cc.warning( "instantiation discovery, already done before" ) + "\n" );
-        }
+        log.warning( "Skipping automatic ", cc.notice( "ERC721" ),
+            "instantiation discovery, already done before" );
         return;
     }
     const addressCallFrom = joAccountSC.address();
@@ -271,10 +234,8 @@ export async function waitForClonedTokenAppearErc721WithMetadata(
     if( "abi" in tokenERC721SC && typeof tokenERC721SC.abi == "object" &&
         "address" in tokenERC721SC && typeof tokenERC721SC.address == "string"
     ) {
-        if( log.verboseGet() >= log.verboseReversed().warning ) {
-            log.write( cc.warning( "Skipping automatic " ) + cc.notice( "ERC721_with_metadata" ) +
-                cc.warning( " instantiation discovery, already done before" ) + "\n" );
-        }
+        log.warning( "Skipping automatic ", cc.notice( "ERC721_with_metadata" ),
+            " instantiation discovery, already done before" );
         return;
     }
     const addressCallFrom = joAccountSC.address();
@@ -291,10 +252,8 @@ export async function waitForClonedTokenAppearErc1155(
     if( "abi" in tokenERC1155SC && typeof tokenERC1155SC.abi == "object" &&
         "address" in tokenERC1155SC && typeof tokenERC1155SC.address == "string"
     ) {
-        if( log.verboseGet() >= log.verboseReversed().warning ) {
-            log.write( cc.warning( "Skipping automatic " ) + cc.notice( "ERC1155" ) +
-                cc.warning( " instantiation discovery, already done before" ) + "\n" );
-        }
+        log.warning( "Skipping automatic ", cc.notice( "ERC1155" ),
+            " instantiation discovery, already done before" );
         return;
     }
     const addressCallFrom = joAccountSC.address();
@@ -432,12 +391,9 @@ export function checkKeyExistInABI( strName, strFile, joABI, strKey, isExitOnErr
     } catch ( err ) {
     }
     if( isExitOnError ) {
-        if( log.verboseGet() >= log.verboseReversed().fatal ) {
-            log.write( cc.fatal( "FATAL, CRITICAL ERROR:" ) + cc.error( "Loaded " ) +
-                cc.warning( strName ) + cc.error( " ABI JSON file " ) + cc.info( strFile ) +
-                cc.error( " does not contain needed key " ) + cc.warning( strKey ) +
-                ", stack is: ", "\n", cc.stack( err.stack ) );
-        }
+        log.fatal( cc.fatal( "FATAL, CRITICAL ERROR:" ), "Loaded ", cc.warning( strName ),
+            " ABI JSON file ", cc.info( strFile ), " does not contain needed key ",
+            cc.warning( strKey ), ", stack is: ", "\n", cc.stack( err.stack ) );
         process.exit( 126 );
     }
     return false;
