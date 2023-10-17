@@ -23,7 +23,6 @@
  * @copyright SKALE Labs 2019-Present
  */
 
-import * as log from "./log.mjs";
 import * as cc from "./cc.mjs";
 
 import * as owaspUtils from "./owaspUtils.mjs";
@@ -68,19 +67,13 @@ export const currentTimestamp = () => {
 export async function safeWaitForNextBlockToAppear( details, ethersProvider ) {
     const nBlockNumber =
         owaspUtils.toBN( await safeGetBlockNumber( details, 10, ethersProvider ) );
-    if( log.verboseGet() >= log.verboseReversed().trace ) {
-        details.write( cc.debug( "Waiting for next block to appear..." ) + "\n" );
-        details.write( cc.debug( "    ...have block " ) +
-            cc.info( nBlockNumber.toHexString() ) + "\n" );
-    }
+    details.trace( "Waiting for next block to appear..." );
+    details.trace( "    ...have block ", cc.info( nBlockNumber.toHexString() ) );
     for( ; true; ) {
         await sleep( 1000 );
         const nBlockNumber2 =
             owaspUtils.toBN( await safeGetBlockNumber( details, 10, ethersProvider ) );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( cc.debug( "    ...have block " ) +
-                cc.info( nBlockNumber2.toHexString() ) + "\n" );
-        }
+        details.trace( "    ...have block ", cc.info( nBlockNumber2.toHexString() ) );
         if( nBlockNumber2.gt( nBlockNumber ) )
             break;
     }
@@ -106,13 +99,9 @@ export async function safeGetBlockNumber(
         return ret;
     } catch ( err ) {
         ret = retValOnFail;
-        if( log.verboseGet() >= log.verboseReversed().error ) {
-            details.write( cc.error( "Failed call attempt " ) + cc.info( idxAttempt ) +
-                cc.error( " to " ) + cc.note( strFnName + "()" ) + cc.error( " via " ) +
-                cc.u( u ) + cc.error( ", error is: " ) +
-                cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) );
-        }
+        details.error( "Failed call attempt ", idxAttempt, " to ", cc.note( strFnName + "()" ),
+            " via ", cc.u( u ), ", error is: ", cc.warning( owaspUtils.extractErrorMessage( err ) ),
+            ", stack is: ", "\n", cc.stack( err.stack ) );
     }
     ++ idxAttempt;
     while( ret === "" && idxAttempt <= cntAttempts ) {
@@ -121,31 +110,22 @@ export async function safeGetBlockNumber(
             ret = retValOnFail;
             if( ! throwIfServerOffline )
                 return ret;
-            if( log.verboseGet() >= log.verboseReversed().error ) {
-                details.write( cc.error( "Cannot call " ) + cc.note( strFnName + "()" ) +
-                    cc.error( " via " ) + cc.u( u ) + cc.warning( " because server is off-line" ) +
-                    "\n" );
-            }
+            details.error( "Cannot call ", cc.note( strFnName + "()" ), " via ", cc.u( u ),
+                cc.warning( " because server is off-line" ) );
             throw new Error( "Cannot " + strFnName + "() via " + u.toString() +
             " because server is off-line" );
         }
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( cc.warning( "Repeat call to " ) + cc.note( strFnName + "()" ) +
-                cc.error( " via " ) + cc.u( u ) + cc.warning( ", attempt " ) +
-                cc.info( idxAttempt ) + "\n" );
-        }
+        details.trace( "Repeat call to ", cc.note( strFnName + "()" ), " via ", cc.u( u ),
+            ", attempt ", idxAttempt );
         try {
             ret = await ethersProvider[strFnName]();
             return ret;
         } catch ( err ) {
             ret = retValOnFail;
-            if( log.verboseGet() >= log.verboseReversed().error ) {
-                details.write( cc.error( "Failed call attempt " ) + cc.info( idxAttempt ) +
-                    cc.error( " to " ) + cc.note( strFnName + "()" ) + cc.error( " via " ) +
-                    cc.u( u ) + cc.error( ", error is: " ) +
-                    cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                    cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) );
-            }
+            details.error( "Failed call attempt ", idxAttempt, " to ",
+                cc.note( strFnName + "()" ), " via ", cc.u( u ), ", error is: ",
+                cc.warning( owaspUtils.extractErrorMessage( err ) ),
+                ", stack is: ", "\n", cc.stack( err.stack ) );
         }
         ++ idxAttempt;
     }

@@ -277,7 +277,7 @@ function initMonitoringServer() {
                     const strError = owaspUtils.extractErrorMessage( err );
                     log.write( strLogPrefix + cc.error( "Failed to sent answer to " ) +
                         cc.info( ip ) + cc.error( ", error is: " ) + cc.warning( strError ) +
-                        cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) );
+                        ", stack is: ", "\n", cc.stack( err.stack ) );
                 }
             }
         } );
@@ -313,7 +313,7 @@ function initJsonRpcServer() {
                     log.write( strLogPrefix + cc.error( "Failed to sent answer " ) +
                         cc.j( joAnswer ) + cc.error( " to " ) + cc.info( ip ) +
                         cc.error( ", error is: " ) + cc.warning( strError ) +
-                        cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) );
+                        ", stack is: ", "\n", cc.stack( err.stack ) );
                 }
             }
         };
@@ -445,7 +445,7 @@ async function doTheJob() {
                 log.write( strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
                     cc.error( " Exception occurred while executing action: " ) +
                     cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                    cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) );
+                    ", stack is: ", "\n", cc.stack( err.stack ) );
             }
         }
     }

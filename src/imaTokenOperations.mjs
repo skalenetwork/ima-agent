@@ -96,7 +96,7 @@ export async function getOwnerOfErc721(
         if( log.verboseGet() >= log.verboseReversed().error ) {
             const strError = owaspUtils.extractErrorMessage( err );
             log.write( strLogPrefix + cc.fatal( "ERROR:" ) + " " + cc.error( strError ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) );
+                ", stack is: ", "\n", cc.stack( err.stack ) );
         }
     }
     return "<no-data-or-error>";
@@ -132,7 +132,7 @@ export async function getBalanceErc1155(
         if( log.verboseGet() >= log.verboseReversed().error ) {
             const strError = owaspUtils.extractErrorMessage( err );
             log.write( strLogPrefix + cc.fatal( "ERROR:" ) + " " + cc.error( strError ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) );
+                ", stack is: ", "\n", cc.stack( err.stack ) );
         }
     }
     return "<no-data-or-error>";

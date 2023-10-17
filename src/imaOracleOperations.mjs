@@ -129,7 +129,7 @@ async function prepareOracleGasPriceSetup( optsGasPriseSetup ) {
                     cc.info( "Main Net gas price" ) + cc.error( " via call to " ) +
                     cc.info( "Oracle" ) + cc.error( ", error is: " ) +
                     cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                    cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) );
+                    ", stack is: ", "\n", cc.stack( err.stack ) );
             }
         }
     }
@@ -346,12 +346,12 @@ export async function doOracleGasPriceSetup(
                 log.write( optsGasPriseSetup.strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
                     cc.error( " Error in doOracleGasPriceSetup() during " +
                     optsGasPriseSetup.strActionName + ": " ) + cc.error( strError ) +
-                    cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) );
+                    ", stack is: ", "\n", cc.stack( err.stack ) );
                 optsGasPriseSetup.details.write( optsGasPriseSetup.strLogPrefix +
                     cc.fatal( "CRITICAL ERROR:" ) +
                     cc.error( " Error in doOracleGasPriceSetup() during " +
                     optsGasPriseSetup.strActionName + ": " ) + cc.error( strError ) +
-                    cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) );
+                    ", stack is: ", "\n", cc.stack( err.stack ) );
             }
         }
         optsGasPriseSetup.details.exposeDetailsTo( log, "doOracleGasPriceSetup", false );
