@@ -40,7 +40,7 @@ export function composeGasUsageReportFromArray( strName, jarrReceipts ) {
         } catch ( err ) { }
     }
     s += "    " + cc.attention( "SUM" ) + cc.debug( "....." ) +
-        cc.info( sumGasUsed.toString() ) + "\n";
+        cc.info( sumGasUsed.toString() );
     return { "sumGasUsed": sumGasUsed, "strReport": s };
 }
 
