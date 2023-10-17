@@ -41,21 +41,13 @@ export function initialSkaleNetworkScanForS2S() {
         "fn": async function() {
             const strLogPrefix = cc.info( "SKALE network scan for S2S:" ) + " ";
             if( imaState.strPathAbiJsonSkaleManager.length === 0 ) {
-                if( log.verboseGet() >= log.verboseReversed().fatal ) {
-                    log.write( cc.fatal( "CRITICAL ERROR:" ) +
-                        cc.error( " missing Skale Manager ABI, please specify " ) +
-                        cc.info( "abi-skale-manager" ) + "\n" );
-                }
+                log.fatal( cc.fatal( "CRITICAL ERROR:" ),
+                    " missing Skale Manager ABI, please specify ",
+                    cc.info( "abi-skale-manager" ) );
                 process.exit( 153 );
             }
-            if( log.verboseGet() >= log.verboseReversed().information ) {
-                log.write( strLogPrefix +
-                    cc.debug( "Downloading SKALE network information..." ) + "\n" );
-            }
-            if( log.verboseGet() >= log.verboseReversed().information ) {
-                log.write( strLogPrefix +
-                    cc.notice( "Will init periodic S-Chains caching now..." ) + "\n" );
-            }
+            log.information( strLogPrefix, "Downloading SKALE network information..." );
+            log.information( strLogPrefix, "Will init periodic S-Chains caching now..." );
             const opts = {
                 imaState: imaState,
                 "details": log,
@@ -72,18 +64,12 @@ export function initialSkaleNetworkScanForS2S() {
                 imaState.chainProperties.sc.strChainName,
                 opts
             ).then( function() {
-                if( log.verboseGet() >= log.verboseReversed().information ) {
-                    log.write( strLogPrefix +
-                        cc.success( "Done, did started periodic S-Chains caching." ) +
-                        "\n" );
-                }
+                log.success( strLogPrefix, "Done, did started periodic S-Chains caching." );
             } ).catch( function( err ) {
-                if( log.verboseGet() >= log.verboseReversed().error ) {
-                    const strError = owaspUtils.extractErrorMessage( err );
-                    log.write( cc.fatal( "CRITICAL ERROR:" ) +
-                        cc.error( " failed to start periodic S-Chains caching" ) +
-                        cc.warning( strError ) + "\n" );
-                }
+                const strError = owaspUtils.extractErrorMessage( err );
+                log.error( cc.fatal( "CRITICAL ERROR:" ),
+                    " failed to start periodic S-Chains caching",
+                    cc.warning( strError ) );
             } );
             return true;
         }
@@ -191,17 +177,11 @@ export function getSChainDiscoveredNodesCount( joSChainNetworkInfo ) {
 
 export async function waitUntilSChainStarted() {
     const imaState = state.get();
-    if( log.verboseGet() >= log.verboseReversed().debug ) {
-        log.write( cc.debug( "Checking " ) + cc.info( "S-Chain" ) +
-            cc.debug( " is accessible and sane..." ) + "\n" );
-    }
+    log.debug( "Checking ", cc.info( "S-Chain" ), " is accessible and sane..." );
     if( ( !imaState.chainProperties.sc.strURL ) ||
         imaState.chainProperties.sc.strURL.length === 0
     ) {
-        if( log.verboseGet() >= log.verboseReversed().warning ) {
-            log.write( cc.warning( "Skipped, " ) + cc.info( "S-Chain" ) +
-                cc.warning( " URL was not provided." ) + "\n" );
-        }
+        log.warning( "Skipped, ", cc.info( "S-Chain" ), " URL was not provided." );
         return;
     }
     let bSuccess = false;
@@ -209,22 +189,17 @@ export async function waitUntilSChainStarted() {
     const isSilentReDiscovery = true; // it must be silent during S-Chain sanity check
     for( ; !bSuccess; ) {
         try {
-            if( log.verboseGet() >= log.verboseReversed().information ) {
-                log.write( cc.attention( "This S-Chain discovery will be done for " ) +
-                    cc.bright( "startup pre-requisite" ) + "\n" );
-            }
+            log.attention( "This S-Chain discovery will be done for ",
+                cc.bright( "startup pre-requisite" ) );
             const nCountToWait = -1;
             const joSChainNetworkInfo = await discoverSChainNetwork(
                 function( err, joSChainNetworkInfo ) {
                     if( ! err )
                         bSuccess = true;
                 }, isSilentReDiscovery, null, nCountToWait ).catch( ( err ) => {
-                if( log.verboseGet() >= log.verboseReversed().critical ) {
-                    const strError = owaspUtils.extractErrorMessage( err );
-                    log.write( cc.fatal( "CRITICAL ERROR:" ) +
-                            cc.error( " S-Chain network discovery failed: " ) +
-                            cc.warning( strError ) + "\n" );
-                }
+                const strError = owaspUtils.extractErrorMessage( err );
+                log.critical( cc.fatal( "CRITICAL ERROR:" ),
+                    " S-Chain network discovery failed: ", cc.warning( strError ) );
             } );
             if( ! joSChainNetworkInfo )
                 bSuccess = false;
@@ -234,19 +209,13 @@ export async function waitUntilSChainStarted() {
         if( !bSuccess )
             ++ idxWaitAttempt;
         if( idxWaitAttempt >= imaState.nMaxWaitSChainAttempts ) {
-            if( log.verboseGet() >= log.verboseReversed().warning ) {
-                log.write( cc.warning( "Incomplete, " ) + cc.info( "S-Chain" ) +
-                    cc.warning( " sanity check failed after " ) + cc.info( idxWaitAttempt ) +
-                    cc.warning( " attempts." ) + "\n" );
-            }
+            log.warning( "Incomplete, ", cc.info( "S-Chain" ), " sanity check failed after ",
+                cc.info( idxWaitAttempt ), " attempts." );
             return;
         }
         await imaHelperAPIs.sleep( 1000 );
     }
-    if( log.verboseGet() >= log.verboseReversed().information ) {
-        log.write( cc.success( "Done, " ) + cc.info( "S-Chain" ) +
-            cc.success( " is accessible and sane." ) + "\n" );
-    }
+    log.success( "Done, ", cc.info( "S-Chain" ), " is accessible and sane." );
 }
 
 export function isSendImaAgentIndex() {
@@ -262,11 +231,8 @@ export async function continueSChainDiscoveryInBackgroundIfNeeded( isSilentReDis
     fnAfter = fnAfter || function() {};
     const imaState = state.get();
     if( imaState.joSChainDiscovery.repeatIntervalMilliseconds <= 0 ) {
-        if( log.verboseGet() >= log.verboseReversed().information ) {
-            if( ! isSilentReDiscovery )
-                log.write( cc.warning( "This S-Chain re-discovery will not be preformed" ) + "\n" );
-
-        }
+        if( ! isSilentReDiscovery )
+            log.information( "This S-Chain re-discovery will not be preformed" );
         fnAfter();
         return; // no S-Chain re-discovery, special mode
     }
@@ -278,42 +244,30 @@ export async function continueSChainDiscoveryInBackgroundIfNeeded( isSilentReDis
         nCountToWait = cntNodesOnChain;
     let cntDiscovered = getSChainDiscoveredNodesCount( imaState.joSChainNetworkInfo );
     if( cntDiscovered >= cntNodesOnChain ) {
-        if( log.verboseGet() >= log.verboseReversed().information ) {
-            if( ! isSilentReDiscovery ) {
-                log.write( cc.attention( "Everything is discovered about this S-Chain. " +
-                    "No re-discovery is needed" ) + "\n" );
-            }
+        if( ! isSilentReDiscovery ) {
+            log.attention( "Everything is discovered about this S-Chain. ",
+                "No re-discovery is needed" );
         }
         if( gTimerSChainDiscovery != null ) {
             clearInterval( gTimerSChainDiscovery );
             gTimerSChainDiscovery = null;
-            if( log.verboseGet() >= log.verboseReversed().information ) {
-                if( ! isSilentReDiscovery )
-                    log.write( cc.notice( "This S-Chain re-discovery stopped" ) + "\n" );
-
-            }
+            if( ! isSilentReDiscovery )
+                log.notice( "This S-Chain re-discovery stopped" );
         }
         fnAfter();
         return;
     }
     if( cntDiscovered < cntNodesOnChain ) {
-        if( log.verboseGet() >= log.verboseReversed().information ) {
-            if( ! isSilentReDiscovery ) {
-                const cntUnDiscoveredYet = cntNodesOnChain - cntDiscovered;
-                log.write( cc.warning( "Have " ) + cc.info( cntUnDiscoveredYet ) +
-                    cc.warning( " of " ) + cc.info( cntNodesOnChain ) +
-                    cc.warning( " nodes of this S-Chain not discovered yet " +
-                        "before continuing re-discovery." ) + "\n" );
-            }
+        if( ! isSilentReDiscovery ) {
+            const cntUnDiscoveredYet = cntNodesOnChain - cntDiscovered;
+            log.information( "Have ", cntUnDiscoveredYet, " of ", cntNodesOnChain,
+                " nodes of this S-Chain not discovered yet  before continuing re-discovery." );
         }
     }
     const fnAsyncHandler = async function() {
         if( gFlagIsInSChainDiscovery ) {
             isInsideAsyncHandler = false;
-            if( log.verboseGet() >= log.verboseReversed().information ) {
-                log.write( cc.warning( "Notice: " +
-                    "long this S-Chain re-discovery is in progress now..." ) + "\n" );
-            }
+            log.information( "Notice: long this S-Chain re-discovery is in progress now..." );
             return;
         }
         gFlagIsInSChainDiscovery = true;
@@ -325,105 +279,86 @@ export async function continueSChainDiscoveryInBackgroundIfNeeded( isSilentReDis
                 nCountToWait = cntNodesOnChain;
             cntDiscovered = getSChainDiscoveredNodesCount( imaState.joSChainNetworkInfo );
             if( cntDiscovered >= cntNodesOnChain ) {
-                if( log.verboseGet() >= log.verboseReversed().information ) {
-                    if( ! isSilentReDiscovery ) {
-                        log.write( cc.attention( "Everything is discovered about this S-Chain. " +
-                            "No re-discovery is needed" ) + "\n" );
-                    }
+                if( ! isSilentReDiscovery ) {
+                    log.information( "Everything is discovered about this S-Chain. ",
+                        "No re-discovery is needed" );
                 }
                 if( gTimerSChainDiscovery != null ) {
                     clearInterval( gTimerSChainDiscovery );
                     gTimerSChainDiscovery = null;
-                    if( log.verboseGet() >= log.verboseReversed().information ) {
-                        if( ! isSilentReDiscovery )
-                            log.write( cc.notice( "This S-Chain re-discovery stopped" ) + "\n" );
-
-                    }
+                    if( ! isSilentReDiscovery )
+                        log.information( "This S-Chain re-discovery stopped" );
                 }
                 // fnAfter() will be called here inside async call at beginning
                 gFlagIsInSChainDiscovery = false;
                 return;
             }
             if( cntDiscovered < cntNodesOnChain ) {
-                if( log.verboseGet() >= log.verboseReversed().information ) {
-                    if( ! isSilentReDiscovery ) {
-                        const cntUnDiscoveredYet = cntNodesOnChain - cntDiscovered;
-                        log.write( cc.warning( "Have " ) + cc.info( cntUnDiscoveredYet ) +
-                            cc.warning( " of " ) + cc.info( cntNodesOnChain ) +
-                            cc.warning( " nodes of this S-Chain not discovered yet " +
-                                "on re-discovery step." ) + "\n" );
-                    }
+                if( ! isSilentReDiscovery ) {
+                    const cntUnDiscoveredYet = cntNodesOnChain - cntDiscovered;
+                    log.information( "Have ", cntUnDiscoveredYet, " of ", cntNodesOnChain,
+                        " nodes of this S-Chain not discovered yet on re-discovery step." );
                 }
             }
-            if( log.verboseGet() >= log.verboseReversed().information ) {
-                if( ! isSilentReDiscovery ) {
-                    log.write( cc.attention( "This S-Chain discovery will be done for " ) +
-                        cc.bright( "re-discover task" ) + "\n" );
-                    log.write( cc.info( "Will re-discover " ) + cc.notice( nCountToWait ) +
-                        cc.info( "-node S-Chain network, " ) + cc.notice( cntDiscovered ) +
-                        cc.info( " node(s) already discovered..." ) + "\n" );
-                }
+            if( ! isSilentReDiscovery ) {
+                log.information( "This S-Chain discovery will be done for re-discover task" );
+                log.information( "Will re-discover ", nCountToWait, "-node S-Chain network, ",
+                    cntDiscovered, " node(s) already discovered..." );
             }
             await discoverSChainNetwork( function( err, joSChainNetworkInfo ) {
                 if( ! err ) {
                     const cntDiscoveredNow =
                         getSChainDiscoveredNodesCount( joSChainNetworkInfo );
-                    if( log.verboseGet() >= log.verboseReversed().information ) {
-                        const strDiscoveryStatus =
-                            cc.info( cntDiscoveredNow ) + cc.success( " nodes known" );
-                        let strMessage =
-                            cc.success( "S-Chain network was re-discovered, " ) +
-                            cc.info( cntDiscoveredNow ) +
-                            cc.success( " of " ) + cc.info( nCountToWait ) +
-                            cc.success( " node(s) (" ) + strDiscoveryStatus + cc.success( ")" );
-                        const cntStillUnknown = cntNodesOnChain - cntDiscoveredNow;
-                        if( cntStillUnknown > 0 ) {
-                            strMessage += cc.success( ", " ) +
-                                cc.info( cntStillUnknown ) +
-                                cc.success( " of " ) + cc.info( cntNodesOnChain ) +
-                                cc.success( " still unknown (" );
-                            try {
-                                const jarrNodes = joSChainNetworkInfo.network;
-                                let cntBad = 0;
-                                for( let i = 0; i < jarrNodes.length; ++i ) {
-                                    const joNode = jarrNodes[i];
-                                    try {
-                                        if( ! isSChainNodeFullyDiscovered( joNode ) ) {
-                                            if( cntBad > 0 )
-                                                strMessage += cc.success( ", " );
-                                            const strNodeURL =
-                                                imaUtils.composeSChainNodeUrl( joNode );
-                                            const strNodeDescColorized =
-                                                cc.notice( "#" ) + cc.info( i ) +
-                                                cc.attention( "(" ) + cc.u( strNodeURL ) +
-                                                cc.attention( ")" );
-                                            strMessage += strNodeDescColorized;
-                                            ++ cntBad;
-                                        }
-                                    } catch ( err ) { }
-                                }
-                            } catch ( err ) { }
-                            strMessage += cc.success( ")" );
-                        }
-                        if( ! isSilentReDiscovery ) {
-                            strMessage +=
-                                cc.success( ", complete re-discovered S-Chain network info: " ) +
-                                cc.j( joSChainNetworkInfo );
-                        }
-                        if( log.verboseGet() >= log.verboseReversed().information )
-                            log.write( strMessage + "\n" );
+                    const strDiscoveryStatus =
+                        cc.info( cntDiscoveredNow ) + cc.success( " nodes known" );
+                    let strMessage =
+                        cc.success( "S-Chain network was re-discovered, " ) +
+                        cc.info( cntDiscoveredNow ) +
+                        cc.success( " of " ) + cc.info( nCountToWait ) +
+                        cc.success( " node(s) (" ) + strDiscoveryStatus + cc.success( ")" );
+                    const cntStillUnknown = cntNodesOnChain - cntDiscoveredNow;
+                    if( cntStillUnknown > 0 ) {
+                        strMessage += cc.success( ", " ) +
+                            cc.info( cntStillUnknown ) +
+                            cc.success( " of " ) + cc.info( cntNodesOnChain ) +
+                            cc.success( " still unknown (" );
+                        try {
+                            const jarrNodes = joSChainNetworkInfo.network;
+                            let cntBad = 0;
+                            for( let i = 0; i < jarrNodes.length; ++i ) {
+                                const joNode = jarrNodes[i];
+                                try {
+                                    if( ! isSChainNodeFullyDiscovered( joNode ) ) {
+                                        if( cntBad > 0 )
+                                            strMessage += cc.success( ", " );
+                                        const strNodeURL =
+                                            imaUtils.composeSChainNodeUrl( joNode );
+                                        const strNodeDescColorized =
+                                            cc.notice( "#" ) + cc.info( i ) +
+                                            cc.attention( "(" ) + cc.u( strNodeURL ) +
+                                            cc.attention( ")" );
+                                        strMessage += strNodeDescColorized;
+                                        ++ cntBad;
+                                    }
+                                } catch ( err ) { }
+                            }
+                        } catch ( err ) { }
+                        strMessage += cc.success( ")" );
                     }
+                    if( ! isSilentReDiscovery ) {
+                        strMessage +=
+                            cc.success( ", complete re-discovered S-Chain network info: " ) +
+                            cc.j( joSChainNetworkInfo );
+                    }
+                    log.information( strMessage );
                     imaState.joSChainNetworkInfo = joSChainNetworkInfo;
                 }
                 fnAfter();
                 continueSChainDiscoveryInBackgroundIfNeeded( isSilentReDiscovery, null );
             }, isSilentReDiscovery, imaState.joSChainNetworkInfo, nCountToWait ).catch( ( err ) => {
-                if( log.verboseGet() >= log.verboseReversed().critical ) {
-                    const strError = owaspUtils.extractErrorMessage( err );
-                    log.write( cc.fatal( "CRITICAL ERROR:" ) +
-                        cc.error( " S-Chain network re-discovery failed: " ) +
-                        cc.warning( strError ) + "\n" );
-                }
+                const strError = owaspUtils.extractErrorMessage( err );
+                log.critical( cc.fatal( "CRITICAL ERROR:" ),
+                    " S-Chain network re-discovery failed: ", cc.warning( strError ) );
             } );
         } catch ( err ) { }
         gFlagIsInSChainDiscovery = false;
@@ -447,9 +382,8 @@ async function discoverSChainWalkNodes( optsDiscover ) {
             cc.notice( "#" ) + cc.info( nCurrentNodeIdx ) +
             cc.attention( "(" ) + cc.u( strNodeURL ) + cc.attention( ")" );
         if( ! optsDiscover.isSilentReDiscovery ) {
-            log.write( optsDiscover.strLogPrefix +
-                cc.attention( "Will try to discover S-Chain node " ) +
-                strNodeDescColorized + cc.attention( "..." ) + "\n" );
+            log.information( optsDiscover.strLogPrefix,
+                "Will try to discover S-Chain node ", strNodeDescColorized, "..." );
         }
         try {
             if( optsDiscover.joPrevSChainNetworkInfo &&
@@ -459,13 +393,10 @@ async function discoverSChainWalkNodes( optsDiscover ) {
                     optsDiscover.joPrevSChainNetworkInfo.network[nCurrentNodeIdx];
                 if( isSChainNodeFullyDiscovered( joPrevNode ) ) {
                     joNode.imaInfo = JSON.parse( JSON.stringify( joPrevNode.imaInfo ) );
-                    if( log.verboseGet() >= log.verboseReversed().information ) {
-                        if( ! optsDiscover.isSilentReDiscovery ) {
-                            log.write( optsDiscover.strLogPrefix +
-                                cc.info( "OK, in case of " ) + strNodeDescColorized +
-                                cc.info( " node " ) + cc.info( joNode.nodeID ) +
-                                cc.info( " will use previous discovery result." ) + "\n" );
-                        }
+                    if( ! optsDiscover.isSilentReDiscovery ) {
+                        log.information( optsDiscover.strLogPrefix, "OK, in case of ",
+                            strNodeDescColorized, " node ", cc.info( joNode.nodeID ),
+                            " will use previous discovery result." );
                     }
                     continue; // skip this node discovery, enrich rest of nodes
                 }
@@ -476,13 +407,10 @@ async function discoverSChainWalkNodes( optsDiscover ) {
             await rpcCall.create( strNodeURL, rpcCallOpts,
                 async function( joCall, err ) {
                     if( err ) {
-                        if( log.verboseGet() >= log.verboseReversed().critical ) {
-                            if( ! optsDiscover.isSilentReDiscovery ) {
-                                log.write( optsDiscover.strLogPrefix +
-                                    cc.fatal( "CRITICAL ERROR:" ) +
-                                    cc.error( " JSON RPC call(creation) to S-Chain node " ) +
-                                    strNodeDescColorized + cc.error( " failed" ) + "\n" );
-                            }
+                        if( ! optsDiscover.isSilentReDiscovery ) {
+                            log.critical( optsDiscover.strLogPrefix, cc.fatal( "CRITICAL ERROR:" ),
+                                " JSON RPC call(creation) to S-Chain node ",
+                                strNodeDescColorized, " failed" );
                         }
                         ++ optsDiscover.cntFailed;
                         if( joCall )
@@ -498,14 +426,12 @@ async function discoverSChainWalkNodes( optsDiscover ) {
                     joCall.call( joDataIn, function( joIn, joOut, err ) {
                         if( err ) {
                             const strError = owaspUtils.extractErrorMessage( err );
-                            if( log.verboseGet() >= log.verboseReversed().critical ) {
-                                if( ! optsDiscover.isSilentReDiscovery ) {
-                                    log.write( optsDiscover.strLogPrefix +
-                                        cc.fatal( "CRITICAL ERROR:" ) +
-                                        cc.error( " JSON RPC call(network) to S-Chain node " ) +
-                                        strNodeDescColorized + cc.error( " failed, error: " ) +
-                                        cc.warning( strError ) + "\n" );
-                                }
+                            if( ! optsDiscover.isSilentReDiscovery ) {
+                                log.critical( optsDiscover.strLogPrefix,
+                                    cc.fatal( "CRITICAL ERROR:" ),
+                                    " JSON RPC call(network) to S-Chain node ",
+                                    strNodeDescColorized, " failed, error: ",
+                                    cc.warning( strError ) );
                             }
                             ++ optsDiscover.cntFailed;
                             return;
@@ -513,27 +439,21 @@ async function discoverSChainWalkNodes( optsDiscover ) {
                         joNode.imaInfo = joOut.result;
                         if( isSChainNodeFullyDiscovered( joNode ) )
                             ++ optsDiscover.nCountReceivedImaDescriptions;
-                        if( log.verboseGet() >= log.verboseReversed().information ) {
-                            if( !optsDiscover.isSilentReDiscovery ) {
-                                log.write( optsDiscover.strLogPrefix + cc.success( "OK, got " ) +
-                                    strNodeDescColorized + cc.success( " node " ) +
-                                    cc.info( joNode.nodeID ) + cc.success( " IMA information(" ) +
-                                    cc.info( optsDiscover.nCountReceivedImaDescriptions ) +
-                                    cc.success( " of " ) +
-                                    cc.info( optsDiscover.cntNodes ) + cc.success( ")." ) + "\n" );
-                            }
+                        if( !optsDiscover.isSilentReDiscovery ) {
+                            log.success( optsDiscover.strLogPrefix, "OK, got ",
+                                strNodeDescColorized, " node ", cc.info( joNode.nodeID ),
+                                " IMA information(", optsDiscover.nCountReceivedImaDescriptions,
+                                " of ", optsDiscover.cntNodes, ")." );
                         }
                     } );
                 } );
         } catch ( err ) {
-            if( log.verboseGet() >= log.verboseReversed().critical ) {
-                if( ! optsDiscover.isSilentReDiscovery ) {
-                    const strError = owaspUtils.extractErrorMessage( err );
-                    log.write( optsDiscover.strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
-                        cc.error( " JSON RPC call(err) to S-Chain node " ) + strNodeDescColorized +
-                        cc.error( " was not created: " ) + cc.warning( strError ) +
-                        cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
-                }
+            if( ! optsDiscover.isSilentReDiscovery ) {
+                const strError = owaspUtils.extractErrorMessage( err );
+                log.critical( optsDiscover.strLogPrefix, cc.fatal( "CRITICAL ERROR:" ),
+                    " JSON RPC call(err) to S-Chain node ", strNodeDescColorized,
+                    " was not created: ", cc.warning( strError ), ", stack is: ", "\n",
+                    cc.stack( err.stack ) );
             }
             ++ optsDiscover.cntFailed;
         }
@@ -541,13 +461,9 @@ async function discoverSChainWalkNodes( optsDiscover ) {
 }
 
 async function discoverSChainWait( optsDiscover ) {
-    if( log.verboseGet() >= log.verboseReversed().information ) {
-        if( ! optsDiscover.isSilentReDiscovery ) {
-            log.write( optsDiscover.strLogPrefix +
-                cc.debug( "Waiting for response from at least " ) +
-                cc.info( optsDiscover.nCountToWait ) +
-                cc.debug( " node(s)..." ) + "\n" );
-        }
+    if( ! optsDiscover.isSilentReDiscovery ) {
+        log.debug( optsDiscover.strLogPrefix, "Waiting for response from at least ",
+            optsDiscover.nCountToWait, " node(s)..." );
     }
     let nWaitAttempt = 0;
     const nWaitStepMilliseconds = 1 * 1000; // step can be small here
@@ -562,35 +478,23 @@ async function discoverSChainWait( optsDiscover ) {
         // notice, below provided up-to-date count of available and fully discovered nodes:
         optsDiscover.nCountReceivedImaDescriptions =
             getSChainDiscoveredNodesCount( optsDiscover.joSChainNetworkInfo );
-        if( log.verboseGet() >= log.verboseReversed().debug ) {
-            if( ! optsDiscover.isSilentReDiscovery ) {
-                log.write( cc.debug( "Waiting (S-Chain discovery) attempt " ) +
-                    cc.info( nWaitAttempt ) + cc.debug( " of " ) + cc.info( cntWaitAttempts ) +
-                    cc.debug( " for S-Chain nodes, total " ) +
-                    cc.info( optsDiscover.cntNodes ) + cc.debug( ", available " ) +
-                    cc.info( optsDiscover.nCountAvailable ) + cc.debug( ", expected at least " ) +
-                    cc.info( optsDiscover.nCountToWait ) + cc.debug( ", discovered " ) +
-                    cc.info( optsDiscover.nCountReceivedImaDescriptions ) + "\n" );
-            }
+        if( ! optsDiscover.isSilentReDiscovery ) {
+            log.debug( "Waiting (S-Chain discovery) attempt ", nWaitAttempt, " of ",
+                cntWaitAttempts, " for S-Chain nodes, total ", optsDiscover.cntNodes,
+                ", available ", optsDiscover.nCountAvailable, ", expected at least ",
+                optsDiscover.nCountToWait, ", discovered ",
+                optsDiscover.nCountReceivedImaDescriptions );
         }
-        if( log.verboseGet() >= log.verboseReversed().information ) {
-            if( !optsDiscover.isSilentReDiscovery ) {
-                log.write( optsDiscover.strLogPrefix +
-                    cc.debug( "Have S-Chain description response about " ) +
-                    cc.info( optsDiscover.nCountReceivedImaDescriptions ) +
-                    cc.debug( " of " ) + cc.info( optsDiscover.cntNodes ) +
-                    cc.debug( " node(s)." ) + "\n" );
-            }
+        if( !optsDiscover.isSilentReDiscovery ) {
+            log.information( optsDiscover.strLogPrefix, "Have S-Chain description response about ",
+                optsDiscover.nCountReceivedImaDescriptions, " of ", optsDiscover.cntNodes,
+                " node(s)." );
         }
         if( optsDiscover.nCountReceivedImaDescriptions >= optsDiscover.nCountToWait ) {
-            if( log.verboseGet() >= log.verboseReversed().information ) {
-                if( !optsDiscover.isSilentReDiscovery ) {
-                    log.write( optsDiscover.strLogPrefix +
-                        cc.success( "This S-Chain discovery will finish with " ) +
-                        cc.info( optsDiscover.nCountReceivedImaDescriptions ) +
-                        cc.success( " of " ) + cc.info( optsDiscover.cntNodes ) +
-                        cc.success( " node(s) discovered." ) + "\n" );
-                }
+            if( !optsDiscover.isSilentReDiscovery ) {
+                log.success( optsDiscover.strLogPrefix, "This S-Chain discovery will finish with ",
+                    optsDiscover.nCountReceivedImaDescriptions, " of ", optsDiscover.cntNodes,
+                    " node(s) discovered." );
             }
             clearInterval( iv );
             optsDiscover.fnAfter( null, optsDiscover.joSChainNetworkInfo );
@@ -601,12 +505,10 @@ async function discoverSChainWait( optsDiscover ) {
             clearInterval( iv );
             const strErrorDescription =
                 "S-Chain network discovery wait timeout, network will be re-discovered later";
-            if( log.verboseGet() >= log.verboseReversed().warning ) {
-                if( ! optsDiscover.isSilentReDiscovery ) {
-                    log.write( optsDiscover.strLogPrefix +
-                        cc.warning( "WARNING: This S-Chain discovery will finish due to: " ) +
-                        cc.error( strErrorDescription ) + "\n" );
-                }
+            if( ! optsDiscover.isSilentReDiscovery ) {
+                log.warning( optsDiscover.strLogPrefix,
+                    "WARNING: This S-Chain discovery will finish due to: ",
+                    cc.error( strErrorDescription ) );
             }
             if( getSChainDiscoveredNodesCount(
                 optsDiscover.joSChainNetworkInfo ) > 0 )
@@ -615,15 +517,11 @@ async function discoverSChainWait( optsDiscover ) {
                 optsDiscover.fnAfter( new Error( strErrorDescription ), null );
             return;
         }
-        if( log.verboseGet() >= log.verboseReversed().debug ) {
-            if( ! optsDiscover.isSilentReDiscovery ) {
-                log.write( optsDiscover.strLogPrefix +
-                    cc.debug( "S-Chain discovery waiting attempt " ) + cc.info( nWaitAttempt ) +
-                    cc.debug( " of " ) + cc.info( cntWaitAttempts ) + cc.debug( " for " ) +
-                    cc.notice( optsDiscover.nCountToWait -
-                        optsDiscover.nCountReceivedImaDescriptions ) +
-                    cc.debug( " node answer(s)" ) + "\n" );
-            }
+        if( ! optsDiscover.isSilentReDiscovery ) {
+            log.debug( optsDiscover.strLogPrefix, "S-Chain discovery waiting attempt ",
+                nWaitAttempt, " of ", cntWaitAttempts, " for ",
+                ( optsDiscover.nCountToWait - optsDiscover.nCountReceivedImaDescriptions ),
+                " node answer(s)" );
         }
     }, nWaitStepMilliseconds );
 }
@@ -649,12 +547,8 @@ export async function discoverSChainNetwork(
         optsDiscover.nCountToWait < 0 )
         optsDiscover.nCountToWait = 0;
     optsDiscover.fnAfter = optsDiscover.fnAfter || function() {};
-    if( log.verboseGet() >= log.verboseReversed().information ) {
-        if( !optsDiscover.isSilentReDiscovery ) {
-            log.write( optsDiscover.strLogPrefix +
-                cc.attention( "This S-Chain discovery will start..." ) + "\n" );
-        }
-    }
+    if( !optsDiscover.isSilentReDiscovery )
+        log.information( optsDiscover.strLogPrefix, "This S-Chain discovery will start..." );
     const promiseComplete = new Promise( function( resolve, reject ) {
         const doCompoundSChainDiscoveryWork = async function() {
             const rpcCallOpts = null;
@@ -664,14 +558,11 @@ export async function discoverSChainNetwork(
                     async function( joCall, err ) {
                         if( err ) {
                             const strError = owaspUtils.extractErrorMessage( err );
-                            if( log.verboseGet() >= log.verboseReversed().critical ) {
-                                if( ! optsDiscover.isSilentReDiscovery ) {
-                                    log.write( optsDiscover.strLogPrefix +
-                                        cc.fatal( "CRITICAL ERROR:" ) +
-                                        cc.error( " JSON RPC call to (own) S-Chain " ) +
-                                        cc.u( scURL ) +
-                                        cc.error( " failed: " ) + cc.warning( strError ) + "\n" );
-                                }
+                            if( ! optsDiscover.isSilentReDiscovery ) {
+                                log.critical( optsDiscover.strLogPrefix,
+                                    cc.fatal( "CRITICAL ERROR:" ),
+                                    " JSON RPC call to (own) S-Chain ", cc.u( scURL ),
+                                    " failed: ", cc.warning( strError ) );
                             }
                             optsDiscover.fnAfter( err, null );
                             if( joCall )
@@ -687,46 +578,35 @@ export async function discoverSChainNetwork(
                             joDataIn.params.fromImaAgentIndex = optsDiscover.imaState.nNodeNumber;
                         await joCall.call( joDataIn, async function( joIn, joOut, err ) {
                             if( err ) {
-                                if( log.verboseGet() >= log.verboseReversed().critical ) {
-                                    if( ! optsDiscover.isSilentReDiscovery ) {
-                                        const strError = owaspUtils.extractErrorMessage( err );
-                                        log.write( optsDiscover.strLogPrefix +
-                                            cc.fatal( "CRITICAL ERROR:" ) +
-                                            cc.error( " JSON RPC call to (own) S-Chain " ) +
-                                            cc.u( scURL ) + cc.error( " failed, error: " ) +
-                                            cc.warning( strError ) + "\n" );
-                                    }
+                                if( ! optsDiscover.isSilentReDiscovery ) {
+                                    const strError = owaspUtils.extractErrorMessage( err );
+                                    log.critical( optsDiscover.strLogPrefix,
+                                        cc.fatal( "CRITICAL ERROR:" ),
+                                        " JSON RPC call to (own) S-Chain ", cc.u( scURL ),
+                                        " failed, error: ", cc.warning( strError ) );
                                 }
                                 optsDiscover.fnAfter( err, null );
                                 await joCall.disconnect();
                                 reject( err );
                                 return;
                             }
-                            if( ( !optsDiscover.isSilentReDiscovery ) &&
-                                log.verboseGet() >= log.verboseReversed().trace ) {
-                                log.write( optsDiscover.strLogPrefix +
-                                        cc.debug( "OK, got (own) S-Chain network information: " ) +
-                                        cc.j( joOut.result ) + "\n" );
-                            } else if(
-                                ( !optsDiscover.isSilentReDiscovery ) &&
-                                log.verboseGet() >= log.verboseReversed().information ) {
-                                log.write( optsDiscover.strLogPrefix +
-                                    cc.success( "OK, got S-Chain " ) + cc.u( scURL ) +
-                                    cc.success( " network information." ) + "\n" );
+                            if( ! optsDiscover.isSilentReDiscovery ) {
+                                log.trace( optsDiscover.strLogPrefix,
+                                    "OK, got (own) S-Chain network information: ",
+                                    cc.j( joOut.result ) );
+                                log.success( optsDiscover.strLogPrefix, "OK, got S-Chain ",
+                                    cc.u( scURL ), " network information." );
                             }
                             optsDiscover.nCountReceivedImaDescriptions = 0;
                             optsDiscover.joSChainNetworkInfo = joOut.result;
                             if( ! optsDiscover.joSChainNetworkInfo ) {
-                                if( log.verboseGet() >= log.verboseReversed().critical ) {
-                                    if( ! optsDiscover.isSilentReDiscovery ) {
-                                        const err2 = new Error( "Got wrong response, " +
-                                            "network information description was not detected" );
-                                        log.write( optsDiscover.strLogPrefix +
-                                            cc.fatal( "CRITICAL ERROR:" ) +
-                                            cc.error( " Network was not detected via call to " ) +
-                                            cc.u( scURL ) + cc.error( ": " ) + cc.warning( err2 ) +
-                                            "\n" );
-                                    }
+                                if( ! optsDiscover.isSilentReDiscovery ) {
+                                    const err2 = new Error( "Got wrong response, " +
+                                        "network information description was not detected" );
+                                    log.critical( optsDiscover.strLogPrefix,
+                                        cc.fatal( "CRITICAL ERROR:" ),
+                                        " Network was not detected via call to ",
+                                        cc.u( scURL ), ": ", cc.warning( err2 ) );
                                 }
                                 optsDiscover.fnAfter( err2, null );
                                 await joCall.disconnect();
@@ -744,41 +624,28 @@ export async function discoverSChainNetwork(
                             }
                             if( optsDiscover.nCountToWait > optsDiscover.cntNodes )
                                 optsDiscover.nCountToWait = optsDiscover.cntNodes;
-                            if( log.verboseGet() >= log.verboseReversed().information ) {
-                                if( ! optsDiscover.isSilentReDiscovery ) {
-                                    log.write( optsDiscover.strLogPrefix +
-                                        cc.debug( "Will gather details of " ) +
-                                        cc.info( optsDiscover.nCountToWait ) + cc.debug( " of " ) +
-                                        cc.info( optsDiscover.cntNodes ) +
-                                        cc.debug( " node(s)..." ) + "\n" );
-                                }
+                            if( ! optsDiscover.isSilentReDiscovery ) {
+                                log.information( optsDiscover.strLogPrefix,
+                                    "Will gather details of ", optsDiscover.nCountToWait,
+                                    " of ", optsDiscover.cntNodes, " node(s)..." );
                             }
                             await discoverSChainWalkNodes( optsDiscover );
                             optsDiscover.nCountAvailable =
                                 optsDiscover.cntNodes - optsDiscover.cntFailed;
-                            if( log.verboseGet() >= log.verboseReversed().information ) {
-                                if( ! optsDiscover.isSilentReDiscovery ) {
-                                    log.write( cc.debug( "Waiting for S-Chain nodes, total " ) +
-                                        cc.warning( optsDiscover.cntNodes ) +
-                                            cc.debug( ", available " ) +
-                                        cc.warning( optsDiscover.nCountAvailable ) +
-                                        cc.debug( ", expected at least " ) +
-                                        cc.warning( optsDiscover.nCountToWait ) + "\n" );
-                                }
+                            if( ! optsDiscover.isSilentReDiscovery ) {
+                                log.debug( "Waiting for S-Chain nodes, total ",
+                                    optsDiscover.cntNodes, ", available ",
+                                    optsDiscover.nCountAvailable, ", expected at least ",
+                                    optsDiscover.nCountToWait );
                             }
                             if( optsDiscover.nCountAvailable < optsDiscover.nCountToWait ) {
-                                if( log.verboseGet() >= log.verboseReversed().critical ) {
-                                    if( ! optsDiscover.isSilentReDiscovery ) {
-                                        log.write( optsDiscover.strLogPrefix +
-                                            cc.fatal( "CRITICAL ERROR:" ) +
-                                            cc.error( " Not enough nodes available " +
-                                            "on S-Chain, total " ) +
-                                            cc.warning( optsDiscover.cntNodes ) +
-                                            cc.error( ", available " ) +
-                                            cc.warning( optsDiscover.nCountAvailable ) +
-                                            cc.error( ", expected at least " ) +
-                                            cc.warning( optsDiscover.nCountToWait ) + "\n" );
-                                    }
+                                if( ! optsDiscover.isSilentReDiscovery ) {
+                                    log.critical( optsDiscover.strLogPrefix,
+                                        cc.fatal( "CRITICAL ERROR:" ),
+                                        " Not enough nodes available on S-Chain, total ",
+                                        optsDiscover.cntNodes, ", available ",
+                                        optsDiscover.nCountAvailable, ", expected at least ",
+                                        optsDiscover.nCountToWait );
                                 }
                                 const err = new Error(
                                     "Not enough nodes available on S-Chain, total " +
@@ -797,15 +664,12 @@ export async function discoverSChainNetwork(
                         } );
                     } );
             } catch ( err ) {
-                if( log.verboseGet() >= log.verboseReversed().critical ) {
-                    if( ! optsDiscover.isSilentReDiscovery ) {
-                        const strError = owaspUtils.extractErrorMessage( err );
-                        log.write( optsDiscover.strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
-                            cc.error( " JSON RPC call(discoverSChainNetwork) " +
-                                "to S-Chain was not created: " ) +
-                            cc.warning( strError ) + cc.error( ", stack is: " ) + "\n" +
-                            cc.stack( err.stack ) + "\n" );
-                    }
+                if( ! optsDiscover.isSilentReDiscovery ) {
+                    const strError = owaspUtils.extractErrorMessage( err );
+                    log.critical( optsDiscover.strLogPrefix, cc.fatal( "CRITICAL ERROR:" ),
+                        " JSON RPC call(discoverSChainNetwork) to S-Chain was not created: ",
+                        cc.warning( strError ), ", stack is: ", "\n",
+                        cc.stack( err.stack ) );
                 }
                 optsDiscover.joSChainNetworkInfo = null;
                 optsDiscover.fnAfter( err, null );
@@ -827,11 +691,8 @@ function checkPeriodicDiscoveryNoLongerNeeded( joSChainNetworkInfo, isSilentReDi
     const cntNodesOnChain = getSChainNodesCount( imaState.joSChainNetworkInfo );
     const cntAlreadyDiscovered = getSChainDiscoveredNodesCount( joSChainNetworkInfo );
     if( ! isSilentReDiscovery ) {
-        log.write(
-            cc.debug( "Periodic S-Chain re-discovery already have " ) +
-            cc.info( cntAlreadyDiscovered ) + cc.debug( " of " ) +
-            cc.info( cntNodesOnChain ) + cc.debug( " node(s) discovered" ) +
-            "\n" );
+        log.notice( "Periodic S-Chain re-discovery already have ",
+            cntAlreadyDiscovered, " of ", cntNodesOnChain, " node(s) discovered" );
     }
     if( cntAlreadyDiscovered >= cntNodesOnChain ) {
         if( gIntervalPeriodicDiscovery ) {
@@ -852,22 +713,17 @@ export async function doPeriodicSChainNetworkDiscoveryIfNeeded(
     let joPrevSChainNetworkInfo = imaState.joSChainNetworkInfo;
     if( checkPeriodicDiscoveryNoLongerNeeded(
         joPrevSChainNetworkInfo, isSilentReDiscovery ) ) {
-        if( ! isSilentReDiscovery ) {
-            log.write(
-                cc.success( "Periodic S-Chain re-discovery is not needed right from startup" ) +
-                "\n" );
-        }
+        if( ! isSilentReDiscovery )
+            log.success( "Periodic S-Chain re-discovery is not needed right from startup" );
         return; // not needed right from very beginning
     }
     const cntNodesOnChain = getSChainNodesCount( imaState.joSChainNetworkInfo );
     let periodicDiscoveryInterval = imaState.joSChainDiscovery.periodicDiscoveryInterval;
     if( periodicDiscoveryInterval <= 0 )
         periodicDiscoveryInterval = 5 * 60 * 1000;
-    if( log.verboseGet() >= log.verboseReversed().information ) {
-        if( ! isSilentReDiscovery ) {
-            log.write( cc.debug( "Periodic S-Chain re-discovery will be done with " ) +
-                cc.info( periodicDiscoveryInterval ) + cc.debug( " interval..." ) + "\n" );
-        }
+    if( ! isSilentReDiscovery ) {
+        log.debug( "Periodic S-Chain re-discovery will be done with ",
+            periodicDiscoveryInterval, " interval..." );
     }
     fnAfterRediscover = fnAfterRediscover || function() { };
     gIntervalPeriodicDiscovery = setInterval( async function() {
@@ -876,36 +732,27 @@ export async function doPeriodicSChainNetworkDiscoveryIfNeeded(
             : cntNodesOnChain;
         if( nCountToWait > cntNodesOnChain )
             nCountToWait = cntNodesOnChain;
-        if( log.verboseGet() >= log.verboseReversed().information ) {
-            if( !isSilentReDiscovery ) {
-                log.write(
-                    cc.attention( "This S-Chain discovery will be done for " ) +
-                    cc.bright( "periodic discovery update" ) + "\n" );
-            }
+        if( !isSilentReDiscovery ) {
+            log.information( "This S-Chain discovery will be done for ",
+                cc.bright( "periodic discovery update" ) );
         }
         await discoverSChainNetwork(
             null, isSilentReDiscovery, joPrevSChainNetworkInfo, nCountToWait );
         joPrevSChainNetworkInfo = imaState.joSChainNetworkInfo;
         if( checkPeriodicDiscoveryNoLongerNeeded(
             joPrevSChainNetworkInfo, isSilentReDiscovery ) ) {
-            if( ! isSilentReDiscovery ) {
-                log.write(
-                    cc.debug( "Final periodic S-Chain re-discovery done" ) +
-                    "\n" );
-            }
+            if( ! isSilentReDiscovery )
+                log.information( "Final periodic S-Chain re-discovery done" );
             fnAfterRediscover( true );
             return; // not needed anymore, all nodes completely discovered
         }
-        if( ! isSilentReDiscovery ) {
-            log.write(
-                cc.debug( "Partial periodic S-Chain re-discovery done" ) +
-                "\n" );
-        }
+        if( ! isSilentReDiscovery )
+            log.information( "Partial periodic S-Chain re-discovery done" );
+
         fnAfterRediscover( false );
     }, periodicDiscoveryInterval );
     if( ! isSilentReDiscovery ) {
-        log.write(
-            cc.debug( "Periodic S-Chain re-discovery was started with interval " ) +
-            cc.info( periodicDiscoveryInterval ) + cc.debug( " millisecond(s)" ) + "\n" );
+        log.information( "Periodic S-Chain re-discovery was started with interval ",
+            periodicDiscoveryInterval, " millisecond(s)" );
     }
 }
