@@ -333,10 +333,9 @@ export async function continueSChainDiscoveryInBackgroundIfNeeded( isSilentReDis
                                             strMessage += cc.success( ", " );
                                         const strNodeURL =
                                             imaUtils.composeSChainNodeUrl( joNode );
-                                        const strNodeDescColorized =
-                                            cc.notice( "#" ) + cc.info( i ) +
-                                            cc.attention( "(" ) + cc.u( strNodeURL ) +
-                                            cc.attention( ")" );
+                                        const strNodeDescColorized = cc.notice( "#" ) +
+                                            cc.info( i ) + cc.attention( "(" ) +
+                                            cc.u( strNodeURL ) + cc.attention( ")" );
                                         strMessage += strNodeDescColorized;
                                         ++ cntBad;
                                     }
@@ -378,8 +377,7 @@ async function discoverSChainWalkNodes( optsDiscover ) {
         const nCurrentNodeIdx = 0 + i;
         const joNode = optsDiscover.jarrNodes[nCurrentNodeIdx];
         const strNodeURL = imaUtils.composeSChainNodeUrl( joNode );
-        const strNodeDescColorized =
-            cc.notice( "#" ) + cc.info( nCurrentNodeIdx ) +
+        const strNodeDescColorized = cc.notice( "#" ) + cc.info( nCurrentNodeIdx ) +
             cc.attention( "(" ) + cc.u( strNodeURL ) + cc.attention( ")" );
         if( ! optsDiscover.isSilentReDiscovery ) {
             log.information( optsDiscover.strLogPrefix,

@@ -107,7 +107,7 @@ export async function safeGetPastEventsProgressive(
     if( nBlockTo == "latest" ) {
         isLastLatest = true;
         nBlockTo = nLatestBlockNumberPlus1;
-        details.trace( strLogPrefix, "Iterative scan up to latest block ", cc.attention( "#" ),
+        details.trace( strLogPrefix, "Iterative scan up to latest block #",
             cc.info( nBlockTo.toHexString() ), " assumed instead of ", cc.attention( "latest" ) );
     } else {
         nBlockTo = owaspUtils.toBN( nBlockTo );
@@ -475,8 +475,8 @@ export async function safeGetPastEventsIterative(
     if( nBlockTo == "latest" ) {
         isLastLatest = true;
         nBlockTo = nLatestBlockNumberPlus1;
-        details.trace( strLogPrefix, "Iterative scan up to latest block ",
-            cc.info( "#" ), cc.info( nBlockTo.toHexString() ),
+        details.trace( strLogPrefix, "Iterative scan up to latest block #",
+            cc.info( nBlockTo.toHexString() ),
             " assumed instead of ", cc.attention( "latest" ) );
     } else {
         nBlockTo = owaspUtils.toBN( nBlockTo );

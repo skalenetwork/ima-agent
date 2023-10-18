@@ -499,8 +499,8 @@ function performBlsVerifyI(
         return true;
     const imaState = state.get();
     const strLogPrefix =
-        cc.bright( strDirection ) + cc.debug( "/" ) + cc.info( "BLS" ) + cc.debug( "/" ) +
-        cc.notice( "#" ) + cc.bright( nZeroBasedNodeIndex ) + cc.debug( ":" ) + " ";
+        cc.bright( strDirection ) + cc.debug( "/" ) + cc.info( "BLS" ) + cc.debug( "/#" ) +
+        cc.bright( nZeroBasedNodeIndex ) + cc.debug( ":" ) + " ";
     const nThreshold = discoverBlsThreshold( imaState.joSChainNetworkInfo );
     const nParticipants = discoverBlsParticipants( imaState.joSChainNetworkInfo );
     if( ! checkBlsThresholdAndBlsParticipants(
@@ -512,19 +512,19 @@ function performBlsVerifyI(
     };
     let strOutput = "";
     try {
-        details.trace( strLogPrefix, "BLS node ", cc.notice( "#" ), nZeroBasedNodeIndex,
+        details.trace( strLogPrefix, "BLS node #", nZeroBasedNodeIndex,
             " - first message nonce is ", nIdxCurrentMsgBlockStart );
-        details.trace( strLogPrefix, "BLS node ", cc.notice( "#" ), nZeroBasedNodeIndex,
+        details.trace( strLogPrefix, "BLS node #", nZeroBasedNodeIndex,
             " - first source chain name is ", cc.info( strFromChainName ) );
-        details.trace( strLogPrefix, "BLS node ", cc.notice( "#" ), nZeroBasedNodeIndex,
+        details.trace( strLogPrefix, "BLS node #", nZeroBasedNodeIndex,
             " - messages array ", cc.j( jarrMessages ) );
         const strMessageHash =
             owaspUtils.removeStarting0x(
                 keccak256Message( jarrMessages, nIdxCurrentMsgBlockStart, strFromChainName ) );
-        details.trace( strLogPrefix, "BLS node ", cc.notice( "#" ), nZeroBasedNodeIndex,
+        details.trace( strLogPrefix, "BLS node #", nZeroBasedNodeIndex,
             " - hashed verify message is ", cc.info( strMessageHash ) );
         const joMsg = { "message": strMessageHash };
-        details.debug( strLogPrefix, "BLS node ", cc.notice( "#" ), nZeroBasedNodeIndex,
+        details.debug( strLogPrefix, "BLS node #", nZeroBasedNodeIndex,
             " - composed  ", cc.j( joMsg ), " composed from ", cc.j( jarrMessages ),
             " using glue ", cc.j( joResultFromNode ), " and public key ", cc.j( joPublicKey ) );
         const strSignResultFileName = strActionDir + "/sign-result" + nZeroBasedNodeIndex + ".json";
@@ -539,22 +539,22 @@ function performBlsVerifyI(
             " --j " + nZeroBasedNodeIndex +
             " --input " + strSignResultFileName
             ;
-        details.trace( strLogPrefix, "Will execute node ", cc.notice( "#" ),
+        details.trace( strLogPrefix, "Will execute node #",
             nZeroBasedNodeIndex, " BLS verify command:", "\n", cc.notice( strVerifyCommand ) );
         strOutput = childProcessModule.execSync( strVerifyCommand, { cwd: strActionDir } );
-        details.trace( strLogPrefix, "BLS node ", cc.notice( "#" ),
+        details.trace( strLogPrefix, "BLS node #",
             nZeroBasedNodeIndex, " verify output is:", "\n", cc.notice( strOutput ) );
-        details.success( strLogPrefix, "BLS node ", cc.notice( "#" ),
+        details.success( strLogPrefix, "BLS node #",
             nZeroBasedNodeIndex, " verify success" );
         fnShellRestore();
         return true;
     } catch ( err ) {
-        details.critical( strLogPrefix, cc.fatal( "CRITICAL ERROR:" ), " BLS node ",
-            cc.notice( "#" ), nZeroBasedNodeIndex, " verify error:", " error description is: ",
+        details.critical( strLogPrefix, cc.fatal( "CRITICAL ERROR:" ), " BLS node #",
+            nZeroBasedNodeIndex, " verify error:", " error description is: ",
             cc.warning( owaspUtils.extractErrorMessage( err ) ), ", stack is: ", "\n",
             cc.stack( err.stack ) );
-        details.critical( strLogPrefix, cc.error( "CRITICAL ERROR:" ), " BLS node ",
-            cc.notice( "#" ), nZeroBasedNodeIndex, " verify output is:", "\n",
+        details.critical( strLogPrefix, cc.error( "CRITICAL ERROR:" ), " BLS node #",
+            nZeroBasedNodeIndex, " verify output is:", "\n",
             cc.notice( strOutput ) );
         fnShellRestore();
     }
@@ -572,8 +572,7 @@ function performBlsVerifyIU256(
         return true;
     const imaState = state.get();
     const strLogPrefix =
-        cc.info( "BLS" ) + cc.debug( "/" ) +
-        cc.notice( "#" ) + cc.bright( nZeroBasedNodeIndex ) +
+        cc.info( "BLS" ) + cc.debug( "/#" ) + cc.bright( nZeroBasedNodeIndex ) +
         cc.debug( ":" ) + " ";
     const nThreshold = discoverBlsThreshold( imaState.joSChainNetworkInfo );
     const nParticipants = discoverBlsParticipants( imaState.joSChainNetworkInfo );
@@ -587,7 +586,7 @@ function performBlsVerifyIU256(
     let strOutput = "";
     try {
         const joMsg = { "message": keccak256U256( u256, true ) };
-        details.debug( strLogPrefix, "BLS u256 node ", cc.notice( "#" ), nZeroBasedNodeIndex,
+        details.debug( strLogPrefix, "BLS u256 node #", nZeroBasedNodeIndex,
             cc.debug( " verify message " ) + cc.j( joMsg ) + " composed from ", cc.j( u256 ),
             " using glue ", cc.j( joResultFromNode ), " and public key ", cc.j( joPublicKey ) );
         const strSignResultFileName = strActionDir + "/sign-result" + nZeroBasedNodeIndex + ".json";
@@ -602,23 +601,23 @@ function performBlsVerifyIU256(
             " --j " + nZeroBasedNodeIndex +
             " --input " + strSignResultFileName
             ;
-        details.trace( strLogPrefix, "Will execute node ", cc.notice( "#" ),
+        details.trace( strLogPrefix, "Will execute node #",
             nZeroBasedNodeIndex, " BLS u256 verify command:", "\n",
             cc.notice( strVerifyCommand ) );
         strOutput = childProcessModule.execSync( strVerifyCommand, { cwd: strActionDir } );
-        details.trace( strLogPrefix, "BLS u256 node ", cc.notice( "#" ), nZeroBasedNodeIndex +
+        details.trace( strLogPrefix, "BLS u256 node #", nZeroBasedNodeIndex +
             " verify output is:", "\n", cc.notice( strOutput ) );
-        details.success( strLogPrefix, "BLS u256 node ", cc.notice( "#" ),
+        details.success( strLogPrefix, "BLS u256 node #",
             nZeroBasedNodeIndex, " verify success" );
         fnShellRestore();
         return true;
     } catch ( err ) {
-        details.error( strLogPrefix, cc.fatal( "CRITICAL ERROR:" ), " BLS u256 node ",
-            cc.notice( "#" ), nZeroBasedNodeIndex, " verify error:",
+        details.error( strLogPrefix, cc.fatal( "CRITICAL ERROR:" ), " BLS u256 node #",
+            nZeroBasedNodeIndex, " verify error:",
             " error description is: ", cc.warning( owaspUtils.extractErrorMessage( err ) ),
             ", stack is: ", "\n", cc.stack( err.stack ) );
-        details.error( strLogPrefix, cc.error( "CRITICAL ERROR:" ), " BLS u256 node ",
-            cc.notice( "#" ), nZeroBasedNodeIndex, " verify output is:", "\n",
+        details.error( strLogPrefix, cc.error( "CRITICAL ERROR:" ), " BLS u256 node #",
+            nZeroBasedNodeIndex, " verify output is:", "\n",
             cc.notice( strOutput ) );
         fnShellRestore();
     }
@@ -981,8 +980,8 @@ async function gatherSigningStartImpl( optsSignOperation ) {
         const iv = setInterval( function() {
             if( optsSignOperation.joGatheringTracker.nCountReceivedPrevious !=
                 optsSignOperation.joGatheringTracker.nCountReceived ) {
-                optsSignOperation.details.debug( cc.bright( optsSignOperation.strDirection ), "/",
-                    cc.attention( "#" ), optsSignOperation.nTransferLoopCounter,
+                optsSignOperation.details.debug( cc.bright( optsSignOperation.strDirection ), "/#",
+                    optsSignOperation.nTransferLoopCounter,
                     " BLS signature gathering progress updated, now have ",
                     optsSignOperation.joGatheringTracker.nCountReceived, " BLS parts of ",
                     optsSignOperation.nCountOfBlsPartsToCollect, " arrived, have ",
@@ -997,8 +996,8 @@ async function gatherSigningStartImpl( optsSignOperation ) {
                 optsSignOperation.joGatheringTracker.nCountErrors;
             if( optsSignOperation.cntSuccess >= optsSignOperation.nCountOfBlsPartsToCollect ) {
                 optsSignOperation.strLogPrefixB =
-                    cc.bright( optsSignOperation.strDirection ) + cc.debug( "/" ) +
-                    cc.attention( "#" ) + cc.sunny( optsSignOperation.nTransferLoopCounter ) +
+                    cc.bright( optsSignOperation.strDirection ) + cc.debug( "/#" ) +
+                    cc.sunny( optsSignOperation.nTransferLoopCounter ) +
                     cc.debug( "/" ) + cc.info( "BLS" ) +
                     cc.debug( "/" ) + cc.sunny( "Summary" ) + cc.debug( ":" ) + " ";
                 clearInterval( iv );
@@ -1343,8 +1342,7 @@ async function doSignProcessHandleCall(
             let bNodeSignatureOKay = false; // initially assume signature is wrong
             optsSignOperation.strLogPrefixA =
                 cc.bright( optsSignOperation.strDirection ) + cc.debug( "/" ) +
-                cc.info( "BLS" ) + cc.debug( "/" ) +
-                cc.notice( "#" ) + cc.bright( nZeroBasedNodeIndex ) +
+                cc.info( "BLS" ) + cc.debug( "/#" ) + cc.bright( nZeroBasedNodeIndex ) +
                 cc.debug( ":" ) + " ";
             try {
                 optsSignOperation.cntSuccess =
@@ -1551,9 +1549,8 @@ async function doSignMessagesImpl(
         fromChainID: -4
     };
     optsSignOperation.strLogPrefix =
-        cc.bright( optsSignOperation.strDirection ) + cc.debug( "/" ) +
-        cc.attention( "#" ) + cc.sunny( optsSignOperation.nTransferLoopCounter ) + " " +
-        cc.info( "Sign msgs via " ) +
+        cc.bright( optsSignOperation.strDirection ) + cc.debug( "/#" ) +
+        cc.sunny( optsSignOperation.nTransferLoopCounter ) + " " + cc.info( "Sign msgs via " ) +
         cc.attention( optsSignOperation.imaState.isCrossImaBlsMode ? "IMA agent" : "skaled" ) +
         cc.info( ":" ) + " ";
     optsSignOperation.joGatheringTracker = {
@@ -1798,7 +1795,7 @@ async function doSignU256OneImpl( i, optsSignU256 ) {
                     const nZeroBasedNodeIndex = joNode.imaInfo.thisNodeIndex - 1;
                     // partial BLS verification for one participant
                     let bNodeSignatureOKay = false; // initially assume signature is wrong
-                    const strLogPrefixA = cc.info( "BLS" ) + cc.debug( "/" ) + cc.notice( "#" ) +
+                    const strLogPrefixA = cc.info( "BLS" ) + cc.debug( "/#" ) +
                         cc.bright( nZeroBasedNodeIndex ) + cc.debug( ":" ) + " ";
                     try {
                         const cntSuccess = optsSignU256.joGatheringTracker.nCountReceived -
@@ -2116,8 +2113,7 @@ export async function doVerifyReadyHash(
     const strDirection = "RAW";
     const strLogPrefix =
         cc.bright( strDirection ) + cc.debug( "/" ) +
-        cc.info( "BLS" ) + cc.debug( "/" ) +
-        cc.notice( "#" ) + cc.bright( nZeroBasedNodeIndex ) +
+        cc.info( "BLS" ) + cc.debug( "/#" ) + cc.bright( nZeroBasedNodeIndex ) +
         cc.debug( ":" ) + " ";
     const details = log.createMemoryStream();
     let isSuccess = false;
@@ -2142,12 +2138,12 @@ export async function doVerifyReadyHash(
     try {
         const joPublicKey = discoverPublicKeyByIndex(
             nZeroBasedNodeIndex, imaState.joSChainNetworkInfo, details, true );
-        details.trace( strLogPrefix, "BLS node ", cc.notice( "#" ),
+        details.trace( strLogPrefix, "BLS node #",
             nZeroBasedNodeIndex, " - hashed verify message is ", cc.info( strMessageHash ) );
         const joMsg = {
             "message": strMessageHash
         };
-        details.debug( strLogPrefix, "BLS node ", cc.notice( "#" ), nZeroBasedNodeIndex,
+        details.debug( strLogPrefix, "BLS node #", nZeroBasedNodeIndex,
             " - composed  ", cc.j( joMsg ), " using hash ", cc.j( strMessageHash ), " and glue ",
             cc.j( joResultFromNode ), " and public key ", cc.j( joPublicKey ) );
         const strSignResultFileName = strActionDir + "/sign-result" + nZeroBasedNodeIndex + ".json";
@@ -2162,31 +2158,31 @@ export async function doVerifyReadyHash(
             " --j " + nZeroBasedNodeIndex +
             " --input " + strSignResultFileName
             ;
-        details.trace( strLogPrefix, "Will execute node ", cc.notice( "#" ) + nZeroBasedNodeIndex,
+        details.trace( strLogPrefix, "Will execute node #" + nZeroBasedNodeIndex,
             " BLS verify command:", "\n", cc.notice( strVerifyCommand ) );
         strOutput = childProcessModule.execSync( strVerifyCommand, { cwd: strActionDir } );
-        details.trace( strLogPrefix, "BLS node ", cc.notice( "#" ), nZeroBasedNodeIndex,
+        details.trace( strLogPrefix, "BLS node #", nZeroBasedNodeIndex,
             " verify output is:", "\n", cc.notice( strOutput ) );
-        details.trace( strLogPrefix + cc.success( "BLS node " ) + cc.notice( "#" ) +
+        details.trace( strLogPrefix + cc.success( "BLS node #" ) +
             nZeroBasedNodeIndex + cc.success( " verify success" ) );
         fnShellRestore();
         isSuccess = true;
     } catch ( err ) {
         if( log.id != details.id ) {
-            log.critical( strLogPrefix, cc.fatal( "CRITICAL ERROR:" ), " BLS node ",
-                cc.notice( "#" ), nZeroBasedNodeIndex, " verify error, error description is: ",
+            log.critical( strLogPrefix, cc.fatal( "CRITICAL ERROR:" ), " BLS node #",
+                nZeroBasedNodeIndex, " verify error, error description is: ",
                 cc.warning( owaspUtils.extractErrorMessage( err ) ),
                 ", stack is: ", "\n" + cc.stack( err.stack ) );
-            log.critical( strLogPrefix, cc.fatal( "CRITICAL ERROR:" ), " BLS node ",
-                cc.notice( "#" ), nZeroBasedNodeIndex, " verify output is:", "\n",
+            log.critical( strLogPrefix, cc.fatal( "CRITICAL ERROR:" ), " BLS node#",
+                nZeroBasedNodeIndex, " verify output is:", "\n",
                 cc.warning( strOutput ) );
         }
-        details.critical( strLogPrefix, cc.fatal( "CRITICAL ERROR:" ), " BLS node ",
-            cc.notice( "#" ), nZeroBasedNodeIndex, " verify error, error description is: ",
+        details.critical( strLogPrefix, cc.fatal( "CRITICAL ERROR:" ), " BLS node #",
+            nZeroBasedNodeIndex, " verify error, error description is: ",
             cc.warning( owaspUtils.extractErrorMessage( err ) ),
             ", stack is: ", "\n" + cc.stack( err.stack ) );
-        details.critical( strLogPrefix, cc.fatal( "CRITICAL ERROR:" ), " BLS node ",
-            cc.notice( "#" ), nZeroBasedNodeIndex, " verify output is:", "\n",
+        details.critical( strLogPrefix, cc.fatal( "CRITICAL ERROR:" ), " BLS node #" ,
+            nZeroBasedNodeIndex, " verify output is:", "\n",
             cc.warning( strOutput ) );
         fnShellRestore();
         isSuccess = false;

@@ -85,58 +85,22 @@ class ObserverServer extends SocketServer {
                 const isFlush = true;
                 socket.send( jo, isFlush );
             };
-            self.fatal = function() {
-                if( log.verboseGet() >= log.verboseReversed().fatal )
-                    self.log( formatArgs( arguments, cc.error ) + "\n" );
-            };
-            self.critical = function() {
-                if( log.verboseGet() >= log.verboseReversed().critical )
-                    self.log( formatArgs( arguments, cc.error ) + "\n" );
-            };
-            self.error = function() {
-                if( log.verboseGet() >= log.verboseReversed().error )
-                    self.log( formatArgs( arguments, cc.error ) + "\n" );
-            };
-            self.warning = function() {
-                if( log.verboseGet() >= log.verboseReversed().warning )
-                    self.log( formatArgs( arguments, cc.warning ) + "\n" );
-            };
-            self.attention = function() {
-                if( log.verboseGet() >= log.verboseReversed().attention )
-                    self.log( formatArgs( arguments, cc.attention ) + "\n" );
-            };
-            self.information = function() {
-                if( log.verboseGet() >= log.verboseReversed().information )
-                    self.log( formatArgs( arguments, cc.info ) + "\n" );
-            };
-            self.info = function() {
-                if( log.verboseGet() >= log.verboseReversed().information )
-                    self.log( formatArgs( arguments, cc.info ) + "\n" );
-            };
-            self.notice = function() {
-                if( log.verboseGet() >= log.verboseReversed().notice )
-                    self.log( formatArgs( arguments, cc.notice ) + "\n" );
-            };
-            self.note = function() {
-                if( log.verboseGet() >= log.verboseReversed().notice )
-                    self.log( formatArgs( arguments, cc.note ) + "\n" );
-            };
-            self.debug = function() {
-                if( log.verboseGet() >= log.verboseReversed().debug )
-                    self.log( formatArgs( arguments, cc.debug ) + "\n" );
-            };
-            self.trace = function() {
-                if( log.verboseGet() >= log.verboseReversed().trace )
-                    self.log( formatArgs( arguments, cc.trace ) + "\n" );
-            };
-            self.success = function() {
-                if( log.verboseGet() >= log.verboseReversed().information )
-                    self.log( formatArgs( arguments, cc.success ) + "\n" );
-            };
-
+            self.initLogMethods();
             self.opts = JSON.parse( JSON.stringify( joMessage.message.opts ) );
             self.opts.details = {
-                write: self.log
+                "write": self.log,
+                "fatal": self.fatal,
+                "critical": self.critical,
+                "error": self.error,
+                "warning": self.warning,
+                "attention": self.attention,
+                "information": self.information,
+                "info": self.info,
+                "notice": self.notice,
+                "note": self.note,
+                "debug": self.debug,
+                "trace": self.trace,
+                "success": self.success
             };
             cc.enable( joMessage.message.cc.isEnabled );
             log.verboseSet( self.opts.imaState.verbose_ );
@@ -259,6 +223,56 @@ class ObserverServer extends SocketServer {
             self.intervalPeriodicSchainsCaching = null;
         }
         super.dispose();
+    }
+    initLogMethods() {
+        self.fatal = function() {
+            if( log.verboseGet() >= log.verboseReversed().fatal )
+                self.log( formatArgs( arguments, cc.error ) + "\n" );
+        };
+        self.critical = function() {
+            if( log.verboseGet() >= log.verboseReversed().critical )
+                self.log( formatArgs( arguments, cc.error ) + "\n" );
+        };
+        self.error = function() {
+            if( log.verboseGet() >= log.verboseReversed().error )
+                self.log( formatArgs( arguments, cc.error ) + "\n" );
+        };
+        self.warning = function() {
+            if( log.verboseGet() >= log.verboseReversed().warning )
+                self.log( formatArgs( arguments, cc.warning ) + "\n" );
+        };
+        self.attention = function() {
+            if( log.verboseGet() >= log.verboseReversed().attention )
+                self.log( formatArgs( arguments, cc.attention ) + "\n" );
+        };
+        self.information = function() {
+            if( log.verboseGet() >= log.verboseReversed().information )
+                self.log( formatArgs( arguments, cc.info ) + "\n" );
+        };
+        self.info = function() {
+            if( log.verboseGet() >= log.verboseReversed().information )
+                self.log( formatArgs( arguments, cc.info ) + "\n" );
+        };
+        self.notice = function() {
+            if( log.verboseGet() >= log.verboseReversed().notice )
+                self.log( formatArgs( arguments, cc.notice ) + "\n" );
+        };
+        self.note = function() {
+            if( log.verboseGet() >= log.verboseReversed().notice )
+                self.log( formatArgs( arguments, cc.note ) + "\n" );
+        };
+        self.debug = function() {
+            if( log.verboseGet() >= log.verboseReversed().debug )
+                self.log( formatArgs( arguments, cc.debug ) + "\n" );
+        };
+        self.trace = function() {
+            if( log.verboseGet() >= log.verboseReversed().trace )
+                self.log( formatArgs( arguments, cc.trace ) + "\n" );
+        };
+        self.success = function() {
+            if( log.verboseGet() >= log.verboseReversed().information )
+                self.log( formatArgs( arguments, cc.success ) + "\n" );
+        };
     }
 };
 

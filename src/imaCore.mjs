@@ -1059,7 +1059,7 @@ async function doMainTransferLoopActions( optsTransfer ) {
             optsTransfer.strDirection + "/#" + optsTransfer.nTransferLoopCounter + "-" +
             "doTransfer-B-" + optsTransfer.chainNameSrc + "-->" + optsTransfer.chainNameDst;
         optsTransfer.strGatheredDetailsName_colored =
-            cc.bright( optsTransfer.strDirection ) + cc.debug( "/" ) + cc.attention( "#" ) +
+            cc.bright( optsTransfer.strDirection ) + cc.debug( "/#" ) +
             cc.sunny( optsTransfer.nTransferLoopCounter ) + cc.debug( "-" ) +
             cc.info( "doTransfer-B-" ) + cc.notice( optsTransfer.chainNameSrc ) +
             cc.debug( "-->" ) + cc.notice( optsTransfer.chainNameDst );
@@ -1147,14 +1147,14 @@ export async function doTransfer(
         optsTransfer.nTransferLoopCounter + "-" + "doTransfer-A" + "-" +
         optsTransfer.chainNameSrc + "-->" + optsTransfer.chainNameDst;
     optsTransfer.strGatheredDetailsName_colored = cc.bright( optsTransfer.strDirection ) +
-        cc.debug( "/" ) + cc.attention( "#" ) + cc.sunny( optsTransfer.nTransferLoopCounter ) +
+        cc.debug( "/#" ) + cc.sunny( optsTransfer.nTransferLoopCounter ) +
         cc.debug( "-" ) + cc.info( "doTransfer-A-" ) + cc.debug( "-" ) +
         cc.notice( optsTransfer.chainNameSrc ) + cc.debug( "-->" ) +
         cc.notice( optsTransfer.chainNameDst );
     optsTransfer.details = optsTransfer.imaState.isDynamicLogInDoTransfer
         ? log : log.createMemoryStream( true );
-    optsTransfer.strLogPrefixShort = cc.bright( optsTransfer.strDirection ) + cc.debug( "/" ) +
-        cc.attention( "#" ) + cc.sunny( optsTransfer.nTransferLoopCounter ) + " ";
+    optsTransfer.strLogPrefixShort = cc.bright( optsTransfer.strDirection ) + cc.debug( "/#" ) +
+        cc.sunny( optsTransfer.nTransferLoopCounter ) + " ";
     optsTransfer.strLogPrefix = optsTransfer.strLogPrefixShort + cc.info( "transfer loop from " ) +
         cc.notice( optsTransfer.chainNameSrc ) + cc.info( " to " ) +
         cc.notice( optsTransfer.chainNameDst ) + cc.info( ":" ) + " ";
