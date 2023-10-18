@@ -45,37 +45,35 @@ export async function reimbursementShowBalance(
     const strLogPrefix = cc.info( "Gas Reimbursement - Show Balance" ) + " ";
     try {
         const addressFrom = joReceiverMainNet;
-        details.write( strLogPrefix + cc.debug( "Querying wallet " ) +
-            cc.notice( strReimbursementChain ) + cc.debug( "/" ) + cc.info( addressFrom ) +
-            cc.debug( " balance..." ) + "\n" );
+        details.debug( strLogPrefix, "Querying wallet ",
+            cc.notice( strReimbursementChain ), "/", cc.info( addressFrom ),
+            " balance..." );
         const xWei =
             await joCommunityPool.callStatic.getBalance(
                 addressFrom, strReimbursementChain, { from: addressFrom } );
-        s = strLogPrefix + cc.success( "Balance(wei): " ) + cc.attention( xWei ) + "\n";
-        if( isForcePrintOut || log.verboseGet() >= log.verboseReversed().information )
-            log.write( s );
-        details.write( s );
+        s = strLogPrefix + cc.success( "Balance(wei): " ) + cc.attention( xWei );
+        if( isForcePrintOut )
+            log.information( s );
+        details.information( s );
         const xEth = owaspUtils.ethersMod.ethers.utils.formatEther( owaspUtils.toBN( xWei ) );
-        s = strLogPrefix + cc.success( "Balance(eth): " ) + cc.attention( xEth ) + "\n";
-        if( isForcePrintOut || log.verboseGet() >= log.verboseReversed().information )
-            log.write( s );
-        details.write( s );
+        s = strLogPrefix + cc.success( "Balance(eth): " ) + cc.attention( xEth );
+        if( isForcePrintOut )
+            log.information( s );
+        details.information( s );
         if( log.exposeDetailsGet() )
             details.exposeDetailsTo( log, "reimbursementShowBalance", true );
         details.close();
         return xWei;
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().critical ) {
-            const strError = owaspUtils.extractErrorMessage( err );
-            const s = strLogPrefix +
-                cc.fatal( "CRITICAL ERROR:" ) +
-                cc.error( " Payment error in reimbursementShowBalance(): " ) +
-                cc.error( strError ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
-            if( log.id != details.id )
-                log.write( s );
-            details.write( s );
-        }
+        const strError = owaspUtils.extractErrorMessage( err );
+        const s = strLogPrefix +
+            cc.fatal( "CRITICAL ERROR:" ) +
+            cc.error( " Payment error in reimbursementShowBalance(): " ) +
+            cc.error( strError ) +
+            cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
+        if( log.id != details.id )
+            log.critical( s );
+        details.critical( s );
         details.exposeDetailsTo( log, "reimbursementShowBalance", false );
         details.close();
         return 0;
@@ -96,45 +94,44 @@ export async function reimbursementEstimateAmount(
     let s = "";
     const strLogPrefix = cc.info( "Gas Reimbursement - Estimate Amount To Recharge" ) + " ";
     try {
-        details.write( strLogPrefix + cc.debug( "Querying wallet " ) +
-            cc.notice( strReimbursementChain ) + cc.debug( " balance..." ) + "\n" );
+        details.debug( strLogPrefix, "Querying wallet ",
+            cc.notice( strReimbursementChain ), " balance..." );
         const addressReceiver = joReceiverMainNet;
         const xWei =
         await joCommunityPool.callStatic.getBalance(
             addressReceiver, strReimbursementChain, { from: addressReceiver } );
-        s = strLogPrefix + cc.success( "Balance(wei): " ) + cc.attention( xWei ) + "\n";
-        if( isForcePrintOut || log.verboseGet() >= log.verboseReversed().information )
-            log.write( s );
-        details.write( s );
+        s = strLogPrefix + cc.success( "Balance(wei): " ) + cc.attention( xWei );
+        if( isForcePrintOut )
+            log.information( s );
+        details.information( s );
         const xEth = owaspUtils.ethersMod.ethers.utils.formatEther( owaspUtils.toBN( xWei ) );
-        s = strLogPrefix + cc.success( "Balance(eth): " ) + cc.attention( xEth ) + "\n";
-        if( isForcePrintOut || log.verboseGet() >= log.verboseReversed().information )
-            log.write( s );
-        details.write( s );
-
+        s = strLogPrefix + cc.success( "Balance(eth): " ) + cc.attention( xEth );
+        if( isForcePrintOut )
+            log.information( s );
+        details.information( s );
         const minTransactionGas =
             owaspUtils.parseIntOrHex(
                 await joCommunityPool.callStatic.minTransactionGas(
                     { from: addressReceiver } ) );
         s = strLogPrefix + cc.success( "MinTransactionGas: " ) +
-            cc.attention( minTransactionGas ) + "\n";
-        if( isForcePrintOut || log.verboseGet() >= log.verboseReversed().information )
-            log.write( s );
-        details.write( s );
+            cc.attention( minTransactionGas );
+        if( isForcePrintOut )
+            log.information( s );
+        details.information( s );
 
         const gasPrice = await transactionCustomizerMainNet.computeGasPrice(
             ethersProviderMainNet, 200000000000 );
-        s = strLogPrefix + cc.success( "Multiplied Gas Price: " ) + cc.attention( gasPrice ) + "\n";
-        if( isForcePrintOut || log.verboseGet() >= log.verboseReversed().information )
-            log.write( s );
-        details.write( s );
+        s = strLogPrefix + cc.success( "Multiplied Gas Price: " ) + cc.attention( gasPrice );
+        if( isForcePrintOut )
+            log.information( s );
+        details.information( s );
 
         const minAmount = minTransactionGas * gasPrice;
         s = strLogPrefix + cc.success( "Minimum recharge balance: " ) +
-            cc.attention( minAmount ) + "\n";
-        if( isForcePrintOut || log.verboseGet() >= log.verboseReversed().information )
-            log.write( s );
-        details.write( s );
+            cc.attention( minAmount );
+        if( isForcePrintOut )
+            log.information( s );
+        details.information( s );
 
         let amountToRecharge = 0;
         if( xWei >= minAmount )
@@ -143,35 +140,33 @@ export async function reimbursementEstimateAmount(
             amountToRecharge = minAmount - xWei;
 
         s = strLogPrefix + cc.success( "Estimated amount to recharge(wei): " ) +
-            cc.attention( amountToRecharge ) + "\n";
-        if( isForcePrintOut || log.verboseGet() >= log.verboseReversed().information )
-            log.write( s );
-        details.write( s );
+            cc.attention( amountToRecharge );
+        if( isForcePrintOut )
+            log.information( s );
+        details.information( s );
 
         const amountToRechargeEth =
             owaspUtils.ethersMod.ethers.utils.formatEther(
                 owaspUtils.toBN( amountToRecharge.toString() ) );
         s = strLogPrefix + cc.success( "Estimated amount to recharge(eth): " ) +
-            cc.attention( amountToRechargeEth ) + "\n";
-        if( isForcePrintOut || log.verboseGet() >= log.verboseReversed().information )
-            log.write( s );
-        details.write( s );
+            cc.attention( amountToRechargeEth );
+        if( isForcePrintOut )
+            log.information( s );
+        details.information( s );
 
         if( log.exposeDetailsGet() )
             details.exposeDetailsTo( log, "reimbursementEstimateAmount", true );
         details.close();
         return amountToRecharge;
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().critical ) {
-            const strError = owaspUtils.extractErrorMessage( err );
-            const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
-                cc.error( " Payment error in reimbursementEstimateAmount(): " ) +
-                cc.error( strError ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
-            if( log.id != details.id )
-                log.write( s );
-            details.write( s );
-        }
+        const strError = owaspUtils.extractErrorMessage( err );
+        const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
+            cc.error( " Payment error in reimbursementEstimateAmount(): " ) +
+            cc.error( strError ) +
+            cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
+        if( log.id != details.id )
+            log.critical( s );
+        details.critical( s );
         details.exposeDetailsTo( log, "reimbursementEstimateAmount", false );
         details.close();
         return 0;
@@ -193,7 +188,7 @@ export async function reimbursementWalletRecharge(
     let strActionName = "";
     const strLogPrefix = cc.info( "Gas Reimbursement - Wallet Recharge" ) + " ";
     try {
-        details.write( strLogPrefix + cc.debug( "Recharging wallet " ) +
+        details.debug( strLogPrefix, "Recharging wallet ",
             cc.notice( strReimbursementChain ), "..." );
         strActionName = "Recharge reimbursement wallet on Main Net";
         const addressReceiver = joAccountMN.address();
@@ -203,20 +198,14 @@ export async function reimbursementWalletRecharge(
         ];
         const gasPrice = await transactionCustomizerMainNet.computeGasPrice(
             ethersProviderMainNet, 200000000000 );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using computed " ) + cc.info( "gasPrice" ) +
-                cc.debug( "=" ) + cc.j( gasPrice ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using computed gasPrice=", cc.j( gasPrice ) );
         const estimatedGas =
             await transactionCustomizerMainNet.computeGas(
                 details, ethersProviderMainNet,
                 "CommunityPool", joCommunityPool, "rechargeUserWallet", arrArguments,
                 joAccountMN, strActionName,
                 gasPrice, 3000000, nReimbursementRecharge, null );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using estimated " ) + cc.info( "gas" ) +
-                cc.debug( "=" ) + cc.notice( estimatedGas ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using estimated gas=", cc.notice( estimatedGas ) );
         const isIgnore = false;
         const strErrorOfDryRun =
             await imaTx.dryRunCall(
@@ -240,16 +229,14 @@ export async function reimbursementWalletRecharge(
             } );
         }
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().critical ) {
-            const strError = owaspUtils.extractErrorMessage( err );
-            const s = strLogPrefix +
-                cc.fatal( "CRITICAL ERROR:" ) + cc.error( " Payment error in " +
-                strActionName + ": " ) + cc.error( strError ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
-            if( log.id != details.id )
-                log.write( s );
-            details.write( s );
-        }
+        const strError = owaspUtils.extractErrorMessage( err );
+        const s = strLogPrefix +
+            cc.fatal( "CRITICAL ERROR:" ) + cc.error( " Payment error in " +
+            strActionName + ": " ) + cc.error( strError ) +
+            cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
+        if( log.id != details.id )
+            log.critical( s );
+        details.critical( s );
         details.exposeDetailsTo( log, "reimbursementWalletRecharge", false );
         details.close();
         return false;
@@ -277,7 +264,7 @@ export async function reimbursementWalletWithdraw(
     let strActionName = "";
     const strLogPrefix = cc.info( "Gas Reimbursement - Wallet Withdraw" ) + " ";
     try {
-        details.write( strLogPrefix + cc.debug( "Withdrawing wallet " ) +
+        details.debug( strLogPrefix, "Withdrawing wallet ",
             cc.notice( strReimbursementChain ), "..." );
         strActionName = "Withdraw reimbursement wallet";
         const arrArguments = [
@@ -288,21 +275,14 @@ export async function reimbursementWalletWithdraw(
         const weiHowMuch = undefined;
         const gasPrice = await transactionCustomizerMainNet.computeGasPrice(
             ethersProviderMainNet, 200000000000 );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using computed " ) +
-                cc.info( "gasPrice" ) + cc.debug( "=" ) + cc.j( gasPrice ) +
-                "\n" );
-        }
+        details.trace( strLogPrefix, "Using computed gasPrice=", cc.j( gasPrice ) );
         const estimatedGas =
             await transactionCustomizerMainNet.computeGas(
                 details, ethersProviderMainNet,
                 "CommunityPool", joCommunityPool, "withdrawFunds", arrArguments,
                 joAccountMN, strActionName,
                 gasPrice, 3000000, weiHowMuch, null );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using estimated " ) + cc.info( "gas" ) +
-                cc.debug( "=" ) + cc.notice( estimatedGas ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using estimated gas=", cc.notice( estimatedGas ) );
         const isIgnore = false;
         const strErrorOfDryRun =
             await imaTx.dryRunCall(
@@ -326,16 +306,14 @@ export async function reimbursementWalletWithdraw(
             } );
         }
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().critical ) {
-            const strError = owaspUtils.extractErrorMessage( err );
-            const s = strLogPrefix +
-                cc.fatal( "CRITICAL ERROR:" ) + cc.error( " Payment error in " +
-                strActionName + ": " ) + cc.error( strError ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
-            if( log.id != details.id )
-                log.write( s );
-            details.write( s );
-        }
+        const strError = owaspUtils.extractErrorMessage( err );
+        const s = strLogPrefix +
+            cc.fatal( "CRITICAL ERROR:" ) + cc.error( " Payment error in " +
+            strActionName + ": " ) + cc.error( strError ) +
+            cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
+        if( log.id != details.id )
+            log.critical( s );
+        details.critical( s );
         details.exposeDetailsTo( log, "reimbursementWalletWithdraw", false );
         details.close();
         return false;
@@ -364,7 +342,7 @@ export async function reimbursementSetRange(
     const strLogPrefix =
         cc.info( "Gas Reimbursement - Set Minimal time interval from S2M transfers" ) + " ";
     try {
-        details.write( strLogPrefix + cc.debug( "Setting minimal S2M interval to " ) +
+        details.debug( strLogPrefix, "Setting minimal S2M interval to ",
             cc.notice( nReimbursementRange ), "..." );
         strActionName = "Set reimbursement range";
         const arrArguments = [
@@ -374,10 +352,7 @@ export async function reimbursementSetRange(
         const weiHowMuch = undefined;
         const gasPrice = await transactionCustomizerSChain.computeGasPrice(
             ethersProviderSChain, 200000000000 );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using computed " ) + cc.info( "gasPrice" ) +
-                cc.debug( "=" ) + cc.j( gasPrice ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using computed gasPrice=", cc.j( gasPrice ) );
         const estimatedGas =
             await transactionCustomizerSChain.computeGas(
                 details, ethersProviderSChain,
@@ -385,10 +360,7 @@ export async function reimbursementSetRange(
                 "setTimeLimitPerMessage", arrArguments,
                 joAccountSC, strActionName,
                 gasPrice, 3000000, weiHowMuch, null );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using estimated " ) + cc.info( "gas" ) +
-                cc.debug( "=" ) + cc.notice( estimatedGas ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using estimated gas=", cc.notice( estimatedGas ) );
         const isIgnore = false;
         const strErrorOfDryRun =
             await imaTx.dryRunCall(
@@ -417,15 +389,13 @@ export async function reimbursementSetRange(
             } );
         }
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().critical ) {
-            const strError = owaspUtils.extractErrorMessage( err );
-            const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
-                cc.error( " Payment error in " + strActionName + ": " ) + cc.error( strError ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
-            if( log.id != details.id )
-                log.write( s );
-            details.write( s );
-        }
+        const strError = owaspUtils.extractErrorMessage( err );
+        const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
+            cc.error( " Payment error in " + strActionName + ": " ) + cc.error( strError ) +
+            cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
+        if( log.id != details.id )
+            log.critical( s );
+        details.critical( s );
         details.exposeDetailsTo( log, "reimbursementSetRange", false );
         details.close();
         return false;
