@@ -85,6 +85,55 @@ class ObserverServer extends SocketServer {
                 const isFlush = true;
                 socket.send( jo, isFlush );
             };
+            self.fatal = function() {
+                if( log.verboseGet() >= log.verboseReversed().fatal )
+                    self.log( formatArgs( arguments, cc.error ) + "\n" );
+            };
+            self.critical = function() {
+                if( log.verboseGet() >= log.verboseReversed().critical )
+                    self.log( formatArgs( arguments, cc.error ) + "\n" );
+            };
+            self.error = function() {
+                if( log.verboseGet() >= log.verboseReversed().error )
+                    self.log( formatArgs( arguments, cc.error ) + "\n" );
+            };
+            self.warning = function() {
+                if( log.verboseGet() >= log.verboseReversed().warning )
+                    self.log( formatArgs( arguments, cc.warning ) + "\n" );
+            };
+            self.attention = function() {
+                if( log.verboseGet() >= log.verboseReversed().attention )
+                    self.log( formatArgs( arguments, cc.attention ) + "\n" );
+            };
+            self.information = function() {
+                if( log.verboseGet() >= log.verboseReversed().information )
+                    self.log( formatArgs( arguments, cc.info ) + "\n" );
+            };
+            self.info = function() {
+                if( log.verboseGet() >= log.verboseReversed().information )
+                    self.log( formatArgs( arguments, cc.info ) + "\n" );
+            };
+            self.notice = function() {
+                if( log.verboseGet() >= log.verboseReversed().notice )
+                    self.log( formatArgs( arguments, cc.notice ) + "\n" );
+            };
+            self.note = function() {
+                if( log.verboseGet() >= log.verboseReversed().notice )
+                    self.log( formatArgs( arguments, cc.note ) + "\n" );
+            };
+            self.debug = function() {
+                if( log.verboseGet() >= log.verboseReversed().debug )
+                    self.log( formatArgs( arguments, cc.debug ) + "\n" );
+            };
+            self.trace = function() {
+                if( log.verboseGet() >= log.verboseReversed().trace )
+                    self.log( formatArgs( arguments, cc.trace ) + "\n" );
+            };
+            self.success = function() {
+                if( log.verboseGet() >= log.verboseReversed().information )
+                    self.log( formatArgs( arguments, cc.success ) + "\n" );
+            };
+
             self.opts = JSON.parse( JSON.stringify( joMessage.message.opts ) );
             self.opts.details = {
                 write: self.log
@@ -108,11 +157,8 @@ class ObserverServer extends SocketServer {
                 const isFlush = true;
                 socket.send( jo, isFlush );
             } );
-            if( log.verboseGet() >= log.verboseReversed().debug ) {
-                log.write(
-                    cc.debug( "Loop worker " ) + cc.notice( workerData.url ) +
-                    cc.debug( " will save cached S-Chains..." ) + "\n" );
-            }
+            log.debug( "Loop worker ", cc.notice( workerData.url ),
+                " will save cached S-Chains..." );
             skaleObserver.setLastCachedSChains( self.opts.imaState.arrSChainsCached );
             self.opts.imaState.chainProperties.mn.joAccount.address = owaspUtils.fnAddressImpl_;
             self.opts.imaState.chainProperties.sc.joAccount.address = owaspUtils.fnAddressImpl_;
@@ -124,13 +170,10 @@ class ObserverServer extends SocketServer {
                 self.opts.imaState.chainProperties.mn.ethersProvider =
                     owaspUtils.getEthersProviderFromURL( u );
             } else {
-                if( log.verboseGet() >= log.verboseReversed().warning ) {
-                    self.log( cc.warning( "WARNING:" ) + cc.warning( " No " ) +
-                        cc.note( "Main-net" ) +
-                        cc.warning( " URL specified in command line arguments" ) +
-                        cc.debug( "(needed for particular operations only) in " ) +
-                        threadInfo.threadDescription() + "\n" );
-                }
+                self.warning( "WARNING: No ", cc.note( "Main-net" ),
+                    " URL specified in command line arguments",
+                    cc.debug( "(needed for particular operations only)" ), " in ",
+                    threadInfo.threadDescription() );
             }
 
             if( self.opts.imaState.chainProperties.sc.strURL &&
@@ -141,13 +184,10 @@ class ObserverServer extends SocketServer {
                 self.opts.imaState.chainProperties.sc.ethersProvider =
                     owaspUtils.getEthersProviderFromURL( u );
             } else {
-                if( log.verboseGet() >= log.verboseReversed().warning ) {
-                    self.log( cc.warning( "WARNING:" ) + cc.warning( " No " ) +
-                        cc.note( "Main-net" ) +
-                        cc.warning( " URL specified in command line arguments" ) +
-                        cc.debug( "(needed for particular operations only) in " ) +
-                        threadInfo.threadDescription() + "\n" );
-                }
+                self.warning( "WARNING: No ", cc.note( "Main-net" ),
+                    " URL specified in command line arguments",
+                    cc.debug( "(needed for particular operations only)" ), " in ",
+                    threadInfo.threadDescription() );
             }
 
             self.opts.imaState.optsLoop.joRuntimeOpts.isInsideWorker = true;
@@ -164,48 +204,35 @@ class ObserverServer extends SocketServer {
             state.set( imaState );
             imaCLI.initContracts();
             self.initComplete = true;
-            if( log.verboseGet() >= log.verboseReversed().information ) {
-                self.log( cc.debug( "IMA loop worker" ) + " " + cc.notice( workerData.url ) +
-                    cc.debug( " will do the following work:" ) + "\n" + "    " +
-                    cc.info( "Oracle" ) + cc.debug( " operations....." ) +
-                    cc.yn( self.opts.imaState.optsLoop.enableStepOracle ) + "\n" +
-                    "    " + cc.info( "M2S" ) + cc.debug( " transfers........." ) +
-                    cc.yn( self.opts.imaState.optsLoop.enableStepM2S ) + "\n" +
-                    "    " + cc.info( "S2M" ) + cc.debug( " transfers........." ) +
-                    cc.yn( self.opts.imaState.optsLoop.enableStepS2M ) + "\n" +
-                    "    " + cc.info( "S2S" ) + cc.debug( " transfers........." ) +
-                    cc.yn( self.opts.imaState.optsLoop.enableStepS2S ) + "\n" );
-            }
+            self.information( "IMA loop worker ", cc.notice( workerData.url ),
+                " will do the following work:\n    ", cc.attention( "Oracle" ), " operations.....",
+                cc.yn( self.opts.imaState.optsLoop.enableStepOracle ), "\n",
+                "    ", cc.attention( "M2S" ), cc.debug( " transfers........." ),
+                cc.yn( self.opts.imaState.optsLoop.enableStepM2S ), "\n" +
+                "    ", cc.attention( "S2M" ), cc.debug( " transfers........." ),
+                cc.yn( self.opts.imaState.optsLoop.enableStepS2M ), "\n",
+                "    ", cc.attention( "S2S" ), cc.debug( " transfers........." ),
+                cc.yn( self.opts.imaState.optsLoop.enableStepS2S ) );
             /* await */
             loop.runTransferLoop( self.opts.imaState.optsLoop );
-            if( log.verboseGet() >= log.verboseReversed().information ) {
-                self.log( cc.debug( "Full init compete for in-worker IMA loop" ) +
-                    " " + cc.notice( workerData.url ) + cc.debug( " in " ) +
-                    threadInfo.threadDescription() + "\n" );
-            }
+            self.information( "Full init compete for in-worker IMA loop ",
+                cc.notice( workerData.url ), " in ", threadInfo.threadDescription() );
             return joAnswer;
         };
         self.mapApiHandlers.spreadUpdatedSChainNetwork =
             function( joMessage, joAnswer, eventData, socket ) {
-                if( log.verboseGet() >= log.verboseReversed().debug ) {
-                    self.log( cc.debug( "New own S-Chains network information is arrived to " ) +
-                        cc.notice( workerData.url ) + cc.debug( " loop worker in " ) +
-                        threadInfo.threadDescription() + cc.debug( ": " ) +
-                        cc.j( joMessage.joSChainNetworkInfo ) +
-                        cc.debug( ", this own S-Chain update is " ) +
-                        ( joMessage.isFinal
-                            ? cc.success( "final" ) : cc.warning( "partial" ) ) +
-                        "\n" );
-                }
+                self.debug( "New own S-Chains network information is arrived to ",
+                    cc.notice( workerData.url ), " loop worker in ",
+                    threadInfo.threadDescription(), ": ",
+                    cc.j( joMessage.joSChainNetworkInfo ),
+                    ", this own S-Chain update is ",
+                    ( joMessage.isFinal ? cc.success( "final" ) : cc.warning( "partial" ) ) );
                 imaState.joSChainNetworkInfo = joMessage.joSChainNetworkInfo;
             };
         self.mapApiHandlers.schainsCached = function( joMessage, joAnswer, eventData, socket ) {
-            if( log.verboseGet() >= log.verboseReversed().debug ) {
-                self.log( cc.debug( "S-Chains cache did arrived to " ) +
-                    cc.notice( workerData.url ) + cc.debug( " loop worker in " ) +
-                    threadInfo.threadDescription() + cc.debug( ": " ) +
-                    cc.j( joMessage.message.arrSChainsCached ) + "\n" );
-            }
+            self.debug( "S-Chains cache did arrived to ", cc.notice( workerData.url ),
+                " loop worker in ", threadInfo.threadDescription(), ": ",
+                cc.j( joMessage.message.arrSChainsCached ) );
             skaleObserver.setLastCachedSChains( joMessage.message.arrSChainsCached );
         };
         // eslint-disable-next-line dot-notation
@@ -221,11 +248,8 @@ class ObserverServer extends SocketServer {
                     joMessage.params.signature
                 );
             };
-        if( log.verboseGet() >= log.verboseReversed().information ) {
-            self.log( cc.debug( "Initialized in-worker IMA loop " ) +
-                cc.info( workerData.url ) + cc.debug( " server in " ) +
-                threadInfo.threadDescription() + "\n" );
-        }
+        self.information( "Initialized in-worker IMA loop ",
+            cc.info( workerData.url ), " server in ", threadInfo.threadDescription() );
     }
     dispose() {
         const self = this;
@@ -242,9 +266,6 @@ const acceptor = new networkLayer.InWorkerSocketServerAcceptor( workerData.url, 
 const server = new ObserverServer( acceptor );
 server.on( "dispose", function() {
     const self = server;
-    if( log.verboseGet() >= log.verboseReversed().debug ) {
-        self.log( cc.debug( "Disposed in-worker in " ) +
-        threadInfo.threadDescription() + cc.debug( " IMA loop" ) +
-        " " + cc.notice( workerData.url ) + "\n" );
-    }
+    self.debug( "Disposed in-worker in ", threadInfo.threadDescription(), " IMA loop", " ",
+        cc.notice( workerData.url ) );
 } );
