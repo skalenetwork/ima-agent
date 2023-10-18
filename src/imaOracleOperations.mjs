@@ -46,10 +46,8 @@ async function prepareOracleGasPriceSetup( optsGasPriseSetup ) {
         "prepareOracleGasPriceSetup.optsGasPriseSetup.latestBlockNumber()";
     optsGasPriseSetup.latestBlockNumber =
         await optsGasPriseSetup.ethersProviderMainNet.getBlockNumber();
-    if( log.verboseGet() >= log.verboseReversed().trace ) {
-        optsGasPriseSetup.details.write( cc.debug( "Latest block on Main Net is " ) +
-            cc.info( optsGasPriseSetup.latestBlockNumber ) + "\n" );
-    }
+    optsGasPriseSetup.details.trace( "Latest block on Main Net is ",
+        cc.info( optsGasPriseSetup.latestBlockNumber ) );
     optsGasPriseSetup.strActionName =
         "prepareOracleGasPriceSetup.optsGasPriseSetup.bnTimestampOfBlock()";
     optsGasPriseSetup.latestBlock =
@@ -57,48 +55,37 @@ async function prepareOracleGasPriceSetup( optsGasPriseSetup ) {
             .getBlock( optsGasPriseSetup.latestBlockNumber );
     optsGasPriseSetup.bnTimestampOfBlock =
         owaspUtils.toBN( optsGasPriseSetup.latestBlock.timestamp );
-    if( log.verboseGet() >= log.verboseReversed().trace ) {
-        optsGasPriseSetup.details.write( cc.debug( "Local timestamp on Main Net is " ) +
-                cc.info( optsGasPriseSetup.bnTimestampOfBlock.toString() ) + cc.debug( "=" ) +
-                cc.info( owaspUtils.ensureStartsWith0x(
-                    optsGasPriseSetup.bnTimestampOfBlock.toHexString() ) ) +
-                cc.debug( " (original)" ) + "\n" );
-    }
+    optsGasPriseSetup.details.trace( "Local timestamp on Main Net is ",
+        cc.info( optsGasPriseSetup.bnTimestampOfBlock.toString() ), "=",
+        cc.info( owaspUtils.ensureStartsWith0x(
+            optsGasPriseSetup.bnTimestampOfBlock.toHexString() ) ),
+        " (original)" );
     optsGasPriseSetup.bnTimeZoneOffset = owaspUtils.toBN( parseInt( new Date( parseInt(
         optsGasPriseSetup.bnTimestampOfBlock.toString(), 10 ) ).getTimezoneOffset(), 10 ) );
-    if( log.verboseGet() >= log.verboseReversed().trace ) {
-        optsGasPriseSetup.details.write( cc.debug( "Local time zone offset is " ) +
-            cc.info( optsGasPriseSetup.bnTimeZoneOffset.toString() ) + cc.debug( "=" ) +
-            cc.info( owaspUtils.ensureStartsWith0x(
-                optsGasPriseSetup.bnTimeZoneOffset.toHexString() ) ) +
-            cc.debug( " (original)" ) + "\n" );
-    }
+    optsGasPriseSetup.details.trace( "Local time zone offset is ",
+        cc.info( optsGasPriseSetup.bnTimeZoneOffset.toString() ), "=",
+        cc.info( owaspUtils.ensureStartsWith0x(
+            optsGasPriseSetup.bnTimeZoneOffset.toHexString() ) ),
+        " (original)" );
     optsGasPriseSetup.bnTimestampOfBlock =
         optsGasPriseSetup.bnTimestampOfBlock.add( optsGasPriseSetup.bnTimeZoneOffset );
-    if( log.verboseGet() >= log.verboseReversed().trace ) {
-        optsGasPriseSetup.details.write( cc.debug( "UTC timestamp on Main Net is " ) +
-            cc.info( optsGasPriseSetup.bnTimestampOfBlock.toString() ) + cc.debug( "=" ) +
-            cc.info( owaspUtils.ensureStartsWith0x(
-                optsGasPriseSetup.bnTimestampOfBlock.toHexString() ) ) +
-            cc.debug( " (original)" ) + "\n" );
-    }
+    optsGasPriseSetup.details.trace( "UTC timestamp on Main Net is ",
+        cc.info( optsGasPriseSetup.bnTimestampOfBlock.toString() ), "=",
+        cc.info( owaspUtils.ensureStartsWith0x(
+            optsGasPriseSetup.bnTimestampOfBlock.toHexString() ) ),
+        " (original)" );
     const bnValueToSubtractFromTimestamp = owaspUtils.toBN( 60 );
-    if( log.verboseGet() >= log.verboseReversed().trace ) {
-        optsGasPriseSetup.details.write( cc.debug( "Value to subtract from timestamp is " ) +
-            cc.info( bnValueToSubtractFromTimestamp ) + cc.debug( "=" ) +
-            cc.info( owaspUtils.ensureStartsWith0x(
-                bnValueToSubtractFromTimestamp.toHexString() ) ) +
-        cc.debug( " (to adjust it to past a bit)" ) + "\n" );
-    }
+    optsGasPriseSetup.details.trace( "Value to subtract from timestamp is ",
+        cc.info( bnValueToSubtractFromTimestamp ), "=",
+        cc.info( owaspUtils.ensureStartsWith0x( bnValueToSubtractFromTimestamp.toHexString() ) ),
+        " (to adjust it to past a bit)" );
     optsGasPriseSetup.bnTimestampOfBlock =
         optsGasPriseSetup.bnTimestampOfBlock.sub( bnValueToSubtractFromTimestamp );
-    if( log.verboseGet() >= log.verboseReversed().trace ) {
-        optsGasPriseSetup.details.write( cc.debug( "Timestamp on Main Net is " ) +
-            cc.info( optsGasPriseSetup.bnTimestampOfBlock.toHexString() ) + cc.debug( "=" ) +
-            cc.info( owaspUtils.ensureStartsWith0x(
-                optsGasPriseSetup.bnTimestampOfBlock.toHexString() ) ) +
-            cc.debug( " (adjusted to past a bit)" ) + "\n" );
-    }
+    optsGasPriseSetup.details.trace( "Timestamp on Main Net is ",
+        cc.info( optsGasPriseSetup.bnTimestampOfBlock.toHexString() ), "=",
+        cc.info( owaspUtils.ensureStartsWith0x(
+            optsGasPriseSetup.bnTimestampOfBlock.toHexString() ) ),
+        " (adjusted to past a bit)" );
     optsGasPriseSetup.strActionName = "prepareOracleGasPriceSetup.getGasPrice()";
     optsGasPriseSetup.gasPriceOnMainNet = null;
     if( getEnabledOracle() ) {
@@ -112,60 +99,41 @@ async function prepareOracleGasPriceSetup( optsGasPriseSetup ) {
             isVerboseTraceDetails:
                 ( log.verboseGet() >= log.verboseReversed().debug ) ? true : false
         };
-        if( log.verboseGet() >= log.verboseReversed().debug ) {
-            optsGasPriseSetup.details.write( cc.debug( "Will fetch " ) +
-                cc.info( "Main Net gas price" ) + cc.debug( " via call to " ) +
-                cc.info( "Oracle" ) + cc.debug( " with options " ) +
-                cc.j( oracleOpts ), "..." );
-        }
+        optsGasPriseSetup.details.debug(
+            "Will fetch Main Net gas price via call to Oracle with options ",
+            cc.j( oracleOpts ), "..." );
         try {
             optsGasPriseSetup.gasPriceOnMainNet = owaspUtils.ensureStartsWith0x(
                 ( await imaOracle.oracleGetGasPrice(
                     oracleOpts, optsGasPriseSetup.details ) ).toString( 16 ) );
         } catch ( err ) {
             optsGasPriseSetup.gasPriceOnMainNet = null;
-            if( log.verboseGet() >= log.verboseReversed().error ) {
-                optsGasPriseSetup.details.write( cc.error( "Failed to fetch " ) +
-                    cc.info( "Main Net gas price" ) + cc.error( " via call to " ) +
-                    cc.info( "Oracle" ) + cc.error( ", error is: " ) +
-                    cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                    ", stack is: ", "\n", cc.stack( err.stack ) );
-            }
+            optsGasPriseSetup.details.error(
+                "Failed to fetch Main Net gas price via call to Oracle, error is: ",
+                cc.warning( owaspUtils.extractErrorMessage( err ) ),
+                ", stack is: ", "\n", cc.stack( err.stack ) );
         }
     }
     if( optsGasPriseSetup.gasPriceOnMainNet === null ) {
-        if( log.verboseGet() >= log.verboseReversed().debug ) {
-            optsGasPriseSetup.details.write( cc.debug( "Will fetch " ) +
-                cc.info( "Main Net gas price" ) + cc.debug( " directly..." ) + "\n" );
-        }
+        optsGasPriseSetup.details.debug( "Will fetch Main Net gas price directly..." );
         optsGasPriseSetup.gasPriceOnMainNet = owaspUtils.ensureStartsWith0x(
             owaspUtils.toBN(
                 await optsGasPriseSetup.ethersProviderMainNet.getGasPrice() ).toHexString() );
     }
-    if( log.verboseGet() >= log.verboseReversed().debug ) {
-        optsGasPriseSetup.details.write( cc.success( "Done, " ) + cc.info( "Oracle" ) +
-            cc.success( " did computed new " ) + cc.info( "Main Net gas price" ) +
-            cc.success( "=" ) +
-            cc.bright( owaspUtils.toBN( optsGasPriseSetup.gasPriceOnMainNet ).toString() ) +
-            cc.success( "=" ) + cc.bright( optsGasPriseSetup.gasPriceOnMainNet ) + "\n" );
-    }
+    optsGasPriseSetup.details.success( "Done, Oracle did computed new Main Net gas price =",
+        cc.bright( owaspUtils.toBN( optsGasPriseSetup.gasPriceOnMainNet ).toString() ),
+        "=", cc.bright( optsGasPriseSetup.gasPriceOnMainNet ) );
     const joGasPriceOnMainNetOld =
         await optsGasPriseSetup.joCommunityLocker.callStatic.mainnetGasPrice(
             { from: optsGasPriseSetup.joAccountSC.address() } );
     const bnGasPriceOnMainNetOld = owaspUtils.toBN( joGasPriceOnMainNetOld );
-    if( log.verboseGet() >= log.verboseReversed().trace ) {
-        optsGasPriseSetup.details.write( cc.debug( "Previous " ) + cc.info( "Main Net gas price" ) +
-            cc.debug( " saved and kept in " ) + cc.info( "CommunityLocker" ) + cc.debug( "=" ) +
-            cc.bright( bnGasPriceOnMainNetOld.toString() ) + cc.debug( "=" ) +
-            cc.bright( bnGasPriceOnMainNetOld.toHexString() ) + "\n" );
-    }
+    optsGasPriseSetup.details.trace(
+        "Previous Main Net gas price saved and kept in CommunityLocker =",
+        cc.bright( bnGasPriceOnMainNetOld.toString() ), "=",
+        cc.bright( bnGasPriceOnMainNetOld.toHexString() ) );
     if( bnGasPriceOnMainNetOld.eq( owaspUtils.toBN( optsGasPriseSetup.gasPriceOnMainNet ) ) ) {
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            optsGasPriseSetup.details.write( cc.debug( "Previous " ) +
-                cc.info( "Main Net gas price" ) +
-                cc.debug( " is equal to new one, will skip setting it in " ) +
-                cc.info( "CommunityLocker" ) + "\n" );
-        }
+        optsGasPriseSetup.details.trace( "Previous Main Net gas price is equal to new one, " +
+            " will skip setting it in CommunityLocker" );
         if( log.exposeDetailsGet() )
             optsGasPriseSetup.details.exposeDetailsTo( log, "doOracleGasPriceSetup", true );
         optsGasPriseSetup.details.close();
@@ -207,22 +175,16 @@ export async function doOracleGasPriceSetup(
 
     if( optsGasPriseSetup.fnSignMsgOracle == null ||
         optsGasPriseSetup.fnSignMsgOracle == undefined ) {
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            optsGasPriseSetup.details.write( optsGasPriseSetup.strLogPrefix +
-                cc.debug( "Using internal u256 signing stub function" ) + "\n" );
-        }
+        optsGasPriseSetup.details.trace( optsGasPriseSetup.strLogPrefix,
+            "Using internal u256 signing stub function" );
         optsGasPriseSetup.fnSignMsgOracle = async function( u256, details, fnAfter ) {
-            if( log.verboseGet() >= log.verboseReversed().trace ) {
-                details.write( optsGasPriseSetup.strLogPrefix +
-                    cc.debug( "u256 signing callback was " ) + cc.error( "not provided" ) + "\n" );
-            }
+            details.trace( optsGasPriseSetup.strLogPrefix,
+                "u256 signing callback was not provided" );
             await fnAfter( null, u256, null ); // null - no error, null - no signatures
         };
     } else {
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            optsGasPriseSetup.details.write( optsGasPriseSetup.strLogPrefix +
-                cc.debug( "Using externally provided u256 signing function" ) + "\n" );
-        }
+        optsGasPriseSetup.details.trace( optsGasPriseSetup.strLogPrefix,
+            "Using externally provided u256 signing function" );
     }
     try {
         await prepareOracleGasPriceSetup( optsGasPriseSetup );
@@ -232,19 +194,15 @@ export async function doOracleGasPriceSetup(
             optsGasPriseSetup.gasPriceOnMainNet, optsGasPriseSetup.details,
             async function( strError, u256, joGlueResult ) {
                 if( strError ) {
-                    if( log.verboseGet() >= log.verboseReversed().critical ) {
-                        if( log.id != optsGasPriseSetup.details.id ) {
-                            log.write( optsGasPriseSetup.strLogPrefix +
-                                cc.fatal( "CRITICAL ERROR:" ) +
-                                cc.error( " Error in doOracleGasPriceSetup() during " +
-                                optsGasPriseSetup.strActionName + ": " ) +
-                                cc.error( strError ) + "\n" );
-                        }
+                    if( log.id != optsGasPriseSetup.details.id ) {
+                        log.critical( optsGasPriseSetup.strLogPrefix, cc.fatal( "CRITICAL ERROR:" ),
+                            " Error in doOracleGasPriceSetup() during ",
+                            optsGasPriseSetup.strActionName, ": ", cc.warning( strError ) );
                     }
-                    optsGasPriseSetup.details.write( optsGasPriseSetup.strLogPrefix +
-                        cc.fatal( "CRITICAL ERROR:" ) +
-                        cc.error( " Error in doOracleGasPriceSetup() during " +
-                        optsGasPriseSetup.strActionName + ": " ) + cc.error( strError ) + "\n" );
+                    optsGasPriseSetup.details.critical( optsGasPriseSetup.strLogPrefix,
+                        cc.fatal( "CRITICAL ERROR:" ),
+                        " Error in doOracleGasPriceSetup() during ",
+                        optsGasPriseSetup.strActionName, ": ", cc.warning( strError ) );
                     optsGasPriseSetup.details.exposeDetailsTo(
                         log, "doOracleGasPriceSetup", false );
                     imaTransferErrorHandling.saveTransferError(
@@ -276,37 +234,28 @@ export async function doOracleGasPriceSetup(
                         optsGasPriseSetup.bnTimestampOfBlock.toHexString() ),
                     sign // bls signature components
                 ];
-                if( log.verboseGet() >= log.verboseReversed().debug ) {
-                    const joDebugArgs = [
-                        [ signature.X, signature.Y ], // BLS glue of signatures
-                        hashPoint.X, // G1.X from joGlueResult.hashSrc
-                        hashPoint.Y, // G1.Y from joGlueResult.hashSrc
-                        hint
-                    ];
-                    optsGasPriseSetup.details.write( optsGasPriseSetup.strLogPrefix +
-                        cc.debug( "....debug args for " ) + cc.debug( ": " ) +
-                        cc.j( joDebugArgs ) + "\n" );
-                }
+                const joDebugArgs = [
+                    [ signature.X, signature.Y ], // BLS glue of signatures
+                    hashPoint.X, // G1.X from joGlueResult.hashSrc
+                    hashPoint.Y, // G1.Y from joGlueResult.hashSrc
+                    hint
+                ];
+                optsGasPriseSetup.details.debug( optsGasPriseSetup.strLogPrefix,
+                    "....debug args for : ", cc.j( joDebugArgs ) );
                 const weiHowMuch = undefined;
                 const gasPrice =
                     await optsGasPriseSetup.transactionCustomizerSChain.computeGasPrice(
                         optsGasPriseSetup.ethersProviderSChain, 200000000000 );
-                if( log.verboseGet() >= log.verboseReversed().trace ) {
-                    optsGasPriseSetup.details.write( optsGasPriseSetup.strLogPrefix +
-                        cc.debug( "Using computed " ) + cc.info( "gasPrice" ) + cc.debug( "=" ) +
-                        cc.j( gasPrice ) + "\n" );
-                }
+                optsGasPriseSetup.details.trace( optsGasPriseSetup.strLogPrefix,
+                    "Using computed gasPrice =", cc.j( gasPrice ) );
                 const estimatedGasSetGasPrice =
                     await optsGasPriseSetup.transactionCustomizerSChain.computeGas(
                         optsGasPriseSetup.details, optsGasPriseSetup.ethersProviderSChain,
                         "CommunityLocker", optsGasPriseSetup.joCommunityLocker,
                         "setGasPrice", arrArgumentsSetGasPrice, optsGasPriseSetup.joAccountSC,
                         optsGasPriseSetup.strActionName, gasPrice, 10000000, weiHowMuch, null );
-                if( log.verboseGet() >= log.verboseReversed().trace ) {
-                    optsGasPriseSetup.details.write( optsGasPriseSetup.strLogPrefix +
-                        cc.debug( "Using estimated " ) + cc.info( "gas" ) +
-                        cc.debug( "=" ) + cc.notice( estimatedGasSetGasPrice ) + "\n" );
-                }
+                optsGasPriseSetup.details.trace( optsGasPriseSetup.strLogPrefix,
+                    "Using estimated gas =", cc.notice( estimatedGasSetGasPrice ) );
                 const isIgnoreSetGasPrice = false;
                 const strErrorOfDryRun = await imaTx.dryRunCall( optsGasPriseSetup.details,
                     optsGasPriseSetup.ethersProviderSChain,
@@ -341,18 +290,16 @@ export async function doOracleGasPriceSetup(
             } );
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
-        if( log.verboseGet() >= log.verboseReversed().critical ) {
-            if( log.id != optsGasPriseSetup.details.id ) {
-                log.write( optsGasPriseSetup.strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
-                    cc.error( " Error in doOracleGasPriceSetup() during " +
-                    optsGasPriseSetup.strActionName + ": " ) + cc.error( strError ) +
-                    ", stack is: ", "\n", cc.stack( err.stack ) );
-                optsGasPriseSetup.details.write( optsGasPriseSetup.strLogPrefix +
-                    cc.fatal( "CRITICAL ERROR:" ) +
-                    cc.error( " Error in doOracleGasPriceSetup() during " +
-                    optsGasPriseSetup.strActionName + ": " ) + cc.error( strError ) +
-                    ", stack is: ", "\n", cc.stack( err.stack ) );
-            }
+        if( log.id != optsGasPriseSetup.details.id ) {
+            log.critical( optsGasPriseSetup.strLogPrefix, cc.fatal( "CRITICAL ERROR:" ),
+                " Error in doOracleGasPriceSetup() during ",
+                optsGasPriseSetup.strActionName, ": ", cc.warning( strError ),
+                ", stack is: ", "\n", cc.stack( err.stack ) );
+            optsGasPriseSetup.details.critical( optsGasPriseSetup.strLogPrefix,
+                cc.fatal( "CRITICAL ERROR:" ),
+                " Error in doOracleGasPriceSetup() during ",
+                optsGasPriseSetup.strActionName, ": ", cc.warning( strError ),
+                ", stack is: ", "\n", cc.stack( err.stack ) );
         }
         optsGasPriseSetup.details.exposeDetailsTo( log, "doOracleGasPriceSetup", false );
         imaTransferErrorHandling.saveTransferError(
