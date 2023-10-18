@@ -102,46 +102,31 @@ function parseCommandLine() {
     }
     if( haveReimbursementCommands ) {
         if( imaState.strReimbursementChain == "" ) {
-            if( log.verboseGet() >= log.verboseReversed().fatal ) {
-                log.write( cc.fatal( "RUNTIME INIT ERROR:" ) +
-                    cc.error( " missing value for " ) + cc.info( "reimbursement-chain" ) +
-                    cc.error( " parameter, must be non-empty chain name" ) + "\n" );
-            }
+            log.fatal( cc.fatal( "RUNTIME INIT ERROR:" ),
+                " missing value for reimbursement-chain parameter, must be non-empty chain name" );
             process.exit( 163 );
         }
     }
     if( imaState.nReimbursementRange >= 0 )
         clpTools.commandLineTaskReimbursementSetRange();
     if( imaState.nAutoExitAfterSeconds > 0 ) {
-        if( log.verboseGet() >= log.verboseReversed().warning ) {
-            log.write( cc.warning( "Automatic exit after " ) +
-                cc.info( imaState.nAutoExitAfterSeconds ) +
-                cc.warning( " second(s) is requested." ) + "\n" );
-        }
+        log.warning( "Automatic exit after ", imaState.nAutoExitAfterSeconds,
+            " second(s) is requested." );
         const iv = owaspUtils.setInterval2( function() {
-            if( log.verboseGet() >= log.verboseReversed().warning ) {
-                log.write( cc.warning( "Performing automatic exit after " ) +
-                    cc.info( imaState.nAutoExitAfterSeconds ) + cc.warning( " second(s)..." ) +
-                    "\n" );
-            }
+            log.warning( "Performing automatic exit after ", imaState.nAutoExitAfterSeconds,
+                " second(s)..." );
             owaspUtils.clearInterval2( iv );
             process.exit( 0 );
         }, imaState.nAutoExitAfterSeconds * 1000 );
     } else
-        log.write( cc.warning( "Automatic exit was not requested, skipping it." ) + "\n" );
+        log.warning( "Automatic exit was not requested, skipping it." );
     if( imaState.strLogFilePath.length > 0 ) {
-        if( log.verboseGet() >= log.verboseReversed().information ) {
-            log.write( cc.debug( "Will print message to file " ) +
-                cc.info( imaState.strLogFilePath ) + "\n" );
-        }
-        log.add(
-            imaState.strLogFilePath, imaState.nLogMaxSizeBeforeRotation,
+        log.information( "Will print message to file ", imaState.strLogFilePath );
+        log.add( imaState.strLogFilePath, imaState.nLogMaxSizeBeforeRotation,
             imaState.nLogMaxFilesCount );
     }
-    if( imaState.isPrintSecurityValues && log.verboseGet() >= log.verboseReversed().information ) {
-        log.write( cc.debug( "Agent was started with " ) + cc.info( process.argv.length ) +
-            cc.debug( " command line argument(s) as: " ) + strPrintedArguments + "\n" );
-    }
+    log.information( "Agent was started with ", process.argv.length,
+        " command line argument(s) as: ", strPrintedArguments );
     if( imaState.bIsNeededCommonInit ) {
         imaCLI.commonInit();
         imaCLI.initContracts();
@@ -159,9 +144,9 @@ function initMonitoringServer() {
     if( imaState.nMonitoringPort <= 0 )
         return;
     const strLogPrefix = cc.attention( "Monitoring:" ) + " ";
-    if( imaState.bLogMonitoringServer && log.verboseGet() >= log.verboseReversed().trace ) {
-        log.write( strLogPrefix + cc.normal( "Will start monitoring WS server on port " ) +
-            cc.info( imaState.nMonitoringPort ) + "\n" );
+    if( imaState.bLogMonitoringServer ) {
+        log.trace( strLogPrefix, "Will start monitoring WS server on port ",
+            imaState.nMonitoringPort );
     }
     gServerMonitoringWS = new ws.WebSocketServer( { port: 0 + imaState.nMonitoringPort } );
     gServerMonitoringWS.on( "connection", function( wsPeer, req ) {
@@ -173,8 +158,8 @@ function initMonitoringServer() {
             ip = req._socket.remoteAddress;
         if( !ip )
             ip = "N/A";
-        if( imaState.bLogMonitoringServer && log.verboseGet() >= log.verboseReversed().debug )
-            log.write( strLogPrefix + cc.normal( "New connection from " ) + cc.info( ip ) + "\n" );
+        if( imaState.bLogMonitoringServer )
+            log.debug( strLogPrefix, "New connection from ", cc.info( ip ) );
         wsPeer.on( "message", function( message ) {
             const joAnswer = {
                 "method": null,
@@ -183,12 +168,9 @@ function initMonitoringServer() {
             };
             try {
                 const joMessage = JSON.parse( message );
-                if( imaState.bLogMonitoringServer &&
-                    log.verboseGet() >= log.verboseReversed().trace
-                ) {
-                    log.write( strLogPrefix + cc.sunny( "<<<" ) + " " +
-                        cc.normal( "message from " ) + cc.info( ip ) + cc.normal( ": " ) +
-                        cc.j( joMessage ) + "\n" );
+                if( imaState.bLogMonitoringServer ) {
+                    log.trace( strLogPrefix, "<<< message from ", cc.info( ip ), ": ",
+                        cc.j( joMessage ) );
                 }
                 if( ! ( "method" in joMessage ) )
                     throw new Error( "\"method\" field was not specified" );
@@ -256,29 +238,22 @@ function initMonitoringServer() {
                         "Unknown method name \"" + joMessage.method + "\" was specified" );
                 } // switch( joMessage.method )
             } catch ( err ) {
-                if( log.verboseGet() >= log.verboseReversed().error ) {
-                    const strError = owaspUtils.extractErrorMessage( err );
-                    log.write( strLogPrefix + cc.error( "Bad message from " ) + cc.info( ip ) +
-                        cc.error( ": " ) + cc.warning( message ) + cc.error( ", error is: " ) +
-                        cc.warning( strError ) + cc.error( ", stack is: " ) + "\n" +
-                        cc.stack( err.stack ) );
-                }
+                const strError = owaspUtils.extractErrorMessage( err );
+                log.error( strLogPrefix, "Bad message from ", cc.info( ip ), ": ",
+                    cc.warning( message ), ", error is: ", cc.warning( strError ),
+                    ", stack is: ", "\n", cc.stack( err.stack ) );
             }
             try {
-                if( imaState.bLogMonitoringServer &&
-                    log.verboseGet() >= log.verboseReversed().trace
-                ) {
-                    log.write( strLogPrefix + cc.sunny( ">>>" ) + " " + cc.normal( "answer to " ) +
-                        cc.info( ip ) + cc.normal( ": " ) + cc.j( joAnswer ) + "\n" );
+                if( imaState.bLogMonitoringServer ) {
+                    log.trace( strLogPrefix, ">>> answer to ", cc.info( ip ), ": ",
+                        cc.j( joAnswer ) );
                 }
                 wsPeer.send( JSON.stringify( joAnswer ) );
             } catch ( err ) {
-                if( log.verboseGet() >= log.verboseReversed().error ) {
-                    const strError = owaspUtils.extractErrorMessage( err );
-                    log.write( strLogPrefix + cc.error( "Failed to sent answer to " ) +
-                        cc.info( ip ) + cc.error( ", error is: " ) + cc.warning( strError ) +
-                        ", stack is: ", "\n", cc.stack( err.stack ) );
-                }
+                const strError = owaspUtils.extractErrorMessage( err );
+                log.error( strLogPrefix, "Failed to sent answer to ", cc.info( ip ),
+                    ", error is: ", cc.warning( strError ),
+                    ", stack is: ", "\n", cc.stack( err.stack ) );
             }
         } );
     } );
@@ -302,19 +277,13 @@ function initJsonRpcServer() {
             try {
                 res.header( "Content-Type", "application/json" );
                 res.status( 200 ).send( JSON.stringify( joAnswer ) );
-                if( log.verboseGet() >= log.verboseReversed().trace ) {
-                    log.write( strLogPrefix + cc.sunny( ">>>" ) + " " +
-                        cc.normal( "did sent answer to " ) + cc.info( ip ) + cc.normal( ": " ) +
-                        cc.j( joAnswer ) + "\n" );
-                }
+                log.trace( strLogPrefix, ">>> did sent answer to ", cc.info( ip ), ": ",
+                    cc.j( joAnswer ) );
             } catch ( err ) {
-                if( log.verboseGet() >= log.verboseReversed().error ) {
-                    const strError = owaspUtils.extractErrorMessage( err );
-                    log.write( strLogPrefix + cc.error( "Failed to sent answer " ) +
-                        cc.j( joAnswer ) + cc.error( " to " ) + cc.info( ip ) +
-                        cc.error( ", error is: " ) + cc.warning( strError ) +
-                        ", stack is: ", "\n", cc.stack( err.stack ) );
-                }
+                const strError = owaspUtils.extractErrorMessage( err );
+                log.error( strLogPrefix, "Failed to sent answer ", cc.j( joAnswer ), " to ",
+                    cc.info( ip ), ", error is: ", cc.warning( strError ),
+                    ", stack is: ", "\n", cc.stack( err.stack ) );
             }
         };
         let joAnswer = {
@@ -324,11 +293,8 @@ function initJsonRpcServer() {
         };
         try {
             const joMessage = JSON.parse( message );
-            if( log.verboseGet() >= log.verboseReversed().trace ) {
-                log.write( strLogPrefix + cc.sunny( "<<<" ) + " " +
-                    cc.normal( "Peer message from " ) + cc.info( ip ) + cc.normal( ": " ) +
-                    cc.j( joMessage ) + "\n" );
-            }
+            log.trace( strLogPrefix, "<<< Peer message from ", cc.info( ip ), ": ",
+                cc.j( joMessage ) );
             if( ! ( "method" in joMessage ) )
                 throw new Error( "\"method\" field was not specified" );
             joAnswer.method = joMessage.method;
@@ -395,13 +361,10 @@ function initJsonRpcServer() {
                 throw new Error( "Unknown method name \"" + joMessage.method + "\" was specified" );
             } // switch( joMessage.method )
         } catch ( err ) {
-            if( log.verboseGet() >= log.verboseReversed().error ) {
-                const strError = owaspUtils.extractErrorMessage( err );
-                log.write( strLogPrefix + cc.error( "Bad message from " ) + cc.info( ip ) +
-                    cc.error( ": " ) + cc.warning( message ) + cc.error( ", error is: " ) +
-                    cc.warning( strError ) + cc.error( ", stack is: " ) + "\n" +
-                    cc.stack( err.stack ) );
-            }
+            const strError = owaspUtils.extractErrorMessage( err );
+            log.error( strLogPrefix, "Bad message from ", cc.info( ip ), ": ",
+                cc.warning( message ), ", error is: ", cc.warning( strError ),
+                ", stack is: ", "\n", cc.stack( err.stack ) );
         }
         if( ! isSkipMode )
             fnSendAnswer( joAnswer );
@@ -417,46 +380,32 @@ async function doTheJob() {
     let cntFalse = 0;
     let cntTrue = 0;
     for( idxAction = 0; idxAction < cntActions; ++idxAction ) {
-        if( log.verboseGet() >= log.verboseReversed().information )
-            log.write( strLogPrefix + cc.debug( imaHelperAPIs.longSeparator ) + "\n" );
+        log.information( strLogPrefix, cc.debug( imaHelperAPIs.longSeparator ) );
         const joAction = imaState.arrActions[idxAction];
-        if( log.verboseGet() >= log.verboseReversed().debug ) {
-            log.write( strLogPrefix + cc.notice( "Will execute action:" ) + " " +
-                cc.info( joAction.name ) + cc.debug( " (" ) + cc.info( idxAction + 1 ) +
-                cc.debug( " of " ) + cc.info( cntActions ) + cc.debug( ")" ) + "\n" );
-        }
+        log.debug( strLogPrefix, "Will execute action: ", cc.info( joAction.name ), " (",
+            idxAction + 1, " of ", cntActions, ")" );
         try {
             if( await joAction.fn() ) {
                 ++cntTrue;
-                if( log.verboseGet() >= log.verboseReversed().information ) {
-                    log.write( strLogPrefix + cc.success( "Succeeded action:" ) + " " +
-                    cc.info( joAction.name ) + "\n" );
-                }
+                log.success( strLogPrefix, "Succeeded action: ", cc.info( joAction.name ) );
             } else {
                 ++cntFalse;
-                if( log.verboseGet() >= log.verboseReversed().error ) {
-                    log.write( strLogPrefix + cc.warning( "Failed action:" ) + " " +
-                        cc.info( joAction.name ) + "\n" );
-                }
+                log.error( strLogPrefix, "Failed action: ", cc.info( joAction.name ) );
             }
         } catch ( err ) {
             ++cntFalse;
-            if( log.verboseGet() >= log.verboseReversed().critical ) {
-                log.write( strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
-                    cc.error( " Exception occurred while executing action: " ) +
-                    cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                    ", stack is: ", "\n", cc.stack( err.stack ) );
-            }
+            log.critical( strLogPrefix, cc.fatal( "CRITICAL ERROR:" ),
+                " Exception occurred while executing action: ",
+                cc.warning( owaspUtils.extractErrorMessage( err ) ),
+                ", stack is: ", "\n", cc.stack( err.stack ) );
         }
     }
-    if( log.verboseGet() >= log.verboseReversed().information ) {
-        log.write( strLogPrefix + cc.debug( imaHelperAPIs.longSeparator ) + "\n" );
-        log.write( strLogPrefix + cc.info( "FINISH:" ) + "\n" );
-        log.write( strLogPrefix + cc.info( cntActions ) + cc.notice( " task(s) executed" ) + "\n" );
-        log.write( strLogPrefix + cc.info( cntTrue ) + cc.success( " task(s) succeeded" ) + "\n" );
-        log.write( strLogPrefix + cc.info( cntFalse ) + cc.error( " task(s) failed" ) + "\n" );
-        log.write( strLogPrefix + cc.debug( imaHelperAPIs.longSeparator ) + "\n" );
-    }
+    log.information( strLogPrefix, imaHelperAPIs.longSeparator );
+    log.information( strLogPrefix, "FINISH:" );
+    log.information( strLogPrefix, cntActions, cc.notice( " task(s) executed" ) );
+    log.information( strLogPrefix, cntTrue, cc.success( " task(s) succeeded" ) );
+    log.information( strLogPrefix, cntFalse, cc.error( " task(s) failed" ) );
+    log.information( strLogPrefix, imaHelperAPIs.longSeparator );
     process.exitCode = ( cntFalse > 0 ) ? cntFalse : 0;
     if( ! state.isPreventExitAfterLastAction() )
         process.exit( process.exitCode );
@@ -494,34 +443,24 @@ async function main() {
     };
     if( imaState.bSignMessages ) {
         if( imaState.strPathBlsGlue.length == 0 ) {
-            if( log.verboseGet() >= log.verboseReversed().fatal ) {
-                log.write( cc.fatal( "FATAL, CRITICAL ERROR:" ) +
-                    cc.error( " please specify --bls-glue parameter." ) + "\n" );
-            }
+            log.fatal( cc.fatal( "FATAL, CRITICAL ERROR:" ),
+                " please specify --bls-glue parameter." );
             process.exit( 164 );
         }
         if( imaState.strPathHashG1.length == 0 ) {
-            if( log.verboseGet() >= log.verboseReversed().fatal ) {
-                log.write( cc.fatal( "FATAL, CRITICAL ERROR:" ) +
-                    cc.error( " please specify --hash-g1 parameter." ) + "\n" );
-            }
+            log.fatal( cc.fatal( "FATAL, CRITICAL ERROR:" ),
+                " please specify --hash-g1 parameter." );
             process.exit( 165 );
         }
-        if( log.verboseGet() >= log.verboseReversed().information ) {
-            log.write( cc.debug( "S-Chain network was discovery uses " ) +
-                ( isSilentReDiscovery
-                    ? cc.warning( "silent" )
-                    : cc.success( "exposed details" ) ) +
-                    cc.debug( " mode" ) + "\n" );
-        }
+        log.information( "S-Chain network was discovery uses ",
+            ( isSilentReDiscovery ? cc.warning( "silent" ) : cc.success( "exposed details" ) ),
+            " mode" );
         if( ! imaState.bNoWaitSChainStarted ) {
             discoveryTools.waitUntilSChainStarted().then( function() {
                 // uses call to discoveryTools.discoverSChainNetwork()
-                if( log.verboseGet() >= log.verboseReversed().information ) {
-                    if( ! isSilentReDiscovery ) {
-                        log.write( cc.attention( "This S-Chain discovery will be done for " ) +
-                            cc.bright( "command line task handler" ) + "\n" );
-                    }
+                if( ! isSilentReDiscovery ) {
+                    log.information(
+                        "This S-Chain discovery will be done for command line task handler" );
                 }
                 const nCountToWait = -1;
                 discoveryTools.discoverSChainNetwork( function( err, joSChainNetworkInfo ) {
@@ -529,10 +468,7 @@ async function main() {
                         // error information is printed by discoveryTools.discoverSChainNetwork()
                         process.exit( 166 );
                     }
-                    if( log.verboseGet() >= log.verboseReversed().information ) {
-                        log.write( cc.success( "S-Chain network was discovered: " ) +
-                            cc.j( joSChainNetworkInfo ) + "\n" );
-                    }
+                    log.success( "S-Chain network was discovered: ", cc.j( joSChainNetworkInfo ) );
                     imaState.joSChainNetworkInfo = joSChainNetworkInfo;
                     discoveryTools.continueSChainDiscoveryInBackgroundIfNeeded(
                         isSilentReDiscovery, function() {
@@ -545,12 +481,9 @@ async function main() {
                     return 0;
                 }, isSilentReDiscovery, imaState.joSChainNetworkInfo, nCountToWait
                 ).catch( ( err ) => {
-                    if( log.verboseGet() >= log.verboseReversed().critical ) {
-                        const strError = owaspUtils.extractErrorMessage( err );
-                        log.write( cc.fatal( "CRITICAL ERROR:" ) +
-                            cc.error( " S-Chain network discovery failed: " ) +
-                            cc.warning( strError ) + "\n" );
-                    }
+                    const strError = owaspUtils.extractErrorMessage( err );
+                    log.critical( cc.fatal( "CRITICAL ERROR:" ),
+                        " S-Chain network discovery failed: ", cc.warning( strError ) );
                 } );
             } );
         }
