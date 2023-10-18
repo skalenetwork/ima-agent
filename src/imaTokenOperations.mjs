@@ -57,12 +57,9 @@ export async function getBalanceErc20(
             await contractERC20.callStatic.balanceOf( strAddress, { from: strAddress } );
         return balance;
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().error ) {
-            const strError = owaspUtils.extractErrorMessage( err );
-            log.write( strLogPrefix + cc.fatal( "ERROR:" ) + " " +
-                cc.error( strError ) + cc.error( ", stack is: " ) + "\n" +
-                cc.stack( err.stack ) );
-        }
+        const strError = owaspUtils.extractErrorMessage( err );
+        log.error( strLogPrefix, cc.fatal( "ERROR:" ), " ",
+            strError, ", stack is: ", "\n", cc.stack( err.stack ) );
     }
     return "<no-data-or-error>";
 }
@@ -93,11 +90,9 @@ export async function getOwnerOfErc721(
             await contractERC721.callStatic.ownerOf( idToken, { from: strAddress } );
         return owner;
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().error ) {
-            const strError = owaspUtils.extractErrorMessage( err );
-            log.write( strLogPrefix + cc.fatal( "ERROR:" ) + " " + cc.error( strError ) +
-                ", stack is: ", "\n", cc.stack( err.stack ) );
-        }
+        const strError = owaspUtils.extractErrorMessage( err );
+        log.error( strLogPrefix, cc.fatal( "ERROR:" ), " ", strError,
+            ", stack is: ", "\n", cc.stack( err.stack ) );
     }
     return "<no-data-or-error>";
 }
@@ -129,11 +124,9 @@ export async function getBalanceErc1155(
                 strAddress, idToken, { from: strAddress } );
         return balance;
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().error ) {
-            const strError = owaspUtils.extractErrorMessage( err );
-            log.write( strLogPrefix + cc.fatal( "ERROR:" ) + " " + cc.error( strError ) +
-                ", stack is: ", "\n", cc.stack( err.stack ) );
-        }
+        const strError = owaspUtils.extractErrorMessage( err );
+        log.error( strLogPrefix, cc.fatal( "ERROR:" ), " ", strError,
+            ", stack is: ", "\n", cc.stack( err.stack ) );
     }
     return "<no-data-or-error>";
 }
@@ -185,20 +178,15 @@ export async function doErc721PaymentFromMainNet(
         const weiHowMuchApprove = undefined;
         let gasPrice = await transactionCustomizerMainNet.computeGasPrice(
             ethersProviderMainNet, 200000000000 );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using computed " ) + cc.info( "gasPrice" ) +
-                cc.debug( "=" ) + cc.j( gasPrice ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using computed gasPrice=", cc.j( gasPrice ) );
         const estimatedGasApprove =
             await transactionCustomizerMainNet.computeGas(
                 details, ethersProviderMainNet,
                 "ERC721", contractERC721, "approve", arrArgumentsApprove,
                 joAccountSrc, strActionName,
                 gasPrice, 8000000, weiHowMuchApprove, null );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using estimated(approve) " ) +
-                cc.info( "gas" ) + cc.debug( "=" ) + cc.notice( estimatedGasApprove ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using estimated(approve) gas=",
+            cc.notice( estimatedGasApprove ) );
         const isIgnoreApprove = false;
         const strErrorOfDryRunApprove =
             await imaTx.dryRunCall(
@@ -226,10 +214,7 @@ export async function doErc721PaymentFromMainNet(
         const weiHowMuchDepositERC721 = undefined;
         gasPrice = await transactionCustomizerMainNet.computeGasPrice(
             ethersProviderMainNet, 200000000000 );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using computed " ) + cc.info( "gasPrice" ) +
-                cc.debug( "=" ) + cc.j( gasPrice ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using computed gasPrice=", cc.j( gasPrice ) );
         const estimatedGasDeposit =
             await transactionCustomizerMainNet.computeGas(
                 details, ethersProviderMainNet,
@@ -237,10 +222,8 @@ export async function doErc721PaymentFromMainNet(
                 "depositERC721", arrArgumentsDepositERC721,
                 joAccountSrc, strActionName,
                 gasPrice, 8000000, weiHowMuchDepositERC721, null );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using estimated(deposit) " ) +
-                cc.info( "gas" ) + cc.debug( "=" ) + cc.notice( estimatedGasDeposit ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using estimated(deposit) gas=",
+            cc.notice( estimatedGasDeposit ) );
         const isIgnoreDepositERC721 = true;
         const strErrorOfDryRunDepositERC721 =
             await imaTx.dryRunCall(
@@ -269,11 +252,9 @@ export async function doErc721PaymentFromMainNet(
         // Must-have event(s) analysis as indicator(s) of success
         const strEventName = "OutgoingMessage";
         if( joMessageProxyMainNet ) {
-            details.write( strLogPrefix +
-                cc.debug( "Verifying the " ) + cc.info( strEventName ) +
-                cc.debug( " event of the " ) + cc.info( "MessageProxy" ) + cc.debug( "/" ) +
-                cc.notice( joMessageProxyMainNet.address ) + cc.debug( " contract ..." ) +
-                "\n" );
+            details.debug( strLogPrefix, "Verifying the ", cc.info( strEventName ),
+                " event of the MessageProxy/", cc.notice( joMessageProxyMainNet.address ),
+                " contract ..." );
             await imaHelperAPIs.sleep(
                 imaHelperAPIs.getMillisecondsSleepBeforeFetchOutgoingMessageEvent() );
             const joEvents = await imaEventLogScan.getContractCallEvents(
@@ -283,12 +264,9 @@ export async function doErc721PaymentFromMainNet(
                 joMessageProxyMainNet.filters[strEventName]()
             );
             if( joEvents.length > 0 ) {
-                details.write( strLogPrefix +
-                    cc.success( "Success, verified the " ) + cc.info( strEventName ) +
-                    cc.success( " event of the " ) + cc.info( "MessageProxy" ) +
-                    cc.success( "/" ) + cc.notice( joMessageProxyMainNet.address ) +
-                    cc.success( " contract, found event(s): " ) + cc.j( joEvents ) +
-                    "\n" );
+                details.success( strLogPrefix, "Success, verified the ", cc.info( strEventName ),
+                    " event of the MessageProxy/", cc.notice( joMessageProxyMainNet.address ),
+                    " contract, found event(s): ", cc.j( joEvents ) );
             } else {
                 throw new Error(
                     "Verification failed for the \"OutgoingMessage\" " +
@@ -298,16 +276,14 @@ export async function doErc721PaymentFromMainNet(
             }
         }
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().critical ) {
-            const strError = owaspUtils.extractErrorMessage( err );
-            const s = strLogPrefix +
-                cc.fatal( "CRITICAL ERROR:" ) + cc.error( " Payment error in " +
-                strActionName + ": " ) + cc.error( strError ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
-            if( log.id != details.id )
-                log.write( s );
-            details.write( s );
-        }
+        const strError = owaspUtils.extractErrorMessage( err );
+        const s = strLogPrefix +
+            cc.fatal( "CRITICAL ERROR:" ) + " Payment error in " +
+            strActionName + ": " + cc.warning( strError ) +
+            ", stack is: " + "\n" + cc.stack( err.stack );
+        if( log.id != details.id )
+            log.critical( s );
+        details.critical( s );
         details.exposeDetailsTo( log, "doErc721PaymentFromMainNet", false );
         details.close();
         return false;
@@ -367,20 +343,15 @@ export async function doErc20PaymentFromMainNet(
         const weiHowMuchApprove = undefined;
         let gasPrice = await transactionCustomizerMainNet.computeGasPrice(
             ethersProviderMainNet, 200000000000 );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using computed " ) + cc.info( "gasPrice" ) +
-                cc.debug( "=" ) + cc.j( gasPrice ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using computed gasPrice=", cc.j( gasPrice ) );
         const estimatedGasApprove =
             await transactionCustomizerMainNet.computeGas(
                 details, ethersProviderMainNet,
                 "ERC20", contractERC20, "approve", arrArgumentsApprove,
                 joAccountSrc, strActionName,
                 gasPrice, 8000000, weiHowMuchApprove, null );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using estimated(approve) " ) +
-                cc.info( "gas" ) + cc.debug( "=" ) + cc.notice( estimatedGasApprove ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using estimated(approve) gas=",
+            cc.notice( estimatedGasApprove ) );
         const isIgnoreApprove = false;
         const strErrorOfDryRunApprove =
             await imaTx.dryRunCall(
@@ -408,10 +379,7 @@ export async function doErc20PaymentFromMainNet(
         const weiHowMuchDepositERC20 = undefined;
         gasPrice = await transactionCustomizerMainNet.computeGasPrice(
             ethersProviderMainNet, 200000000000 );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using computed " ) + cc.info( "gasPrice" ) +
-                cc.debug( "=" ) + cc.j( gasPrice ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using computed gasPrice=", cc.j( gasPrice ) );
         const estimatedGasDeposit =
             await transactionCustomizerMainNet.computeGas(
                 details, ethersProviderMainNet,
@@ -419,10 +387,8 @@ export async function doErc20PaymentFromMainNet(
                 "depositERC20", arrArgumentsDepositERC20,
                 joAccountSrc, strActionName,
                 gasPrice, 8000000, weiHowMuchDepositERC20, null );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using estimated(deposit) " ) +
-                cc.info( "gas" ) + cc.debug( "=" ) + cc.notice( estimatedGasDeposit ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using estimated(deposit) gas=",
+            cc.notice( estimatedGasDeposit ) );
         const isIgnoreDepositERC20 = true;
         const strErrorOfDryRunDepositERC20 =
             await imaTx.dryRunCall(
@@ -451,11 +417,9 @@ export async function doErc20PaymentFromMainNet(
         // Must-have event(s) analysis as indicator(s) of success
         const strEventName = "OutgoingMessage";
         if( joMessageProxyMainNet ) {
-            details.write( strLogPrefix +
-                cc.debug( "Verifying the " ) + cc.info( strEventName ) +
-                cc.debug( " event of the " ) + cc.info( "MessageProxy" ) + cc.debug( "/" ) +
-                cc.notice( joMessageProxyMainNet.address ) + cc.debug( " contract ..." ) +
-                "\n" );
+            details.debug( strLogPrefix, "Verifying the ", cc.info( strEventName ),
+                " event of the MessageProxy/", cc.notice( joMessageProxyMainNet.address ),
+                " contract ..." );
             await imaHelperAPIs.sleep(
                 imaHelperAPIs.getMillisecondsSleepBeforeFetchOutgoingMessageEvent() );
             const joEvents = await imaEventLogScan.getContractCallEvents(
@@ -465,12 +429,9 @@ export async function doErc20PaymentFromMainNet(
                 joMessageProxyMainNet.filters[strEventName]()
             );
             if( joEvents.length > 0 ) {
-                details.write( strLogPrefix +
-                    cc.success( "Success, verified the " ) + cc.info( strEventName ) +
-                    cc.success( " event of the " ) + cc.info( "MessageProxy" ) +
-                    cc.success( "/" ) + cc.notice( joMessageProxyMainNet.address ) +
-                    cc.success( " contract, found event(s): " ) + cc.j( joEvents ) +
-                    "\n" );
+                details.success( strLogPrefix, "Success, verified the ", cc.info( strEventName ),
+                    " event of the MessageProxy/", cc.notice( joMessageProxyMainNet.address ) +
+                    " contract, found event(s): ", cc.j( joEvents ) );
             } else {
                 throw new Error(
                     "Verification failed for th\"OutgoingMessage\" event " +
@@ -479,15 +440,13 @@ export async function doErc20PaymentFromMainNet(
             }
         }
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().critical ) {
-            const strError = owaspUtils.extractErrorMessage( err );
-            const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
-                cc.error( " Payment error in " + strActionName + ": " ) + cc.error( strError ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
-            if( log.id != details.id )
-                log.write( s );
-            details.write( s );
-        }
+        const strError = owaspUtils.extractErrorMessage( err );
+        const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
+            cc.error( " Payment error in " ) + strActionName + ": " + cc.warning( strError ) +
+            ", stack is: " + "\n" + cc.stack( err.stack );
+        if( log.id != details.id )
+            log.critical( s );
+        details.critical( s );
         details.exposeDetailsTo( log, "doErc20PaymentFromMainNet", false );
         details.close();
         return false;
@@ -546,19 +505,14 @@ export async function doErc1155PaymentFromMainNet(
         const weiHowMuchApprove = undefined;
         let gasPrice = await transactionCustomizerMainNet.computeGasPrice(
             ethersProviderMainNet, 200000000000 );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using computed " ) + cc.info( "gasPrice" ) +
-                cc.debug( "=" ) + cc.j( gasPrice ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using computed gasPrice=", cc.j( gasPrice ) );
         const estimatedGasApprove =
             await transactionCustomizerMainNet.computeGas(
                 details, ethersProviderMainNet,
                 "ERC1155", contractERC1155, "setApprovalForAll", arrArgumentsApprove,
                 joAccountSrc, strActionName, gasPrice, 8000000, weiHowMuchApprove, null );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using estimated(approve) " ) +
-                cc.info( "gas" ) + cc.debug( "=" ) + cc.notice( estimatedGasApprove ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using estimated(approve) gas=",
+            cc.notice( estimatedGasApprove ) );
         const isIgnoreApprove = false;
         const strErrorOfDryRunApprove =
             await imaTx.dryRunCall(
@@ -584,10 +538,7 @@ export async function doErc1155PaymentFromMainNet(
         const weiHowMuchDepositERC1155 = undefined;
         gasPrice = await transactionCustomizerMainNet.computeGasPrice(
             ethersProviderMainNet, 200000000000 );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using computed " ) + cc.info( "gasPrice" ) +
-                cc.debug( "=" ) + cc.j( gasPrice ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using computed gasPrice=", cc.j( gasPrice ) );
         const estimatedGasDeposit =
             await transactionCustomizerMainNet.computeGas(
                 details, ethersProviderMainNet,
@@ -595,10 +546,8 @@ export async function doErc1155PaymentFromMainNet(
                 "depositERC1155", arrArgumentsDepositERC1155,
                 joAccountSrc, strActionName,
                 gasPrice, 8000000, weiHowMuchDepositERC1155, null );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using estimated(deposit) " ) +
-                cc.info( "gas" ) + cc.debug( "=" ) + cc.notice( estimatedGasDeposit ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using estimated(deposit) gas=",
+            cc.notice( estimatedGasDeposit ) );
         const isIgnoreDepositERC1155 = true;
         const strErrorOfDryRunDepositERC1155 =
             await imaTx.dryRunCall(
@@ -625,11 +574,9 @@ export async function doErc1155PaymentFromMainNet(
         // Must-have event(s) analysis as indicator(s) of success
         const strEventName = "OutgoingMessage";
         if( joMessageProxyMainNet ) {
-            details.write( strLogPrefix +
-                cc.debug( "Verifying the " ) + cc.info( strEventName ) +
-                cc.debug( " event of the " ) + cc.info( "MessageProxy" ) + cc.debug( "/" ) +
-                cc.notice( joMessageProxyMainNet.address ) + cc.debug( " contract ..." ) +
-                "\n" );
+            details.trace( strLogPrefix, "Verifying the ", cc.info( strEventName ),
+                " event of the MessageProxy/", cc.notice( joMessageProxyMainNet.address ),
+                " contract ..." );
             await imaHelperAPIs.sleep(
                 imaHelperAPIs.getMillisecondsSleepBeforeFetchOutgoingMessageEvent() );
             const joEvents = await imaEventLogScan.getContractCallEvents(
@@ -639,12 +586,9 @@ export async function doErc1155PaymentFromMainNet(
                 joMessageProxyMainNet.filters[strEventName]()
             );
             if( joEvents.length > 0 ) {
-                details.write( strLogPrefix +
-                    cc.success( "Success, verified the " ) + cc.info( strEventName ) +
-                    cc.success( " event of the " ) + cc.info( "MessageProxy" ) +
-                    cc.success( "/" ) + cc.notice( joMessageProxyMainNet.address ) +
-                    cc.success( " contract, found event(s): " ) + cc.j( joEvents ) +
-                    "\n" );
+                details.success( strLogPrefix, "Success, verified the ", cc.info( strEventName ),
+                    " event of the MessageProxy/", cc.notice( joMessageProxyMainNet.address ),
+                    " contract, found event(s): ", cc.j( joEvents ) );
             } else {
                 throw new Error(
                     "Verification failed for the \"OutgoingMessage\" event " +
@@ -653,15 +597,13 @@ export async function doErc1155PaymentFromMainNet(
             }
         }
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().critical ) {
-            const strError = owaspUtils.extractErrorMessage( err );
-            const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
-                cc.error( " Payment error in " + strActionName + ": " ) + cc.error( strError ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
-            if( log.id != details.id )
-                log.write( s );
-            details.write( s );
-        }
+        const strError = owaspUtils.extractErrorMessage( err );
+        const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
+            cc.error( " Payment error in " ) + strActionName + ": " + cc.warning( strError ) +
+            ", stack is: " + "\n" + cc.stack( err.stack );
+        if( log.id != details.id )
+            log.critical( s );
+        details.critical( s );
         details.exposeDetailsTo( log, "doErc1155PaymentFromMainNet", false );
         details.close();
         return false;
@@ -716,19 +658,14 @@ export async function doErc1155BatchPaymentFromMainNet(
         const weiHowMuchApprove = undefined;
         let gasPrice = await transactionCustomizerMainNet.computeGasPrice(
             ethersProviderMainNet, 200000000000 );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using computed " ) + cc.info( "gasPrice" ) +
-                cc.debug( "=" ) + cc.j( gasPrice ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using computed gasPrice=", cc.j( gasPrice ) );
         const estimatedGasApprove =
             await transactionCustomizerMainNet.computeGas(
                 details, ethersProviderMainNet,
                 "ERC1155", contractERC1155, "setApprovalForAll", arrArgumentsApprove,
                 joAccountSrc, strActionName, gasPrice, 8000000, weiHowMuchApprove, null );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using estimated(approve) " ) +
-                cc.info( "gas" ) + cc.debug( "=" ) + cc.notice( estimatedGasApprove ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using estimated(approve) gas=",
+            cc.notice( estimatedGasApprove ) );
         const isIgnoreApprove = false;
         const strErrorOfDryRunApprove =
             await imaTx.dryRunCall(
@@ -754,10 +691,7 @@ export async function doErc1155BatchPaymentFromMainNet(
         const weiHowMuchDepositERC1155Batch = undefined;
         gasPrice = await transactionCustomizerMainNet.computeGasPrice(
             ethersProviderMainNet, 200000000000 );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using computed " ) + cc.info( "gasPrice" ) +
-                cc.debug( "=" ) + cc.j( gasPrice ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using computed gasPrice=", cc.j( gasPrice ) );
         const estimatedGasDeposit =
             await transactionCustomizerMainNet.computeGas(
                 details, ethersProviderMainNet,
@@ -765,10 +699,8 @@ export async function doErc1155BatchPaymentFromMainNet(
                 "depositERC1155Batch", arrArgumentsDepositERC1155Batch,
                 joAccountSrc, strActionName,
                 gasPrice, 8000000, weiHowMuchDepositERC1155Batch, null );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using estimated(deposit) " ) +
-                cc.info( "gas" ) + cc.debug( "=" ) + cc.notice( estimatedGasDeposit ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using estimated(deposit) gas=",
+            cc.notice( estimatedGasDeposit ) );
         const isIgnoreDepositERC1155Batch = true;
         const strErrorOfDryRunDepositERC1155Batch =
             await imaTx.dryRunCall(
@@ -795,11 +727,9 @@ export async function doErc1155BatchPaymentFromMainNet(
         // Must-have event(s) analysis as indicator(s) of success
         const strEventName = "OutgoingMessage";
         if( joMessageProxyMainNet ) {
-            details.write( strLogPrefix +
-                cc.debug( "Verifying the " ) + cc.info( strEventName ) +
-                cc.debug( " event of the " ) + cc.info( "MessageProxy" ) + cc.debug( "/" ) +
-                cc.notice( joMessageProxyMainNet.address ) + cc.debug( " contract ..." ) +
-                "\n" );
+            details.debug( strLogPrefix, "Verifying the ", cc.info( strEventName ),
+                " event of the MessageProxy/", cc.notice( joMessageProxyMainNet.address ),
+                " contract ..." );
             await imaHelperAPIs.sleep(
                 imaHelperAPIs.getMillisecondsSleepBeforeFetchOutgoingMessageEvent() );
             const joEvents = await imaEventLogScan.getContractCallEvents(
@@ -809,12 +739,9 @@ export async function doErc1155BatchPaymentFromMainNet(
                 joMessageProxyMainNet.filters[strEventName]()
             );
             if( joEvents.length > 0 ) {
-                details.write( strLogPrefix +
-                    cc.success( "Success, verified the " ) + cc.info( strEventName ) +
-                    cc.success( " event of the " ) + cc.info( "MessageProxy" ) +
-                    cc.success( "/" ) + cc.notice( joMessageProxyMainNet.address ) +
-                    cc.success( " contract, found event(s): " ) + cc.j( joEvents ) +
-                    "\n" );
+                details.success( strLogPrefix, "Success, verified the ", cc.info( strEventName ),
+                    " event of the MessageProxy/", cc.notice( joMessageProxyMainNet.address ),
+                    " contract, found event(s): ", cc.j( joEvents ) );
             } else {
                 throw new Error(
                     "Verification failed for the \"OutgoingMessage\" event " +
@@ -823,15 +750,13 @@ export async function doErc1155BatchPaymentFromMainNet(
             }
         }
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().critical ) {
-            const strError = owaspUtils.extractErrorMessage( err );
-            const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
-                cc.error( " Payment error in " + strActionName + ": " ) + cc.error( strError ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
-            if( log.id != details.id )
-                log.write( s );
-            details.write( s );
-        }
+        const strError = owaspUtils.extractErrorMessage( err );
+        const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
+            cc.error( " Payment error in " ) + strActionName + ": " + cc.warning( strError ) +
+            ", stack is: " + "\n" + cc.stack( err.stack );
+        if( log.id != details.id )
+            log.critical( s );
+        details.critical( s );
         details.exposeDetailsTo( log, "doErc1155BatchPaymentFromMainNet", false );
         details.close();
         return false;
@@ -886,20 +811,15 @@ export async function doErc20PaymentFromSChain(
         const weiHowMuchApprove = undefined;
         let gasPrice = await transactionCustomizerSChain.computeGasPrice(
             ethersProviderSChain, 200000000000 );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using computed " ) +
-                cc.info( "gasPrice" ) + cc.debug( "=" ) + cc.j( gasPrice ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using computed gasPrice=", cc.j( gasPrice ) );
         const estimatedGasApprove =
             await transactionCustomizerSChain.computeGas(
                 details, ethersProviderSChain,
                 "ERC20", contractERC20, "approve", arrArgumentsApprove,
                 joAccountSrc, strActionName,
                 gasPrice, 8000000, weiHowMuchApprove, null );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using estimated(approve) " ) +
-                cc.info( "gas" ) + cc.debug( "=" ) + cc.notice( estimatedGasApprove ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using estimated(approve) gas=",
+            cc.notice( estimatedGasApprove ) );
         const isIgnoreApprove = false;
         const strErrorOfDryRunApprove =
             await imaTx.dryRunCall(
@@ -923,9 +843,9 @@ export async function doErc20PaymentFromSChain(
             } );
         }
         if( imaHelperAPIs.getSleepBetweenTransactionsOnSChainMilliseconds() > 0 ) {
-            details.write( cc.normal( "Sleeping " ) +
-                cc.info( imaHelperAPIs.getSleepBetweenTransactionsOnSChainMilliseconds() ) +
-                cc.normal( " milliseconds between transactions..." ) + "\n" );
+            details.trace( "Sleeping ",
+                imaHelperAPIs.getSleepBetweenTransactionsOnSChainMilliseconds(),
+                " milliseconds between transactions..." );
             await imaHelperAPIs.sleep(
                 imaHelperAPIs.getSleepBetweenTransactionsOnSChainMilliseconds() );
         }
@@ -940,17 +860,11 @@ export async function doErc20PaymentFromSChain(
                 "exitToMainERC20", arrArgumentsExitToMainERC20,
                 joAccountSrc, strActionName,
                 gasPrice, 8000000, weiHowMuchExitToMainERC20, null );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using estimated(approve) " ) +
-                cc.info( "gas" ) + cc.debug( "=" ) + cc.notice( estimatedGasExitToMainERC20 ) +
-                "\n" );
-        }
+        details.trace( strLogPrefix, "Using estimated(approve) gas=",
+            cc.notice( estimatedGasExitToMainERC20 ) );
         gasPrice = await transactionCustomizerSChain.computeGasPrice(
             ethersProviderSChain, 200000000000 );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using computed " ) +
-                cc.info( "gasPrice" ) + cc.debug( "=" ) + cc.j( gasPrice ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using computed gasPrice=", cc.j( gasPrice ) );
         const isIgnoreExitToMainERC20 = true;
         const strErrorOfDryRunExitToMainERC20 =
             await imaTx.dryRunCall(
@@ -978,10 +892,9 @@ export async function doErc20PaymentFromSChain(
         // Must-have event(s) analysis as indicator(s) of success
         const strEventName = "OutgoingMessage";
         if( joMessageProxySChain ) {
-            details.write( strLogPrefix + cc.debug( "Verifying the " ) + cc.info( strEventName ) +
-                cc.debug( " event of the " ) + cc.info( "MessageProxy" ) + cc.debug( "/" ) +
-                cc.notice( joMessageProxySChain.address ) + cc.debug( " contract ..." ) +
-                "\n" );
+            details.debug( strLogPrefix, "Verifying the ", cc.info( strEventName ),
+                " event of the MessageProxy/", cc.notice( joMessageProxySChain.address ),
+                " contract ..." );
             await imaHelperAPIs.sleep(
                 imaHelperAPIs.getMillisecondsSleepBeforeFetchOutgoingMessageEvent() );
             const joEvents = await imaEventLogScan.getContractCallEvents(
@@ -990,11 +903,10 @@ export async function doErc20PaymentFromSChain(
                 joReceiptExitToMainERC20.blockNumber, joReceiptExitToMainERC20.transactionHash,
                 joMessageProxySChain.filters[strEventName]() );
             if( joEvents.length > 0 ) {
-                details.write( strLogPrefix + cc.success( "Success, verified the " ) +
-                    cc.info( strEventName ) + cc.success( " event of the " ) +
-                    cc.info( "MessageProxy" ) + cc.success( "/" ) +
-                    cc.notice( joMessageProxySChain.address ) +
-                    cc.success( " contract, found event(s): " ) + cc.j( joEvents ) + "\n" );
+                details.success( strLogPrefix, "Success, verified the ",
+                    cc.info( strEventName ), " event of the MessageProxy/",
+                    cc.notice( joMessageProxySChain.address ),
+                    " contract, found event(s): ", cc.j( joEvents ) );
             } else {
                 throw new Error(
                     "Verification failed for the \"OutgoingMessage\" event " +
@@ -1003,15 +915,13 @@ export async function doErc20PaymentFromSChain(
             }
         }
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().critical ) {
-            const strError = owaspUtils.extractErrorMessage( err );
-            const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
-                cc.error( " Payment error in " + strActionName + ": " ) + cc.error( strError ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
-            if( log.id != details.id )
-                log.write( s );
-            details.write( s );
-        }
+        const strError = owaspUtils.extractErrorMessage( err );
+        const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
+            cc.error( " Payment error in " ) + strActionName + ": " + cc.warning( strError ) +
+            ", stack is: " + "\n" + cc.stack( err.stack );
+        if( log.id != details.id )
+            log.critical( s );
+        details.critical( s );
         details.exposeDetailsTo( log, "doErc20PaymentFromSChain", false );
         details.close();
         return false;
@@ -1067,20 +977,15 @@ export async function doErc721PaymentFromSChain(
         const weiHowMuchApprove = undefined;
         let gasPrice = await transactionCustomizerSChain.computeGasPrice(
             ethersProviderSChain, 200000000000 );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using computed " ) +
-                cc.info( "gasPrice" ) + cc.debug( "=" ) + cc.j( gasPrice ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using computed gasPrice=", cc.j( gasPrice ) );
         const estimatedGasApprove =
             await transactionCustomizerSChain.computeGas(
                 details, ethersProviderSChain,
                 "ERC721", contractERC721, "approve", arrArgumentsApprove,
                 joAccountSrc, strActionName,
                 gasPrice, 8000000, weiHowMuchApprove, null );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using estimated(transfer from) " ) +
-                cc.info( "gas" ) + cc.debug( "=" ) + cc.notice( estimatedGasApprove ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using estimated(transfer from) gas=",
+            cc.notice( estimatedGasApprove ) );
         const isIgnoreApprove = false;
         const strErrorOfDryRunApprove =
             await imaTx.dryRunCall(
@@ -1104,9 +1009,9 @@ export async function doErc721PaymentFromSChain(
             } );
         }
         if( imaHelperAPIs.getSleepBetweenTransactionsOnSChainMilliseconds() > 0 ) {
-            details.write( cc.normal( "Sleeping " ) +
-                cc.info( imaHelperAPIs.getSleepBetweenTransactionsOnSChainMilliseconds() ) +
-                cc.normal( " milliseconds between transactions..." ) + "\n" );
+            details.trace( "Sleeping ",
+                imaHelperAPIs.getSleepBetweenTransactionsOnSChainMilliseconds(),
+                " milliseconds between transactions..." );
             await imaHelperAPIs.sleep(
                 imaHelperAPIs.getSleepBetweenTransactionsOnSChainMilliseconds() );
         }
@@ -1116,10 +1021,7 @@ export async function doErc721PaymentFromSChain(
         const weiHowMuchExitToMainERC721 = undefined;
         gasPrice = await transactionCustomizerSChain.computeGasPrice(
             ethersProviderSChain, 200000000000 );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using computed " ) + cc.info( "gasPrice" ) +
-                cc.debug( "=" ) + cc.j( gasPrice ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using computed gasPrice=", cc.j( gasPrice ) );
         const estimatedGasExitToMainERC721 =
             await transactionCustomizerSChain.computeGas(
                 details, ethersProviderSChain,
@@ -1127,11 +1029,8 @@ export async function doErc721PaymentFromSChain(
                 "exitToMainERC721", arrArgumentsExitToMainERC721,
                 joAccountSrc, strActionName,
                 gasPrice, 8000000, weiHowMuchExitToMainERC721, null );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using estimated(exit to main) " ) +
-                cc.info( "gas" ) + cc.debug( "=" ) + cc.notice( estimatedGasExitToMainERC721 ) +
-                "\n" );
-        }
+        details.trace( strLogPrefix, "Using estimated(exit to main) gas=",
+            cc.notice( estimatedGasExitToMainERC721 ) );
         const isIgnoreExitToMainERC721 = true;
         const strErrorOfDryRunExitToMainERC721 =
             await imaTx.dryRunCall(
@@ -1159,10 +1058,9 @@ export async function doErc721PaymentFromSChain(
         // Must-have event(s) analysis as indicator(s) of success
         const strEventName = "OutgoingMessage";
         if( joMessageProxySChain ) {
-            details.write( strLogPrefix + cc.debug( "Verifying the " ) +
-                cc.info( strEventName ) + cc.debug( " event of the " ) + cc.info( "MessageProxy" ) +
-                cc.debug( "/" ) + cc.notice( joMessageProxySChain.address ) +
-                cc.debug( " contract ..." ) + "\n" );
+            details.debug( strLogPrefix, "Verifying the ", cc.info( strEventName ),
+                " event of the MessageProxy/", cc.notice( joMessageProxySChain.address ),
+                cc.debug( " contract ..." ) );
             await imaHelperAPIs.sleep(
                 imaHelperAPIs.getMillisecondsSleepBeforeFetchOutgoingMessageEvent() );
             const joEvents = await imaEventLogScan.getContractCallEvents(
@@ -1172,11 +1070,10 @@ export async function doErc721PaymentFromSChain(
                 joReceiptExitToMainERC721.transactionHash,
                 joMessageProxySChain.filters[strEventName]() );
             if( joEvents.length > 0 ) {
-                details.write( strLogPrefix + cc.success( "Success, verified the " ) +
-                    cc.info( strEventName ) + cc.success( " event of the " ) +
-                    cc.info( "MessageProxy" ) + cc.success( "/" ) +
-                    cc.notice( joMessageProxySChain.address ) +
-                    cc.success( " contract, found event(s): " ) + cc.j( joEvents ) + "\n" );
+                details.success( strLogPrefix, "Success, verified the ",
+                    cc.info( strEventName ), " event of the MessageProxy/",
+                    cc.notice( joMessageProxySChain.address ),
+                    " contract, found event(s): ", cc.j( joEvents ) );
             } else {
                 throw new Error(
                     "Verification failed for the \"OutgoingMessage\" event " +
@@ -1185,15 +1082,13 @@ export async function doErc721PaymentFromSChain(
             }
         }
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().critical ) {
-            const strError = owaspUtils.extractErrorMessage( err );
-            const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
-                cc.error( " Payment error in " + strActionName + ": " ) + cc.error( strError ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
-            if( log.id != details.id )
-                log.write( s );
-            details.write( s );
-        }
+        const strError = owaspUtils.extractErrorMessage( err );
+        const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
+            cc.error( " Payment error in " ) + strActionName + ": " + cc.warning( strError ) +
+            ", stack is: " + "\n" + cc.stack( err.stack );
+        if( log.id != details.id )
+            log.critical( s );
+        details.critical( s );
         details.exposeDetailsTo( log, "doErc721PaymentFromSChain", false );
         details.close();
         return false;
@@ -1252,19 +1147,14 @@ export async function doErc1155PaymentFromSChain(
         const weiHowMuchApprove = undefined;
         let gasPrice = await transactionCustomizerSChain.computeGasPrice(
             ethersProviderSChain, 200000000000 );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using computed " ) +
-                cc.info( "gasPrice" ) + cc.debug( "=" ) + cc.j( gasPrice ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using computed gasPrice=", cc.j( gasPrice ) );
         const estimatedGasApprove =
             await transactionCustomizerSChain.computeGas(
                 details, ethersProviderSChain,
                 "ERC1155", contractERC1155, "setApprovalForAll", arrArgumentsApprove,
                 joAccountSrc, strActionName, gasPrice, 8000000, weiHowMuchApprove, null );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using estimated(transfer from) " ) +
-                cc.info( "gas" ) + cc.debug( "=" ) + cc.notice( estimatedGasApprove ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using estimated(transfer from) gas=",
+            cc.notice( estimatedGasApprove ) );
         const isIgnoreApprove = false;
         const strErrorOfDryRunApprove =
             await imaTx.dryRunCall(
@@ -1288,9 +1178,9 @@ export async function doErc1155PaymentFromSChain(
             } );
         }
         if( imaHelperAPIs.getSleepBetweenTransactionsOnSChainMilliseconds() > 0 ) {
-            details.write( cc.normal( "Sleeping " ) +
-                cc.info( imaHelperAPIs.getSleepBetweenTransactionsOnSChainMilliseconds() ) +
-                cc.normal( " milliseconds between transactions..." ) + "\n" );
+            details.trace( "Sleeping ",
+                imaHelperAPIs.getSleepBetweenTransactionsOnSChainMilliseconds(),
+                " milliseconds between transactions..." );
             await imaHelperAPIs.sleep(
                 imaHelperAPIs.getSleepBetweenTransactionsOnSChainMilliseconds() );
         }
@@ -1300,10 +1190,7 @@ export async function doErc1155PaymentFromSChain(
         const weiHowMuchExitToMainERC1155 = undefined;
         gasPrice = await transactionCustomizerSChain.computeGasPrice(
             ethersProviderSChain, 200000000000 );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using computed " ) +
-                cc.info( "gasPrice" ) + cc.debug( "=" ) + cc.j( gasPrice ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using computed gasPrice=", cc.j( gasPrice ) );
         const estimatedGasExitToMainERC1155 =
             await transactionCustomizerSChain.computeGas(
                 details, ethersProviderSChain,
@@ -1311,11 +1198,8 @@ export async function doErc1155PaymentFromSChain(
                 "exitToMainERC1155", arrArgumentsExitToMainERC1155,
                 joAccountSrc, strActionName, gasPrice, 8000000, weiHowMuchExitToMainERC1155,
                 null );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using estimated(exit to main) " ) +
-                cc.info( "gas" ) + cc.debug( "=" ) + cc.notice( estimatedGasExitToMainERC1155 ) +
-                "\n" );
-        }
+        details.trace( strLogPrefix, "Using estimated(exit to main) gas=",
+            cc.notice( estimatedGasExitToMainERC1155 ) );
         const isIgnoreExitToMainERC1155 = true;
         const strErrorOfDryRunExitToMainERC1155 =
             await imaTx.dryRunCall(
@@ -1344,10 +1228,9 @@ export async function doErc1155PaymentFromSChain(
         // Must-have event(s) analysis as indicator(s) of success
         const strEventName = "OutgoingMessage";
         if( joMessageProxySChain ) {
-            details.write( strLogPrefix + cc.debug( "Verifying the " ) + cc.info( strEventName ) +
-                cc.debug( " event of the " ) + cc.info( "MessageProxy" ) + cc.debug( "/" ) +
-                cc.notice( joMessageProxySChain.address ) + cc.debug( " contract ..." ) +
-                "\n" );
+            details.debug( strLogPrefix, "Verifying the ", cc.info( strEventName ),
+                " event of the MessageProxy/", cc.notice( joMessageProxySChain.address ),
+                " contract ..." );
             await imaHelperAPIs.sleep(
                 imaHelperAPIs.getMillisecondsSleepBeforeFetchOutgoingMessageEvent() );
             const joEvents = await imaEventLogScan.getContractCallEvents(
@@ -1357,11 +1240,10 @@ export async function doErc1155PaymentFromSChain(
                 joReceiptExitToMainERC1155.transactionHash,
                 joMessageProxySChain.filters[strEventName]() );
             if( joEvents.length > 0 ) {
-                details.write( strLogPrefix + cc.success( "Success, verified the " ) +
-                    cc.info( strEventName ) + cc.success( " event of the " ) +
-                    cc.info( "MessageProxy" ) + cc.success( "/" ) +
-                    cc.notice( joMessageProxySChain.address ) +
-                    cc.success( " contract, found event(s): " ) + cc.j( joEvents ) + "\n" );
+                details.success( strLogPrefix, "Success, verified the ",
+                    cc.info( strEventName ), " event of the MessageProxy/",
+                    cc.notice( joMessageProxySChain.address ),
+                    " contract, found event(s): ", cc.j( joEvents ) );
             } else {
                 throw new Error(
                     "Verification failed for the \"OutgoingMessage\" event " +
@@ -1370,15 +1252,13 @@ export async function doErc1155PaymentFromSChain(
             }
         }
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().critical ) {
-            const strError = owaspUtils.extractErrorMessage( err );
-            const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
-                cc.error( " Payment error in " + strActionName + ": " ) + cc.error( strError ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
-            if( log.id != details.id )
-                log.write( s );
-            details.write( s );
-        }
+        const strError = owaspUtils.extractErrorMessage( err );
+        const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
+            cc.error( " Payment error in " ) + strActionName + ": " + cc.warning( strError ) +
+            ", stack is: " + "\n" + cc.stack( err.stack );
+        if( log.id != details.id )
+            log.critical( s );
+        details.critical( s );
         details.exposeDetailsTo( log, "doErc1155PaymentFromSChain", false );
         details.close();
         return false;
@@ -1436,19 +1316,14 @@ export async function doErc1155BatchPaymentFromSChain(
         const weiHowMuchApprove = undefined;
         let gasPrice = await transactionCustomizerSChain.computeGasPrice(
             ethersProviderSChain, 200000000000 );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using computed " ) +
-                cc.info( "gasPrice" ) + cc.debug( "=" ) + cc.j( gasPrice ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using computed gasPrice=", cc.j( gasPrice ) );
         const estimatedGasApprove =
             await transactionCustomizerSChain.computeGas(
                 details, ethersProviderSChain,
                 "ERC1155", contractERC1155, "setApprovalForAll", arrArgumentsApprove,
                 joAccountSrc, strActionName, gasPrice, 8000000, weiHowMuchApprove, null );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using estimated(transfer from) " ) +
-                cc.info( "gas" ) + cc.debug( "=" ) + cc.notice( estimatedGasApprove ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using estimated(transfer from) gas=",
+            cc.notice( estimatedGasApprove ) );
         const isIgnoreApprove = false;
         const strErrorOfDryRunApprove =
             await imaTx.dryRunCall(
@@ -1473,9 +1348,9 @@ export async function doErc1155BatchPaymentFromSChain(
             } );
         }
         if( imaHelperAPIs.getSleepBetweenTransactionsOnSChainMilliseconds() > 0 ) {
-            details.write( cc.normal( "Sleeping " ) +
-                cc.info( imaHelperAPIs.getSleepBetweenTransactionsOnSChainMilliseconds() ) +
-                cc.normal( " milliseconds between transactions..." ) + "\n" );
+            details.trace( "Sleeping ",
+                imaHelperAPIs.getSleepBetweenTransactionsOnSChainMilliseconds(),
+                " milliseconds between transactions..." );
             await imaHelperAPIs.sleep(
                 imaHelperAPIs.getSleepBetweenTransactionsOnSChainMilliseconds() );
         }
@@ -1485,10 +1360,7 @@ export async function doErc1155BatchPaymentFromSChain(
         const weiHowMuchExitToMainERC1155Batch = undefined;
         gasPrice = await transactionCustomizerSChain.computeGasPrice(
             ethersProviderSChain, 200000000000 );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using computed " ) +
-                cc.info( "gasPrice" ) + cc.debug( "=" ) + cc.j( gasPrice ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using computed gasPrice=", cc.j( gasPrice ) );
         const estimatedGasExitToMainERC1155Batch =
             await transactionCustomizerSChain.computeGas(
                 details, ethersProviderSChain,
@@ -1496,11 +1368,8 @@ export async function doErc1155BatchPaymentFromSChain(
                 "exitToMainERC1155Batch", arrArgumentsExitToMainERC1155Batch,
                 joAccountSrc, strActionName, gasPrice, 8000000,
                 weiHowMuchExitToMainERC1155Batch, null );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using estimated(exit to main) " ) +
-                cc.info( "gas" ) + cc.debug( "=" ) +
-                cc.notice( estimatedGasExitToMainERC1155Batch ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using estimated(exit to main) gas=",
+            cc.notice( estimatedGasExitToMainERC1155Batch ) );
         const isIgnoreExitToMainERC1155Batch = true;
         const strErrorOfDryRunExitToMainERC1155Batch =
             await imaTx.dryRunCall(
@@ -1530,10 +1399,9 @@ export async function doErc1155BatchPaymentFromSChain(
         // Must-have event(s) analysis as indicator(s) of success
         const strEventName = "OutgoingMessage";
         if( joMessageProxySChain ) {
-            details.write( strLogPrefix + cc.debug( "Verifying the " ) + cc.info( strEventName ) +
-                cc.debug( " event of the " ) + cc.info( "MessageProxy" ) + cc.debug( "/" ) +
-                cc.notice( joMessageProxySChain.address ) + cc.debug( " contract ..." ) +
-                "\n" );
+            details.debug( strLogPrefix, "Verifying the ", cc.info( strEventName ),
+                " event of the MessageProxy/", cc.notice( joMessageProxySChain.address ),
+                " contract ..." );
             await imaHelperAPIs.sleep(
                 imaHelperAPIs.getMillisecondsSleepBeforeFetchOutgoingMessageEvent() );
             const joEvents = await imaEventLogScan.getContractCallEvents(
@@ -1543,11 +1411,10 @@ export async function doErc1155BatchPaymentFromSChain(
                 joReceiptExitToMainERC1155Batch.transactionHash,
                 joMessageProxySChain.filters[strEventName]() );
             if( joEvents.length > 0 ) {
-                details.write( strLogPrefix + cc.success( "Success, verified the " ) +
-                    cc.info( strEventName ) + cc.success( " event of the " ) +
-                    cc.info( "MessageProxy" ) + cc.success( "/" ) +
-                    cc.notice( joMessageProxySChain.address ) +
-                    cc.success( " contract, found event(s): " ) + cc.j( joEvents ) + "\n" );
+                details.success( strLogPrefix, "Success, verified the ",
+                    cc.info( strEventName ), " event of the MessageProxy/",
+                    cc.notice( joMessageProxySChain.address ),
+                    " contract, found event(s): ", cc.j( joEvents ) );
             } else {
                 throw new Error(
                     "Verification failed for the \"OutgoingMessage\" event " +
@@ -1556,15 +1423,13 @@ export async function doErc1155BatchPaymentFromSChain(
             }
         }
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().critical ) {
-            const strError = owaspUtils.extractErrorMessage( err );
-            const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
-                cc.error( " Payment error in " + strActionName + ": " ) + cc.error( strError ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
-            if( log.id != details.id )
-                log.write( s );
-            details.write( s );
-        }
+        const strError = owaspUtils.extractErrorMessage( err );
+        const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
+            cc.error( " Payment error in " ) + strActionName + ": " + cc.warning( strError ) +
+            ", stack is: " + "\n" + cc.stack( err.stack );
+        if( log.id != details.id )
+            log.critical( s );
+        details.critical( s );
         details.exposeDetailsTo( log, "doErc1155BatchPaymentFromSChain", false );
         details.close();
         return false;
@@ -1618,26 +1483,20 @@ export async function doErc20PaymentS2S(
             throw new Error( "No transaction customizer provided" );
         const ercSrcAbi20 = joSrcErc20[strCoinNameErc20Src + "_abi"];
         const ercSrcAddress20 = joSrcErc20[strCoinNameErc20Src + "_address"];
-        details.write( strLogPrefix + cc.attention( "Token Manager ERC20" ) +
-            cc.debug( " address on source chain...." ) +
-            cc.note( joTokenManagerERC20Src.address ) + "\n" );
-        details.write( strLogPrefix + cc.attention( "Source ERC20" ) +
-            cc.debug( " coin name........................." ) +
-            cc.note( strCoinNameErc20Src ) + "\n" );
-        details.write( strLogPrefix + cc.attention( "Source ERC20" ) +
-            cc.debug( " token address....................." ) +
-            cc.note( ercSrcAddress20 ) + "\n" );
+        details.trace( strLogPrefix, "Token Manager ERC20 address on source chain....",
+            cc.note( joTokenManagerERC20Src.address ) );
+        details.trace( strLogPrefix, "Source ERC20 coin name.........................",
+            cc.note( strCoinNameErc20Src ) );
+        details.trace( strLogPrefix, "Source ERC20 token address.....................",
+            cc.note( ercSrcAddress20 ) );
         if( isReverse || ercDstAddress20 ) {
-            details.write( strLogPrefix + cc.attention( "Destination ERC20" ) +
-                cc.debug( " token address................" ) +
-                cc.note( ercDstAddress20 ) + "\n" );
+            details.trace( strLogPrefix, "Destination ERC20 token address................",
+                cc.note( ercDstAddress20 ) );
         }
-        details.write( strLogPrefix + cc.attention( "Destination chain name" ) +
-            cc.debug( "........................." ) +
-            cc.note( strChainNameDst ) + "\n" );
-        details.write( strLogPrefix + cc.attention( "Amount of tokens" ) +
-            cc.debug( " to transfer..................." ) +
-            cc.note( nAmountOfToken ) + "\n" );
+        details.trace( strLogPrefix, "Destination chain name.........................",
+            cc.note( strChainNameDst ) );
+        details.trace( strLogPrefix, "Amount of tokens to transfer...................",
+            cc.note( nAmountOfToken ) );
         strActionName = "ERC20 payment S2S, approve, " + ( isForward ? "forward" : "reverse" );
         const contractERC20 =
             new owaspUtils.ethersMod.ethers.Contract(
@@ -1653,19 +1512,14 @@ export async function doErc20PaymentS2S(
         ];
         const weiHowMuchApprove = undefined;
         let gasPrice = await tc.computeGasPrice( ethersProviderSrc, 200000000000 );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using computed " ) +
-                cc.info( "gasPrice" ) + cc.debug( "=" ) + cc.j( gasPrice ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using computed gasPrice=", cc.j( gasPrice ) );
         const estimatedGasApprove =
             await tc.computeGas(
                 details, ethersProviderSrc,
                 "ERC20", contractERC20, "approve", arrArgumentsApprove,
                 joAccountSrc, strActionName, gasPrice, 8000000, weiHowMuchApprove, null );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using estimated(approve) " ) +
-                cc.info( "gas" ) + cc.debug( "=" ) + cc.notice( estimatedGasApprove ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using estimated(approve) gas=",
+            cc.notice( estimatedGasApprove ) );
         const isIgnoreApprove = false;
         const strErrorOfDryRunApprove =
             await imaTx.dryRunCall(
@@ -1692,10 +1546,7 @@ export async function doErc20PaymentS2S(
             "ERC20 payment S2S, transferERC20 " + ( isForward ? "forward" : "reverse" );
         const weiHowMuchTransferERC20 = undefined;
         gasPrice = await tc.computeGasPrice( ethersProviderSrc, 200000000000 );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using computed " ) +
-                cc.info( "gasPrice" ) + cc.debug( "=" ) + cc.j( gasPrice ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using computed gasPrice=", cc.j( gasPrice ) );
         const estimatedGasTransfer =
             await tc.computeGas(
                 details, ethersProviderSrc,
@@ -1703,10 +1554,8 @@ export async function doErc20PaymentS2S(
                 "transferToSchainERC20", arrArgumentsTransfer,
                 joAccountSrc, strActionName, gasPrice,
                 8000000, weiHowMuchTransferERC20, null );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using estimated(transfer) " ) +
-            cc.info( "gas" ) + cc.debug( "=" ) + cc.notice( estimatedGasTransfer ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using estimated(transfer) gas=",
+            cc.notice( estimatedGasTransfer ) );
         const isIgnoreTransferERC20 = true;
         const strErrorOfDryRunTransferERC20 =
             await imaTx.dryRunCall(
@@ -1731,15 +1580,13 @@ export async function doErc20PaymentS2S(
             } );
         }
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().critical ) {
-            const strError = owaspUtils.extractErrorMessage( err );
-            const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
-                cc.error( " Payment error in " + strActionName + ": " ) + cc.error( strError ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
-            if( log.id != details.id )
-                log.write( s );
-            details.write( s );
-        }
+        const strError = owaspUtils.extractErrorMessage( err );
+        const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
+            cc.error( " Payment error in " ) + strActionName + ": " + cc.warning( strError ) +
+            ", stack is: " + "\n" + cc.stack( err.stack );
+        if( log.id != details.id )
+            log.critical( s );
+        details.critical( s );
         details.exposeDetailsTo(
             log, "doErc20PaymentS2S/" + ( isForward ? "forward" : "reverse" ), false );
         details.close();
@@ -1796,24 +1643,20 @@ export async function doErc721PaymentS2S(
             throw new Error( "No transaction customizer provided" );
         const ercSrcAbi721 = joSrcErc721[strCoinNameErc721Src + "_abi"];
         const ercSrcAddress721 = joSrcErc721[strCoinNameErc721Src + "_address"];
-        details.write( strLogPrefix + cc.attention( "Token Manager ERC721" ) +
-            cc.debug( " address on source chain...." ) +
-            cc.note( joTokenManagerERC721Src.address ) + "\n" );
-        details.write( strLogPrefix + cc.attention( "Source ERC721" ) +
-            cc.debug( " coin name........................." ) +
-            cc.note( strCoinNameErc721Src ) + "\n" );
-        details.write( strLogPrefix + cc.attention( "Source ERC721" ) +
-            cc.debug( " token address....................." ) +
-            cc.note( ercSrcAddress721 ) + "\n" );
+        details.trace( strLogPrefix, "Token Manager ERC721 address on source chain....",
+            cc.note( joTokenManagerERC721Src.address ) );
+        details.trace( strLogPrefix, "Source ERC721 coin name.........................",
+            cc.note( strCoinNameErc721Src ) );
+        details.trace( strLogPrefix, "Source ERC721 token address.....................",
+            cc.note( ercSrcAddress721 ) );
         if( isReverse || ercDstAddress721 ) {
-            details.write( strLogPrefix + cc.attention( "Destination ERC721" ) +
-                cc.debug( " token address................" ) +
-                cc.note( ercDstAddress721 ) + "\n" );
+            details.trace( strLogPrefix, "Destination ERC721 token address................",
+                cc.note( ercDstAddress721 ) );
         }
-        details.write( strLogPrefix + cc.attention( "Destination chain name" ) +
-            cc.debug( "........................." ) + cc.note( strChainNameDst ) + "\n" );
-        details.write( strLogPrefix + cc.attention( "Token ID" ) +
-            cc.debug( " to transfer..........................." ) + cc.note( tokenId ) + "\n" );
+        details.trace( strLogPrefix, "Destination chain name.........................",
+            cc.note( strChainNameDst ) );
+        details.trace( strLogPrefix, "Token ID to transfer...........................",
+            cc.note( tokenId ) );
         strActionName = "ERC721 payment S2S, approve, " + ( isForward ? "forward" : "reverse" );
         const contractERC721 =
             new owaspUtils.ethersMod.ethers.Contract(
@@ -1829,19 +1672,14 @@ export async function doErc721PaymentS2S(
         ];
         const weiHowMuchApprove = undefined;
         let gasPrice = await tc.computeGasPrice( ethersProviderSrc, 200000000000 );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using computed " ) +
-                cc.info( "gasPrice" ) + cc.debug( "=" ) + cc.j( gasPrice ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using computed gasPrice=", cc.j( gasPrice ) );
         const estimatedGasApprove =
             await tc.computeGas(
                 details, ethersProviderSrc,
                 "ERC721", contractERC721, "approve", arrArgumentsApprove,
                 joAccountSrc, strActionName, gasPrice, 8000000, weiHowMuchApprove, null );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using estimated(approve) " ) +
-                cc.info( "gas" ) + cc.debug( "=" ) + cc.notice( estimatedGasApprove ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using estimated(approve) gas=",
+            cc.notice( estimatedGasApprove ) );
         const isIgnoreApprove = false;
         const strErrorOfDryRunApprove =
             await imaTx.dryRunCall(
@@ -1869,10 +1707,7 @@ export async function doErc721PaymentS2S(
             "ERC721 payment S2S, transferERC721 " + ( isForward ? "forward" : "reverse" );
         const weiHowMuchTransferERC721 = undefined;
         gasPrice = await tc.computeGasPrice( ethersProviderSrc, 200000000000 );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using computed " ) +
-                cc.info( "gasPrice" ) + cc.debug( "=" ) + cc.j( gasPrice ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using computed gasPrice=", cc.j( gasPrice ) );
         const estimatedGasTransfer =
             await tc.computeGas(
                 details, ethersProviderSrc,
@@ -1880,10 +1715,8 @@ export async function doErc721PaymentS2S(
                 "transferToSchainERC721", arrArgumentsTransfer,
                 joAccountSrc, strActionName, isIgnoreTransferERC721,
                 gasPrice, 8000000, weiHowMuchTransferERC721, null );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using estimated(transfer) " ) +
-                cc.info( "gas" ) + cc.debug( "=" ) + cc.notice( estimatedGasTransfer ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using estimated(transfer) gas=",
+            cc.notice( estimatedGasTransfer ) );
         const strErrorOfDryRunTransferERC721 =
             await imaTx.dryRunCall(
                 details, ethersProviderSrc,
@@ -1907,15 +1740,13 @@ export async function doErc721PaymentS2S(
             } );
         }
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().critical ) {
-            const strError = owaspUtils.extractErrorMessage( err );
-            const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
-                cc.error( " Payment error in " + strActionName + ": " ) + cc.error( strError ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
-            if( log.id != details.id )
-                log.write( s );
-            details.write( s );
-        }
+        const strError = owaspUtils.extractErrorMessage( err );
+        const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
+            cc.error( " Payment error in " ) + strActionName + ": " + cc.warning( strError ) +
+            ", stack is: " + "\n" + cc.stack( err.stack );
+        if( log.id != details.id )
+            log.critical( s );
+        details.critical( s );
         details.exposeDetailsTo(
             log,
             "doErc721PaymentS2S/" + ( isForward ? "forward" : "reverse" ), false );
@@ -1976,26 +1807,22 @@ export async function doErc1155PaymentS2S(
             throw new Error( "No transaction customizer provided" );
         const ercSrcAbi1155 = joSrcErc1155[strCoinNameErc1155Src + "_abi"];
         const ercSrcAddress1155 = joSrcErc1155[strCoinNameErc1155Src + "_address"];
-        details.write( strLogPrefix + cc.attention( "Token Manager ERC1155" ) +
-            cc.debug( " address on source chain...." ) +
-            cc.note( joTokenManagerERC1155Src.address ) + "\n" );
-        details.write( strLogPrefix + cc.attention( "Source ERC1155" ) +
-            cc.debug( " coin name........................." ) +
-            cc.note( strCoinNameErc1155Src ) + "\n" );
-        details.write( strLogPrefix + cc.attention( "Source ERC1155" ) +
-            cc.debug( " token address....................." ) +
-            cc.note( ercSrcAddress1155 ) + "\n" );
+        details.trace( strLogPrefix, "Token Manager ERC1155 address on source chain....",
+            cc.note( joTokenManagerERC1155Src.address ) );
+        details.trace( strLogPrefix, "Source ERC1155 coin name.........................",
+            cc.note( strCoinNameErc1155Src ) );
+        details.trace( strLogPrefix, "Source ERC1155 token address.....................",
+            cc.note( ercSrcAddress1155 ) );
         if( isReverse || ercDstAddress1155 ) {
-            details.write( strLogPrefix + cc.attention( "Destination ERC1155" ) +
-                cc.debug( " token address................" ) +
-                cc.note( ercDstAddress1155 ) + "\n" );
+            details.trace( strLogPrefix, "Destination ERC1155 token address................",
+                cc.note( ercDstAddress1155 ) );
         }
-        details.write( strLogPrefix + cc.attention( "Destination chain name" ) +
-            cc.debug( "........................." ) + cc.note( strChainNameDst ) + "\n" );
-        details.write( strLogPrefix + cc.attention( "Token ID" ) +
-            cc.debug( " to transfer..........................." ) + cc.note( tokenId ) + "\n" );
-        details.write( strLogPrefix + cc.attention( "Amount of tokens" ) +
-            cc.debug( " to transfer..................." ) + cc.note( nAmountOfToken ) + "\n" );
+        details.trace( strLogPrefix, "Destination chain name.........................",
+            cc.note( strChainNameDst ) );
+        details.trace( strLogPrefix, "Token ID to transfer...........................",
+            cc.note( tokenId ) );
+        details.trace( strLogPrefix, "Amount of tokens to transfer...................",
+            cc.note( nAmountOfToken ) );
         strActionName = "ERC1155 payment S2S, approve, " + ( isForward ? "forward" : "reverse" );
         const contractERC1155 =
             new owaspUtils.ethersMod.ethers.Contract(
@@ -2012,19 +1839,14 @@ export async function doErc1155PaymentS2S(
         ];
         const weiHowMuchApprove = undefined;
         let gasPrice = await tc.computeGasPrice( ethersProviderSrc, 200000000000 );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using computed " ) +
-                cc.info( "gasPrice" ) + cc.debug( "=" ) + cc.j( gasPrice ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using computed gasPrice=", cc.j( gasPrice ) );
         const estimatedGasApprove =
             await tc.computeGas(
                 details, ethersProviderSrc,
                 "ERC1155", contractERC1155, "setApprovalForAll", arrArgumentsApprove,
                 joAccountSrc, strActionName, gasPrice, 8000000, weiHowMuchApprove, null );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using estimated(approve) " ) +
-                cc.info( "gas" ) + cc.debug( "=" ) + cc.notice( estimatedGasApprove ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using estimated(approve) gas=",
+            cc.notice( estimatedGasApprove ) );
         const isIgnoreApprove = false;
         const strErrorOfDryRunApprove =
             await imaTx.dryRunCall(
@@ -2051,10 +1873,7 @@ export async function doErc1155PaymentS2S(
             "ERC1155 payment S2S, transferERC1155 " + ( isForward ? "forward" : "reverse" );
         const weiHowMuchTransferERC1155 = undefined;
         gasPrice = await tc.computeGasPrice( ethersProviderSrc, 200000000000 );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using computed " ) +
-                cc.info( "gasPrice" ) + cc.debug( "=" ) + cc.j( gasPrice ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using computed gasPrice=", cc.j( gasPrice ) );
         const estimatedGasTransfer =
             await tc.computeGas(
                 details, ethersProviderSrc,
@@ -2062,10 +1881,8 @@ export async function doErc1155PaymentS2S(
                 "transferToSchainERC1155", arrArgumentsTransfer,
                 joAccountSrc, strActionName, gasPrice,
                 8000000, weiHowMuchTransferERC1155, null );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using estimated(transfer) " ) +
-                cc.info( "gas" ) + cc.debug( "=" ) + cc.notice( estimatedGasTransfer ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using estimated(transfer) gas=",
+            cc.notice( estimatedGasTransfer ) );
         const isIgnoreTransferERC1155 = true;
         const strErrorOfDryRunTransferERC1155 =
             await imaTx.dryRunCall(
@@ -2090,16 +1907,14 @@ export async function doErc1155PaymentS2S(
             } );
         }
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().critical ) {
-            const strError = owaspUtils.extractErrorMessage( err );
-            const s = strLogPrefix +
-                cc.fatal( "CRITICAL ERROR:" ) + cc.error( " Payment error in " +
-                strActionName + ": " ) + cc.error( strError ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
-            if( log.id != details.id )
-                log.write( s );
-            details.write( s );
-        }
+        const strError = owaspUtils.extractErrorMessage( err );
+        const s = strLogPrefix +
+            cc.fatal( "CRITICAL ERROR:" ) + cc.error( " Payment error in " +
+            strActionName + ": " ) + cc.warning( strError ) +
+            ", stack is: " + "\n" + cc.stack( err.stack );
+        if( log.id != details.id )
+            log.critical( s );
+        details.critical( s );
         details.exposeDetailsTo(
             log, "doErc1155PaymentS2S/" + ( isForward ? "forward" : "reverse" ), false );
         details.close();
@@ -2159,26 +1974,22 @@ export async function doErc1155BatchPaymentS2S(
             throw new Error( "No transaction customizer provided" );
         const ercSrcAbi1155 = joSrcErc1155[strCoinNameErc1155Src + "_abi"];
         const ercSrcAddress1155 = joSrcErc1155[strCoinNameErc1155Src + "_address"];
-        details.write( strLogPrefix + cc.attention( "Token Manager ERC1155" ) +
-            cc.debug( " address on source chain...." ) +
-            cc.note( joTokenManagerERC1155Src.address ) + "\n" );
-        details.write( strLogPrefix + cc.attention( "Source ERC1155" ) +
-            cc.debug( " coin name........................." ) +
-            cc.note( strCoinNameErc1155Src ) + "\n" );
-        details.write( strLogPrefix + cc.attention( "Source ERC1155" ) +
-            cc.debug( " token address....................." ) +
-            cc.note( ercSrcAddress1155 ) + "\n" );
+        details.trace( strLogPrefix, "Token Manager ERC1155 address on source chain....",
+            cc.note( joTokenManagerERC1155Src.address ) );
+        details.trace( strLogPrefix, "Source ERC1155 coin name.........................",
+            cc.note( strCoinNameErc1155Src ) );
+        details.trace( strLogPrefix, "Source ERC1155 token address.....................",
+            cc.note( ercSrcAddress1155 ) );
         if( isReverse || ercDstAddress1155 ) {
-            details.write( strLogPrefix + cc.attention( "Destination ERC1155" ) +
-                cc.debug( " token address................" ) +
-                cc.note( ercDstAddress1155 ) + "\n" );
+            details.trace( strLogPrefix, "Destination ERC1155 token address................"
+                .cc.note( ercDstAddress1155 ) );
         }
-        details.write( strLogPrefix + cc.attention( "Destination chain name" ) +
-            cc.debug( "........................." ) + cc.note( strChainNameDst ) + "\n" );
-        details.write( strLogPrefix + cc.attention( "Token IDs" ) +
-            cc.debug( " to transfer.........................." ) + cc.j( arrTokenIds ) + "\n" );
-        details.write( strLogPrefix + cc.attention( "Amounts of tokens" ) +
-            cc.debug( " to transfer.................." ) + cc.j( arrTokenAmounts ) + "\n" );
+        details.trace( strLogPrefix, "Destination chain name.........................",
+            cc.note( strChainNameDst ) );
+        details.trace( strLogPrefix, "Token IDs to transfer..........................",
+            cc.j( arrTokenIds ) );
+        details.trace( strLogPrefix, "Amounts of tokens to transfer..................",
+            cc.j( arrTokenAmounts ) );
         strActionName =
             "ERC1155 batch-payment S2S, approve, " + ( isForward ? "forward" : "reverse" );
         const contractERC1155 =
@@ -2196,19 +2007,14 @@ export async function doErc1155BatchPaymentS2S(
         ];
         const weiHowMuchApprove = undefined;
         let gasPrice = await tc.computeGasPrice( ethersProviderSrc, 200000000000 );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using computed " ) +
-                cc.info( "gasPrice" ) + cc.debug( "=" ) + cc.j( gasPrice ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using computed gasPrice=", cc.j( gasPrice ) );
         const estimatedGasApprove =
             await tc.computeGas(
                 details, ethersProviderSrc,
                 "ERC1155", contractERC1155, "setApprovalForAll", arrArgumentsApprove,
                 joAccountSrc, strActionName, gasPrice, 8000000, weiHowMuchApprove, null );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using estimated(approve) " ) +
-                cc.info( "gas" ) + cc.debug( "=" ) + cc.notice( estimatedGasApprove ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using estimated(approve) gas=",
+            cc.notice( estimatedGasApprove ) );
         const isIgnoreApprove = false;
         const strErrorOfDryRunApprove =
             await imaTx.dryRunCall(
@@ -2236,10 +2042,7 @@ export async function doErc1155BatchPaymentS2S(
             "ERC1155 batch-payment S2S, transferERC1155 " + ( isForward ? "forward" : "reverse" );
         const weiHowMuchTransferERC1155 = undefined;
         gasPrice = await tc.computeGasPrice( ethersProviderSrc, 200000000000 );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using computed " ) +
-                cc.info( "gasPrice" ) + cc.debug( "=" ) + cc.j( gasPrice ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using computed gasPrice=", cc.j( gasPrice ) );
         const estimatedGasTransfer =
             await tc.computeGas(
                 details, ethersProviderSrc,
@@ -2247,10 +2050,8 @@ export async function doErc1155BatchPaymentS2S(
                 "transferToSchainERC1155Batch", arrArgumentsTransfer,
                 joAccountSrc, strActionName,
                 gasPrice, 8000000, weiHowMuchTransferERC1155, null );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using estimated(transfer) " ) +
-                cc.info( "gas" ) + cc.debug( "=" ) + cc.notice( estimatedGasTransfer ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using estimated(transfer) gas=",
+            cc.notice( estimatedGasTransfer ) );
         const isIgnoreTransferERC1155 = true;
         const strErrorOfDryRunTransferERC1155 =
             await imaTx.dryRunCall(
@@ -2275,15 +2076,13 @@ export async function doErc1155BatchPaymentS2S(
             } );
         }
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().critical ) {
-            const strError = owaspUtils.extractErrorMessage( err );
-            const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
-                cc.error( " Payment error in " + strActionName + ": " ) + cc.error( strError ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
-            if( log.id != details.id )
-                log.write( s );
-            details.write( s );
-        }
+        const strError = owaspUtils.extractErrorMessage( err );
+        const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
+            cc.error( " Payment error in " ) + strActionName + ": " + cc.warning( strError ) +
+            ", stack is: " + "\n" + cc.stack( err.stack );
+        if( log.id != details.id )
+            log.critical( s );
+        details.critical( s );
         details.exposeDetailsTo(
             log, "doErc1155BatchPaymentS2S/" + ( isForward ? "forward" : "reverse" ), false );
         details.close();
@@ -2314,9 +2113,7 @@ export async function mintErc20(
     const strLogPrefix = cc.info( "mintErc20() call" ) + " ";
     const details = log.createMemoryStream();
     try {
-        details.write( strLogPrefix +
-            cc.debug( "Mint " ) + cc.info( "ERC20" ) + cc.debug( " token amount " ) +
-            cc.notice( nAmount ) + "\n" );
+        details.debug( strLogPrefix, "Mint ERC20 token amount ", cc.notice( nAmount ) );
         if( ! ( ethersProvider && joAccount && strAddressMintTo &&
             typeof strAddressMintTo == "string" && strAddressMintTo.length > 0 &&
             strTokenContractAddress && typeof strTokenContractAddress == "string" &&
@@ -2335,20 +2132,14 @@ export async function mintErc20(
         ];
         const weiHowMuchMint = undefined;
         const gasPrice = await tc.computeGasPrice( ethersProvider, 200000000000 );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using computed " ) + cc.info( "gasPrice" ) +
-                cc.debug( "=" ) + cc.j( gasPrice ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using computed gasPrice=", cc.j( gasPrice ) );
         const estimatedGasMint =
             await tc.computeGas(
                 details, ethersProvider,
                 "ERC20", contract, "mint", arrArgumentsMint,
                 joAccount, strActionName,
                 gasPrice, 10000000, weiHowMuchMint, null );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using estimated " ) + cc.info( "gas" ) +
-                cc.debug( "=" ) + cc.notice( estimatedGasMint ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using estimated gas=", cc.notice( estimatedGasMint ) );
         strActionName = "Mint ERC20";
         const isIgnoreMint = false;
         const strErrorOfDryRun =
@@ -2378,19 +2169,17 @@ export async function mintErc20(
         details.close();
         return joReceipt; // can be used as "true" boolean value
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().critical ) {
-            const strError = owaspUtils.extractErrorMessage( err );
-            if( log.id != details.id ) {
-                log.write( strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
-                    cc.error( " Error in mintErc20() during " + strActionName + ": " ) +
-                    cc.error( strError ) + cc.error( ", stack is: " ) + "\n" +
-                    cc.stack( err.stack ) );
-            }
-            details.write( strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
-                cc.error( " Error in mintErc20() during " + strActionName + ": " ) +
-                cc.error( strError ) + cc.error( ", stack is: " ) + "\n" +
+        const strError = owaspUtils.extractErrorMessage( err );
+        if( log.id != details.id ) {
+            log.critical( strLogPrefix, cc.fatal( "CRITICAL ERROR:" ),
+                " Error in mintErc20() during ", strActionName, ": ",
+                cc.warning( strError ), ", stack is: ", "\n",
                 cc.stack( err.stack ) );
         }
+        details.critical( strLogPrefix, cc.fatal( "CRITICAL ERROR:" ),
+            " Error in mintErc20() during ", strActionName, ": ",
+            cc.warning( strError ), ", stack is: ", "\n",
+            cc.stack( err.stack ) );
         details.exposeDetailsTo( log, "mintErc20()", false );
         details.close();
         return false;
@@ -2412,8 +2201,7 @@ export async function mintErc721(
     const strLogPrefix = cc.info( "mintErc721() call" ) + " ";
     const details = log.createMemoryStream();
     try {
-        details.write( strLogPrefix + cc.debug( "Mint " ) + cc.info( "ERC721" ) +
-            cc.debug( " token ID " ) + cc.notice( idToken ) + "\n" );
+        details.debug( strLogPrefix, "Mint ERC721 token ID ", cc.notice( idToken ) );
         if( ! ( ethersProvider && joAccount && strAddressMintTo &&
             typeof strAddressMintTo == "string" && strAddressMintTo.length > 0 &&
             strTokenContractAddress && typeof strTokenContractAddress == "string" &&
@@ -2434,20 +2222,14 @@ export async function mintErc721(
         ];
         const weiHowMuchMint = undefined;
         const gasPrice = await tc.computeGasPrice( ethersProvider, 200000000000 );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using computed " ) + cc.info( "gasPrice" ) +
-                cc.debug( "=" ) + cc.j( gasPrice ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using computed gasPrice=", cc.j( gasPrice ) );
         const estimatedGasMint =
             await tc.computeGas(
                 details, ethersProvider,
                 "ERC721", contract, "mint", arrArgumentsMint,
                 joAccount, strActionName,
                 gasPrice, 10000000, weiHowMuchMint, null );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using estimated " ) + cc.info( "gas" ) +
-                cc.debug( "=" ) + cc.notice( estimatedGasMint ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using estimated gas=", cc.notice( estimatedGasMint ) );
         strActionName = "Mint ERC721";
         const isIgnoreMint = false;
         const strErrorOfDryRun =
@@ -2477,19 +2259,17 @@ export async function mintErc721(
         details.close();
         return joReceipt; // can be used as "true" boolean value
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().critical ) {
-            const strError = owaspUtils.extractErrorMessage( err );
-            if( log.id != details.id ) {
-                log.write( strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
-                    cc.error( " Error in mintErc721() during " + strActionName + ": " ) +
-                    cc.error( strError ) + cc.error( ", stack is: " ) + "\n" +
-                    cc.stack( err.stack ) );
-            }
-            details.write( strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
-                cc.error( " Error in mintErc721() during " + strActionName + ": " ) +
-                cc.error( strError ) + cc.error( ", stack is: " ) + "\n" +
+        const strError = owaspUtils.extractErrorMessage( err );
+        if( log.id != details.id ) {
+            log.critical( strLogPrefix, cc.fatal( "CRITICAL ERROR:" ),
+                " Error in mintErc721() during ", strActionName, ": ",
+                cc.warning( strError ), ", stack is: ", "\n",
                 cc.stack( err.stack ) );
         }
+        details.critical( strLogPrefix, cc.fatal( "CRITICAL ERROR:" ) +
+            " Error in mintErc721() during ", strActionName, ": ",
+        cc.warning( strError ), ", stack is: ", "\n",
+        cc.stack( err.stack ) );
         details.exposeDetailsTo( log, "mintErc721()", false );
         details.close();
         return false;
@@ -2512,10 +2292,8 @@ export async function mintErc1155(
     const strLogPrefix = cc.info( "mintErc1155() call" ) + " ";
     const details = log.createMemoryStream();
     try {
-        details.write( strLogPrefix +
-            cc.debug( "Mint " ) + cc.info( "ERC1155" ) + cc.debug( " token ID " ) +
-            cc.notice( idToken ) + cc.debug( " token amount " ) + cc.notice( nAmount ) +
-            "\n" );
+        details.debug( strLogPrefix, "Mint ERC1155 token ID ", cc.notice( idToken ),
+            " token amount ", cc.notice( nAmount ) );
         if( ! ( ethersProvider && joAccount && strAddressMintTo &&
             typeof strAddressMintTo == "string" && strAddressMintTo.length > 0 &&
             strTokenContractAddress && typeof strTokenContractAddress == "string" &&
@@ -2537,20 +2315,14 @@ export async function mintErc1155(
         ];
         const weiHowMuchMint = undefined;
         const gasPrice = await tc.computeGasPrice( ethersProvider, 200000000000 );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using computed " ) + cc.info( "gasPrice" ) +
-                cc.debug( "=" ) + cc.j( gasPrice ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using computed gasPrice=", cc.j( gasPrice ) );
         const estimatedGasMint =
             await tc.computeGas(
                 details, ethersProvider,
                 "ERC1155", contract, "mint", arrArgumentsMint,
                 joAccount, strActionName,
                 gasPrice, 10000000, weiHowMuchMint, null );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using estimated " ) + cc.info( "gas" ) +
-                cc.debug( "=" ) + cc.notice( estimatedGasMint ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using estimated gas=", cc.notice( estimatedGasMint ) );
         strActionName = "Mint ERC1155";
         const isIgnoreMint = false;
         const strErrorOfDryRun =
@@ -2580,19 +2352,17 @@ export async function mintErc1155(
         details.close();
         return joReceipt; // can be used as "true" boolean value
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().critical ) {
-            const strError = owaspUtils.extractErrorMessage( err );
-            if( log.id != details.id ) {
-                log.write( strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
-                    cc.error( " Error in mintErc1155() during " + strActionName + ": " ) +
-                    cc.error( strError ) + cc.error( ", stack is: " ) + "\n" +
-                    cc.stack( err.stack ) );
-            }
-            details.write( strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
-                cc.error( " Error in mintErc1155() during " + strActionName + ": " ) +
-                cc.error( strError ) + cc.error( ", stack is: " ) + "\n" +
+        const strError = owaspUtils.extractErrorMessage( err );
+        if( log.id != details.id ) {
+            log.critical( strLogPrefix, cc.fatal( "CRITICAL ERROR:" ),
+                " Error in mintErc1155() during ", strActionName, ": ",
+                cc.warning( strError ), ", stack is: ", "\n",
                 cc.stack( err.stack ) );
         }
+        details.critical( strLogPrefix, cc.fatal( "CRITICAL ERROR:" ) +
+            " Error in mintErc1155() during ", strActionName, ": ",
+        cc.warning( strError ), ", stack is: ", "\n",
+        cc.stack( err.stack ) );
         details.exposeDetailsTo( log, "mintErc1155()", false );
         details.close();
         return false;
@@ -2614,8 +2384,7 @@ export async function burnErc20(
     const strLogPrefix = cc.info( "burnErc20() call" ) + " ";
     const details = log.createMemoryStream();
     try {
-        details.write( strLogPrefix + cc.debug( "Burn " ) + cc.info( "ERC20" ) +
-            cc.debug( " token amount " ) + cc.notice( nAmount ) + "\n" );
+        details.debug( strLogPrefix, "Burn ERC20 token amount ", cc.notice( nAmount ) );
         if( ! ( ethersProvider && joAccount && strAddressBurnFrom &&
             typeof strAddressBurnFrom == "string" && strAddressBurnFrom.length > 0 &&
             strTokenContractAddress && typeof strTokenContractAddress == "string" &&
@@ -2635,20 +2404,14 @@ export async function burnErc20(
         ];
         const weiHowMuchBurn = undefined;
         const gasPrice = await tc.computeGasPrice( ethersProvider, 200000000000 );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using computed " ) + cc.info( "gasPrice" ) +
-                cc.debug( "=" ) + cc.j( gasPrice ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using computed gasPrice=", cc.j( gasPrice ) );
         const estimatedGasBurn =
             await tc.computeGas(
                 details, ethersProvider,
                 "ERC20", contract, "burnFrom", arrArgumentsBurn,
                 joAccount, strActionName,
                 gasPrice, 10000000, weiHowMuchBurn, null );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using estimated " ) + cc.info( "gas" ) +
-                cc.debug( "=" ) + cc.notice( estimatedGasBurn ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using estimated gas=", cc.notice( estimatedGasBurn ) );
         strActionName = "Burn ERC20";
         const isIgnoreBurn = false;
         const strErrorOfDryRun =
@@ -2678,19 +2441,17 @@ export async function burnErc20(
         details.close();
         return joReceipt; // can be used as "true" boolean value
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().critical ) {
-            const strError = owaspUtils.extractErrorMessage( err );
-            if( log.id != details.id ) {
-                log.write( strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
-                    cc.error( " Error in burnErc20() during " + strActionName + ": " ) +
-                    cc.error( strError ) + cc.error( ", stack is: " ) + "\n" +
-                    cc.stack( err.stack ) );
-            }
-            details.write( strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
-                cc.error( " Error in burnErc20() during " + strActionName + ": " ) +
-                    cc.error( strError ) + cc.error( ", stack is: " ) + "\n" +
-                    cc.stack( err.stack ) );
+        const strError = owaspUtils.extractErrorMessage( err );
+        if( log.id != details.id ) {
+            log.critical( strLogPrefix, cc.fatal( "CRITICAL ERROR:" ),
+                " Error in burnErc20() during ", strActionName, ": ",
+                cc.warning( strError ), ", stack is: ", "\n",
+                cc.stack( err.stack ) );
         }
+        details.critical( strLogPrefix, cc.fatal( "CRITICAL ERROR:" ) +
+            " Error in burnErc20() during ", strActionName, ": ",
+        cc.warning( strError ), ", stack is: ", "\n",
+        cc.stack( err.stack ) );
         details.exposeDetailsTo( log, "burnErc20()", false );
         details.close();
         return false;
@@ -2711,8 +2472,7 @@ export async function burnErc721(
     const strLogPrefix = cc.info( "burnErc721() call" ) + " ";
     const details = log.createMemoryStream();
     try {
-        details.write( strLogPrefix + cc.debug( "Burn " ) + cc.info( "ERC721" ) +
-            cc.debug( " token ID " ) + cc.notice( idToken ) + "\n" );
+        details.debug( strLogPrefix, "Burn ERC721 token ID ", cc.notice( idToken ) );
         if( ! ( ethersProvider && joAccount &&
             strTokenContractAddress && typeof strTokenContractAddress == "string" &&
             strTokenContractAddress.length > 0 && joTokenContractABI
@@ -2730,20 +2490,14 @@ export async function burnErc721(
         ];
         const weiHowMuchBurn = undefined;
         const gasPrice = await tc.computeGasPrice( ethersProvider, 200000000000 );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using computed " ) + cc.info( "gasPrice" ) +
-                cc.debug( "=" ) + cc.j( gasPrice ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using computed gasPrice=", cc.j( gasPrice ) );
         const estimatedGasBurn =
             await tc.computeGas(
                 details, ethersProvider,
                 "ERC721", contract, "burn", arrArgumentsBurn,
                 joAccount, strActionName,
                 gasPrice, 10000000, weiHowMuchBurn, null );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using estimated " ) + cc.info( "gas" ) +
-                cc.debug( "=" ) + cc.notice( estimatedGasBurn ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using estimated gas=", cc.notice( estimatedGasBurn ) );
         strActionName = "Burn ERC721";
         const isIgnoreBurn = false;
         const strErrorOfDryRun =
@@ -2773,19 +2527,16 @@ export async function burnErc721(
         details.close();
         return joReceipt; // can be used as "true" boolean value
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().critical ) {
-            const strError = owaspUtils.extractErrorMessage( err );
-            if( log.id != details.id ) {
-                log.write( strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
-                    cc.error( " Error in burnErc721() during " + strActionName + ": " ) +
-                    cc.error( strError ) + cc.error( ", stack is: " ) +
-                    "\n" + cc.stack( err.stack ) );
-            }
-            details.write( strLogPrefix +
-                cc.fatal( "CRITICAL ERROR:" ) + cc.error( " Error in burnErc721() during " +
-                strActionName + ": " ) + cc.error( strError ) + cc.error( ", stack is: " ) +
+        const strError = owaspUtils.extractErrorMessage( err );
+        if( log.id != details.id ) {
+            log.critical( strLogPrefix, cc.fatal( "CRITICAL ERROR:" ),
+                " Error in burnErc721() during ", strActionName, ": ",
+                cc.warning( strError ) + ", stack is: " +
                 "\n" + cc.stack( err.stack ) );
         }
+        details.critical( strLogPrefix, cc.fatal( "CRITICAL ERROR:" ),
+            " Error in burnErc721() during ", strActionName, ": ",
+            cc.warning( strError ), ", stack is: ", "\n" + cc.stack( err.stack ) );
         details.exposeDetailsTo( log, "burnErc721()", false );
         details.close();
         return false;
@@ -2808,10 +2559,8 @@ export async function burnErc1155(
     const strLogPrefix = cc.info( "burnErc1155() call" ) + " ";
     const details = log.createMemoryStream();
     try {
-        details.write( strLogPrefix +
-            cc.debug( "Burn " ) + cc.info( "ERC1155" ) + cc.debug( " token ID " ) +
-            cc.notice( idToken ) + cc.debug( " token amount " ) + cc.notice( nAmount ) +
-            "\n" );
+        details.debug( strLogPrefix, "Burn ERC1155 token ID ", cc.notice( idToken ),
+            " token amount ", cc.notice( nAmount ) );
         if( ! ( ethersProvider && joAccount && strAddressBurnFrom &&
             typeof strAddressBurnFrom == "string" && strAddressBurnFrom.length > 0 &&
             strTokenContractAddress && typeof strTokenContractAddress == "string" &&
@@ -2832,20 +2581,14 @@ export async function burnErc1155(
         ];
         const weiHowMuchBurn = undefined;
         const gasPrice = await tc.computeGasPrice( ethersProvider, 200000000000 );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using computed " ) + cc.info( "gasPrice" ) +
-                cc.debug( "=" ) + cc.j( gasPrice ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using computed gasPrice=", cc.j( gasPrice ) );
         const estimatedGasBurn =
             await tc.computeGas(
                 details, ethersProvider,
                 "ERC1155", contract, "burn", arrArgumentsBurn,
                 joAccount, strActionName,
                 gasPrice, 10000000, weiHowMuchBurn, null );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using estimated " ) + cc.info( "gas" ) +
-                cc.debug( "=" ) + cc.notice( estimatedGasBurn ) + "\n" );
-        }
+        details.trace( strLogPrefix, "Using estimated gas=", cc.notice( estimatedGasBurn ) );
         strActionName = "Burn ERC1155";
         const isIgnoreBurn = false;
         const strErrorOfDryRun =
@@ -2875,19 +2618,17 @@ export async function burnErc1155(
         details.close();
         return joReceipt; // can be used as "true" boolean value
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().critical ) {
-            const strError = owaspUtils.extractErrorMessage( err );
-            if( log.id != details.id ) {
-                log.write( strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
-                    cc.error( " Error in burnErc1155() during " + strActionName + ": " ) +
-                    cc.error( strError ) + cc.error( ", stack is: " ) + "\n" +
-                    cc.stack( err.stack ) );
-            }
-            details.write( strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
-                cc.error( " Error in burnErc1155() during " + strActionName + ": " ) +
-                cc.error( strError ) + cc.error( ", stack is: " ) + "\n" +
+        const strError = owaspUtils.extractErrorMessage( err );
+        if( log.id != details.id ) {
+            log.critical( strLogPrefix, cc.fatal( "CRITICAL ERROR:" ),
+                " Error in burnErc1155() during ", strActionName, ": ",
+                cc.warning( strError ), ", stack is: ", "\n",
                 cc.stack( err.stack ) );
         }
+        details.critical( strLogPrefix, cc.fatal( "CRITICAL ERROR:" ) +
+            " Error in burnErc1155() during ", strActionName, ": ",
+        cc.warning( strError ), ", stack is: ", "\n",
+        cc.stack( err.stack ) );
         details.exposeDetailsTo( log, "burnErc1155()", false );
         details.close();
         return false;
