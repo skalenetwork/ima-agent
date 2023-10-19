@@ -455,7 +455,7 @@ export function formatArgs( arrArgs, fnFormatter ) {
     fnFormatter = fnFormatter || function( arg ) { return arg; };
     let s = "";
     try {
-        for( i = 0; i < arrArgs.length; ++i ) {
+        for( let i = 0; i < arrArgs.length; ++i ) {
             try {
                 // if( i > 0 && s.length > 0 )
                 //    s += " ";
@@ -486,7 +486,7 @@ export function outputStringToAllStreams( s ) {
     try {
         if( s.length <= 0 )
             return;
-        for( i = 0; i < gArrStreams.length; ++i ) {
+        for( let i = 0; i < gArrStreams.length; ++i ) {
             try {
                 const objEntry = gArrStreams[i];
                 if( objEntry && "write" in objEntry && typeof objEntry.write == "function" )
