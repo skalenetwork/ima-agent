@@ -76,7 +76,7 @@ export function initialSkaleNetworkScanForS2S() {
 
 export function formatBalanceInfo( bi, strAddress ) {
     let s = "";
-    s += cc.attention( bi.assetName );
+    s += cc.j( bi.assetName );
     if( "assetAddress" in bi &&
         typeof bi.assetAddress == "string" && bi.assetAddress.length > 0 )
         s += cc.normal( "/" ) + cc.notice( bi.assetAddress );
@@ -90,9 +90,9 @@ export function formatBalanceInfo( bi, strAddress ) {
         const isSame =
             ( bi.owner.trim().toLowerCase() == strAddress.trim().toLowerCase() );
         s += " " + ( isSame
-            ? cc.success( "same (as account " ) + cc.attention( strAddress ) +
+            ? cc.success( "same (as account " ) + cc.j( strAddress ) +
                 cc.success( " specified in the command line arguments)" )
-            : cc.error( "different (than account " ) + cc.attention( strAddress ) +
+            : cc.error( "different (than account " ) + cc.j( strAddress ) +
                 cc.error( " specified in the command line arguments)" ) );
     }
     return s;

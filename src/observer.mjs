@@ -362,7 +362,7 @@ export async function loadSChain( idxSChain, hash, joData, cntSChains, opts ) {
     }
     hash = hash || await opts.imaState.joSChainsInternal.callStatic.schainsAtSystem( idxSChain );
     if( opts && opts.details )
-        opts.details.trace( "    Hash ", cc.attention( hash ) );
+        opts.details.trace( "    Hash ", cc.j( hash ) );
     if( opts && opts.bStopNeeded )
         return null;
     joData = joData ||
@@ -465,7 +465,7 @@ export async function loadSChainsWithEMC( opts ) {
             const hash = values3[0];
             if( opts && opts.details ) {
                 opts.details.trace( "    Hash of chain #",
-                    idxFirstChainInGroup + idxSChain, " is ", cc.attention( hash ) );
+                    idxFirstChainInGroup + idxSChain, " is ", cc.j( hash ) );
             }
             arrSChainHashes.push( hash );
         }
@@ -960,9 +960,8 @@ export async function cacheSChains( strChainNameConnectedTo, opts ) {
         } else
             gArrSChainsCached = arrSChains;
         if( opts && opts.details ) {
-            opts.details.trace( "Connected ", cc.attention( "S-Chains" ),
-                " cache was updated in ", threadInfo.threadDescription(),
-                ": ", cc.j( gArrSChainsCached ) );
+            opts.details.trace( "Connected S-Chains cache was updated in ",
+                threadInfo.threadDescription(), ": ", cc.j( gArrSChainsCached ) );
         }
         if( opts && opts.details ) {
             opts.details.trace( "Will dispatch inThread-arrSChainsCached event in ",
@@ -1085,7 +1084,7 @@ export async function ensureHaveWorker( opts ) {
             }
             break;
         case "log":
-            log.attention( cc.attention( "SNB WORKER" ), " ", joMessage.message );
+            log.attention( "SNB WORKER ", joMessage.message );
             break;
         } // switch ( joMessage.method )
     } );

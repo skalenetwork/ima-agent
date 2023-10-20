@@ -189,14 +189,12 @@ async function doQueryOutgoingMessageCounter( optsTransfer ) {
             cc.info( optsTransfer.nOutMsgCnt ) );
     } catch ( err ) {
         optsTransfer.details.critical( "(IMMEDIATE) error caught during ",
-            cc.attention( optsTransfer.strActionName ),
-            ", error optsTransfer.details: ",
+            optsTransfer.strActionName, ", error optsTransfer.details: ",
             cc.warning( owaspUtils.extractErrorMessage( err ) ),
             ", stack is: ", "\n", cc.stack( err.stack ) );
         if( log.id != optsTransfer.details.id ) {
             log.critical( "(IMMEDIATE) error caught during ",
-                cc.attention( optsTransfer.strActionName ),
-                ", error optsTransfer.details: ",
+                optsTransfer.strActionName, ", error optsTransfer.details: ",
                 cc.warning( owaspUtils.extractErrorMessage( err ) ),
                 ", stack is: ", "\n", cc.stack( err.stack ) );
         }
@@ -609,8 +607,8 @@ async function callbackAllMessagesSign( optsTransfer, err, jarrMessages, joGlueR
             "postIncomingMessages", arrArgumentsPostIncomingMessages,
             optsTransfer.joAccountDst, optsTransfer.strActionName,
             gasPrice, 10000000, weiHowMuchPostIncomingMessages, null );
-    optsTransfer.details.debug( optsTransfer.strLogPrefix, "Using estimated ".cc.info( "gas" ),
-        "=", cc.notice( estimatedGasPostIncomingMessages ) );
+    optsTransfer.details.debug( optsTransfer.strLogPrefix, "Using estimated gas=",
+        cc.j( estimatedGasPostIncomingMessages ) );
     if( optsTransfer.strDirection == "S2M" ) {
         const expectedGasLimit = perMessageGasForTransfer * optsTransfer.jarrMessages.length +
             additionalS2MTransferOverhead;
@@ -1401,7 +1399,7 @@ export async function doAllS2S( // s-chain --> s-chain
                     await pwa.notifyOnLoopEnd( imaState, "s2s", nIndexS2S );
                 } else {
                     bOK = true;
-                    const strLogPrefix = cc.attention( "S2S Loop:" ) + " ";
+                    const strLogPrefix = "S2S Loop: ";
                     log.notice( strLogPrefix, "Skipped(s2s) in ",
                         threadInfo.threadDescription(), " due to time framing check" );
                 }

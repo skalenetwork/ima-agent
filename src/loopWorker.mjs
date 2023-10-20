@@ -169,13 +169,13 @@ class ObserverServer extends SocketServer {
             imaCLI.initContracts();
             self.initComplete = true;
             self.information( "IMA loop worker ", cc.notice( workerData.url ),
-                " will do the following work:\n    ", cc.attention( "Oracle" ), " operations.....",
+                " will do the following work:\n    ", cc.j( "Oracle" ), " operations.....",
                 cc.yn( self.opts.imaState.optsLoop.enableStepOracle ), "\n",
-                "    ", cc.attention( "M2S" ), cc.debug( " transfers........." ),
+                "    ", cc.j( "M2S" ), cc.debug( " transfers........." ),
                 cc.yn( self.opts.imaState.optsLoop.enableStepM2S ), "\n" +
-                "    ", cc.attention( "S2M" ), cc.debug( " transfers........." ),
+                "    ", cc.j( "S2M" ), cc.debug( " transfers........." ),
                 cc.yn( self.opts.imaState.optsLoop.enableStepS2M ), "\n",
-                "    ", cc.attention( "S2S" ), cc.debug( " transfers........." ),
+                "    ", cc.j( "S2S" ), cc.debug( " transfers........." ),
                 cc.yn( self.opts.imaState.optsLoop.enableStepS2S ) );
             /* await */
             loop.runTransferLoop( self.opts.imaState.optsLoop );

@@ -80,38 +80,38 @@ export function checkTimeFraming( d, strDirection, joRuntimeOpts ) {
             }
         }
         log.debug( "\n",
-            cc.info( "Unix UTC time stamp" ), "........", cc.attention( nUtcUnixTimeStamp ), "\n",
+            cc.info( "Unix UTC time stamp" ), "........", cc.j( nUtcUnixTimeStamp ), "\n",
             cc.info( "All Chains Range" ), "...........",
             cc.notice( nSecondsRangeForAllSChains ), "\n",
-            cc.info( "S-Chain Range Mod" ), "..........", cc.notice( nMod ), "\n",
-            cc.info( "Active Node Frame Index" ), "....", cc.notice( nActiveNodeFrameIndex ), "\n",
-            cc.info( "Testing Frame Index" ), "........", cc.notice( imaState.nNodeNumber ), "\n",
-            cc.info( "Transfer Direction" ), ".........", cc.sunny( strDirection || "NA" ) );
+            cc.info( "S-Chain Range Mod" ), "..........", cc.j( nMod ), "\n",
+            cc.info( "Active Node Frame Index" ), "....", cc.j( nActiveNodeFrameIndex ), "\n",
+            cc.info( "Testing Frame Index" ), "........", cc.j( imaState.nNodeNumber ), "\n",
+            cc.info( "Transfer Direction" ), ".........", cc.j( strDirection || "NA" ) );
         if( nFrameShift > 0 ) {
             log.debug(
-                cc.info( "Frame Shift" ), "................", cc.note( nFrameShift ), "\n",
+                cc.info( "Frame Shift" ), "................", cc.j( nFrameShift ), "\n",
                 cc.info( "S2S known chain index" ), "......",
-                cc.note( joRuntimeOpts.idxChainKnownForS2S ), "\n",
+                cc.j( joRuntimeOpts.idxChainKnownForS2S ), "\n",
                 cc.info( "S2S known chains count" ), ".....",
-                cc.note( joRuntimeOpts.cntChainsKnownForS2S ), "\n"
+                cc.j( joRuntimeOpts.cntChainsKnownForS2S ), "\n"
             );
             if( "joExtraSignOpts" in joRuntimeOpts &&
                 typeof joRuntimeOpts.joExtraSignOpts == "object" ) {
                 log.debug( cc.info( "S-Chain source" ), ".............",
-                    cc.info( joRuntimeOpts.joExtraSignOpts.chainNameSrc ),
-                    "/", cc.attention( joRuntimeOpts.joExtraSignOpts.chainIdSrc ) );
+                    cc.j( joRuntimeOpts.joExtraSignOpts.chainNameSrc ),
+                    "/", cc.j( joRuntimeOpts.joExtraSignOpts.chainIdSrc ) );
             } else {
                 log.debug( cc.info( "S-Chain destination" ), "........",
                     cc.info( joRuntimeOpts.joExtraSignOpts.chainNameDst ),
-                    cc.debug( "/" ), cc.attention( joRuntimeOpts.joExtraSignOpts.chainIdDst ) );
+                    cc.debug( "/" ), cc.j( joRuntimeOpts.joExtraSignOpts.chainIdDst ) );
             }
         }
         log.debug( "\n",
             cc.info( "Is skip" ), "....................", cc.yn( bSkip ), "\n",
             cc.info( "Is inside gap" ), "..............", cc.yn( bInsideGap ), "\n",
-            cc.info( "Range Start" ), "................", cc.notice( nRangeStart ), "\n",
-            cc.info( "Frame Start" ), "................", cc.notice( nFrameStart ), "\n",
-            cc.info( "Gap Start" ), "..................", cc.notice( nGapStart ) );
+            cc.info( "Range Start" ), "................", cc.j( nRangeStart ), "\n",
+            cc.info( "Frame Start" ), "................", cc.j( nFrameStart ), "\n",
+            cc.info( "Gap Start" ), "..................", cc.j( nGapStart ) );
         if( bSkip )
             return false;
     } catch ( err ) {
@@ -611,7 +611,7 @@ export async function ensureHaveWorkers( opts ) {
                     cc.warning( owaspUtils.extractErrorMessage( joMessage.error ) ) );
                 break;
             case "log":
-                log.information( cc.attention( "LOOP WORKER" ), " ", notice( workerData.url ),
+                log.information( "LOOP WORKER ", notice( workerData.url ),
                     " ", joMessage.message );
                 break;
             case "saveTransferError":

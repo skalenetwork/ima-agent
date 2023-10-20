@@ -51,12 +51,12 @@ export async function reimbursementShowBalance(
         const xWei =
             await joCommunityPool.callStatic.getBalance(
                 addressFrom, strReimbursementChain, { from: addressFrom } );
-        s = strLogPrefix + cc.success( "Balance(wei): " ) + cc.attention( xWei );
+        s = strLogPrefix + cc.success( "Balance(wei): " ) + cc.j( xWei );
         if( isForcePrintOut )
             log.information( s );
         details.information( s );
         const xEth = owaspUtils.ethersMod.ethers.utils.formatEther( owaspUtils.toBN( xWei ) );
-        s = strLogPrefix + cc.success( "Balance(eth): " ) + cc.attention( xEth );
+        s = strLogPrefix + cc.success( "Balance(eth): " ) + cc.j( xEth );
         if( isForcePrintOut )
             log.information( s );
         details.information( s );
@@ -98,12 +98,12 @@ export async function reimbursementEstimateAmount(
         const xWei =
         await joCommunityPool.callStatic.getBalance(
             addressReceiver, strReimbursementChain, { from: addressReceiver } );
-        s = strLogPrefix + cc.success( "Balance(wei): " ) + cc.attention( xWei );
+        s = strLogPrefix + cc.success( "Balance(wei): " ) + cc.j( xWei );
         if( isForcePrintOut )
             log.information( s );
         details.information( s );
         const xEth = owaspUtils.ethersMod.ethers.utils.formatEther( owaspUtils.toBN( xWei ) );
-        s = strLogPrefix + cc.success( "Balance(eth): " ) + cc.attention( xEth );
+        s = strLogPrefix + cc.success( "Balance(eth): " ) + cc.j( xEth );
         if( isForcePrintOut )
             log.information( s );
         details.information( s );
@@ -112,21 +112,21 @@ export async function reimbursementEstimateAmount(
                 await joCommunityPool.callStatic.minTransactionGas(
                     { from: addressReceiver } ) );
         s = strLogPrefix + cc.success( "MinTransactionGas: " ) +
-            cc.attention( minTransactionGas );
+            cc.j( minTransactionGas );
         if( isForcePrintOut )
             log.information( s );
         details.information( s );
 
         const gasPrice = await transactionCustomizerMainNet.computeGasPrice(
             ethersProviderMainNet, 200000000000 );
-        s = strLogPrefix + cc.success( "Multiplied Gas Price: " ) + cc.attention( gasPrice );
+        s = strLogPrefix + cc.success( "Multiplied Gas Price: " ) + cc.j( gasPrice );
         if( isForcePrintOut )
             log.information( s );
         details.information( s );
 
         const minAmount = minTransactionGas * gasPrice;
         s = strLogPrefix + cc.success( "Minimum recharge balance: " ) +
-            cc.attention( minAmount );
+            cc.j( minAmount );
         if( isForcePrintOut )
             log.information( s );
         details.information( s );
@@ -138,7 +138,7 @@ export async function reimbursementEstimateAmount(
             amountToRecharge = minAmount - xWei;
 
         s = strLogPrefix + cc.success( "Estimated amount to recharge(wei): " ) +
-            cc.attention( amountToRecharge );
+            cc.j( amountToRecharge );
         if( isForcePrintOut )
             log.information( s );
         details.information( s );
@@ -147,7 +147,7 @@ export async function reimbursementEstimateAmount(
             owaspUtils.ethersMod.ethers.utils.formatEther(
                 owaspUtils.toBN( amountToRecharge.toString() ) );
         s = strLogPrefix + cc.success( "Estimated amount to recharge(eth): " ) +
-            cc.attention( amountToRechargeEth );
+            cc.j( amountToRechargeEth );
         if( isForcePrintOut )
             log.information( s );
         details.information( s );

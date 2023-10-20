@@ -137,7 +137,7 @@ async function payedCallPrepare( optsPayedCall ) {
         "Payed-call of action ", cc.info( optsPayedCall.strActionName ),
         " will do payed-call ", optsPayedCall.strContractCallDescription,
         " with call options ", cc.j( optsPayedCall.callOpts ),
-        " via ", cc.attention( optsPayedCall.joACI.strType ),
+        " via ", cc.j( optsPayedCall.joACI.strType ),
         "-sign-and-send using from address ",
         cc.notice( optsPayedCall.joAccount.address() ), "..." );
     optsPayedCall.unsignedTx =
@@ -388,7 +388,7 @@ export async function payedCall(
             ", error is: " + owaspUtils.extractErrorMessage( err ) );
     }
     optsPayedCall.details.success( optsPayedCall.strLogPrefix, "Done, TX was ",
-        cc.attention( optsPayedCall.joACI ? optsPayedCall.joACI.strType : "N/A" ),
+        cc.j( optsPayedCall.joACI ? optsPayedCall.joACI.strType : "N/A" ),
         "-signed-and-sent, receipt is ", cc.j( optsPayedCall.joReceipt ) );
     try {
         const bnGasSpent = owaspUtils.toBN( optsPayedCall.joReceipt.cumulativeGasUsed );
@@ -421,7 +421,7 @@ export async function checkTransactionToSchain(
     ethersProvider,
     joAccount
 ) {
-    const strLogPrefix = cc.attention( "PoW-mining:" ) + " ";
+    const strLogPrefix = "PoW-mining: ";
     try {
         const strFromAddress = joAccount.address(); // unsignedTx.from;
         const requiredBalance = unsignedTx.gasPrice.mul( unsignedTx.gasLimit );

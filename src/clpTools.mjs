@@ -63,7 +63,7 @@ const gInfoRegistrationCost = {
 export async function registerStep1( isPrintSummaryRegistrationCosts ) {
     const imaState = state.get();
     imaCLI.initContracts();
-    const strLogPrefix = cc.attention( "Reg 1:" ) + " ";
+    const strLogPrefix = "Reg 1: ";
     log.information( strLogPrefix, "Will check chain registration now..." );
     let bSuccess = await imaReg.checkIsRegisteredSChainInDepositBoxes( // step 1
         imaState.chainProperties.mn.ethersProvider,
@@ -1250,8 +1250,8 @@ export function commandLineTaskViewS2M() {
                 return false;
             const xEth =
                 owaspUtils.ethersMod.ethers.utils.formatEther( owaspUtils.toBN( xWei ) );
-            log.success( "Main-net user can receive: ", cc.attention( xWei ),
-                " wei = ", cc.attention( xEth ), " eth" );
+            log.success( "Main-net user can receive: ", cc.j( xWei ),
+                " wei = ", cc.j( xEth ), " eth" );
             return true;
         }
     } );
@@ -1670,14 +1670,14 @@ export function commandLineTaskDiscoverChainId() {
                 skaleObserver.discoverChainId( joDiscoverEntry.strURL );
                 if( chainId === null ) {
                     log.error( strLogPrefix, "Failed to detect ",
-                        cc.note( joDiscoverEntry.name ), " ", cc.attention( "chain ID" ) );
+                        cc.j( joDiscoverEntry.name ), " chain ID" );
                 } else {
                     const cid16 =
                         owaspUtils.ensureStartsWith0x(
                             owaspUtils.toBN( chainId ).toHexString() );
                     const cid10 = "" + owaspUtils.toBN( chainId ).toString();
-                    log.information( strLogPrefix, "Got ", cc.note( joDiscoverEntry.name ), " ",
-                        cc.attention( "chain ID" ), "=", cc.note( cid16 ), "=", cc.note( cid10 ),
+                    log.information( strLogPrefix, "Got ", cc.j( joDiscoverEntry.name ),
+                        " chain ID=", cc.j( cid16 ), "=", cc.j( cid10 ),
                         " from URL ", cc.u( joDiscoverEntry.strURL ) );
                     joDiscoverEntry.fnSave( chainId );
                 }

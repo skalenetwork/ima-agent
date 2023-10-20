@@ -68,11 +68,11 @@ async function run() {
             log.debug( "TX nonce is ", cc.j( txNonce ) );
         const strPathCert = process.argv[13];
         if( gIsDebugLogging )
-            log.debug( "Path to SGX certificate file is ", cc.attention( strPathCert ) );
+            log.debug( "Path to SGX certificate file is ", cc.j( strPathCert ) );
 
         const strPathKey = process.argv[14];
         if( gIsDebugLogging )
-            log.debug( "Path to SGX key file is ", cc.attention( strPathKey ) );
+            log.debug( "Path to SGX key file is ", cc.j( strPathKey ) );
 
         const ethersProvider = owaspUtils.getEthersProviderFromURL( strURL );
 
@@ -92,7 +92,7 @@ async function run() {
             log.debug( "----- RAW unsigned TX ----> ", cc.info( rawTX ) );
         const txHash = owaspUtils.ethersMod.ethers.utils.keccak256( rawTX );
         if( gIsDebugLogging )
-            log.debug( "----- TX hash ----> ", cc.attention( txHash ) );
+            log.debug( "----- TX hash ----> ", cc.j( txHash ) );
 
         const rpcCallOpts = {
             "cert": fs.readFileSync( strPathCert, "utf8" ),

@@ -367,9 +367,9 @@ export async function viewEthPaymentFromSchainOnMainNet(
             await joDepositBoxETH.callStatic.approveTransfers(
                 addressFrom,
                 { from: addressFrom } );
-        details.success( strLogPrefix, "You can receive(wei): ", cc.attention( xWei ) );
+        details.success( strLogPrefix, "You can receive(wei): ", cc.j( xWei ) );
         const xEth = owaspUtils.ethersMod.ethers.utils.formatEther( owaspUtils.toBN( xWei ) );
-        const s = strLogPrefix + cc.success( "You can receive(eth): " ) + cc.attention( xEth );
+        const s = strLogPrefix + cc.success( "You can receive(eth): " ) + cc.j( xEth );
         if( log.id != details.id )
             log.success( s );
         details.success( s );

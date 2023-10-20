@@ -302,10 +302,7 @@ function performBlsGlue(
     arrSignResults
 ) {
     const imaState = state.get();
-    const strLogPrefix =
-        cc.bright( strDirection ) + cc.debug( "/" ) +
-        cc.info( "BLS" ) + cc.debug( "/" ) +
-        cc.attention( "Glue" ) + cc.debug( ":" ) + " ";
+    const strLogPrefix = strDirection + "/BLS/Glue: ";
     let joGlueResult = null;
     const nThreshold = discoverBlsThreshold( imaState.joSChainNetworkInfo );
     const nParticipants = discoverBlsParticipants( imaState.joSChainNetworkInfo );
@@ -331,8 +328,8 @@ function performBlsGlue(
         for( let i = 0; i < cnt; ++i ) {
             const jo = arrSignResults[i];
             const strPath = strActionDir + "/sign-result" + jo.index + ".json";
-            details.trace( strLogPrefix, "Saving ".cc.notice( strPath ),
-                " file containing ", cc.j( jo ) );
+            details.trace( strLogPrefix, "Saving ", cc.j( strPath ), " file containing ",
+                cc.j( jo ) );
             imaUtils.jsonFileSave( strPath, jo );
             strInput += " --input " + strPath;
         }
@@ -345,7 +342,7 @@ function performBlsGlue(
         details.trace( strLogPrefix, "Will execute BLS glue command:", "\n",
             cc.notice( strGlueCommand ) );
         strOutput = childProcessModule.execSync( strGlueCommand, { cwd: strActionDir } );
-        details.trace( strLogPrefix, "BLS glue output is:", "\n".cc.notice( strOutput ) );
+        details.trace( strLogPrefix, "BLS glue output is:", "\n", cc.j( strOutput ) );
         joGlueResult = imaUtils.jsonFileLoad( strActionDir + "/glue-result.json" );
         details.trace( strLogPrefix, "BLS glue result is: ", cc.j( joGlueResult ) );
         if( "X" in joGlueResult.signature && "Y" in joGlueResult.signature ) {
@@ -396,9 +393,7 @@ function performBlsGlue(
 
 function performBlsGlueU256( details, u256, arrSignResults ) {
     const imaState = state.get();
-    const strLogPrefix =
-        cc.info( "BLS" ) + cc.debug( "/" ) + cc.attention( "Glue" ) +
-        cc.debug( ":" ) + " ";
+    const strLogPrefix = "BLS/Glue: ";
     let joGlueResult = null;
     const nThreshold = discoverBlsThreshold( imaState.joSChainNetworkInfo );
     const nParticipants = discoverBlsParticipants( imaState.joSChainNetworkInfo );
@@ -925,8 +920,8 @@ async function prepareSignMessagesImpl( optsSignOperation ) {
         optsSignOperation.joExtraSignOpts
     );
     optsSignOperation.details.trace( optsSignOperation.strLogPrefix, "Will sign ",
-        optsSignOperation.jarrMessages.length, " message(s), ".cc.notice( "sequence ID" ),
-        " is ".cc.attention( optsSignOperation.sequenceId ), "..." );
+        optsSignOperation.jarrMessages.length, " message(s), sequence ID is ",
+        cc.j( optsSignOperation.sequenceId ), "..." );
     optsSignOperation.details.trace( optsSignOperation.strLogPrefix +
         cc.debug( "Will query to sign " ) + cc.info( optsSignOperation.jarrNodes.length ) +
         cc.debug( " skaled node(s)..." ) );
@@ -958,8 +953,7 @@ async function prepareSignMessagesImpl( optsSignOperation ) {
     optsSignOperation.nCountOfBlsPartsToCollect = 0 + optsSignOperation.nThreshold;
     optsSignOperation.details.trace( optsSignOperation.strLogPrefix, "Will BLS-collect ",
         optsSignOperation.nCountOfBlsPartsToCollect, " from ", optsSignOperation.jarrNodes.length,
-        " nodes, ", cc.notice( "sequence ID" ), " is ",
-        cc.attention( optsSignOperation.sequenceId ) );
+        " nodes, sequence ID is ", cc.j( optsSignOperation.sequenceId ) );
     return true;
 }
 
@@ -1279,16 +1273,16 @@ async function doSignProcessHandleCall(
                 "JSON RPC call(doSignProcessHandleCall) to S-Chain node ", strNodeDescColorized,
                 "(node #", i, " via ", cc.notice( strNodeURL ),
                 ") failed, RPC call reported error: ",
-                cc.warning( owaspUtils.extractErrorMessage( err ) ), ", ",
-                cc.notice( "sequence ID" ), " is ", cc.attention( optsSignOperation.sequenceId ) );
+                cc.warning( owaspUtils.extractErrorMessage( err ) ), ", sequence ID is ",
+                cc.j( optsSignOperation.sequenceId ) );
         }
         optsSignOperation.details.error(
             optsSignOperation.strLogPrefix,
             "JSON RPC call(doSignProcessHandleCall) to S-Chain node ", strNodeDescColorized,
             "(node #", i, " via ", cc.notice( strNodeURL ),
             ") failed, RPC call reported error: ",
-            cc.warning( owaspUtils.extractErrorMessage( err ) ), ", ",
-            cc.notice( "sequence ID" ), " is ", cc.attention( optsSignOperation.sequenceId ) );
+            cc.warning( owaspUtils.extractErrorMessage( err ) ), ", sequence ID is ",
+            cc.j( optsSignOperation.sequenceId ) );
         await joCall.disconnect();
         return;
     }
@@ -1298,8 +1292,8 @@ async function doSignProcessHandleCall(
         cc.notice( strNodeURL ), ") for transfer from chain ",
         cc.info( optsSignOperation.fromChainName ), " to chain ",
         cc.info( optsSignOperation.targetChainName ), " with params ", cc.j( joParams ),
-        ", answer is ", cc.j( joOut ), ", ", cc.notice( "sequence ID" ), " is ",
-        cc.attention( optsSignOperation.sequenceId ) );
+        ", answer is ", cc.j( joOut ), ", sequence ID is ",
+        cc.j( optsSignOperation.sequenceId ) );
     if( joOut.result == null ||
         joOut.result == undefined ||
         ( !typeof joOut.result == "object" )
@@ -1309,14 +1303,14 @@ async function doSignProcessHandleCall(
             log.critical( optsSignOperation.strLogPrefix,
                 "S-Chain node ", strNodeDescColorized, " reported wallet error: ",
                 cc.warning( owaspUtils.extractErrorMessage( joOut, "unknown wallet error(1)" ) ),
-                ", ", cc.notice( "sequence ID" ), " is ",
-                cc.attention( optsSignOperation.sequenceId ) );
+                ", sequence ID is ",
+                cc.j( optsSignOperation.sequenceId ) );
         }
         optsSignOperation.details.critical( optsSignOperation.strLogPrefix,
             "S-Chain node ", strNodeDescColorized, " reported wallet error: ",
             cc.warning( owaspUtils.extractErrorMessage( joOut, "unknown wallet error(1)" ) ),
-            ", ", cc.notice( "sequence ID" ), " is ",
-            cc.attention( optsSignOperation.sequenceId ) );
+            ", sequence ID is ",
+            cc.j( optsSignOperation.sequenceId ) );
         await joCall.disconnect();
         return;
     }
@@ -1384,8 +1378,8 @@ async function doSignProcessHandleCall(
                         strNodeDescColorized, " partial signature fail from with index ",
                         nZeroBasedNodeIndex,
                         ", error is ", cc.warning( owaspUtils.extractErrorMessage( err ) ),
-                        ", ", cc.notice( "sequence ID" ), " is ",
-                        cc.attention( optsSignOperation.sequenceId ), ", stack is:", "\n",
+                        ", sequence ID is ",
+                        cc.j( optsSignOperation.sequenceId ), ", stack is:", "\n",
                         cc.stack( err.stack ) );
                 }
                 optsSignOperation.details.critical( optsSignOperation.strLogPrefixA,
@@ -1393,7 +1387,7 @@ async function doSignProcessHandleCall(
                     " partial signature fail from with index ", nZeroBasedNodeIndex, ", error is ",
                     cc.warning( owaspUtils.extractErrorMessage( err ) ), ", ",
                     cc.notice( "sequence ID" ), " is ",
-                    cc.attention( optsSignOperation.sequenceId ), ", stack is:", "\n",
+                    cc.j( optsSignOperation.sequenceId ), ", stack is:", "\n",
                     cc.stack( err.stack ) );
             }
             if( bNodeSignatureOKay ) {
@@ -1415,14 +1409,14 @@ async function doSignProcessHandleCall(
             log.critical( optsSignOperation.strLogPrefix, "S-Chain node ", strNodeDescColorized,
                 " signature fail from node ", cc.info( joNode.nodeID ), ", error is ",
                 cc.warning( owaspUtils.extractErrorMessage( err ) ), ", ",
-                cc.notice( "sequence ID" ), " is ", cc.attention( optsSignOperation.sequenceId ),
+                cc.notice( "sequence ID" ), " is ", cc.j( optsSignOperation.sequenceId ),
                 ", stack is:", "\n" + cc.stack( err.stack ) );
         }
         optsSignOperation.details.critical( ptsSignOperation.strLogPrefix, "S-Chain node ",
             strNodeDescColorized,
             " signature fail from node ", cc.info( joNode.nodeID ), ", error is ",
             cc.warning( owaspUtils.extractErrorMessage( err ) ), ", ",
-            cc.notice( "sequence ID" ), " is ", cc.attention( optsSignOperation.sequenceId ),
+            cc.notice( "sequence ID" ), " is ", cc.j( optsSignOperation.sequenceId ),
             ", stack is:", "\n" + cc.stack( err.stack ) );
     }
     await joCall.disconnect();
@@ -1440,7 +1434,7 @@ async function doSignProcessOneImpl( i, optsSignOperation ) {
         cc.bright( optsSignOperation.jarrNodes.length ) +
         cc.debug( ", ID " ) + cc.info( joNode.nodeID ) + cc.debug( ")" ) +
         ", " + cc.notice( "sequence ID" ) + cc.debug( " is " ) +
-        cc.attention( optsSignOperation.sequenceId );
+        cc.j( optsSignOperation.sequenceId );
     const rpcCallOpts = null;
     rpcCall.create(
         strNodeURL, rpcCallOpts, async function( joCall, err ) {
@@ -1453,14 +1447,14 @@ async function doSignProcessOneImpl( i, optsSignOperation ) {
                         strNodeDescColorized, " failed, RPC call was not created, error is: ",
                         cc.warning( owaspUtils.extractErrorMessage( err ) ), ", ",
                         cc.notice( "sequence ID" ), " is ",
-                        cc.attention( optsSignOperation.sequenceId ) );
+                        cc.j( optsSignOperation.sequenceId ) );
                 }
                 optsSignOperation.details.error( optsSignOperation.strLogPrefix,
                     "JSON RPC call(doSignProcessOneImpl) to S-Chain node ",
                     strNodeDescColorized, " failed, RPC call was not created, error is: ",
                     cc.warning( owaspUtils.extractErrorMessage( err ) ), ", ",
                     cc.notice( "sequence ID" ), " is ",
-                    cc.attention( optsSignOperation.sequenceId ) );
+                    cc.j( optsSignOperation.sequenceId ) );
                 if( joCall )
                     await joCall.disconnect();
                 return;
@@ -1486,8 +1480,8 @@ async function doSignProcessOneImpl( i, optsSignOperation ) {
                 cc.notice( strNodeURL ), " for transfer from chain ",
                 cc.info( optsSignOperation.fromChainName ), " to chain ",
                 cc.info( optsSignOperation.targetChainName ), " with params ", cc.j( joParams ),
-                ", ", cc.notice( "sequence ID" ), " is ",
-                cc.attention( optsSignOperation.sequenceId ) );
+                ", sequence ID is ",
+                cc.j( optsSignOperation.sequenceId ) );
             await joCall.call( {
                 "method": "skale_imaVerifyAndSign",
                 "params": joParams
@@ -1534,11 +1528,9 @@ async function doSignMessagesImpl(
         targetChainID: -4,
         fromChainID: -4
     };
-    optsSignOperation.strLogPrefix =
-        cc.bright( optsSignOperation.strDirection ) + cc.debug( "/#" ) +
-        cc.sunny( optsSignOperation.nTransferLoopCounter ) + " " + cc.info( "Sign msgs via " ) +
-        cc.attention( optsSignOperation.imaState.isCrossImaBlsMode ? "IMA agent" : "skaled" ) +
-        cc.info( ":" ) + " ";
+    optsSignOperation.strLogPrefix = optsSignOperation.strDirection + "/#" +
+        optsSignOperation.nTransferLoopCounter + " " + "Sign msgs via " +
+        ( optsSignOperation.imaState.isCrossImaBlsMode ? "IMA agent" : "skaled" ) + ": ";
     optsSignOperation.joGatheringTracker = {
         nCountReceivedPrevious: 0,
         nCountReceived: 0,
@@ -2581,11 +2573,11 @@ export async function handleSkaleImaVerifyAndSign( joCallData ) {
         if( log.id != optsHandleVerifyAndSign.details.id ) {
             log.critical( optsHandleVerifyAndSign.strLogPrefix,
                 "IMA messages verifier/signer error: ", cc.warning( strError ),
-                ", stack is:", "\n".cc.stack( err.stack ) );
+                ", stack is:", "\n", cc.stack( err.stack ) );
         }
         optsHandleVerifyAndSign.details.critical( optsHandleVerifyAndSign.strLogPrefix,
             "IMA messages verifier/signer error: ", cc.warning( strError ),
-            ", stack is:", "\n".cc.stack( err.stack ) );
+            ", stack is:", "\n", cc.stack( err.stack ) );
     }
     optsHandleVerifyAndSign.details.exposeDetailsTo(
         log, "IMA messages verifier/signer", optsHandleVerifyAndSign.isSuccess );

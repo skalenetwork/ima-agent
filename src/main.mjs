@@ -143,7 +143,7 @@ function initMonitoringServer() {
     const imaState = state.get();
     if( imaState.nMonitoringPort <= 0 )
         return;
-    const strLogPrefix = cc.attention( "Monitoring:" ) + " ";
+    const strLogPrefix = "Monitoring: ";
     if( imaState.bLogMonitoringServer ) {
         log.trace( strLogPrefix, "Will start monitoring WS server on port ",
             imaState.nMonitoringPort );
@@ -265,7 +265,7 @@ function initJsonRpcServer() {
     const imaState = state.get();
     if( imaState.nJsonRpcPort <= 0 )
         return;
-    const strLogPrefix = cc.attention( "JSON RPC:" ) + " ";
+    const strLogPrefix = "JSON RPC: ";
     gExpressJsonRpcAppIMA = express();
     gExpressJsonRpcAppIMA.use( bodyParser.urlencoded( { extended: true } ) );
     gExpressJsonRpcAppIMA.use( bodyParser.json() );
@@ -382,15 +382,15 @@ async function doTheJob() {
     for( idxAction = 0; idxAction < cntActions; ++idxAction ) {
         log.information( strLogPrefix, cc.debug( imaHelperAPIs.longSeparator ) );
         const joAction = imaState.arrActions[idxAction];
-        log.debug( strLogPrefix, "Will execute action: ", cc.info( joAction.name ), " (",
+        log.debug( strLogPrefix, "Will execute action: ", joAction.name, " (",
             idxAction + 1, " of ", cntActions, ")" );
         try {
             if( await joAction.fn() ) {
                 ++cntTrue;
-                log.success( strLogPrefix, "Succeeded action: ", cc.info( joAction.name ) );
+                log.success( strLogPrefix, "Succeeded action: ", joAction.name );
             } else {
                 ++cntFalse;
-                log.error( strLogPrefix, "Failed action: ", cc.info( joAction.name ) );
+                log.error( strLogPrefix, "Failed action: ", joAction.name );
             }
         } catch ( err ) {
             ++cntFalse;

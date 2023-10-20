@@ -108,7 +108,7 @@ export async function safeGetPastEventsProgressive(
         isLastLatest = true;
         nBlockTo = nLatestBlockNumberPlus1;
         details.trace( strLogPrefix, "Iterative scan up to latest block #",
-            cc.info( nBlockTo.toHexString() ), " assumed instead of ", cc.attention( "latest" ) );
+            cc.info( nBlockTo.toHexString() ), " assumed instead of ", cc.j( "latest" ) );
     } else {
         nBlockTo = owaspUtils.toBN( nBlockTo );
         if( nBlockTo.gte( nLatestBlockNumber ) )
@@ -118,7 +118,7 @@ export async function safeGetPastEventsProgressive(
     const nBlockZero = owaspUtils.toBN( 0 );
     const isFirstZero = ( nBlockFrom.eq( nBlockZero ) ) ? true : false;
     if( ! ( isFirstZero && isLastLatest ) ) {
-        details.trace( strLogPrefix, "Will skip ", cc.attention( "progressive" ),
+        details.trace( strLogPrefix, "Will skip ", cc.j( "progressive" ),
             " scan and use scan in block range from ", cc.info( nBlockFrom.toHexString() ),
             " to ", cc.info( nBlockTo.toHexString() ) );
         return await safeGetPastEvents(
@@ -127,12 +127,12 @@ export async function safeGetPastEventsProgressive(
             nBlockFrom, nBlockTo, joFilter
         );
     }
-    details.trace( strLogPrefix, "Will run ", cc.attention( "progressive" ), " scan..." );
+    details.trace( strLogPrefix, "Will run ", cc.j( "progressive" ), " scan..." );
     details.trace( strLogPrefix, "Current latest block number is ",
         cc.info( nLatestBlockNumber.toHexString() ) );
     const arrProgressiveEventsScanPlan =
         createProgressiveEventsScanPlan( details, nLatestBlockNumberPlus1 );
-    details.trace( "Composed ", cc.attention( "progressive" ),
+    details.trace( "Composed ", cc.j( "progressive" ),
         " scan plan is: ", cc.j( arrProgressiveEventsScanPlan ) );
     let joLastPlan = { "nBlockFrom": 0, "nBlockTo": "latest", "type": "entire block range" };
     for( let idxPlan = 0; idxPlan < arrProgressiveEventsScanPlan.length; ++idxPlan ) {
@@ -140,7 +140,7 @@ export async function safeGetPastEventsProgressive(
         if( joPlan.nBlockFrom < 0 )
             continue;
         joLastPlan = joPlan;
-        details.trace( strLogPrefix, "Progressive scan of ", cc.attention( "getPastEvents" ),
+        details.trace( strLogPrefix, "Progressive scan of ", cc.j( "getPastEvents" ),
             "/", cc.info( strEventName ), ", from block ", cc.info( joPlan.nBlockFrom ),
             ", to block ", cc.info( joPlan.nBlockTo ), ", block range is ", cc.info( joPlan.type ),
             "..." );
@@ -153,7 +153,7 @@ export async function safeGetPastEventsProgressive(
                 );
             if( joAllEventsInBlock && joAllEventsInBlock.length > 0 ) {
                 details.success( strLogPrefix, "Progressive scan of ",
-                    cc.attention( "getPastEvents" ), cc.debug( "/" ), cc.info( strEventName ),
+                    cc.j( "getPastEvents" ), cc.debug( "/" ), cc.info( strEventName ),
                     ", from block ", cc.info( joPlan.nBlockFrom ), ", to block ",
                     cc.info( joPlan.nBlockTo ), ", block range is ", cc.info( joPlan.type ),
                     ", found ", cc.info( joAllEventsInBlock.length ), " event(s)" );
@@ -164,7 +164,7 @@ export async function safeGetPastEventsProgressive(
     details.error( strLogPrefix, "Could not get Event \"", cc.info( strEventName ),
         "\", from block ", cc.info( joLastPlan.nBlockFrom ), ", to block ",
         cc.info( joLastPlan.nBlockTo ), ", block range is ", cc.info( joLastPlan.type ),
-        ", using ", cc.attention( "progressive" ), " event scan" );
+        ", using ", cc.j( "progressive" ), " event scan" );
     return [];
 }
 
@@ -470,7 +470,7 @@ export async function safeGetPastEventsIterative(
         nBlockTo = nLatestBlockNumberPlus1;
         details.trace( strLogPrefix, "Iterative scan up to latest block #",
             cc.info( nBlockTo.toHexString() ),
-            " assumed instead of ", cc.attention( "latest" ) );
+            " assumed instead of ", cc.j( "latest" ) );
     } else {
         nBlockTo = owaspUtils.toBN( nBlockTo );
         if( nBlockTo.gte( nLatestBlockNumber ) )
@@ -515,7 +515,7 @@ export async function safeGetPastEventsIterative(
                 idxBlockSubRangeFrom, idxBlockSubRangeTo, joFilter
             );
             if( joAllEventsInBlock && joAllEventsInBlock != "" && joAllEventsInBlock.length > 0 ) {
-                details.success( strLogPrefix, "Result of ", cc.attention( "iterative" ),
+                details.success( strLogPrefix, "Result of ", cc.j( "iterative" ),
                     " scan in ", cc.info( nBlockFrom.toHexString() ), "/",
                     cc.info( nBlockTo.toHexString() ), " block range is ",
                     cc.j( joAllEventsInBlock ) );
@@ -535,7 +535,7 @@ export async function safeGetPastEventsIterative(
         if( idxBlockSubRangeTo.lte( nBlockFrom ) )
             break;
     }
-    details.debug( strLogPrefix, "Result of ", cc.attention( "iterative" ), " scan in ",
+    details.debug( strLogPrefix, "Result of ", cc.j( "iterative" ), " scan in ",
         cc.info( nBlockFrom.toHexString() ), "/", cc.info( nBlockTo.toHexString() ),
         " block range is ", cc.warning( "empty" ) );
     return "";

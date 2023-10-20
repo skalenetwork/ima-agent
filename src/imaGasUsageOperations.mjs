@@ -31,7 +31,7 @@ export function composeGasUsageReportFromArray( strName, jarrReceipts ) {
     if( ! ( strName && typeof strName == "string" && jarrReceipts ) )
         return "";
     let i, sumGasUsed = owaspUtils.toBN( "0" ),
-        s = "\n" + cc.info( "Gas usage report for " ) + cc.attention( strName ) + "\n";
+        s = "\n" + cc.info( "Gas usage report for " ) + cc.j( strName ) + "\n";
     for( i = 0; i < jarrReceipts.length; ++ i ) {
         try {
             sumGasUsed = sumGasUsed.add( owaspUtils.toBN( jarrReceipts[i].receipt.gasUsed ) );

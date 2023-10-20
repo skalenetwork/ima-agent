@@ -154,8 +154,8 @@ export async function waitForClonedTokenToAppear(
     let ts1;
     log.information( "Waiting for ", cc.notice( strTokenSuffixUC ),
         " token to appear automatically deployed on S-Chain ",
-        cc.attention( sc.chainName ), "..." );
-    log.debug( "... source chain name is ", cc.attention( strMainnetName ) );
+        cc.j( sc.chainName ), "..." );
+    log.debug( "... source chain name is ", cc.j( strMainnetName ) );
     log.debug( "... destination ", cc.notice( "TokenManager" + strTokenSuffixUC ),
         " address is ", cc.notice( sc.joABI["token_manager_" +
         strTokenSuffixLC + "_address"] ) );
@@ -180,14 +180,14 @@ export async function waitForClonedTokenToAppear(
             ts1 = cc.timestampHR();
             log.success( "Done, duration is ", cc.info( cc.getDurationString( ts0, ts1 ) ) );
             log.success( "Discovered ", cc.notice( strTokenSuffixUC ),
-                " instantiated on S-Chain ", cc.attention( sc.chainName ),
+                " instantiated on S-Chain ", cc.j( sc.chainName ),
                 " at address ", cc.notice( addressOnSChain ) );
             return addressOnSChain;
         }
     }
     ts1 = cc.timestampHR();
     log.error( "Failed to discover ", cc.notice( strTokenSuffixUC ),
-        " instantiated on S-Chain ", cc.attention( sc.chainName ) );
+        " instantiated on S-Chain ", cc.j( sc.chainName ) );
     throw new Error( "Failed to discover \"" + strTokenSuffixUC +
         "\" instantiated on S-Chain \"" + sc.chainName + "\"" );
 }
