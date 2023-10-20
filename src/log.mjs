@@ -256,7 +256,7 @@ export function createMemoryOutputStream() {
                 strTitle = strTitle
                     ? ( cc.bright( " (" ) + cc.attention( strTitle ) + cc.bright( ")" ) ) : "";
                 const strSuccessPrefix = isSuccess
-                    ? cc.success( "SUCCESS" ) : cc.fatal( "ERROR" );
+                    ? cc.success( "SUCCESS" ) : cc.error( "ERROR" );
                 otherStream.write(
                     cc.bright( "\n--- --- --- --- --- GATHERED " ) + strSuccessPrefix +
                     cc.bright( " DETAILS FOR LATEST(" ) + cc.sunny( strTitle ) +

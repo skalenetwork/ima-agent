@@ -154,7 +154,7 @@ export async function doEthPaymentFromMainNet(
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         const s = strLogPrefix +
-            cc.error( "Payment error in " + strActionName + ": " ) + cc.error( strError ) +
+            cc.error( "Payment error in " + strActionName + ": " ) + cc.warning( strError ) +
             cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
         if( log.id != details.id )
             log.critical( s );
@@ -265,7 +265,7 @@ export async function doEthPaymentFromSChain(
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         const s = strLogPrefix + cc.error( "Payment error in " + strActionName + ": " ) +
-            cc.error( strError ) + cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
+            cc.warning( strError ) + cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
         if( log.id != details.id )
             log.critical( s );
         details.critical( s );
@@ -334,7 +334,7 @@ export async function receiveEthPaymentFromSchainOnMainNet(
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         const s = strLogPrefix + cc.error( "Receive payment error in " + strActionName + ": " ) +
-            cc.error( strError ) + cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
+            cc.warning( strError ) + cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
         if( log.id != details.id )
             log.critical( s );
         details.critical( s );
@@ -378,7 +378,7 @@ export async function viewEthPaymentFromSchainOnMainNet(
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         const s = strLogPrefix + cc.error( "View payment error in " + strActionName + ": " ) +
-            cc.error( strError ) + cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
+            cc.warning( strError ) + cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
         if( log.id != details.id )
             log.critical( s );
         details.critical( s );

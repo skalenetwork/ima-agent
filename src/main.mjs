@@ -102,8 +102,8 @@ function parseCommandLine() {
     }
     if( haveReimbursementCommands ) {
         if( imaState.strReimbursementChain == "" ) {
-            log.fatal( cc.fatal( "RUNTIME INIT ERROR:" ),
-                " missing value for reimbursement-chain parameter, must be non-empty chain name" );
+            log.fatal( "Runtime init error: missing value for reimbursement-chain parameter, " +
+                "must be non-empty chain name" );
             process.exit( 163 );
         }
     }
@@ -394,8 +394,7 @@ async function doTheJob() {
             }
         } catch ( err ) {
             ++cntFalse;
-            log.critical( strLogPrefix, cc.fatal( "CRITICAL ERROR:" ),
-                " Exception occurred while executing action: ",
+            log.critical( strLogPrefix, "Exception occurred while executing action: ",
                 cc.warning( owaspUtils.extractErrorMessage( err ) ),
                 ", stack is: ", "\n", cc.stack( err.stack ) );
         }
@@ -443,13 +442,11 @@ async function main() {
     };
     if( imaState.bSignMessages ) {
         if( imaState.strPathBlsGlue.length == 0 ) {
-            log.fatal( cc.fatal( "FATAL, CRITICAL ERROR:" ),
-                " please specify --bls-glue parameter." );
+            log.fatal( "Please specify --bls-glue parameter." );
             process.exit( 164 );
         }
         if( imaState.strPathHashG1.length == 0 ) {
-            log.fatal( cc.fatal( "FATAL, CRITICAL ERROR:" ),
-                " please specify --hash-g1 parameter." );
+            log.fatal( "Please specify --hash-g1 parameter." );
             process.exit( 165 );
         }
         log.information( "S-Chain network was discovery uses ",
@@ -482,8 +479,7 @@ async function main() {
                 }, isSilentReDiscovery, imaState.joSChainNetworkInfo, nCountToWait
                 ).catch( ( err ) => {
                     const strError = owaspUtils.extractErrorMessage( err );
-                    log.critical( cc.fatal( "CRITICAL ERROR:" ),
-                        " S-Chain network discovery failed: ", cc.warning( strError ) );
+                    log.critical( "S-Chain network discovery failed: ", cc.warning( strError ) );
                 } );
             } );
         }

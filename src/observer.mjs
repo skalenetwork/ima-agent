@@ -987,8 +987,8 @@ export async function cacheSChains( strChainNameConnectedTo, opts ) {
         if( opts.fnCacheChanged )
             opts.fnCacheChanged( gArrSChainsCached, strError );
         if( opts && opts.details ) {
-            opts.details.error( cc.fatal( "ERROR:" ), " Failed to cache: ", cc.warning( err ) );
-            opts.details.error( cc.stack( err.stack ) );
+            opts.details.error( "Failed to cache: ", cc.warning( err ),
+                "stack is: ", cc.stack( err.stack ) );
         }
     }
     return strError; // null on success
@@ -1018,8 +1018,7 @@ export function setLastCachedSChains( arrSChainsCached ) {
                 "chainsCacheChanged",
                 { "detail": { "arrSChainsCached": getLastCachedSChains() } } ) );
     } else {
-        log.error( cc.fatal( "CRITICAL ERROR:" ),
-            " Cannot dispatch arrSChainsCached event with bad object ",
+        log.error( "Cannot dispatch arrSChainsCached event with bad object ",
             cc.j( arrSChainsCached ), " in ", threadInfo.threadDescription() );
     }
 }
@@ -1071,8 +1070,7 @@ export async function ensureHaveWorker( opts ) {
                 break;
             }
             gClient.errorLogicalInit = joMessage.error;
-            opts.details.critical( cc.fatal( "CRITICAL ERROR:" ),
-                " SNB worker thread reported/returned init error: ",
+            opts.details.critical( "SNB worker thread reported/returned init error: ",
                 cc.warning( owaspUtils.extractErrorMessage( joMessage.error ) ) );
             break;
         case "periodicCachingDoNow":

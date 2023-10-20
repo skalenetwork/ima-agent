@@ -404,7 +404,7 @@ export async function singleTransferLoop( optsLoop ) {
             cc.tf( bResult ) );
         return bResult;
     } catch ( err ) {
-        log.error( strLogPrefix, cc.fatal( "Exception in transfer loop: " ),
+        log.error( strLogPrefix, "Exception in transfer loop: ",
             cc.warning( owaspUtils.extractErrorMessage( err ) ),
             ", stack is: ", "\n", cc.stack( err.stack ) );
     }

@@ -1009,7 +1009,7 @@ async function gatherSigningStartImpl( optsSignOperation ) {
                         if( ! joCommonPublicKey ) {
                             strError = "No BLS common public key";
                             optsSignOperation.details.error( optsSignOperation.strLogPrefixB,
-                                cc.error( strError ) );
+                                cc.warning( strError ) );
                         } else if( performBlsVerify(
                             optsSignOperation.details, optsSignOperation.strDirection,
                             joGlueResult, optsSignOperation.jarrMessages,
@@ -1024,7 +1024,7 @@ async function gatherSigningStartImpl( optsSignOperation ) {
                         } else {
                             strError = "BLS verification failed";
                             optsSignOperation.details.error( optsSignOperation.strLogPrefixB,
-                                cc.error( strError ) );
+                                cc.warning( strError ) );
                         }
                     }
                 } else {

@@ -195,13 +195,12 @@ export async function doOracleGasPriceSetup(
             async function( strError, u256, joGlueResult ) {
                 if( strError ) {
                     if( log.id != optsGasPriseSetup.details.id ) {
-                        log.critical( optsGasPriseSetup.strLogPrefix, cc.fatal( "CRITICAL ERROR:" ),
-                            " Error in doOracleGasPriceSetup() during ",
+                        log.critical( optsGasPriseSetup.strLogPrefix,
+                            "Error in doOracleGasPriceSetup() during ",
                             optsGasPriseSetup.strActionName, ": ", cc.warning( strError ) );
                     }
                     optsGasPriseSetup.details.critical( optsGasPriseSetup.strLogPrefix,
-                        cc.fatal( "CRITICAL ERROR:" ),
-                        " Error in doOracleGasPriceSetup() during ",
+                        "Error in doOracleGasPriceSetup() during ",
                         optsGasPriseSetup.strActionName, ": ", cc.warning( strError ) );
                     optsGasPriseSetup.details.exposeDetailsTo(
                         log, "doOracleGasPriceSetup", false );
@@ -291,13 +290,12 @@ export async function doOracleGasPriceSetup(
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != optsGasPriseSetup.details.id ) {
-            log.critical( optsGasPriseSetup.strLogPrefix, cc.fatal( "CRITICAL ERROR:" ),
-                " Error in doOracleGasPriceSetup() during ",
+            log.critical( optsGasPriseSetup.strLogPrefix,
+                "Error in doOracleGasPriceSetup() during ",
                 optsGasPriseSetup.strActionName, ": ", cc.warning( strError ),
                 ", stack is: ", "\n", cc.stack( err.stack ) );
             optsGasPriseSetup.details.critical( optsGasPriseSetup.strLogPrefix,
-                cc.fatal( "CRITICAL ERROR:" ),
-                " Error in doOracleGasPriceSetup() during ",
+                "Error in doOracleGasPriceSetup() during ",
                 optsGasPriseSetup.strActionName, ": ", cc.warning( strError ),
                 ", stack is: ", "\n", cc.stack( err.stack ) );
         }

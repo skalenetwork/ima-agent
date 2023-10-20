@@ -202,8 +202,7 @@ async function payedCallTM( optsPayedCall ) {
                     "Hash of sent TM-transaction: ", cc.j( txHashSent ) );
                 resolve( optsPayedCall.joReceipt );
             } catch ( err ) {
-                const strError = cc.fatal( "BAD ERROR:" ) + " " +
-                    cc.error( "TM-transaction was not sent, underlying error is: " ) +
+                const strError = cc.error( "TM-transaction was not sent, underlying error is: " ) +
                     cc.warning( err.toString() );
                 optsPayedCall.details.critical( optsPayedCall.strLogPrefix, strError );
                 if( log.id != optsPayedCall.details.id )
@@ -358,21 +357,20 @@ export async function payedCall(
             await payedCallDirect( optsPayedCall );
             break;
         default: {
-            const strErrorPrefix = "CRITICAL TRANSACTION SIGN AND SEND ERROR(INNER FLOW):";
-            const s = cc.fatal( strErrorPrefix ) + " " +
+            const strErrorPrefix = "Transaction sign and send error(INNER FLOW): ";
+            const s = strErrorPrefix +
                 cc.error( "bad credentials information specified, " +
                     "no explicit SGX and no explicit private key found" );
             optsPayedCall.details.critical( s );
             if( log.id != optsPayedCall.details.id )
                 log.critical( s );
-            throw new Error( strErrorPrefix + " bad credentials information specified, " +
+            throw new Error( strErrorPrefix + "bad credentials information specified, " +
                 "no explicit SGX and no explicit private key found" );
         } // NOTICE: "break;" is not needed here because of "throw" above
         } // switch( optsPayedCall.joACI.strType )
     } catch ( err ) {
-        const strErrorPrefix = "CRITICAL TRANSACTION SIGN AND SEND ERROR(OUTER FLOW):";
-        const s =
-            optsPayedCall.strLogPrefix + cc.error( strErrorPrefix ) + " " +
+        const strErrorPrefix = "Transaction sign and send error(outer flow):";
+        const s = optsPayedCall.strLogPrefix + cc.error( strErrorPrefix ) + " " +
             cc.warning( owaspUtils.extractErrorMessage( err ) ) +
             cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
         optsPayedCall.details.critical( s );
@@ -466,8 +464,7 @@ export async function checkTransactionToSchain(
                 cc.notice( strFromAddress ), ", PoW-mining is not needed and will be skipped" );
         }
     } catch ( err ) {
-        details.critical( strLogPrefix,
-            cc.fatal( "CRITICAL PoW-mining ERROR(checkTransactionToSchain):" ),
+        details.critical( strLogPrefix,"PoW-mining error(checkTransactionToSchain):",
             " exception occur before PoW-mining, error is: ",
             cc.warning( owaspUtils.extractErrorMessage( err ) ),
             ", stack is: ", "\n", cc.stack( err.stack ) );
@@ -489,8 +486,7 @@ export async function calculatePowNumber( address, nonce, gas, details, strLogPr
         details.trace( strLogPrefix, "Got PoW-mining execution result: ", cc.notice( res ) );
         return res;
     } catch ( err ) {
-        details.critical( strLogPrefix,
-            cc.fatal( "CRITICAL PoW-mining ERROR(calculatePowNumber):" ),
+        details.critical( strLogPrefix, "PoW-mining error(calculatePowNumber):",
             " exception occur during PoW-mining, error is: ",
             cc.warning( owaspUtils.extractErrorMessage( err ) ),
             ", stack is: ", "\n", cc.stack( err.stack ) );
@@ -677,8 +673,7 @@ async function tmEnsureTransaction(
         await imaHelperAPIs.sleep( sleepMilliseconds );
     }
     if( !joReceipt ) {
-        const strMsg =
-            cc.fatal( "BAD ERROR:" ) + " " + cc.error( "TM TX " ) + cc.info( txId ) +
+        const strMsg = cc.error( "TM TX " ) + cc.info( txId ) +
             cc.error( " transaction has been dropped" );
         details.error( strPrefixDetails, strMsg );
         if( log.id != details.id )

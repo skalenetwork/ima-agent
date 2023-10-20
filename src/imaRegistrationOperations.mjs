@@ -48,9 +48,9 @@ export async function invokeHasChain(
         return bHasSchain;
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
-        const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
+        const s = strLogPrefix +
             cc.error( "Error in invokeHasChain() during " + strActionName + ": " ) +
-            cc.error( strError ) + cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
+            cc.warning( strError ) + cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
         if( log.id != details.id )
             log.critical( s );
         details.critical( s );
@@ -113,10 +113,10 @@ export async function checkIsRegisteredSChainInDepositBoxes( // step 1
         return bIsRegistered;
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
-        const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
+        const s = strLogPrefix +
             cc.error(
-                " Error in checkIsRegisteredSChainInDepositBoxes(reg-step1)() during " +
-            strActionName + ": " ) + cc.error( strError ) + cc.error( ", stack is: " ) +
+                "Error in checkIsRegisteredSChainInDepositBoxes(reg-step1)() during " +
+            strActionName + ": " ) + cc.warning( strError ) + cc.error( ", stack is: " ) +
             "\n" + cc.stack( err.stack );
         if( log.id != details.id )
             log.critical( s );
@@ -213,11 +213,8 @@ export async function registerSChainInDepositBoxes( // step 1
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         const s = strLogPrefix +
-            cc.fatal( "CRITICAL ERROR:" ) +
-            cc.error( " Error in registerSChainInDepositBoxes() during " +
-            strActionName + ": " ) +
-            cc.error( strError ) + cc.error( ", stack is: " ) +
-            "\n" + cc.stack( err.stack );
+            cc.error( "Error in registerSChainInDepositBoxes() during " + strActionName + ": " ) +
+            cc.warning( strError ) + cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
         if( log.id != details.id )
             log.critical( s );
         details.critical( s );

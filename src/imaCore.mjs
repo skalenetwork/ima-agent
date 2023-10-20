@@ -403,7 +403,7 @@ async function gatherMessages( optsTransfer ) {
                 const s = optsTransfer.strLogPrefix +
                     cc.error( "Exception(evaluate block depth) while " +
                         "getting transaction hash and block number during " +
-                    optsTransfer.strActionName + ": " ) + cc.error( strError ) +
+                    optsTransfer.strActionName + ": " ) + cc.warning( strError ) +
                     cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
                 optsTransfer.details.critical( s );
                 if( log.id != optsTransfer.details.id )
@@ -463,7 +463,7 @@ async function gatherMessages( optsTransfer ) {
                 const s = optsTransfer.strLogPrefix +
                     cc.error( "Exception(evaluate block age) while " +
                         "getting block number and timestamp during " +
-                    optsTransfer.strActionName + ": " ) + cc.error( strError ) +
+                    optsTransfer.strActionName + ": " ) + cc.warning( strError ) +
                     cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
                 optsTransfer.details.critical( s );
                 if( log.id != optsTransfer.details.id )
@@ -518,7 +518,7 @@ async function preCheckAllMessagesSign( optsTransfer, err, jarrMessages, joGlueR
         optsTransfer.bErrorInSigningMessages = true;
         const strError = owaspUtils.extractErrorMessage( err );
         const s = optsTransfer.strLogPrefix +
-            cc.error( "Error signing messages: " ) + cc.error( strError );
+            cc.error( "Error signing messages: " ) + cc.warning( strError );
         optsTransfer.details.critical( s );
         if( log.id != optsTransfer.details.id )
             log.critical( s );

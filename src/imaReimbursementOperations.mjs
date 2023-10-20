@@ -66,11 +66,8 @@ export async function reimbursementShowBalance(
         return xWei;
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
-        const s = strLogPrefix +
-            cc.fatal( "CRITICAL ERROR:" ) +
-            cc.error( " Payment error in reimbursementShowBalance(): " ) +
-            cc.error( strError ) +
-            cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
+        const s = strLogPrefix + cc.error( "Payment error in reimbursementShowBalance(): " ) +
+            cc.warning( strError ) + cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
         if( log.id != details.id )
             log.critical( s );
         details.critical( s );
@@ -160,10 +157,8 @@ export async function reimbursementEstimateAmount(
         return amountToRecharge;
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
-        const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
-            cc.error( " Payment error in reimbursementEstimateAmount(): " ) +
-            cc.error( strError ) +
-            cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
+        const s = strLogPrefix + cc.error( " Payment error in reimbursementEstimateAmount(): " ) +
+            cc.warning( strError ) + cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
         if( log.id != details.id )
             log.critical( s );
         details.critical( s );
@@ -230,10 +225,8 @@ export async function reimbursementWalletRecharge(
         }
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
-        const s = strLogPrefix +
-            cc.fatal( "CRITICAL ERROR:" ) + cc.error( " Payment error in " +
-            strActionName + ": " ) + cc.error( strError ) +
-            cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
+        const s = strLogPrefix + cc.error( " Payment error in " + strActionName + ": " ) +
+            cc.warning( strError ) + cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
         if( log.id != details.id )
             log.critical( s );
         details.critical( s );
@@ -307,10 +300,8 @@ export async function reimbursementWalletWithdraw(
         }
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
-        const s = strLogPrefix +
-            cc.fatal( "CRITICAL ERROR:" ) + cc.error( " Payment error in " +
-            strActionName + ": " ) + cc.error( strError ) +
-            cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
+        const s = strLogPrefix + cc.error( "Payment error in " + strActionName + ": " ) +
+            cc.warning( strError ) + cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
         if( log.id != details.id )
             log.critical( s );
         details.critical( s );
@@ -390,9 +381,8 @@ export async function reimbursementSetRange(
         }
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
-        const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
-            cc.error( " Payment error in " + strActionName + ": " ) + cc.error( strError ) +
-            cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
+        const s = strLogPrefix + cc.error( " Payment error in " + strActionName + ": " ) +
+            cc.warning( strError ) + cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
         if( log.id != details.id )
             log.critical( s );
         details.critical( s );

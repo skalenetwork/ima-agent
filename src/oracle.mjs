@@ -111,8 +111,8 @@ export function oracleGetGasPrice( oracleOpts, details ) {
                 cntAttempts = 1;
             rpcCall.create( url, callOpts || { }, async function( joCall, err ) {
                 if( err ) {
-                    details.error( cc.fatal( "CRITICAL ORACLE ERROR:" ),
-                        " RPC connection problem for url ", cc.u( url ), ", error description: ",
+                    details.error( "RPC connection problem for url ", cc.u( url ),
+                        ", error description: ",
                         cc.warning( owaspUtils.extractErrorMessage( err ) ) );
                     if( joCall )
                         await joCall.disconnect();
@@ -137,13 +137,12 @@ export function oracleGetGasPrice( oracleOpts, details ) {
                     await joCall.call( joIn, async function( joIn, joOut, err ) {
                         if( err ) {
                             if( isVerboseTraceDetails ) {
-                                details.error( cc.fatal( "CRITICAL ORACLE ERROR:" ),
-                                    " JSON RPC call(oracle_submitRequest) ",
+                                details.error( "JSON RPC call(oracle_submitRequest) ",
                                     cc.attention( "oracle_submitRequest" ), " failed, error: ",
                                     cc.warning( owaspUtils.extractErrorMessage( err ) ) );
                             }
                             await joCall.disconnect();
-                            reject( new Error( "CRITICAL ORACLE ERROR: " +
+                            reject( new Error(
                                 "JSON RPC call(oracle_submitRequest) failed, error: " +
                                 owaspUtils.extractErrorMessage( err ) ) );
                             return;
@@ -154,12 +153,11 @@ export function oracleGetGasPrice( oracleOpts, details ) {
                         }
                         if( !( "result" in joOut && typeof joOut.result == "string" &&
                             joOut.result.length > 0 ) ) {
-                            details.error( cc.fatal( "CRITICAL ORACLE ERROR:" ),
-                                " bad unexpected result(",
+                            details.error( " bad unexpected result(",
                                 cc.attention( "oracle_submitRequest" ), "), error description is",
                                 owaspUtils.extractErrorMessage( err ) );
                             await joCall.disconnect();
-                            reject( new Error( "CRITICAL ORACLE ERROR: " +
+                            reject( new Error( "ORACLE ERROR: " +
                                 "bad unexpected result(oracle_submitRequest)" ) );
                             return;
                         }
@@ -183,8 +181,7 @@ export function oracleGetGasPrice( oracleOpts, details ) {
                                 await joCall.call( joIn, async function( joIn, joOut, err ) {
                                     if( err ) {
                                         if( isVerboseTraceDetails ) {
-                                            details.error( cc.fatal( "CRITICAL ORACLE ERROR:" ),
-                                                " JSON RPC call(",
+                                            details.error( "JSON RPC call(",
                                                 cc.attention( "oracle_checkResult" ),
                                                 ") failed, error: ",
                                                 cc.warning( owaspUtils.extractErrorMessage( err ) )
@@ -201,8 +198,7 @@ export function oracleGetGasPrice( oracleOpts, details ) {
                                     if( !( "result" in joOut && typeof joOut.result == "string" &&
                                         joOut.result.length > 0 ) ) {
                                         if( isVerboseTraceDetails ) {
-                                            details.error( cc.fatal( "CRITICAL ORACLE ERROR:" ),
-                                                " bad unexpected result in ",
+                                            details.error( "Bad unexpected result in ",
                                                 cc.attention( "oracle_checkResult" ) );
                                         }
                                         await joCall.disconnect();
@@ -228,8 +224,7 @@ export function oracleGetGasPrice( oracleOpts, details ) {
                                     return;
                                 } );
                             } catch ( err ) {
-                                details.critical( cc.fatal( "CRITICAL ORACLE ERROR:" ),
-                                    " RPC call ", cc.attention( "oracle_checkResult" ),
+                                details.critical( "RPC call ", cc.attention( "oracle_checkResult" ),
                                     " exception is: ",
                                     cc.warning( owaspUtils.extractErrorMessage( err ) ),
                                     ", stack is: ", "\n", cc.stack( err.stack ) );
@@ -238,8 +233,7 @@ export function oracleGetGasPrice( oracleOpts, details ) {
                                 return;
                             }
                         }
-                        details.error( cc.fatal( "CRITICAL ORACLE ERROR:" ),
-                            " RPC call ", cc.attention( "oracle_checkResult" ),
+                        details.error( "RPC call ", cc.attention( "oracle_checkResult" ),
                             " all attempts timed out" );
                         reject( new Error(
                             "RPC call(oracle_checkResult) all attempts timed out" ) );
@@ -247,8 +241,7 @@ export function oracleGetGasPrice( oracleOpts, details ) {
                         return;
                     } );
                 } catch ( err ) {
-                    details.critical( cc.fatal( "CRITICAL ORACLE ERROR:" ),
-                        " RPC call", cc.attention( "oracle_submitRequest" ),
+                    details.critical( "RPC call", cc.attention( "oracle_submitRequest" ),
                         " exception is: ", cc.warning( owaspUtils.extractErrorMessage( err ) ) +
                         ", stack is: ", "\n", cc.stack( err.stack ) );
                     reject( err );
@@ -256,8 +249,7 @@ export function oracleGetGasPrice( oracleOpts, details ) {
                 await joCall.disconnect();
             } );
         } catch ( err ) {
-            details.error( cc.fatal( "CRITICAL ORACLE ERROR:" ),
-                " RPC call object creation failed, error is: ",
+            details.error( "RPC call object creation failed, error is: ",
                 cc.warning( owaspUtils.extractErrorMessage( err ) ),
                 ", stack is: ", "\n", cc.stack( err.stack ) );
             reject( err );

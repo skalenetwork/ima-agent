@@ -91,9 +91,9 @@ export async function safeGetPastEventsProgressive(
     nBlockFrom, nBlockTo, joFilter
 ) {
     if( ! imaTransferErrorHandling.getEnabledProgressiveEventsScan() ) {
-        details.warning( strLogPrefix, cc.error( "IMPORTANT NOTICE:" ), " ", "Will skip ",
-            cc.attention( "progressive" ), " events scan in block range from ", cc.j( nBlockFrom ),
-            " to ", cc.j( nBlockTo ), " because it's ", cc.error( "DISABLED" ) );
+        details.warning( strLogPrefix, "IMPORTANT NOTICE: Will skip progressive events scan " +
+            "in block range from ", cc.j( nBlockFrom ), " to ", cc.j( nBlockTo ), " because it's ",
+        cc.error( "DISABLED" ) );
         return await safeGetPastEvents(
             details, strLogPrefix,
             ethersProvider, attempts, joContract, strEventName,
@@ -254,10 +254,9 @@ export async function safeGetTransactionCount(
         ++ idxAttempt;
     }
     if( ( idxAttempt + 1 ) > cntAttempts && ret === "" ) {
-        details.error( cc.fatal( "ERROR:" ), " Failed call to ", cc.note( strFnName + "()" ),
+        details.error( "Failed call to ", cc.note( strFnName + "()" ),
             " via ", cc.u( u ), " after ", cc.info( cntAttempts ), " attempts " );
-        throw new Error(
-            "Failed call to " + strFnName + "() via " + u.toString() +
+        throw new Error( "Failed call to " + strFnName + "() via " + u.toString() +
             " after " + cntAttempts + " attempts" );
     }
     return ret;
@@ -298,8 +297,7 @@ export async function safeGetTransactionReceipt(
                 return ret;
             details.error( "Cannot call ", cc.note( strFnName + "()" ),
                 " via ", cc.u( u ), cc.warning( " because server is off-line" ) );
-            throw new Error(
-                "Cannot " + strFnName + "() via " + u.toString() +
+            throw new Error( "Cannot " + strFnName + "() via " + u.toString() +
                 " because server is off-line" );
         }
         details.trace( "Repeat call to ", cc.note( strFnName + "()" ), " via ", cc.u( u ),
@@ -318,10 +316,9 @@ export async function safeGetTransactionReceipt(
         ++ idxAttempt;
     }
     if( ( idxAttempt + 1 ) > cntAttempts && ( txReceipt === "" || txReceipt === undefined ) ) {
-        details.error( cc.fatal( "ERROR:" ), " Failed call to ", cc.note( strFnName + "()" ),
+        details.error( "Failed call to ", cc.note( strFnName + "()" ),
             " via ", cc.u( u ), " after ", cntAttempts, " attempts " );
-        throw new Error(
-            "Failed call to " + strFnName + "() via " + u.toString() +
+        throw new Error( "Failed call to " + strFnName + "() via " + u.toString() +
             " after " + cntAttempts + " attempts" );
     }
     return ret;
@@ -436,14 +433,11 @@ export async function safeGetPastEvents(
         ++ idxAttempt;
     }
     if( ( idxAttempt + 1 ) === cntAttempts && ret === "" ) {
-        details.error( strLogPrefix, cc.fatal( "ERROR:" ),
-            " Failed filtering attempt for ", cc.note( strEventName ),
-            " event via ", cc.u( u ), ", from block ",
-            cc.info( nBlockFrom.toHexString() ), ", to block ",
-            cc.info( nBlockTo.toHexString() ), " after ", cc.info( cntAttempts ),
+        details.error( strLogPrefix, "Failed filtering attempt for ", cc.note( strEventName ),
+            " event via ", cc.u( u ), ", from block ", cc.info( nBlockFrom.toHexString() ),
+            ", to block ", cc.info( nBlockTo.toHexString() ), " after ", cc.info( cntAttempts ),
             " attempts " );
-        throw new Error(
-            "Failed filtering attempt for " + strEventName + " event, from block " +
+        throw new Error( "Failed filtering attempt for " + strEventName + " event, from block " +
             nBlockFrom.toHexString() + ", to block " + nBlockTo.toHexString() +
             " via " + u.toString() + " after " + cntAttempts + " attempts"
         );
@@ -458,10 +452,9 @@ export async function safeGetPastEventsIterative(
 ) {
     if( imaHelperAPIs.getBlocksCountInInIterativeStepOfEventsScan() <= 0 ||
         imaHelperAPIs.getMaxIterationsInAllRangeEventsScan() <= 0 ) {
-        details.warning( strLogPrefix, cc.error( "IMPORTANT NOTICE:" ), " Will skip ",
-            cc.attention( "iterative" ), " events scan in block range from ",
-            cc.j( nBlockFrom ), " to ", cc.j( nBlockTo ), " because it's ",
-            cc.error( "DISABLED" ) );
+        details.warning( strLogPrefix, "IMPORTANT NOTICE: Will skip iterative events scan " +
+            "in block range from ", cc.j( nBlockFrom ), " to ", cc.j( nBlockTo ), " because it's ",
+        cc.error( "DISABLED" ) );
         return await safeGetPastEvents(
             details, strLogPrefix,
             ethersProvider, attempts, joContract,
@@ -491,11 +484,9 @@ export async function safeGetPastEventsIterative(
             owaspUtils.toBN( imaHelperAPIs.getBlocksCountInInIterativeStepOfEventsScan() )
         ).gt( owaspUtils.toBN( imaHelperAPIs.getMaxIterationsInAllRangeEventsScan() ) )
         ) {
-            details.warning( strLogPrefix, cc.fatal( "IMPORTANT NOTICE:" ),
-                " Will skip ", cc.attention( "iterative" ),
-                " scan and use scan in block range from ",
-                cc.info( nBlockFrom.toHexString() ), " to ",
-                cc.info( nBlockTo.toHexString() ) );
+            details.warning( strLogPrefix, "IMPORTANT NOTICE: Will skip iterative scan and " +
+                "use scan in block range from ", cc.info( nBlockFrom.toHexString() ), " to ",
+            cc.info( nBlockTo.toHexString() ) );
             return await safeGetPastEvents(
                 details, strLogPrefix,
                 ethersProvider, attempts, joContract, strEventName,
