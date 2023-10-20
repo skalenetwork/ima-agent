@@ -94,8 +94,8 @@ export function ensureHaveValue(
     if( value.length === 0 ) {
         retVal = false;
         if( ! isPrintValue ) {
-            console.log( "    " + cc.error( "IMPORTANT WARNING:" ) +
-                cc.warning( " missing value for " ) + fnNameColorizer( name ) );
+            console.log( cc.error( "WARNING:" ) + cc.warning( " missing value for " ) +
+                fnNameColorizer( name ) );
         }
         if( isExitIfEmpty )
             process.exit( 126 );
@@ -3925,9 +3925,8 @@ export function imaInitEthersProviders() {
         asyncCheckUrlAtStartup( u, "Main-net" );
         imaState.chainProperties.mn.ethersProvider = owaspUtils.getEthersProviderFromURL( u );
     } else {
-        log.warning( cc.error( "WARNING:" ), " No ", cc.note( "Main-net" ),
-            " URL specified in command line arguments",
-            cc.debug( "(needed for particular operations only)" ) );
+        log.warning( " No Main-net URL specified in command line arguments" +
+            "(needed for particular operations only)" );
     }
 
     if( imaState.chainProperties.sc.strURL &&
@@ -3938,9 +3937,8 @@ export function imaInitEthersProviders() {
         asyncCheckUrlAtStartup( u, "S-Chain" );
         imaState.chainProperties.sc.ethersProvider = owaspUtils.getEthersProviderFromURL( u );
     } else {
-        log.warning( cc.error( "WARNING:" ), " No ", cc.note( "S-Chain" ),
-            " URL specified in command line arguments",
-            cc.debug( "(needed for particular operations only)" ) );
+        log.warning( " No S-Chain URL specified in command line arguments" +
+            "(needed for particular operations only)" );
     }
 
     if( imaState.chainProperties.tc.strURL &&
@@ -3951,9 +3949,8 @@ export function imaInitEthersProviders() {
         asyncCheckUrlAtStartup( u, "S<->S Target S-Chain" );
         imaState.chainProperties.tc.ethersProvider = owaspUtils.getEthersProviderFromURL( u );
     } else {
-        log.warning( cc.error( "WARNING:" ), " No ", cc.note( "S<->S Target S-Chain" ) +
-            " URL specified in command line arguments",
-        cc.debug( "(needed for particular operations only)" ) );
+        log.warning( " No S<->S Target S-Chain URL specified in command line arguments" +
+            "(needed for particular operations only)" );
     }
 
 } // imaInitEthersProviders

@@ -500,8 +500,8 @@ async function discoverSChainWait( optsDiscover ) {
                 "S-Chain network discovery wait timeout, network will be re-discovered later";
             if( ! optsDiscover.isSilentReDiscovery ) {
                 log.warning( optsDiscover.strLogPrefix,
-                    "WARNING: This S-Chain discovery will finish due to: ",
-                    cc.error( strErrorDescription ) );
+                    "This S-Chain discovery will finish due to: ",
+                    cc.warning( strErrorDescription ) );
             }
             if( getSChainDiscoveredNodesCount(
                 optsDiscover.joSChainNetworkInfo ) > 0 )

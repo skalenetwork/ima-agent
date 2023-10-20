@@ -188,14 +188,18 @@ async function doQueryOutgoingMessageCounter( optsTransfer ) {
             "Result of ", cc.notice( optsTransfer.strActionName ), " call: ",
             cc.info( optsTransfer.nOutMsgCnt ) );
     } catch ( err ) {
-        const strError = cc.error( "IMMEDIATE ERROR LOG: error caught during " ) +
-            cc.attention( optsTransfer.strActionName ) +
-            cc.error( ", error optsTransfer.details: " ) +
-            cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-            cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
-        optsTransfer.details.critical( strError );
-        if( log.id != optsTransfer.details.id )
-            log.critical( strError );
+        optsTransfer.details.critical( "(IMMEDIATE) error caught during ",
+            cc.attention( optsTransfer.strActionName ),
+            ", error optsTransfer.details: ",
+            cc.warning( owaspUtils.extractErrorMessage( err ) ),
+            ", stack is: ", "\n", cc.stack( err.stack ) );
+        if( log.id != optsTransfer.details.id ) {
+            log.critical( "(IMMEDIATE) error caught during ",
+                cc.attention( optsTransfer.strActionName ),
+                ", error optsTransfer.details: ",
+                cc.warning( owaspUtils.extractErrorMessage( err ) ),
+                ", stack is: ", "\n", cc.stack( err.stack ) );
+        }
     }
 
     optsTransfer.strActionName = "dst-chain.MessageProxy.getIncomingMessagesCounter()";
@@ -325,11 +329,12 @@ async function analyzeGatheredRecords( optsTransfer, r ) {
         }
     }
     if( joValues == "" ) {
-        const strError = optsTransfer.strLogPrefix +
-            cc.error( "Can't get events from MessageProxy" );
-        optsTransfer.details.critical( strError );
-        if( log.id != optsTransfer.details.id )
-            log.critical( strError );
+        optsTransfer.details.critical( optsTransfer.strLogPrefix,
+            "Can't get events from MessageProxy" );
+        if( log.id != optsTransfer.details.id ) {
+            log.critical( optsTransfer.strLogPrefix,
+                "Can't get events from MessageProxy" );
+        }
         optsTransfer.details.exposeDetailsTo(
             log, optsTransfer.strGatheredDetailsName, false );
         imaTransferErrorHandling.saveTransferError(
@@ -400,14 +405,18 @@ async function gatherMessages( optsTransfer ) {
             } catch ( err ) {
                 bSecurityCheckPassed = false;
                 const strError = owaspUtils.extractErrorMessage( err );
-                const s = optsTransfer.strLogPrefix +
-                    cc.error( "Exception(evaluate block depth) while " +
-                        "getting transaction hash and block number during " +
-                    optsTransfer.strActionName + ": " ) + cc.warning( strError ) +
-                    cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
-                optsTransfer.details.critical( s );
-                if( log.id != optsTransfer.details.id )
-                    log.critical( s );
+                optsTransfer.details.critical( optsTransfer.strLogPrefix,
+                    "Exception(evaluate block depth) while " +
+                        "getting transaction hash and block number during ",
+                    optsTransfer.strActionName, ": ", cc.warning( strError ),
+                    ", stack is: ", "\n", cc.stack( err.stack ) );
+                if( log.id != optsTransfer.details.id ) {
+                    log.critical( optsTransfer.strLogPrefix,
+                        "Exception(evaluate block depth) while " +
+                            "getting transaction hash and block number during ",
+                        optsTransfer.strActionName, ": ", cc.warning( strError ),
+                        ", stack is: ", "\n", cc.stack( err.stack ) );
+                }
                 optsTransfer.details.exposeDetailsTo(
                     log, optsTransfer.strGatheredDetailsName, false );
                 imaTransferErrorHandling.saveTransferError(
@@ -460,14 +469,17 @@ async function gatherMessages( optsTransfer ) {
             } catch ( err ) {
                 bSecurityCheckPassed = false;
                 const strError = owaspUtils.extractErrorMessage( err );
-                const s = optsTransfer.strLogPrefix +
-                    cc.error( "Exception(evaluate block age) while " +
+                optsTransfer.details.critical( optsTransfer.strLogPrefix,
+                    "Exception(evaluate block age) while " +
                         "getting block number and timestamp during " +
-                    optsTransfer.strActionName + ": " ) + cc.warning( strError ) +
-                    cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
-                optsTransfer.details.critical( s );
-                if( log.id != optsTransfer.details.id )
-                    log.critical( s );
+                        optsTransfer.strActionName + ": ", cc.warning( strError ),
+                    ", stack is: ", "\n", cc.stack( err.stack ) );
+                if( log.id != optsTransfer.details.id ) {
+                    log.critical( "Exception(evaluate block age) while " +
+                        "getting block number and timestamp during " +
+                        optsTransfer.strActionName + ": ", cc.warning( strError ),
+                    ", stack is: ", "\n", cc.stack( err.stack ) );
+                }
                 optsTransfer.details.exposeDetailsTo(
                     log, optsTransfer.strGatheredDetailsName, false );
                 imaTransferErrorHandling.saveTransferError(
@@ -517,11 +529,12 @@ async function preCheckAllMessagesSign( optsTransfer, err, jarrMessages, joGlueR
     if( err ) {
         optsTransfer.bErrorInSigningMessages = true;
         const strError = owaspUtils.extractErrorMessage( err );
-        const s = optsTransfer.strLogPrefix +
-            cc.error( "Error signing messages: " ) + cc.warning( strError );
-        optsTransfer.details.critical( s );
-        if( log.id != optsTransfer.details.id )
-            log.critical( s );
+        optsTransfer.details.critical( optsTransfer.strLogPrefix,
+            "Error signing messages: ", cc.warning( strError ) );
+        if( log.id != optsTransfer.details.id ) {
+            log.critical( optsTransfer.strLogPrefix,
+                "Error signing messages: ", cc.warning( strError ) );
+        }
         imaTransferErrorHandling.saveTransferError(
             optsTransfer.strTransferErrorCategoryName, optsTransfer.details.toString() );
         return false;
@@ -670,15 +683,18 @@ async function callbackAllMessagesSign( optsTransfer, err, jarrMessages, joGlueR
                         cc.notice( optsTransfer.joMessageProxyDst.address ),
                         " contract, no events found" );
                 } else {
-                    const strError = optsTransfer.strLogPrefix + cc.warning( "Failed" ) +
-                        cc.error( " verification of the " ) +
-                        cc.warning( "PostMessageError" ) + cc.error( " event of the " ) +
-                        cc.warning( "MessageProxy" ) + cc.error( "/" ) +
-                        cc.notice( optsTransfer.joMessageProxyDst.address ) +
-                        cc.error( " contract, found event(s): " ) + cc.j( joEvents );
-                    optsTransfer.details.critical( strError );
-                    if( log.id != optsTransfer.details.id )
-                        log.critical( strError );
+                    optsTransfer.details.critical( optsTransfer.strLogPrefix,
+                        "Failed verification of the ", cc.j( "PostMessageError" ),
+                        " event of the ", cc.j( "MessageProxy" ), "/",
+                        cc.j( optsTransfer.joMessageProxyDst.address ),
+                        " contract, found event(s): ", cc.j( joEvents ) );
+                    if( log.id != optsTransfer.details.id ) {
+                        log.critical( optsTransfer.strLogPrefix,
+                            "Failed verification of the ", cc.j( "PostMessageError" ),
+                            " event of the ", cc.j( "MessageProxy" ), "/",
+                            cc.j( optsTransfer.joMessageProxyDst.address ),
+                            " contract, found event(s): ", cc.j( joEvents ) );
+                    }
                     imaTransferErrorHandling.saveTransferError(
                         optsTransfer.strTransferErrorCategoryName,
                         optsTransfer.details.toString() );
@@ -690,13 +706,13 @@ async function callbackAllMessagesSign( optsTransfer, err, jarrMessages, joGlueR
                     "transfer to Main Net via MessageProxy error absence on Main Net" );
             } else {
                 optsTransfer.details.warning( optsTransfer.strLogPrefix,
-                    cc.error( "WARNING:" ), " Cannot validate transfer to Main Net via " +
+                    " Cannot validate transfer to Main Net via " +
                         "MessageProxy error absence on Main Net, " +
                         "no valid transaction receipt provided" );
             }
         } else {
             optsTransfer.details.warning( optsTransfer.strLogPrefix,
-                cc.error( "WARNING:" ), " Cannot validate transfer to Main Net " +
+                " Cannot validate transfer to Main Net " +
                     "via MessageProxy error absence on Main Net, no MessageProxy provided" );
         }
     }
@@ -719,12 +735,12 @@ async function handleAllMessagesSigning( optsTransfer ) {
                     // callback fn as argument of optsTransfer.fnSignMessages
                     optsTransfer.bErrorInSigningMessages = true;
                     const strError = owaspUtils.extractErrorMessage( err );
-                    const strErrorMessage = optsTransfer.strLogPrefix +
-                        cc.error( "Problem in transfer handler(in signer): " ) +
-                        cc.warning( strError );
-                    optsTransfer.details.error( strErrorMessage );
-                    if( log.id != optsTransfer.details.id )
-                        log.error( strErrorMessage );
+                    optsTransfer.details.error( optsTransfer.strLogPrefix,
+                        "Problem in transfer handler(in signer): ", cc.warning( strError ) );
+                    if( log.id != optsTransfer.details.id ) {
+                        log.error( optsTransfer.strLogPrefix,
+                            "Problem in transfer handler(in signer): ", cc.warning( strError ) );
+                    }
                     imaTransferErrorHandling.saveTransferError(
                         optsTransfer.strTransferErrorCategoryName,
                         optsTransfer.details.toString() );
@@ -737,12 +753,12 @@ async function handleAllMessagesSigning( optsTransfer ) {
         return true;
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
-        const strErrorMessage = optsTransfer.strLogPrefix +
-            cc.error( "Problem in transfer handler(general): " ) +
-            cc.warning( strError );
-        optsTransfer.details.error( strErrorMessage );
-        if( log.id != optsTransfer.details.id )
-            log.error( strErrorMessage );
+        optsTransfer.details.error( optsTransfer.strLogPrefix,
+            "Problem in transfer handler(general): ", cc.warning( strError ) );
+        if( log.id != optsTransfer.details.id ) {
+            log.error( optsTransfer.strLogPrefix,
+                "Problem in transfer handler(general): ", cc.warning( strError ) );
+        }
         imaTransferErrorHandling.saveTransferError(
             optsTransfer.strTransferErrorCategoryName,
             optsTransfer.details.toString() );
@@ -823,17 +839,20 @@ async function checkOutgoingMessageEvent( optsTransfer, joSChain ) {
                     }
                 } catch ( err ) {
                     ++ cntFailedNodes;
-                    const strError = optsTransfer.strLogPrefix +
-                        cc.error( optsTransfer.strDirection +
-                        " message analysis error:" ) + " " +
-                        cc.error( "Failed to scan events on node " ) + cc.info( joNode.name ) +
-                        cc.error( ", error is: " ) +
-                        cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                        cc.error( ", detailed node description is: " ) + cc.j( joNode ) +
-                        cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
-                    optsTransfer.details.error( strError );
-                    if( log.id != optsTransfer.details.id )
-                        log.error( strError );
+                    optsTransfer.details.error( optsTransfer.strLogPrefix,
+                        cc.j( optsTransfer.strDirection ), " message analysis error: " +
+                        "Failed to scan events on node ", cc.j( joNode.name ),
+                        ", error is: ", cc.warning( owaspUtils.extractErrorMessage( err ) ),
+                        ", detailed node description is: ", cc.j( joNode ),
+                        ", stack is: ", "\n", cc.stack( err.stack ) );
+                    if( log.id != optsTransfer.details.id ) {
+                        log.error( optsTransfer.strLogPrefix,
+                            cc.j( optsTransfer.strDirection ), " message analysis error: " +
+                            "Failed to scan events on node ", cc.j( joNode.name ),
+                            ", error is: ", cc.warning( owaspUtils.extractErrorMessage( err ) ),
+                            ", detailed node description is: ", cc.j( joNode ),
+                            ", stack is: ", "\n", cc.stack( err.stack ) );
+                    }
                     continue;
                 }
                 if( bEventIsFound ) {
@@ -846,23 +865,27 @@ async function checkOutgoingMessageEvent( optsTransfer, joSChain ) {
                 } else {
                     ++ cntFailedNodes;
                     // eslint-disable-next-line dot-notation
-                    const strError = optsTransfer.strLogPrefix +
-                        cc.sunny( optsTransfer.strDirection ) + cc.error( " message " ) +
-                        cc.info( idxMessage + 1 ) + cc.error( " validation on node " ) +
-                        cc.info( joNode.name ) + cc.success( " using URL " ) +
-                        cc.info( strUrlHttp ) + cc.error( " is failed" );
-                    optsTransfer.details.error( strError );
-                    if( log.id != optsTransfer.details.id )
-                        log.error( strError );
+                    optsTransfer.details.error( optsTransfer.strLogPrefix,
+                        cc.j( optsTransfer.strDirection ), " message ",
+                        cc.j( idxMessage + 1 ), " validation on node ",
+                        cc.j( joNode.name ), " using URL ",
+                        cc.info( strUrlHttp ), " is failed" );
+                    if( log.id != optsTransfer.details.id ) {
+                        log.error( optsTransfer.strLogPrefix,
+                            cc.j( optsTransfer.strDirection ), " message ",
+                            cc.j( idxMessage + 1 ), " validation on node ",
+                            cc.j( joNode.name ), " using URL ",
+                            cc.info( strUrlHttp ), " is failed" );
+                    }
                 }
                 if( cntFailedNodes > optsTransfer.cntNodesMayFail )
                     break;
                 if( cntPassedNodes >= optsTransfer.cntNodesShouldPass ) {
                     // eslint-disable-next-line dot-notation
                     optsTransfer.details.information( optsTransfer.strLogPrefix,
-                        cc.sunny( optsTransfer.strDirection ), " message ",
-                        cc.info( idxMessage + 1 ), " validation on node ",
-                        cc.info( joNode.name ), " using URL ",
+                        cc.j( optsTransfer.strDirection ), " message ",
+                        cc.j( idxMessage + 1 ), " validation on node ",
+                        cc.j( joNode.name ), " using URL ",
                         cc.info( strUrlHttp ), " is passed" );
                     break;
                 }
@@ -870,32 +893,40 @@ async function checkOutgoingMessageEvent( optsTransfer, joSChain ) {
         } catch ( err ) {
             // eslint-disable-next-line dot-notation
             const strUrlHttp = joNode ? joNode["http_endpoint_ip"] : "";
-            const strError = optsTransfer.strLogPrefix +
-                cc.error( optsTransfer.strDirection + " message analysis error:" ) +
-                " " + cc.error( "Failed to process events for " ) +
-                cc.sunny( optsTransfer.strDirection ) + cc.error( " message " ) +
-                cc.info( idxMessage + 1 ) + cc.error( " on node " ) +
-                ( joNode
-                    ? cc.info( joNode.name )
-                    : cc.error( "<<unknown node name>>" ) ) +
-                cc.error( " using URL " ) +
-                ( joNode ? cc.info( strUrlHttp ) : cc.error( "<<unknown node endpoint>>" ) ) +
-                cc.error( ", error is: " ) +
-                cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
-            optsTransfer.details.critical( strError );
-            if( log.id != optsTransfer.details.id )
-                log.critical( strError );
+            optsTransfer.details.critical( optsTransfer.strLogPrefix,
+                cc.j( optsTransfer.strDirection ),
+                " message analysis error: Failed to process events for ",
+                cc.j( optsTransfer.strDirection ), " message ",
+                cc.j( idxMessage + 1 ), " on node ",
+                ( joNode ? cc.info( joNode.name ) : cc.error( "<<unknown node name>>" ) ),
+                " using URL ",
+                ( joNode ? cc.info( strUrlHttp ) : cc.error( "<<unknown node endpoint>>" ) ),
+                ", error is: ", cc.warning( owaspUtils.extractErrorMessage( err ) ),
+                ", stack is: ", "\n", cc.stack( err.stack ) );
+            if( log.id != optsTransfer.details.id ) {
+                log.critical( optsTransfer.strLogPrefix,
+                    cc.j( optsTransfer.strDirection ),
+                    " message analysis error: Failed to process events for ",
+                    cc.j( optsTransfer.strDirection ), " message ",
+                    cc.j( idxMessage + 1 ), " on node ",
+                    ( joNode ? cc.info( joNode.name ) : cc.error( "<<unknown node name>>" ) ),
+                    " using URL ",
+                    ( joNode ? cc.info( strUrlHttp ) : cc.error( "<<unknown node endpoint>>" ) ),
+                    ", error is: ", cc.warning( owaspUtils.extractErrorMessage( err ) ),
+                    ", stack is: ", "\n", cc.stack( err.stack ) );
+            }
         }
         if( cntFailedNodes > optsTransfer.cntNodesMayFail ) {
-            const s = optsTransfer.strLogPrefix +
-                cc.error( "Error validating " ) + cc.sunny( optsTransfer.strDirection ) +
-                cc.error( " messages, failed node count " ) + cc.info( cntFailedNodes ) +
-                cc.error( " is greater then allowed to fail " ) +
-                cc.info( optsTransfer.cntNodesMayFail ) + "\n";
-            optsTransfer.details.critical( s );
-            if( log.id != optsTransfer.details.id )
-                log.critical( s );
+            optsTransfer.details.critical( optsTransfer.strLogPrefix,
+                "Error validating ", cc.j( optsTransfer.strDirection ),
+                " messages, failed node count ", cntFailedNodes,
+                " is greater then allowed to fail ", optsTransfer.cntNodesMayFail );
+            if( log.id != optsTransfer.details.id ) {
+                log.critical( optsTransfer.strLogPrefix,
+                    "Error validating ", cc.j( optsTransfer.strDirection ),
+                    " messages, failed node count ", cntFailedNodes,
+                    " is greater then allowed to fail ", optsTransfer.cntNodesMayFail );
+            }
             optsTransfer.details.exposeDetailsTo(
                 log, optsTransfer.strGatheredDetailsName, false );
             imaTransferErrorHandling.saveTransferError(
@@ -905,14 +936,16 @@ async function checkOutgoingMessageEvent( optsTransfer, joSChain ) {
             return false;
         }
         if( ! ( cntPassedNodes >= optsTransfer.cntNodesShouldPass ) ) {
-            const s = optsTransfer.strLogPrefix +
-                cc.error( "Error validating " ) + cc.sunny( optsTransfer.strDirection ) +
-                cc.error( " messages, passed node count " ) + cc.info( cntFailedNodes ) +
-                cc.error( " is less then needed count " ) +
-                cc.info( optsTransfer.cntNodesShouldPass );
-            optsTransfer.details.critical( s );
-            if( log.id != optsTransfer.details.id )
-                log.critical( s );
+            optsTransfer.details.critical( optsTransfer.strLogPrefix,
+                "Error validating ", cc.j( optsTransfer.strDirection ),
+                " messages, passed node count ", cntFailedNodes,
+                " is less then needed count ", optsTransfer.cntNodesShouldPass );
+            if( log.id != optsTransfer.details.id ) {
+                log.critical( optsTransfer.strLogPrefix,
+                    "Error validating ", cc.j( optsTransfer.strDirection ),
+                    " messages, passed node count ", cntFailedNodes,
+                    " is less then needed count ", optsTransfer.cntNodesShouldPass );
+            }
             optsTransfer.details.exposeDetailsTo(
                 log, optsTransfer.strGatheredDetailsName, false );
             imaTransferErrorHandling.saveTransferError(
@@ -930,22 +963,22 @@ async function doMainTransferLoopActions( optsTransfer ) {
     optsTransfer.nIdxCurrentMsg = optsTransfer.nIncMsgCnt;
     while( optsTransfer.nIdxCurrentMsg < optsTransfer.nOutMsgCnt ) {
         if( optsTransfer.nStepsDone > optsTransfer.nTransferSteps ) {
-            const strWarning = optsTransfer.strLogPrefix + cc.error( "WARNING:" ) + " " +
-                cc.warning( "Transfer step count overflow" );
-            optsTransfer.details.warning( strWarning );
-            if( log.id != optsTransfer.details.id )
-                log.warning( strWarning );
+            optsTransfer.details.warning( optsTransfer.strLogPrefix,
+                "Transfer step count overflow" );
+            if( log.id != optsTransfer.details.id ) {
+                log.warning( optsTransfer.strLogPrefix,
+                    "Transfer step count overflow" );
+            }
             optsTransfer.details.close();
             imaTransferErrorHandling.saveTransferSuccessAll();
             return false;
         }
-        optsTransfer.details.trace(
-            optsTransfer.strLogPrefix, "Entering block former iteration with ",
-            cc.notice( "message counter" ), " set to ",
-            cc.info( optsTransfer.nIdxCurrentMsg ), ", transfer step number is ",
-            cc.info( optsTransfer.nStepsDone ), ", can transfer up to ",
-            cc.info( optsTransfer.nMaxTransactionsCount ), " message(s) per step",
-            ", can perform up to ", cc.info( optsTransfer.nTransferSteps ),
+        optsTransfer.details.trace( optsTransfer.strLogPrefix,
+            "Entering block former iteration with message counter set to ",
+            cc.j( optsTransfer.nIdxCurrentMsg ), ", transfer step number is ",
+            cc.j( optsTransfer.nStepsDone ), ", can transfer up to ",
+            cc.j( optsTransfer.nMaxTransactionsCount ), " message(s) per step",
+            ", can perform up to ", cc.j( optsTransfer.nTransferSteps ),
             " transfer step(s)" );
         if( ! loop.checkTimeFraming(
             null, optsTransfer.strDirection, optsTransfer.joRuntimeOpts ) ) {
@@ -965,11 +998,12 @@ async function doMainTransferLoopActions( optsTransfer ) {
         if( ! loop.checkTimeFraming(
             null, optsTransfer.strDirection, optsTransfer.joRuntimeOpts )
         ) {
-            const strWarning = optsTransfer.strLogPrefix + cc.error( "WARNING:" ) + " " +
-                cc.warning( "Time framing overflow (after forming block of messages)" );
-            optsTransfer.details.warning( strWarning );
-            if( log.id != optsTransfer.details.id )
-                log.warning( strWarning );
+            optsTransfer.details.warning( optsTransfer.strLogPrefix,
+                "Time framing overflow (after forming block of messages)" );
+            if( log.id != optsTransfer.details.id ) {
+                log.warning( optsTransfer.strLogPrefix,
+                    "Time framing overflow (after forming block of messages)" );
+            }
             optsTransfer.details.close();
             imaTransferErrorHandling.saveTransferSuccessAll();
             return false;
@@ -1067,14 +1101,16 @@ async function doMainTransferLoopActions( optsTransfer ) {
             if( ! ( await handleAllMessagesSigning( optsTransfer ) ) )
                 return false;
         } catch ( err ) {
-            const strError =
-                optsTransfer.strLogPrefix +
-                cc.error( "Exception from signing messages function: " ) +
-                cc.warning( owaspUtils.extractErrorMessage( err ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) );
-            optsTransfer.details.critical( strError );
-            if( log.id != optsTransfer.details.id )
-                log.critical( strError );
+            optsTransfer.details.critical( optsTransfer.strLogPrefix,
+                "Exception from signing messages function: ",
+                cc.warning( owaspUtils.extractErrorMessage( err ) ),
+                ", stack is: ", "\n", cc.stack( err.stack ) );
+            if( log.id != optsTransfer.details.id ) {
+                log.critical( optsTransfer.strLogPrefix,
+                    "Exception from signing messages function: ",
+                    cc.warning( owaspUtils.extractErrorMessage( err ) ),
+                    ", stack is: ", "\n", cc.stack( err.stack ) );
+            }
         }
         if( optsTransfer.bErrorInSigningMessages )
             break;
@@ -1181,11 +1217,10 @@ export async function doTransfer(
                 joExtraSignOpts, fnAfter
             ) {
                 optsTransfer.details.debug( optsTransfer.strLogPrefix,
-                    "Message signing callback was ", cc.error( "not provided" ),
-                    " to IMA, first real message index is:",
-                    cc.info( nIdxCurrentMsgBlockStart ), ", have ",
-                    cc.info( optsTransfer.jarrMessages.length ),
-                    " message(s) to process ", cc.j( optsTransfer.jarrMessages ) );
+                    "Message signing callback was not provided to IMA, " +
+                    "first real message index is:", cc.j( nIdxCurrentMsgBlockStart ), ", have ",
+                    cc.j( optsTransfer.jarrMessages.length ), " message(s) to process ",
+                    cc.j( optsTransfer.jarrMessages ) );
                 await fnAfter( null, jarrMessages, null ); // null - no error, null - no signatures
             };
         } else {
@@ -1212,14 +1247,18 @@ export async function doTransfer(
                 return false;
             }
         } catch ( err ) {
-            const strError = optsTransfer.strLogPrefix +
-                cc.error( "Error in " ) + optsTransfer.strGatheredDetailsName_colored +
-                cc.error( " during " + optsTransfer.strActionName + ": " ) +
+            optsTransfer.details.critical( optsTransfer.strLogPrefix,
+                "Error in ", optsTransfer.strGatheredDetailsName_colored,
+                " during ", optsTransfer.strActionName, ": ",
                 cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
-            optsTransfer.details.critical( strError );
-            if( log.id != optsTransfer.details.id )
-                log.critical( strError );
+                ", stack is: ", "\n", cc.stack( err.stack ) );
+            if( log.id != optsTransfer.details.id ) {
+                log.critical( optsTransfer.strLogPrefix,
+                    "Error in ", optsTransfer.strGatheredDetailsName_colored,
+                    " during ", optsTransfer.strActionName, ": ",
+                    cc.warning( owaspUtils.extractErrorMessage( err ) ) +
+                    ", stack is: ", "\n", cc.stack( err.stack ) );
+            }
             optsTransfer.details.exposeDetailsTo( log,
                 optsTransfer.strGatheredDetailsName, false );
             imaTransferErrorHandling.saveTransferError(

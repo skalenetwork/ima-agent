@@ -314,10 +314,9 @@ export async function doCall( joCall, joIn, fn ) {
                         ? joCall.joRpcOptions.key : null
                 } );
                 const body = response.data.toString( "utf8" );
-                if( response && response.statusCode && response.statusCode !== 200 ) {
-                    log.warning( cc.error( "WARNING:" ), " REST call status code is ",
-                        cc.info( response.statusCode ) );
-                }
+                if( response && response.statusCode && response.statusCode !== 200 )
+                    log.warning( " REST call status code is ", cc.j( response.statusCode ) );
+
                 joOut = JSON.parse( body );
                 errCall = null;
             } catch ( err ) {

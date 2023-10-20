@@ -48,12 +48,12 @@ export async function invokeHasChain(
         return bHasSchain;
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
-        const s = strLogPrefix +
-            cc.error( "Error in invokeHasChain() during " + strActionName + ": " ) +
-            cc.warning( strError ) + cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
-        if( log.id != details.id )
-            log.critical( s );
-        details.critical( s );
+        if( log.id != details.id ) {
+            log.critical( strLogPrefix, "Error in invokeHasChain() during ", strActionName, ": ",
+                cc.warning( strError ), ", stack is: ", "\n", cc.stack( err.stack ) );
+        }
+        details.critical( strLogPrefix, "Error in invokeHasChain() during ", strActionName, ": ",
+            cc.warning( strError ), ", stack is: ", "\n", cc.stack( err.stack ) );
     }
     return false;
 }
@@ -113,14 +113,16 @@ export async function checkIsRegisteredSChainInDepositBoxes( // step 1
         return bIsRegistered;
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
-        const s = strLogPrefix +
-            cc.error(
-                "Error in checkIsRegisteredSChainInDepositBoxes(reg-step1)() during " +
-            strActionName + ": " ) + cc.warning( strError ) + cc.error( ", stack is: " ) +
-            "\n" + cc.stack( err.stack );
-        if( log.id != details.id )
-            log.critical( s );
-        details.critical( s );
+        if( log.id != details.id ) {
+            log.critical( strLogPrefix,
+                "Error in checkIsRegisteredSChainInDepositBoxes(reg-step1)() during ",
+                strActionName, ": ", cc.warning( strError ),
+                ", stack is: ", "\n", cc.stack( err.stack ) );
+        }
+        details.critical( strLogPrefix,
+            "Error in checkIsRegisteredSChainInDepositBoxes(reg-step1)() during ",
+            strActionName, ": ", cc.warning( strError ),
+            ", stack is: ", "\n", cc.stack( err.stack ) );
         details.exposeDetailsTo( log, "checkIsRegisteredSChainInDepositBoxes", false );
         details.close();
     }
@@ -212,12 +214,14 @@ export async function registerSChainInDepositBoxes( // step 1
             throw new Error( "S-Chain ownership status check timeout" );
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
-        const s = strLogPrefix +
-            cc.error( "Error in registerSChainInDepositBoxes() during " + strActionName + ": " ) +
-            cc.warning( strError ) + cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack );
-        if( log.id != details.id )
-            log.critical( s );
-        details.critical( s );
+        if( log.id != details.id ) {
+            log.critical( strLogPrefix, "Error in registerSChainInDepositBoxes() during ",
+                strActionName, ": ", cc.warning( strError ),
+                ", stack is: ", "\n", cc.stack( err.stack ) );
+        }
+        details.critical( strLogPrefix, "Error in registerSChainInDepositBoxes() during ",
+            strActionName, ": ", cc.warning( strError ),
+            ", stack is: ", "\n", cc.stack( err.stack ) );
         details.exposeDetailsTo( log, "registerSChainInDepositBoxes", false );
         details.close();
         return null;

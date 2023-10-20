@@ -901,8 +901,8 @@ async function prepareSignMessagesImpl( optsSignOperation ) {
     ) ) {
         optsSignOperation.bHaveResultReportCalled = true;
         optsSignOperation.details.debug( optsSignOperation.strLogPrefix,
-            "BLS message signing is ", cc.error( "turned off" ),
-            ", first real message index is: ", optsSignOperation.nIdxCurrentMsgBlockStart,
+            "BLS message signing is turned off, first real message index is: ",
+            optsSignOperation.nIdxCurrentMsgBlockStart,
             ", have ", optsSignOperation.jarrMessages.length, " message(s) to process ",
             cc.j( optsSignOperation.jarrMessages ) );
         optsSignOperation.details.exposeDetailsTo(
@@ -1594,12 +1594,12 @@ async function doSignMessagesImpl(
                 optsSignOperation.jarrMessages,
                 null
             ).catch( ( err ) => {
-                const strErrorMessage =
-                    cc.error( "Failed BLS sign due to error-reporting callback exception: " ) +
-                    cc.warning( owaspUtils.extractErrorMessage( err ) );
-                log.critical( strErrorMessage );
+                log.critical( "Failed BLS sign due to error-reporting callback exception: ",
+                    cc.warning( owaspUtils.extractErrorMessage( err ) ) );
                 if( optsSignOperation.details ) {
-                    optsSignOperation.details.critical( strErrorMessage );
+                    optsSignOperation.details.critical(
+                        "Failed BLS sign due to error-reporting callback exception: ",
+                        cc.warning( owaspUtils.extractErrorMessage( err ) ) );
                     optsSignOperation.details.exposeDetailsTo(
                         log, optsSignOperation.strGatheredDetailsName, false );
                     optsSignOperation.details.close();
@@ -2048,8 +2048,8 @@ export async function doSignU256( u256, details, fn ) {
         optsSignU256.imaState.strPathBlsGlue.length > 0 &&
         optsSignU256.imaState.joSChainNetworkInfo
     ) ) {
-        optsSignU256.details.information( optsSignU256.strLogPrefix,
-            "BLS u256 signing is ", cc.error( "unavailable" ) );
+        optsSignU256.details.warning( optsSignU256.strLogPrefix,
+            "BLS u256 signing is unavailable" );
         await optsSignU256.fn( "BLS u256 signing is unavailable", optsSignU256.u256, null );
         return;
     }
@@ -2210,7 +2210,7 @@ export async function doSignReadyHash( strMessageHash, isExposeOutput ) {
                 "key": fs.readFileSync( joAccount.strPathSslKey, "utf8" )
             };
         } else
-            details.warning( "Will sign via SGX ", cc.error( "without SSL options" ) );
+            details.warning( "Will sign via SGX without SSL options" );
 
         const signerIndex = imaState.nNodeNumber;
         await rpcCall.create( joAccount.strSgxURL, rpcCallOpts, async function( joCall, err ) {
@@ -2472,10 +2472,8 @@ export async function handleSkaleImaVerifyAndSign( joCallData ) {
                 "cert": fs.readFileSync( joAccount.strPathSslCert, "utf8" ),
                 "key": fs.readFileSync( joAccount.strPathSslKey, "utf8" )
             };
-        } else {
-            optsHandleVerifyAndSign.details.warning( "Will sign via SGX ",
-                cc.error( "without SSL options" ) );
-        }
+        } else
+            optsHandleVerifyAndSign.details.warning( "Will sign via SGX without SSL options" );
         const signerIndex = optsHandleVerifyAndSign.imaState.nNodeNumber;
         await rpcCall.create( joAccount.strSgxURL, rpcCallOpts, async function( joCall, err ) {
             if( err ) {
@@ -2659,10 +2657,8 @@ export async function handleSkaleImaBSU256( joCallData ) {
                 "cert": fs.readFileSync( optsBSU256.joAccount.strPathSslCert, "utf8" ),
                 "key": fs.readFileSync( optsBSU256.joAccount.strPathSslKey, "utf8" )
             };
-        } else {
-            optsBSU256.details.warning( "Will sign via SGX ",
-                cc.error( "without SSL options" ) );
-        }
+        } else
+            optsBSU256.details.warning( "Will sign via SGX without SSL options" );
         const signerIndex = optsBSU256.imaState.nNodeNumber;
         await rpcCall.create( optsBSU256.joAccount.strSgxURL, rpcCallOpts,
             async function( joCall, err ) {
