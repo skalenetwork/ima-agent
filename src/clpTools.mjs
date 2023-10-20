@@ -102,8 +102,7 @@ export async function registerStep1( isPrintSummaryRegistrationCosts ) {
         clpTools.printSummaryRegistrationCosts();
     if( !bSuccess ) {
         const nRetCode = 163;
-        log.fatal( strLogPrefix, cc.fatal( "FATAL, CRITICAL ERROR:" ),
-            " failed to register S-Chain in deposit box, will return code ",
+        log.fatal( strLogPrefix, "failed to register S-Chain in deposit box, will return code ",
             cc.warning( nRetCode ) );
         process.exit( nRetCode );
     }
@@ -1213,8 +1212,7 @@ export function commandLineTaskPaymentS2S() {
             // ETH payment
             log.information( "one S->S single ETH payment: ",
                 cc.sunny( imaState.nAmountOfWei ) );
-            lop.fatal( cc.fatal( "CRITICAL ERROR:" ),
-                " S->S ETH payment(s) are neither supported nor allowed" );
+            lop.fatal( "S->S ETH payment(s) are neither supported nor allowed" );
             process.exit( 154 );
         }
     } );
@@ -1474,7 +1472,7 @@ export function commandLineTaskBrowseSChain() {
         "fn": async function() {
             const strLogPrefix = cc.info( "S-Chain Browse:" ) + " ";
             if( imaState.chainProperties.sc.strURL.length === 0 ) {
-                log.fatal( cc.fatal( "CRITICAL ERROR:" ), " missing S-Chain URL, please specify ",
+                log.fatal( " missing S-Chain URL, please specify ",
                     cc.info( "url-s-chain" ) );
                 process.exit( 155 );
             }
@@ -1485,8 +1483,7 @@ export function commandLineTaskBrowseSChain() {
                 rpcCallOpts,
                 async function( joCall, err ) {
                     if( err ) {
-                        log.fatal( cc.fatal( "CRITICAL ERROR:" ),
-                            " JSON RPC call to S-Chain failed" );
+                        log.fatal( "JSON RPC call to S-Chain failed" );
                         if( joCall )
                             await joCall.disconnect();
                         process.exit( 156 );
@@ -1500,8 +1497,7 @@ export function commandLineTaskBrowseSChain() {
                     await joCall.call( joDataIn, async function( joIn, joOut, err ) {
                         if( err ) {
                             const strError = owaspUtils.extractErrorMessage( err );
-                            log.fatal( cc.fatal( "CRITICAL ERROR:" ),
-                                " JSON RPC call to S-Chain failed, error: ",
+                            log.fatal( "JSON RPC call to S-Chain failed, error: ",
                                 cc.warning( strError ) );
                             await joCall.disconnect();
                             process.exit( 157 );
@@ -1524,8 +1520,7 @@ export function commandLineTaskBrowseSChain() {
                                 rpcCallOpts,
                                 async function( joCall, err ) {
                                     if( err ) {
-                                        log.fatal( cc.fatal( "CRITICAL ERROR:" ),
-                                            " JSON RPC call to S-Chain failed" );
+                                        log.fatal( "JSON RPC call to S-Chain failed" );
                                         await joCall.disconnect();
                                         process.exit( 158 );
                                     }
@@ -1540,8 +1535,7 @@ export function commandLineTaskBrowseSChain() {
                                         ++ nCountReceivedImaDescriptions;
                                         if( err ) {
                                             const strError = owaspUtils.extractErrorMessage( err );
-                                            log.fatal( cc.fatal( "CRITICAL ERROR:" ),
-                                                " JSON RPC call to S-Chain failed,error: ",
+                                            log.fatal( "JSON RPC call to S-Chain failed,error: ",
                                                 cc.warning( strError ) );
                                             process.exit( 159 );
                                         }
@@ -1573,8 +1567,7 @@ export function commandLineTaskBrowseSkaleNetwork() {
         "fn": async function() {
             const strLogPrefix = cc.info( "SKALE NETWORK Browse:" ) + " ";
             if( imaState.strPathAbiJsonSkaleManager.length === 0 ) {
-                log.fatal( cc.fatal( "CRITICAL ERROR:" ),
-                    " missing Skale Manager ABI, please specify ",
+                log.fatal( "Missing Skale Manager ABI, please specify ",
                     cc.info( "abi-skale-manager" ) );
                 process.exit( 160 );
             }
@@ -1601,8 +1594,7 @@ export function commandLineTaskBrowseConnectedSChains() {
         "fn": async function() {
             const strLogPrefix = cc.info( "Browse connected S-Chains:" ) + " ";
             if( imaState.strPathAbiJsonSkaleManager.length === 0 ) {
-                log.fatal( cc.fatal( "CRITICAL ERROR:" ),
-                    " missing Skale Manager ABI, please specify ",
+                log.fatal( "Missing Skale Manager ABI, please specify ",
                     cc.info( "abi-skale-manager" ) );
                 process.exit( 161 );
             }
@@ -1667,8 +1659,7 @@ export function commandLineTaskDiscoverChainId() {
                 } );
             }
             if( arrURLsToDiscover.length === 0 ) {
-                log.fatal( cc.fatal( "CRITICAL ERROR:" ),
-                    " no URLs provided to discover chain IDs, please specify ",
+                log.fatal( "No URLs provided to discover chain IDs, please specify ",
                     cc.warning( "--url-main-net" )," and/or ", cc.warning( "--url-s-chain" ),
                     " and/or ", cc.warning( "--url-t-chain" ), "." );
                 process.exit( 162 );

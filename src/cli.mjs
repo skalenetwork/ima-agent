@@ -851,7 +851,7 @@ function printHelpAction( soi ) {
     console.log( cc.sunny( "ACTION" ) + cc.info( " commands:" ) );
     console.log( soi + cc.debug( "--" ) +
         cc.bright( "show-config" ), "..........................",
-    cc.notice( "Show " ) + cc.note( "configuration alues" ) +
+    cc.notice( "Show " ) + cc.note( "configuration values" ) +
         cc.notice( " and exit." ) );
     console.log( soi + cc.debug( "--" ) +
         cc.bright( "show-balance" ), ".........................",
@@ -2535,7 +2535,7 @@ export function parse( joExternalHandlers, argv ) {
             joExternalHandlers[joArg.name]();
             continue;
         }
-        console.log( cc.fatal( "CRITICAL ERROR:" ) +
+        console.log( cc.fatal( "COMMAND LINE PARSER ERROR:" ) +
             cc.error( " unknown command line argument " ) + cc.info( joArg.name ) );
         return 666;
     }
@@ -2559,7 +2559,7 @@ async function asyncCheckUrlAtStartup( u, name ) {
         }
         return isOnLine;
     } catch ( err ) {
-        details.error( cc.fatal( "ERROR:" ), " Failed to check URL ", cc.u( u ),
+        details.error( "Failed to check URL ", cc.u( u ),
             " connectivity for ", cc.info( name ), " at start-up, error is: ",
             cc.warning( owaspUtils.extractErrorMessage( err ) ),
             ", stack is: ", "\n", cc.stack( err.stack ) );
@@ -2923,14 +2923,12 @@ function commonInitCheckErc20() {
                     }
                 }
             } else {
-                if( n1 === 0 ) {
-                    log.error( cc.fatal( "FATAL, CRITICAL ERROR:" ),
-                        " Main-net ERC20 token name is not discovered(malformed JSON)" );
-                }
-                if( n2 === 0 && imaState.chainProperties.sc.strPathJsonErc20.length > 0 ) {
-                    log.error( cc.fatal( "FATAL, CRITICAL ERROR:" ),
-                        " S-Chain ERC20 token name is not discovered(malformed JSON)" );
-                }
+                if( n1 === 0 )
+                    log.error( " Main-net ERC20 token name is not discovered(malformed JSON)" );
+
+                if( n2 === 0 && imaState.chainProperties.sc.strPathJsonErc20.length > 0 )
+                    log.error( " S-Chain ERC20 token name is not discovered(malformed JSON)" );
+
                 imaState.chainProperties.mn.joErc20 = null;
                 imaState.chainProperties.sc.joErc20 = null;
                 imaState.chainProperties.tc.strCoinNameErc20 = "";
@@ -2938,14 +2936,10 @@ function commonInitCheckErc20() {
                 process.exit( 126 );
             }
         } else {
-            if( n1 === 0 ) {
-                log.error( cc.fatal( "FATAL, CRITICAL ERROR:" ),
-                    " Main-net ERC20 JSON is invalid" );
-            }
-            if( n2 === 0 && imaState.chainProperties.sc.strPathJsonErc20.length > 0 ) {
-                log.error( cc.fatal( "FATAL, CRITICAL ERROR:" ),
-                    " S-Chain ERC20 JSON is invalid" );
-            }
+            if( n1 === 0 )
+                log.error( "Main-net ERC20 JSON is invalid" );
+            if( n2 === 0 && imaState.chainProperties.sc.strPathJsonErc20.length > 0 )
+                log.error( "S-Chain ERC20 JSON is invalid" );
             imaState.chainProperties.mn.joErc20 = null;
             imaState.chainProperties.sc.joErc20 = null;
             imaState.chainProperties.tc.strCoinNameErc20 = "";
@@ -2974,8 +2968,8 @@ function commonInitCheckErc20() {
                     }
                 } else {
                     if( n2 === 0 && imaState.chainProperties.sc.strPathJsonErc20.length > 0 ) {
-                        log.error( cc.fatal( "FATAL, CRITICAL ERROR:" ),
-                            " S-Chain ERC20 token name is not discovered(malformed JSON)" );
+                        log.error(
+                            "S-Chain ERC20 token name is not discovered(malformed JSON)" );
                     }
                     imaState.chainProperties.mn.joErc20 = null;
                     imaState.chainProperties.sc.joErc20 = null;
@@ -2988,8 +2982,8 @@ function commonInitCheckErc20() {
     }
     if( n1 !== 0 && n2 === 0 ) {
         if( imaState.strAddrErc20Explicit.length === 0 ) {
-            log.warning( cc.error( "IMPORTANT NOTICE:" ),
-                " Both S-Chain ERC20 JSON and explicit  ERC20 address are not specified" );
+            log.warning( "IMPORTANT NOTICE: Both S-Chain ERC20 JSON and explicit " +
+                "ERC20 address are not specified" );
         } else {
             if( isPrintGathered )
                 log.attention( "IMPORTANT NOTICE: S-Chain ERC20 ABI will be auto-generated" );
@@ -3022,8 +3016,7 @@ function commonInitCheckErc20() {
                 }
             } else {
                 if( n2 === 0 && imaState.chainProperties.tc.strPathJsonErc20.length > 0 ) {
-                    log.fatal( cc.fatal( "FATAL, CRITICAL ERROR:" ),
-                        " S<->S Target S-Chain ERC20 token name ",
+                    log.fatal( " S<->S Target S-Chain ERC20 token name ",
                         "is not discovered(malformed JSON)" );
                 }
                 imaState.chainProperties.tc.joErc20 = null;
@@ -3037,8 +3030,8 @@ function commonInitCheckErc20() {
         imaState.chainProperties.tc.strCoinNameErc20.length === 0 &&
         imaState.chainProperties.sc.strCoinNameErc20.length > 0
     ) {
-        log.warning( cc.error( "IMPORTANT NOTICE:" ),
-            " Both S<->S Target S-Chain ERC20 JSON and explicit ERC20 address are not specified" );
+        log.warning( "IMPORTANT NOTICE: Both S<->S Target S-Chain ERC20 JSON and explicit " +
+            "ERC20 address are not specified" );
     }
 }
 
@@ -3087,12 +3080,12 @@ function commonInitCheckErc721() {
                 }
             } else {
                 if( n1 === 0 ) {
-                    log.fatal( cc.fatal( "FATAL, CRITICAL ERROR:" ),
-                        " Main-net ERC721 token name  is not discovered(malformed JSON)" );
+                    log.fatal(
+                        "Main-net ERC721 token name  is not discovered(malformed JSON)" );
                 }
                 if( n2 === 0 && imaState.chainProperties.sc.strPathJsonErc721.length > 0 ) {
-                    log.fatal( cc.fatal( "FATAL, CRITICAL ERROR:" ),
-                        " S-Chain ERC721 token name is not discovered(malformed JSON)" );
+                    log.fatal(
+                        "S-Chain ERC721 token name is not discovered(malformed JSON)" );
                 }
                 imaState.chainProperties.mn.joErc721 = null;
                 imaState.chainProperties.sc.joErc721 = null;
@@ -3101,14 +3094,12 @@ function commonInitCheckErc721() {
                 process.exit( 126 );
             }
         } else {
-            if( n1 === 0 ) {
-                log.fatal( cc.fatal( "FATAL, CRITICAL ERROR:" ),
-                    " Main-net ERC721 JSON is invalid" );
-            }
-            if( n2 === 0 && imaState.chainProperties.sc.strPathJsonErc721.length > 0 ) {
-                log.fatal( cc.fatal( "FATAL, CRITICAL ERROR:" ),
-                    " S-Chain ERC721 JSON is invalid" );
-            }
+            if( n1 === 0 )
+                log.fatal( "Main-net ERC721 JSON is invalid" );
+
+            if( n2 === 0 && imaState.chainProperties.sc.strPathJsonErc721.length > 0 )
+                log.fatal( "S-Chain ERC721 JSON is invalid" );
+
             imaState.chainProperties.mn.joErc721 = null;
             imaState.chainProperties.sc.joErc721 = null;
             imaState.chainProperties.mn.strCoinNameErc721 = "";
@@ -3137,8 +3128,8 @@ function commonInitCheckErc721() {
                             cc.attention( imaState.chainProperties.sc.strCoinNameErc721 ) );
                     } else {
                         if( n2 === 0 && imaState.chainProperties.sc.strPathJsonErc721.length > 0 ) {
-                            log.fatal( cc.fatal( "FATAL, CRITICAL ERROR:" ),
-                                " S-Chain ERC721 token name is not discovered(malformed JSON)" );
+                            log.fatal(
+                                "S-Chain ERC721 token name is not discovered(malformed JSON)" );
                         }
                         imaState.chainProperties.mn.joErc721 = null;
                         imaState.chainProperties.sc.joErc721 = null;
@@ -3153,8 +3144,8 @@ function commonInitCheckErc721() {
     if( n1 !== 0 && n2 === 0 ) {
         if( imaState.strAddrErc721Explicit.length === 0 ) {
             if( isPrintGathered ) {
-                log.warning( cc.error( "IMPORTANT NOTICE:" ),
-                    " Both S-Chain ERC721 JSON and explicit ERC721 address are not specified" );
+                log.warning( "IMPORTANT NOTICE: Both S-Chain ERC721 JSON and explicit " +
+                    "ERC721 address are not specified" );
             }
         } else {
             if( isPrintGathered )
@@ -3189,8 +3180,7 @@ function commonInitCheckErc721() {
                     imaState.chainProperties.tc.strPathJsonErc721.length > 0 &&
                     isPrintGathered
                 ) {
-                    log.fatal( cc.fatal( "FATAL, CRITICAL ERROR:" ),
-                        " S<->S Target S-Chain ERC721 token name ",
+                    log.fatal( "S<->S Target S-Chain ERC721 token name ",
                         "is not discovered(malformed JSON)" );
                 }
                 imaState.chainProperties.tc.joErc721 = null;
@@ -3204,8 +3194,8 @@ function commonInitCheckErc721() {
         imaState.chainProperties.tc.strCoinNameErc721.length === 0 &&
         imaState.chainProperties.sc.strCoinNameErc721.length > 0
     ) {
-        log.warning( cc.error( "IMPORTANT NOTICE:" ),
-            " Both S<->S Target S-Chain ERC721 JSON and ",
+        log.warning(
+            "IMPORTANT NOTICE: Both S<->S Target S-Chain ERC721 JSON and ",
             "explicit ERC721 address are not specified" );
     }
 }
@@ -3255,11 +3245,11 @@ function commonInitCheckErc1155() {
                 }
             } else {
                 if( n1 === 0 ) {
-                    log.fatal( cc.fatal( "FATAL, CRITICAL ERROR:" ),
+                    log.fatal(
                         " Main-net ERC1155 token name  is not discovered(malformed JSON)" );
                 }
                 if( n2 === 0 && imaState.chainProperties.sc.strPathJsonErc1155.length > 0 ) {
-                    log.fatal( cc.fatal( "FATAL, CRITICAL ERROR:" ),
+                    log.fatal(
                         " S-Chain ERC1155 token name is not discovered(malformed JSON)" );
                 }
                 imaState.chainProperties.mn.joErc1155 = null;
@@ -3269,14 +3259,11 @@ function commonInitCheckErc1155() {
                 process.exit( 126 );
             }
         } else {
-            if( n1 === 0 ) {
-                log.fatal( cc.fatal( "FATAL, CRITICAL ERROR:" ),
-                    " Main-net ERC1155 JSON is invalid" );
-            }
-            if( n2 === 0 && imaState.chainProperties.sc.strPathJsonErc1155.length > 0 ) {
-                log.fatal( cc.fatal( "FATAL, CRITICAL ERROR:" ),
-                    " S-Chain ERC1155 JSON is invalid" );
-            }
+            if( n1 === 0 )
+                log.fatal( "Main-net ERC1155 JSON is invalid" );
+            if( n2 === 0 && imaState.chainProperties.sc.strPathJsonErc1155.length > 0 )
+                log.fatal( "S-Chain ERC1155 JSON is invalid" );
+
             imaState.chainProperties.mn.joErc1155 = null;
             imaState.chainProperties.sc.joErc1155 = null;
             imaState.chainProperties.mn.strCoinNameErc1155 = "";
@@ -3306,7 +3293,7 @@ function commonInitCheckErc1155() {
                     }
                 } else {
                     if( n2 === 0 && imaState.chainProperties.sc.strPathJsonErc1155.length > 0 ) {
-                        log.fatal( cc.fatal( "FATAL, CRITICAL ERROR:" ),
+                        log.fatal(
                             " S-Chain ERC1155 token name  is not discovered(malformed JSON)" );
                     }
                     imaState.chainProperties.mn.joErc1155 = null;
@@ -3321,8 +3308,8 @@ function commonInitCheckErc1155() {
     if( n1 !== 0 && n2 === 0 ) {
         if( imaState.strAddrErc1155Explicit.length === 0 ) {
             if( isPrintGathered ) {
-                log.warning( cc.error( "IMPORTANT NOTICE:" ),
-                    " Both S-Chain ERC1155 JSON and  explicit ERC1155 address are not specified" );
+                log.warning( "IMPORTANT NOTICE: Both S-Chain ERC1155 JSON and " +
+                    "explicit ERC1155 address are not specified" );
             }
         } else {
             if( isPrintGathered )
@@ -3359,8 +3346,7 @@ function commonInitCheckErc1155() {
                     imaState.chainProperties.tc.strPathJsonErc1155.length > 0 &&
                     isPrintGathered
                 ) {
-                    log.fatal( cc.fatal( "FATAL, CRITICAL ERROR:" ),
-                        " S<->S Target S-Chain ERC1155 token name ",
+                    log.fatal( " S<->S Target S-Chain ERC1155 token name ",
                         "is not discovered(malformed JSON)" );
                 }
                 imaState.chainProperties.tc.joErc1155 = null;
@@ -3374,8 +3360,8 @@ function commonInitCheckErc1155() {
         imaState.chainProperties.tc.strCoinNameErc1155.length === 0 &&
         imaState.chainProperties.sc.strCoinNameErc1155.length > 0
     ) {
-        log.warning( cc.error( "IMPORTANT NOTICE:" ),
-            "Both S<->S Target S-Chain ERC1155 JSON and ",
+        log.warning(
+            "IMPORTANT NOTICE: Both S<->S Target S-Chain ERC1155 JSON and ",
             "explicit ERC1155 address are not specified" );
     }
 }

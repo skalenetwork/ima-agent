@@ -335,52 +335,76 @@ class ObserverServer extends SocketServer {
     }
     initLogMethods() {
         self.fatal = function() {
-            if( log.verboseGet() >= log.verboseReversed().fatal )
-                self.log( formatArgs( arguments, cc.error ) + "\n" );
+            if( log.verboseGet() >= log.verboseReversed().fatal ) {
+                self.log( log.getLogLinePrefixFatal() +
+                formatArgs( arguments, cc.error ) + "\n" );
+            }
         };
         self.critical = function() {
-            if( log.verboseGet() >= log.verboseReversed().critical )
-                self.log( formatArgs( arguments, cc.error ) + "\n" );
+            if( log.verboseGet() >= log.verboseReversed().critical ) {
+                self.log( log.getLogLinePrefixCritical() +
+                formatArgs( arguments, cc.error ) + "\n" );
+            }
         };
         self.error = function() {
-            if( log.verboseGet() >= log.verboseReversed().error )
-                self.log( formatArgs( arguments, cc.error ) + "\n" );
+            if( log.verboseGet() >= log.verboseReversed().error ) {
+                self.log( log.getLogLinePrefixError() +
+                formatArgs( arguments, cc.error ) + "\n" );
+            }
         };
         self.warning = function() {
-            if( log.verboseGet() >= log.verboseReversed().warning )
-                self.log( formatArgs( arguments, cc.warning ) + "\n" );
+            if( log.verboseGet() >= log.verboseReversed().warning ) {
+                self.log( log.getLogLinePrefixWarning() +
+                formatArgs( arguments, cc.warning ) + "\n" );
+            }
         };
         self.attention = function() {
-            if( log.verboseGet() >= log.verboseReversed().attention )
-                self.log( formatArgs( arguments, cc.attention ) + "\n" );
+            if( log.verboseGet() >= log.verboseReversed().attention ) {
+                self.log( log.getLogLinePrefixAttention() +
+                formatArgs( arguments, cc.attention ) + "\n" );
+            }
         };
         self.information = function() {
-            if( log.verboseGet() >= log.verboseReversed().information )
-                self.log( formatArgs( arguments, cc.info ) + "\n" );
+            if( log.verboseGet() >= log.verboseReversed().information ) {
+                self.log( log.getLogLinePrefixInformation() +
+                formatArgs( arguments, cc.info ) + "\n" );
+            }
         };
         self.info = function() {
-            if( log.verboseGet() >= log.verboseReversed().information )
-                self.log( formatArgs( arguments, cc.info ) + "\n" );
+            if( log.verboseGet() >= log.verboseReversed().information ) {
+                self.log( log.getLogLinePrefixInformation() +
+                formatArgs( arguments, cc.info ) + "\n" );
+            }
         };
         self.notice = function() {
-            if( log.verboseGet() >= log.verboseReversed().notice )
-                self.log( formatArgs( arguments, cc.notice ) + "\n" );
+            if( log.verboseGet() >= log.verboseReversed().notice ) {
+                self.log( log.getLogLinePrefixNotice() +
+                formatArgs( arguments, cc.notice ) + "\n" );
+            }
         };
         self.note = function() {
-            if( log.verboseGet() >= log.verboseReversed().notice )
-                self.log( formatArgs( arguments, cc.note ) + "\n" );
+            if( log.verboseGet() >= log.verboseReversed().notice ) {
+                self.log( log.getLogLinePrefixNote() +
+                formatArgs( arguments, cc.note ) + "\n" );
+            }
         };
         self.debug = function() {
-            if( log.verboseGet() >= log.verboseReversed().debug )
-                self.log( formatArgs( arguments, cc.debug ) + "\n" );
+            if( log.verboseGet() >= log.verboseReversed().debug ) {
+                self.log( log.getLogLinePrefixDebug() +
+                formatArgs( arguments, cc.debug ) + "\n" );
+            }
         };
         self.trace = function() {
-            if( log.verboseGet() >= log.verboseReversed().trace )
-                self.log( formatArgs( arguments, cc.trace ) + "\n" );
+            if( log.verboseGet() >= log.verboseReversed().trace ) {
+                self.log( log.getLogLinePrefixTrace() +
+                formatArgs( arguments, cc.trace ) + "\n" );
+            }
         };
         self.success = function() {
-            if( log.verboseGet() >= log.verboseReversed().information )
-                self.log( formatArgs( arguments, cc.success ) + "\n" );
+            if( log.verboseGet() >= log.verboseReversed().information ) {
+                self.log( log.getLogLinePrefixSuccess() +
+                formatArgs( arguments, cc.success ) + "\n" );
+            }
         };
     }
 };

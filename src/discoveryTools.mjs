@@ -41,8 +41,7 @@ export function initialSkaleNetworkScanForS2S() {
         "fn": async function() {
             const strLogPrefix = cc.info( "SKALE network scan for S2S:" ) + " ";
             if( imaState.strPathAbiJsonSkaleManager.length === 0 ) {
-                log.fatal( cc.fatal( "CRITICAL ERROR:" ),
-                    " missing Skale Manager ABI, please specify ",
+                log.fatal( "Missing Skale Manager ABI, please specify ",
                     cc.info( "abi-skale-manager" ) );
                 process.exit( 153 );
             }
@@ -67,8 +66,7 @@ export function initialSkaleNetworkScanForS2S() {
                 log.success( strLogPrefix, "Done, did started periodic S-Chains caching." );
             } ).catch( function( err ) {
                 const strError = owaspUtils.extractErrorMessage( err );
-                log.error( cc.fatal( "CRITICAL ERROR:" ),
-                    " failed to start periodic S-Chains caching",
+                log.error( "Failed to start periodic S-Chains caching",
                     cc.warning( strError ) );
             } );
             return true;
@@ -198,8 +196,7 @@ export async function waitUntilSChainStarted() {
                         bSuccess = true;
                 }, isSilentReDiscovery, null, nCountToWait ).catch( ( err ) => {
                 const strError = owaspUtils.extractErrorMessage( err );
-                log.critical( cc.fatal( "CRITICAL ERROR:" ),
-                    " S-Chain network discovery failed: ", cc.warning( strError ) );
+                log.critical( "S-Chain network discovery failed: ", cc.warning( strError ) );
             } );
             if( ! joSChainNetworkInfo )
                 bSuccess = false;
@@ -356,8 +353,7 @@ export async function continueSChainDiscoveryInBackgroundIfNeeded( isSilentReDis
                 continueSChainDiscoveryInBackgroundIfNeeded( isSilentReDiscovery, null );
             }, isSilentReDiscovery, imaState.joSChainNetworkInfo, nCountToWait ).catch( ( err ) => {
                 const strError = owaspUtils.extractErrorMessage( err );
-                log.critical( cc.fatal( "CRITICAL ERROR:" ),
-                    " S-Chain network re-discovery failed: ", cc.warning( strError ) );
+                log.critical( "S-Chain network re-discovery failed: ", cc.warning( strError ) );
             } );
         } catch ( err ) { }
         gFlagIsInSChainDiscovery = false;
@@ -406,8 +402,8 @@ async function discoverSChainWalkNodes( optsDiscover ) {
                 async function( joCall, err ) {
                     if( err ) {
                         if( ! optsDiscover.isSilentReDiscovery ) {
-                            log.critical( optsDiscover.strLogPrefix, cc.fatal( "CRITICAL ERROR:" ),
-                                " JSON RPC call(creation) to S-Chain node ",
+                            log.critical( optsDiscover.strLogPrefix,
+                                "JSON RPC call(creation) to S-Chain node ",
                                 strNodeDescColorized, " failed" );
                         }
                         ++ optsDiscover.cntFailed;
@@ -426,8 +422,7 @@ async function discoverSChainWalkNodes( optsDiscover ) {
                             const strError = owaspUtils.extractErrorMessage( err );
                             if( ! optsDiscover.isSilentReDiscovery ) {
                                 log.critical( optsDiscover.strLogPrefix,
-                                    cc.fatal( "CRITICAL ERROR:" ),
-                                    " JSON RPC call(network) to S-Chain node ",
+                                    "JSON RPC call(network) to S-Chain node ",
                                     strNodeDescColorized, " failed, error: ",
                                     cc.warning( strError ) );
                             }
@@ -448,8 +443,8 @@ async function discoverSChainWalkNodes( optsDiscover ) {
         } catch ( err ) {
             if( ! optsDiscover.isSilentReDiscovery ) {
                 const strError = owaspUtils.extractErrorMessage( err );
-                log.critical( optsDiscover.strLogPrefix, cc.fatal( "CRITICAL ERROR:" ),
-                    " JSON RPC call(err) to S-Chain node ", strNodeDescColorized,
+                log.critical( optsDiscover.strLogPrefix,
+                    "JSON RPC call(err) to S-Chain node ", strNodeDescColorized,
                     " was not created: ", cc.warning( strError ), ", stack is: ", "\n",
                     cc.stack( err.stack ) );
             }
@@ -558,8 +553,7 @@ export async function discoverSChainNetwork(
                             const strError = owaspUtils.extractErrorMessage( err );
                             if( ! optsDiscover.isSilentReDiscovery ) {
                                 log.critical( optsDiscover.strLogPrefix,
-                                    cc.fatal( "CRITICAL ERROR:" ),
-                                    " JSON RPC call to (own) S-Chain ", cc.u( scURL ),
+                                    "JSON RPC call to (own) S-Chain ", cc.u( scURL ),
                                     " failed: ", cc.warning( strError ) );
                             }
                             optsDiscover.fnAfter( err, null );
@@ -579,8 +573,7 @@ export async function discoverSChainNetwork(
                                 if( ! optsDiscover.isSilentReDiscovery ) {
                                     const strError = owaspUtils.extractErrorMessage( err );
                                     log.critical( optsDiscover.strLogPrefix,
-                                        cc.fatal( "CRITICAL ERROR:" ),
-                                        " JSON RPC call to (own) S-Chain ", cc.u( scURL ),
+                                        "JSON RPC call to (own) S-Chain ", cc.u( scURL ),
                                         " failed, error: ", cc.warning( strError ) );
                                 }
                                 optsDiscover.fnAfter( err, null );
@@ -602,8 +595,7 @@ export async function discoverSChainNetwork(
                                     const err2 = new Error( "Got wrong response, " +
                                         "network information description was not detected" );
                                     log.critical( optsDiscover.strLogPrefix,
-                                        cc.fatal( "CRITICAL ERROR:" ),
-                                        " Network was not detected via call to ",
+                                        "Network was not detected via call to ",
                                         cc.u( scURL ), ": ", cc.warning( err2 ) );
                                 }
                                 optsDiscover.fnAfter( err2, null );
@@ -639,8 +631,7 @@ export async function discoverSChainNetwork(
                             if( optsDiscover.nCountAvailable < optsDiscover.nCountToWait ) {
                                 if( ! optsDiscover.isSilentReDiscovery ) {
                                     log.critical( optsDiscover.strLogPrefix,
-                                        cc.fatal( "CRITICAL ERROR:" ),
-                                        " Not enough nodes available on S-Chain, total ",
+                                        "Not enough nodes available on S-Chain, total ",
                                         optsDiscover.cntNodes, ", available ",
                                         optsDiscover.nCountAvailable, ", expected at least ",
                                         optsDiscover.nCountToWait );
@@ -664,8 +655,8 @@ export async function discoverSChainNetwork(
             } catch ( err ) {
                 if( ! optsDiscover.isSilentReDiscovery ) {
                     const strError = owaspUtils.extractErrorMessage( err );
-                    log.critical( optsDiscover.strLogPrefix, cc.fatal( "CRITICAL ERROR:" ),
-                        " JSON RPC call(discoverSChainNetwork) to S-Chain was not created: ",
+                    log.critical( optsDiscover.strLogPrefix,
+                        "JSON RPC call(discoverSChainNetwork) to S-Chain was not created: ",
                         cc.warning( strError ), ", stack is: ", "\n",
                         cc.stack( err.stack ) );
                 }

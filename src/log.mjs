@@ -131,52 +131,76 @@ export function createStandardOutputStream() {
             "exposeDetailsTo": function( otherStream, strTitle, isSuccess ) { },
             // high-level formatters
             "fatal": function() {
-                if( verboseGet() >= verboseReversed().fatal )
-                    this.write( formatArgs( arguments, cc.error ) + "\n" );
+                if( verboseGet() >= verboseReversed().fatal ) {
+                    this.write( getLogLinePrefixFatal() +
+                        formatArgs( arguments, cc.error ) + "\n" );
+                }
             },
             "critical": function() {
-                if( verboseGet() >= verboseReversed().critical )
-                    this.write( formatArgs( arguments, cc.error ) + "\n" );
+                if( verboseGet() >= verboseReversed().critical ) {
+                    this.write( getLogLinePrefixCritical() +
+                        formatArgs( arguments, cc.error ) + "\n" );
+                }
             },
             "error": function() {
-                if( verboseGet() >= verboseReversed().error )
-                    this.write( formatArgs( arguments, cc.error ) + "\n" );
+                if( verboseGet() >= verboseReversed().error ) {
+                    this.write( getLogLinePrefixError() +
+                        formatArgs( arguments, cc.error ) + "\n" );
+                }
             },
             "warning": function() {
-                if( verboseGet() >= verboseReversed().warning )
-                    this.write( formatArgs( arguments, cc.warning ) + "\n" );
+                if( verboseGet() >= verboseReversed().warning ) {
+                    this.write( getLogLinePrefixWarning() +
+                        formatArgs( arguments, cc.warning ) + "\n" );
+                }
             },
             "attention": function() {
-                if( verboseGet() >= verboseReversed().attention )
-                    this.write( formatArgs( arguments, cc.attention ) + "\n" );
+                if( verboseGet() >= verboseReversed().attention ) {
+                    this.write( getLogLinePrefixAttention() +
+                        formatArgs( arguments, cc.attention ) + "\n" );
+                }
             },
             "information": function() {
-                if( verboseGet() >= verboseReversed().information )
-                    this.write( formatArgs( arguments, cc.info ) + "\n" );
+                if( verboseGet() >= verboseReversed().information ) {
+                    this.write( getLogLinePrefixInformation() +
+                        formatArgs( arguments, cc.info ) + "\n" );
+                }
             },
             "info": function() {
-                if( verboseGet() >= verboseReversed().information )
-                    this.write( formatArgs( arguments, cc.info ) + "\n" );
+                if( verboseGet() >= verboseReversed().information ) {
+                    this.write( getLogLinePrefixInformation() +
+                        formatArgs( arguments, cc.info ) + "\n" );
+                }
             },
             "notice": function() {
-                if( verboseGet() >= verboseReversed().notice )
-                    this.write( formatArgs( arguments, cc.notice ) + "\n" );
+                if( verboseGet() >= verboseReversed().notice ) {
+                    this.write( getLogLinePrefixNotice() +
+                        formatArgs( arguments, cc.notice ) + "\n" );
+                }
             },
             "note": function() {
-                if( verboseGet() >= verboseReversed().notice )
-                    this.write( formatArgs( arguments, cc.note ) + "\n" );
+                if( verboseGet() >= verboseReversed().notice ) {
+                    this.write( getLogLinePrefixNote() +
+                        formatArgs( arguments, cc.note ) + "\n" );
+                }
             },
             "debug": function() {
-                if( verboseGet() >= verboseReversed().debug )
-                    this.write( formatArgs( arguments, cc.debug ) + "\n" );
+                if( verboseGet() >= verboseReversed().debug ) {
+                    this.write( getLogLinePrefixDebug() +
+                        formatArgs( arguments, cc.debug ) + "\n" );
+                }
             },
             "trace": function() {
-                if( verboseGet() >= verboseReversed().trace )
-                    this.write( formatArgs( arguments, cc.trace ) + "\n" );
+                if( verboseGet() >= verboseReversed().trace ) {
+                    this.write( getLogLinePrefixTrace() +
+                        formatArgs( arguments, cc.trace ) + "\n" );
+                }
             },
             "success": function() {
-                if( verboseGet() >= verboseReversed().information )
-                    this.write( formatArgs( arguments, cc.success ) + "\n" );
+                if( verboseGet() >= verboseReversed().information ) {
+                    this.write( getLogLinePrefixSuccess() +
+                        formatArgs( arguments, cc.success ) + "\n" );
+                }
             }
         };
         objEntry.open();
@@ -248,52 +272,76 @@ export function createMemoryOutputStream() {
             },
             // high-level formatters
             "fatal": function() {
-                if( verboseGet() >= verboseReversed().fatal )
-                    this.write( formatArgs( arguments, cc.error ) + "\n" );
+                if( verboseGet() >= verboseReversed().fatal ) {
+                    this.write( getLogLinePrefixFatal() +
+                        formatArgs( arguments, cc.error ) + "\n" );
+                }
             },
             "critical": function() {
-                if( verboseGet() >= verboseReversed().critical )
-                    this.write( formatArgs( arguments, cc.error ) + "\n" );
+                if( verboseGet() >= verboseReversed().critical ) {
+                    this.write( getLogLinePrefixCritical() +
+                        formatArgs( arguments, cc.error ) + "\n" );
+                }
             },
             "error": function() {
-                if( verboseGet() >= verboseReversed().error )
-                    this.write( formatArgs( arguments, cc.error ) + "\n" );
+                if( verboseGet() >= verboseReversed().error ) {
+                    this.write( getLogLinePrefixError() +
+                        formatArgs( arguments, cc.error ) + "\n" );
+                }
             },
             "warning": function() {
-                if( verboseGet() >= verboseReversed().warning )
-                    this.write( formatArgs( arguments, cc.warning ) + "\n" );
+                if( verboseGet() >= verboseReversed().warning ) {
+                    this.write( getLogLinePrefixWarning() +
+                        formatArgs( arguments, cc.warning ) + "\n" );
+                }
             },
             "attention": function() {
-                if( verboseGet() >= verboseReversed().attention )
-                    this.write( formatArgs( arguments, cc.attention ) + "\n" );
+                if( verboseGet() >= verboseReversed().attention ) {
+                    this.write( getLogLinePrefixAttention() +
+                        formatArgs( arguments, cc.attention ) + "\n" );
+                }
             },
             "information": function() {
-                if( verboseGet() >= verboseReversed().information )
-                    this.write( formatArgs( arguments, cc.info ) + "\n" );
+                if( verboseGet() >= verboseReversed().information ) {
+                    this.write( getLogLinePrefixInformation() +
+                        formatArgs( arguments, cc.info ) + "\n" );
+                }
             },
             "info": function() {
-                if( verboseGet() >= verboseReversed().information )
-                    this.write( formatArgs( arguments, cc.info ) + "\n" );
+                if( verboseGet() >= verboseReversed().information ) {
+                    this.write( getLogLinePrefixInformation() +
+                        formatArgs( arguments, cc.info ) + "\n" );
+                }
             },
             "notice": function() {
-                if( verboseGet() >= verboseReversed().notice )
-                    this.write( formatArgs( arguments, cc.notice ) + "\n" );
+                if( verboseGet() >= verboseReversed().notice ) {
+                    this.write( getLogLinePrefixNotice() +
+                        formatArgs( arguments, cc.notice ) + "\n" );
+                }
             },
             "note": function() {
-                if( verboseGet() >= verboseReversed().notice )
-                    this.write( formatArgs( arguments, cc.note ) + "\n" );
+                if( verboseGet() >= verboseReversed().notice ) {
+                    this.write( getLogLinePrefixNote() +
+                        formatArgs( arguments, cc.note ) + "\n" );
+                }
             },
             "debug": function() {
-                if( verboseGet() >= verboseReversed().debug )
-                    this.write( formatArgs( arguments, cc.debug ) + "\n" );
+                if( verboseGet() >= verboseReversed().debug ) {
+                    this.write( getLogLinePrefixDebug() +
+                        formatArgs( arguments, cc.debug ) + "\n" );
+                }
             },
             "trace": function() {
-                if( verboseGet() >= verboseReversed().trace )
-                    this.write( formatArgs( arguments, cc.trace ) + "\n" );
+                if( verboseGet() >= verboseReversed().trace ) {
+                    this.write( getLogLinePrefixTrace() +
+                        formatArgs( arguments, cc.trace ) + "\n" );
+                }
             },
             "success": function() {
-                if( verboseGet() >= verboseReversed().information )
-                    this.write( formatArgs( arguments, cc.success ) + "\n" );
+                if( verboseGet() >= verboseReversed().information ) {
+                    this.write( getLogLinePrefixSuccess() +
+                        formatArgs( arguments, cc.success ) + "\n" );
+                }
             }
         };
         objEntry.open();
@@ -382,52 +430,76 @@ export function createFileOutput( strFilePath, nMaxSizeBeforeRotation, nMaxFiles
             "exposeDetailsTo": function( otherStream, strTitle, isSuccess ) { },
             // high-level formatters
             "fatal": function() {
-                if( verboseGet() >= verboseReversed().fatal )
-                    this.write( formatArgs( arguments, cc.error ) + "\n" );
+                if( verboseGet() >= verboseReversed().fatal ) {
+                    this.write( getLogLinePrefixFatal() +
+                        formatArgs( arguments, cc.error ) + "\n" );
+                }
             },
             "critical": function() {
-                if( verboseGet() >= verboseReversed().critical )
-                    this.write( formatArgs( arguments, cc.error ) + "\n" );
+                if( verboseGet() >= verboseReversed().critical ) {
+                    this.write( getLogLinePrefixCritical() +
+                        formatArgs( arguments, cc.error ) + "\n" );
+                }
             },
             "error": function() {
-                if( verboseGet() >= verboseReversed().error )
-                    this.write( formatArgs( arguments, cc.error ) + "\n" );
+                if( verboseGet() >= verboseReversed().error ) {
+                    this.write( getLogLinePrefixError() +
+                        formatArgs( arguments, cc.error ) + "\n" );
+                }
             },
             "warning": function() {
-                if( verboseGet() >= verboseReversed().warning )
-                    this.write( formatArgs( arguments, cc.warning ) + "\n" );
+                if( verboseGet() >= verboseReversed().warning ) {
+                    this.write( getLogLinePrefixWarning() +
+                        formatArgs( arguments, cc.warning ) + "\n" );
+                }
             },
             "attention": function() {
-                if( verboseGet() >= verboseReversed().attention )
-                    this.write( formatArgs( arguments, cc.attention ) + "\n" );
+                if( verboseGet() >= verboseReversed().attention ) {
+                    this.write( getLogLinePrefixAttention() +
+                        formatArgs( arguments, cc.attention ) + "\n" );
+                }
             },
             "information": function() {
-                if( verboseGet() >= verboseReversed().information )
-                    this.write( formatArgs( arguments, cc.info ) + "\n" );
+                if( verboseGet() >= verboseReversed().information ) {
+                    this.write( getLogLinePrefixInformation() +
+                        formatArgs( arguments, cc.info ) + "\n" );
+                }
             },
             "info": function() {
-                if( verboseGet() >= verboseReversed().information )
-                    this.write( formatArgs( arguments, cc.info ) + "\n" );
+                if( verboseGet() >= verboseReversed().information ) {
+                    this.write( getLogLinePrefixInformation() +
+                        formatArgs( arguments, cc.info ) + "\n" );
+                }
             },
             "notice": function() {
-                if( verboseGet() >= verboseReversed().notice )
-                    this.write( formatArgs( arguments, cc.notice ) + "\n" );
+                if( verboseGet() >= verboseReversed().notice ) {
+                    this.write( getLogLinePrefixNotice() +
+                        formatArgs( arguments, cc.notice ) + "\n" );
+                }
             },
             "note": function() {
-                if( verboseGet() >= verboseReversed().notice )
-                    this.write( formatArgs( arguments, cc.note ) + "\n" );
+                if( verboseGet() >= verboseReversed().notice ) {
+                    this.write( getLogLinePrefixNote() +
+                        formatArgs( arguments, cc.note ) + "\n" );
+                }
             },
             "debug": function() {
-                if( verboseGet() >= verboseReversed().debug )
-                    this.write( formatArgs( arguments, cc.debug ) + "\n" );
+                if( verboseGet() >= verboseReversed().debug ) {
+                    this.write( getLogLinePrefixDebug() +
+                        formatArgs( arguments, cc.debug ) + "\n" );
+                }
             },
             "trace": function() {
-                if( verboseGet() >= verboseReversed().trace )
-                    this.write( formatArgs( arguments, cc.trace ) + "\n" );
+                if( verboseGet() >= verboseReversed().trace ) {
+                    this.write( getLogLinePrefixTrace() +
+                        formatArgs( arguments, cc.trace ) + "\n" );
+                }
             },
             "success": function() {
-                if( verboseGet() >= verboseReversed().information )
-                    this.write( formatArgs( arguments, cc.success ) + "\n" );
+                if( verboseGet() >= verboseReversed().information ) {
+                    this.write( getLogLinePrefixSuccess() +
+                        formatArgs( arguments, cc.success ) + "\n" );
+                }
             }
         };
         objEntry.open();
@@ -504,54 +576,88 @@ export function write() {
     outputStringToAllStreams( s );
 }
 
+export function getLogLinePrefixFatal() {
+    return cc.fatal( "FATAL ERROR:" ) + " ";
+}
+export function getLogLinePrefixCritical() {
+    return cc.fatal( "CRITICAL ERROR:" ) + " ";
+}
+export function getLogLinePrefixError() {
+    return cc.fatal( "ERROR:" ) + " ";
+}
+export function getLogLinePrefixWarning() {
+    return cc.error( "WARNING:" ) + " ";
+}
+export function getLogLinePrefixAttention() {
+    return "";
+}
+export function getLogLinePrefixInformation() {
+    return "";
+}
+export function getLogLinePrefixNotice() {
+    return "";
+}
+export function getLogLinePrefixNote() {
+    return "";
+}
+export function getLogLinePrefixDebug() {
+    return "";
+}
+export function getLogLinePrefixTrace() {
+    return "";
+}
+export function getLogLinePrefixSuccess() {
+    return "";
+}
+
 // high-level formatters
 export function fatal() {
     if( verboseGet() >= verboseReversed().fatal )
-        write( formatArgs( arguments, cc.error ) + "\n" );
+        write( getLogLinePrefixFatal() + formatArgs( arguments, cc.error ) + "\n" );
 }
 export function critical() {
     if( verboseGet() >= verboseReversed().critical )
-        write( formatArgs( arguments, cc.error ) + "\n" );
+        write( getLogLinePrefixCritical() + formatArgs( arguments, cc.error ) + "\n" );
 }
 export function error() {
     if( verboseGet() >= verboseReversed().error )
-        write( formatArgs( arguments, cc.error ) + "\n" );
+        write( getLogLinePrefixError() + formatArgs( arguments, cc.error ) + "\n" );
 }
 export function warning() {
     if( verboseGet() >= verboseReversed().warning )
-        write( formatArgs( arguments, cc.warning ) + "\n" );
+        write( getLogLinePrefixWarning() + formatArgs( arguments, cc.warning ) + "\n" );
 }
 export function attention() {
     if( verboseGet() >= verboseReversed().attention )
-        write( formatArgs( arguments, cc.attention ) + "\n" );
+        write( getLogLinePrefixAttention() + formatArgs( arguments, cc.attention ) + "\n" );
 }
 export function information() {
     if( verboseGet() >= verboseReversed().information )
-        write( formatArgs( arguments, cc.info ) + "\n" );
+        write( formatArgs( getLogLinePrefixInformation() + arguments, cc.info ) + "\n" );
 }
 export function info() {
     if( verboseGet() >= verboseReversed().information )
-        write( formatArgs( arguments, cc.info ) + "\n" );
+        write( getLogLinePrefixInformation() + formatArgs( arguments, cc.info ) + "\n" );
 }
 export function notice() {
     if( verboseGet() >= verboseReversed().notice )
-        write( formatArgs( arguments, cc.notice ) + "\n" );
+        write( getLogLinePrefixNotice() + formatArgs( arguments, cc.notice ) + "\n" );
 }
 export function note() {
     if( verboseGet() >= verboseReversed().notice )
-        write( formatArgs( arguments, cc.note ) + "\n" );
+        write( getLogLinePrefixNote() + formatArgs( arguments, cc.note ) + "\n" );
 }
 export function debug() {
     if( verboseGet() >= verboseReversed().debug )
-        write( formatArgs( arguments, cc.debug ) + "\n" );
+        write( getLogLinePrefixDebug() + formatArgs( arguments, cc.debug ) + "\n" );
 }
 export function trace() {
     if( verboseGet() >= verboseReversed().trace )
-        write( formatArgs( arguments, cc.trace ) + "\n" );
+        write( getLogLinePrefixTrace() + formatArgs( arguments, cc.trace ) + "\n" );
 }
 export function success() {
     if( verboseGet() >= verboseReversed().information )
-        write( formatArgs( arguments, cc.success ) + "\n" );
+        write( getLogLinePrefixSuccess() + formatArgs( arguments, cc.success ) + "\n" );
 }
 
 export function removeAll() {

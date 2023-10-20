@@ -606,7 +606,7 @@ export async function ensureHaveWorkers( opts ) {
                     break;
                 }
                 aClient.errorLogicalInit = joMessage.error;
-                opts.details.critical( cc.fatal( "CRITICAL ERROR:" ), " Loop worker thread ",
+                opts.details.critical( " Loop worker thread ",
                     idxWorker, " reported/returned init error: ",
                     cc.warning( owaspUtils.extractErrorMessage( joMessage.error ) ) );
                 break;

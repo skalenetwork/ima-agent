@@ -109,7 +109,7 @@ export function jsonFileLoad( strPath, joDefault, bLogOutput ) {
         return jo;
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
-        log.error( cc.fatal( "CRITICAL ERROR:" ), " failed to load JSON file ",
+        log.error( " failed to load JSON file ",
             cc.info( strPath ), ": ", cc.warning( strError ) + ", stack is: ", "\n",
             cc.stack( err.stack ) );
     }
@@ -129,7 +129,7 @@ export function jsonFileSave( strPath, jo, bLogOutput ) {
         return true;
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
-        log.error( cc.fatal( "CRITICAL ERROR:" ), " failed to save JSON file ",
+        log.error( " failed to save JSON file ",
             cc.info( strPath ), ": ", cc.warning( strError ),
             ", stack is: ", "\n", cc.stack( err.stack ) );
     }
