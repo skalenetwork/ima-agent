@@ -39,7 +39,7 @@ export async function getBalanceEth(
     joAccount,
     contractERC20
 ) {
-    const strLogPrefix = cc.info( "getBalanceEth() call" ) + " ";
+    const strLogPrefix = "getBalanceEth() call ";
     try {
         if( ! ( ethersProvider && joAccount ) )
             return "<no-data>";

@@ -594,10 +594,10 @@ async function tmGetRecord( txId ) {
 async function tmWait( details, txId, ethersProvider, nWaitSeconds = 36000 ) {
     const strPrefixDetails = cc.debug( "(gathered details)" ) + " ";
     const strPrefixLog = cc.debug( "(immediate log)" ) + " ";
-    details.debug( strPrefixDetails, "TM - will wait TX ", cc.info( txId ),
+    details.debug( strPrefixDetails, "TM - will wait TX ", cc.j( txId ),
         " to complete for ", cc.info( nWaitSeconds ), " second(s) maximum" );
     if( log.id != details.id ) {
-        log.debug( strPrefixLog, "TM - will wait TX ", cc.info( txId ),
+        log.debug( strPrefixLog, "TM - will wait TX ", cc.j( txId ),
             " to complete for ", cc.info( nWaitSeconds ), " second(s) maximum" );
     }
     const startTs = imaHelperAPIs.currentTimestamp();
@@ -605,34 +605,34 @@ async function tmWait( details, txId, ethersProvider, nWaitSeconds = 36000 ) {
                 ( imaHelperAPIs.currentTimestamp() - startTs ) < nWaitSeconds )
         await imaHelperAPIs.sleep( 500 );
     const r = await tmGetRecord( txId );
-    details.debug( strPrefixDetails, "TM - TX ", cc.info( txId ), " record is ",
+    details.debug( strPrefixDetails, "TM - TX ", cc.j( txId ), " record is ",
         cc.info( JSON.stringify( r ) ) );
     if( log.id != details.id ) {
-        log.debug( strPrefixLog, "TM - TX ", cc.info( txId ), " record is ",
+        log.debug( strPrefixLog, "TM - TX ", cc.j( txId ), " record is ",
             cc.info( JSON.stringify( r ) ) );
     }
     if( ( !r ) ) {
-        details.error( strPrefixDetails, "TM - TX ", cc.info( txId ), " status is NULL RECORD" );
+        details.error( strPrefixDetails, "TM - TX ", cc.j( txId ), " status is NULL RECORD" );
         if( log.id != details.id )
-            log.error( strPrefixLog, "TM - TX ", cc.info( txId ), " status is NULL RECORD" );
+            log.error( strPrefixLog, "TM - TX ", cc.j( txId ), " status is NULL RECORD" );
     } else if( r.status == "SUCCESS" ) {
         if( log.id != details.id ) {
-            log.information( strPrefixLog, "TM - TX ", cc.info( txId ), " success",
-                details.information( strPrefixDetails, "TM - TX ", cc.info( txId ), " success" ) );
+            log.information( strPrefixLog, "TM - TX ", cc.j( txId ), " success",
+                details.information( strPrefixDetails, "TM - TX ", cc.j( txId ), " success" ) );
         }
     } else {
-        details.error( strPrefixDetails, "TM - TX ", cc.info( txId ), " status is ",
+        details.error( strPrefixDetails, "TM - TX ", cc.j( txId ), " status is ",
             cc.warning( r.status ) );
         if( log.id != details.id ) {
-            log.error( strPrefixLog, "TM - TX ", cc.info( txId ), " status is ",
+            log.error( strPrefixLog, "TM - TX ", cc.j( txId ), " status is ",
                 cc.warning( r.status ) );
         }
     }
     if( ( !tmIsFinished( r ) ) || r.status == "DROPPED" ) {
-        details.error( strPrefixDetails, "TM - TX ", cc.info( txId ),
+        details.error( strPrefixDetails, "TM - TX ", cc.j( txId ),
             " was unsuccessful, wait failed" );
         if( log.id != details.id ) {
-            log.error( strPrefixLog, "TM - TX ", cc.info( txId ),
+            log.error( strPrefixLog, "TM - TX ", cc.j( txId ),
                 " was unsuccessful, wait failed" );
         }
         return null;
@@ -640,10 +640,10 @@ async function tmWait( details, txId, ethersProvider, nWaitSeconds = 36000 ) {
     const joReceipt = await imaEventLogScan.safeGetTransactionReceipt(
         details, 10, ethersProvider, r.tx_hash );
     if( !joReceipt ) {
-        details.error( strPrefixDetails, "TM - TX ", cc.info( txId ),
+        details.error( strPrefixDetails, "TM - TX ", cc.j( txId ),
             " was unsuccessful, failed to fetch transaction receipt" );
         if( log.id != details.id ) {
-            log.error( strPrefixLog, "TM - TX ", cc.info( txId ),
+            log.error( strPrefixLog, "TM - TX ", cc.j( txId ),
                 " was unsuccessful, failed to fetch transaction receipt" );
         }
         return null;
@@ -663,36 +663,36 @@ async function tmEnsureTransaction(
     const strPrefixLog = cc.debug( "(immediate log)" ) + " ";
     for( ; idxAttempt < cntAttempts; ++idxAttempt ) {
         txId = await tmSend( details, txAdjusted, priority );
-        details.debug( strPrefixDetails, "TM - next TX ", cc.info( txId ) );
+        details.debug( strPrefixDetails, "TM - next TX ", cc.j( txId ) );
         if( log.id != details.id )
-            log.debug( strPrefixLog, "TM - next TX ", cc.info( txId ) );
+            log.debug( strPrefixLog, "TM - next TX ", cc.j( txId ) );
         joReceipt = await tmWait( details, txId, ethersProvider );
         if( joReceipt )
             break;
-        details.error( strPrefixDetails, "TM - unsuccessful TX ", cc.info( txId ),
-            " sending attempt ", cc.info( idxAttempt ), " of ", cc.info( cntAttempts ),
+        details.error( strPrefixDetails, "TM - unsuccessful TX ", cc.j( txId ),
+            " sending attempt ", idxAttempt, " of ", cc.info( cntAttempts ),
             " receipt: ", cc.info( joReceipt ) );
         if( log.id != details.id ) {
-            log.error( strPrefixLog, "TM - unsuccessful TX ", cc.info( txId ),
-                " sending attempt ", cc.info( idxAttempt ), " of ", cc.info( cntAttempts ),
+            log.error( strPrefixLog, "TM - unsuccessful TX ", cc.j( txId ),
+                " sending attempt ", idxAttempt, " of ", cc.info( cntAttempts ),
                 " receipt: ", cc.info( joReceipt ) );
         }
         await imaHelperAPIs.sleep( sleepMilliseconds );
     }
     if( !joReceipt ) {
-        details.error( strPrefixDetails, "TM TX ", cc.info( txId ),
+        details.error( strPrefixDetails, "TM TX ", cc.j( txId ),
             " transaction has been dropped" );
         if( log.id != details.id ) {
-            log.error( strPrefixLog, "TM TX ", cc.info( txId ),
+            log.error( strPrefixLog, "TM TX ", cc.j( txId ),
                 " transaction has been dropped" );
         }
         throw new Error( "TM unsuccessful transaction " + txId );
     }
-    details.information( strPrefixDetails, "TM - successful TX ", cc.info( txId ),
-        ", sending attempt ", cc.info( idxAttempt ), " of ", cc.info( cntAttempts ) );
+    details.information( strPrefixDetails, "TM - successful TX ", cc.j( txId ),
+        ", sending attempt ", idxAttempt, " of ", cc.info( cntAttempts ) );
     if( log.id != details.id ) {
-        log.information( strPrefixLog, "TM - successful TX ", cc.info( txId ),
-            ", sending attempt ", cc.info( idxAttempt ), " of ", cc.info( cntAttempts ) );
+        log.information( strPrefixLog, "TM - successful TX ", cc.j( txId ),
+            ", sending attempt ", idxAttempt, " of ", cc.info( cntAttempts ) );
     }
     return [ txId, joReceipt ];
 }

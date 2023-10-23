@@ -39,10 +39,9 @@ export function initialSkaleNetworkScanForS2S() {
     imaState.arrActions.push( {
         "name": "SKALE network scan for S2S",
         "fn": async function() {
-            const strLogPrefix = cc.info( "SKALE network scan for S2S:" ) + " ";
+            const strLogPrefix = "SKALE network scan for S2S: ";
             if( imaState.strPathAbiJsonSkaleManager.length === 0 ) {
-                log.fatal( "Missing Skale Manager ABI, please specify ",
-                    cc.info( "abi-skale-manager" ) );
+                log.fatal( "Missing Skale Manager ABI, please specify  \"--abi-skale-manager\"" );
                 process.exit( 153 );
             }
             log.information( strLogPrefix, "Downloading SKALE network information..." );
@@ -175,11 +174,11 @@ export function getSChainDiscoveredNodesCount( joSChainNetworkInfo ) {
 
 export async function waitUntilSChainStarted() {
     const imaState = state.get();
-    log.debug( "Checking ", cc.info( "S-Chain" ), " is accessible and sane..." );
+    log.debug( "Checking S-Chain is accessible and sane..." );
     if( ( !imaState.chainProperties.sc.strURL ) ||
         imaState.chainProperties.sc.strURL.length === 0
     ) {
-        log.warning( "Skipped, ", cc.info( "S-Chain" ), " URL was not provided." );
+        log.warning( "Skipped, S-Chain URL was not provided." );
         return;
     }
     let bSuccess = false;
@@ -206,13 +205,13 @@ export async function waitUntilSChainStarted() {
         if( !bSuccess )
             ++ idxWaitAttempt;
         if( idxWaitAttempt >= imaState.nMaxWaitSChainAttempts ) {
-            log.warning( "Incomplete, ", cc.info( "S-Chain" ), " sanity check failed after ",
-                cc.info( idxWaitAttempt ), " attempts." );
+            log.warning( "Incomplete, S-Chain sanity check failed after ",
+                idxWaitAttempt, " attempts." );
             return;
         }
         await imaHelperAPIs.sleep( 1000 );
     }
-    log.success( "Done, ", cc.info( "S-Chain" ), " is accessible and sane." );
+    log.success( "Done, S-Chain is accessible and sane." );
 }
 
 export function isSendImaAgentIndex() {
@@ -306,18 +305,17 @@ export async function continueSChainDiscoveryInBackgroundIfNeeded( isSilentReDis
                 if( ! err ) {
                     const cntDiscoveredNow =
                         getSChainDiscoveredNodesCount( joSChainNetworkInfo );
-                    const strDiscoveryStatus =
-                        cc.info( cntDiscoveredNow ) + cc.success( " nodes known" );
                     let strMessage =
                         cc.success( "S-Chain network was re-discovered, " ) +
-                        cc.info( cntDiscoveredNow ) +
-                        cc.success( " of " ) + cc.info( nCountToWait ) +
-                        cc.success( " node(s) (" ) + strDiscoveryStatus + cc.success( ")" );
+                        cc.j( cntDiscoveredNow ) +
+                        cc.success( " of " ) + cc.j( nCountToWait ) +
+                        cc.success( " node(s) (" ) + cc.j( cntDiscoveredNow ) +
+                        cc.success( " nodes known" ) + cc.success( ")" );
                     const cntStillUnknown = cntNodesOnChain - cntDiscoveredNow;
                     if( cntStillUnknown > 0 ) {
                         strMessage += cc.success( ", " ) +
-                            cc.info( cntStillUnknown ) +
-                            cc.success( " of " ) + cc.info( cntNodesOnChain ) +
+                            cc.j( cntStillUnknown ) +
+                            cc.success( " of " ) + cc.j( cntNodesOnChain ) +
                             cc.success( " still unknown (" );
                         try {
                             const jarrNodes = joSChainNetworkInfo.network;
@@ -331,7 +329,7 @@ export async function continueSChainDiscoveryInBackgroundIfNeeded( isSilentReDis
                                         const strNodeURL =
                                             imaUtils.composeSChainNodeUrl( joNode );
                                         const strNodeDescColorized = cc.notice( "#" ) +
-                                            cc.info( i ) + cc.attention( "(" ) +
+                                            cc.j( i ) + cc.attention( "(" ) +
                                             cc.u( strNodeURL ) + cc.attention( ")" );
                                         strMessage += strNodeDescColorized;
                                         ++ cntBad;
@@ -373,7 +371,7 @@ async function discoverSChainWalkNodes( optsDiscover ) {
         const nCurrentNodeIdx = 0 + i;
         const joNode = optsDiscover.jarrNodes[nCurrentNodeIdx];
         const strNodeURL = imaUtils.composeSChainNodeUrl( joNode );
-        const strNodeDescColorized = cc.notice( "#" ) + cc.info( nCurrentNodeIdx ) +
+        const strNodeDescColorized = cc.notice( "#" ) + cc.j( nCurrentNodeIdx ) +
             cc.attention( "(" ) + cc.u( strNodeURL ) + cc.attention( ")" );
         if( ! optsDiscover.isSilentReDiscovery ) {
             log.information( optsDiscover.strLogPrefix,
@@ -389,7 +387,7 @@ async function discoverSChainWalkNodes( optsDiscover ) {
                     joNode.imaInfo = JSON.parse( JSON.stringify( joPrevNode.imaInfo ) );
                     if( ! optsDiscover.isSilentReDiscovery ) {
                         log.information( optsDiscover.strLogPrefix, "OK, in case of ",
-                            strNodeDescColorized, " node ", cc.info( joNode.nodeID ),
+                            strNodeDescColorized, " node ", cc.j( joNode.nodeID ),
                             " will use previous discovery result." );
                     }
                     continue; // skip this node discovery, enrich rest of nodes
@@ -434,7 +432,7 @@ async function discoverSChainWalkNodes( optsDiscover ) {
                             ++ optsDiscover.nCountReceivedImaDescriptions;
                         if( !optsDiscover.isSilentReDiscovery ) {
                             log.success( optsDiscover.strLogPrefix, "OK, got ",
-                                strNodeDescColorized, " node ", cc.info( joNode.nodeID ),
+                                strNodeDescColorized, " node ", cc.j( joNode.nodeID ),
                                 " IMA information(", optsDiscover.nCountReceivedImaDescriptions,
                                 " of ", optsDiscover.cntNodes, ")." );
                         }
@@ -527,7 +525,7 @@ export async function discoverSChainNetwork(
         joPrevSChainNetworkInfo: joPrevSChainNetworkInfo || null,
         nCountToWait: nCountToWait,
         imaState: state.get(),
-        strLogPrefix: cc.info( "S-Chain network discovery:" ) + " ",
+        strLogPrefix: "S-Chain network discovery: ",
         joSChainNetworkInfo: null,
         jarrNodes: [],
         cntNodes: 0,

@@ -314,9 +314,9 @@ function performBlsGlue(
         owaspUtils.removeStarting0x(
             keccak256Message( jarrMessages, nIdxCurrentMsgBlockStart, strFromChainName )
         );
-    details.debug( strLogPrefix, "Message hash to sign is ", cc.info( strMessageHash ) );
+    details.debug( strLogPrefix, "Message hash to sign is ", cc.j( strMessageHash ) );
     const strActionDir = allocBlsTmpActionDir();
-    details.trace( strLogPrefix, "performBlsGlue will work in ", cc.info( strActionDir ),
+    details.trace( strLogPrefix, "performBlsGlue will work in ", cc.j( strActionDir ),
         " director with ", arrSignResults.length, " sign results..." );
     const fnShellRestore = function() {
         shell.rm( "-rf", strActionDir );
@@ -348,7 +348,7 @@ function performBlsGlue(
         if( "X" in joGlueResult.signature && "Y" in joGlueResult.signature ) {
             details.debug( strLogPrefix, cc.success( "BLS glue success" ) );
             joGlueResult.hashSrc = strMessageHash;
-            details.trace( strLogPrefix, "Computing ", cc.info( "G1" ), " hash point..." );
+            details.trace( strLogPrefix, "Computing ", cc.j( "G1" ), " hash point..." );
             const strPath = strActionDir + "/hash.json";
             details.trace( strLogPrefix, "Saving ", cc.notice( strPath ), " file..." );
             imaUtils.jsonFileSave( strPath, { "message": strMessageHash } );
@@ -403,11 +403,11 @@ function performBlsGlueU256( details, u256, arrSignResults ) {
         nThreshold, nParticipants, "BLS glue-256", details ) )
         return null;
     details.trace( strLogPrefix, "Original long message is ",
-        cc.info( keccak256U256( u256, false ) ) );
+        cc.j( keccak256U256( u256, false ) ) );
     const strMessageHash = keccak256U256( u256, true );
-    details.trace( strLogPrefix, "Message hash to sign is ", cc.info( strMessageHash ) );
+    details.trace( strLogPrefix, "Message hash to sign is ", cc.j( strMessageHash ) );
     const strActionDir = allocBlsTmpActionDir();
-    details.trace( strLogPrefix, "performBlsGlueU256 will work in ", cc.info( strActionDir ),
+    details.trace( strLogPrefix, "performBlsGlueU256 will work in ", cc.j( strActionDir ),
         " director with ", arrSignResults.length, " sign results..." );
     const fnShellRestore = function() {
         shell.rm( "-rf", strActionDir );
@@ -438,7 +438,7 @@ function performBlsGlueU256( details, u256, arrSignResults ) {
         if( "X" in joGlueResult.signature && "Y" in joGlueResult.signature ) {
             details.trace( strLogPrefix, cc.success( "BLS glue success" ) );
             joGlueResult.hashSrc = strMessageHash;
-            details.trace( strLogPrefix, "Computing ", cc.info( "G1" ), " hash point..." );
+            details.trace( strLogPrefix, "Computing ", cc.j( "G1" ), " hash point..." );
             const strPath = strActionDir + "/hash.json";
             details.trace( strLogPrefix, "Saving ", cc.notice( strPath ), " file..." );
             imaUtils.jsonFileSave( strPath, { "message": strMessageHash } );
@@ -492,9 +492,7 @@ function performBlsVerifyI(
     if( !joResultFromNode )
         return true;
     const imaState = state.get();
-    const strLogPrefix =
-        cc.bright( strDirection ) + cc.debug( "/" ) + cc.info( "BLS" ) + cc.debug( "/#" ) +
-        cc.bright( nZeroBasedNodeIndex ) + cc.debug( ":" ) + " ";
+    const strLogPrefix = strDirection + "/BLS/#" + nZeroBasedNodeIndex + ": ";
     const nThreshold = discoverBlsThreshold( imaState.joSChainNetworkInfo );
     const nParticipants = discoverBlsParticipants( imaState.joSChainNetworkInfo );
     if( ! checkBlsThresholdAndBlsParticipants(
@@ -509,14 +507,14 @@ function performBlsVerifyI(
         details.trace( strLogPrefix, "BLS node #", nZeroBasedNodeIndex,
             " - first message nonce is ", nIdxCurrentMsgBlockStart );
         details.trace( strLogPrefix, "BLS node #", nZeroBasedNodeIndex,
-            " - first source chain name is ", cc.info( strFromChainName ) );
+            " - first source chain name is ", cc.j( strFromChainName ) );
         details.trace( strLogPrefix, "BLS node #", nZeroBasedNodeIndex,
             " - messages array ", cc.j( jarrMessages ) );
         const strMessageHash =
             owaspUtils.removeStarting0x(
                 keccak256Message( jarrMessages, nIdxCurrentMsgBlockStart, strFromChainName ) );
         details.trace( strLogPrefix, "BLS node #", nZeroBasedNodeIndex,
-            " - hashed verify message is ", cc.info( strMessageHash ) );
+            " - hashed verify message is ", cc.j( strMessageHash ) );
         const joMsg = { "message": strMessageHash };
         details.debug( strLogPrefix, "BLS node #", nZeroBasedNodeIndex,
             " - composed  ", cc.j( joMsg ), " composed from ", cc.j( jarrMessages ),
@@ -565,9 +563,7 @@ function performBlsVerifyIU256(
     if( ! joResultFromNode )
         return true;
     const imaState = state.get();
-    const strLogPrefix =
-        cc.info( "BLS" ) + cc.debug( "/#" ) + cc.bright( nZeroBasedNodeIndex ) +
-        cc.debug( ":" ) + " ";
+    const strLogPrefix = "BLS/#" + nZeroBasedNodeIndex + ": ";
     const nThreshold = discoverBlsThreshold( imaState.joSChainNetworkInfo );
     const nParticipants = discoverBlsParticipants( imaState.joSChainNetworkInfo );
     if( ! checkBlsThresholdAndBlsParticipants(
@@ -636,15 +632,12 @@ function performBlsVerify(
         shell.rm( "-rf", strActionDir );
     };
     let strOutput = "";
-    const strLogPrefix =
-        cc.bright( strDirection ) + cc.debug( "/" ) +
-        cc.info( "BLS" ) + cc.debug( "/" ) +
-        cc.sunny( "Summary" ) + cc.debug( ":" ) + " ";
+    const strLogPrefix = strDirection + "/BLS/Summary: ";
     try {
         details.trace( strLogPrefix, "BLS/summary verify message - ",
-            "first message nonce is ", cc.info( nIdxCurrentMsgBlockStart ) );
+            "first message nonce is ", cc.j( nIdxCurrentMsgBlockStart ) );
         details.trace( strLogPrefix, "BLS/summary verify message - ",
-            "first source chain name is ", cc.info( strFromChainName ) );
+            "first source chain name is ", cc.j( strFromChainName ) );
         details.trace( strLogPrefix, "BLS/summary verify message - ",
             "messages array ", cc.j( jarrMessages ) );
         const strMessageHash =
@@ -652,7 +645,7 @@ function performBlsVerify(
                 keccak256Message( jarrMessages, nIdxCurrentMsgBlockStart, strFromChainName )
             );
         details.trace( strLogPrefix, "BLS/summary verify message - ",
-            "hashed verify message is ", cc.info( strMessageHash ) );
+            "hashed verify message is ", cc.j( strMessageHash ) );
         const joMsg = { "message": strMessageHash };
         details.debug( strLogPrefix, "BLS/summary verify message - composed JSON ",
             cc.j( joMsg ), " from messages array ", cc.j( jarrMessages ), " using glue ",
@@ -706,8 +699,7 @@ function performBlsVerifyU256( details, joGlueResult, u256, joCommonPublicKey ) 
         shell.rm( "-rf", strActionDir );
     };
     let strOutput = "";
-    const strLogPrefix =
-        cc.info( "BLS u256" ) + cc.debug( "/" ) + cc.sunny( "Summary" ) + cc.debug( ":" ) + " ";
+    const strLogPrefix = "BLS u256/Summary: ";
     try {
         const joMsg = { "message": keccak256U256( u256, true ) };
         details.debug( strLogPrefix, "BLS u256/summary verify message ", cc.j( joMsg ),
@@ -798,12 +790,12 @@ async function checkCorrectnessOfMessagesToSign(
     details.debug( strLogPrefix, cc.bright( strDirection ),
         " message correctness validation through call to ",
         cc.notice( "verifyOutgoingMessageData" ), " method of ", cc.bright( "MessageProxy" ),
-        " contract with address ", cc.notice( joMessageProxy.address ),
-        ", caller account address is ", cc.info( joMessageProxy.address ),
+        " contract with address ", cc.j( joMessageProxy.address ),
+        ", caller account address is ", cc.j( joMessageProxy.address ),
         ", message(s) count is ", jarrMessages.length, ", message(s) to process are ",
         cc.j( jarrMessages ), ", first real message index is ", nIdxCurrentMsgBlockStart,
-        ", messages will be sent to chain name ", cc.info( joChainName ),
-        ", caller address is ", cc.info( strCallerAccountAddress ) );
+        ", messages will be sent to chain name ", cc.j( joChainName ),
+        ", caller address is ", cc.j( strCallerAccountAddress ) );
     let cntBadMessages = 0, i = 0;
     const cnt = jarrMessages.length;
     if( strDirection == "S2M" || strDirection == "S2S" ) {
@@ -813,8 +805,8 @@ async function checkCorrectnessOfMessagesToSign(
             try {
                 details.trace( strLogPrefix, cc.bright( strDirection ),
                     " Will validate message ", i, " of ", cnt, ", real message index is ",
-                    idxMessage, ", source contract is ", cc.info( joMessage.sender ),
-                    ", destination contract is ", cc.info( joMessage.destinationContract ),
+                    idxMessage, ", source contract is ", cc.j( joMessage.sender ),
+                    ", destination contract is ", cc.j( joMessage.destinationContract ),
                     ", message data is ", cc.j( joMessage.data ) );
                 const outgoingMessageData = {
                     "dstChainHash": owaspUtils.ethersMod.ethers.utils.id( joChainName ),
@@ -840,7 +832,7 @@ async function checkCorrectnessOfMessagesToSign(
                 if( log.id != details.id ) {
                     log.critical( strLogPrefix, cc.bright( strDirection ),
                         " Correctness validation failed for message ",
-                        idxMessage, " sent to ", cc.info( joChainName ),
+                        idxMessage, " sent to ", cc.j( joChainName ),
                         ", message is: ", cc.j( joMessage ), ", error information: ",
                         cc.warning( owaspUtils.extractErrorMessage( err ) ),
                         ", stack is:", "\n", cc.stack( err.stack )
@@ -848,7 +840,7 @@ async function checkCorrectnessOfMessagesToSign(
                 }
                 details.critical( cc.bright( strDirection ),
                     " Correctness validation failed for message ",
-                    idxMessage, " sent to ", cc.info( joChainName ),
+                    idxMessage, " sent to ", cc.j( joChainName ),
                     ", message is: ", cc.j( joMessage ), ", error information: ",
                     cc.warning( owaspUtils.extractErrorMessage( err ) ),
                     ", stack is:", "\n", cc.stack( err.stack )
@@ -860,14 +852,14 @@ async function checkCorrectnessOfMessagesToSign(
     if( cntBadMessages > 0 ) {
         if( log.id != details.id ) {
             log.critical( strLogPrefix, "Correctness validation failed for ",
-                cc.info( cntBadMessages ), " of ", cnt, " message(s)"
+                cntBadMessages, " of ", cnt, " message(s)"
             );
         }
         details.critical( strLogPrefix, "Correctness validation failed for ",
-            cc.info( cntBadMessages ), " of ", cnt, " message(s)"
+            cntBadMessages, " of ", cnt, " message(s)"
         );
     } else
-        details.success( strLogPrefix, "Correctness validation passed for ".cnt, " message(s)" );
+        details.success( strLogPrefix, "Correctness validation passed for ", cnt, " message(s)" );
 
 }
 
@@ -923,7 +915,7 @@ async function prepareSignMessagesImpl( optsSignOperation ) {
         optsSignOperation.jarrMessages.length, " message(s), sequence ID is ",
         cc.j( optsSignOperation.sequenceId ), "..." );
     optsSignOperation.details.trace( optsSignOperation.strLogPrefix +
-        cc.debug( "Will query to sign " ) + cc.info( optsSignOperation.jarrNodes.length ) +
+        cc.debug( "Will query to sign " ) + cc.j( optsSignOperation.jarrNodes.length ) +
         cc.debug( " skaled node(s)..." ) );
     optsSignOperation.nThreshold =
         discoverBlsThreshold( optsSignOperation.imaState.joSChainNetworkInfo );
@@ -980,11 +972,8 @@ async function gatherSigningStartImpl( optsSignOperation ) {
                 optsSignOperation.joGatheringTracker.nCountReceived -
                 optsSignOperation.joGatheringTracker.nCountErrors;
             if( optsSignOperation.cntSuccess >= optsSignOperation.nCountOfBlsPartsToCollect ) {
-                optsSignOperation.strLogPrefixB =
-                    cc.bright( optsSignOperation.strDirection ) + cc.debug( "/#" ) +
-                    cc.sunny( optsSignOperation.nTransferLoopCounter ) +
-                    cc.debug( "/" ) + cc.info( "BLS" ) +
-                    cc.debug( "/" ) + cc.sunny( "Summary" ) + cc.debug( ":" ) + " ";
+                optsSignOperation.strLogPrefixB = optsSignOperation.strDirection + "/#" +
+                    optsSignOperation.nTransferLoopCounter + "/BLS/Summary: ";
                 clearInterval( iv );
                 let strError = null, strSuccessfulResultDescription = null;
                 const joGlueResult = performBlsGlue(
@@ -1288,10 +1277,10 @@ async function doSignProcessHandleCall(
     }
     optsSignOperation.details.trace( optsSignOperation.strLogPrefix,
         log.generateTimestampString( null, true ), " ",
-        "Got answer from ", cc.info( "skale_imaVerifyAndSign" ), "(node #", i, " via ",
+        "Got answer from ", cc.j( "skale_imaVerifyAndSign" ), "(node #", i, " via ",
         cc.notice( strNodeURL ), ") for transfer from chain ",
-        cc.info( optsSignOperation.fromChainName ), " to chain ",
-        cc.info( optsSignOperation.targetChainName ), " with params ", cc.j( joParams ),
+        cc.j( optsSignOperation.fromChainName ), " to chain ",
+        cc.j( optsSignOperation.targetChainName ), " with params ", cc.j( joParams ),
         ", answer is ", cc.j( joOut ), ", sequence ID is ",
         cc.j( optsSignOperation.sequenceId ) );
     if( joOut.result == null ||
@@ -1315,7 +1304,7 @@ async function doSignProcessHandleCall(
         return;
     }
     optsSignOperation.details.debug( optsSignOperation.strLogPrefix, "Node ",
-        cc.info( joNode.nodeID ), " sign result: ", cc.j( joOut.result ? joOut.result : null ) );
+        cc.j( joNode.nodeID ), " sign result: ", cc.j( joOut.result ? joOut.result : null ) );
     try {
         if( joOut.result.signResult.signatureShare.length > 0 &&
             joOut.result.signResult.status === 0
@@ -1323,10 +1312,8 @@ async function doSignProcessHandleCall(
             const nZeroBasedNodeIndex = joNode.imaInfo.thisNodeIndex - 1;
             // partial BLS verification for one participant
             let bNodeSignatureOKay = false; // initially assume signature is wrong
-            optsSignOperation.strLogPrefixA =
-                cc.bright( optsSignOperation.strDirection ) + cc.debug( "/" ) +
-                cc.info( "BLS" ) + cc.debug( "/#" ) + cc.bright( nZeroBasedNodeIndex ) +
-                cc.debug( ":" ) + " ";
+            optsSignOperation.strLogPrefixA = optsSignOperation.strDirection + "/BLS/#" +
+                nZeroBasedNodeIndex + ": ";
             try {
                 optsSignOperation.cntSuccess =
                     optsSignOperation.joGatheringTracker.nCountReceived -
@@ -1366,7 +1353,7 @@ async function doSignProcessHandleCall(
                 ) ) {
                     optsSignOperation.details.success( optsSignOperation.strLogPrefixA,
                         "Got successful BLS verification result for node ",
-                        cc.info( joNode.nodeID ), " with index ", nZeroBasedNodeIndex );
+                        cc.j( joNode.nodeID ), " with index ", nZeroBasedNodeIndex );
                     bNodeSignatureOKay = true; // node verification passed
                 } else {
                     optsSignOperation.details.error( optsSignOperation.strLogPrefixA,
@@ -1407,14 +1394,14 @@ async function doSignProcessHandleCall(
         ++optsSignOperation.joGatheringTracker.nCountErrors;
         if( log.id != optsSignOperation.details.id ) {
             log.critical( optsSignOperation.strLogPrefix, "S-Chain node ", strNodeDescColorized,
-                " signature fail from node ", cc.info( joNode.nodeID ), ", error is ",
+                " signature fail from node ", cc.j( joNode.nodeID ), ", error is ",
                 cc.warning( owaspUtils.extractErrorMessage( err ) ), ", ",
                 cc.notice( "sequence ID" ), " is ", cc.j( optsSignOperation.sequenceId ),
                 ", stack is:", "\n" + cc.stack( err.stack ) );
         }
         optsSignOperation.details.critical( ptsSignOperation.strLogPrefix, "S-Chain node ",
             strNodeDescColorized,
-            " signature fail from node ", cc.info( joNode.nodeID ), ", error is ",
+            " signature fail from node ", cc.j( joNode.nodeID ), ", error is ",
             cc.warning( owaspUtils.extractErrorMessage( err ) ), ", ",
             cc.notice( "sequence ID" ), " is ", cc.j( optsSignOperation.sequenceId ),
             ", stack is:", "\n" + cc.stack( err.stack ) );
@@ -1432,7 +1419,7 @@ async function doSignProcessOneImpl( i, optsSignOperation ) {
     const strNodeDescColorized = cc.u( strNodeURL ) + " " +
         cc.debug( "(" ) + cc.bright( i ) + cc.debug( "/" ) +
         cc.bright( optsSignOperation.jarrNodes.length ) +
-        cc.debug( ", ID " ) + cc.info( joNode.nodeID ) + cc.debug( ")" ) +
+        cc.debug( ", ID " ) + cc.j( joNode.nodeID ) + cc.debug( ")" ) +
         ", " + cc.notice( "sequence ID" ) + cc.debug( " is " ) +
         cc.j( optsSignOperation.sequenceId );
     const rpcCallOpts = null;
@@ -1476,10 +1463,10 @@ async function doSignProcessOneImpl( i, optsSignOperation ) {
             };
             optsSignOperation.details.trace( optsSignOperation.strLogPrefix,
                 log.generateTimestampString( null, true ), " ", "Will invoke ",
-                cc.info( "skale_imaVerifyAndSign" ), " to node #", i, " via ",
-                cc.notice( strNodeURL ), " for transfer from chain ",
-                cc.info( optsSignOperation.fromChainName ), " to chain ",
-                cc.info( optsSignOperation.targetChainName ), " with params ", cc.j( joParams ),
+                cc.j( "skale_imaVerifyAndSign" ), " to node #", i, " via ",
+                cc.u( strNodeURL ), " for transfer from chain ",
+                cc.j( optsSignOperation.fromChainName ), " to chain ",
+                cc.j( optsSignOperation.targetChainName ), " with params ", cc.j( joParams ),
                 ", sequence ID is ",
                 cc.j( optsSignOperation.sequenceId ) );
             await joCall.call( {
@@ -1557,8 +1544,8 @@ async function doSignMessagesImpl(
             if( optsSignOperation.cntSuccess >= optsSignOperation.nCountOfBlsPartsToCollect ) {
                 optsSignOperation.details.trace( optsSignOperation.strLogPrefix,
                     log.generateTimestampString( null, true ), " Stop invoking ",
-                    cc.info( "skale_imaVerifyAndSign" ), " for transfer from chain ",
-                    cc.info( fromChainName ) + " at #", i,
+                    cc.j( "skale_imaVerifyAndSign" ), " for transfer from chain ",
+                    cc.j( fromChainName ) + " at #", i,
                     " because successfully gathered count is reached ",
                     cc.j( optsSignOperation.cntSuccess ) );
                 break;
@@ -1600,7 +1587,7 @@ async function doSignMessagesImpl(
         }
     }
     optsSignOperation.details.information(
-        cc.info( optsSignOperation.strGatheredDetailsName ), cc.success( " completed" ) );
+        cc.j( optsSignOperation.strGatheredDetailsName ), cc.success( " completed" ) );
     if( optsSignOperation.details ) {
         optsSignOperation.details.exposeDetailsTo(
             log, optsSignOperation.strGatheredDetailsName, true );
@@ -1655,17 +1642,17 @@ export async function doSignMessagesS2S(
 
 async function prepareSignU256( optsSignU256 ) {
     optsSignU256.details.debug( optsSignU256.strLogPrefix, "Will sign ",
-        cc.info( optsSignU256.u256 ), " value..." );
+        cc.j( optsSignU256.u256 ), " value..." );
     optsSignU256.details.trace( optsSignU256.strLogPrefix, "Will query to sign ",
-        cc.info( optsSignU256.jarrNodes.length ), " skaled node(s)..." );
+        cc.j( optsSignU256.jarrNodes.length ), " skaled node(s)..." );
     optsSignU256.nThreshold =
         discoverBlsThreshold( optsSignU256.imaState.joSChainNetworkInfo );
     optsSignU256.nParticipants =
         discoverBlsParticipants( optsSignU256.imaState.joSChainNetworkInfo );
     optsSignU256.details.trace( optsSignU256.strLogPrefix,
-        "Discovered BLS threshold is ", cc.info( optsSignU256.nThreshold ), "." );
+        "Discovered BLS threshold is ", cc.j( optsSignU256.nThreshold ), "." );
     optsSignU256.details.trace( optsSignU256.strLogPrefix,
-        "Discovered number of BLS participants is ", cc.info( optsSignU256.nParticipants ) + "." );
+        "Discovered number of BLS participants is ", cc.j( optsSignU256.nParticipants ) + "." );
     if( ! checkBlsThresholdAndBlsParticipants(
         optsSignU256.nThreshold,
         optsSignU256.nParticipants,
@@ -1681,8 +1668,8 @@ async function prepareSignU256( optsSignU256 ) {
     }
     optsSignU256.nCountOfBlsPartsToCollect = 0 + optsSignU256.nThreshold;
     optsSignU256.details.trace( optsSignU256.strLogPrefix,
-        "Will(optsSignU256.u256) collect ", cc.info( optsSignU256.nCountOfBlsPartsToCollect ),
-        " from ", cc.info( optsSignU256.jarrNodes.length ), " nodes" );
+        "Will(optsSignU256.u256) collect ", optsSignU256.nCountOfBlsPartsToCollect,
+        " from ", optsSignU256.jarrNodes.length, " nodes" );
     return true;
 }
 
@@ -1695,7 +1682,7 @@ async function doSignU256OneImpl( i, optsSignU256 ) {
         : imaUtils.composeSChainNodeUrl( joNode );
     const strNodeDescColorized = cc.u( strNodeURL ) + " " + cc.debug( "(" ) + cc.bright( i ) +
         cc.debug( "/" ) + cc.bright( optsSignU256.jarrNodes.length ) +
-        cc.debug( ", ID " ) + cc.info( joNode.nodeID ) + cc.debug( ")" );
+        cc.debug( ", ID " ) + cc.j( joNode.nodeID ) + cc.debug( ")" );
     const rpcCallOpts = null;
     await rpcCall.create( strNodeURL, rpcCallOpts, async function( joCall, err ) {
         ++optsSignU256.joGatheringTracker.nCountReceived;
@@ -1716,8 +1703,8 @@ async function doSignU256OneImpl( i, optsSignU256 ) {
             return;
         }
         optsSignU256.details.trace( optsSignU256.strLogPrefix, "Will invoke ",
-            cc.info( "skale_imaBSU256" ), " for to sign value ",
-            cc.info( optsSignU256.u256.toString() ) );
+            cc.j( "skale_imaBSU256" ), " for to sign value ",
+            cc.j( optsSignU256.u256.toString() ) );
         await joCall.call( {
             "method": "skale_imaBSU256",
             "params": {
@@ -1741,8 +1728,8 @@ async function doSignU256OneImpl( i, optsSignU256 ) {
                 return;
             }
             optsSignU256.details.trace( optsSignU256.strLogPrefix, "Did invoked ",
-                cc.info( "skale_imaBSU256" ), " for to sign value ",
-                cc.info( optsSignU256.u256.toString() ), ", answer is: ", cc.j( joOut ) );
+                cc.j( "skale_imaBSU256" ), " for to sign value ",
+                cc.j( optsSignU256.u256.toString() ), ", answer is: ", cc.j( joOut ) );
             if( joOut.result == null ||
                 joOut.result == undefined ||
                 ( !typeof joOut.result == "object" )
@@ -1762,7 +1749,7 @@ async function doSignU256OneImpl( i, optsSignU256 ) {
                 return;
             }
             optsSignU256.details.trace( optsSignU256.strLogPrefix, "Node ",
-                cc.info( joNode.nodeID ), " sign result: ",
+                cc.j( joNode.nodeID ), " sign result: ",
                 cc.j( joOut.result ? joOut.result : null ) );
             try {
                 if( joOut.result.signResult.signatureShare.length > 0 &&
@@ -1771,8 +1758,7 @@ async function doSignU256OneImpl( i, optsSignU256 ) {
                     const nZeroBasedNodeIndex = joNode.imaInfo.thisNodeIndex - 1;
                     // partial BLS verification for one participant
                     let bNodeSignatureOKay = false; // initially assume signature is wrong
-                    const strLogPrefixA = cc.info( "BLS" ) + cc.debug( "/#" ) +
-                        cc.bright( nZeroBasedNodeIndex ) + cc.debug( ":" ) + " ";
+                    const strLogPrefixA = "BLS/#" + nZeroBasedNodeIndex + ": ";
                     try {
                         const cntSuccess = optsSignU256.joGatheringTracker.nCountReceived -
                             optsSignU256.joGatheringTracker.nCountErrors;
@@ -1800,7 +1786,7 @@ async function doSignU256OneImpl( i, optsSignU256 ) {
                             optsSignU256.u256, joPublicKey ) ) {
                             optsSignU256.details.success( strLogPrefixA,
                                 "Got successful BLS verification result for node ",
-                                cc.info( joNode.nodeID ), " with index ", nZeroBasedNodeIndex );
+                                cc.j( joNode.nodeID ), " with index ", nZeroBasedNodeIndex );
                             bNodeSignatureOKay = true; // node verification passed
                         } else {
                             const strError = "BLS u256 one node verify failed";
@@ -1839,13 +1825,13 @@ async function doSignU256OneImpl( i, optsSignU256 ) {
                 if( log.id != optsSignU256.details.id ) {
                     log.critical( optsSignU256.strLogPrefix, "S-Chain node ",
                         strNodeDescColorized,
-                        " signature fail from node ", cc.info( joNode.nodeID ),
+                        " signature fail from node ", cc.j( joNode.nodeID ),
                         ", error is ", cc.warning( owaspUtils.extractErrorMessage( err ) ),
                         ", stack is:", "\n", cc.stack( err.stack ) );
                 }
                 optsSignU256.details.critical( optsSignU256.strLogPrefix, "S-Chain node ",
                     strNodeDescColorized,
-                    " signature fail from node ", cc.info( joNode.nodeID ),
+                    " signature fail from node ", cc.j( joNode.nodeID ),
                     ", error is ", cc.warning( owaspUtils.extractErrorMessage( err ) ),
                     ", stack is:", "\n", cc.stack( err.stack ) );
             }
@@ -1861,12 +1847,12 @@ async function doSignU256Gathering( optsSignU256 ) {
         const iv = setInterval( function() {
             if( optsSignU256.joGatheringTracker.nCountReceivedPrevious !=
                 optsSignU256.joGatheringTracker.nCountReceived ) {
-                optsSignU256.details.debug( cc.info( "BLS u256" ) +
-                    " BLS signature gathering progress updated, now have ",
-                optsSignU256.joGatheringTracker.nCountReceived, " BLS parts of ",
-                optsSignU256.nCountOfBlsPartsToCollect, " arrived, have ",
-                optsSignU256.cntSuccess, " success(es) and " ,
-                optsSignU256.joGatheringTracker.nCountErrors, " error(s)" );
+                optsSignU256.details.debug(
+                    "BLS u256 - BLS signature gathering progress updated, now have ",
+                    optsSignU256.joGatheringTracker.nCountReceived, " BLS parts of ",
+                    optsSignU256.nCountOfBlsPartsToCollect, " arrived, have ",
+                    optsSignU256.cntSuccess, " success(es) and " ,
+                    optsSignU256.joGatheringTracker.nCountErrors, " error(s)" );
                 optsSignU256.joGatheringTracker.nCountReceivedPrevious =
                     0 + optsSignU256.joGatheringTracker.nCountReceived;
             }
@@ -1875,8 +1861,7 @@ async function doSignU256Gathering( optsSignU256 ) {
                 optsSignU256.joGatheringTracker.nCountReceived -
                 optsSignU256.joGatheringTracker.nCountErrors;
             if( cntSuccess >= optsSignU256.nCountOfBlsPartsToCollect ) {
-                const strLogPrefixB = cc.info( "BLS u256" ) +
-                    cc.debug( "/" ) + cc.sunny( "Summary" ) + cc.debug( ":" ) + " ";
+                const strLogPrefixB = "BLS u256/Summary: ";
                 clearInterval( iv );
                 let strError = null, strSuccessfulResultDescription = null;
                 const joGlueResult =
@@ -2015,7 +2000,7 @@ export async function doSignU256( u256, details, fn ) {
         fn: fn,
         details: details,
         imaState: state.get(),
-        strLogPrefix: cc.info( "Sign u256:" ) + " ",
+        strLogPrefix: "Sign u256: ",
         joGatheringTracker: {
             nCountReceivedPrevious: 0,
             nCountReceived: 0,
@@ -2086,10 +2071,7 @@ export async function doVerifyReadyHash(
 ) {
     const imaState = state.get();
     const strDirection = "RAW";
-    const strLogPrefix =
-        cc.bright( strDirection ) + cc.debug( "/" ) +
-        cc.info( "BLS" ) + cc.debug( "/#" ) + cc.bright( nZeroBasedNodeIndex ) +
-        cc.debug( ":" ) + " ";
+    const strLogPrefix = strDirection + "/BLS/#" + nZeroBasedNodeIndex + ": ";
     const details = log.createMemoryStream();
     let isSuccess = false;
     const arrTmp = signature.signatureShare.split( ":" );
@@ -2114,7 +2096,7 @@ export async function doVerifyReadyHash(
         const joPublicKey = discoverPublicKeyByIndex(
             nZeroBasedNodeIndex, imaState.joSChainNetworkInfo, details, true );
         details.trace( strLogPrefix, "BLS node #",
-            nZeroBasedNodeIndex, " - hashed verify message is ", cc.info( strMessageHash ) );
+            nZeroBasedNodeIndex, " - hashed verify message is ", cc.j( strMessageHash ) );
         const joMsg = {
             "message": strMessageHash
         };
@@ -2180,7 +2162,7 @@ export async function doSignReadyHash( strMessageHash, isExposeOutput ) {
         details.trace( strLogPrefix, "Discovered BLS threshold is ", nThreshold, "." );
         details.trace( strLogPrefix, "Discovered number of BLS participants is ",
             nParticipants, "." );
-        details.trace( strLogPrefix, "hash value to sign is ", cc.info( strMessageHash ) );
+        details.trace( strLogPrefix, "hash value to sign is ", cc.j( strMessageHash ) );
         if( ! checkBlsThresholdAndBlsParticipants(
             nThreshold, nParticipants, "sign ready hash", details ) )
             return false;
@@ -2237,8 +2219,8 @@ export async function doSignReadyHash( strMessageHash, isExposeOutput ) {
                     "signerIndex": signerIndex + 0 // 1-based
                 }
             };
-            details.trace( strLogPrefix, "Will invoke ", cc.info( "SGX" ),
-                " with call data ", cc.j( joCallSGX ) );
+            details.trace( strLogPrefix, "Will invoke ", "SGX with call data ",
+                cc.j( joCallSGX ) );
             await joCall.call( joCallSGX, async function( joIn, joOut, err ) {
                 if( err ) {
                     const jsErrorObject = new Error(
@@ -2258,8 +2240,8 @@ export async function doSignReadyHash( strMessageHash, isExposeOutput ) {
                     await joCall.disconnect();
                     throw jsErrorObject;
                 }
-                details.trace( strLogPrefix, "Call to ", cc.info( "SGX" ),
-                    " done, answer is: ", cc.j( joOut ) );
+                details.trace( strLogPrefix, "Call to ", "SGX done, answer is: ",
+                    cc.j( joOut ) );
                 joSignResult = joOut;
                 if( joOut.result != null && joOut.result != undefined &&
                     typeof joOut.result == "object" )
@@ -2327,10 +2309,10 @@ async function prepareHandlingOfSkaleImaVerifyAndSign( optsHandleVerifyAndSign )
     optsHandleVerifyAndSign.details.trace( optsHandleVerifyAndSign.strLogPrefix,
         cc.bright( optsHandleVerifyAndSign.strDirection ),
         " verification algorithm will work for transfer from chain ",
-        cc.info( optsHandleVerifyAndSign.strFromChainName ), "/",
-        cc.notice( optsHandleVerifyAndSign.strFromChainID ), " to chain",
-        cc.info( optsHandleVerifyAndSign.strToChainName ), "/",
-        cc.notice( optsHandleVerifyAndSign.strToChainID ),
+        cc.j( optsHandleVerifyAndSign.strFromChainName ), "/",
+        cc.j( optsHandleVerifyAndSign.strFromChainID ), " to chain",
+        cc.j( optsHandleVerifyAndSign.strToChainName ), "/",
+        cc.j( optsHandleVerifyAndSign.strToChainID ),
         " and work with array of message(s) ",
         cc.j( optsHandleVerifyAndSign.jarrMessages ) );
     optsHandleVerifyAndSign.nThreshold =
@@ -2340,11 +2322,11 @@ async function prepareHandlingOfSkaleImaVerifyAndSign( optsHandleVerifyAndSign )
     optsHandleVerifyAndSign.details.debug( optsHandleVerifyAndSign.strLogPrefix,
         cc.bright( optsHandleVerifyAndSign.strDirection ),
         " verification algorithm discovered BLS threshold is ",
-        cc.info( optsHandleVerifyAndSign.nThreshold ), "." );
+        cc.j( optsHandleVerifyAndSign.nThreshold ), "." );
     optsHandleVerifyAndSign.details.debug( optsHandleVerifyAndSign.strLogPrefix,
-        cc.bright( optsHandleVerifyAndSign.strDirection ) +
+        cc.j( optsHandleVerifyAndSign.strDirection ) +
         " verification algorithm discovered number of BLS participants is ",
-        cc.info( optsHandleVerifyAndSign.nParticipants ), "." );
+        cc.j( optsHandleVerifyAndSign.nParticipants ), "." );
     if( ! checkBlsThresholdAndBlsParticipants(
         optsHandleVerifyAndSign.nThreshold,
         optsHandleVerifyAndSign.nParticipants,
@@ -2362,7 +2344,7 @@ async function prepareHandlingOfSkaleImaVerifyAndSign( optsHandleVerifyAndSign )
     optsHandleVerifyAndSign.details.debug( optsHandleVerifyAndSign.strLogPrefix,
         cc.bright( optsHandleVerifyAndSign.strDirection ),
         " verification algorithm message hash to sign is ",
-        cc.info( optsHandleVerifyAndSign.strMessageHash ) );
+        cc.j( optsHandleVerifyAndSign.strMessageHash ) );
     return true;
 }
 
@@ -2371,8 +2353,8 @@ async function prepareS2sOfSkaleImaVerifyAndSign( optsHandleVerifyAndSign ) {
     const strSChainNameDst = optsHandleVerifyAndSign.joCallData.params.dstChainName;
     optsHandleVerifyAndSign.details.trace( optsHandleVerifyAndSign.strLogPrefix,
         cc.bright( optsHandleVerifyAndSign.strDirection ),
-        " verification algorithm will use for source chain name ", cc.info( strSChainNameSrc ),
-        " and destination chain name ", cc.info( strSChainNameDst ) );
+        " verification algorithm will use for source chain name ", cc.j( strSChainNameSrc ),
+        " and destination chain name ", cc.j( strSChainNameDst ) );
     const arrSChainsCached = skaleObserver.getLastCachedSChains();
     if( ( !arrSChainsCached ) || arrSChainsCached.length == 0 ) {
         throw new Error(
@@ -2400,8 +2382,8 @@ async function prepareS2sOfSkaleImaVerifyAndSign( optsHandleVerifyAndSign ) {
     optsHandleVerifyAndSign.details.trace( optsHandleVerifyAndSign.strLogPrefix,
         cc.bright( optsHandleVerifyAndSign.strDirection ),
         " verification algorithm discovered source chain URL is ", cc.u( strUrlSrcSChain ),
-        ", chain name is ", cc.info( joSChainSrc.data.computed.computedSChainId ),
-        ", chain id is ", cc.info( joSChainSrc.data.computed.chainId ) );
+        ", chain name is ", cc.j( joSChainSrc.data.computed.computedSChainId ),
+        ", chain id is ", cc.j( joSChainSrc.data.computed.chainId ) );
     optsHandleVerifyAndSign.joExtraSignOpts = {
         skaleObserver: skaleObserver,
         ethersProviderSrc: owaspUtils.getEthersProviderFromURL( strUrlSrcSChain ),
@@ -2503,8 +2485,8 @@ export async function handleSkaleImaVerifyAndSign( joCallData ) {
             };
             optsHandleVerifyAndSign.details.trace( optsHandleVerifyAndSign.strLogPrefix,
                 cc.bright( optsHandleVerifyAndSign.strDirection ),
-                " verification algorithm will invoke ", cc.info( "SGX" ),
-                " with call data ", cc.j( joCallSGX ) );
+                " verification algorithm will invoke ", "SGX with call data ",
+                cc.j( joCallSGX ) );
             await joCall.call( joCallSGX, async function( joIn, joOut, err ) {
                 if( err ) {
                     const strError =
@@ -2530,7 +2512,7 @@ export async function handleSkaleImaVerifyAndSign( joCallData ) {
                 }
                 optsHandleVerifyAndSign.details.trace( optsHandleVerifyAndSign.strLogPrefix,
                     cc.bright( optsHandleVerifyAndSign.strDirection ) +
-                    " Call to ", cc.info( "SGX" ), " done, answer is: ", cc.j( joOut ) );
+                    " Call to SGX done, answer is: ", cc.j( joOut ) );
                 let joSignResult = joOut;
                 if( joOut.result != null && joOut.result != undefined &&
                     typeof joOut.result == "object" )
@@ -2604,10 +2586,10 @@ async function handleSkaleImaBSU256Prepare( optsBSU256 ) {
         return false;
     optsBSU256.u256 = optsBSU256.joCallData.params.valueToSign;
     optsBSU256.details.trace( optsBSU256.strLogPrefix,
-        "U256 original value is ", cc.info( optsBSU256.u256 ) );
+        "U256 original value is ", cc.j( optsBSU256.u256 ) );
     optsBSU256.strMessageHash = keccak256U256.u256( optsBSU256.u256, true );
     optsBSU256.details.trace( optsBSU256.strLogPrefix,
-        "hash of U256 value to sign is ", cc.info( optsBSU256.strMessageHash ) );
+        "hash of U256 value to sign is ", cc.j( optsBSU256.strMessageHash ) );
     optsBSU256.details.trace( optsBSU256.strLogPrefix, "Will BLS-sign U256." );
     optsBSU256.joAccount = optsBSU256.imaState.chainProperties.sc.optsBSU256.joAccount;
     if( ! optsBSU256.joAccount.strURL ) {
@@ -2683,8 +2665,8 @@ export async function handleSkaleImaBSU256( joCallData ) {
                         "signerIndex": signerIndex + 0 // 1-based
                     }
                 };
-                optsBSU256.details.trace( optsBSU256.strLogPrefix, "Will invoke ",
-                    cc.info( "SGX" ), " with call data ", cc.j( joCallSGX ) );
+                optsBSU256.details.trace( optsBSU256.strLogPrefix,
+                    "Will invoke SGX with call data ", cc.j( joCallSGX ) );
                 await joCall.call( joCallSGX, async function( joIn, joOut, err ) {
                     if( err ) {
                         const jsErrorObject = new Error(
@@ -2706,8 +2688,8 @@ export async function handleSkaleImaBSU256( joCallData ) {
                         await joCall.disconnect();
                         throw jsErrorObject;
                     }
-                    optsBSU256.details.trace( optsBSU256.strLogPrefix, "Call to ",
-                        cc.info( "SGX" ), " done, answer is: ", cc.j( joOut ) );
+                    optsBSU256.details.trace( optsBSU256.strLogPrefix,
+                        "Call to SGX done, answer is: ", cc.j( joOut ) );
                     let joSignResult = joOut;
                     if( joOut.result != null && joOut.result != undefined &&
                         typeof joOut.result == "object" )

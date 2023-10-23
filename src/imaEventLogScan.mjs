@@ -219,7 +219,7 @@ export async function safeGetTransactionCount(
         return ret;
     } catch ( err ) {
         ret = retValOnFail;
-        details.error( "Failed call attempt ", cc.info( idxAttempt ),
+        details.error( "Failed call attempt ", idxAttempt,
             " to ", cc.note( strFnName + "()" ), " via ",
             cc.u( u ), ", error is: ",
             cc.warning( owaspUtils.extractErrorMessage( err ) ),
@@ -245,7 +245,7 @@ export async function safeGetTransactionCount(
             return ret;
         } catch ( err ) {
             ret = retValOnFail;
-            details.error( "Failed call attempt ", cc.info( idxAttempt ),
+            details.error( "Failed call attempt ", idxAttempt,
                 " to ", cc.note( strFnName + "()" ), " via ",
                 cc.u( u ), ", error is: ",
                 cc.warning( owaspUtils.extractErrorMessage( err ) ),
@@ -307,7 +307,7 @@ export async function safeGetTransactionReceipt(
             return ret;
         } catch ( err ) {
             ret = retValOnFail;
-            details.error( "Failed call attempt ", cc.info( idxAttempt ),
+            details.error( "Failed call attempt ", idxAttempt,
                 " to ", cc.note( strFnName + "()" ), " via ",
                 cc.u( u ),", error is: ",
                 cc.warning( owaspUtils.extractErrorMessage( err ) ),
@@ -415,7 +415,7 @@ export async function safeGetPastEvents(
         } catch ( err ) {
             ret = retValOnFail;
             details.error( strLogPrefix, "Failed filtering attempt ",
-                cc.info( idxAttempt ) + " for event ", cc.note( strEventName ),
+                idxAttempt, " for event ", cc.note( strEventName ),
                 " via ", cc.u( u ), ", from block ",
                 cc.info( nBlockFrom.toHexString() ), ", to block ",
                 cc.info( nBlockTo.toHexString() ), ", error is: ",

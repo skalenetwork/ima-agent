@@ -1470,10 +1470,9 @@ export function commandLineTaskBrowseSChain() {
     imaState.arrActions.push( {
         "name": "Browse S-Chain network",
         "fn": async function() {
-            const strLogPrefix = cc.info( "S-Chain Browse:" ) + " ";
+            const strLogPrefix = "S-Chain Browse: ";
             if( imaState.chainProperties.sc.strURL.length === 0 ) {
-                log.fatal( " missing S-Chain URL, please specify ",
-                    cc.info( "url-s-chain" ) );
+                log.fatal( " missing S-Chain URL, please specify \"--url-s-chain\"" );
                 process.exit( 155 );
             }
             log.information( strLogPrefix, "Downloading S-Chain network information ..." );
@@ -1540,7 +1539,7 @@ export function commandLineTaskBrowseSChain() {
                                             process.exit( 159 );
                                         }
                                         log.information( strLogPrefix, "Node ",
-                                            cc.info( joNode.nodeID ), " IMA information: ",
+                                            cc.j( joNode.nodeID ), " IMA information: ",
                                             cc.j( joOut.result ) );
                                         await joCall.disconnect();
                                     } );
@@ -1565,10 +1564,9 @@ export function commandLineTaskBrowseSkaleNetwork() {
     imaState.arrActions.push( {
         "name": "Browse S-Chain network",
         "fn": async function() {
-            const strLogPrefix = cc.info( "SKALE NETWORK Browse:" ) + " ";
+            const strLogPrefix = "SKALE NETWORK Browse: ";
             if( imaState.strPathAbiJsonSkaleManager.length === 0 ) {
-                log.fatal( "Missing Skale Manager ABI, please specify ",
-                    cc.info( "abi-skale-manager" ) );
+                log.fatal( "Missing Skale Manager ABI, please specify \"--abi-skale-manager\"" );
                 process.exit( 160 );
             }
             log.information( strLogPrefix, "Downloading SKALE network information..." );
@@ -1592,10 +1590,9 @@ export function commandLineTaskBrowseConnectedSChains() {
     imaState.arrActions.push( {
         "name": "Browse connected S-Chains",
         "fn": async function() {
-            const strLogPrefix = cc.info( "Browse connected S-Chains:" ) + " ";
+            const strLogPrefix = "Browse connected S-Chains: ";
             if( imaState.strPathAbiJsonSkaleManager.length === 0 ) {
-                log.fatal( "Missing Skale Manager ABI, please specify ",
-                    cc.info( "abi-skale-manager" ) );
+                log.fatal( "Missing Skale Manager ABI, please specify \"--abi-skale-manager\"" );
                 process.exit( 161 );
             }
             log.information( strLogPrefix, "Downloading SKALE network information..." );
@@ -1620,7 +1617,7 @@ export function commandLineTaskDiscoverChainId() {
     imaState.arrActions.push( {
         "name": "Discover chains ID(s)",
         "fn": async function() {
-            const strLogPrefix = cc.info( "Discover chains ID(s):" ) + " ";
+            const strLogPrefix = "Discover chains ID(s): ";
             const arrURLsToDiscover = [];
             if( imaState.chainProperties.mn.strURL &&
                 typeof( imaState.chainProperties.mn.strURL ) == "string" &&
@@ -1659,9 +1656,9 @@ export function commandLineTaskDiscoverChainId() {
                 } );
             }
             if( arrURLsToDiscover.length === 0 ) {
-                log.fatal( "No URLs provided to discover chain IDs, please specify ",
-                    cc.warning( "--url-main-net" )," and/or ", cc.warning( "--url-s-chain" ),
-                    " and/or ", cc.warning( "--url-t-chain" ), "." );
+                log.fatal( "No URLs provided to discover chain IDs, please " +
+                    "specify \"--url-main-net\" and/or \"--url-s-chain\" " +
+                    "and/or \"--url-t-chain\"." );
                 process.exit( 162 );
             }
             for( let i = 0; i < arrURLsToDiscover.length; ++ i ) {
