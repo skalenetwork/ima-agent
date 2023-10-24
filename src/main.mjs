@@ -33,7 +33,6 @@ import * as log from "./log.mjs";
 import * as cc from "./cc.mjs";
 import * as imaCLI from "./cli.mjs";
 import * as loop from "./loop.mjs";
-import * as imaUtils from "./utils.mjs";
 import * as imaHelperAPIs from "./imaHelperAPIs.mjs";
 import * as imaTransferErrorHandling from "./imaTransferErrorHandling.mjs";
 import * as imaBLS from "./bls.mjs";
@@ -50,11 +49,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
 function parseCommandLine() {
     const imaState = state.get();
     cc.autoEnableFromCommandLineArgs();
-    let strPrintedArguments = cc.normal( process.argv.join( " " ) );
-    strPrintedArguments = imaUtils.replaceAll( strPrintedArguments, "--", cc.bright( "--" ) );
-    strPrintedArguments = imaUtils.replaceAll( strPrintedArguments, "=", cc.sunny( "=" ) );
-    strPrintedArguments = imaUtils.replaceAll( strPrintedArguments, "/", cc.info( "/" ) );
-    strPrintedArguments = imaUtils.replaceAll( strPrintedArguments, ":", cc.info( ":" ) );
+    const strPrintedArguments = process.argv.join( " " );
     imaCLI.parse( {
         "register": clpTools.commandLineTaskRegister,
         "register1": clpTools.commandLineTaskRegister1,
@@ -159,7 +154,7 @@ function initMonitoringServer() {
         if( !ip )
             ip = "N/A";
         if( imaState.bLogMonitoringServer )
-            log.debug( strLogPrefix, "New connection from ", cc.info( ip ) );
+            log.debug( strLogPrefix, "New connection from ", log.v( ip ) );
         wsPeer.on( "message", function( message ) {
             const joAnswer = {
                 "method": null,
@@ -169,8 +164,8 @@ function initMonitoringServer() {
             try {
                 const joMessage = JSON.parse( message );
                 if( imaState.bLogMonitoringServer ) {
-                    log.trace( strLogPrefix, "<<< message from ", cc.info( ip ), ": ",
-                        cc.j( joMessage ) );
+                    log.trace( strLogPrefix, "<<< message from ", log.v( ip ), ": ",
+                        log.v( joMessage ) );
                 }
                 if( ! ( "method" in joMessage ) )
                     throw new Error( "\"method\" field was not specified" );
@@ -239,21 +234,21 @@ function initMonitoringServer() {
                 } // switch( joMessage.method )
             } catch ( err ) {
                 const strError = owaspUtils.extractErrorMessage( err );
-                log.error( strLogPrefix, "Bad message from ", cc.info( ip ), ": ",
-                    cc.warning( message ), ", error is: ", cc.warning( strError ),
-                    ", stack is: ", "\n", cc.stack( err.stack ) );
+                log.error( strLogPrefix, "Bad message from ", log.v( ip ), ": ",
+                    cc.warning( message ), ", error is: ", log.em( strError ),
+                    ", stack is: ", "\n", log.s( err.stack ) );
             }
             try {
                 if( imaState.bLogMonitoringServer ) {
-                    log.trace( strLogPrefix, ">>> answer to ", cc.info( ip ), ": ",
-                        cc.j( joAnswer ) );
+                    log.trace( strLogPrefix, ">>> answer to ", log.v( ip ), ": ",
+                        log.v( joAnswer ) );
                 }
                 wsPeer.send( JSON.stringify( joAnswer ) );
             } catch ( err ) {
                 const strError = owaspUtils.extractErrorMessage( err );
-                log.error( strLogPrefix, "Failed to sent answer to ", cc.info( ip ),
-                    ", error is: ", cc.warning( strError ),
-                    ", stack is: ", "\n", cc.stack( err.stack ) );
+                log.error( strLogPrefix, "Failed to sent answer to ", log.v( ip ),
+                    ", error is: ", log.em( strError ),
+                    ", stack is: ", "\n", log.s( err.stack ) );
             }
         } );
     } );
@@ -277,13 +272,13 @@ function initJsonRpcServer() {
             try {
                 res.header( "Content-Type", "application/json" );
                 res.status( 200 ).send( JSON.stringify( joAnswer ) );
-                log.trace( strLogPrefix, ">>> did sent answer to ", cc.info( ip ), ": ",
-                    cc.j( joAnswer ) );
+                log.trace( strLogPrefix, ">>> did sent answer to ", log.v( ip ), ": ",
+                    log.v( joAnswer ) );
             } catch ( err ) {
                 const strError = owaspUtils.extractErrorMessage( err );
-                log.error( strLogPrefix, "Failed to sent answer ", cc.j( joAnswer ), " to ",
-                    cc.info( ip ), ", error is: ", cc.warning( strError ),
-                    ", stack is: ", "\n", cc.stack( err.stack ) );
+                log.error( strLogPrefix, "Failed to sent answer ", log.v( joAnswer ), " to ",
+                    log.v( ip ), ", error is: ", log.em( strError ),
+                    ", stack is: ", "\n", log.s( err.stack ) );
             }
         };
         let joAnswer = {
@@ -293,8 +288,8 @@ function initJsonRpcServer() {
         };
         try {
             const joMessage = JSON.parse( message );
-            log.trace( strLogPrefix, "<<< Peer message from ", cc.info( ip ), ": ",
-                cc.j( joMessage ) );
+            log.trace( strLogPrefix, "<<< Peer message from ", log.v( ip ), ": ",
+                log.v( joMessage ) );
             if( ! ( "method" in joMessage ) )
                 throw new Error( "\"method\" field was not specified" );
             joAnswer.method = joMessage.method;
@@ -362,9 +357,9 @@ function initJsonRpcServer() {
             } // switch( joMessage.method )
         } catch ( err ) {
             const strError = owaspUtils.extractErrorMessage( err );
-            log.error( strLogPrefix, "Bad message from ", cc.info( ip ), ": ",
-                cc.warning( message ), ", error is: ", cc.warning( strError ),
-                ", stack is: ", "\n", cc.stack( err.stack ) );
+            log.error( strLogPrefix, "Bad message from ", log.v( ip ), ": ",
+                cc.warning( message ), ", error is: ", log.em( strError ),
+                ", stack is: ", "\n", log.s( err.stack ) );
         }
         if( ! isSkipMode )
             fnSendAnswer( joAnswer );
@@ -374,7 +369,7 @@ function initJsonRpcServer() {
 
 async function doTheJob() {
     const imaState = state.get();
-    const strLogPrefix = cc.info( "Job 1:" ) + " ";
+    const strLogPrefix = "Job 1: ";
     let idxAction = 0;
     const cntActions = imaState.arrActions.length;
     let cntFalse = 0;
@@ -395,13 +390,13 @@ async function doTheJob() {
         } catch ( err ) {
             ++cntFalse;
             log.critical( strLogPrefix, "Exception occurred while executing action: ",
-                cc.warning( owaspUtils.extractErrorMessage( err ) ),
-                ", stack is: ", "\n", cc.stack( err.stack ) );
+                log.em( owaspUtils.extractErrorMessage( err ) ),
+                ", stack is: ", "\n", log.s( err.stack ) );
         }
     }
     log.information( strLogPrefix, imaHelperAPIs.longSeparator );
     log.information( strLogPrefix, "FINISH:" );
-    log.information( strLogPrefix, cntActions, cc.notice( " task(s) executed" ) );
+    log.information( strLogPrefix, cntActions, " task(s) executed" );
     log.information( strLogPrefix, cntTrue, cc.success( " task(s) succeeded" ) );
     log.information( strLogPrefix, cntFalse, cc.error( " task(s) failed" ) );
     log.information( strLogPrefix, imaHelperAPIs.longSeparator );
@@ -465,7 +460,7 @@ async function main() {
                         // error information is printed by discoveryTools.discoverSChainNetwork()
                         process.exit( 166 );
                     }
-                    log.success( "S-Chain network was discovered: ", cc.j( joSChainNetworkInfo ) );
+                    log.success( "S-Chain network was discovered: ", log.v( joSChainNetworkInfo ) );
                     imaState.joSChainNetworkInfo = joSChainNetworkInfo;
                     discoveryTools.continueSChainDiscoveryInBackgroundIfNeeded(
                         isSilentReDiscovery, function() {
@@ -479,7 +474,7 @@ async function main() {
                 }, isSilentReDiscovery, imaState.joSChainNetworkInfo, nCountToWait
                 ).catch( ( err ) => {
                     const strError = owaspUtils.extractErrorMessage( err );
-                    log.critical( "S-Chain network discovery failed: ", cc.warning( strError ) );
+                    log.critical( "S-Chain network discovery failed: ", log.em( strError ) );
                 } );
             } );
         }

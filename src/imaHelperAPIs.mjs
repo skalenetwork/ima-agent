@@ -68,12 +68,12 @@ export async function safeWaitForNextBlockToAppear( details, ethersProvider ) {
     const nBlockNumber =
         owaspUtils.toBN( await safeGetBlockNumber( details, 10, ethersProvider ) );
     details.trace( "Waiting for next block to appear..." );
-    details.trace( "    ...have block ", cc.info( nBlockNumber.toHexString() ) );
+    details.trace( "    ...have block ", log.v( nBlockNumber.toHexString() ) );
     for( ; true; ) {
         await sleep( 1000 );
         const nBlockNumber2 =
             owaspUtils.toBN( await safeGetBlockNumber( details, 10, ethersProvider ) );
-        details.trace( "    ...have block ", cc.info( nBlockNumber2.toHexString() ) );
+        details.trace( "    ...have block ", log.v( nBlockNumber2.toHexString() ) );
         if( nBlockNumber2.gt( nBlockNumber ) )
             break;
     }
@@ -99,9 +99,10 @@ export async function safeGetBlockNumber(
         return ret;
     } catch ( err ) {
         ret = retValOnFail;
-        details.error( "Failed call attempt ", idxAttempt, " to ", cc.note( strFnName + "()" ),
-            " via ", cc.u( u ), ", error is: ", cc.warning( owaspUtils.extractErrorMessage( err ) ),
-            ", stack is: ", "\n", cc.stack( err.stack ) );
+        details.error( "Failed call attempt ", idxAttempt, " to ", strFnName + "()",
+            " via ", log.u( u ), ", error is: ",
+            log.em( owaspUtils.extractErrorMessage( err ) ),
+            ", stack is: ", "\n", log.s( err.stack ) );
     }
     ++ idxAttempt;
     while( ret === "" && idxAttempt <= cntAttempts ) {
@@ -110,12 +111,12 @@ export async function safeGetBlockNumber(
             ret = retValOnFail;
             if( ! throwIfServerOffline )
                 return ret;
-            details.error( "Cannot call ", cc.note( strFnName + "()" ), " via ", cc.u( u ),
-                cc.warning( " because server is off-line" ) );
+            details.error( "Cannot call ", strFnName + "()", " via ", log.u( u ),
+                " because server is off-line" );
             throw new Error( "Cannot " + strFnName + "() via " + u.toString() +
             " because server is off-line" );
         }
-        details.trace( "Repeat call to ", cc.note( strFnName + "()" ), " via ", cc.u( u ),
+        details.trace( "Repeat call to ", strFnName + "()", " via ", log.u( u ),
             ", attempt ", idxAttempt );
         try {
             ret = await ethersProvider[strFnName]();
@@ -123,15 +124,15 @@ export async function safeGetBlockNumber(
         } catch ( err ) {
             ret = retValOnFail;
             details.error( "Failed call attempt ", idxAttempt, " to ",
-                cc.note( strFnName + "()" ), " via ", cc.u( u ), ", error is: ",
-                cc.warning( owaspUtils.extractErrorMessage( err ) ),
-                ", stack is: ", "\n", cc.stack( err.stack ) );
+                strFnName + "()", " via ", log.u( u ), ", error is: ",
+                log.em( owaspUtils.extractErrorMessage( err ) ),
+                ", stack is: ", "\n", log.s( err.stack ) );
         }
         ++ idxAttempt;
     }
     if( ( idxAttempt + 1 ) > cntAttempts && ret === "" ) {
-        details.error( "Failed call to ", cc.note( strFnName + "()" ),
-            " via ", cc.u( u ), " after ", cntAttempts, " attempts " );
+        details.error( "Failed call to ", strFnName + "()",
+            " via ", log.u( u ), " after ", cntAttempts, " attempts " );
         throw new Error( "Failed call to " + strFnName + "() via " +
         u.toString() + " after " + cntAttempts + " attempts" );
     }

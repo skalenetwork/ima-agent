@@ -58,7 +58,7 @@ async function findOutReferenceLogRecord(
     const cntLogRecord = arrLogRecords.length;
     if( isVerbose ) {
         details.debug( strLogPrefix, "Got ", cntLogRecord, " log record(s) (",
-            cc.j( strEventName ), ") with data: ", cc.j( arrLogRecords ) );
+            log.v( strEventName ), ") with data: ", log.v( arrLogRecords ) );
     }
     for( let idxLogRecord = 0; idxLogRecord < cntLogRecord; ++ idxLogRecord ) {
         const joEvent = arrLogRecords[idxLogRecord];
@@ -76,15 +76,15 @@ async function findOutReferenceLogRecord(
             owaspUtils.toBN( joReferenceLogRecord.currentMessage.toString() );
         if( bnCurrentMessage.eq( bnMessageNumberToFind ) ) {
             if( isVerbose ) {
-                details.success( strLogPrefix, "Found ", cc.j( strEventName ), " log record ",
-                    cc.j( joReferenceLogRecord ), " for message ", nMessageNumberToFind );
+                details.success( strLogPrefix, "Found ", log.v( strEventName ), " log record ",
+                    log.v( joReferenceLogRecord ), " for message ", nMessageNumberToFind );
             }
             return joReferenceLogRecord;
         }
     }
     if( isVerbose ) {
-        details.error( strLogPrefix, "Failed to find ", cc.j( strEventName ),
-            " log record for message ", cc.j( nMessageNumberToFind ) );
+        details.error( strLogPrefix, "Failed to find ", log.v( strEventName ),
+            " log record for message ", log.v( nMessageNumberToFind ) );
     }
     return null;
 }
@@ -96,9 +96,9 @@ async function findOutAllReferenceLogRecords(
 ) {
     if( isVerbose ) {
         details.debug( strLogPrefix, "Optimized IMA message search algorithm will start at block ",
-            cc.j( bnBlockId.toString() ), ", will search for outgoing message counter ",
-            cc.j( nOutMsgCnt.toString() ), " and approach down to incoming message counter ",
-            cc.j( nIncMsgCnt.toString() ) );
+            log.v( bnBlockId.toString() ), ", will search for outgoing message counter ",
+            log.v( nOutMsgCnt.toString() ), " and approach down to incoming message counter ",
+            log.v( nIncMsgCnt.toString() ) );
     }
     const arrLogRecordReferences = [];
     const cntExpected = nOutMsgCnt - nIncMsgCnt;
@@ -129,13 +129,13 @@ async function findOutAllReferenceLogRecords(
         if( isVerbose ) {
             details.error( strLogPrefix, "Optimized IMA message search algorithm fail, found ",
                 cntFound, " log record(s), expected ", cntExpected,
-                " log record(s), found records are: ", cc.j( arrLogRecordReferences ) );
+                " log record(s), found records are: ", log.v( arrLogRecordReferences ) );
         }
     } else {
         if( isVerbose ) {
             details.success( strLogPrefix,
                 "Optimized IMA message search algorithm success, found all ", cntFound,
-                " log record(s): ", cc.j( arrLogRecordReferences ) );
+                " log record(s): ", log.v( arrLogRecordReferences ) );
         }
     }
     return arrLogRecordReferences;
@@ -162,16 +162,14 @@ let gTransferLoopCounter = 0;
 //            )
 async function doQueryOutgoingMessageCounter( optsTransfer ) {
     let nPossibleIntegerValue = 0;
-    optsTransfer.details.debug( optsTransfer.strLogPrefixShort, "SRC ",
-        cc.sunny( "MessageProxy" ), " address is.....",
-        cc.bright( optsTransfer.joMessageProxySrc.address ) );
-    optsTransfer.details.debug( optsTransfer.strLogPrefixShort, "DST ",
-        cc.sunny( "MessageProxy" ), " address is.....",
-        cc.bright( optsTransfer.joMessageProxyDst.address ) );
+    optsTransfer.details.debug( optsTransfer.strLogPrefixShort, "SRC MessageProxy address is.....",
+        log.v( optsTransfer.joMessageProxySrc.address ) );
+    optsTransfer.details.debug( optsTransfer.strLogPrefixShort, "DST MessageProxy address is.....",
+        log.v( optsTransfer.joMessageProxyDst.address ) );
     optsTransfer.strActionName = "src-chain.MessageProxy.getOutgoingMessagesCounter()";
     try {
         optsTransfer.details.debug( optsTransfer.strLogPrefix,
-            "Will call ", cc.notice( optsTransfer.strActionName ), "..." );
+            "Will call ", log.v( optsTransfer.strActionName ), "..." );
         nPossibleIntegerValue =
             await optsTransfer.joMessageProxySrc.callStatic.getOutgoingMessagesCounter(
                 optsTransfer.chainNameDst,
@@ -185,24 +183,24 @@ async function doQueryOutgoingMessageCounter( optsTransfer ) {
         }
         optsTransfer.nOutMsgCnt = owaspUtils.toInteger( nPossibleIntegerValue );
         optsTransfer.details.information( optsTransfer.strLogPrefix,
-            "Result of ", cc.notice( optsTransfer.strActionName ), " call: ",
-            cc.j( optsTransfer.nOutMsgCnt ) );
+            "Result of ", log.v( optsTransfer.strActionName ), " call: ",
+            log.v( optsTransfer.nOutMsgCnt ) );
     } catch ( err ) {
         optsTransfer.details.critical( "(IMMEDIATE) error caught during ",
             optsTransfer.strActionName, ", error optsTransfer.details: ",
-            cc.warning( owaspUtils.extractErrorMessage( err ) ),
-            ", stack is: ", "\n", cc.stack( err.stack ) );
+            log.em( owaspUtils.extractErrorMessage( err ) ),
+            ", stack is: ", "\n", log.s( err.stack ) );
         if( log.id != optsTransfer.details.id ) {
             log.critical( "(IMMEDIATE) error caught during ",
                 optsTransfer.strActionName, ", error optsTransfer.details: ",
-                cc.warning( owaspUtils.extractErrorMessage( err ) ),
-                ", stack is: ", "\n", cc.stack( err.stack ) );
+                log.em( owaspUtils.extractErrorMessage( err ) ),
+                ", stack is: ", "\n", log.s( err.stack ) );
         }
     }
 
     optsTransfer.strActionName = "dst-chain.MessageProxy.getIncomingMessagesCounter()";
     optsTransfer.details.debug( optsTransfer.strLogPrefix,
-        "Will call ", cc.notice( optsTransfer.strActionName ), "..." );
+        "Will call ", log.v( optsTransfer.strActionName ), "..." );
     nPossibleIntegerValue =
         await optsTransfer.joMessageProxyDst.callStatic.getIncomingMessagesCounter(
             optsTransfer.chainNameSrc,
@@ -214,7 +212,7 @@ async function doQueryOutgoingMessageCounter( optsTransfer ) {
     }
     optsTransfer.nIncMsgCnt = owaspUtils.toInteger( nPossibleIntegerValue );
     optsTransfer.details.debug( optsTransfer.strLogPrefix, "Result of ",
-        cc.notice( optsTransfer.strActionName ), " call: ", cc.j( optsTransfer.nIncMsgCnt ) );
+        log.v( optsTransfer.strActionName ), " call: ", log.v( optsTransfer.nIncMsgCnt ) );
     optsTransfer.strActionName = "src-chain.MessageProxy.getIncomingMessagesCounter()";
     nPossibleIntegerValue =
         await optsTransfer.joMessageProxySrc.callStatic.getIncomingMessagesCounter(
@@ -227,7 +225,7 @@ async function doQueryOutgoingMessageCounter( optsTransfer ) {
     }
     const idxLastToPopNotIncluding = owaspUtils.toInteger( nPossibleIntegerValue );
     optsTransfer.details.debug( optsTransfer.strLogPrefix, "Result of ",
-        cc.notice( optsTransfer.strActionName ), " call: ", cc.j( idxLastToPopNotIncluding ) );
+        log.v( optsTransfer.strActionName ), " call: ", log.v( idxLastToPopNotIncluding ) );
     // first, try optimized scanner
     optsTransfer.arrLogRecordReferences = [];
     try {
@@ -251,19 +249,16 @@ async function doQueryOutgoingMessageCounter( optsTransfer ) {
         } catch ( err ) {
             optsTransfer.arrLogRecordReferences = [];
             optsTransfer.details.error(
-                optsTransfer.strLogPrefix, cc.warning( "Optimized log search is ",
-                    "off", cc.warning( " Running old IMA smart contracts?" ),
-                    cc.success( " Please upgrade, if possible." ),
-                    cc.warning( " This message is based on error: " ),
-                    cc.success( " Please upgrade, if possible." ),
-                    cc.warning( " Error is: " ),
-                    owaspUtils.extractErrorMessage( err ) ),
-                cc.warning( ", stack is: " ), "\n", cc.stack( err.stack ) );
+                optsTransfer.strLogPrefix, "Optimized log search is off. Running old IMA smart " +
+                    "contracts? Please upgrade, if possible. This message is based on error: " +
+                    " Please upgrade, if possible. Error is: ",
+                log.em( owaspUtils.extractErrorMessage( err ) ),
+                ", stack is: ", "\n", log.s( err.stack ) );
         }
     } catch ( err ) {
         optsTransfer.arrLogRecordReferences = [];
         optsTransfer.details.error( optsTransfer.strLogPrefix,
-            cc.warning( "Optimized log search is un-available." ) );
+            log.em( "Optimized log search is un-available." ) );
     }
     // second, use classic raw events search
     optsTransfer.strActionName =
@@ -299,12 +294,12 @@ async function analyzeGatheredRecords( optsTransfer, r ) {
         owaspUtils.ethersMod.ethers.utils.id( optsTransfer.chainNameDst );
     optsTransfer.details.debug( optsTransfer.strLogPrefix, "Will review ", r.length,
         " found event records(in reverse order, newest to oldest) while looking for hash ",
-        cc.j( strChainHashWeAreLookingFor ), " of destination chain ",
-        cc.j( optsTransfer.chainNameDst ) );
+        log.v( strChainHashWeAreLookingFor ), " of destination chain ",
+        log.v( optsTransfer.chainNameDst ) );
     for( let i = r.length - 1; i >= 0; i-- ) {
         const joEvent = r[i];
         optsTransfer.details.debug( optsTransfer.strLogPrefix,
-            "Will review found event record ", i, " with data ", cc.j( joEvent ) );
+            "Will review found event record ", i, " with data ", log.v( joEvent ) );
         const eventValuesByName = {
             "dstChainHash": joEvent.args[0],
             "msgCounter": joEvent.args[1],
@@ -318,12 +313,12 @@ async function analyzeGatheredRecords( optsTransfer, r ) {
             optsTransfer.details.success( optsTransfer.strLogPrefix,
                 "Found event record ", i, " reviewed and ",
                 "accepted for processing, found event values are ",
-                cc.j( joValues ), ", found block number is ",
-                cc.j( joValues.savedBlockNumberForOptimizations ) );
+                log.v( joValues ), ", found block number is ",
+                log.v( joValues.savedBlockNumberForOptimizations ) );
             break;
         } else {
             optsTransfer.details.debug( optsTransfer.strLogPrefix, "Found event record ", i,
-                " reviewed and ", cc.warning( "skipped" ) );
+                " reviewed and skipped" );
         }
     }
     if( joValues == "" ) {
@@ -366,8 +361,8 @@ async function gatherMessages( optsTransfer ) {
         optsTransfer.strActionName = "src-chain->MessageProxy->scan-past-events()";
         const strEventName = "OutgoingMessage";
         optsTransfer.details.debug( optsTransfer.strLogPrefix, "Will call ",
-            cc.notice( optsTransfer.strActionName ), " for ",
-            cc.j( strEventName ), " event..." );
+            log.v( optsTransfer.strActionName ), " for ",
+            log.v( strEventName ), " event..." );
         r = await imaEventLogScan.safeGetPastEventsProgressive(
             optsTransfer.details, optsTransfer.strLogPrefixShort, optsTransfer.ethersProviderSrc,
             10, optsTransfer.joMessageProxySrc, strEventName, nBlockFrom, nBlockTo,
@@ -385,19 +380,19 @@ async function gatherMessages( optsTransfer ) {
             try {
                 const transactionHash = r[0].transactionHash;
                 optsTransfer.details.debug( optsTransfer.strLogPrefix,
-                    "Event transactionHash is ", cc.j( transactionHash ) );
+                    "Event transactionHash is ", log.v( transactionHash ) );
                 const blockNumber = r[0].blockNumber;
                 optsTransfer.details.debug( optsTransfer.strLogPrefix,
-                    "Event blockNumber is ", cc.j( blockNumber ) );
+                    "Event blockNumber is ", log.v( blockNumber ) );
                 const nLatestBlockNumber = await imaHelperAPIs.safeGetBlockNumber(
                     optsTransfer.details, 10, optsTransfer.ethersProviderSrc );
                 optsTransfer.details.debug( optsTransfer.strLogPrefix,
-                    "Latest blockNumber is ", cc.j( nLatestBlockNumber ) );
+                    "Latest blockNumber is ", log.v( nLatestBlockNumber ) );
                 const nDist = nLatestBlockNumber - blockNumber;
                 if( nDist < optsTransfer.nBlockAwaitDepth )
                     bSecurityCheckPassed = false;
                 optsTransfer.details.debug( optsTransfer.strLogPrefix,
-                    "Distance by blockNumber is ", cc.j( nDist ),
+                    "Distance by blockNumber is ", log.v( nDist ),
                     ", await check is ",
                     ( bSecurityCheckPassed ? cc.success( "PASSED" ) : cc.error( "FAILED" ) ) );
             } catch ( err ) {
@@ -406,14 +401,14 @@ async function gatherMessages( optsTransfer ) {
                 optsTransfer.details.critical( optsTransfer.strLogPrefix,
                     "Exception(evaluate block depth) while " +
                         "getting transaction hash and block number during ",
-                    optsTransfer.strActionName, ": ", cc.warning( strError ),
-                    ", stack is: ", "\n", cc.stack( err.stack ) );
+                    optsTransfer.strActionName, ": ", log.em( strError ),
+                    ", stack is: ", "\n", log.s( err.stack ) );
                 if( log.id != optsTransfer.details.id ) {
                     log.critical( optsTransfer.strLogPrefix,
                         "Exception(evaluate block depth) while " +
                             "getting transaction hash and block number during ",
-                        optsTransfer.strActionName, ": ", cc.warning( strError ),
-                        ", stack is: ", "\n", cc.stack( err.stack ) );
+                        optsTransfer.strActionName, ": ", log.em( strError ),
+                        ", stack is: ", "\n", log.s( err.stack ) );
                 }
                 optsTransfer.details.exposeDetailsTo(
                     log, optsTransfer.strGatheredDetailsName, false );
@@ -424,7 +419,7 @@ async function gatherMessages( optsTransfer ) {
             }
             optsTransfer.strActionName = "" + strActionNameOld;
             if( !bSecurityCheckPassed ) {
-                const s = optsTransfer.strLogPrefix + cc.warning( "Block depth check was " +
+                const s = optsTransfer.strLogPrefix + log.em( "Block depth check was " +
                     "not passed, canceling search for transfer events" );
                 optsTransfer.details.warning( s );
                 if( log.id != optsTransfer.details.id )
@@ -439,10 +434,10 @@ async function gatherMessages( optsTransfer ) {
             try {
                 const transactionHash = r[0].transactionHash;
                 optsTransfer.details.debug( optsTransfer.strLogPrefix,
-                    "Event transactionHash is ", cc.j( transactionHash ) );
+                    "Event transactionHash is ", log.v( transactionHash ) );
                 const blockNumber = r[0].blockNumber;
                 optsTransfer.details.debug( optsTransfer.strLogPrefix,
-                    "Event blockNumber is ", cc.j( blockNumber ) );
+                    "Event blockNumber is ", log.v( blockNumber ) );
                 const joBlock = await optsTransfer.ethersProviderSrc.getBlock( blockNumber );
                 if( !owaspUtils.validateInteger( joBlock.timestamp ) ) {
                     throw new Error( "Block \"timestamp\" is not a valid integer value: " +
@@ -450,15 +445,15 @@ async function gatherMessages( optsTransfer ) {
                 }
                 const timestampBlock = owaspUtils.toInteger( joBlock.timestamp );
                 optsTransfer.details.debug( optsTransfer.strLogPrefix,
-                    "Block   TS is ", cc.j( timestampBlock ) );
+                    "Block   TS is ", log.v( timestampBlock ) );
                 const timestampCurrent = imaHelperAPIs.currentTimestamp();
                 optsTransfer.details.debug( optsTransfer.strLogPrefix,
-                    "Current TS is ", cc.j( timestampCurrent ) );
+                    "Current TS is ", log.v( timestampCurrent ) );
                 const tsDiff = timestampCurrent - timestampBlock;
                 optsTransfer.details.debug( optsTransfer.strLogPrefix,
-                    "Diff    TS is ", cc.j( tsDiff ) );
+                    "Diff    TS is ", log.v( tsDiff ) );
                 optsTransfer.details.debug( optsTransfer.strLogPrefix,
-                    "Expected diff ", cc.j( optsTransfer.nBlockAge ) );
+                    "Expected diff ", log.v( optsTransfer.nBlockAge ) );
                 if( tsDiff < optsTransfer.nBlockAge )
                     bSecurityCheckPassed = false;
                 optsTransfer.details.debug( optsTransfer.strLogPrefix,
@@ -470,13 +465,13 @@ async function gatherMessages( optsTransfer ) {
                 optsTransfer.details.critical( optsTransfer.strLogPrefix,
                     "Exception(evaluate block age) while " +
                         "getting block number and timestamp during " +
-                        optsTransfer.strActionName + ": ", cc.warning( strError ),
-                    ", stack is: ", "\n", cc.stack( err.stack ) );
+                        optsTransfer.strActionName + ": ", log.em( strError ),
+                    ", stack is: ", "\n", log.s( err.stack ) );
                 if( log.id != optsTransfer.details.id ) {
                     log.critical( "Exception(evaluate block age) while " +
                         "getting block number and timestamp during " +
-                        optsTransfer.strActionName + ": ", cc.warning( strError ),
-                    ", stack is: ", "\n", cc.stack( err.stack ) );
+                        optsTransfer.strActionName + ": ", log.em( strError ),
+                    ", stack is: ", "\n", log.s( err.stack ) );
                 }
                 optsTransfer.details.exposeDetailsTo(
                     log, optsTransfer.strGatheredDetailsName, false );
@@ -492,13 +487,12 @@ async function gatherMessages( optsTransfer ) {
                 break;
             }
         }
-        optsTransfer.details.success( optsTransfer.strLogPrefix,
-            "Got event optsTransfer.details from ", cc.notice( "getPastEvents()" ),
-            " event invoked with ", cc.notice( "msgCounter" ), " set to ",
-            cc.j( optsTransfer.nIdxCurrentMsg ), " and ", cc.notice( "dstChain" ), " set to ",
-            cc.j( optsTransfer.chainNameDst ), ", event description: ", cc.j( joValues ) );
+        optsTransfer.details.success( optsTransfer.strLogPrefix, "Got event optsTransfer.details " +
+            "from getPastEvents() event invoked with msgCounter set to ",
+        log.v( optsTransfer.nIdxCurrentMsg ), " and dstChain set to ",
+        log.v( optsTransfer.chainNameDst ), ", event description: ", log.v( joValues ) );
         optsTransfer.details.debug( optsTransfer.strLogPrefix,
-            "Will process message counter value ", cc.j( optsTransfer.nIdxCurrentMsg ) );
+            "Will process message counter value ", log.v( optsTransfer.nIdxCurrentMsg ) );
         optsTransfer.arrMessageCounters.push( optsTransfer.nIdxCurrentMsg );
         const joMessage = {
             "sender": joValues.srcContract,
@@ -518,9 +512,9 @@ async function preCheckAllMessagesSign( optsTransfer, err, jarrMessages, joGlueR
         optsTransfer.strLogPrefix +
         cc.debug( "Did invoked message signing callback, " +
             "first real message index is: " ) +
-        cc.j( optsTransfer.nIdxCurrentMsgBlockStart ) +
-        cc.debug( ", have " ) + cc.j( optsTransfer.jarrMessages.length ) +
-        cc.debug( " message(s) to process " ) + cc.j( optsTransfer.jarrMessages );
+        log.v( optsTransfer.nIdxCurrentMsgBlockStart ) +
+        cc.debug( ", have " ) + log.v( optsTransfer.jarrMessages.length ) +
+        cc.debug( " message(s) to process " ) + log.v( optsTransfer.jarrMessages );
     optsTransfer.details.debug( strDidInvokedSigningCallbackMessage );
     if( log.id != optsTransfer.details.id )
         log.debug( strDidInvokedSigningCallbackMessage );
@@ -528,10 +522,10 @@ async function preCheckAllMessagesSign( optsTransfer, err, jarrMessages, joGlueR
         optsTransfer.bErrorInSigningMessages = true;
         const strError = owaspUtils.extractErrorMessage( err );
         optsTransfer.details.critical( optsTransfer.strLogPrefix,
-            "Error signing messages: ", cc.warning( strError ) );
+            "Error signing messages: ", log.em( strError ) );
         if( log.id != optsTransfer.details.id ) {
             log.critical( optsTransfer.strLogPrefix,
-                "Error signing messages: ", cc.warning( strError ) );
+                "Error signing messages: ", log.em( strError ) );
         }
         imaTransferErrorHandling.saveTransferError(
             optsTransfer.strTransferErrorCategoryName, optsTransfer.details.toString() );
@@ -541,7 +535,7 @@ async function preCheckAllMessagesSign( optsTransfer, err, jarrMessages, joGlueR
         null, optsTransfer.strDirection, optsTransfer.joRuntimeOpts )
     ) {
         const strWarning = optsTransfer.strLogPrefix +
-            cc.warning( "Time framing overflow (after signing messages)" );
+            log.em( "Time framing overflow (after signing messages)" );
         optsTransfer.details.warning( strWarning );
         if( log.id != optsTransfer.details.id )
             log.warning( strWarning );
@@ -557,10 +551,9 @@ async function callbackAllMessagesSign( optsTransfer, err, jarrMessages, joGlueR
     const nBlockSize = optsTransfer.arrMessageCounters.length;
     optsTransfer.strActionName = "dst-chain.MessageProxy.postIncomingMessages()";
     const strWillCallPostIncomingMessagesAction = optsTransfer.strLogPrefix +
-        cc.debug( "Will call " ) + cc.notice( optsTransfer.strActionName ) +
-        cc.debug( " for " ) + cc.notice( "block size" ) + cc.debug( " set to " ) +
-        cc.j( nBlockSize ) + cc.debug( ", " ) + cc.notice( "message counters =" ) +
-        cc.debug( " are " ) + cc.j( optsTransfer.arrMessageCounters ) +
+        cc.debug( "Will call " ) + log.v( optsTransfer.strActionName ) +
+        cc.debug( " for block size set to " ) + log.v( nBlockSize ) +
+        cc.debug( ", message counters = are " ) + log.v( optsTransfer.arrMessageCounters ) +
         cc.debug( "..." );
     optsTransfer.details.debug( strWillCallPostIncomingMessagesAction );
     if( log.id != optsTransfer.details.id )
@@ -590,16 +583,15 @@ async function callbackAllMessagesSign( optsTransfer, err, jarrMessages, joGlueR
         hashPoint.X, // G1.X from joGlueResult.hashSrc
         hashPoint.Y, // G1.Y from joGlueResult.hashSrc
         hint ];
-    optsTransfer.details.debug( optsTransfer.strLogPrefix, "....debug args for ",
-        cc.notice( "msgCounter" ), " set to " + cc.j( optsTransfer.nIdxCurrentMsgBlockStart ),
-        ": ", cc.j( joDebugArgs ) );
+    optsTransfer.details.debug( optsTransfer.strLogPrefix, "....debug args for msgCounter set to ",
+        log.v( optsTransfer.nIdxCurrentMsgBlockStart ), ": ", log.v( joDebugArgs ) );
     optsTransfer.strActionName = optsTransfer.strDirection + " - Post incoming messages";
     const weiHowMuchPostIncomingMessages = undefined;
     const gasPrice =
         await optsTransfer.transactionCustomizerDst.computeGasPrice(
             optsTransfer.ethersProviderDst, 200000000000 );
     optsTransfer.details.debug( optsTransfer.strLogPrefix, "Using computed ",
-        cc.j( "gasPrice" ), "=", cc.j( gasPrice ) );
+        log.v( "gasPrice" ), "=", log.v( gasPrice ) );
     let estimatedGasPostIncomingMessages =
         await optsTransfer.transactionCustomizerDst.computeGas(
             optsTransfer.details, optsTransfer.ethersProviderDst,
@@ -608,7 +600,7 @@ async function callbackAllMessagesSign( optsTransfer, err, jarrMessages, joGlueR
             optsTransfer.joAccountDst, optsTransfer.strActionName,
             gasPrice, 10000000, weiHowMuchPostIncomingMessages, null );
     optsTransfer.details.debug( optsTransfer.strLogPrefix, "Using estimated gas=",
-        cc.j( estimatedGasPostIncomingMessages ) );
+        log.v( estimatedGasPostIncomingMessages ) );
     if( optsTransfer.strDirection == "S2M" ) {
         const expectedGasLimit = perMessageGasForTransfer * optsTransfer.jarrMessages.length +
             additionalS2MTransferOverhead;
@@ -652,8 +644,8 @@ async function callbackAllMessagesSign( optsTransfer, err, jarrMessages, joGlueR
     }
     optsTransfer.cntProcessed += optsTransfer.cntAccumulatedForBlock;
     optsTransfer.details.information( optsTransfer.strLogPrefix,
-        "Validating transfer from ", cc.j( optsTransfer.chainNameSrc ), " to ",
-        cc.j( optsTransfer.chainNameDst ), "..." );
+        "Validating transfer from ", log.v( optsTransfer.chainNameSrc ), " to ",
+        log.v( optsTransfer.chainNameDst ), "..." );
     // check DepositBox -> Error on Mainnet only
     if( optsTransfer.chainNameDst == "Mainnet" ) {
         optsTransfer.details.debug( optsTransfer.strLogPrefix,
@@ -663,9 +655,9 @@ async function callbackAllMessagesSign( optsTransfer, err, jarrMessages, joGlueR
                 "transactionHash" in joReceipt ) {
                 const strEventName = "PostMessageError";
                 optsTransfer.details.debug( optsTransfer.strLogPrefix,
-                    "Verifying the ", cc.j( strEventName ), " event of the ",
-                    cc.j( "MessageProxy" ), "/",
-                    cc.j( optsTransfer.joMessageProxyDst.address ),
+                    "Verifying the ", log.v( strEventName ), " event of the ",
+                    log.v( "MessageProxy" ), "/",
+                    log.v( optsTransfer.joMessageProxyDst.address ),
                     " contract..." );
                 const joEvents = await imaEventLogScan.getContractCallEvents(
                     optsTransfer.details, optsTransfer.strLogPrefixShort,
@@ -675,22 +667,22 @@ async function callbackAllMessagesSign( optsTransfer, err, jarrMessages, joGlueR
                     optsTransfer.joMessageProxyDst.filters[strEventName]() );
                 if( joEvents.length == 0 ) {
                     optsTransfer.details.success( optsTransfer.strLogPrefix,
-                        "Success, verified the ", cc.j( strEventName ), " event of the ",
-                        cc.j( "MessageProxy" ), "/",
-                        cc.j( optsTransfer.joMessageProxyDst.address ),
+                        "Success, verified the ", log.v( strEventName ), " event of the ",
+                        log.v( "MessageProxy" ), "/",
+                        log.v( optsTransfer.joMessageProxyDst.address ),
                         " contract, no events found" );
                 } else {
                     optsTransfer.details.critical( optsTransfer.strLogPrefix,
-                        "Failed verification of the ", cc.j( "PostMessageError" ),
-                        " event of the ", cc.j( "MessageProxy" ), "/",
-                        cc.j( optsTransfer.joMessageProxyDst.address ),
-                        " contract, found event(s): ", cc.j( joEvents ) );
+                        "Failed verification of the ", log.v( "PostMessageError" ),
+                        " event of the ", log.v( "MessageProxy" ), "/",
+                        log.v( optsTransfer.joMessageProxyDst.address ),
+                        " contract, found event(s): ", log.v( joEvents ) );
                     if( log.id != optsTransfer.details.id ) {
                         log.critical( optsTransfer.strLogPrefix,
-                            "Failed verification of the ", cc.j( "PostMessageError" ),
-                            " event of the ", cc.j( "MessageProxy" ), "/",
-                            cc.j( optsTransfer.joMessageProxyDst.address ),
-                            " contract, found event(s): ", cc.j( joEvents ) );
+                            "Failed verification of the ", log.v( "PostMessageError" ),
+                            " event of the ", log.v( "MessageProxy" ), "/",
+                            log.v( optsTransfer.joMessageProxyDst.address ),
+                            " contract, found event(s): ", log.v( joEvents ) );
                     }
                     imaTransferErrorHandling.saveTransferError(
                         optsTransfer.strTransferErrorCategoryName,
@@ -733,10 +725,10 @@ async function handleAllMessagesSigning( optsTransfer ) {
                     optsTransfer.bErrorInSigningMessages = true;
                     const strError = owaspUtils.extractErrorMessage( err );
                     optsTransfer.details.error( optsTransfer.strLogPrefix,
-                        "Problem in transfer handler(in signer): ", cc.warning( strError ) );
+                        "Problem in transfer handler(in signer): ", log.em( strError ) );
                     if( log.id != optsTransfer.details.id ) {
                         log.error( optsTransfer.strLogPrefix,
-                            "Problem in transfer handler(in signer): ", cc.warning( strError ) );
+                            "Problem in transfer handler(in signer): ", log.em( strError ) );
                     }
                     imaTransferErrorHandling.saveTransferError(
                         optsTransfer.strTransferErrorCategoryName,
@@ -751,10 +743,10 @@ async function handleAllMessagesSigning( optsTransfer ) {
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         optsTransfer.details.error( optsTransfer.strLogPrefix,
-            "Problem in transfer handler(general): ", cc.warning( strError ) );
+            "Problem in transfer handler(general): ", log.em( strError ) );
         if( log.id != optsTransfer.details.id ) {
             log.error( optsTransfer.strLogPrefix,
-                "Problem in transfer handler(general): ", cc.warning( strError ) );
+                "Problem in transfer handler(general): ", log.em( strError ) );
         }
         imaTransferErrorHandling.saveTransferError(
             optsTransfer.strTransferErrorCategoryName,
@@ -770,10 +762,10 @@ async function checkOutgoingMessageEvent( optsTransfer, joSChain ) {
         const idxImaMessage = optsTransfer.arrMessageCounters[idxMessage];
         const joMessage = optsTransfer.jarrMessages[idxMessage];
         optsTransfer.details.trace( optsTransfer.strLogPrefix,
-            cc.sunny( optsTransfer.strDirection ),
-            " message analysis for message ", cc.j( idxMessage + 1 ), " of ",
-            cc.j( cntMessages ), " with IMA message index ", cc.j( idxImaMessage ),
-            " and message envelope data:", cc.j( joMessage ) );
+            log.v( optsTransfer.strDirection ),
+            " message analysis for message ", log.v( idxMessage + 1 ), " of ",
+            log.v( cntMessages ), " with IMA message index ", log.v( idxImaMessage ),
+            " and message envelope data:", log.v( joMessage ) );
         let cntPassedNodes = 0, cntFailedNodes = 0, joNode = null;
         try {
             for( let idxNode = 0; idxNode < cntNodes; ++ idxNode ) {
@@ -781,8 +773,8 @@ async function checkOutgoingMessageEvent( optsTransfer, joSChain ) {
                 // eslint-disable-next-line dot-notation
                 const strUrlHttp = joNode["http_endpoint_ip"];
                 optsTransfer.details.trace( optsTransfer.strLogPrefix, "Validating ",
-                    cc.sunny( optsTransfer.strDirection ), " message ", cc.j( idxMessage + 1 ),
-                    " on node ", cc.j( joNode.name ), " using URL ", cc.u( strUrlHttp ),
+                    log.v( optsTransfer.strDirection ), " message ", log.v( idxMessage + 1 ),
+                    " on node ", log.v( joNode.name ), " using URL ", log.u( strUrlHttp ),
                     "..." );
                 let bEventIsFound = false;
                 try {
@@ -810,8 +802,8 @@ async function checkOutgoingMessageEvent( optsTransfer, joSChain ) {
                     );
                     const cntEvents = node_r.length;
                     optsTransfer.details.trace( optsTransfer.strLogPrefix, "Got ",
-                        cntEvents, " event(s) (", cc.j( strEventName ), ") on node ",
-                        cc.j( joNode.name ), " with data: ", cc.j( node_r ) );
+                        cntEvents, " event(s) (", log.v( strEventName ), ") on node ",
+                        log.v( joNode.name ), " with data: ", log.v( node_r ) );
                     for( let idxEvent = 0; idxEvent < cntEvents; ++ idxEvent ) {
                         const joEvent = node_r[idxEvent];
                         const eventValuesByName = {
@@ -837,42 +829,42 @@ async function checkOutgoingMessageEvent( optsTransfer, joSChain ) {
                 } catch ( err ) {
                     ++ cntFailedNodes;
                     optsTransfer.details.error( optsTransfer.strLogPrefix,
-                        cc.j( optsTransfer.strDirection ), " message analysis error: " +
-                        "Failed to scan events on node ", cc.j( joNode.name ),
-                        ", error is: ", cc.warning( owaspUtils.extractErrorMessage( err ) ),
-                        ", detailed node description is: ", cc.j( joNode ),
-                        ", stack is: ", "\n", cc.stack( err.stack ) );
+                        log.v( optsTransfer.strDirection ), " message analysis error: " +
+                        "Failed to scan events on node ", log.v( joNode.name ),
+                        ", error is: ", log.em( owaspUtils.extractErrorMessage( err ) ),
+                        ", detailed node description is: ", log.v( joNode ),
+                        ", stack is: ", "\n", log.s( err.stack ) );
                     if( log.id != optsTransfer.details.id ) {
                         log.error( optsTransfer.strLogPrefix,
-                            cc.j( optsTransfer.strDirection ), " message analysis error: " +
-                            "Failed to scan events on node ", cc.j( joNode.name ),
-                            ", error is: ", cc.warning( owaspUtils.extractErrorMessage( err ) ),
-                            ", detailed node description is: ", cc.j( joNode ),
-                            ", stack is: ", "\n", cc.stack( err.stack ) );
+                            log.v( optsTransfer.strDirection ), " message analysis error: " +
+                            "Failed to scan events on node ", log.v( joNode.name ),
+                            ", error is: ", log.em( owaspUtils.extractErrorMessage( err ) ),
+                            ", detailed node description is: ", log.v( joNode ),
+                            ", stack is: ", "\n", log.s( err.stack ) );
                     }
                     continue;
                 }
                 if( bEventIsFound ) {
                     ++ cntPassedNodes;
                     optsTransfer.details.success( optsTransfer.strLogPrefix,
-                        cc.sunny( optsTransfer.strDirection ), " message ",
-                        cc.j( idxMessage + 1 ), " validation on node ",
-                        cc.j( joNode.name ), " using URL ",
-                        cc.u( strUrlHttp ), " is passed" );
+                        log.v( optsTransfer.strDirection ), " message ",
+                        log.v( idxMessage + 1 ), " validation on node ",
+                        log.v( joNode.name ), " using URL ",
+                        log.u( strUrlHttp ), " is passed" );
                 } else {
                     ++ cntFailedNodes;
                     // eslint-disable-next-line dot-notation
                     optsTransfer.details.error( optsTransfer.strLogPrefix,
-                        cc.j( optsTransfer.strDirection ), " message ",
-                        cc.j( idxMessage + 1 ), " validation on node ",
-                        cc.j( joNode.name ), " using URL ",
-                        cc.u( strUrlHttp ), " is failed" );
+                        log.v( optsTransfer.strDirection ), " message ",
+                        log.v( idxMessage + 1 ), " validation on node ",
+                        log.v( joNode.name ), " using URL ",
+                        log.u( strUrlHttp ), " is failed" );
                     if( log.id != optsTransfer.details.id ) {
                         log.error( optsTransfer.strLogPrefix,
-                            cc.j( optsTransfer.strDirection ), " message ",
-                            cc.j( idxMessage + 1 ), " validation on node ",
-                            cc.j( joNode.name ), " using URL ",
-                            cc.u( strUrlHttp ), " is failed" );
+                            log.v( optsTransfer.strDirection ), " message ",
+                            log.v( idxMessage + 1 ), " validation on node ",
+                            log.v( joNode.name ), " using URL ",
+                            log.u( strUrlHttp ), " is failed" );
                     }
                 }
                 if( cntFailedNodes > optsTransfer.cntNodesMayFail )
@@ -880,10 +872,10 @@ async function checkOutgoingMessageEvent( optsTransfer, joSChain ) {
                 if( cntPassedNodes >= optsTransfer.cntNodesShouldPass ) {
                     // eslint-disable-next-line dot-notation
                     optsTransfer.details.information( optsTransfer.strLogPrefix,
-                        cc.j( optsTransfer.strDirection ), " message ",
-                        cc.j( idxMessage + 1 ), " validation on node ",
-                        cc.j( joNode.name ), " using URL ",
-                        cc.u( strUrlHttp ), " is passed" );
+                        log.v( optsTransfer.strDirection ), " message ",
+                        log.v( idxMessage + 1 ), " validation on node ",
+                        log.v( joNode.name ), " using URL ",
+                        log.u( strUrlHttp ), " is passed" );
                     break;
                 }
             }
@@ -891,36 +883,36 @@ async function checkOutgoingMessageEvent( optsTransfer, joSChain ) {
             // eslint-disable-next-line dot-notation
             const strUrlHttp = joNode ? joNode["http_endpoint_ip"] : "";
             optsTransfer.details.critical( optsTransfer.strLogPrefix,
-                cc.j( optsTransfer.strDirection ),
+                log.v( optsTransfer.strDirection ),
                 " message analysis error: Failed to process events for ",
-                cc.j( optsTransfer.strDirection ), " message ",
-                cc.j( idxMessage + 1 ), " on node ",
-                ( joNode ? cc.j( joNode.name ) : cc.error( "<<unknown node name>>" ) ),
+                log.v( optsTransfer.strDirection ), " message ",
+                log.v( idxMessage + 1 ), " on node ",
+                ( joNode ? log.v( joNode.name ) : cc.error( "<<unknown node name>>" ) ),
                 " using URL ",
-                ( joNode ? cc.u( strUrlHttp ) : cc.error( "<<unknown node endpoint>>" ) ),
-                ", error is: ", cc.warning( owaspUtils.extractErrorMessage( err ) ),
-                ", stack is: ", "\n", cc.stack( err.stack ) );
+                ( joNode ? log.u( strUrlHttp ) : cc.error( "<<unknown node endpoint>>" ) ),
+                ", error is: ", log.em( owaspUtils.extractErrorMessage( err ) ),
+                ", stack is: ", "\n", log.s( err.stack ) );
             if( log.id != optsTransfer.details.id ) {
                 log.critical( optsTransfer.strLogPrefix,
-                    cc.j( optsTransfer.strDirection ),
+                    log.v( optsTransfer.strDirection ),
                     " message analysis error: Failed to process events for ",
-                    cc.j( optsTransfer.strDirection ), " message ",
-                    cc.j( idxMessage + 1 ), " on node ",
-                    ( joNode ? cc.j( joNode.name ) : cc.error( "<<unknown node name>>" ) ),
+                    log.v( optsTransfer.strDirection ), " message ",
+                    log.v( idxMessage + 1 ), " on node ",
+                    ( joNode ? log.v( joNode.name ) : cc.error( "<<unknown node name>>" ) ),
                     " using URL ",
-                    ( joNode ? cc.u( strUrlHttp ) : cc.error( "<<unknown node endpoint>>" ) ),
-                    ", error is: ", cc.warning( owaspUtils.extractErrorMessage( err ) ),
-                    ", stack is: ", "\n", cc.stack( err.stack ) );
+                    ( joNode ? log.u( strUrlHttp ) : cc.error( "<<unknown node endpoint>>" ) ),
+                    ", error is: ", log.em( owaspUtils.extractErrorMessage( err ) ),
+                    ", stack is: ", "\n", log.s( err.stack ) );
             }
         }
         if( cntFailedNodes > optsTransfer.cntNodesMayFail ) {
             optsTransfer.details.critical( optsTransfer.strLogPrefix,
-                "Error validating ", cc.j( optsTransfer.strDirection ),
+                "Error validating ", log.v( optsTransfer.strDirection ),
                 " messages, failed node count ", cntFailedNodes,
                 " is greater then allowed to fail ", optsTransfer.cntNodesMayFail );
             if( log.id != optsTransfer.details.id ) {
                 log.critical( optsTransfer.strLogPrefix,
-                    "Error validating ", cc.j( optsTransfer.strDirection ),
+                    "Error validating ", log.v( optsTransfer.strDirection ),
                     " messages, failed node count ", cntFailedNodes,
                     " is greater then allowed to fail ", optsTransfer.cntNodesMayFail );
             }
@@ -934,12 +926,12 @@ async function checkOutgoingMessageEvent( optsTransfer, joSChain ) {
         }
         if( ! ( cntPassedNodes >= optsTransfer.cntNodesShouldPass ) ) {
             optsTransfer.details.critical( optsTransfer.strLogPrefix,
-                "Error validating ", cc.j( optsTransfer.strDirection ),
+                "Error validating ", log.v( optsTransfer.strDirection ),
                 " messages, passed node count ", cntFailedNodes,
                 " is less then needed count ", optsTransfer.cntNodesShouldPass );
             if( log.id != optsTransfer.details.id ) {
                 log.critical( optsTransfer.strLogPrefix,
-                    "Error validating ", cc.j( optsTransfer.strDirection ),
+                    "Error validating ", log.v( optsTransfer.strDirection ),
                     " messages, passed node count ", cntFailedNodes,
                     " is less then needed count ", optsTransfer.cntNodesShouldPass );
             }
@@ -972,16 +964,15 @@ async function doMainTransferLoopActions( optsTransfer ) {
         }
         optsTransfer.details.trace( optsTransfer.strLogPrefix,
             "Entering block former iteration with message counter set to ",
-            cc.j( optsTransfer.nIdxCurrentMsg ), ", transfer step number is ",
-            cc.j( optsTransfer.nStepsDone ), ", can transfer up to ",
-            cc.j( optsTransfer.nMaxTransactionsCount ), " message(s) per step",
-            ", can perform up to ", cc.j( optsTransfer.nTransferSteps ),
+            log.v( optsTransfer.nIdxCurrentMsg ), ", transfer step number is ",
+            log.v( optsTransfer.nStepsDone ), ", can transfer up to ",
+            log.v( optsTransfer.nMaxTransactionsCount ), " message(s) per step",
+            ", can perform up to ", log.v( optsTransfer.nTransferSteps ),
             " transfer step(s)" );
         if( ! loop.checkTimeFraming(
             null, optsTransfer.strDirection, optsTransfer.joRuntimeOpts ) ) {
-            const strWarning = optsTransfer.strLogPrefix + cc.warning( "WARNING:" ) + " " +
-                cc.warning( "Time framing overflow " +
-                    "(after entering block former iteration loop)" );
+            const strWarning = optsTransfer.strLogPrefix + log.em( "WARNING:" ) + " " +
+            log.em( "Time framing overflow (after entering block former iteration loop)" );
             optsTransfer.details.warning( strWarning );
             if( log.id != optsTransfer.details.id )
                 log.warning( strWarning );
@@ -1052,15 +1043,15 @@ async function doMainTransferLoopActions( optsTransfer ) {
                     );
             optsTransfer.cntNodesMayFail = cntNodes - optsTransfer.cntNodesShouldPass;
             optsTransfer.details.trace( optsTransfer.strLogPrefix,
-                cc.sunny( optsTransfer.strDirection ),
+                log.v( optsTransfer.strDirection ),
                 " message analysis will be performed o S-Chain ",
-                cc.j( optsTransfer.chainNameSrc ), " with ",
-                cc.j( cntNodes ), " node(s), ",
-                cc.j( optsTransfer.cntNodesShouldPass ),
+                log.v( optsTransfer.chainNameSrc ), " with ",
+                log.v( cntNodes ), " node(s), ",
+                log.v( optsTransfer.cntNodesShouldPass ),
                 " node(s) should have same message(s), ",
-                cc.j( optsTransfer.cntNodesMayFail ) +
+                log.v( optsTransfer.cntNodesMayFail ) +
                 " node(s) allowed to fail message(s) comparison, ",
-                cc.j( cntMessages ), " message(s) to check..." );
+                log.v( cntMessages ), " message(s) to check..." );
             if( ! ( await checkOutgoingMessageEvent( optsTransfer, joSChain ) ) )
                 return false;
         }
@@ -1070,9 +1061,9 @@ async function doMainTransferLoopActions( optsTransfer ) {
             optsTransfer.strLogPrefix +
             cc.debug( "Will invoke message signing callback, " +
                 "first real message index is: " ) +
-            cc.j( optsTransfer.nIdxCurrentMsgBlockStart ) +
-            cc.debug( ", have " ) + cc.j( optsTransfer.jarrMessages.length ) +
-            cc.debug( " message(s) to process " ) + cc.j( optsTransfer.jarrMessages );
+            log.v( optsTransfer.nIdxCurrentMsgBlockStart ) +
+            cc.debug( ", have " ) + log.v( optsTransfer.jarrMessages.length ) +
+            cc.debug( " message(s) to process " ) + log.v( optsTransfer.jarrMessages );
         optsTransfer.details.information( strWillInvokeSigningCallbackMessage );
         if( log.id != optsTransfer.details.id )
             log.information( strWillInvokeSigningCallbackMessage );
@@ -1094,13 +1085,13 @@ async function doMainTransferLoopActions( optsTransfer ) {
         } catch ( err ) {
             optsTransfer.details.critical( optsTransfer.strLogPrefix,
                 "Exception from signing messages function: ",
-                cc.warning( owaspUtils.extractErrorMessage( err ) ),
-                ", stack is: ", "\n", cc.stack( err.stack ) );
+                log.em( owaspUtils.extractErrorMessage( err ) ),
+                ", stack is: ", "\n", log.s( err.stack ) );
             if( log.id != optsTransfer.details.id ) {
                 log.critical( optsTransfer.strLogPrefix,
                     "Exception from signing messages function: ",
-                    cc.warning( owaspUtils.extractErrorMessage( err ) ),
-                    ", stack is: ", "\n", cc.stack( err.stack ) );
+                    log.em( owaspUtils.extractErrorMessage( err ) ),
+                    ", stack is: ", "\n", log.s( err.stack ) );
             }
         }
         if( optsTransfer.bErrorInSigningMessages )
@@ -1202,9 +1193,9 @@ export async function doTransfer(
             ) {
                 optsTransfer.details.debug( optsTransfer.strLogPrefix,
                     "Message signing callback was not provided to IMA, " +
-                    "first real message index is:", cc.j( nIdxCurrentMsgBlockStart ), ", have ",
-                    cc.j( optsTransfer.jarrMessages.length ), " message(s) to process ",
-                    cc.j( optsTransfer.jarrMessages ) );
+                    "first real message index is:", log.v( nIdxCurrentMsgBlockStart ), ", have ",
+                    log.v( optsTransfer.jarrMessages.length ), " message(s) to process ",
+                    log.v( optsTransfer.jarrMessages ) );
                 await fnAfter( null, jarrMessages, null ); // null - no error, null - no signatures
             };
         } else {
@@ -1234,14 +1225,14 @@ export async function doTransfer(
             optsTransfer.details.critical( optsTransfer.strLogPrefix,
                 "Error in ", optsTransfer.strGatheredDetailsName,
                 " during ", optsTransfer.strActionName, ": ",
-                cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                ", stack is: ", "\n", cc.stack( err.stack ) );
+                log.em( owaspUtils.extractErrorMessage( err ) ) +
+                ", stack is: ", "\n", log.s( err.stack ) );
             if( log.id != optsTransfer.details.id ) {
                 log.critical( optsTransfer.strLogPrefix,
                     "Error in ", optsTransfer.strGatheredDetailsNam,
                     " during ", optsTransfer.strActionName, ": ",
-                    cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                    ", stack is: ", "\n", cc.stack( err.stack ) );
+                    log.em( owaspUtils.extractErrorMessage( err ) ) +
+                    ", stack is: ", "\n", log.s( err.stack ) );
             }
             optsTransfer.details.exposeDetailsTo( log,
                 optsTransfer.strGatheredDetailsName, false );
@@ -1270,8 +1261,8 @@ export async function doTransfer(
         gIsOneTransferInProgressInThisThread = false;
         const strError = owaspUtils.extractErrorMessage( err );
         optsTransfer.details.error( optsTransfer.strLogPrefix,
-            "Transfer loop step failed with error: ", cc.warning( strError ),
-            " in ", threadInfo.threadDescription(), ", stack is: ", "\n", cc.stack( err.stack ) );
+            "Transfer loop step failed with error: ", log.em( strError ),
+            " in ", threadInfo.threadDescription(), ", stack is: ", "\n", log.s( err.stack ) );
         if( log.exposeDetailsGet() && optsTransfer.details.exposeDetailsTo ) {
             optsTransfer.details.exposeDetailsTo(
                 log, optsTransfer.strGatheredDetailsName, true );
@@ -1313,8 +1304,8 @@ export async function doAllS2S( // s-chain --> s-chain
         const joAccountSrc = joAccountDst; // ???
         const chainNameSrc = "" + joSChain.data.name;
         const chainIdSrc = "" + joSChain.data.computed.chainId;
-        log.information( "S2S transfer walk trough ", cc.j( chainNameSrc ),
-            "/", cc.j( chainIdSrc ), " S-Chain in ",
+        log.information( "S2S transfer walk trough ", log.v( chainNameSrc ),
+            "/", log.v( chainIdSrc ), " S-Chain in ",
             threadInfo.threadDescription(), "..." );
         let bOK = false;
         try {
@@ -1393,9 +1384,9 @@ export async function doAllS2S( // s-chain --> s-chain
         } catch ( err ) {
             bOK = false;
             const strError = owaspUtils.extractErrorMessage( err );
-            log.error( "S2S step error from S-Chain ", cc.j( chainNameSrc ),
-                ", error is: ", cc.warning( strError ), " in ", threadInfo.threadDescription(),
-                ", stack is: ", "\n", cc.stack( err.stack ) );
+            log.error( "S2S step error from S-Chain ", log.v( chainNameSrc ),
+                ", error is: ", log.em( strError ), " in ", threadInfo.threadDescription(),
+                ", stack is: ", "\n", log.s( err.stack ) );
             imaState.loopState.s2s.isInProgress = false;
             await pwa.notifyOnLoopEnd( imaState, "s2s", nIndexS2S );
         }
@@ -1412,11 +1403,11 @@ export async function doAllS2S( // s-chain --> s-chain
         let s = cc.debug( "Stats for S2S steps in " ) +
             threadInfo.threadDescription() + cc.debug( ": " );
         if( cntOK > 0 ) {
-            s += " " + cc.j( cntOK ) + " " +
+            s += " " + log.v( cntOK ) + " " +
                 cc.success( "S-Chain(s) processed OKay" ) + cc.debug( ", " );
         }
         if( cntFail > 0 ) {
-            s += " " + cc.j( cntFail ) + " " +
+            s += " " + log.v( cntFail ) + " " +
                 cc.error( "S-Chain(s) failed" );
         }
         log.debug( s );

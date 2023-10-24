@@ -52,16 +52,13 @@ function getUtcTimestampString( d ) {
 
 export function findPowNumber( strRequestPart, details, isVerbose ) {
     details = details || log;
-    if( isVerbose ) {
-        details.debug( "source part of request to find ",
-            cc.sunny( "PoW number" ), " is ", cc.notice( strRequestPart ) );
-    }
+    if( isVerbose )
+        details.debug( "source part of request to find PoW number is ", log.v( strRequestPart ) );
+
     const t = getUtcTimestampString();
     let i = 0, n = 0, s = "";
-    if( isVerbose ) {
-        details.debug( "source ", cc.sunny( "t" ), "=", cc.info( t ), ", this is ",
-            cc.sunny( "UTC timestamp" ) );
-    }
+    if( isVerbose )
+        details.debug( "source t=", log.v( t ), ", this is UTC timestamp" );
     for( ; i < gConstMaxPowResultLimit; ++ i ) {
         n = "" + i;
         s = "{" + strRequestPart + ",\"time\":" + t + ",\"pow\":" + n + "}";
@@ -75,15 +72,13 @@ export function findPowNumber( strRequestPart, details, isVerbose ) {
         const r = gBigNumUpperPart.div( f );
         if( r.gt( gBigNumMinPowResult ) ) {
             if( isVerbose ) {
-                details.debug( "computed ", cc.sunny( "n" ), "=",
-                    cc.info( i ), ", this is resulting ", cc.sunny( "PoW number" ) );
-                details.debug( "computed ", cc.sunny( "f" ), "=",
-                    cc.info( f.toString() ), "=",
-                    cc.info( owaspUtils.ensureStartsWith0x( f.toString( 16 ) ) ) );
-                details.debug( "computed ", cc.sunny( "r" ), "=", cc.info( "(2**256-1)/f" ), "=",
-                    cc.info( r.toString() ) + "=",
-                    cc.info( owaspUtils.ensureStartsWith0x( r.toString( 16 ) ) ) );
-                details.debug( "computed ", cc.sunny( "s" ), "=", cc.info( s ) );
+                details.debug( "computed n=", i, ", this is resulting PoW number" );
+                details.debug( "computed f=", log.v( f.toString() ), "=",
+                    log.v( owaspUtils.ensureStartsWith0x( f.toString( 16 ) ) ) );
+                details.debug( "computed r=", log.v( "(2**256-1)/f" ), "=",
+                    log.v( r.toString() ), "=",
+                    log.v( owaspUtils.ensureStartsWith0x( r.toString( 16 ) ) ) );
+                details.debug( "computed s=", log.v( s ) );
             }
             break;
         }
@@ -111,9 +106,9 @@ export function oracleGetGasPrice( oracleOpts, details ) {
                 cntAttempts = 1;
             rpcCall.create( url, callOpts || { }, async function( joCall, err ) {
                 if( err ) {
-                    details.error( "RPC connection problem for url ", cc.u( url ),
+                    details.error( "RPC connection problem for url ", log.u( url ),
                         ", error description: ",
-                        cc.warning( owaspUtils.extractErrorMessage( err ) ) );
+                        log.em( owaspUtils.extractErrorMessage( err ) ) );
                     if( joCall )
                         await joCall.disconnect();
                     reject( new Error(
@@ -131,15 +126,15 @@ export function oracleGetGasPrice( oracleOpts, details ) {
                     );
                     const joIn = { "method": "oracle_submitRequest", "params": [ s ] };
                     if( isVerboseTraceDetails ) {
-                        details.debug( "RPC call", cc.j( "oracle_submitRequest" ), " is ",
-                            cc.j( joIn ) );
+                        details.debug( "RPC call", log.v( "oracle_submitRequest" ), " is ",
+                            log.v( joIn ) );
                     }
                     await joCall.call( joIn, async function( joIn, joOut, err ) {
                         if( err ) {
                             if( isVerboseTraceDetails ) {
                                 details.error( "JSON RPC call(oracle_submitRequest) ",
-                                    cc.j( "oracle_submitRequest" ), " failed, error: ",
-                                    cc.warning( owaspUtils.extractErrorMessage( err ) ) );
+                                    log.v( "oracle_submitRequest" ), " failed, error: ",
+                                    log.em( owaspUtils.extractErrorMessage( err ) ) );
                             }
                             await joCall.disconnect();
                             reject( new Error(
@@ -148,13 +143,13 @@ export function oracleGetGasPrice( oracleOpts, details ) {
                             return;
                         }
                         if( isVerboseTraceDetails ) {
-                            details.debug( "RPC call(", cc.j( "oracle_submitRequest" ),
-                                ") result is: ", cc.j( joOut ) );
+                            details.debug( "RPC call(", log.v( "oracle_submitRequest" ),
+                                ") result is: ", log.v( joOut ) );
                         }
                         if( !( "result" in joOut && typeof joOut.result == "string" &&
                             joOut.result.length > 0 ) ) {
                             details.error( " bad unexpected result(",
-                                cc.j( "oracle_submitRequest" ), "), error description is",
+                                log.v( "oracle_submitRequest" ), "), error description is",
                                 owaspUtils.extractErrorMessage( err ) );
                             await joCall.disconnect();
                             reject( new Error( "ORACLE ERROR: " +
@@ -172,19 +167,19 @@ export function oracleGetGasPrice( oracleOpts, details ) {
                                 };
                                 if( isVerboseTraceDetails ) {
                                     details.debug( "RPC call ",
-                                        cc.j( "oracle_checkResult" ), " attempt ",
+                                        log.v( "oracle_checkResult" ), " attempt ",
                                         idxAttempt, " of ", cntAttempts, "..." );
                                     details.debug( "RPC call ",
-                                        cc.j( "oracle_checkResult" ), " is ",
-                                        cc.j( joIn ) );
+                                        log.v( "oracle_checkResult" ), " is ",
+                                        log.v( joIn ) );
                                 }
                                 await joCall.call( joIn, async function( joIn, joOut, err ) {
                                     if( err ) {
                                         if( isVerboseTraceDetails ) {
                                             details.error( "JSON RPC call(",
-                                                cc.j( "oracle_checkResult" ),
+                                                log.v( "oracle_checkResult" ),
                                                 ") failed, error: ",
-                                                cc.warning( owaspUtils.extractErrorMessage( err ) )
+                                                log.em( owaspUtils.extractErrorMessage( err ) )
                                             );
                                         }
                                         await joCall.disconnect();
@@ -192,31 +187,28 @@ export function oracleGetGasPrice( oracleOpts, details ) {
                                     }
                                     if( isVerboseTraceDetails ) {
                                         details.debug( "RPC call ",
-                                            cc.j( "oracle_checkResult" ),
-                                            " result is: ", cc.j( joOut ) );
+                                            log.v( "oracle_checkResult" ),
+                                            " result is: ", log.v( joOut ) );
                                     }
                                     if( !( "result" in joOut && typeof joOut.result == "string" &&
                                         joOut.result.length > 0 ) ) {
                                         if( isVerboseTraceDetails ) {
                                             details.error( "Bad unexpected result in ",
-                                                cc.j( "oracle_checkResult" ) );
+                                                log.v( "oracle_checkResult" ) );
                                         }
                                         await joCall.disconnect();
                                         return;
                                     }
                                     const joResult = JSON.parse( joOut.result );
                                     if( isVerboseTraceDetails ) {
-                                        details.debug( "RPC call ",
-                                            cc.j( "oracle_checkResult" ),
-                                            " parsed ", cc.sunny( "result" ),
-                                            " field is: ", cc.j( joResult ) );
+                                        details.debug( "RPC call ", log.v( "oracle_checkResult" ),
+                                            " parsed result field is: ", log.v( joResult ) );
                                     }
                                     const gp = numberToBN( joResult.rslts[0] );
                                     if( isVerbose ) {
-                                        details.success( "success, computed ",
-                                            cc.sunny( "Gas Price" ), "=",
-                                            cc.info( gp.toString() ), "=",
-                                            cc.info( owaspUtils.ensureStartsWith0x(
+                                        details.success( "success, computed Gas Price=",
+                                            log.v( gp.toString() ), "=",
+                                            log.v( owaspUtils.ensureStartsWith0x(
                                                 gp.toString( 16 ) ) ) );
                                     }
                                     resolve( gp );
@@ -224,16 +216,16 @@ export function oracleGetGasPrice( oracleOpts, details ) {
                                     return;
                                 } );
                             } catch ( err ) {
-                                details.critical( "RPC call ", cc.j( "oracle_checkResult" ),
+                                details.critical( "RPC call ", log.v( "oracle_checkResult" ),
                                     " exception is: ",
-                                    cc.warning( owaspUtils.extractErrorMessage( err ) ),
-                                    ", stack is: ", "\n", cc.stack( err.stack ) );
+                                    log.em( owaspUtils.extractErrorMessage( err ) ),
+                                    ", stack is: ", "\n", log.s( err.stack ) );
                                 reject( err );
                                 await joCall.disconnect();
                                 return;
                             }
                         }
-                        details.error( "RPC call ", cc.j( "oracle_checkResult" ),
+                        details.error( "RPC call ", log.v( "oracle_checkResult" ),
                             " all attempts timed out" );
                         reject( new Error(
                             "RPC call(oracle_checkResult) all attempts timed out" ) );
@@ -241,17 +233,17 @@ export function oracleGetGasPrice( oracleOpts, details ) {
                         return;
                     } );
                 } catch ( err ) {
-                    details.critical( "RPC call", cc.j( "oracle_submitRequest" ),
-                        " exception is: ", cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                        ", stack is: ", "\n", cc.stack( err.stack ) );
+                    details.critical( "RPC call", log.v( "oracle_submitRequest" ),
+                        " exception is: ", log.em( owaspUtils.extractErrorMessage( err ) ) +
+                        ", stack is: ", "\n", log.s( err.stack ) );
                     reject( err );
                 }
                 await joCall.disconnect();
             } );
         } catch ( err ) {
             details.error( "RPC call object creation failed, error is: ",
-                cc.warning( owaspUtils.extractErrorMessage( err ) ),
-                ", stack is: ", "\n", cc.stack( err.stack ) );
+                log.em( owaspUtils.extractErrorMessage( err ) ),
+                ", stack is: ", "\n", log.s( err.stack ) );
             reject( err );
             return;
         }

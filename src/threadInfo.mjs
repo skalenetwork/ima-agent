@@ -47,6 +47,6 @@ export function threadDescription( isColorized ) {
     const tid = getCurrentThreadID();
     const st = isMainThread() ? "main" : "worker";
     return isColorized
-        ? ( cc.sunny( st ) + cc.bright( " thread " ) + cc.info( tid ) )
+        ? ( cc.sunny( st ) + cc.debug( " thread " ) + log.v( tid ) )
         : ( st + " thread " + tid );
 }

@@ -121,7 +121,7 @@ class ObserverServer extends SocketServer {
                 const isFlush = true;
                 socket.send( jo, isFlush );
             } );
-            log.debug( "Loop worker ", cc.notice( workerData.url ),
+            log.debug( "Loop worker ", log.v( workerData.url ),
                 " will save cached S-Chains..." );
             skaleObserver.setLastCachedSChains( self.opts.imaState.arrSChainsCached );
             self.opts.imaState.chainProperties.mn.joAccount.address = owaspUtils.fnAddressImpl_;
@@ -134,8 +134,7 @@ class ObserverServer extends SocketServer {
                 self.opts.imaState.chainProperties.mn.ethersProvider =
                     owaspUtils.getEthersProviderFromURL( u );
             } else {
-                self.warning( "WARNING: No ", cc.note( "Main-net" ),
-                    " URL specified in command line arguments",
+                self.warning( "WARNING: No Main-net URL specified in command line arguments",
                     cc.debug( "(needed for particular operations only)" ), " in ",
                     threadInfo.threadDescription() );
             }
@@ -148,8 +147,7 @@ class ObserverServer extends SocketServer {
                 self.opts.imaState.chainProperties.sc.ethersProvider =
                     owaspUtils.getEthersProviderFromURL( u );
             } else {
-                self.warning( "WARNING: No ", cc.note( "Main-net" ),
-                    " URL specified in command line arguments",
+                self.warning( "WARNING: No Main-net URL specified in command line arguments",
                     cc.debug( "(needed for particular operations only)" ), " in ",
                     threadInfo.threadDescription() );
             }
@@ -168,35 +166,35 @@ class ObserverServer extends SocketServer {
             state.set( imaState );
             imaCLI.initContracts();
             self.initComplete = true;
-            self.information( "IMA loop worker ", cc.notice( workerData.url ),
-                " will do the following work:\n    ", cc.j( "Oracle" ), " operations.....",
+            self.information( "IMA loop worker ", log.v( workerData.url ),
+                " will do the following work:\n    ", log.v( "Oracle" ), " operations.....",
                 cc.yn( self.opts.imaState.optsLoop.enableStepOracle ), "\n",
-                "    ", cc.j( "M2S" ), cc.debug( " transfers........." ),
+                "    ", log.v( "M2S" ), cc.debug( " transfers........." ),
                 cc.yn( self.opts.imaState.optsLoop.enableStepM2S ), "\n" +
-                "    ", cc.j( "S2M" ), cc.debug( " transfers........." ),
+                "    ", log.v( "S2M" ), cc.debug( " transfers........." ),
                 cc.yn( self.opts.imaState.optsLoop.enableStepS2M ), "\n",
-                "    ", cc.j( "S2S" ), cc.debug( " transfers........." ),
+                "    ", log.v( "S2S" ), cc.debug( " transfers........." ),
                 cc.yn( self.opts.imaState.optsLoop.enableStepS2S ) );
             /* await */
             loop.runTransferLoop( self.opts.imaState.optsLoop );
             self.information( "Full init compete for in-worker IMA loop ",
-                cc.notice( workerData.url ), " in ", threadInfo.threadDescription() );
+                log.v( workerData.url ), " in ", threadInfo.threadDescription() );
             return joAnswer;
         };
         self.mapApiHandlers.spreadUpdatedSChainNetwork =
             function( joMessage, joAnswer, eventData, socket ) {
                 self.debug( "New own S-Chains network information is arrived to ",
-                    cc.notice( workerData.url ), " loop worker in ",
+                    log.v( workerData.url ), " loop worker in ",
                     threadInfo.threadDescription(), ": ",
-                    cc.j( joMessage.joSChainNetworkInfo ),
+                    log.v( joMessage.joSChainNetworkInfo ),
                     ", this own S-Chain update is ",
                     ( joMessage.isFinal ? cc.success( "final" ) : cc.warning( "partial" ) ) );
                 imaState.joSChainNetworkInfo = joMessage.joSChainNetworkInfo;
             };
         self.mapApiHandlers.schainsCached = function( joMessage, joAnswer, eventData, socket ) {
-            self.debug( "S-Chains cache did arrived to ", cc.notice( workerData.url ),
+            self.debug( "S-Chains cache did arrived to ", log.v( workerData.url ),
                 " loop worker in ", threadInfo.threadDescription(), ": ",
-                cc.j( joMessage.message.arrSChainsCached ) );
+                log.v( joMessage.message.arrSChainsCached ) );
             skaleObserver.setLastCachedSChains( joMessage.message.arrSChainsCached );
         };
         // eslint-disable-next-line dot-notation
@@ -213,7 +211,7 @@ class ObserverServer extends SocketServer {
                 );
             };
         self.information( "Initialized in-worker IMA loop ",
-            cc.info( workerData.url ), " server in ", threadInfo.threadDescription() );
+            log.u( workerData.url ), " server in ", threadInfo.threadDescription() );
     }
     dispose() {
         const self = this;
@@ -305,5 +303,5 @@ const server = new ObserverServer( acceptor );
 server.on( "dispose", function() {
     const self = server;
     self.debug( "Disposed in-worker in ", threadInfo.threadDescription(), " IMA loop", " ",
-        cc.notice( workerData.url ) );
+        log.v( workerData.url ) );
 } );

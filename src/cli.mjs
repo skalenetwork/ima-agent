@@ -117,7 +117,7 @@ export function ensureHaveCredentials(
     strFriendlyChainName = strFriendlyChainName || "<UNKNOWN>";
     if( ! ( typeof joAccount == "object" ) ) {
         log.error( "ARGUMENTS VALIDATION WARNING: bad account specified for ",
-            cc.info( strFriendlyChainName ), " chain" );
+            log.v( strFriendlyChainName ), " chain" );
         if( isExitIfEmpty )
             process.exit( 126 );
     }
@@ -192,7 +192,7 @@ export function ensureHaveCredentials(
     }
     if( cntAccountVariantsSpecified == 0 ) {
         log.error( "ARGUMENTS VALIDATION WARNING: bad credentials information specified for ",
-            cc.info( strFriendlyChainName ), " chain, no explicit SGX, no explicit private key, ",
+            log.v( strFriendlyChainName ), " chain, no explicit SGX, no explicit private key, ",
             "no wallet address found" );
         if( isExitIfEmpty )
             process.exit( 126 );
@@ -2536,7 +2536,7 @@ export function parse( joExternalHandlers, argv ) {
             continue;
         }
         console.log( cc.fatal( "COMMAND LINE PARSER ERROR:" ) +
-            cc.error( " unknown command line argument " ) + cc.info( joArg.name ) );
+            cc.error( " unknown command line argument " ) + log.v( joArg.name ) );
         return 666;
     }
     return 0;
@@ -2546,23 +2546,23 @@ async function asyncCheckUrlAtStartup( u, name ) {
     const details = log.createMemoryStream();
     const nTimeoutMilliseconds = 10 * 1000;
     try {
-        details.debug( "Will check URL ", cc.u( u ), " connectivity for ",
-            cc.info( name ), " at start-up..." );
+        details.debug( "Will check URL ", log.u( u ), " connectivity for ",
+            log.v( name ), " at start-up..." );
         const isLog = false;
         const isOnLine = await rpcCall.checkUrl( u, nTimeoutMilliseconds, isLog );
         if( isOnLine ) {
-            details.success( "Done, start-up checking URL ", cc.u( u ), " connectivity for ",
-                cc.info( name ), ", URL is on-line." );
+            details.success( "Done, start-up checking URL ", log.u( u ), " connectivity for ",
+                log.v( name ), ", URL is on-line." );
         } else {
-            details.error( "Done, start-up checking URL ", cc.u( u ), " connectivity for ",
-                cc.info( name ), ", URL is off-line." );
+            details.error( "Done, start-up checking URL ", log.u( u ), " connectivity for ",
+                log.v( name ), ", URL is off-line." );
         }
         return isOnLine;
     } catch ( err ) {
-        details.error( "Failed to check URL ", cc.u( u ),
-            " connectivity for ", cc.info( name ), " at start-up, error is: ",
-            cc.warning( owaspUtils.extractErrorMessage( err ) ),
-            ", stack is: ", "\n", cc.stack( err.stack ) );
+        details.error( "Failed to check URL ", log.u( u ),
+            " connectivity for ", log.v( name ), " at start-up, error is: ",
+            log.em( owaspUtils.extractErrorMessage( err ) ),
+            ", stack is: ", "\n", log.s( err.stack ) );
     }
     return false;
 }
@@ -2577,14 +2577,14 @@ function commonInitPrintSysInfo() {
         log.debug( "This process ", cc.sunny( "EUID" ), " is ", cc.bright( process.geteuid() ) );
         log.debug( "This process ", cc.sunny( "GID" ), " is ", cc.bright( process.getgid() ) );
         log.debug( "This process ", cc.sunny( "UID" ), " is ", cc.bright( process.getuid() ) );
-        log.debug( "This process ", cc.sunny( "groups" ), " are ", cc.j( process.getgroups() ) );
+        log.debug( "This process ", cc.sunny( "groups" ), " are ", log.v( process.getgroups() ) );
         log.debug( "This process ", cc.sunny( "CWD" ), " is ", cc.bright( process.cwd() ) );
         log.debug( "This process ", cc.sunny( "platform" ), " is ", cc.bright( process.platform ) );
-        log.debug( "This process ", cc.sunny( "release" ), " is ", cc.j( process.release ) );
-        log.debug( "This process ", cc.sunny( "report" ), " is ", cc.j( process.report ) );
-        log.debug( "This process ", cc.sunny( "config" ), " is ", cc.j( process.config ) );
+        log.debug( "This process ", cc.sunny( "release" ), " is ", log.v( process.release ) );
+        log.debug( "This process ", cc.sunny( "report" ), " is ", log.v( process.report ) );
+        log.debug( "This process ", cc.sunny( "config" ), " is ", log.v( process.config ) );
         log.debug( cc.sunny( "Node JS" ), " ", cc.bright( "detailed version information" ),
-            " is ", cc.j( process.versions ) );
+            " is ", log.v( process.versions ) );
         log.debug( cc.sunny( "OS" ), " ", cc.bright( "type" ), " is ", cc.bright( os.type() ) );
         log.debug( cc.sunny( "OS" ), " ", cc.bright( "platform" ),
             " is ", cc.bright( os.platform() ) );
@@ -2596,20 +2596,20 @@ function commonInitPrintSysInfo() {
             " is ", cc.bright( os.endianness() ) );
         log.debug( cc.sunny( "OS" ), " ", cc.bright( "host name" ),
             " is ", cc.bright( os.hostname() ) );
-        log.debug( cc.sunny( "OS" ), " ", cc.bright( "CPUs" ), " are ", cc.j( os.cpus() ) );
+        log.debug( cc.sunny( "OS" ), " ", cc.bright( "CPUs" ), " are ", log.v( os.cpus() ) );
         log.debug( cc.sunny( "OS" ), " ", cc.bright( "network interfaces" ),
-            " are ", cc.j( os.networkInterfaces() ) );
+            " are ", log.v( os.networkInterfaces() ) );
         log.debug( cc.sunny( "OS" ), " ", cc.bright( "home dir" ),
             " is ", cc.bright( os.homedir() ) );
         log.debug( cc.sunny( "OS" ), " ", cc.bright( "tmp dir" ),
             " is ", cc.bright( os.tmpdir() ) );
         log.debug( cc.sunny( "OS" ), " ", cc.bright( "uptime" ), " is ", cc.bright( os.uptime() ) );
-        log.debug( cc.sunny( "OS" ), " ", cc.bright( "user" ), " is ", cc.j( os.userInfo() ) );
+        log.debug( cc.sunny( "OS" ), " ", cc.bright( "user" ), " is ", log.v( os.userInfo() ) );
         const joMemory = { total: os.totalmem(), free: os.freemem() };
         joMemory.freePercent = ( joMemory.free / joMemory.total ) * 100.0;
-        log.debug( cc.sunny( "OS" ), " ", cc.bright( "memory" ), " is ", cc.j( joMemory ) );
+        log.debug( cc.sunny( "OS" ), " ", cc.bright( "memory" ), " is ", log.v( joMemory ) );
         const joLA = os.loadavg();
-        log.debug( cc.sunny( "OS" ), " ", cc.bright( "average load" ), " is ", cc.j( joLA ) );
+        log.debug( cc.sunny( "OS" ), " ", cc.bright( "average load" ), " is ", log.v( joLA ) );
     }
 }
 
@@ -3397,19 +3397,19 @@ function commonInitCheckGeneralArgs() {
         "Main-net URL",
         imaState.chainProperties.mn.strURL, false,
         isPrintGathered && isPrintSecurityValues, null, ( x ) => {
-            return cc.u( x );
+            return log.u( x );
         } );
     ensureHaveValue(
         "S-chain URL",
         imaState.chainProperties.sc.strURL, false,
         isPrintGathered && isPrintSecurityValues, null, ( x ) => {
-            return cc.u( x );
+            return log.u( x );
         } );
     ensureHaveValue(
         "S<->S Target S-chain URL",
         imaState.chainProperties.tc.strURL, false,
         isPrintGathered && isPrintSecurityValues, null, ( x ) => {
-            return cc.u( x );
+            return log.u( x );
         } );
     ensureHaveValue(
         "Main-net Ethereum network name",

@@ -90,28 +90,28 @@ export function jsonFileLoad( strPath, joDefault, bLogOutput ) {
         bLogOutput = false;
     joDefault = joDefault || {};
     if( bLogOutput )
-        log.debug( "Will load JSON file ", cc.info( strPath ), "..." );
+        log.debug( "Will load JSON file ", log.v( strPath ), "..." );
 
     if( !fileExists( strPath ) ) {
         if( bLogOutput )
-            log.error( "Cannot load JSON file ", cc.info( strPath ), ", it does not exist" );
+            log.error( "Cannot load JSON file ", log.v( strPath ), ", it does not exist" );
         return joDefault;
     }
     try {
         const s = fs.readFileSync( strPath );
         if( bLogOutput ) {
-            log.debug( "Did loaded content of JSON file ", cc.info( strPath ),
+            log.debug( "Did loaded content of JSON file ", log.v( strPath ),
                 ", will parse it..." );
         }
         const jo = JSON.parse( s );
         if( bLogOutput )
-            log.success( "Done, loaded content of JSON file ", cc.info( strPath ), "." );
+            log.success( "Done, loaded content of JSON file ", log.v( strPath ), "." );
         return jo;
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         log.error( " failed to load JSON file ",
-            cc.info( strPath ), ": ", cc.warning( strError ) + ", stack is: ", "\n",
-            cc.stack( err.stack ) );
+            log.v( strPath ), ": ", log.em( strError ) + ", stack is: ", "\n",
+            log.s( err.stack ) );
     }
     return joDefault;
 }
@@ -120,18 +120,18 @@ export function jsonFileSave( strPath, jo, bLogOutput ) {
     if( bLogOutput == undefined || bLogOutput == null )
         bLogOutput = false;
     if( bLogOutput )
-        log.debug( "Will save JSON file ", cc.info( strPath ), "..." );
+        log.debug( "Will save JSON file ", log.v( strPath ), "..." );
     try {
         const s = JSON.stringify( jo, null, 4 );
         fs.writeFileSync( strPath, s );
         if( bLogOutput )
-            log.success( "Done, saved content of JSON file ", cc.info( strPath ), "." );
+            log.success( "Done, saved content of JSON file ", log.v( strPath ), "." );
         return true;
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         log.error( " failed to save JSON file ",
-            cc.info( strPath ), ": ", cc.warning( strError ),
-            ", stack is: ", "\n", cc.stack( err.stack ) );
+            log.v( strPath ), ": ", log.em( strError ),
+            ", stack is: ", "\n", log.s( err.stack ) );
     }
     return false;
 }
@@ -152,12 +152,12 @@ export async function waitForClonedTokenToAppear(
     const strTokenSuffixLCshort = owaspUtils.replaceAll( strTokenSuffixLC, "_with_metadata", "" );
     const ts0 = cc.timestampHR();
     let ts1;
-    log.information( "Waiting for ", cc.notice( strTokenSuffixUC ),
+    log.information( "Waiting for ", log.v( strTokenSuffixUC ),
         " token to appear automatically deployed on S-Chain ",
-        cc.j( sc.chainName ), "..." );
-    log.debug( "... source chain name is ", cc.j( strMainnetName ) );
-    log.debug( "... destination ", cc.notice( "TokenManager" + strTokenSuffixUC ),
-        " address is ", cc.notice( sc.joABI["token_manager_" +
+        log.v( sc.chainName ), "..." );
+    log.debug( "... source chain name is ", log.v( strMainnetName ) );
+    log.debug( "... destination ", log.v( "TokenManager" + strTokenSuffixUC ),
+        " address is ", log.v( sc.joABI["token_manager_" +
         strTokenSuffixLC + "_address"] ) );
     const contractTokenManager = new owaspUtils.ethersMod.ethers.Contract(
         sc.joABI["token_manager_" + strTokenSuffixLC + "_address"],
@@ -165,7 +165,7 @@ export async function waitForClonedTokenToAppear(
         sc.ethersProvider
     );
     for( let idxAttempt = 0; idxAttempt < cntAttempts; ++ idxAttempt ) {
-        log.information( "Discovering ", cc.notice( strTokenSuffixUC ), " step ", idxAttempt,
+        log.information( "Discovering ", log.v( strTokenSuffixUC ), " step ", idxAttempt,
             "..." );
         if( gMillisecondsToSleepStepWaitForClonedTokenToAppear > 0 )
             await imaHelperAPIs.sleep( gMillisecondsToSleepStepWaitForClonedTokenToAppear );
@@ -178,16 +178,16 @@ export async function waitForClonedTokenToAppear(
             );
         if( addressOnSChain != "0x0000000000000000000000000000000000000000" ) {
             ts1 = cc.timestampHR();
-            log.success( "Done, duration is ", cc.info( cc.getDurationString( ts0, ts1 ) ) );
-            log.success( "Discovered ", cc.notice( strTokenSuffixUC ),
-                " instantiated on S-Chain ", cc.j( sc.chainName ),
-                " at address ", cc.notice( addressOnSChain ) );
+            log.success( "Done, duration is ", log.v( cc.getDurationString( ts0, ts1 ) ) );
+            log.success( "Discovered ", log.v( strTokenSuffixUC ),
+                " instantiated on S-Chain ", log.v( sc.chainName ),
+                " at address ", log.v( addressOnSChain ) );
             return addressOnSChain;
         }
     }
     ts1 = cc.timestampHR();
-    log.error( "Failed to discover ", cc.notice( strTokenSuffixUC ),
-        " instantiated on S-Chain ", cc.j( sc.chainName ) );
+    log.error( "Failed to discover ", log.v( strTokenSuffixUC ),
+        " instantiated on S-Chain ", log.v( sc.chainName ) );
     throw new Error( "Failed to discover \"" + strTokenSuffixUC +
         "\" instantiated on S-Chain \"" + sc.chainName + "\"" );
 }
@@ -198,7 +198,7 @@ export async function waitForClonedTokenAppearErc20(
     if( "abi" in tokenERC20SC && typeof tokenERC20SC.abi == "object" &&
         "address" in tokenERC20SC && typeof tokenERC20SC.address == "string"
     ) {
-        log.warning( "Skipping automatic ", cc.notice( "ERC20" ),
+        log.warning( "Skipping automatic ", log.v( "ERC20" ),
             " instantiation discovery, already done before" );
         return;
     }
@@ -216,7 +216,7 @@ export async function waitForClonedTokenAppearErc721(
     if( "abi" in tokenERC721SC && typeof tokenERC721SC.abi == "object" &&
         "address" in tokenERC721SC && typeof tokenERC721SC.address == "string"
     ) {
-        log.warning( "Skipping automatic ", cc.notice( "ERC721" ),
+        log.warning( "Skipping automatic ", log.v( "ERC721" ),
             "instantiation discovery, already done before" );
         return;
     }
@@ -234,7 +234,7 @@ export async function waitForClonedTokenAppearErc721WithMetadata(
     if( "abi" in tokenERC721SC && typeof tokenERC721SC.abi == "object" &&
         "address" in tokenERC721SC && typeof tokenERC721SC.address == "string"
     ) {
-        log.warning( "Skipping automatic ", cc.notice( "ERC721_with_metadata" ),
+        log.warning( "Skipping automatic ", log.v( "ERC721_with_metadata" ),
             " instantiation discovery, already done before" );
         return;
     }
@@ -252,7 +252,7 @@ export async function waitForClonedTokenAppearErc1155(
     if( "abi" in tokenERC1155SC && typeof tokenERC1155SC.abi == "object" &&
         "address" in tokenERC1155SC && typeof tokenERC1155SC.address == "string"
     ) {
-        log.warning( "Skipping automatic ", cc.notice( "ERC1155" ),
+        log.warning( "Skipping automatic ", log.v( "ERC1155" ),
             " instantiation discovery, already done before" );
         return;
     }
@@ -391,9 +391,9 @@ export function checkKeyExistInABI( strName, strFile, joABI, strKey, isExitOnErr
     } catch ( err ) {
     }
     if( isExitOnError ) {
-        log.fatal( "Loaded ", cc.warning( strName ),
-            " ABI JSON file ", cc.info( strFile ), " does not contain needed key ",
-            cc.warning( strKey ), ", stack is: ", "\n", cc.stack( err.stack ) );
+        log.fatal( "Loaded ", log.v( strName ), " ABI JSON file ", log.v( strFile ),
+            " does not contain needed key ",
+            log.v( strKey ), ", stack is: ", "\n", log.s( err.stack ) );
         process.exit( 126 );
     }
     return false;

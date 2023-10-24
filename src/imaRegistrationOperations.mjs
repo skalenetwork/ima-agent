@@ -24,7 +24,6 @@
  */
 
 import * as log from "./log.mjs";
-import * as cc from "./cc.mjs";
 
 import * as owaspUtils from "./owaspUtils.mjs";
 import * as imaHelperAPIs from "./imaHelperAPIs.mjs";
@@ -37,10 +36,10 @@ export async function invokeHasChain(
     joAccount, // Main-Net or S-Chin
     chainIdSChain
 ) {
-    const strLogPrefix = cc.sunny( "Wait for added chain status:" ) + " ";
+    const strLogPrefix = "Wait for added chain status: ";
     const strActionName = "invokeHasChain(hasSchain): joLinker.hasSchain";
     try {
-        details.debug( strLogPrefix, "Will call ", cc.notice( strActionName ), "..." );
+        details.debug( strLogPrefix, "Will call ", log.v( strActionName ), "..." );
         const addressFrom = joAccount.address();
         const bHasSchain =
             await joLinker.callStatic.hasSchain( chainIdSChain, { from: addressFrom } );
@@ -50,10 +49,10 @@ export async function invokeHasChain(
         const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != details.id ) {
             log.critical( strLogPrefix, "Error in invokeHasChain() during ", strActionName, ": ",
-                cc.warning( strError ), ", stack is: ", "\n", cc.stack( err.stack ) );
+                log.em( strError ), ", stack is: ", "\n", log.s( err.stack ) );
         }
         details.critical( strLogPrefix, "Error in invokeHasChain() during ", strActionName, ": ",
-            cc.warning( strError ), ", stack is: ", "\n", cc.stack( err.stack ) );
+            log.em( strError ), ", stack is: ", "\n", log.s( err.stack ) );
     }
     return false;
 }
@@ -93,9 +92,9 @@ export async function checkIsRegisteredSChainInDepositBoxes( // step 1
     chainIdSChain
 ) {
     const details = log.createMemoryStream();
-    details.debug( "Main-net Linker address is...........", cc.bright( joLinker.address ) );
-    details.debug( "S-Chain  ID is.......................", cc.bright( chainIdSChain ) );
-    const strLogPrefix = cc.note( "RegChk S in depositBox:" ) + " ";
+    details.debug( "Main-net Linker address is...........", log.v( joLinker.address ) );
+    details.debug( "S-Chain  ID is.......................", log.v( chainIdSChain ) );
+    const strLogPrefix = "RegChk S in depositBox: ";
     details.debug( strLogPrefix, imaHelperAPIs.longSeparator );
     details.debug( strLogPrefix, "checkIsRegisteredSChainInDepositBoxes(reg-step1)" );
     details.debug( strLogPrefix, imaHelperAPIs.longSeparator );
@@ -116,13 +115,13 @@ export async function checkIsRegisteredSChainInDepositBoxes( // step 1
         if( log.id != details.id ) {
             log.critical( strLogPrefix,
                 "Error in checkIsRegisteredSChainInDepositBoxes(reg-step1)() during ",
-                strActionName, ": ", cc.warning( strError ),
-                ", stack is: ", "\n", cc.stack( err.stack ) );
+                strActionName, ": ", log.em( strError ),
+                ", stack is: ", "\n", log.s( err.stack ) );
         }
         details.critical( strLogPrefix,
             "Error in checkIsRegisteredSChainInDepositBoxes(reg-step1)() during ",
-            strActionName, ": ", cc.warning( strError ),
-            ", stack is: ", "\n", cc.stack( err.stack ) );
+            strActionName, ": ", log.em( strError ),
+            ", stack is: ", "\n", log.s( err.stack ) );
         details.exposeDetailsTo( log, "checkIsRegisteredSChainInDepositBoxes", false );
         details.close();
     }
@@ -148,9 +147,9 @@ export async function registerSChainInDepositBoxes( // step 1
 ) {
     const details = log.createMemoryStream();
     const jarrReceipts = [];
-    details.debug( "Main-net Linker address is..........", cc.bright( joLinker.address ) );
-    details.debug( "S-Chain ID is.......................", + cc.bright( chainNameSChain ) );
-    const strLogPrefix = cc.sunny( "Reg S in depositBoxes:" ) + " ";
+    details.debug( "Main-net Linker address is..........", log.v( joLinker.address ) );
+    details.debug( "S-Chain ID is.......................", + log.v( chainNameSChain ) );
+    const strLogPrefix = "Reg S in depositBoxes: ";
     details.debug( strLogPrefix, imaHelperAPIs.longSeparator );
     details.debug( strLogPrefix, "reg-step1:registerSChainInDepositBoxes" );
     details.debug( strLogPrefix, imaHelperAPIs.longSeparator );
@@ -173,7 +172,7 @@ export async function registerSChainInDepositBoxes( // step 1
         const weiHowMuch = undefined;
         const gasPrice = await transactionCustomizerMainNet.computeGasPrice(
             ethersProviderMainNet, 200000000000 );
-        details.trace( strLogPrefix, "Using computed gasPrice = ", cc.j( gasPrice ) );
+        details.trace( strLogPrefix, "Using computed gasPrice = ", log.v( gasPrice ) );
         const estimatedGas =
             await transactionCustomizerMainNet.computeGas(
                 details,
@@ -183,7 +182,7 @@ export async function registerSChainInDepositBoxes( // step 1
                 gasPrice, 3000000, weiHowMuch,
                 null
             );
-        details.trace( strLogPrefix, "Using estimated gas = ", cc.notice( estimatedGas ) );
+        details.trace( strLogPrefix, "Using estimated gas = ", log.v( estimatedGas ) );
         const isIgnore = false;
         const strErrorOfDryRun =
             await imaTx.dryRunCall(
@@ -216,12 +215,12 @@ export async function registerSChainInDepositBoxes( // step 1
         const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != details.id ) {
             log.critical( strLogPrefix, "Error in registerSChainInDepositBoxes() during ",
-                strActionName, ": ", cc.warning( strError ),
-                ", stack is: ", "\n", cc.stack( err.stack ) );
+                strActionName, ": ", log.em( strError ),
+                ", stack is: ", "\n", log.s( err.stack ) );
         }
         details.critical( strLogPrefix, "Error in registerSChainInDepositBoxes() during ",
-            strActionName, ": ", cc.warning( strError ),
-            ", stack is: ", "\n", cc.stack( err.stack ) );
+            strActionName, ": ", log.em( strError ),
+            ", stack is: ", "\n", log.s( err.stack ) );
         details.exposeDetailsTo( log, "registerSChainInDepositBoxes", false );
         details.close();
         return null;

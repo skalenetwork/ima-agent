@@ -794,6 +794,22 @@ export function verboseList() {
         if( !gMapVerbose.hasOwnProperty( key ) )
             continue; // skip loop if the property is from prototype
         const name = gMapVerbose[key];
-        console.log( "    " + cc.info( key ) + cc.sunny( "=" ) + cc.bright( name ) );
+        console.log( "    " + cc.j( key ) + cc.sunny( "=" ) + cc.bright( name ) );
     }
+}
+
+export function u( x ) {
+    return cc.u( x );
+}
+
+export function v( x ) {
+    return cc.j( x );
+}
+
+export function em( x ) {
+    return cc.warning( x );
+}
+
+export function s( x ) {
+    return cc.stack( x );
 }

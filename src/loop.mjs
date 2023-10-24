@@ -80,45 +80,44 @@ export function checkTimeFraming( d, strDirection, joRuntimeOpts ) {
             }
         }
         log.debug( "\n",
-            cc.info( "Unix UTC time stamp" ), "........", cc.j( nUtcUnixTimeStamp ), "\n",
-            cc.info( "All Chains Range" ), "...........",
-            cc.notice( nSecondsRangeForAllSChains ), "\n",
-            cc.info( "S-Chain Range Mod" ), "..........", cc.j( nMod ), "\n",
-            cc.info( "Active Node Frame Index" ), "....", cc.j( nActiveNodeFrameIndex ), "\n",
-            cc.info( "Testing Frame Index" ), "........", cc.j( imaState.nNodeNumber ), "\n",
-            cc.info( "Transfer Direction" ), ".........", cc.j( strDirection || "NA" ) );
+            "Unix UTC time stamp", "........", log.v( nUtcUnixTimeStamp ), "\n",
+            "All Chains Range", "...........", nSecondsRangeForAllSChains, "\n",
+            "S-Chain Range Mod", "..........", log.v( nMod ), "\n",
+            "Active Node Frame Index", "....", log.v( nActiveNodeFrameIndex ), "\n",
+            "Testing Frame Index", "........", log.v( imaState.nNodeNumber ), "\n",
+            "Transfer Direction", ".........", log.v( strDirection || "NA" ) );
         if( nFrameShift > 0 ) {
             log.debug(
-                cc.info( "Frame Shift" ), "................", cc.j( nFrameShift ), "\n",
-                cc.info( "S2S known chain index" ), "......",
-                cc.j( joRuntimeOpts.idxChainKnownForS2S ), "\n",
-                cc.info( "S2S known chains count" ), ".....",
-                cc.j( joRuntimeOpts.cntChainsKnownForS2S ), "\n"
+                "Frame Shift", "................", log.v( nFrameShift ), "\n",
+                "S2S known chain index", "......",
+                log.v( joRuntimeOpts.idxChainKnownForS2S ), "\n",
+                "S2S known chains count", ".....",
+                log.v( joRuntimeOpts.cntChainsKnownForS2S ), "\n"
             );
             if( "joExtraSignOpts" in joRuntimeOpts &&
                 typeof joRuntimeOpts.joExtraSignOpts == "object" ) {
-                log.debug( cc.info( "S-Chain source" ), ".............",
-                    cc.j( joRuntimeOpts.joExtraSignOpts.chainNameSrc ),
-                    "/", cc.j( joRuntimeOpts.joExtraSignOpts.chainIdSrc ) );
+                log.debug( "S-Chain source", ".............",
+                    log.v( joRuntimeOpts.joExtraSignOpts.chainNameSrc ),
+                    "/", log.v( joRuntimeOpts.joExtraSignOpts.chainIdSrc ) );
             } else {
-                log.debug( cc.info( "S-Chain destination" ), "........",
-                    cc.info( joRuntimeOpts.joExtraSignOpts.chainNameDst ),
-                    cc.debug( "/" ), cc.j( joRuntimeOpts.joExtraSignOpts.chainIdDst ) );
+                log.debug( "S-Chain destination", "........",
+                    log.v( joRuntimeOpts.joExtraSignOpts.chainNameDst ),
+                    cc.debug( "/" ), log.v( joRuntimeOpts.joExtraSignOpts.chainIdDst ) );
             }
         }
         log.debug( "\n",
-            cc.info( "Is skip" ), "....................", cc.yn( bSkip ), "\n",
-            cc.info( "Is inside gap" ), "..............", cc.yn( bInsideGap ), "\n",
-            cc.info( "Range Start" ), "................", cc.j( nRangeStart ), "\n",
-            cc.info( "Frame Start" ), "................", cc.j( nFrameStart ), "\n",
-            cc.info( "Gap Start" ), "..................", cc.j( nGapStart ) );
+            "Is skip", "....................", cc.yn( bSkip ), "\n",
+            "Is inside gap", "..............", cc.yn( bInsideGap ), "\n",
+            "Range Start", "................", log.v( nRangeStart ), "\n",
+            "Frame Start", "................", log.v( nFrameStart ), "\n",
+            "Gap Start", "..................", log.v( nGapStart ) );
         if( bSkip )
             return false;
     } catch ( err ) {
         log.error( "Exception in time framing check in ",
             threadInfo.threadDescription(), ": ",
-            cc.warning( owaspUtils.extractErrorMessage( err ) ),
-            ", stack is: ", "\n", cc.stack( err.stack ) );
+            log.em( owaspUtils.extractErrorMessage( err ) ),
+            ", stack is: ", "\n", log.s( err.stack ) );
     }
     return true;
 };
@@ -157,9 +156,9 @@ async function singleTransferLoopPartOracle( optsLoop, strLogPrefix ) {
             }
         } catch ( err ) {
             log.error( strLogPrefix, "Oracle operation exception: ",
-                cc.warning( owaspUtils.extractErrorMessage( err ) ),
+                log.em( owaspUtils.extractErrorMessage( err ) ),
                 " in ", threadInfo.threadDescription(),
-                ", stack is: ", "\n", cc.stack( err.stack ) );
+                ", stack is: ", "\n", log.s( err.stack ) );
             imaState.loopState.oracle.isInProgress = false;
             await pwa.notifyOnLoopEnd( imaState, "oracle" );
             throw err;
@@ -221,8 +220,8 @@ async function singleTransferLoopPartM2S( optsLoop, strLogPrefix ) {
         } catch ( err ) {
             log.error( strLogPrefix, "M2S transfer exception in ",
                 threadInfo.threadDescription() , ": ",
-                cc.warning( owaspUtils.extractErrorMessage( err ) ),
-                ", stack is: ", "\n", cc.stack( err.stack ) );
+                log.em( owaspUtils.extractErrorMessage( err ) ),
+                ", stack is: ", "\n", log.s( err.stack ) );
             imaState.loopState.m2s.isInProgress = false;
             await pwa.notifyOnLoopEnd( imaState, "m2s" );
             throw err;
@@ -288,8 +287,8 @@ async function singleTransferLoopPartS2M( optsLoop, strLogPrefix ) {
         } catch ( err ) {
             log.error( strLogPrefix, "S2M transfer exception in ",
                 threadInfo.threadDescription() , ": ",
-                cc.warning( owaspUtils.extractErrorMessage( err ) ),
-                ", stack is: ", "\n", cc.stack( err.stack ) );
+                log.em( owaspUtils.extractErrorMessage( err ) ),
+                ", stack is: ", "\n", log.s( err.stack ) );
             imaState.loopState.s2m.isInProgress = false;
             await pwa.notifyOnLoopEnd( imaState, "s2m" );
             throw err;
@@ -330,8 +329,8 @@ async function singleTransferLoopPartS2S( optsLoop, strLogPrefix ) {
         } catch ( err ) {
             log.error( strLogPrefix, "S2S transfer exception in ",
                 threadInfo.threadDescription() , ": ",
-                cc.warning( owaspUtils.extractErrorMessage( err ) ),
-                ", stack is: ", "\n", cc.stack( err.stack ) );
+                log.em( owaspUtils.extractErrorMessage( err ) ),
+                ", stack is: ", "\n", log.s( err.stack ) );
             throw err;
         }
         log.information( strLogPrefix, "All S2S transfers done in ",
@@ -345,7 +344,7 @@ async function singleTransferLoopPartS2S( optsLoop, strLogPrefix ) {
 }
 
 function printLoopPartSkippedWarning( strLoopPartName ) {
-    log.warning( strLogPrefix, "Skipped ", cc.notice( strLoopPartName ),
+    log.warning( strLogPrefix, "Skipped ", log.v( strLoopPartName ),
         " transfer loop part due to other single ",
         "transfer loop is in progress right now" );
 }
@@ -405,8 +404,8 @@ export async function singleTransferLoop( optsLoop ) {
         return bResult;
     } catch ( err ) {
         log.error( strLogPrefix, "Exception in transfer loop: ",
-            cc.warning( owaspUtils.extractErrorMessage( err ) ),
-            ", stack is: ", "\n", cc.stack( err.stack ) );
+            log.em( owaspUtils.extractErrorMessage( err ) ),
+            ", stack is: ", "\n", log.s( err.stack ) );
     }
     imaState.loopState.oracle.isInProgress = false;
     imaState.loopState.m2s.isInProgress = false;
@@ -453,10 +452,10 @@ export function notifyCacheChangedSNB( arrSChainsCached ) {
             "message": { "arrSChainsCached": arrSChainsCached }
         };
         log.debug( "S-Chains cache will be sent to ",
-            cc.notice( gArrClients[idxWorker].url ), " loop worker..." );
+            log.v( gArrClients[idxWorker].url ), " loop worker..." );
         gArrClients[idxWorker].send( jo );
         log.debug( "S-Chains cache did sent to ",
-            cc.notice( gArrClients[idxWorker].url ), " loop worker" );
+            log.v( gArrClients[idxWorker].url ), " loop worker" );
     }
     log.debug( "Loop module did finished broadcasting arrSChainsCached event to its ",
         cntWorkers, " worker(s) in ", threadInfo.threadDescription(), "..." );
@@ -608,7 +607,7 @@ export async function ensureHaveWorkers( opts ) {
                 aClient.errorLogicalInit = joMessage.error;
                 opts.details.critical( " Loop worker thread ",
                     idxWorker, " reported/returned init error: ",
-                    cc.warning( owaspUtils.extractErrorMessage( joMessage.error ) ) );
+                    log.em( owaspUtils.extractErrorMessage( joMessage.error ) ) );
                 break;
             case "log":
                 log.information( "LOOP WORKER ", notice( workerData.url ),

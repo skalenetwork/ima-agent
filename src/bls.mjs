@@ -100,19 +100,19 @@ function checkBlsThresholdAndBlsParticipants(
     nThreshold, nParticipants, strOperation, details ) {
     details = details || log;
     if( nThreshold <= 0 ) {
-        details.fatal( "Operation ", cc.bright( strOperation ),
+        details.fatal( "Operation ", log.v( strOperation ),
             " will fail because discovered BLS threshold ", nThreshold,
             " is invalid number or bad value" );
         return false;
     }
     if( nParticipants <= 0 ) {
-        details.fatal( "Operation ", cc.bright( strOperation ),
+        details.fatal( "Operation ", log.v( strOperation ),
             " will fail because discovered BLS number of participants ", nParticipants,
             " is invalid number or bad value" );
         return false;
     }
     if( nThreshold > nParticipants ) {
-        details.fatal( "Operation ", cc.bright( strOperation ),
+        details.fatal( "Operation ", log.v( strOperation ),
             " will fail because discovered BLS threshold ", nThreshold,
             " is greater than BLS number of participants ", nParticipants );
         return false;
@@ -137,7 +137,7 @@ function discoverPublicKeyByIndex( nNodeIndex, joSChainNetworkInfo, details, isT
     }
     details.fatal( "BLS 1/", cntNodes,
         " public key discovery failed for node #",
-        nNodeIndex, ", node data is: ", cc.j( joNode ) );
+        nNodeIndex, ", node data is: ", log.v( joNode ) );
     if( isThrowException ) {
         throw new Error( "BLS 1/" + cntNodes +
             " public key discovery failed for node #" + nNodeIndex );
@@ -161,7 +161,7 @@ function discoverCommonPublicKey( joSChainNetworkInfo, isThrowException ) {
         }
     }
     details.fatal( "BLS common public key discovery failed, chain data is: ",
-        cc.j( joSChainNetworkInfo ) );
+        log.v( joSChainNetworkInfo ) );
     if( isThrowException )
         throw new Error( "BLS common public key discovery failed" );
     return null;
@@ -314,9 +314,9 @@ function performBlsGlue(
         owaspUtils.removeStarting0x(
             keccak256Message( jarrMessages, nIdxCurrentMsgBlockStart, strFromChainName )
         );
-    details.debug( strLogPrefix, "Message hash to sign is ", cc.j( strMessageHash ) );
+    details.debug( strLogPrefix, "Message hash to sign is ", log.v( strMessageHash ) );
     const strActionDir = allocBlsTmpActionDir();
-    details.trace( strLogPrefix, "performBlsGlue will work in ", cc.j( strActionDir ),
+    details.trace( strLogPrefix, "performBlsGlue will work in ", log.v( strActionDir ),
         " director with ", arrSignResults.length, " sign results..." );
     const fnShellRestore = function() {
         shell.rm( "-rf", strActionDir );
@@ -328,8 +328,8 @@ function performBlsGlue(
         for( let i = 0; i < cnt; ++i ) {
             const jo = arrSignResults[i];
             const strPath = strActionDir + "/sign-result" + jo.index + ".json";
-            details.trace( strLogPrefix, "Saving ", cc.j( strPath ), " file containing ",
-                cc.j( jo ) );
+            details.trace( strLogPrefix, "Saving ", log.v( strPath ), " file containing ",
+                log.v( jo ) );
             imaUtils.jsonFileSave( strPath, jo );
             strInput += " --input " + strPath;
         }
@@ -340,28 +340,28 @@ function performBlsGlue(
             strInput +
             " --output " + strActionDir + "/glue-result.json";
         details.trace( strLogPrefix, "Will execute BLS glue command:", "\n",
-            cc.notice( strGlueCommand ) );
+            log.v( strGlueCommand ) );
         strOutput = childProcessModule.execSync( strGlueCommand, { cwd: strActionDir } );
-        details.trace( strLogPrefix, "BLS glue output is:", "\n", cc.j( strOutput ) );
+        details.trace( strLogPrefix, "BLS glue output is:", "\n", log.v( strOutput ) );
         joGlueResult = imaUtils.jsonFileLoad( strActionDir + "/glue-result.json" );
-        details.trace( strLogPrefix, "BLS glue result is: ", cc.j( joGlueResult ) );
+        details.trace( strLogPrefix, "BLS glue result is: ", log.v( joGlueResult ) );
         if( "X" in joGlueResult.signature && "Y" in joGlueResult.signature ) {
-            details.debug( strLogPrefix, cc.success( "BLS glue success" ) );
+            details.success( strLogPrefix, "BLS glue success" );
             joGlueResult.hashSrc = strMessageHash;
-            details.trace( strLogPrefix, "Computing ", cc.j( "G1" ), " hash point..." );
+            details.trace( strLogPrefix, "Computing ", log.v( "G1" ), " hash point..." );
             const strPath = strActionDir + "/hash.json";
-            details.trace( strLogPrefix, "Saving ", cc.notice( strPath ), " file..." );
+            details.trace( strLogPrefix, "Saving ", log.v( strPath ), " file..." );
             imaUtils.jsonFileSave( strPath, { "message": strMessageHash } );
             const strHasG1Command =
                 imaState.strPathHashG1 +
                 " --t " + nThreshold +
                 " --n " + nParticipants;
             details.trace( strLogPrefix, "Will execute HashG1 command:", "\n",
-                cc.notice( strHasG1Command ) );
+                log.v( strHasG1Command ) );
             strOutput = childProcessModule.execSync( strHasG1Command, { cwd: strActionDir } );
-            details.trace( strLogPrefix, "HashG1 output is:", "\n", cc.notice( strOutput ) );
+            details.trace( strLogPrefix, "HashG1 output is:", "\n", log.v( strOutput ) );
             const joResultHashG1 = imaUtils.jsonFileLoad( strActionDir + "/g1.json" );
-            details.trace( strLogPrefix, "HashG1 result is: ", cc.j( joResultHashG1 ) );
+            details.trace( strLogPrefix, "HashG1 result is: ", log.v( joResultHashG1 ) );
             if( "g1" in joResultHashG1 &&
                 "hint" in joResultHashG1.g1 &&
                 "hashPoint" in joResultHashG1.g1 &&
@@ -382,9 +382,9 @@ function performBlsGlue(
         fnShellRestore();
     } catch ( err ) {
         details.critical( strLogPrefix, "BLS glue error description is: ",
-            cc.warning( owaspUtils.extractErrorMessage( err ) ),
-            ", stack is: ", "\n", cc.stack( err.stack ) );
-        details.critical( strLogPrefix, "BLS glue output is:", "\n", cc.notice( strOutput ) );
+            log.em( owaspUtils.extractErrorMessage( err ) ),
+            ", stack is: ", "\n", log.s( err.stack ) );
+        details.critical( strLogPrefix, "BLS glue output is:", "\n", log.v( strOutput ) );
         fnShellRestore();
         joGlueResult = null;
     }
@@ -403,11 +403,11 @@ function performBlsGlueU256( details, u256, arrSignResults ) {
         nThreshold, nParticipants, "BLS glue-256", details ) )
         return null;
     details.trace( strLogPrefix, "Original long message is ",
-        cc.j( keccak256U256( u256, false ) ) );
+        log.v( keccak256U256( u256, false ) ) );
     const strMessageHash = keccak256U256( u256, true );
-    details.trace( strLogPrefix, "Message hash to sign is ", cc.j( strMessageHash ) );
+    details.trace( strLogPrefix, "Message hash to sign is ", log.v( strMessageHash ) );
     const strActionDir = allocBlsTmpActionDir();
-    details.trace( strLogPrefix, "performBlsGlueU256 will work in ", cc.j( strActionDir ),
+    details.trace( strLogPrefix, "performBlsGlueU256 will work in ", log.v( strActionDir ),
         " director with ", arrSignResults.length, " sign results..." );
     const fnShellRestore = function() {
         shell.rm( "-rf", strActionDir );
@@ -430,28 +430,28 @@ function performBlsGlueU256( details, u256, arrSignResults ) {
             strInput +
             " --output " + strActionDir + "/glue-result.json";
         details.trace( strLogPrefix, "Will execute BLS glue command:", "\n",
-            cc.notice( strGlueCommand ) );
+            log.v( strGlueCommand ) );
         strOutput = childProcessModule.execSync( strGlueCommand, { cwd: strActionDir } );
-        details.trace( strLogPrefix, "BLS glue output is:", "\n", cc.notice( strOutput ) );
+        details.trace( strLogPrefix, "BLS glue output is:", "\n", log.v( strOutput ) );
         joGlueResult = imaUtils.jsonFileLoad( strActionDir + "/glue-result.json" );
-        details.trace( strLogPrefix, "BLS glue result is: ", cc.j( joGlueResult ) );
+        details.trace( strLogPrefix, "BLS glue result is: ", log.v( joGlueResult ) );
         if( "X" in joGlueResult.signature && "Y" in joGlueResult.signature ) {
-            details.trace( strLogPrefix, cc.success( "BLS glue success" ) );
+            details.success( strLogPrefix, "BLS glue success" );
             joGlueResult.hashSrc = strMessageHash;
-            details.trace( strLogPrefix, "Computing ", cc.j( "G1" ), " hash point..." );
+            details.trace( strLogPrefix, "Computing ", log.v( "G1" ), " hash point..." );
             const strPath = strActionDir + "/hash.json";
-            details.trace( strLogPrefix, "Saving ", cc.notice( strPath ), " file..." );
+            details.trace( strLogPrefix, "Saving ", log.v( strPath ), " file..." );
             imaUtils.jsonFileSave( strPath, { "message": strMessageHash } );
             const strHasG1Command =
                 imaState.strPathHashG1 +
                 " --t " + nThreshold +
                 " --n " + nParticipants;
             details.trace( strLogPrefix, "Will execute HashG1 command:", "\n",
-                cc.notice( strHasG1Command ) );
+                log.v( strHasG1Command ) );
             strOutput = childProcessModule.execSync( strHasG1Command, { cwd: strActionDir } );
-            details.trace( strLogPrefix, "HashG1 output is:", "\n", cc.notice( strOutput ) );
+            details.trace( strLogPrefix, "HashG1 output is:", "\n", log.v( strOutput ) );
             const joResultHashG1 = imaUtils.jsonFileLoad( strActionDir + "/g1.json" );
-            details.trace( strLogPrefix, "HashG1 result is: ", cc.j( joResultHashG1 ) );
+            details.trace( strLogPrefix, "HashG1 result is: ", log.v( joResultHashG1 ) );
             if( "g1" in joResultHashG1 &&
                 "hint" in joResultHashG1.g1 &&
                 "hashPoint" in joResultHashG1.g1 &&
@@ -472,9 +472,9 @@ function performBlsGlueU256( details, u256, arrSignResults ) {
         fnShellRestore();
     } catch ( err ) {
         details.critical( "BLS glue error description is: ",
-            cc.warning( owaspUtils.extractErrorMessage( err ) ) + "\n" +
-            ", stack is: ", cc.stack( err.stack ) );
-        details.critical( "BLS glue output is:", "\n", cc.notice( strOutput ) );
+            log.em( owaspUtils.extractErrorMessage( err ) ) + "\n" +
+            ", stack is: ", log.s( err.stack ) );
+        details.critical( "BLS glue output is:", "\n", log.v( strOutput ) );
         fnShellRestore();
         joGlueResult = null;
     }
@@ -507,18 +507,18 @@ function performBlsVerifyI(
         details.trace( strLogPrefix, "BLS node #", nZeroBasedNodeIndex,
             " - first message nonce is ", nIdxCurrentMsgBlockStart );
         details.trace( strLogPrefix, "BLS node #", nZeroBasedNodeIndex,
-            " - first source chain name is ", cc.j( strFromChainName ) );
+            " - first source chain name is ", log.v( strFromChainName ) );
         details.trace( strLogPrefix, "BLS node #", nZeroBasedNodeIndex,
-            " - messages array ", cc.j( jarrMessages ) );
+            " - messages array ", log.v( jarrMessages ) );
         const strMessageHash =
             owaspUtils.removeStarting0x(
                 keccak256Message( jarrMessages, nIdxCurrentMsgBlockStart, strFromChainName ) );
         details.trace( strLogPrefix, "BLS node #", nZeroBasedNodeIndex,
-            " - hashed verify message is ", cc.j( strMessageHash ) );
+            " - hashed verify message is ", log.v( strMessageHash ) );
         const joMsg = { "message": strMessageHash };
         details.debug( strLogPrefix, "BLS node #", nZeroBasedNodeIndex,
-            " - composed  ", cc.j( joMsg ), " composed from ", cc.j( jarrMessages ),
-            " using glue ", cc.j( joResultFromNode ), " and public key ", cc.j( joPublicKey ) );
+            " - composed  ", log.v( joMsg ), " composed from ", log.v( jarrMessages ),
+            " using glue ", log.v( joResultFromNode ), " and public key ", log.v( joPublicKey ) );
         const strSignResultFileName = strActionDir + "/sign-result" + nZeroBasedNodeIndex + ".json";
         imaUtils.jsonFileSave( strSignResultFileName, joResultFromNode );
         imaUtils.jsonFileSave( strActionDir + "/hash.json", joMsg );
@@ -532,10 +532,10 @@ function performBlsVerifyI(
             " --input " + strSignResultFileName
             ;
         details.trace( strLogPrefix, "Will execute node #",
-            nZeroBasedNodeIndex, " BLS verify command:", "\n", cc.notice( strVerifyCommand ) );
+            nZeroBasedNodeIndex, " BLS verify command:", "\n", log.v( strVerifyCommand ) );
         strOutput = childProcessModule.execSync( strVerifyCommand, { cwd: strActionDir } );
         details.trace( strLogPrefix, "BLS node #",
-            nZeroBasedNodeIndex, " verify output is:", "\n", cc.notice( strOutput ) );
+            nZeroBasedNodeIndex, " verify output is:", "\n", log.v( strOutput ) );
         details.success( strLogPrefix, "BLS node #",
             nZeroBasedNodeIndex, " verify success" );
         fnShellRestore();
@@ -543,11 +543,11 @@ function performBlsVerifyI(
     } catch ( err ) {
         details.critical( strLogPrefix, "BLS node #",
             nZeroBasedNodeIndex, " verify error:", " error description is: ",
-            cc.warning( owaspUtils.extractErrorMessage( err ) ), ", stack is: ", "\n",
-            cc.stack( err.stack ) );
+            log.em( owaspUtils.extractErrorMessage( err ) ), ", stack is: ", "\n",
+            log.s( err.stack ) );
         details.critical( strLogPrefix, "BLS node #",
             nZeroBasedNodeIndex, " verify output is:", "\n",
-            cc.notice( strOutput ) );
+            log.v( strOutput ) );
         fnShellRestore();
     }
     return false;
@@ -577,8 +577,8 @@ function performBlsVerifyIU256(
     try {
         const joMsg = { "message": keccak256U256( u256, true ) };
         details.debug( strLogPrefix, "BLS u256 node #", nZeroBasedNodeIndex,
-            cc.debug( " verify message " ) + cc.j( joMsg ) + " composed from ", cc.j( u256 ),
-            " using glue ", cc.j( joResultFromNode ), " and public key ", cc.j( joPublicKey ) );
+            cc.debug( " verify message " ) + log.v( joMsg ) + " composed from ", log.v( u256 ),
+            " using glue ", log.v( joResultFromNode ), " and public key ", log.v( joPublicKey ) );
         const strSignResultFileName = strActionDir + "/sign-result" + nZeroBasedNodeIndex + ".json";
         imaUtils.jsonFileSave( strSignResultFileName, joResultFromNode );
         imaUtils.jsonFileSave( strActionDir + "/hash.json", joMsg );
@@ -593,20 +593,20 @@ function performBlsVerifyIU256(
             ;
         details.trace( strLogPrefix, "Will execute node #",
             nZeroBasedNodeIndex, " BLS u256 verify command:", "\n",
-            cc.notice( strVerifyCommand ) );
+            log.v( strVerifyCommand ) );
         strOutput = childProcessModule.execSync( strVerifyCommand, { cwd: strActionDir } );
         details.trace( strLogPrefix, "BLS u256 node #", nZeroBasedNodeIndex +
-            " verify output is:", "\n", cc.notice( strOutput ) );
+            " verify output is:", "\n", log.v( strOutput ) );
         details.success( strLogPrefix, "BLS u256 node #",
             nZeroBasedNodeIndex, " verify success" );
         fnShellRestore();
         return true;
     } catch ( err ) {
         details.error( strLogPrefix, "BLS u256 node #", nZeroBasedNodeIndex, " verify error:",
-            " error description is: ", cc.warning( owaspUtils.extractErrorMessage( err ) ),
-            ", stack is: ", "\n", cc.stack( err.stack ) );
+            " error description is: ", log.em( owaspUtils.extractErrorMessage( err ) ),
+            ", stack is: ", "\n", log.s( err.stack ) );
         details.error( strLogPrefix, "BLS u256 node #", nZeroBasedNodeIndex, " verify output is:",
-            "\n", cc.notice( strOutput ) );
+            "\n", log.v( strOutput ) );
         fnShellRestore();
     }
     return false;
@@ -635,21 +635,21 @@ function performBlsVerify(
     const strLogPrefix = strDirection + "/BLS/Summary: ";
     try {
         details.trace( strLogPrefix, "BLS/summary verify message - ",
-            "first message nonce is ", cc.j( nIdxCurrentMsgBlockStart ) );
+            "first message nonce is ", log.v( nIdxCurrentMsgBlockStart ) );
         details.trace( strLogPrefix, "BLS/summary verify message - ",
-            "first source chain name is ", cc.j( strFromChainName ) );
+            "first source chain name is ", log.v( strFromChainName ) );
         details.trace( strLogPrefix, "BLS/summary verify message - ",
-            "messages array ", cc.j( jarrMessages ) );
+            "messages array ", log.v( jarrMessages ) );
         const strMessageHash =
             owaspUtils.removeStarting0x(
                 keccak256Message( jarrMessages, nIdxCurrentMsgBlockStart, strFromChainName )
             );
         details.trace( strLogPrefix, "BLS/summary verify message - ",
-            "hashed verify message is ", cc.j( strMessageHash ) );
+            "hashed verify message is ", log.v( strMessageHash ) );
         const joMsg = { "message": strMessageHash };
         details.debug( strLogPrefix, "BLS/summary verify message - composed JSON ",
-            cc.j( joMsg ), " from messages array ", cc.j( jarrMessages ), " using glue ",
-            cc.j( joGlueResult ), " and common public key ", cc.j( joCommonPublicKey ) );
+            log.v( joMsg ), " from messages array ", log.v( jarrMessages ), " using glue ",
+            log.v( joGlueResult ), " and common public key ", log.v( joCommonPublicKey ) );
         imaUtils.jsonFileSave( strActionDir + "/glue-result.json", joGlueResult );
         imaUtils.jsonFileSave( strActionDir + "/hash.json", joMsg );
         const joCommonPublicKeyToSave = {
@@ -660,7 +660,7 @@ function performBlsVerify(
         };
         imaUtils.jsonFileSave( strActionDir + "/common_public_key.json", joCommonPublicKeyToSave );
         details.trace( strLogPrefix, "BLS common public key for verification is:", "\n",
-            cc.j( joCommonPublicKey ) );
+            log.v( joCommonPublicKey ) );
         const strVerifyCommand = "" +
             imaState.strPathBlsVerify +
             " --t " + nThreshold +
@@ -668,18 +668,18 @@ function performBlsVerify(
             " --input " + "./glue-result.json"
             ;
         details.trace( strLogPrefix, "Will execute BLS/summary verify command:", "\n",
-            cc.notice( strVerifyCommand ) );
+            log.v( strVerifyCommand ) );
         strOutput = childProcessModule.execSync( strVerifyCommand, { cwd: strActionDir } );
         details.trace( strLogPrefix, "BLS/summary verify output is:", "\n",
-            cc.notice( strOutput ) );
+            log.v( strOutput ) );
         details.success( strLogPrefix, "BLS/summary verify success" );
         fnShellRestore();
         return true;
     } catch ( err ) {
         details.error( strLogPrefix, "BLS/summary verify error description is: ",
-            cc.warning( owaspUtils.extractErrorMessage( err ) ),
-            ", stack is: ", "\n", cc.stack( err.stack ) );
-        details.error( "BLS/summary verify output is:", "\n", cc.notice( strOutput ) );
+            log.em( owaspUtils.extractErrorMessage( err ) ),
+            ", stack is: ", "\n", log.s( err.stack ) );
+        details.error( "BLS/summary verify output is:", "\n", log.v( strOutput ) );
         fnShellRestore();
     }
     return false;
@@ -702,9 +702,9 @@ function performBlsVerifyU256( details, joGlueResult, u256, joCommonPublicKey ) 
     const strLogPrefix = "BLS u256/Summary: ";
     try {
         const joMsg = { "message": keccak256U256( u256, true ) };
-        details.debug( strLogPrefix, "BLS u256/summary verify message ", cc.j( joMsg ),
-            " composed from ", cc.j( u256 ), " using glue ", cc.j( joGlueResult ),
-            " and common public key ", cc.j( joCommonPublicKey ) );
+        details.debug( strLogPrefix, "BLS u256/summary verify message ", log.v( joMsg ),
+            " composed from ", log.v( u256 ), " using glue ", log.v( joGlueResult ),
+            " and common public key ", log.v( joCommonPublicKey ) );
         imaUtils.jsonFileSave( strActionDir + "/glue-result.json", joGlueResult );
         imaUtils.jsonFileSave( strActionDir + "/hash.json", joMsg );
         const joCommonPublicKeyToSave = {
@@ -715,7 +715,7 @@ function performBlsVerifyU256( details, joGlueResult, u256, joCommonPublicKey ) 
         };
         imaUtils.jsonFileSave( strActionDir + "/common_public_key.json", joCommonPublicKeyToSave );
         details.trace( strLogPrefix, "BLS u256 common public key for verification is:", "\n",
-            cc.j( joCommonPublicKey ) );
+            log.v( joCommonPublicKey ) );
         const strVerifyCommand = "" +
             imaState.strPathBlsVerify +
             " --t " + nThreshold +
@@ -723,19 +723,19 @@ function performBlsVerifyU256( details, joGlueResult, u256, joCommonPublicKey ) 
             " --input " + "./glue-result.json"
             ;
         details.trace( strLogPrefix, "Will execute BLS u256/summary verify command:", "\n",
-            cc.notice( strVerifyCommand ) );
+            log.v( strVerifyCommand ) );
         strOutput = childProcessModule.execSync( strVerifyCommand, { cwd: strActionDir } );
         details.trace( strLogPrefix, "BLS u256/summary verify output is:", "\n",
-            cc.notice( strOutput ) );
+            log.v( strOutput ) );
         details.success( strLogPrefix, "BLS u256/summary verify success" );
         fnShellRestore();
         return true;
     } catch ( err ) {
         details.error( strLogPrefix, "BLS u256/summary  error description is: ",
-            cc.warning( owaspUtils.extractErrorMessage( err ) ),
-            ", stack is: " + "\n" + cc.stack( err.stack ) );
+            log.em( owaspUtils.extractErrorMessage( err ) ),
+            ", stack is: " + "\n" + log.s( err.stack ) );
         details.error( strLogPrefix, "BLS u256/summary verify output is:", "\n",
-            cc.notice( strOutput ) );
+            log.v( strOutput ) );
         fnShellRestore();
     }
     return false;
@@ -787,15 +787,15 @@ async function checkCorrectnessOfMessagesToSign(
     }
 
     const strCallerAccountAddress = joAccount.address();
-    details.debug( strLogPrefix, cc.bright( strDirection ),
+    details.debug( strLogPrefix, log.v( strDirection ),
         " message correctness validation through call to ",
-        cc.notice( "verifyOutgoingMessageData" ), " method of ", cc.bright( "MessageProxy" ),
-        " contract with address ", cc.j( joMessageProxy.address ),
-        ", caller account address is ", cc.j( joMessageProxy.address ),
+        log.v( "verifyOutgoingMessageData" ), " method of ", log.v( "MessageProxy" ),
+        " contract with address ", log.v( joMessageProxy.address ),
+        ", caller account address is ", log.v( joMessageProxy.address ),
         ", message(s) count is ", jarrMessages.length, ", message(s) to process are ",
-        cc.j( jarrMessages ), ", first real message index is ", nIdxCurrentMsgBlockStart,
-        ", messages will be sent to chain name ", cc.j( joChainName ),
-        ", caller address is ", cc.j( strCallerAccountAddress ) );
+        log.v( jarrMessages ), ", first real message index is ", nIdxCurrentMsgBlockStart,
+        ", messages will be sent to chain name ", log.v( joChainName ),
+        ", caller address is ", log.v( strCallerAccountAddress ) );
     let cntBadMessages = 0, i = 0;
     const cnt = jarrMessages.length;
     if( strDirection == "S2M" || strDirection == "S2S" ) {
@@ -803,11 +803,11 @@ async function checkCorrectnessOfMessagesToSign(
             const joMessage = jarrMessages[i];
             const idxMessage = nIdxCurrentMsgBlockStart + i;
             try {
-                details.trace( strLogPrefix, cc.bright( strDirection ),
+                details.trace( strLogPrefix, log.v( strDirection ),
                     " Will validate message ", i, " of ", cnt, ", real message index is ",
-                    idxMessage, ", source contract is ", cc.j( joMessage.sender ),
-                    ", destination contract is ", cc.j( joMessage.destinationContract ),
-                    ", message data is ", cc.j( joMessage.data ) );
+                    idxMessage, ", source contract is ", log.v( joMessage.sender ),
+                    ", destination contract is ", log.v( joMessage.destinationContract ),
+                    ", message data is ", log.v( joMessage.data ) );
                 const outgoingMessageData = {
                     "dstChainHash": owaspUtils.ethersMod.ethers.utils.id( joChainName ),
                     "msgCounter": 0 + idxMessage,
@@ -819,7 +819,7 @@ async function checkCorrectnessOfMessagesToSign(
                     outgoingMessageData,
                     { from: strCallerAccountAddress }
                 );
-                details.trace( strLogPrefix, cc.bright( strDirection ),
+                details.trace( strLogPrefix, log.v( strDirection ),
                     " Got verification call result ", cc.tf( isValidMessage ),
                     ", real message index is: ", idxMessage, ", saved msgCounter is: ",
                     outgoingMessageData.msgCounter );
@@ -830,20 +830,20 @@ async function checkCorrectnessOfMessagesToSign(
             } catch ( err ) {
                 ++cntBadMessages;
                 if( log.id != details.id ) {
-                    log.critical( strLogPrefix, cc.bright( strDirection ),
+                    log.critical( strLogPrefix, log.v( strDirection ),
                         " Correctness validation failed for message ",
-                        idxMessage, " sent to ", cc.j( joChainName ),
-                        ", message is: ", cc.j( joMessage ), ", error information: ",
-                        cc.warning( owaspUtils.extractErrorMessage( err ) ),
-                        ", stack is:", "\n", cc.stack( err.stack )
+                        idxMessage, " sent to ", log.v( joChainName ),
+                        ", message is: ", log.v( joMessage ), ", error information: ",
+                        log.em( owaspUtils.extractErrorMessage( err ) ),
+                        ", stack is:", "\n", log.s( err.stack )
                     );
                 }
-                details.critical( cc.bright( strDirection ),
+                details.critical( log.v( strDirection ),
                     " Correctness validation failed for message ",
-                    idxMessage, " sent to ", cc.j( joChainName ),
-                    ", message is: ", cc.j( joMessage ), ", error information: ",
-                    cc.warning( owaspUtils.extractErrorMessage( err ) ),
-                    ", stack is:", "\n", cc.stack( err.stack )
+                    idxMessage, " sent to ", log.v( joChainName ),
+                    ", message is: ", log.v( joMessage ), ", error information: ",
+                    log.em( owaspUtils.extractErrorMessage( err ) ),
+                    ", stack is:", "\n", log.s( err.stack )
                 );
             }
         }
@@ -879,7 +879,7 @@ async function prepareSignMessagesImpl( optsSignOperation ) {
             ? optsSignOperation.imaState.joSChainNetworkInfo.network
             : [];
     optsSignOperation.details.trace( optsSignOperation.strLogPrefix, " Invoking ",
-        cc.bright( optsSignOperation.strDirection ),
+        log.v( optsSignOperation.strDirection ),
         " signing messages procedure, message signing is ",
         cc.onOff( optsSignOperation.imaState.bSignMessages ) );
     if( !( optsSignOperation.imaState.bSignMessages &&
@@ -891,7 +891,7 @@ async function prepareSignMessagesImpl( optsSignOperation ) {
             "BLS message signing is turned off, first real message index is: ",
             optsSignOperation.nIdxCurrentMsgBlockStart,
             ", have ", optsSignOperation.jarrMessages.length, " message(s) to process ",
-            cc.j( optsSignOperation.jarrMessages ) );
+            log.v( optsSignOperation.jarrMessages ) );
         optsSignOperation.details.exposeDetailsTo(
             log, optsSignOperation.strGatheredDetailsName, false );
         optsSignOperation.details.close();
@@ -913,9 +913,9 @@ async function prepareSignMessagesImpl( optsSignOperation ) {
     );
     optsSignOperation.details.trace( optsSignOperation.strLogPrefix, "Will sign ",
         optsSignOperation.jarrMessages.length, " message(s), sequence ID is ",
-        cc.j( optsSignOperation.sequenceId ), "..." );
+        log.v( optsSignOperation.sequenceId ), "..." );
     optsSignOperation.details.trace( optsSignOperation.strLogPrefix +
-        cc.debug( "Will query to sign " ) + cc.j( optsSignOperation.jarrNodes.length ) +
+        cc.debug( "Will query to sign " ) + log.v( optsSignOperation.jarrNodes.length ) +
         cc.debug( " skaled node(s)..." ) );
     optsSignOperation.nThreshold =
         discoverBlsThreshold( optsSignOperation.imaState.joSChainNetworkInfo );
@@ -945,7 +945,7 @@ async function prepareSignMessagesImpl( optsSignOperation ) {
     optsSignOperation.nCountOfBlsPartsToCollect = 0 + optsSignOperation.nThreshold;
     optsSignOperation.details.trace( optsSignOperation.strLogPrefix, "Will BLS-collect ",
         optsSignOperation.nCountOfBlsPartsToCollect, " from ", optsSignOperation.jarrNodes.length,
-        " nodes, sequence ID is ", cc.j( optsSignOperation.sequenceId ) );
+        " nodes, sequence ID is ", log.v( optsSignOperation.sequenceId ) );
     return true;
 }
 
@@ -957,7 +957,7 @@ async function gatherSigningStartImpl( optsSignOperation ) {
         const iv = setInterval( function() {
             if( optsSignOperation.joGatheringTracker.nCountReceivedPrevious !=
                 optsSignOperation.joGatheringTracker.nCountReceived ) {
-                optsSignOperation.details.debug( cc.bright( optsSignOperation.strDirection ), "/#",
+                optsSignOperation.details.debug( log.v( optsSignOperation.strDirection ), "/#",
                     optsSignOperation.nTransferLoopCounter,
                     " BLS signature gathering progress updated, now have ",
                     optsSignOperation.joGatheringTracker.nCountReceived, " BLS parts of ",
@@ -985,14 +985,14 @@ async function gatherSigningStartImpl( optsSignOperation ) {
                 );
                 if( joGlueResult ) {
                     optsSignOperation.details.success( optsSignOperation.strLogPrefixB,
-                        "Got BLS glue result: ", cc.j( joGlueResult ) );
+                        "Got BLS glue result: ", log.v( joGlueResult ) );
                     if( optsSignOperation.imaState.strPathBlsVerify.length > 0 ) {
                         const joCommonPublicKey = discoverCommonPublicKey(
                             optsSignOperation.imaState.joSChainNetworkInfo, false );
                         if( ! joCommonPublicKey ) {
                             strError = "No BLS common public key";
                             optsSignOperation.details.error( optsSignOperation.strLogPrefixB,
-                                cc.warning( strError ) );
+                                log.em( strError ) );
                         } else if( performBlsVerify(
                             optsSignOperation.details, optsSignOperation.strDirection,
                             joGlueResult, optsSignOperation.jarrMessages,
@@ -1007,32 +1007,32 @@ async function gatherSigningStartImpl( optsSignOperation ) {
                         } else {
                             strError = "BLS verification failed";
                             optsSignOperation.details.error( optsSignOperation.strLogPrefixB,
-                                cc.warning( strError ) );
+                                log.em( strError ) );
                         }
                     }
                 } else {
                     strError = "BLS glue failed, no glue result arrived";
                     optsSignOperation.details.error( optsSignOperation.strLogPrefixB,
-                        "Problem(1) in BLS sign result handler: ", cc.warning( strError ) );
+                        "Problem(1) in BLS sign result handler: ", log.em( strError ) );
                     if( log.id != details.id ) {
                         log.error( optsSignOperation.strLogPrefixB,
-                            "Problem(1) in BLS sign result handler: ", cc.warning( strError ) );
+                            "Problem(1) in BLS sign result handler: ", log.em( strError ) );
                     }
                 }
                 optsSignOperation.trace.trace( "Will call signed-hash answer-sending callback ",
-                    ( strError ? ( cc.debug( " with error " ) + cc.j( strError ) ) : "" ),
-                    ", optsSignOperation.jarrMessages is ", cc.j( optsSignOperation.jarrMessages ),
-                    ", glue result is ", cc.j( joGlueResult ) );
+                    ( strError ? ( cc.debug( " with error " ) + log.v( strError ) ) : "" ),
+                    ", optsSignOperation.jarrMessages is ", log.v( optsSignOperation.jarrMessages ),
+                    ", glue result is ", log.v( joGlueResult ) );
                 optsSignOperation.fn(
                     strError, optsSignOperation.jarrMessages, joGlueResult )
                     .catch( ( err ) => {
                         if( log.id != optsSignOperation.details.id ) {
                             log.critical( "Problem(2) in BLS sign result handler: ",
-                                cc.warning( owaspUtils.extractErrorMessage( err ) ) );
+                                log.em( owaspUtils.extractErrorMessage( err ) ) );
                         }
                         optsSignOperation.details.critical(
                             "Problem(2) in BLS sign result handler: ",
-                            cc.warning( owaspUtils.extractErrorMessage( err ) ) );
+                            log.em( owaspUtils.extractErrorMessage( err ) ) );
                         optsSignOperation.errGathering =
                             "Problem(2) in BLS sign result handler: " +
                             owaspUtils.extractErrorMessage( err );
@@ -1059,13 +1059,13 @@ async function gatherSigningStartImpl( optsSignOperation ) {
                     optsSignOperation.details.error( "Problem(3) in BLS sign result handler, ",
                         "not enough successful BLS signature parts(", optsSignOperation.cntSuccess,
                         " when all attempts done, error optsSignOperation.details: ",
-                        cc.warning( owaspUtils.extractErrorMessage( err ) ) );
+                        log.em( owaspUtils.extractErrorMessage( err ) ) );
                     if( log.id != optsSignOperation.details.id ) {
                         log.error( "Problem(3) in BLS sign result handler, ",
                             "not enough successful BLS signature parts(",
                             optsSignOperation.cntSuccess,
                             " when all attempts done, error optsSignOperation.details: ",
-                            cc.warning( owaspUtils.extractErrorMessage( err ) ) );
+                            log.em( owaspUtils.extractErrorMessage( err ) ) );
                     }
                     optsSignOperation.errGathering =
                         "Problem(3) in BLS sign result handler," +
@@ -1094,13 +1094,13 @@ async function gatherSigningStartImpl( optsSignOperation ) {
                         "not enough successful BLS signature parts(",
                         optsSignOperation.cntSuccess,
                         ") and timeout reached, error optsSignOperation.details: ",
-                        cc.warning( owaspUtils.extractErrorMessage( err ) ) );
+                        log.em( owaspUtils.extractErrorMessage( err ) ) );
                     if( log.id != optsSignOperation.details.id ) {
                         log.critical( "Problem(4) in BLS sign result handler, ",
                             "not enough successful BLS signature parts(",
                             optsSignOperation.cntSuccess,
                             ") and timeout reached, error optsSignOperation.details: ",
-                            cc.warning( owaspUtils.extractErrorMessage( err ) ) );
+                            log.em( owaspUtils.extractErrorMessage( err ) ) );
                     }
                     optsSignOperation.errGathering =
                         "Problem(4) in BLS sign result handler, " +
@@ -1130,18 +1130,18 @@ async function gatherSigningFinishImpl( optsSignOperation ) {
         } ).catch( err => {
             if( log.id != optsSignOperation.details.id ) {
                 log.error( "Failed to verify BLS and send message : ",
-                    cc.warning( owaspUtils.extractErrorMessage( err ) ) );
+                    log.em( owaspUtils.extractErrorMessage( err ) ) );
             }
             optsSignOperation.details.error( "Failed to verify BLS and send message : ",
-                cc.warning( owaspUtils.extractErrorMessage( err ) ) );
+                log.em( owaspUtils.extractErrorMessage( err ) ) );
         } );
     if( optsSignOperation.errGathering ) {
         if( log.id != optsSignOperation.details.id ) {
             log.error( "Failed BLS sign result awaiting(1): ",
-                cc.warning( optsSignOperation.errGathering.toString() ) );
+                log.em( optsSignOperation.errGathering.toString() ) );
         }
         optsSignOperation.details.error( "Failed BLS sign result awaiting(1): ",
-            cc.warning( optsSignOperation.errGathering.toString() ) );
+            log.em( optsSignOperation.errGathering.toString() ) );
         if( ! optsSignOperation.bHaveResultReportCalled ) {
             optsSignOperation.bHaveResultReportCalled = true;
             await optsSignOperation.fn(
@@ -1157,13 +1157,13 @@ async function gatherSigningFinishImpl( optsSignOperation ) {
                         "not enough successful BLS signature parts(" ,
                         optsSignOperation.cntSuccess,
                         ") and timeout reached, error optsSignOperation.details: ",
-                        cc.warning( owaspUtils.extractErrorMessage( err ) ) );
+                        log.em( owaspUtils.extractErrorMessage( err ) ) );
                 }
                 optsSignOperation.details.error( "Problem(5) in BLS sign result handler, ",
                     "not enough successful BLS signature parts(" ,
                     optsSignOperation.cntSuccess,
                     ") and timeout reached, error optsSignOperation.details: ",
-                    cc.warning( owaspUtils.extractErrorMessage( err ) ) );
+                    log.em( owaspUtils.extractErrorMessage( err ) ) );
                 optsSignOperation.details.exposeDetailsTo(
                     log, optsSignOperation.strGatheredDetailsName, false );
                 optsSignOperation.details.close();
@@ -1175,10 +1175,10 @@ async function gatherSigningFinishImpl( optsSignOperation ) {
     if( ! optsSignOperation.bHaveResultReportCalled ) {
         if( log.id != optsSignOperation.details.id ) {
             log.error( "Failed BLS sign result awaiting(2): ",
-                cc.warning( "No reports were arrived" ) );
+                log.em( "No reports were arrived" ) );
         }
         optsSignOperation.details.error( "Failed BLS sign result awaiting(2): ",
-            cc.warning( "No reports were arrived" ) );
+            log.em( "No reports were arrived" ) );
         optsSignOperation.bHaveResultReportCalled = true;
         await optsSignOperation.fn(
             "Failed to gather BLS signatures in " + optsSignOperation.jarrNodes.length +
@@ -1191,13 +1191,13 @@ async function gatherSigningFinishImpl( optsSignOperation ) {
                     "not enough successful BLS signature parts(",
                     optsSignOperation.cntSuccess,
                     ") and timeout reached, error optsSignOperation.details: ",
-                    cc.warning( owaspUtils.extractErrorMessage( err ) ) );
+                    log.em( owaspUtils.extractErrorMessage( err ) ) );
             }
             optsSignOperation.details.error( "Problem(6) in BLS sign result handler, ",
                 "not enough successful BLS signature parts(",
                 optsSignOperation.cntSuccess,
                 ") and timeout reached, error optsSignOperation.details: ",
-                cc.warning( owaspUtils.extractErrorMessage( err ) ) );
+                log.em( owaspUtils.extractErrorMessage( err ) ) );
             optsSignOperation.details.exposeDetailsTo(
                 log, optsSignOperation.strGatheredDetailsName, false );
             optsSignOperation.details.close();
@@ -1260,29 +1260,29 @@ async function doSignProcessHandleCall(
         if( log.id != optsSignOperation.details.id ) {
             log.error( optsSignOperation.strLogPrefix,
                 "JSON RPC call(doSignProcessHandleCall) to S-Chain node ", strNodeDescColorized,
-                "(node #", i, " via ", cc.notice( strNodeURL ),
+                "(node #", i, " via ", log.u( strNodeURL ),
                 ") failed, RPC call reported error: ",
-                cc.warning( owaspUtils.extractErrorMessage( err ) ), ", sequence ID is ",
-                cc.j( optsSignOperation.sequenceId ) );
+                log.em( owaspUtils.extractErrorMessage( err ) ), ", sequence ID is ",
+                log.v( optsSignOperation.sequenceId ) );
         }
         optsSignOperation.details.error(
             optsSignOperation.strLogPrefix,
             "JSON RPC call(doSignProcessHandleCall) to S-Chain node ", strNodeDescColorized,
-            "(node #", i, " via ", cc.notice( strNodeURL ),
+            "(node #", i, " via ", log.u( strNodeURL ),
             ") failed, RPC call reported error: ",
-            cc.warning( owaspUtils.extractErrorMessage( err ) ), ", sequence ID is ",
-            cc.j( optsSignOperation.sequenceId ) );
+            log.em( owaspUtils.extractErrorMessage( err ) ), ", sequence ID is ",
+            log.v( optsSignOperation.sequenceId ) );
         await joCall.disconnect();
         return;
     }
     optsSignOperation.details.trace( optsSignOperation.strLogPrefix,
         log.generateTimestampString( null, true ), " ",
-        "Got answer from ", cc.j( "skale_imaVerifyAndSign" ), "(node #", i, " via ",
-        cc.notice( strNodeURL ), ") for transfer from chain ",
-        cc.j( optsSignOperation.fromChainName ), " to chain ",
-        cc.j( optsSignOperation.targetChainName ), " with params ", cc.j( joParams ),
-        ", answer is ", cc.j( joOut ), ", sequence ID is ",
-        cc.j( optsSignOperation.sequenceId ) );
+        "Got answer from ", log.v( "skale_imaVerifyAndSign" ), "(node #", i, " via ",
+        log.u( strNodeURL ), ") for transfer from chain ",
+        log.v( optsSignOperation.fromChainName ), " to chain ",
+        log.v( optsSignOperation.targetChainName ), " with params ", log.v( joParams ),
+        ", answer is ", log.v( joOut ), ", sequence ID is ",
+        log.v( optsSignOperation.sequenceId ) );
     if( joOut.result == null ||
         joOut.result == undefined ||
         ( !typeof joOut.result == "object" )
@@ -1291,20 +1291,20 @@ async function doSignProcessHandleCall(
         if( log.id != optsSignOperation.details.id ) {
             log.critical( optsSignOperation.strLogPrefix,
                 "S-Chain node ", strNodeDescColorized, " reported wallet error: ",
-                cc.warning( owaspUtils.extractErrorMessage( joOut, "unknown wallet error(1)" ) ),
+                log.em( owaspUtils.extractErrorMessage( joOut, "unknown wallet error(1)" ) ),
                 ", sequence ID is ",
-                cc.j( optsSignOperation.sequenceId ) );
+                log.v( optsSignOperation.sequenceId ) );
         }
         optsSignOperation.details.critical( optsSignOperation.strLogPrefix,
             "S-Chain node ", strNodeDescColorized, " reported wallet error: ",
-            cc.warning( owaspUtils.extractErrorMessage( joOut, "unknown wallet error(1)" ) ),
+            log.em( owaspUtils.extractErrorMessage( joOut, "unknown wallet error(1)" ) ),
             ", sequence ID is ",
-            cc.j( optsSignOperation.sequenceId ) );
+            log.v( optsSignOperation.sequenceId ) );
         await joCall.disconnect();
         return;
     }
     optsSignOperation.details.debug( optsSignOperation.strLogPrefix, "Node ",
-        cc.j( joNode.nodeID ), " sign result: ", cc.j( joOut.result ? joOut.result : null ) );
+        log.v( joNode.nodeID ), " sign result: ", log.v( joOut.result ? joOut.result : null ) );
     try {
         if( joOut.result.signResult.signatureShare.length > 0 &&
             joOut.result.signResult.status === 0
@@ -1353,7 +1353,7 @@ async function doSignProcessHandleCall(
                 ) ) {
                     optsSignOperation.details.success( optsSignOperation.strLogPrefixA,
                         "Got successful BLS verification result for node ",
-                        cc.j( joNode.nodeID ), " with index ", nZeroBasedNodeIndex );
+                        log.v( joNode.nodeID ), " with index ", nZeroBasedNodeIndex );
                     bNodeSignatureOKay = true; // node verification passed
                 } else {
                     optsSignOperation.details.error( optsSignOperation.strLogPrefixA,
@@ -1364,18 +1364,17 @@ async function doSignProcessHandleCall(
                     log.critical( optsSignOperation.strLogPrefixA, "S-Chain node ",
                         strNodeDescColorized, " partial signature fail from with index ",
                         nZeroBasedNodeIndex,
-                        ", error is ", cc.warning( owaspUtils.extractErrorMessage( err ) ),
+                        ", error is ", log.em( owaspUtils.extractErrorMessage( err ) ),
                         ", sequence ID is ",
-                        cc.j( optsSignOperation.sequenceId ), ", stack is:", "\n",
-                        cc.stack( err.stack ) );
+                        log.v( optsSignOperation.sequenceId ), ", stack is:", "\n",
+                        log.s( err.stack ) );
                 }
                 optsSignOperation.details.critical( optsSignOperation.strLogPrefixA,
                     "S-Chain node ", strNodeDescColorized,
                     " partial signature fail from with index ", nZeroBasedNodeIndex, ", error is ",
-                    cc.warning( owaspUtils.extractErrorMessage( err ) ), ", ",
-                    cc.notice( "sequence ID" ), " is ",
-                    cc.j( optsSignOperation.sequenceId ), ", stack is:", "\n",
-                    cc.stack( err.stack ) );
+                    log.em( owaspUtils.extractErrorMessage( err ) ), ", sequence ID is ",
+                    log.v( optsSignOperation.sequenceId ), ", stack is:", "\n",
+                    log.s( err.stack ) );
             }
             if( bNodeSignatureOKay ) {
                 optsSignOperation.arrSignResults.push( {
@@ -1394,17 +1393,15 @@ async function doSignProcessHandleCall(
         ++optsSignOperation.joGatheringTracker.nCountErrors;
         if( log.id != optsSignOperation.details.id ) {
             log.critical( optsSignOperation.strLogPrefix, "S-Chain node ", strNodeDescColorized,
-                " signature fail from node ", cc.j( joNode.nodeID ), ", error is ",
-                cc.warning( owaspUtils.extractErrorMessage( err ) ), ", ",
-                cc.notice( "sequence ID" ), " is ", cc.j( optsSignOperation.sequenceId ),
-                ", stack is:", "\n" + cc.stack( err.stack ) );
+                " signature fail from node ", log.v( joNode.nodeID ), ", error is ",
+                log.em( owaspUtils.extractErrorMessage( err ) ), ", sequence ID is ",
+                log.v( optsSignOperation.sequenceId ), ", stack is:", "\n" + log.s( err.stack ) );
         }
         optsSignOperation.details.critical( ptsSignOperation.strLogPrefix, "S-Chain node ",
             strNodeDescColorized,
-            " signature fail from node ", cc.j( joNode.nodeID ), ", error is ",
-            cc.warning( owaspUtils.extractErrorMessage( err ) ), ", ",
-            cc.notice( "sequence ID" ), " is ", cc.j( optsSignOperation.sequenceId ),
-            ", stack is:", "\n" + cc.stack( err.stack ) );
+            " signature fail from node ", log.v( joNode.nodeID ), ", error is ",
+            log.em( owaspUtils.extractErrorMessage( err ) ), ", sequence ID is ",
+            log.v( optsSignOperation.sequenceId ), ", stack is:", "\n" + log.s( err.stack ) );
     }
     await joCall.disconnect();
 }
@@ -1416,12 +1413,10 @@ async function doSignProcessOneImpl( i, optsSignOperation ) {
     const strNodeURL = optsSignOperation.imaState.isCrossImaBlsMode
         ? imaUtils.composeImaAgentNodeUrl( joNode, isThisNode )
         : imaUtils.composeSChainNodeUrl( joNode );
-    const strNodeDescColorized = cc.u( strNodeURL ) + " " +
-        cc.debug( "(" ) + cc.bright( i ) + cc.debug( "/" ) +
-        cc.bright( optsSignOperation.jarrNodes.length ) +
-        cc.debug( ", ID " ) + cc.j( joNode.nodeID ) + cc.debug( ")" ) +
-        ", " + cc.notice( "sequence ID" ) + cc.debug( " is " ) +
-        cc.j( optsSignOperation.sequenceId );
+    const strNodeDescColorized = log.u( strNodeURL ) + " " + cc.debug( "(" ) + log.v( i ) +
+        cc.debug( "/" ) + log.v( optsSignOperation.jarrNodes.length ) + cc.debug( ", ID " ) +
+        log.v( joNode.nodeID ) + cc.debug( "), sequence ID is " ) +
+        log.v( optsSignOperation.sequenceId );
     const rpcCallOpts = null;
     rpcCall.create(
         strNodeURL, rpcCallOpts, async function( joCall, err ) {
@@ -1432,16 +1427,14 @@ async function doSignProcessOneImpl( i, optsSignOperation ) {
                     log.error( optsSignOperation.strLogPrefix,
                         "JSON RPC call(doSignProcessOneImpl) to S-Chain node ",
                         strNodeDescColorized, " failed, RPC call was not created, error is: ",
-                        cc.warning( owaspUtils.extractErrorMessage( err ) ), ", ",
-                        cc.notice( "sequence ID" ), " is ",
-                        cc.j( optsSignOperation.sequenceId ) );
+                        log.em( owaspUtils.extractErrorMessage( err ) ), ", sequence ID is ",
+                        log.v( optsSignOperation.sequenceId ) );
                 }
                 optsSignOperation.details.error( optsSignOperation.strLogPrefix,
                     "JSON RPC call(doSignProcessOneImpl) to S-Chain node ",
                     strNodeDescColorized, " failed, RPC call was not created, error is: ",
-                    cc.warning( owaspUtils.extractErrorMessage( err ) ), ", ",
-                    cc.notice( "sequence ID" ), " is ",
-                    cc.j( optsSignOperation.sequenceId ) );
+                    log.em( owaspUtils.extractErrorMessage( err ) ), ", sequence ID is ",
+                    log.v( optsSignOperation.sequenceId ) );
                 if( joCall )
                     await joCall.disconnect();
                 return;
@@ -1463,12 +1456,12 @@ async function doSignProcessOneImpl( i, optsSignOperation ) {
             };
             optsSignOperation.details.trace( optsSignOperation.strLogPrefix,
                 log.generateTimestampString( null, true ), " ", "Will invoke ",
-                cc.j( "skale_imaVerifyAndSign" ), " to node #", i, " via ",
-                cc.u( strNodeURL ), " for transfer from chain ",
-                cc.j( optsSignOperation.fromChainName ), " to chain ",
-                cc.j( optsSignOperation.targetChainName ), " with params ", cc.j( joParams ),
+                log.v( "skale_imaVerifyAndSign" ), " to node #", i, " via ",
+                log.u( strNodeURL ), " for transfer from chain ",
+                log.v( optsSignOperation.fromChainName ), " to chain ",
+                log.v( optsSignOperation.targetChainName ), " with params ", log.v( joParams ),
                 ", sequence ID is ",
-                cc.j( optsSignOperation.sequenceId ) );
+                log.v( optsSignOperation.sequenceId ) );
             await joCall.call( {
                 "method": "skale_imaVerifyAndSign",
                 "params": joParams
@@ -1544,10 +1537,10 @@ async function doSignMessagesImpl(
             if( optsSignOperation.cntSuccess >= optsSignOperation.nCountOfBlsPartsToCollect ) {
                 optsSignOperation.details.trace( optsSignOperation.strLogPrefix,
                     log.generateTimestampString( null, true ), " Stop invoking ",
-                    cc.j( "skale_imaVerifyAndSign" ), " for transfer from chain ",
-                    cc.j( fromChainName ) + " at #", i,
+                    log.v( "skale_imaVerifyAndSign" ), " for transfer from chain ",
+                    log.v( fromChainName ) + " at #", i,
                     " because successfully gathered count is reached ",
-                    cc.j( optsSignOperation.cntSuccess ) );
+                    log.v( optsSignOperation.cntSuccess ) );
                 break;
             }
             doSignProcessOneImpl( i, optsSignOperation );
@@ -1557,13 +1550,13 @@ async function doSignMessagesImpl(
     } catch ( err ) {
         if( ( !optsSignOperation.details ) || log.id != optsSignOperation.details.id ) {
             log.critical( "Failed BLS sign due to generic flow exception: ",
-                cc.warning( owaspUtils.extractErrorMessage( err ) ),
-                ", stack is: ", "\n", cc.stack( err.stack ) );
+                log.em( owaspUtils.extractErrorMessage( err ) ),
+                ", stack is: ", "\n", log.s( err.stack ) );
         }
         if( optsSignOperation.details ) {
             optsSignOperation.details.critical( "Failed BLS sign due to generic flow exception: ",
-                cc.warning( owaspUtils.extractErrorMessage( err ) ),
-                ", stack is: ", "\n", cc.stack( err.stack ) );
+                log.em( owaspUtils.extractErrorMessage( err ) ),
+                ", stack is: ", "\n", log.s( err.stack ) );
         }
         if( ! optsSignOperation.bHaveResultReportCalled ) {
             optsSignOperation.bHaveResultReportCalled = true;
@@ -1574,11 +1567,11 @@ async function doSignMessagesImpl(
                 null
             ).catch( ( err ) => {
                 log.critical( "Failed BLS sign due to error-reporting callback exception: ",
-                    cc.warning( owaspUtils.extractErrorMessage( err ) ) );
+                    log.em( owaspUtils.extractErrorMessage( err ) ) );
                 if( optsSignOperation.details ) {
                     optsSignOperation.details.critical(
                         "Failed BLS sign due to error-reporting callback exception: ",
-                        cc.warning( owaspUtils.extractErrorMessage( err ) ) );
+                        log.em( owaspUtils.extractErrorMessage( err ) ) );
                     optsSignOperation.details.exposeDetailsTo(
                         log, optsSignOperation.strGatheredDetailsName, false );
                     optsSignOperation.details.close();
@@ -1586,8 +1579,8 @@ async function doSignMessagesImpl(
             } );
         }
     }
-    optsSignOperation.details.information(
-        cc.j( optsSignOperation.strGatheredDetailsName ), cc.success( " completed" ) );
+    optsSignOperation.details.success(
+        log.v( optsSignOperation.strGatheredDetailsName ), " completed" );
     if( optsSignOperation.details ) {
         optsSignOperation.details.exposeDetailsTo(
             log, optsSignOperation.strGatheredDetailsName, true );
@@ -1642,17 +1635,17 @@ export async function doSignMessagesS2S(
 
 async function prepareSignU256( optsSignU256 ) {
     optsSignU256.details.debug( optsSignU256.strLogPrefix, "Will sign ",
-        cc.j( optsSignU256.u256 ), " value..." );
+        log.v( optsSignU256.u256 ), " value..." );
     optsSignU256.details.trace( optsSignU256.strLogPrefix, "Will query to sign ",
-        cc.j( optsSignU256.jarrNodes.length ), " skaled node(s)..." );
+        log.v( optsSignU256.jarrNodes.length ), " skaled node(s)..." );
     optsSignU256.nThreshold =
         discoverBlsThreshold( optsSignU256.imaState.joSChainNetworkInfo );
     optsSignU256.nParticipants =
         discoverBlsParticipants( optsSignU256.imaState.joSChainNetworkInfo );
     optsSignU256.details.trace( optsSignU256.strLogPrefix,
-        "Discovered BLS threshold is ", cc.j( optsSignU256.nThreshold ), "." );
+        "Discovered BLS threshold is ", log.v( optsSignU256.nThreshold ), "." );
     optsSignU256.details.trace( optsSignU256.strLogPrefix,
-        "Discovered number of BLS participants is ", cc.j( optsSignU256.nParticipants ) + "." );
+        "Discovered number of BLS participants is ", log.v( optsSignU256.nParticipants ) + "." );
     if( ! checkBlsThresholdAndBlsParticipants(
         optsSignU256.nThreshold,
         optsSignU256.nParticipants,
@@ -1680,9 +1673,9 @@ async function doSignU256OneImpl( i, optsSignU256 ) {
     const strNodeURL = optsSignU256.imaState.isCrossImaBlsMode
         ? imaUtils.composeImaAgentNodeUrl( joNode, isThisNode )
         : imaUtils.composeSChainNodeUrl( joNode );
-    const strNodeDescColorized = cc.u( strNodeURL ) + " " + cc.debug( "(" ) + cc.bright( i ) +
-        cc.debug( "/" ) + cc.bright( optsSignU256.jarrNodes.length ) +
-        cc.debug( ", ID " ) + cc.j( joNode.nodeID ) + cc.debug( ")" );
+    const strNodeDescColorized = log.u( strNodeURL ) + " " + cc.debug( "(" ) + log.v( i ) +
+        cc.debug( "/" ) + log.v( optsSignU256.jarrNodes.length ) +
+        cc.debug( ", ID " ) + log.v( joNode.nodeID ) + cc.debug( ")" );
     const rpcCallOpts = null;
     await rpcCall.create( strNodeURL, rpcCallOpts, async function( joCall, err ) {
         ++optsSignU256.joGatheringTracker.nCountReceived;
@@ -1692,19 +1685,19 @@ async function doSignU256OneImpl( i, optsSignU256 ) {
                 log.error( optsSignU256.strLogPrefix,
                     "JSON RPC call(doSignU256OneImpl) to S-Chain node ", strNodeDescColorized,
                     " failed, RPC call was not created, error is: ",
-                    cc.warning( owaspUtils.extractErrorMessage( err ) ) );
+                    log.em( owaspUtils.extractErrorMessage( err ) ) );
             }
             optsSignU256.details.error( optsSignU256.strLogPrefix,
                 "JSON RPC call(doSignU256OneImpl) to S-Chain node ", strNodeDescColorized,
                 " failed, RPC call was not created, error is: ",
-                cc.warning( owaspUtils.extractErrorMessage( err ) ) );
+                log.em( owaspUtils.extractErrorMessage( err ) ) );
             if( joCall )
                 await joCall.disconnect();
             return;
         }
         optsSignU256.details.trace( optsSignU256.strLogPrefix, "Will invoke ",
-            cc.j( "skale_imaBSU256" ), " for to sign value ",
-            cc.j( optsSignU256.u256.toString() ) );
+            log.v( "skale_imaBSU256" ), " for to sign value ",
+            log.v( optsSignU256.u256.toString() ) );
         await joCall.call( {
             "method": "skale_imaBSU256",
             "params": {
@@ -1718,18 +1711,18 @@ async function doSignU256OneImpl( i, optsSignU256 ) {
                     log.error( optsSignU256.strLogPrefix,
                         "JSON RPC call(doSignU256OneImpl) to S-Chain node ",
                         strNodeDescColorized, " failed, RPC call reported error: ",
-                        cc.warning( owaspUtils.extractErrorMessage( err ) ) );
+                        log.em( owaspUtils.extractErrorMessage( err ) ) );
                 }
                 optsSignU256.details.error( optsSignU256.strLogPrefix,
                     "JSON RPC call(doSignU256OneImpl) to S-Chain node ",
                     strNodeDescColorized, " failed, RPC call reported error: ",
-                    cc.warning( owaspUtils.extractErrorMessage( err ) ) );
+                    log.em( owaspUtils.extractErrorMessage( err ) ) );
                 await joCall.disconnect();
                 return;
             }
             optsSignU256.details.trace( optsSignU256.strLogPrefix, "Did invoked ",
-                cc.j( "skale_imaBSU256" ), " for to sign value ",
-                cc.j( optsSignU256.u256.toString() ), ", answer is: ", cc.j( joOut ) );
+                log.v( "skale_imaBSU256" ), " for to sign value ",
+                log.v( optsSignU256.u256.toString() ), ", answer is: ", log.v( joOut ) );
             if( joOut.result == null ||
                 joOut.result == undefined ||
                 ( !typeof joOut.result == "object" )
@@ -1738,19 +1731,19 @@ async function doSignU256OneImpl( i, optsSignU256 ) {
                 if( log.id != optsSignU256.details.id ) {
                     log.error( optsSignU256.strLogPrefix,
                         "S-Chain node ", strNodeDescColorized, " reported wallet error: ",
-                        cc.warning(
+                        log.em(
                             owaspUtils.extractErrorMessage( joOut, "unknown wallet error(2)" ) ) );
                 }
                 optsSignU256.details.error( optsSignU256.strLogPrefix,
                     "S-Chain node ", strNodeDescColorized, " reported wallet error: ",
-                    cc.warning(
+                    log.em(
                         owaspUtils.extractErrorMessage( joOut, "unknown wallet error(2)" ) ) );
                 await joCall.disconnect();
                 return;
             }
             optsSignU256.details.trace( optsSignU256.strLogPrefix, "Node ",
-                cc.j( joNode.nodeID ), " sign result: ",
-                cc.j( joOut.result ? joOut.result : null ) );
+                log.v( joNode.nodeID ), " sign result: ",
+                log.v( joOut.result ? joOut.result : null ) );
             try {
                 if( joOut.result.signResult.signatureShare.length > 0 &&
                     joOut.result.signResult.status === 0
@@ -1786,7 +1779,7 @@ async function doSignU256OneImpl( i, optsSignU256 ) {
                             optsSignU256.u256, joPublicKey ) ) {
                             optsSignU256.details.success( strLogPrefixA,
                                 "Got successful BLS verification result for node ",
-                                cc.j( joNode.nodeID ), " with index ", nZeroBasedNodeIndex );
+                                log.v( joNode.nodeID ), " with index ", nZeroBasedNodeIndex );
                             bNodeSignatureOKay = true; // node verification passed
                         } else {
                             const strError = "BLS u256 one node verify failed";
@@ -1799,15 +1792,15 @@ async function doSignU256OneImpl( i, optsSignU256 ) {
                                 strNodeDescColorized, " sign ", " CRITICAL ERROR:",
                                 " partial signature fail from with index ",
                                 nZeroBasedNodeIndex, ", error is ",
-                                cc.warning( owaspUtils.extractErrorMessage( err ) ),
-                                ", stack is:", "\n", cc.stack( err.stack ) );
+                                log.em( owaspUtils.extractErrorMessage( err ) ),
+                                ", stack is:", "\n", log.s( err.stack ) );
                         }
                         optsSignU256.details.critical( strLogPrefixA, "S-Chain node ",
                             strNodeDescColorized, " sign ", " CRITICAL ERROR:",
                             " partial signature fail from with index ",
                             nZeroBasedNodeIndex, ", error is ",
-                            cc.warning( owaspUtils.extractErrorMessage( err ) ),
-                            ", stack is:", "\n", cc.stack( err.stack ) );
+                            log.em( owaspUtils.extractErrorMessage( err ) ),
+                            ", stack is:", "\n", log.s( err.stack ) );
                     }
                     if( bNodeSignatureOKay ) {
                         optsSignU256.arrSignResults.push( {
@@ -1825,15 +1818,15 @@ async function doSignU256OneImpl( i, optsSignU256 ) {
                 if( log.id != optsSignU256.details.id ) {
                     log.critical( optsSignU256.strLogPrefix, "S-Chain node ",
                         strNodeDescColorized,
-                        " signature fail from node ", cc.j( joNode.nodeID ),
-                        ", error is ", cc.warning( owaspUtils.extractErrorMessage( err ) ),
-                        ", stack is:", "\n", cc.stack( err.stack ) );
+                        " signature fail from node ", log.v( joNode.nodeID ),
+                        ", error is ", log.em( owaspUtils.extractErrorMessage( err ) ),
+                        ", stack is:", "\n", log.s( err.stack ) );
                 }
                 optsSignU256.details.critical( optsSignU256.strLogPrefix, "S-Chain node ",
                     strNodeDescColorized,
-                    " signature fail from node ", cc.j( joNode.nodeID ),
-                    ", error is ", cc.warning( owaspUtils.extractErrorMessage( err ) ),
-                    ", stack is:", "\n", cc.stack( err.stack ) );
+                    " signature fail from node ", log.v( joNode.nodeID ),
+                    ", error is ", log.em( owaspUtils.extractErrorMessage( err ) ),
+                    ", stack is:", "\n", log.s( err.stack ) );
             }
             await joCall.disconnect();
         } ); // joCall.call ...
@@ -1869,7 +1862,7 @@ async function doSignU256Gathering( optsSignU256 ) {
                         optsSignU256.details, optsSignU256.u256, optsSignU256.arrSignResults );
                 if( joGlueResult ) {
                     optsSignU256.details.success( strLogPrefixB,
-                        "Got BLS glue u256 result: ", cc.j( joGlueResult ) );
+                        "Got BLS glue u256 result: ", log.v( joGlueResult ) );
                     if( optsSignU256.imaState.strPathBlsVerify.length > 0 ) {
                         const joCommonPublicKey = discoverCommonPublicKey(
                             optsSignU256.imaState.joSChainNetworkInfo, false );
@@ -1901,25 +1894,25 @@ async function doSignU256Gathering( optsSignU256 ) {
                     strError = "BLS u256 glue failed, no glue result arrived";
                     if( log.id != optsSignU256.details.id ) {
                         log.error( strLogPrefixB, "Problem(1) in BLS u256 sign result handler: ",
-                            cc.warning( strError ) );
+                            log.em( strError ) );
                     }
                     optsSignU256.details.error( strLogPrefixB,
-                        "Problem(1) in BLS u256 sign result handler: ", cc.warning( strError ) );
+                        "Problem(1) in BLS u256 sign result handler: ", log.em( strError ) );
                 }
                 optsSignU256.details.trace( "Will call signed-256 answer-sending callback ",
-                    ( strError ? ( cc.debug( " with error " ) + cc.j( strError ) ) : "" ),
-                    ", u256 is ", cc.j( optsSignU256.u256 ),
-                    ", glue result is ", cc.j( joGlueResult ) );
+                    ( strError ? ( cc.debug( " with error " ) + log.v( strError ) ) : "" ),
+                    ", u256 is ", log.v( optsSignU256.u256 ),
+                    ", glue result is ", log.v( joGlueResult ) );
                 optsSignU256.fn(
                     strError, optsSignU256.u256, joGlueResult )
                     .catch( ( err ) => {
                         if( log.id != optsSignU256.details.id ) {
                             log.critical( "Problem(2) in BLS u256 sign result handler: ",
-                                cc.warning( owaspUtils.extractErrorMessage( err ) ) );
+                                log.em( owaspUtils.extractErrorMessage( err ) ) );
                         }
                         optsSignU256.details.critical(
                             "Problem(2) in BLS u256 sign result handler: ",
-                            cc.warning( owaspUtils.extractErrorMessage( err ) ) );
+                            log.em( owaspUtils.extractErrorMessage( err ) ) );
                         optsSignU256.errGathering =
                             "Problem(2) in BLS u256 sign result handler: " +
                             owaspUtils.extractErrorMessage( err );
@@ -1945,12 +1938,12 @@ async function doSignU256Gathering( optsSignU256 ) {
                         log.critical( "Problem(3) in BLS u256 sign result handler, ",
                             "not enough successful BLS signature parts(", cntSuccess,
                             " when all attempts done, error optsSignU256.details: ",
-                            cc.warning( owaspUtils.extractErrorMessage( err ) ) );
+                            log.em( owaspUtils.extractErrorMessage( err ) ) );
                     }
                     optsSignU256.details.critical( "Problem(3) in BLS u256 sign result handler, ",
                         "not enough successful BLS signature parts(", cntSuccess,
                         " when all attempts done, error optsSignU256.details: ",
-                        cc.warning( owaspUtils.extractErrorMessage( err ) ) );
+                        log.em( owaspUtils.extractErrorMessage( err ) ) );
                     optsSignU256.errGathering =
                         "Problem(3) in BLS u256 sign result handler, " +
                         "not enough successful BLS signature parts(" +
@@ -1975,12 +1968,12 @@ async function doSignU256Gathering( optsSignU256 ) {
                         log.error( "Problem(4) in BLS u256 sign result handler, ",
                             "not enough successful BLS signature parts(", cntSuccess,
                             ") and timeout reached, error optsSignU256.details: ",
-                            cc.warning( owaspUtils.extractErrorMessage( err ) ) );
+                            log.em( owaspUtils.extractErrorMessage( err ) ) );
                     }
                     optsSignU256.details.error( "Problem(4) in BLS u256 sign result handler, ",
                         "not enough successful BLS signature parts(", cntSuccess,
                         ") and timeout reached, error optsSignU256.details: ",
-                        cc.warning( owaspUtils.extractErrorMessage( err ) ) );
+                        log.em( owaspUtils.extractErrorMessage( err ) ) );
                     optsSignU256.errGathering =
                         "Problem(4) in BLS u256 sign result handler, " +
                         "not enough successful BLS signature parts(" +
@@ -2045,18 +2038,18 @@ export async function doSignU256( u256, details, fn ) {
     } ).catch( err => {
         if( log.id != optsSignU256.details.id ) {
             log.critical( "Failed to verify BLS and send message : ",
-                cc.warning( owaspUtils.extractErrorMessage( err ) ) );
+                log.em( owaspUtils.extractErrorMessage( err ) ) );
         }
         optsSignU256.details.critical( "Failed to verify BLS and send message : ",
-            cc.warning( owaspUtils.extractErrorMessage( err ) ) );
+            log.em( owaspUtils.extractErrorMessage( err ) ) );
     } );
     if( optsSignU256.errGathering ) {
         if( log.id != optsSignU256.details.id ) {
             log.error( "Failed BLS u256 sign result awaiting: ",
-                cc.warning( optsSignU256.errGathering.toString() ) );
+                log.em( optsSignU256.errGathering.toString() ) );
         }
         optsSignU256.details.error( "Failed BLS u256 sign result awaiting: ",
-            cc.warning( optsSignU256.errGathering.toString() ) );
+            log.em( optsSignU256.errGathering.toString() ) );
         return;
     }
     optsSignU256.details.information( optsSignU256.strLogPrefix,
@@ -2096,13 +2089,13 @@ export async function doVerifyReadyHash(
         const joPublicKey = discoverPublicKeyByIndex(
             nZeroBasedNodeIndex, imaState.joSChainNetworkInfo, details, true );
         details.trace( strLogPrefix, "BLS node #",
-            nZeroBasedNodeIndex, " - hashed verify message is ", cc.j( strMessageHash ) );
+            nZeroBasedNodeIndex, " - hashed verify message is ", log.v( strMessageHash ) );
         const joMsg = {
             "message": strMessageHash
         };
         details.debug( strLogPrefix, "BLS node #", nZeroBasedNodeIndex,
-            " - composed  ", cc.j( joMsg ), " using hash ", cc.j( strMessageHash ), " and glue ",
-            cc.j( joResultFromNode ), " and public key ", cc.j( joPublicKey ) );
+            " - composed  ", log.v( joMsg ), " using hash ", log.v( strMessageHash ), " and glue ",
+            log.v( joResultFromNode ), " and public key ", log.v( joPublicKey ) );
         const strSignResultFileName = strActionDir + "/sign-result" + nZeroBasedNodeIndex + ".json";
         imaUtils.jsonFileSave( strSignResultFileName, joResultFromNode );
         imaUtils.jsonFileSave( strActionDir + "/hash.json", joMsg );
@@ -2116,31 +2109,30 @@ export async function doVerifyReadyHash(
             " --input " + strSignResultFileName
             ;
         details.trace( strLogPrefix, "Will execute node #" + nZeroBasedNodeIndex,
-            " BLS verify command:", "\n", cc.notice( strVerifyCommand ) );
+            " BLS verify command:", "\n", log.v( strVerifyCommand ) );
         strOutput = childProcessModule.execSync( strVerifyCommand, { cwd: strActionDir } );
         details.trace( strLogPrefix, "BLS node #", nZeroBasedNodeIndex,
-            " verify output is:", "\n", cc.notice( strOutput ) );
-        details.trace( strLogPrefix + cc.success( "BLS node #" ) +
-            nZeroBasedNodeIndex + cc.success( " verify success" ) );
+            " verify output is:", "\n", log.v( strOutput ) );
+        details.success( strLogPrefix, "BLS node #", nZeroBasedNodeIndex,+" verify success" );
         fnShellRestore();
         isSuccess = true;
     } catch ( err ) {
         if( log.id != details.id ) {
             log.critical( strLogPrefix, "BLS node #",
                 nZeroBasedNodeIndex, " verify error, error description is: ",
-                cc.warning( owaspUtils.extractErrorMessage( err ) ),
-                ", stack is: ", "\n" + cc.stack( err.stack ) );
+                log.em( owaspUtils.extractErrorMessage( err ) ),
+                ", stack is: ", "\n" + log.s( err.stack ) );
             log.critical( strLogPrefix, "BLS node#",
                 nZeroBasedNodeIndex, " verify output is:", "\n",
-                cc.warning( strOutput ) );
+                log.em( strOutput ) );
         }
         details.critical( strLogPrefix, "BLS node #",
             nZeroBasedNodeIndex, " verify error, error description is: ",
-            cc.warning( owaspUtils.extractErrorMessage( err ) ),
-            ", stack is: ", "\n" + cc.stack( err.stack ) );
+            log.em( owaspUtils.extractErrorMessage( err ) ),
+            ", stack is: ", "\n" + log.s( err.stack ) );
         details.critical( strLogPrefix, "BLS node #" ,
             nZeroBasedNodeIndex, " verify output is:", "\n",
-            cc.warning( strOutput ) );
+            log.em( strOutput ) );
         fnShellRestore();
         isSuccess = false;
     }
@@ -2162,7 +2154,7 @@ export async function doSignReadyHash( strMessageHash, isExposeOutput ) {
         details.trace( strLogPrefix, "Discovered BLS threshold is ", nThreshold, "." );
         details.trace( strLogPrefix, "Discovered number of BLS participants is ",
             nParticipants, "." );
-        details.trace( strLogPrefix, "hash value to sign is ", cc.j( strMessageHash ) );
+        details.trace( strLogPrefix, "hash value to sign is ", log.v( strMessageHash ) );
         if( ! checkBlsThresholdAndBlsParticipants(
             nThreshold, nParticipants, "sign ready hash", details ) )
             return false;
@@ -2193,12 +2185,12 @@ export async function doSignReadyHash( strMessageHash, isExposeOutput ) {
                     log.error( strLogPrefix,
                         "JSON RPC call(doSignReadyHash) to SGX failed, ",
                         "RPC call was not created, error is: ",
-                        cc.warning( owaspUtils.extractErrorMessage( err ) ) );
+                        log.em( owaspUtils.extractErrorMessage( err ) ) );
                 }
                 details.error( trLogPrefix,
                     "JSON RPC call(doSignReadyHash) to SGX failed, ",
                     "RPC call was not created, error is: ",
-                    cc.warning( owaspUtils.extractErrorMessage( err ) ) );
+                    log.em( owaspUtils.extractErrorMessage( err ) ) );
                 if( joCall )
                     await joCall.disconnect();
                 throw new Error(
@@ -2220,7 +2212,7 @@ export async function doSignReadyHash( strMessageHash, isExposeOutput ) {
                 }
             };
             details.trace( strLogPrefix, "Will invoke ", "SGX with call data ",
-                cc.j( joCallSGX ) );
+                log.v( joCallSGX ) );
             await joCall.call( joCallSGX, async function( joIn, joOut, err ) {
                 if( err ) {
                     const jsErrorObject = new Error(
@@ -2230,18 +2222,18 @@ export async function doSignReadyHash( strMessageHash, isExposeOutput ) {
                     if( log.id != details.id ) {
                         log.error( strLogPrefix, "JSON RPC call(doSignReadyHash) ",
                             "to SGX failed, RPC call reported error: ",
-                            cc.warning( owaspUtils.extractErrorMessage( err ) ),
-                            ", stack is:", "\n", cc.stack( jsErrorObject.stack ) );
+                            log.em( owaspUtils.extractErrorMessage( err ) ),
+                            ", stack is:", "\n", log.s( jsErrorObject.stack ) );
                     }
                     details.error( strLogPrefix, "JSON RPC call(doSignReadyHash) ",
                         "to SGX failed, RPC call reported error: ",
-                        cc.warning( owaspUtils.extractErrorMessage( err ) ),
-                        ", stack is:", "\n", cc.stack( jsErrorObject.stack ) );
+                        log.em( owaspUtils.extractErrorMessage( err ) ),
+                        ", stack is:", "\n", log.s( jsErrorObject.stack ) );
                     await joCall.disconnect();
                     throw jsErrorObject;
                 }
                 details.trace( strLogPrefix, "Call to ", "SGX done, answer is: ",
-                    cc.j( joOut ) );
+                    log.v( joOut ) );
                 joSignResult = joOut;
                 if( joOut.result != null && joOut.result != undefined &&
                     typeof joOut.result == "object" )
@@ -2258,10 +2250,10 @@ export async function doSignReadyHash( strMessageHash, isExposeOutput ) {
                     joRetVal.error = strError;
                     if( log.id != details.id ) {
                         log.error( strLogPrefix, "BLS signing(1) finished with error: ",
-                            cc.warning( joSignResult.errorMessage ) );
+                            log.em( joSignResult.errorMessage ) );
                     }
                     details.error( strLogPrefix, "BLS signing(1) finished with error: ",
-                        cc.warning( joSignResult.errorMessage ) );
+                        log.em( joSignResult.errorMessage ) );
                     await joCall.disconnect();
                     throw new Error( strError );
                 }
@@ -2274,11 +2266,11 @@ export async function doSignReadyHash( strMessageHash, isExposeOutput ) {
         joSignResult = { };
         joSignResult.error = strError;
         if( log.id != details.id ) {
-            log.error( strLogPrefix, "BLS-raw-signer error: ", cc.warning( strError ),
-                ", stack is:", "\n", cc.stack( err.stack ) );
+            log.error( strLogPrefix, "BLS-raw-signer error: ", log.em( strError ),
+                ", stack is:", "\n", log.s( err.stack ) );
         }
-        details.error( strLogPrefix, "BLS-raw-signer error: ", cc.warning( strError ),
-            ", stack is:", "\n", cc.stack( err.stack ) );
+        details.error( strLogPrefix, "BLS-raw-signer error: ", log.em( strError ),
+            ", stack is:", "\n", log.s( err.stack ) );
     }
     const isSuccess = (
         joSignResult && typeof joSignResult == "object" && ( !joSignResult.error ) )
@@ -2291,7 +2283,7 @@ export async function doSignReadyHash( strMessageHash, isExposeOutput ) {
 
 async function prepareHandlingOfSkaleImaVerifyAndSign( optsHandleVerifyAndSign ) {
     optsHandleVerifyAndSign.details.debug( optsHandleVerifyAndSign.strLogPrefix,
-        "Will verify and sign ", cc.j( optsHandleVerifyAndSign.joCallData ) );
+        "Will verify and sign ", log.v( optsHandleVerifyAndSign.joCallData ) );
     optsHandleVerifyAndSign.nIdxCurrentMsgBlockStart =
         optsHandleVerifyAndSign.joCallData.params.startMessageIdx;
     optsHandleVerifyAndSign.strFromChainName =
@@ -2307,26 +2299,26 @@ async function prepareHandlingOfSkaleImaVerifyAndSign( optsHandleVerifyAndSign )
     optsHandleVerifyAndSign.jarrMessages =
         optsHandleVerifyAndSign.joCallData.params.messages;
     optsHandleVerifyAndSign.details.trace( optsHandleVerifyAndSign.strLogPrefix,
-        cc.bright( optsHandleVerifyAndSign.strDirection ),
+        log.v( optsHandleVerifyAndSign.strDirection ),
         " verification algorithm will work for transfer from chain ",
-        cc.j( optsHandleVerifyAndSign.strFromChainName ), "/",
-        cc.j( optsHandleVerifyAndSign.strFromChainID ), " to chain",
-        cc.j( optsHandleVerifyAndSign.strToChainName ), "/",
-        cc.j( optsHandleVerifyAndSign.strToChainID ),
+        log.v( optsHandleVerifyAndSign.strFromChainName ), "/",
+        log.v( optsHandleVerifyAndSign.strFromChainID ), " to chain",
+        log.v( optsHandleVerifyAndSign.strToChainName ), "/",
+        log.v( optsHandleVerifyAndSign.strToChainID ),
         " and work with array of message(s) ",
-        cc.j( optsHandleVerifyAndSign.jarrMessages ) );
+        log.v( optsHandleVerifyAndSign.jarrMessages ) );
     optsHandleVerifyAndSign.nThreshold =
         discoverBlsThreshold( optsHandleVerifyAndSign.imaState.joSChainNetworkInfo );
     optsHandleVerifyAndSign.nParticipants =
         discoverBlsParticipants( optsHandleVerifyAndSign.imaState.joSChainNetworkInfo );
     optsHandleVerifyAndSign.details.debug( optsHandleVerifyAndSign.strLogPrefix,
-        cc.bright( optsHandleVerifyAndSign.strDirection ),
+        log.v( optsHandleVerifyAndSign.strDirection ),
         " verification algorithm discovered BLS threshold is ",
-        cc.j( optsHandleVerifyAndSign.nThreshold ), "." );
+        log.v( optsHandleVerifyAndSign.nThreshold ), "." );
     optsHandleVerifyAndSign.details.debug( optsHandleVerifyAndSign.strLogPrefix,
-        cc.j( optsHandleVerifyAndSign.strDirection ) +
+        log.v( optsHandleVerifyAndSign.strDirection ) +
         " verification algorithm discovered number of BLS participants is ",
-        cc.j( optsHandleVerifyAndSign.nParticipants ), "." );
+        log.v( optsHandleVerifyAndSign.nParticipants ), "." );
     if( ! checkBlsThresholdAndBlsParticipants(
         optsHandleVerifyAndSign.nThreshold,
         optsHandleVerifyAndSign.nParticipants,
@@ -2342,9 +2334,9 @@ async function prepareHandlingOfSkaleImaVerifyAndSign( optsHandleVerifyAndSign )
             )
         );
     optsHandleVerifyAndSign.details.debug( optsHandleVerifyAndSign.strLogPrefix,
-        cc.bright( optsHandleVerifyAndSign.strDirection ),
+        log.v( optsHandleVerifyAndSign.strDirection ),
         " verification algorithm message hash to sign is ",
-        cc.j( optsHandleVerifyAndSign.strMessageHash ) );
+        log.v( optsHandleVerifyAndSign.strMessageHash ) );
     return true;
 }
 
@@ -2352,9 +2344,9 @@ async function prepareS2sOfSkaleImaVerifyAndSign( optsHandleVerifyAndSign ) {
     const strSChainNameSrc = optsHandleVerifyAndSign.joCallData.params.srcChainName;
     const strSChainNameDst = optsHandleVerifyAndSign.joCallData.params.dstChainName;
     optsHandleVerifyAndSign.details.trace( optsHandleVerifyAndSign.strLogPrefix,
-        cc.bright( optsHandleVerifyAndSign.strDirection ),
-        " verification algorithm will use for source chain name ", cc.j( strSChainNameSrc ),
-        " and destination chain name ", cc.j( strSChainNameDst ) );
+        log.v( optsHandleVerifyAndSign.strDirection ),
+        " verification algorithm will use for source chain name ", log.v( strSChainNameSrc ),
+        " and destination chain name ", log.v( strSChainNameDst ) );
     const arrSChainsCached = skaleObserver.getLastCachedSChains();
     if( ( !arrSChainsCached ) || arrSChainsCached.length == 0 ) {
         throw new Error(
@@ -2380,10 +2372,10 @@ async function prepareS2sOfSkaleImaVerifyAndSign( optsHandleVerifyAndSign ) {
             "chain access parameters, try again later" );
     }
     optsHandleVerifyAndSign.details.trace( optsHandleVerifyAndSign.strLogPrefix,
-        cc.bright( optsHandleVerifyAndSign.strDirection ),
-        " verification algorithm discovered source chain URL is ", cc.u( strUrlSrcSChain ),
-        ", chain name is ", cc.j( joSChainSrc.data.computed.computedSChainId ),
-        ", chain id is ", cc.j( joSChainSrc.data.computed.chainId ) );
+        log.v( optsHandleVerifyAndSign.strDirection ),
+        " verification algorithm discovered source chain URL is ", log.u( strUrlSrcSChain ),
+        ", chain name is ", log.v( joSChainSrc.data.computed.computedSChainId ),
+        ", chain id is ", log.v( joSChainSrc.data.computed.chainId ) );
     optsHandleVerifyAndSign.joExtraSignOpts = {
         skaleObserver: skaleObserver,
         ethersProviderSrc: owaspUtils.getEthersProviderFromURL( strUrlSrcSChain ),
@@ -2453,16 +2445,16 @@ export async function handleSkaleImaVerifyAndSign( joCallData ) {
             if( err ) {
                 if( log.id != optsHandleVerifyAndSign.details.id ) {
                     log.error( optsHandleVerifyAndSign.strLogPrefix,
-                        cc.bright( optsHandleVerifyAndSign.strDirection ),
+                        log.v( optsHandleVerifyAndSign.strDirection ),
                         "JSON RPC call(handleSkaleImaVerifyAndSign) to SGX failed, ",
                         "RPC call was not created, error is: " ,
-                        cc.warning( owaspUtils.extractErrorMessage( err ) ) );
+                        log.em( owaspUtils.extractErrorMessage( err ) ) );
                 }
                 optsHandleVerifyAndSign.details.error( optsHandleVerifyAndSign.strLogPrefix,
-                    cc.bright( optsHandleVerifyAndSign.strDirection ),
+                    log.v( optsHandleVerifyAndSign.strDirection ),
                     "JSON RPC call(handleSkaleImaVerifyAndSign) to SGX failed, ",
                     "RPC call was not created, error is: " ,
-                    cc.warning( owaspUtils.extractErrorMessage( err ) ) );
+                    log.em( owaspUtils.extractErrorMessage( err ) ) );
                 if( joCall )
                     await joCall.disconnect();
                 throw new Error(
@@ -2484,9 +2476,9 @@ export async function handleSkaleImaVerifyAndSign( joCallData ) {
                 }
             };
             optsHandleVerifyAndSign.details.trace( optsHandleVerifyAndSign.strLogPrefix,
-                cc.bright( optsHandleVerifyAndSign.strDirection ),
+                log.v( optsHandleVerifyAndSign.strDirection ),
                 " verification algorithm will invoke ", "SGX with call data ",
-                cc.j( joCallSGX ) );
+                log.v( joCallSGX ) );
             await joCall.call( joCallSGX, async function( joIn, joOut, err ) {
                 if( err ) {
                     const strError =
@@ -2499,20 +2491,20 @@ export async function handleSkaleImaVerifyAndSign( joCallData ) {
                         log.error( optsHandleVerifyAndSign.strLogPrefix,
                             "JSON RPC call(handleSkaleImaVerifyAndSign) to SGX failed, ",
                             "RPC call reported error: ",
-                            cc.warning( owaspUtils.extractErrorMessage( err ) ),
-                            ", stack is:", "\n", cc.stack( jsErrorObject.stack ) );
+                            log.em( owaspUtils.extractErrorMessage( err ) ),
+                            ", stack is:", "\n", log.s( jsErrorObject.stack ) );
                     }
                     optsHandleVerifyAndSign.details.error( optsHandleVerifyAndSign.strLogPrefix,
                         "JSON RPC call(handleSkaleImaVerifyAndSign) to SGX failed, ",
                         "RPC call reported error: ",
-                        cc.warning( owaspUtils.extractErrorMessage( err ) ),
-                        ", stack is:", "\n", cc.stack( jsErrorObject.stack ) );
+                        log.em( owaspUtils.extractErrorMessage( err ) ),
+                        ", stack is:", "\n", log.s( jsErrorObject.stack ) );
                     await joCall.disconnect();
                     throw jsErrorObject;
                 }
                 optsHandleVerifyAndSign.details.trace( optsHandleVerifyAndSign.strLogPrefix,
-                    cc.bright( optsHandleVerifyAndSign.strDirection ) +
-                    " Call to SGX done, answer is: ", cc.j( joOut ) );
+                    log.v( optsHandleVerifyAndSign.strDirection ) +
+                    " Call to SGX done, answer is: ", log.v( joOut ) );
                 let joSignResult = joOut;
                 if( joOut.result != null && joOut.result != undefined &&
                     typeof joOut.result == "object" )
@@ -2533,11 +2525,11 @@ export async function handleSkaleImaVerifyAndSign( joCallData ) {
                     if( log.id != optsHandleVerifyAndSign.details.id ) {
                         log.error( optsHandleVerifyAndSign.strLogPrefix,
                             "BLS signing(2) finished with error: ",
-                            cc.warning( joSignResult.errorMessage ) );
+                            log.em( joSignResult.errorMessage ) );
                     }
                     optsHandleVerifyAndSign.details.error( optsHandleVerifyAndSign.strLogPrefix,
                         "BLS signing(2) finished with error: ",
-                        cc.warning( joSignResult.errorMessage ) );
+                        log.em( joSignResult.errorMessage ) );
                     await joCall.disconnect();
                     throw new Error( strError );
                 }
@@ -2554,12 +2546,12 @@ export async function handleSkaleImaVerifyAndSign( joCallData ) {
         optsHandleVerifyAndSign.joRetVal.error = strError;
         if( log.id != optsHandleVerifyAndSign.details.id ) {
             log.critical( optsHandleVerifyAndSign.strLogPrefix,
-                "IMA messages verifier/signer error: ", cc.warning( strError ),
-                ", stack is:", "\n", cc.stack( err.stack ) );
+                "IMA messages verifier/signer error: ", log.em( strError ),
+                ", stack is:", "\n", log.s( err.stack ) );
         }
         optsHandleVerifyAndSign.details.critical( optsHandleVerifyAndSign.strLogPrefix,
-            "IMA messages verifier/signer error: ", cc.warning( strError ),
-            ", stack is:", "\n", cc.stack( err.stack ) );
+            "IMA messages verifier/signer error: ", log.em( strError ),
+            ", stack is:", "\n", log.s( err.stack ) );
     }
     optsHandleVerifyAndSign.details.exposeDetailsTo(
         log, "IMA messages verifier/signer", optsHandleVerifyAndSign.isSuccess );
@@ -2569,7 +2561,7 @@ export async function handleSkaleImaVerifyAndSign( joCallData ) {
 
 async function handleSkaleImaBSU256Prepare( optsBSU256 ) {
     optsBSU256.details.debug( optsBSU256.strLogPrefix +
-        "Will U256-BLS-sign ", cc.j( optsBSU256.joCallData ) );
+        "Will U256-BLS-sign ", log.v( optsBSU256.joCallData ) );
     optsBSU256.nThreshold =
         discoverBlsThreshold( optsBSU256.imaState.joSChainNetworkInfo );
     optsBSU256.nParticipants =
@@ -2586,10 +2578,10 @@ async function handleSkaleImaBSU256Prepare( optsBSU256 ) {
         return false;
     optsBSU256.u256 = optsBSU256.joCallData.params.valueToSign;
     optsBSU256.details.trace( optsBSU256.strLogPrefix,
-        "U256 original value is ", cc.j( optsBSU256.u256 ) );
+        "U256 original value is ", log.v( optsBSU256.u256 ) );
     optsBSU256.strMessageHash = keccak256U256.u256( optsBSU256.u256, true );
     optsBSU256.details.trace( optsBSU256.strLogPrefix,
-        "hash of U256 value to sign is ", cc.j( optsBSU256.strMessageHash ) );
+        "hash of U256 value to sign is ", log.v( optsBSU256.strMessageHash ) );
     optsBSU256.details.trace( optsBSU256.strLogPrefix, "Will BLS-sign U256." );
     optsBSU256.joAccount = optsBSU256.imaState.chainProperties.sc.optsBSU256.joAccount;
     if( ! optsBSU256.joAccount.strURL ) {
@@ -2641,12 +2633,12 @@ export async function handleSkaleImaBSU256( joCallData ) {
                         log.error( optsBSU256.strLogPrefix,
                             "JSON RPC call(handleSkaleImaBSU256) to SGX failed, ",
                             "RPC call was not created, error is: ",
-                            cc.warning( owaspUtils.extractErrorMessage( err ) ) );
+                            log.em( owaspUtils.extractErrorMessage( err ) ) );
                     }
                     optsBSU256.details.error( optsBSU256.strLogPrefix,
                         "JSON RPC call(handleSkaleImaBSU256) to SGX failed, ",
                         "RPC call was not created, error is: ",
-                        cc.warning( owaspUtils.extractErrorMessage( err ) ) );
+                        log.em( owaspUtils.extractErrorMessage( err ) ) );
                     if( joCall )
                         await joCall.disconnect();
                     throw new Error( "JSON RPC call(handleSkaleImaBSU256) to SGX failed, " +
@@ -2666,7 +2658,7 @@ export async function handleSkaleImaBSU256( joCallData ) {
                     }
                 };
                 optsBSU256.details.trace( optsBSU256.strLogPrefix,
-                    "Will invoke SGX with call data ", cc.j( joCallSGX ) );
+                    "Will invoke SGX with call data ", log.v( joCallSGX ) );
                 await joCall.call( joCallSGX, async function( joIn, joOut, err ) {
                     if( err ) {
                         const jsErrorObject = new Error(
@@ -2677,19 +2669,19 @@ export async function handleSkaleImaBSU256( joCallData ) {
                             log.error( optsBSU256.strLogPrefix,
                                 "JSON RPC call(handleSkaleImaBSU256) to SGX failed, ",
                                 "RPC call reported error: ",
-                                cc.warning( owaspUtils.extractErrorMessage( err ) ),
-                                ", stack is:", "\n", cc.stack( jsErrorObject.stack ) );
+                                log.em( owaspUtils.extractErrorMessage( err ) ),
+                                ", stack is:", "\n", log.s( jsErrorObject.stack ) );
                         }
                         optsBSU256.details.error( optsBSU256.strLogPrefix,
                             "JSON RPC call(handleSkaleImaBSU256) to SGX failed, ",
                             "RPC call reported error: ",
-                            cc.warning( owaspUtils.extractErrorMessage( err ) ),
-                            ", stack is:", "\n", cc.stack( jsErrorObject.stack ) );
+                            log.em( owaspUtils.extractErrorMessage( err ) ),
+                            ", stack is:", "\n", log.s( jsErrorObject.stack ) );
                         await joCall.disconnect();
                         throw jsErrorObject;
                     }
                     optsBSU256.details.trace( optsBSU256.strLogPrefix,
-                        "Call to SGX done, answer is: ", cc.j( joOut ) );
+                        "Call to SGX done, answer is: ", log.v( joOut ) );
                     let joSignResult = joOut;
                     if( joOut.result != null && joOut.result != undefined &&
                         typeof joOut.result == "object" )
@@ -2707,11 +2699,11 @@ export async function handleSkaleImaBSU256( joCallData ) {
                         if( log.id != optsBSU256.details.id ) {
                             log.error( optsBSU256.strLogPrefix,
                                 "BLS signing(3) finished with error: ",
-                                cc.warning( joSignResult.errorMessage ) );
+                                log.em( joSignResult.errorMessage ) );
                         }
                         optsBSU256.details.error( optsBSU256.strLogPrefix,
                             "BLS signing(3) finished with error: ",
-                            cc.warning( joSignResult.errorMessage ) );
+                            log.em( joSignResult.errorMessage ) );
                         await joCall.disconnect();
                         throw new Error( strError );
                     }
@@ -2728,12 +2720,12 @@ export async function handleSkaleImaBSU256( joCallData ) {
         optsBSU256.joRetVal.error = strError;
         if( log.id != optsBSU256.details.id ) {
             log.critical( optsBSU256.strLogPrefix,
-                "U256-BLS-signer error: ", cc.warning( strError ),
-                ", stack is:", "\n", cc.stack( err.stack ) );
+                "U256-BLS-signer error: ", log.em( strError ),
+                ", stack is:", "\n", log.s( err.stack ) );
         }
         optsBSU256.details.critical( optsBSU256.strLogPrefix,
-            "U256-BLS-signer error: ", cc.warning( strError ),
-            ", stack is:", "\n", cc.stack( err.stack ) );
+            "U256-BLS-signer error: ", log.em( strError ),
+            ", stack is:", "\n", log.s( err.stack ) );
     }
     optsBSU256.details.exposeDetailsTo( log, "U256-BLS-signer", optsBSU256.isSuccess );
     optsBSU256.details.close();

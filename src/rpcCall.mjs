@@ -29,7 +29,6 @@ import * as https from "https";
 import * as net from "net";
 import { validateURL, isUrlWS } from "./owaspUtils.mjs";
 import * as log from "./log.mjs";
-import * as cc from "./cc.mjs";
 
 const gSecondsConnectionTimeout = 60;
 
@@ -90,8 +89,7 @@ export async function doConnect( joCall, opts, fn ) {
             } );
             joCall.wsConn.on( "error", async function( err ) {
                 strWsError = err.toString() || "internal web socket error";
-                log.error( cc.u( joCall.url ), " web socket error: ",
-                    cc.warning( err.toString() ) );
+                log.error( log.u( joCall.url ), " web socket error: ", log.em( err.toString() ) );
                 const wsConn = joCall.wsConn;
                 joCall.wsConn = null;
                 wsConn.close();
@@ -99,8 +97,7 @@ export async function doConnect( joCall, opts, fn ) {
             } );
             joCall.wsConn.on( "fail", async function( err ) {
                 strWsError = err.toString() || "internal web socket failure";
-                log.error( cc.u( joCall.url ), " web socket fail: ",
-                    cc.warning( err.toString() ) );
+                log.error( log.u( joCall.url ), " web socket fail: ", log.em( err.toString() ) );
                 const wsConn = joCall.wsConn;
                 joCall.wsConn = null;
                 wsConn.close();
@@ -124,13 +121,13 @@ export async function doConnect( joCall, opts, fn ) {
                 },
                 async function( nStep ) { // step handler
                     if( strWsError && typeof strWsError == "string" && strWsError.length > 0 ) {
-                        log.error( cc.u( joCall.url ), " web socket wait error detected: ",
-                            cc.warning( strWsError ) );
+                        log.error( log.u( joCall.url ), " web socket wait error detected: ",
+                            log.em( strWsError ) );
                         return false;
                     }
                     if( nStep >= gSecondsConnectionTimeout ) {
                         strWsError = "wait timeout, web socket is connecting too long";
-                        log.error( cc.u( joCall.url ), " web socket wait timeout detected" );
+                        log.error( log.u( joCall.url ), " web socket wait timeout detected" );
                         const wsConn = joCall.wsConn;
                         joCall.wsConn = null;
                         wsConn.close();
@@ -281,7 +278,7 @@ export async function doCall( joCall, joIn, fn ) {
                     } );
                 } );
                 req.on( "error", err => {
-                    log.error( cc.u( joCall.url ), " REST error ", cc.warning( err.toString() ) );
+                    log.error( log.u( joCall.url ), " REST error ", log.em( err.toString() ) );
                     joOut = null;
                     errCall = "RPC call error: " + err.toString();
                     reject( errCall );
@@ -315,12 +312,12 @@ export async function doCall( joCall, joIn, fn ) {
                 } );
                 const body = response.data.toString( "utf8" );
                 if( response && response.statusCode && response.statusCode !== 200 )
-                    log.warning( " REST call status code is ", cc.j( response.statusCode ) );
+                    log.warning( " REST call status code is ", log.v( response.statusCode ) );
 
                 joOut = JSON.parse( body );
                 errCall = null;
             } catch ( err ) {
-                log.error( cc.u( joCall.url ), " request error ", cc.warning( err.toString() ) );
+                log.error( log.u( joCall.url ), " request error ", log.em( err.toString() ) );
                 joOut = null;
                 errCall = "request error: " + err.toString();
             }

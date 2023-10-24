@@ -115,8 +115,7 @@ class ObserverServer extends SocketServer {
                 self.opts.imaState.chainProperties.mn.ethersProvider =
                     owaspUtils.getEthersProviderFromURL( u );
             } else {
-                self.warning( "WARNING: No ", cc.note( "Main-net" ),
-                    " URL specified in command line arguments",
+                self.warning( "WARNING: No Main-net URL specified in command line arguments",
                     cc.debug( "(needed for particular operations only)" ), " in ",
                     threadInfo.threadDescription() );
             }
@@ -129,8 +128,7 @@ class ObserverServer extends SocketServer {
                 self.opts.imaState.chainProperties.sc.ethersProvider =
                     owaspUtils.getEthersProviderFromURL( u );
             } else {
-                self.warning( "WARNING: No ", cc.note( "Main-net" ),
-                    " URL specified in command line arguments",
+                self.warning( "WARNING: No Main-net URL specified in command line arguments",
                     cc.debug( "(needed for particular operations only))" ), " in ",
                     threadInfo.threadDescription() );
             }
@@ -162,7 +160,7 @@ class ObserverServer extends SocketServer {
             self.initComplete = true;
             self.information( "Full init compete for in-worker SNB server in ",
                 threadInfo.threadDescription(), " ",
-                cc.notice( gURL ) );
+                log.v( gURL ) );
             return joAnswer;
         };
         self.mapApiHandlers.periodicCachingStart =
@@ -191,7 +189,7 @@ class ObserverServer extends SocketServer {
             return joAnswer;
         };
         self.information( "Initialized in-worker SNB server in ",
-            threadInfo.threadDescription(), " is ", cc.notice( gURL ) );
+            threadInfo.threadDescription(), " is ", log.v( gURL ) );
     }
     dispose() {
         const self = this;
@@ -246,7 +244,7 @@ class ObserverServer extends SocketServer {
         self.bIsPeriodicCachingStepInProgress = false;
         if( strError ) {
             self.error( "Parallel periodic SNB caching came across with error: ",
-                cc.warning( strError ), " in ", threadInfo.threadDescription() );
+                log.em( strError ), " in ", threadInfo.threadDescription() );
             return strError;
         }
         self.debug( "Parallel periodic SNB caching in ",
@@ -296,7 +294,7 @@ class ObserverServer extends SocketServer {
                 }
             } catch ( err ) {
                 self.error( "Periodic SNB caching(async) error in ",
-                    threadInfo.threadDescription(), ": ", cc.warning( strError ) );
+                    threadInfo.threadDescription(), ": ", log.em( strError ) );
             }
         };
         const fnPeriodicCaching = function() {
@@ -308,12 +306,12 @@ class ObserverServer extends SocketServer {
                     } ).catch( ( err ) => {
                         self.error( "Periodic SNB caching(sync-delayed) in ",
                             threadInfo.threadDescription()," error: ",
-                            cc.warning( owaspUtils.extractErrorMessage( err ) ) );
+                            log.em( owaspUtils.extractErrorMessage( err ) ) );
                     } );
             } catch ( err ) {
                 self.error( "Periodic SNB caching(sync) in ",
                     threadInfo.threadDescription(), " error: ",
-                    cc.warning( owaspUtils.extractErrorMessage( err ) ) );
+                    log.em( owaspUtils.extractErrorMessage( err ) ) );
             }
         };
         await fnPeriodicCaching();
@@ -414,5 +412,5 @@ const server = new ObserverServer( acceptor );
 server.on( "dispose", function() {
     const self = server;
     self.debug( "Disposed in-worker in ", threadInfo.threadDescription(), " SNB server ",
-        cc.notice( gURL ) );
+        log.v( gURL ) );
 } );
