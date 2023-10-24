@@ -23,8 +23,6 @@
  * @copyright SKALE Labs 2019-Present
  */
 
-import * as cc from "./cc.mjs";
-
 import * as owaspUtils from "./owaspUtils.mjs";
 import * as rpcCall from "./rpcCall.mjs";
 import * as imaHelperAPIs from "./imaHelperAPIs.mjs";
@@ -93,7 +91,7 @@ export async function safeGetPastEventsProgressive(
     if( ! imaTransferErrorHandling.getEnabledProgressiveEventsScan() ) {
         details.warning( strLogPrefix, "IMPORTANT NOTICE: Will skip progressive events scan " +
             "in block range from ", log.v( nBlockFrom ), " to ", log.v( nBlockTo ),
-        " because it's ", cc.error( "DISABLED" ) );
+        " because it's ", log.fmtError( "DISABLED" ) );
         return await safeGetPastEvents(
             details, strLogPrefix,
             ethersProvider, attempts, joContract, strEventName,
@@ -153,7 +151,7 @@ export async function safeGetPastEventsProgressive(
                 );
             if( joAllEventsInBlock && joAllEventsInBlock.length > 0 ) {
                 details.success( strLogPrefix, "Progressive scan of ",
-                    log.v( "getPastEvents" ), cc.debug( "/" ), log.v( strEventName ),
+                    log.v( "getPastEvents" ), "/", log.v( strEventName ),
                     ", from block ", log.v( joPlan.nBlockFrom ), ", to block ",
                     log.v( joPlan.nBlockTo ), ", block range is ", log.v( joPlan.type ),
                     ", found ", log.v( joAllEventsInBlock.length ), " event(s)" );
@@ -453,7 +451,7 @@ export async function safeGetPastEventsIterative(
         imaHelperAPIs.getMaxIterationsInAllRangeEventsScan() <= 0 ) {
         details.warning( strLogPrefix, "IMPORTANT NOTICE: Will skip iterative events scan " +
             "in block range from ", log.v( nBlockFrom ), " to ", log.v( nBlockTo ),
-        " because it's ", cc.error( "DISABLED" ) );
+        " because it's ", log.fmtError( "DISABLED" ) );
         return await safeGetPastEvents(
             details, strLogPrefix,
             ethersProvider, attempts, joContract,

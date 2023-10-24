@@ -235,7 +235,7 @@ function initMonitoringServer() {
             } catch ( err ) {
                 const strError = owaspUtils.extractErrorMessage( err );
                 log.error( strLogPrefix, "Bad message from ", log.v( ip ), ": ",
-                    cc.warning( message ), ", error is: ", log.em( strError ),
+                    log.v( message ), ", error is: ", log.em( strError ),
                     ", stack is: ", "\n", log.s( err.stack ) );
             }
             try {
@@ -357,9 +357,8 @@ function initJsonRpcServer() {
             } // switch( joMessage.method )
         } catch ( err ) {
             const strError = owaspUtils.extractErrorMessage( err );
-            log.error( strLogPrefix, "Bad message from ", log.v( ip ), ": ",
-                cc.warning( message ), ", error is: ", log.em( strError ),
-                ", stack is: ", "\n", log.s( err.stack ) );
+            log.error( strLogPrefix, "Bad message from ", log.v( ip ), ": ", log.v( message ),
+                ", error is: ", log.em( strError ), ", stack is: ", "\n", log.s( err.stack ) );
         }
         if( ! isSkipMode )
             fnSendAnswer( joAnswer );
@@ -375,7 +374,7 @@ async function doTheJob() {
     let cntFalse = 0;
     let cntTrue = 0;
     for( idxAction = 0; idxAction < cntActions; ++idxAction ) {
-        log.information( strLogPrefix, cc.debug( imaHelperAPIs.longSeparator ) );
+        log.information( strLogPrefix, log.fmtDebug( imaHelperAPIs.longSeparator ) );
         const joAction = imaState.arrActions[idxAction];
         log.debug( strLogPrefix, "Will execute action: ", joAction.name, " (",
             idxAction + 1, " of ", cntActions, ")" );
@@ -397,8 +396,8 @@ async function doTheJob() {
     log.information( strLogPrefix, imaHelperAPIs.longSeparator );
     log.information( strLogPrefix, "FINISH:" );
     log.information( strLogPrefix, cntActions, " task(s) executed" );
-    log.information( strLogPrefix, cntTrue, cc.success( " task(s) succeeded" ) );
-    log.information( strLogPrefix, cntFalse, cc.error( " task(s) failed" ) );
+    log.information( strLogPrefix, cntTrue, log.fmtSuccess( " task(s) succeeded" ) );
+    log.information( strLogPrefix, cntFalse, log.fmtError( " task(s) failed" ) );
     log.information( strLogPrefix, imaHelperAPIs.longSeparator );
     process.exitCode = ( cntFalse > 0 ) ? cntFalse : 0;
     if( ! state.isPreventExitAfterLastAction() )
@@ -445,7 +444,8 @@ async function main() {
             process.exit( 165 );
         }
         log.information( "S-Chain network was discovery uses ",
-            ( isSilentReDiscovery ? cc.warning( "silent" ) : cc.success( "exposed details" ) ),
+            ( isSilentReDiscovery
+                ? log.fmtWarning( "silent" ) : log.fmtSuccess( "exposed details" ) ),
             " mode" );
         if( ! imaState.bNoWaitSChainStarted ) {
             discoveryTools.waitUntilSChainStarted().then( function() {

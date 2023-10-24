@@ -23,8 +23,6 @@
  * @copyright SKALE Labs 2019-Present
  */
 
-import * as cc from "./cc.mjs";
-
 import * as owaspUtils from "./owaspUtils.mjs";
 import * as rpcCall from "./rpcCall.mjs";
 
@@ -176,7 +174,7 @@ export function getS2STransferModeDescription() {
 }
 
 export function getS2STransferModeDescriptionColorized() {
-    return gFlagIsForwardS2S ? cc.success( "forward" ) : cc.error( "reverse" );
+    return log.posNeg( gFlagIsForwardS2S, "forward", "reverse" );
 }
 
 export function isForwardS2S() {

@@ -25,7 +25,6 @@
 
 import * as owaspUtils from "./owaspUtils.mjs";
 import * as log from "./log.mjs";
-import * as cc from "./cc.mjs";
 import * as imaCLI from "./cli.mjs";
 import * as rpcCall from "./rpcCall.mjs";
 import * as state from "./state.mjs";
@@ -72,7 +71,7 @@ export async function registerStep1( isPrintSummaryRegistrationCosts ) {
         imaState.chainProperties.sc.strChainName
     );
     log.information( strLogPrefix, "Chain is ",
-        ( bSuccess ? cc.success( "already registered" ) : cc.warning( "not registered yet" ) ) );
+        log.posNeg( bSuccess, "already registered", "not registered yet" ) );
     if( bSuccess )
         return true;
     const jarrReceipts =
@@ -93,7 +92,7 @@ export async function registerStep1( isPrintSummaryRegistrationCosts ) {
         );
     bSuccess = ( jarrReceipts != null && jarrReceipts.length > 0 ) ? true : false;
     log.information( strLogPrefix, "Chain was ",
-        ( bSuccess ? cc.success( "registered successfully" ) : cc.error( "not registered" ) ) );
+        log.posNeg( bSuccess, "registered successfully", "not registered" ) );
     if( bSuccess ) {
         gInfoRegistrationCost.mn =
             gInfoRegistrationCost.mn.concat( gInfoRegistrationCost.mn, jarrReceipts );

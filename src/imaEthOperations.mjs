@@ -24,7 +24,6 @@
  */
 
 import * as log from "./log.mjs";
-import * as cc from "./cc.mjs";
 
 import * as owaspUtils from "./owaspUtils.mjs";
 import * as imaHelperAPIs from "./imaHelperAPIs.mjs";
@@ -366,7 +365,7 @@ export async function viewEthPaymentFromSchainOnMainNet(
                 { from: addressFrom } );
         details.success( strLogPrefix, "You can receive(wei): ", log.v( xWei ) );
         const xEth = owaspUtils.ethersMod.ethers.utils.formatEther( owaspUtils.toBN( xWei ) );
-        const s = strLogPrefix + cc.success( "You can receive(eth): " ) + log.v( xEth );
+        const s = log.fmtSuccess( strLogPrefix, "You can receive(eth): ", log.v( xEth ) );
         if( log.id != details.id )
             log.success( s );
         details.success( s );

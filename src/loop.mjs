@@ -102,12 +102,12 @@ export function checkTimeFraming( d, strDirection, joRuntimeOpts ) {
             } else {
                 log.debug( "S-Chain destination", "........",
                     log.v( joRuntimeOpts.joExtraSignOpts.chainNameDst ),
-                    cc.debug( "/" ), log.v( joRuntimeOpts.joExtraSignOpts.chainIdDst ) );
+                    "/", log.v( joRuntimeOpts.joExtraSignOpts.chainIdDst ) );
             }
         }
         log.debug( "\n",
-            "Is skip", "....................", cc.yn( bSkip ), "\n",
-            "Is inside gap", "..............", cc.yn( bInsideGap ), "\n",
+            "Is skip", "....................", log.yn( bSkip ), "\n",
+            "Is inside gap", "..............", log.yn( bInsideGap ), "\n",
             "Range Start", "................", log.v( nRangeStart ), "\n",
             "Frame Start", "................", log.v( nFrameStart ), "\n",
             "Gap Start", "..................", log.v( nGapStart ) );
@@ -164,7 +164,7 @@ async function singleTransferLoopPartOracle( optsLoop, strLogPrefix ) {
             throw err;
         }
         log.information( strLogPrefix, "Oracle gas price setup done in ",
-            threadInfo.threadDescription(), ": ", cc.tf( b0 ) );
+            threadInfo.threadDescription(), ": ", log.v( b0 ) );
     }
     return b0;
 }
@@ -227,7 +227,7 @@ async function singleTransferLoopPartM2S( optsLoop, strLogPrefix ) {
             throw err;
         }
         log.information( strLogPrefix, "M2S transfer done in ",
-            threadInfo.threadDescription(), ": ", cc.tf( b1 ) );
+            threadInfo.threadDescription(), ": ", log.v( b1 ) );
     } else {
         log.debug( strLogPrefix, "Skipped M2S transfer in ",
             threadInfo.threadDescription(), "." );
@@ -294,7 +294,7 @@ async function singleTransferLoopPartS2M( optsLoop, strLogPrefix ) {
             throw err;
         }
         log.information( strLogPrefix, "S2M transfer done in ",
-            threadInfo.threadDescription(), ": ", cc.tf( b2 ) );
+            threadInfo.threadDescription(), ": ", log.v( b2 ) );
     } else {
         log.debug( strLogPrefix, "Skipped S2M transfer in ",
             threadInfo.threadDescription(), "." );
@@ -334,7 +334,7 @@ async function singleTransferLoopPartS2S( optsLoop, strLogPrefix ) {
             throw err;
         }
         log.information( strLogPrefix, "All S2S transfers done in ",
-            threadInfo.threadDescription(), ": ", cc.tf( b3 ) );
+            threadInfo.threadDescription(), ": ", log.v( b3 ) );
 
     } else {
         log.debug( strLogPrefix, "Skipped S2S transfer in ",
@@ -351,8 +351,8 @@ function printLoopPartSkippedWarning( strLoopPartName ) {
 
 export async function singleTransferLoop( optsLoop ) {
     const imaState = state.get();
-    const strLogPrefix = cc.attention( "Single Loop in " ) +
-        threadInfo.threadDescription() + cc.debug( ":" ) + " ";
+    const strLogPrefix = log.fmtAttention( "Single Loop in ",
+        threadInfo.threadDescription(), ": " );
     try {
         log.debug( strLogPrefix, imaHelperAPIs.longSeparator );
         let b0 = false, b1 = false, b2 = false, b3 = false;
@@ -400,7 +400,7 @@ export async function singleTransferLoop( optsLoop ) {
         const bResult = b0 && b1 && b2 && b3;
         log.notice( strLogPrefix,
             "Final completion status for all performed transfer loop parts is ",
-            cc.tf( bResult ) );
+            log.v( bResult ) );
         return bResult;
     } catch ( err ) {
         log.error( strLogPrefix, "Exception in transfer loop: ",

@@ -25,7 +25,6 @@
 
 import * as owaspUtils from "./owaspUtils.mjs";
 import * as log from "./log.mjs";
-import * as cc from "./cc.mjs";
 import * as rpcCall from "./rpcCall.mjs";
 import * as imaHelperAPIs from "./imaHelperAPIs.mjs";
 import * as skaleObserver from "./observer.mjs";
@@ -78,21 +77,20 @@ export function formatBalanceInfo( bi, strAddress ) {
     s += log.v( bi.assetName );
     if( "assetAddress" in bi &&
         typeof bi.assetAddress == "string" && bi.assetAddress.length > 0 )
-        s += cc.normal( "/" ) + log.v( bi.assetAddress );
+        s += log.fmtDebug( "/", log.v( bi.assetAddress ) );
     if( "idToken" in bi )
-        s += cc.normal( " token ID " ) + log.v( bi.idToken );
-    s += cc.normal( ( bi.assetName == "ERC721" )
-        ? " owner is " : " balance is " );
+        s += log.fmtDebug( " token ID ", log.v( bi.idToken ) );
+    s += log.posNeg( ( bi.assetName == "ERC721" ) ? true : false, " owner is ", " balance is " );
     s += ( bi.assetName == "ERC721" )
         ? log.v( bi.owner ) : log.v( bi.balance );
     if( bi.assetName == "ERC721" ) {
         const isSame =
             ( bi.owner.trim().toLowerCase() == strAddress.trim().toLowerCase() );
         s += " " + ( isSame
-            ? cc.success( "same (as account " ) + log.v( strAddress ) +
-                cc.success( " specified in the command line arguments)" )
-            : cc.error( "different (than account " ) + log.v( strAddress ) +
-                cc.error( " specified in the command line arguments)" ) );
+            ? log.fmtSuccess( "same (as account ", log.v( strAddress ),
+                " specified in the command line arguments)" )
+            : log.fmtError( "different (than account " ), log.v( strAddress ),
+        " specified in the command line arguments)" );
     }
     return s;
 }
@@ -305,17 +303,12 @@ export async function continueSChainDiscoveryInBackgroundIfNeeded( isSilentReDis
                     const cntDiscoveredNow =
                         getSChainDiscoveredNodesCount( joSChainNetworkInfo );
                     let strMessage =
-                        cc.success( "S-Chain network was re-discovered, " ) +
-                        log.v( cntDiscoveredNow ) +
-                        cc.success( " of " ) + log.v( nCountToWait ) +
-                        cc.success( " node(s) (" ) + log.v( cntDiscoveredNow ) +
-                        cc.success( " nodes known" ) + cc.success( ")" );
+                        log.fmtSuccess( "S-Chain network was re-discovered, ", cntDiscoveredNow,
+                            " of ", nCountToWait, " node(s) (", cntDiscoveredNow, " nodes known)" );
                     const cntStillUnknown = cntNodesOnChain - cntDiscoveredNow;
                     if( cntStillUnknown > 0 ) {
-                        strMessage += cc.success( ", " ) +
-                            log.v( cntStillUnknown ) +
-                            cc.success( " of " ) + log.v( cntNodesOnChain ) +
-                            cc.success( " still unknown (" );
+                        strMessage += log.fmtSuccess( ", ", cntStillUnknown, " of ",
+                            cntNodesOnChain, " still unknown (" );
                         try {
                             const jarrNodes = joSChainNetworkInfo.network;
                             let cntBad = 0;
@@ -324,24 +317,23 @@ export async function continueSChainDiscoveryInBackgroundIfNeeded( isSilentReDis
                                 try {
                                     if( ! isSChainNodeFullyDiscovered( joNode ) ) {
                                         if( cntBad > 0 )
-                                            strMessage += cc.success( ", " );
+                                            strMessage += log.fmtSuccess( ", " );
                                         const strNodeURL =
                                             imaUtils.composeSChainNodeUrl( joNode );
-                                        const strNodeDescColorized = cc.notice( "#" ) +
-                                            log.v( i ) + cc.attention( "(" ) +
-                                            log.u( strNodeURL ) + cc.attention( ")" );
+                                        const strNodeDescColorized = log.fmtAttention( "#",
+                                            i, "(", log.u( strNodeURL ), ")" );
                                         strMessage += strNodeDescColorized;
                                         ++ cntBad;
                                     }
                                 } catch ( err ) { }
                             }
                         } catch ( err ) { }
-                        strMessage += cc.success( ")" );
+                        strMessage += log.fmtSuccess( ")" );
                     }
                     if( ! isSilentReDiscovery ) {
                         strMessage +=
-                            cc.success( ", complete re-discovered S-Chain network info: " ) +
-                            log.v( joSChainNetworkInfo );
+                            log.fmtSuccess( ", complete re-discovered S-Chain network info: ",
+                                log.v( joSChainNetworkInfo ) );
                     }
                     log.information( strMessage );
                     imaState.joSChainNetworkInfo = joSChainNetworkInfo;
@@ -370,8 +362,8 @@ async function discoverSChainWalkNodes( optsDiscover ) {
         const nCurrentNodeIdx = 0 + i;
         const joNode = optsDiscover.jarrNodes[nCurrentNodeIdx];
         const strNodeURL = imaUtils.composeSChainNodeUrl( joNode );
-        const strNodeDescColorized = cc.notice( "#" ) + log.v( nCurrentNodeIdx ) +
-            cc.attention( "(" ) + log.u( strNodeURL ) + cc.attention( ")" );
+        const strNodeDescColorized = log.fmtAttention( "#", nCurrentNodeIdx, "(",
+            log.u( strNodeURL ), ")" );
         if( ! optsDiscover.isSilentReDiscovery ) {
             log.information( optsDiscover.strLogPrefix,
                 "Will try to discover S-Chain node ", strNodeDescColorized, "..." );

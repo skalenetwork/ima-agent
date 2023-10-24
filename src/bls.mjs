@@ -24,7 +24,6 @@
  */
 
 import * as fs from "fs";
-import * as cc from "./cc.mjs";
 import * as log from "./log.mjs";
 import * as owaspUtils from "./owaspUtils.mjs";
 import * as childProcessModule from "child_process";
@@ -577,7 +576,7 @@ function performBlsVerifyIU256(
     try {
         const joMsg = { "message": keccak256U256( u256, true ) };
         details.debug( strLogPrefix, "BLS u256 node #", nZeroBasedNodeIndex,
-            cc.debug( " verify message " ) + log.v( joMsg ) + " composed from ", log.v( u256 ),
+            " verify message ", log.v( joMsg ), " composed from ", log.v( u256 ),
             " using glue ", log.v( joResultFromNode ), " and public key ", log.v( joPublicKey ) );
         const strSignResultFileName = strActionDir + "/sign-result" + nZeroBasedNodeIndex + ".json";
         imaUtils.jsonFileSave( strSignResultFileName, joResultFromNode );
@@ -820,7 +819,7 @@ async function checkCorrectnessOfMessagesToSign(
                     { from: strCallerAccountAddress }
                 );
                 details.trace( strLogPrefix, log.v( strDirection ),
-                    " Got verification call result ", cc.tf( isValidMessage ),
+                    " Got verification call result ", log.val( isValidMessage ),
                     ", real message index is: ", idxMessage, ", saved msgCounter is: ",
                     outgoingMessageData.msgCounter );
                 if( !isValidMessage ) {
@@ -881,7 +880,7 @@ async function prepareSignMessagesImpl( optsSignOperation ) {
     optsSignOperation.details.trace( optsSignOperation.strLogPrefix, " Invoking ",
         log.v( optsSignOperation.strDirection ),
         " signing messages procedure, message signing is ",
-        cc.onOff( optsSignOperation.imaState.bSignMessages ) );
+        log.onOff( optsSignOperation.imaState.bSignMessages ) );
     if( !( optsSignOperation.imaState.bSignMessages &&
         optsSignOperation.imaState.strPathBlsGlue.length > 0 &&
         optsSignOperation.imaState.joSChainNetworkInfo
@@ -914,9 +913,9 @@ async function prepareSignMessagesImpl( optsSignOperation ) {
     optsSignOperation.details.trace( optsSignOperation.strLogPrefix, "Will sign ",
         optsSignOperation.jarrMessages.length, " message(s), sequence ID is ",
         log.v( optsSignOperation.sequenceId ), "..." );
-    optsSignOperation.details.trace( optsSignOperation.strLogPrefix +
-        cc.debug( "Will query to sign " ) + log.v( optsSignOperation.jarrNodes.length ) +
-        cc.debug( " skaled node(s)..." ) );
+    optsSignOperation.details.trace( optsSignOperation.strLogPrefix,
+        "Will query to sign ", optsSignOperation.jarrNodes.length,
+        " skaled node(s)..." );
     optsSignOperation.nThreshold =
         discoverBlsThreshold( optsSignOperation.imaState.joSChainNetworkInfo );
     optsSignOperation.nParticipants =
@@ -1020,7 +1019,7 @@ async function gatherSigningStartImpl( optsSignOperation ) {
                     }
                 }
                 optsSignOperation.trace.trace( "Will call signed-hash answer-sending callback ",
-                    ( strError ? ( cc.debug( " with error " ) + log.v( strError ) ) : "" ),
+                    ( strError ? ( " with error " + log.v( strError ) ) : "" ),
                     ", optsSignOperation.jarrMessages is ", log.v( optsSignOperation.jarrMessages ),
                     ", glue result is ", log.v( joGlueResult ) );
                 optsSignOperation.fn(
@@ -1413,10 +1412,9 @@ async function doSignProcessOneImpl( i, optsSignOperation ) {
     const strNodeURL = optsSignOperation.imaState.isCrossImaBlsMode
         ? imaUtils.composeImaAgentNodeUrl( joNode, isThisNode )
         : imaUtils.composeSChainNodeUrl( joNode );
-    const strNodeDescColorized = log.u( strNodeURL ) + " " + cc.debug( "(" ) + log.v( i ) +
-        cc.debug( "/" ) + log.v( optsSignOperation.jarrNodes.length ) + cc.debug( ", ID " ) +
-        log.v( joNode.nodeID ) + cc.debug( "), sequence ID is " ) +
-        log.v( optsSignOperation.sequenceId );
+    const strNodeDescColorized = log.fmtDebug( log.u( strNodeURL ), " (", log.v( i ), "/",
+        optsSignOperation.jarrNodes.length, ", ID ", log.v( joNode.nodeID ), "), sequence ID is ",
+        log.v( optsSignOperation.sequenceId ) );
     const rpcCallOpts = null;
     rpcCall.create(
         strNodeURL, rpcCallOpts, async function( joCall, err ) {
@@ -1673,9 +1671,8 @@ async function doSignU256OneImpl( i, optsSignU256 ) {
     const strNodeURL = optsSignU256.imaState.isCrossImaBlsMode
         ? imaUtils.composeImaAgentNodeUrl( joNode, isThisNode )
         : imaUtils.composeSChainNodeUrl( joNode );
-    const strNodeDescColorized = log.u( strNodeURL ) + " " + cc.debug( "(" ) + log.v( i ) +
-        cc.debug( "/" ) + log.v( optsSignU256.jarrNodes.length ) +
-        cc.debug( ", ID " ) + log.v( joNode.nodeID ) + cc.debug( ")" );
+    const strNodeDescColorized = log.fmtDebug( log.u( strNodeURL ), " (", i, "/",
+        optsSignU256.jarrNodes.length, ", ID ", log.v( joNode.nodeI ), ")" );
     const rpcCallOpts = null;
     await rpcCall.create( strNodeURL, rpcCallOpts, async function( joCall, err ) {
         ++optsSignU256.joGatheringTracker.nCountReceived;
@@ -1900,7 +1897,7 @@ async function doSignU256Gathering( optsSignU256 ) {
                         "Problem(1) in BLS u256 sign result handler: ", log.em( strError ) );
                 }
                 optsSignU256.details.trace( "Will call signed-256 answer-sending callback ",
-                    ( strError ? ( cc.debug( " with error " ) + log.v( strError ) ) : "" ),
+                    ( strError ? ( " with error " + log.v( strError ) ) : "" ),
                     ", u256 is ", log.v( optsSignU256.u256 ),
                     ", glue result is ", log.v( joGlueResult ) );
                 optsSignU256.fn(

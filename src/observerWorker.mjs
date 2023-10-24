@@ -115,9 +115,9 @@ class ObserverServer extends SocketServer {
                 self.opts.imaState.chainProperties.mn.ethersProvider =
                     owaspUtils.getEthersProviderFromURL( u );
             } else {
-                self.warning( "WARNING: No Main-net URL specified in command line arguments",
-                    cc.debug( "(needed for particular operations only)" ), " in ",
-                    threadInfo.threadDescription() );
+                self.warning( "WARNING: No Main-net URL specified in command line arguments" +
+                    "(needed for particular operations only) in ",
+                threadInfo.threadDescription() );
             }
 
             if( self.opts.imaState.chainProperties.sc.strURL &&
@@ -128,9 +128,9 @@ class ObserverServer extends SocketServer {
                 self.opts.imaState.chainProperties.sc.ethersProvider =
                     owaspUtils.getEthersProviderFromURL( u );
             } else {
-                self.warning( "WARNING: No Main-net URL specified in command line arguments",
-                    cc.debug( "(needed for particular operations only))" ), " in ",
-                    threadInfo.threadDescription() );
+                self.warning( "WARNING: No Main-net URL specified in command line arguments" +
+                    "(needed for particular operations only)) in ",
+                threadInfo.threadDescription() );
             }
             self.opts.imaState.joNodes =
                 new owaspUtils.ethersMod.ethers.Contract(
@@ -214,7 +214,7 @@ class ObserverServer extends SocketServer {
         self.opts.details.debug( threadInfo.threadDescription(),
             " thread will invoke S-Chains caching in ",
             ( isForceMultiAttemptsUntilSuccess
-                ? cc.warning( "forced" ) : cc.success( "normal" ) ) +
+                ? log.fmtWarning( "forced" ) : log.fmtSuccess( "normal" ) ) +
             " mode..." );
         for( let idxAttempt = 0;
             // eslint-disable-next-line no-unmodified-loop-condition
@@ -224,7 +224,7 @@ class ObserverServer extends SocketServer {
             try {
                 self.opts.details.debug( threadInfo.threadDescription(),
                     " thread will invoke S-Chains caching(attempt + ",
-                    idxAttempt, cc.debug( ")..." ) );
+                    idxAttempt, ")..." );
                 strError =
                     await skaleObserver.cacheSChains(
                         strChainNameConnectedTo,

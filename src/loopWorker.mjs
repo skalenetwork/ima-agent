@@ -134,9 +134,9 @@ class ObserverServer extends SocketServer {
                 self.opts.imaState.chainProperties.mn.ethersProvider =
                     owaspUtils.getEthersProviderFromURL( u );
             } else {
-                self.warning( "WARNING: No Main-net URL specified in command line arguments",
-                    cc.debug( "(needed for particular operations only)" ), " in ",
-                    threadInfo.threadDescription() );
+                self.warning( "WARNING: No Main-net URL specified in command line arguments" +
+                        "(needed for particular operations only) in ",
+                threadInfo.threadDescription() );
             }
 
             if( self.opts.imaState.chainProperties.sc.strURL &&
@@ -147,9 +147,9 @@ class ObserverServer extends SocketServer {
                 self.opts.imaState.chainProperties.sc.ethersProvider =
                     owaspUtils.getEthersProviderFromURL( u );
             } else {
-                self.warning( "WARNING: No Main-net URL specified in command line arguments",
-                    cc.debug( "(needed for particular operations only)" ), " in ",
-                    threadInfo.threadDescription() );
+                self.warning( "WARNING: No Main-net URL specified in command line arguments" +
+                        "(needed for particular operations only) in ",
+                threadInfo.threadDescription() );
             }
 
             self.opts.imaState.optsLoop.joRuntimeOpts.isInsideWorker = true;
@@ -168,13 +168,13 @@ class ObserverServer extends SocketServer {
             self.initComplete = true;
             self.information( "IMA loop worker ", log.v( workerData.url ),
                 " will do the following work:\n    ", log.v( "Oracle" ), " operations.....",
-                cc.yn( self.opts.imaState.optsLoop.enableStepOracle ), "\n",
-                "    ", log.v( "M2S" ), cc.debug( " transfers........." ),
-                cc.yn( self.opts.imaState.optsLoop.enableStepM2S ), "\n" +
-                "    ", log.v( "S2M" ), cc.debug( " transfers........." ),
-                cc.yn( self.opts.imaState.optsLoop.enableStepS2M ), "\n",
-                "    ", log.v( "S2S" ), cc.debug( " transfers........." ),
-                cc.yn( self.opts.imaState.optsLoop.enableStepS2S ) );
+                log.yn( self.opts.imaState.optsLoop.enableStepOracle ), "\n",
+                "    ", log.v( "M2S" ), log.fmtDebug( " transfers........." ),
+                log.yn( self.opts.imaState.optsLoop.enableStepM2S ), "\n" +
+                "    ", log.v( "S2M" ), log.fmtDebug( " transfers........." ),
+                log.yn( self.opts.imaState.optsLoop.enableStepS2M ), "\n",
+                "    ", log.v( "S2S" ), log.fmtDebug( " transfers........." ),
+                log.yn( self.opts.imaState.optsLoop.enableStepS2S ) );
             /* await */
             loop.runTransferLoop( self.opts.imaState.optsLoop );
             self.information( "Full init compete for in-worker IMA loop ",
@@ -188,7 +188,7 @@ class ObserverServer extends SocketServer {
                     threadInfo.threadDescription(), ": ",
                     log.v( joMessage.joSChainNetworkInfo ),
                     ", this own S-Chain update is ",
-                    ( joMessage.isFinal ? cc.success( "final" ) : cc.warning( "partial" ) ) );
+                    log.posNeg( joMessage.isFinal, "final", "partial" ) );
                 imaState.joSChainNetworkInfo = joMessage.joSChainNetworkInfo;
             };
         self.mapApiHandlers.schainsCached = function( joMessage, joAnswer, eventData, socket ) {

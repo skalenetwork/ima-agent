@@ -24,8 +24,6 @@
  */
 
 import * as log from "./log.mjs";
-import * as cc from "./cc.mjs";
-
 import * as owaspUtils from "./owaspUtils.mjs";
 import * as imaHelperAPIs from "./imaHelperAPIs.mjs";
 import * as imaTx from "./imaTx.mjs";
@@ -58,7 +56,7 @@ export async function getBalanceErc20(
         return balance;
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
-        log.error( strLogPrefix, "ERC20 balance fetching error: ", cc.waring( strError ),
+        log.error( strLogPrefix, "ERC20 balance fetching error: ", log.em( strError ),
             ", stack is: ", "\n", log.s( err.stack ) );
     }
     return "<no-data-or-error>";
@@ -1059,7 +1057,7 @@ export async function doErc721PaymentFromSChain(
         if( joMessageProxySChain ) {
             details.debug( strLogPrefix, "Verifying the ", log.v( strEventName ),
                 " event of the MessageProxy/", log.v( joMessageProxySChain.address ),
-                cc.debug( " contract ..." ) );
+                " contract ..." );
             await imaHelperAPIs.sleep(
                 imaHelperAPIs.getMillisecondsSleepBeforeFetchOutgoingMessageEvent() );
             const joEvents = await imaEventLogScan.getContractCallEvents(

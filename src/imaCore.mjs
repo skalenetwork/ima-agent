@@ -394,7 +394,7 @@ async function gatherMessages( optsTransfer ) {
                 optsTransfer.details.debug( optsTransfer.strLogPrefix,
                     "Distance by blockNumber is ", log.v( nDist ),
                     ", await check is ",
-                    ( bSecurityCheckPassed ? cc.success( "PASSED" ) : cc.error( "FAILED" ) ) );
+                    log.posNeg( bSecurityCheckPassed, "PASSED", "FAILED" ) );
             } catch ( err ) {
                 bSecurityCheckPassed = false;
                 const strError = owaspUtils.extractErrorMessage( err );
@@ -457,8 +457,8 @@ async function gatherMessages( optsTransfer ) {
                 if( tsDiff < optsTransfer.nBlockAge )
                     bSecurityCheckPassed = false;
                 optsTransfer.details.debug( optsTransfer.strLogPrefix,
-                    "Block age check is ", ( bSecurityCheckPassed
-                        ? cc.success( "PASSED" ) : cc.error( "FAILED" ) ) );
+                    "Block age check is ",
+                    log.posNeg( bSecurityCheckPassed, "PASSED", "FAILED" ) );
             } catch ( err ) {
                 bSecurityCheckPassed = false;
                 const strError = owaspUtils.extractErrorMessage( err );
@@ -508,13 +508,10 @@ async function gatherMessages( optsTransfer ) {
 }
 
 async function preCheckAllMessagesSign( optsTransfer, err, jarrMessages, joGlueResult ) {
-    const strDidInvokedSigningCallbackMessage =
-        optsTransfer.strLogPrefix +
-        cc.debug( "Did invoked message signing callback, " +
-            "first real message index is: " ) +
-        log.v( optsTransfer.nIdxCurrentMsgBlockStart ) +
-        cc.debug( ", have " ) + log.v( optsTransfer.jarrMessages.length ) +
-        cc.debug( " message(s) to process " ) + log.v( optsTransfer.jarrMessages );
+    const strDidInvokedSigningCallbackMessage = log.fmtDebug( optsTransfer.strLogPrefix,
+        "Did invoked message signing callback, first real message index is: ",
+        optsTransfer.nIdxCurrentMsgBlockStart, ", have ", optsTransfer.jarrMessages.length,
+        " message(s) to process ", log.v( optsTransfer.jarrMessages ) );
     optsTransfer.details.debug( strDidInvokedSigningCallbackMessage );
     if( log.id != optsTransfer.details.id )
         log.debug( strDidInvokedSigningCallbackMessage );
@@ -550,11 +547,10 @@ async function callbackAllMessagesSign( optsTransfer, err, jarrMessages, joGlueR
         return;
     const nBlockSize = optsTransfer.arrMessageCounters.length;
     optsTransfer.strActionName = "dst-chain.MessageProxy.postIncomingMessages()";
-    const strWillCallPostIncomingMessagesAction = optsTransfer.strLogPrefix +
-        cc.debug( "Will call " ) + log.v( optsTransfer.strActionName ) +
-        cc.debug( " for block size set to " ) + log.v( nBlockSize ) +
-        cc.debug( ", message counters = are " ) + log.v( optsTransfer.arrMessageCounters ) +
-        cc.debug( "..." );
+    const strWillCallPostIncomingMessagesAction = log.fmtDebug( optsTransfer.strLogPrefix,
+        "Will call ", optsTransfer.strActionName, " for block size set to ", log.v( nBlockSize ),
+        ", message counters = are ", log.v( optsTransfer.arrMessageCounters ),
+        "..." );
     optsTransfer.details.debug( strWillCallPostIncomingMessagesAction );
     if( log.id != optsTransfer.details.id )
         log.debug( strWillCallPostIncomingMessagesAction );
@@ -887,9 +883,9 @@ async function checkOutgoingMessageEvent( optsTransfer, joSChain ) {
                 " message analysis error: Failed to process events for ",
                 log.v( optsTransfer.strDirection ), " message ",
                 log.v( idxMessage + 1 ), " on node ",
-                ( joNode ? log.v( joNode.name ) : cc.error( "<<unknown node name>>" ) ),
+                log.posNeg( joNode, log.v( joNode.name ), "<<unknown node name>>" ),
                 " using URL ",
-                ( joNode ? log.u( strUrlHttp ) : cc.error( "<<unknown node endpoint>>" ) ),
+                log.posNeg( joNode, log.u( strUrlHttp ), "<<unknown node endpoint>>" ),
                 ", error is: ", log.em( owaspUtils.extractErrorMessage( err ) ),
                 ", stack is: ", "\n", log.s( err.stack ) );
             if( log.id != optsTransfer.details.id ) {
@@ -898,9 +894,9 @@ async function checkOutgoingMessageEvent( optsTransfer, joSChain ) {
                     " message analysis error: Failed to process events for ",
                     log.v( optsTransfer.strDirection ), " message ",
                     log.v( idxMessage + 1 ), " on node ",
-                    ( joNode ? log.v( joNode.name ) : cc.error( "<<unknown node name>>" ) ),
+                    log.posNeg( joNode, log.v( joNode.name ), "<<unknown node name>>" ),
                     " using URL ",
-                    ( joNode ? log.u( strUrlHttp ) : cc.error( "<<unknown node endpoint>>" ) ),
+                    log.posNeg( joNode, log.u( strUrlHttp ), "<<unknown node endpoint>>" ),
                     ", error is: ", log.em( owaspUtils.extractErrorMessage( err ) ),
                     ", stack is: ", "\n", log.s( err.stack ) );
             }
@@ -1057,13 +1053,10 @@ async function doMainTransferLoopActions( optsTransfer ) {
         }
 
         optsTransfer.strActionName = "sign messages";
-        const strWillInvokeSigningCallbackMessage =
-            optsTransfer.strLogPrefix +
-            cc.debug( "Will invoke message signing callback, " +
-                "first real message index is: " ) +
-            log.v( optsTransfer.nIdxCurrentMsgBlockStart ) +
-            cc.debug( ", have " ) + log.v( optsTransfer.jarrMessages.length ) +
-            cc.debug( " message(s) to process " ) + log.v( optsTransfer.jarrMessages );
+        const strWillInvokeSigningCallbackMessage = log.fmtDebug( optsTransfer.strLogPrefix,
+            "Will invoke message signing callback, first real message index is: ",
+            optsTransfer.nIdxCurrentMsgBlockStart, ", have ", optsTransfer.jarrMessages.length,
+            " message(s) to process ", optsTransfer.jarrMessages );
         optsTransfer.details.information( strWillInvokeSigningCallbackMessage );
         if( log.id != optsTransfer.details.id )
             log.information( strWillInvokeSigningCallbackMessage );
@@ -1181,7 +1174,7 @@ export async function doTransfer(
     try {
         gIsOneTransferInProgressInThisThread = true;
         optsTransfer.details.debug( optsTransfer.strLogPrefix, "Message signing is ",
-            cc.onOff( optsTransfer.imaState.bSignMessages ) );
+            log.onOff( optsTransfer.imaState.bSignMessages ) );
         if( optsTransfer.fnSignMessages == null || optsTransfer.fnSignMessages == undefined ||
             ( ! optsTransfer.imaState.bSignMessages )
         ) {
@@ -1400,15 +1393,14 @@ export async function doAllS2S( // s-chain --> s-chain
     if( "joExtraSignOpts" in joRuntimeOpts )
         delete joRuntimeOpts.joExtraSignOpts; // reset/clear
     if( cntOK > 0 || cntFail > 0 ) {
-        let s = cc.debug( "Stats for S2S steps in " ) +
-            threadInfo.threadDescription() + cc.debug( ": " );
+        let s = log.fmtDebug( "Stats for S2S steps in ", threadInfo.threadDescription(), ": " );
         if( cntOK > 0 ) {
             s += " " + log.v( cntOK ) + " " +
-                cc.success( "S-Chain(s) processed OKay" ) + cc.debug( ", " );
+                log.fmtSuccess( "S-Chain(s) processed OKay" ) + log.fmtDebug( ", " );
         }
         if( cntFail > 0 ) {
             s += " " + log.v( cntFail ) + " " +
-                cc.error( "S-Chain(s) failed" );
+                log.fmtError( "S-Chain(s) failed" );
         }
         log.debug( s );
     }

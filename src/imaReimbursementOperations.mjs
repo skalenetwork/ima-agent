@@ -24,8 +24,6 @@
  */
 
 import * as log from "./log.mjs";
-import * as cc from "./cc.mjs";
-
 import * as owaspUtils from "./owaspUtils.mjs";
 import * as imaTx from "./imaTx.mjs";
 import * as imaGasUsage from "./imaGasUsageOperations.mjs";
@@ -50,12 +48,12 @@ export async function reimbursementShowBalance(
         const xWei =
             await joCommunityPool.callStatic.getBalance(
                 addressFrom, strReimbursementChain, { from: addressFrom } );
-        s = strLogPrefix + cc.success( "Balance(wei): " ) + log.v( xWei );
+        s = strLogPrefix + log.fmtSuccess( "Balance(wei): ", log.v( xWei ) );
         if( isForcePrintOut )
             log.information( s );
         details.information( s );
         const xEth = owaspUtils.ethersMod.ethers.utils.formatEther( owaspUtils.toBN( xWei ) );
-        s = strLogPrefix + cc.success( "Balance(eth): " ) + log.v( xEth );
+        s = strLogPrefix + log.fmtSuccess( "Balance(eth): ", log.v( xEth ) );
         if( isForcePrintOut )
             log.information( s );
         details.information( s );
@@ -97,12 +95,12 @@ export async function reimbursementEstimateAmount(
         const xWei =
         await joCommunityPool.callStatic.getBalance(
             addressReceiver, strReimbursementChain, { from: addressReceiver } );
-        s = strLogPrefix + cc.success( "Balance(wei): " ) + log.v( xWei );
+        s = strLogPrefix + log.fmtSuccess( "Balance(wei): ", log.v( xWei ) );
         if( isForcePrintOut )
             log.information( s );
         details.information( s );
         const xEth = owaspUtils.ethersMod.ethers.utils.formatEther( owaspUtils.toBN( xWei ) );
-        s = strLogPrefix + cc.success( "Balance(eth): " ) + log.v( xEth );
+        s = strLogPrefix + log.fmtSuccess( "Balance(eth): ", log.v( xEth ) );
         if( isForcePrintOut )
             log.information( s );
         details.information( s );
@@ -110,22 +108,20 @@ export async function reimbursementEstimateAmount(
             owaspUtils.parseIntOrHex(
                 await joCommunityPool.callStatic.minTransactionGas(
                     { from: addressReceiver } ) );
-        s = strLogPrefix + cc.success( "MinTransactionGas: " ) +
-            log.v( minTransactionGas );
+        s = strLogPrefix + log.fmtSuccess( "MinTransactionGas: ", log.v( minTransactionGas ) );
         if( isForcePrintOut )
             log.information( s );
         details.information( s );
 
         const gasPrice = await transactionCustomizerMainNet.computeGasPrice(
             ethersProviderMainNet, 200000000000 );
-        s = strLogPrefix + cc.success( "Multiplied Gas Price: " ) + log.v( gasPrice );
+        s = strLogPrefix + log.fmtSuccess( "Multiplied Gas Price: ", log.v( gasPrice ) );
         if( isForcePrintOut )
             log.information( s );
         details.information( s );
 
         const minAmount = minTransactionGas * gasPrice;
-        s = strLogPrefix + cc.success( "Minimum recharge balance: " ) +
-            log.v( minAmount );
+        s = strLogPrefix + log.fmtSuccess( "Minimum recharge balance: ", log.v( minAmount ) );
         if( isForcePrintOut )
             log.information( s );
         details.information( s );
@@ -136,8 +132,8 @@ export async function reimbursementEstimateAmount(
         else
             amountToRecharge = minAmount - xWei;
 
-        s = strLogPrefix + cc.success( "Estimated amount to recharge(wei): " ) +
-            log.v( amountToRecharge );
+        s = strLogPrefix + log.fmtSuccess( "Estimated amount to recharge(wei): ",
+            log.v( amountToRecharge ) );
         if( isForcePrintOut )
             log.information( s );
         details.information( s );
@@ -145,8 +141,8 @@ export async function reimbursementEstimateAmount(
         const amountToRechargeEth =
             owaspUtils.ethersMod.ethers.utils.formatEther(
                 owaspUtils.toBN( amountToRecharge.toString() ) );
-        s = strLogPrefix + cc.success( "Estimated amount to recharge(eth): " ) +
-            log.v( amountToRechargeEth );
+        s = strLogPrefix + log.fmtSuccess( "Estimated amount to recharge(eth): ",
+            log.v( amountToRechargeEth ) );
         if( isForcePrintOut )
             log.information( s );
         details.information( s );

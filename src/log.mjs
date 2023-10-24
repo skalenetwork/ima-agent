@@ -610,7 +610,45 @@ export function getLogLinePrefixSuccess() {
     return "";
 }
 
-// high-level formatters
+// high-level format to returned string
+export function fmtFatal() {
+    return formatArgs( arguments, cc.error );
+}
+export function fmtCritical() {
+    return formatArgs( arguments, cc.error );
+}
+export function fmtError() {
+    return formatArgs( arguments, cc.error );
+}
+export function fmtWarning() {
+    return formatArgs( arguments, cc.warning );
+}
+export function fmtAttention() {
+    return formatArgs( arguments, cc.attention );
+}
+export function fmtInformation() {
+    return formatArgs( arguments, cc.info );
+}
+export function fmtInfo() {
+    return formatArgs( arguments, cc.info );
+}
+export function fmtNotice() {
+    return formatArgs( arguments, cc.notice );
+}
+export function fmtNote() {
+    return formatArgs( arguments, cc.note );
+}
+export function fmtDebug() {
+    return formatArgs( arguments, cc.debug );
+}
+export function fmtTrace() {
+    return formatArgs( arguments, cc.trace );
+}
+export function fmtSuccess() {
+    return formatArgs( arguments, cc.success );
+}
+
+// high-level formatted output
 export function fatal() {
     if( verboseGet() >= verboseReversed().fatal )
         write( getLogLinePrefixFatal() + formatArgs( arguments, cc.error ) + "\n" );
@@ -633,7 +671,7 @@ export function attention() {
 }
 export function information() {
     if( verboseGet() >= verboseReversed().information )
-        write( formatArgs( getLogLinePrefixInformation() + arguments, cc.info ) + "\n" );
+        write( getLogLinePrefixInformation() + formatArgs( arguments, cc.info ) + "\n" );
 }
 export function info() {
     if( verboseGet() >= verboseReversed().information )
@@ -812,4 +850,16 @@ export function em( x ) {
 
 export function s( x ) {
     return cc.stack( x );
+}
+
+export function onOff( x ) {
+    return cc.onOff( x );
+}
+
+export function yn( x ) {
+    return cc.yn( x );
+}
+
+export function posNeg( condition, strPositive, strNegative ) {
+    return condition ? cc.success( strPositive ) : cc.error( strNegative );
 }

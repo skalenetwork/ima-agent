@@ -24,22 +24,21 @@
  */
 
 import * as log from "./log.mjs";
-import * as cc from "./cc.mjs";
 import * as owaspUtils from "./owaspUtils.mjs";
 
 export function composeGasUsageReportFromArray( strName, jarrReceipts ) {
     if( ! ( strName && typeof strName == "string" && jarrReceipts ) )
         return "";
     let i, sumGasUsed = owaspUtils.toBN( "0" ),
-        s = "\n" + cc.info( "Gas usage report for " ) + log.v( strName ) + "\n";
+        s = "\n" + log.fmtInformation( "Gas usage report for " ) + log.v( strName ) + "\n";
     for( i = 0; i < jarrReceipts.length; ++ i ) {
         try {
             sumGasUsed = sumGasUsed.add( owaspUtils.toBN( jarrReceipts[i].receipt.gasUsed ) );
-            s += "    " + log.v( jarrReceipts[i].description ) + cc.debug( "....." ) +
+            s += "    " + log.v( jarrReceipts[i].description ) + log.fmtDebug( "....." ) +
                 log.v( jarrReceipts[i].receipt.gasUsed.toString() ) + "\n";
         } catch ( err ) { }
     }
-    s += "    " + cc.attention( "SUM" ) + cc.debug( "....." ) +
+    s += "    " + log.fmtAttention( "SUM" ) + log.fmtDebug( "....." ) +
         log.v( sumGasUsed.toString() );
     return { "sumGasUsed": sumGasUsed, "strReport": s };
 }

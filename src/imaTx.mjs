@@ -77,20 +77,19 @@ export async function dryRunCall(
         return null; // success
     isDryRunResultIgnore = ( isDryRunResultIgnore != null && isDryRunResultIgnore != undefined )
         ? ( !!isDryRunResultIgnore ) : false;
-    const strContractMethodDescription =
-        cc.debug( strContractName + "(" ) + log.v( joContract.address ) +
-        cc.debug( ")." ) + log.v( strMethodName );
+    const strContractMethodDescription = log.fmtDebug( strContractName, "(",
+        log.v( joContract.address ), ").", log.v( strMethodName ) );
     let strArgumentsDescription = "";
     if( arrArguments.length > 0 ) {
-        strArgumentsDescription += cc.debug( "( " );
+        strArgumentsDescription += log.fmtDebug( "( " );
         for( let i = 0; i < arrArguments.length; ++ i ) {
             if( i > 0 )
-                strArgumentsDescription += cc.debug( ", " );
+                strArgumentsDescription += log.fmtDebug( ", " );
             strArgumentsDescription += log.v( arrArguments[i] );
         }
-        strArgumentsDescription += cc.debug( " )" );
+        strArgumentsDescription += log.fmtDebug( " )" );
     } else
-        strArgumentsDescription += cc.debug( "()" );
+        strArgumentsDescription += log.fmtDebug( "()" );
     const strContractCallDescription = strContractMethodDescription + strArgumentsDescription;
     const strLogPrefix = strContractMethodDescription + " ";
     try {
@@ -330,20 +329,20 @@ export async function payedCall(
         callOpts: {
         }
     };
-    const strContractMethodDescription = log.v( optsPayedCall.strContractName ) +
-        cc.debug( "(" ) + log.v( optsPayedCall.joContract.address ) +
-        cc.debug( ")." ) + log.v( optsPayedCall.strMethodName );
+    const strContractMethodDescription = log.fmtDebug( log.v( optsPayedCall.strContractName ),
+        "(", log.v( optsPayedCall.joContract.address ),
+        ").", log.v( optsPayedCall.strMethodName ) );
     let strArgumentsDescription = "";
     if( optsPayedCall.arrArguments.length > 0 ) {
-        strArgumentsDescription += cc.debug( "( " );
+        strArgumentsDescription += log.fmtDebug( "( " );
         for( let i = 0; i < optsPayedCall.arrArguments.length; ++ i ) {
             if( i > 0 )
-                strArgumentsDescription += cc.debug( ", " );
+                strArgumentsDescription += log.fmtDebug( ", " );
             strArgumentsDescription += log.v( optsPayedCall.arrArguments[i] );
         }
-        strArgumentsDescription += cc.debug( " )" );
+        strArgumentsDescription += log.fmtDebug( " )" );
     } else
-        strArgumentsDescription += cc.debug( "()" );
+        strArgumentsDescription += log.fmtDebug( "()" );
     optsPayedCall.strContractCallDescription =
         strContractMethodDescription + strArgumentsDescription;
     optsPayedCall.strLogPrefix = strContractMethodDescription + " ";
@@ -402,10 +401,8 @@ export async function payedCall(
             gasSpent: gasSpent,
             ethSpent: ethSpent
         };
-        optsPayedCall.details.trace( optsPayedCall.strLogPrefix,
-            cc.debug( "gas spent: " ), log.v( gasSpent ) );
-        optsPayedCall.details.trace( optsPayedCall.strLogPrefix,
-            cc.debug( "ETH spent: " ), log.v( ethSpent ) );
+        optsPayedCall.details.trace( optsPayedCall.strLogPrefix, "gas spent: ", log.v( gasSpent ) );
+        optsPayedCall.details.trace( optsPayedCall.strLogPrefix, "ETH spent: ", log.v( ethSpent ) );
     } catch ( err ) {
         optsPayedCall.details.warning(
             optsPayedCall.strLogPrefix, "TX stats computation error ",
@@ -591,8 +588,8 @@ async function tmGetRecord( txId ) {
 }
 
 async function tmWait( details, txId, ethersProvider, nWaitSeconds = 36000 ) {
-    const strPrefixDetails = cc.debug( "(gathered details)" ) + " ";
-    const strPrefixLog = cc.debug( "(immediate log)" ) + " ";
+    const strPrefixDetails = log.fmtDebug( "(gathered details)" ) + " ";
+    const strPrefixLog = log.fmtDebug( "(immediate log)" ) + " ";
     details.debug( strPrefixDetails, "TM - will wait TX ", log.v( txId ),
         " to complete for ", nWaitSeconds, " second(s) maximum" );
     if( log.id != details.id ) {
@@ -658,8 +655,8 @@ async function tmEnsureTransaction(
     let txId = "";
     let joReceipt = null;
     let idxAttempt = 0;
-    const strPrefixDetails = cc.debug( "(gathered details)" ) + " ";
-    const strPrefixLog = cc.debug( "(immediate log)" ) + " ";
+    const strPrefixDetails = log.fmtDebug( "(gathered details)" ) + " ";
+    const strPrefixLog = log.fmtDebug( "(immediate log)" ) + " ";
     for( ; idxAttempt < cntAttempts; ++idxAttempt ) {
         txId = await tmSend( details, txAdjusted, priority );
         details.debug( strPrefixDetails, "TM - next TX ", log.v( txId ) );
@@ -738,19 +735,19 @@ export class TransactionCustomizer {
     ) {
         let estimatedGas = 0;
         const strContractMethodDescription =
-            log.v( strContractName ) + cc.debug( "(" ) + log.v( joContract.address ) +
-            cc.debug( ")." ) + log.v( strMethodName );
+            log.v( strContractName ) + log.fmtDebug( "(" ) + log.v( joContract.address ) +
+            log.fmtDebug( ")." ) + log.v( strMethodName );
         let strArgumentsDescription = "";
         if( arrArguments.length > 0 ) {
-            strArgumentsDescription += cc.debug( "( " );
+            strArgumentsDescription += log.fmtDebug( "( " );
             for( let i = 0; i < arrArguments.length; ++ i ) {
                 if( i > 0 )
-                    strArgumentsDescription += cc.debug( ", " );
+                    strArgumentsDescription += log.fmtDebug( ", " );
                 strArgumentsDescription += log.v( arrArguments[i] );
             }
-            strArgumentsDescription += cc.debug( " )" );
+            strArgumentsDescription += log.fmtDebug( " )" );
         } else
-            strArgumentsDescription += cc.debug( "()" );
+            strArgumentsDescription += log.fmtDebug( "()" );
         const strContractCallDescription =
             strContractMethodDescription + strArgumentsDescription;
         const strLogPrefix = strContractMethodDescription + " ";

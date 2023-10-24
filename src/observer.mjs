@@ -741,10 +741,10 @@ async function checkWhetherSChainIsConnected( strSChainName, joMessageProxySChai
     if( opts && opts.details ) {
         if( ! isQueryPassed ) {
             opts.details.warning( "Will assume S-Chain ", log.v( strSChainName ),
-                " connected status: ", cc.yn( isConnected ) );
+                " connected status: ", log.yn( isConnected ) );
         } else {
             opts.details.trace( "Got S-Chain ", log.v( strSChainName ),
-                " connected status: ", cc.yn( isConnected ) );
+                " connected status: ", log.yn( isConnected ) );
         }
     }
     return isConnected;
