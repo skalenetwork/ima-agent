@@ -610,7 +610,7 @@ export async function ensureHaveWorkers( opts ) {
                     log.em( owaspUtils.extractErrorMessage( joMessage.error ) ) );
                 break;
             case "log":
-                log.information( "LOOP WORKER ", notice( workerData.url ),
+                log.information( "LOOP WORKER ", log.fmtNotice( workerData.url ),
                     " ", joMessage.message );
                 break;
             case "saveTransferError":

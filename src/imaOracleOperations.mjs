@@ -24,7 +24,6 @@
  */
 
 import * as log from "./log.mjs";
-
 import * as owaspUtils from "./owaspUtils.mjs";
 import * as imaOracle from "./oracle.mjs";
 import * as imaTx from "./imaTx.mjs";

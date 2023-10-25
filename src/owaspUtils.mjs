@@ -28,9 +28,10 @@
 //     https://www.gitbook.com/download/pdf/book/checkmarx/JS-SCP
 // top 10 hit parade: https://owasp.org/www-project-top-ten/
 
+import * as cc from "./cc.mjs";
+import * as log from "./log.mjs";
 import * as ethersMod from "ethers";
 import * as fs from "fs";
-import * as cc from "./cc.mjs";
 import * as ethereumJsUtilModule from "ethereumjs-util";
 import * as ethereumJsWalletModule from "ethereumjs-wallet";
 const Wallet = ethereumJsWalletModule.default.default;

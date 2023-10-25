@@ -23,13 +23,11 @@
  * @copyright SKALE Labs 2019-Present
  */
 
+import * as log from "./log.mjs";
 import * as rpcCall from "./rpcCall.mjs";
 import numberToBN from "number-to-bn";
-
 import * as sha3Module from "sha3";
-
 const Keccak = sha3Module.Keccak;
-
 export const gConstMinPowResultLimit = 10000;
 export const gConstMaxPowResultLimit = 100000;
 

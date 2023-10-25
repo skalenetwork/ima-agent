@@ -819,7 +819,7 @@ async function checkCorrectnessOfMessagesToSign(
                     { from: strCallerAccountAddress }
                 );
                 details.trace( strLogPrefix, log.v( strDirection ),
-                    " Got verification call result ", log.val( isValidMessage ),
+                    " Got verification call result ", log.v( isValidMessage ),
                     ", real message index is: ", idxMessage, ", saved msgCounter is: ",
                     outgoingMessageData.msgCounter );
                 if( !isValidMessage ) {
@@ -1013,12 +1013,12 @@ async function gatherSigningStartImpl( optsSignOperation ) {
                     strError = "BLS glue failed, no glue result arrived";
                     optsSignOperation.details.error( optsSignOperation.strLogPrefixB,
                         "Problem(1) in BLS sign result handler: ", log.em( strError ) );
-                    if( log.id != details.id ) {
+                    if( log.id != optsSignOperation.details.id ) {
                         log.error( optsSignOperation.strLogPrefixB,
                             "Problem(1) in BLS sign result handler: ", log.em( strError ) );
                     }
                 }
-                optsSignOperation.trace.trace( "Will call signed-hash answer-sending callback ",
+                optsSignOperation.details.trace( "Will call signed-hash answer-sending callback ",
                     ( strError ? ( " with error " + log.v( strError ) ) : "" ),
                     ", optsSignOperation.jarrMessages is ", log.v( optsSignOperation.jarrMessages ),
                     ", glue result is ", log.v( joGlueResult ) );

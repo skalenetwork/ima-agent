@@ -23,6 +23,7 @@
  * @copyright SKALE Labs 2019-Present
  */
 
+import * as log from "./log.mjs";
 import * as owaspUtils from "./owaspUtils.mjs";
 import * as rpcCall from "./rpcCall.mjs";
 import * as imaHelperAPIs from "./imaHelperAPIs.mjs";

@@ -25,9 +25,7 @@
 
 import express from "express";
 import bodyParser from "body-parser";
-
 import * as ws from "ws";
-
 import * as owaspUtils from "./owaspUtils.mjs";
 import * as log from "./log.mjs";
 import * as cc from "./cc.mjs";
