@@ -1,12 +1,10 @@
 import * as fs from "fs";
-import * as cc from "./cc.mjs";
 import * as log from "./log.mjs";
 import * as owaspUtils from "./owaspUtils.mjs";
 import * as rpcCall from "./rpcCall.mjs";
 
 const gIsDebugLogging = false; // development option only, must be always false
-const isColors = owaspUtils.toBoolean( process.argv[2] );
-cc.enable( true );
+//const isColors = owaspUtils.toBoolean( process.argv[2] );
 log.addStdout();
 
 // allow self-signed wss and https
@@ -15,7 +13,6 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
 function finalizeOutput( jo ) {
     if( ! jo )
         return;
-    cc.enable( false );
     process.stdout.write( log.v( jo ) );
 }
 
@@ -33,8 +30,6 @@ async function run() {
     try {
         if( gIsDebugLogging )
             log.debug( "Process startup arguments array is ", log.v( process.argv ) );
-        if( gIsDebugLogging )
-            log.debug( "Colorized mode is ", cc.yn( isColors ) );
 
         const strSgxWalletURL = process.argv[3];
         if( gIsDebugLogging )

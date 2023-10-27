@@ -31,7 +31,6 @@ import Redis from "ioredis";
 import * as ethereumJsUtilModule from "ethereumjs-util";
 
 import * as log from "./log.mjs";
-import * as cc from "./cc.mjs";
 
 import * as owaspUtils from "./owaspUtils.mjs";
 import * as imaUtils from "./utils.mjs";
@@ -225,7 +224,7 @@ async function payedCallSGX( optsPayedCall ) {
     optsPayedCall.details.trace( optsPayedCall.strLogPrefix,
         "Chain ID is: ", log.v( chainId ) );
     const strCmd = "" + process.argv[0] + " --no-warnings ./imaSgxExternalSigner.mjs " +
-        ( cc.isEnabled() ? "true" : "false" ) + " " +
+        ( log.isEnabledColorization() ? "true" : "false" ) + " " +
         "\"" + optsPayedCall.joAccount.strSgxURL + "\" " +
         "\"" + optsPayedCall.joAccount.strSgxKeyName + "\" " +
         "\"" + owaspUtils.ethersProviderToUrl( optsPayedCall.ethersProvider ) + "\" " +

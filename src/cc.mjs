@@ -23,7 +23,7 @@
  * @copyright SKALE Labs 2019-Present
  */
 
-let gFlagIsEnabled = true;
+let gFlagIsEnabled = false;
 
 export function autoEnableFromCommandLineArgs() {
     const b =
@@ -34,6 +34,12 @@ export function autoEnableFromCommandLineArgs() {
 
 export function enable( b ) {
     gFlagIsEnabled = !!b;
+}
+
+export function isStringAlreadyColorized( s ) {
+    if( s && typeof s == "string" && s[0] != "\x1b" )
+        return true;
+    return false;
 }
 
 export function isEnabled() {
@@ -659,6 +665,11 @@ export function trace( s ) {
 }
 
 export function debug( s ) {
+    if( !gFlagIsEnabled )
+        return s;
+    return "" + fgWhite + s + reset;
+}
+export function debugDark( s ) {
     if( !gFlagIsEnabled )
         return s;
     return "" + fgBlack + enlight + s + reset;

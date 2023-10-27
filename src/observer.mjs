@@ -28,7 +28,6 @@ import * as url from "url";
 import * as networkLayer from "./socket.mjs";
 import * as threadInfo from "./threadInfo.mjs";
 import * as owaspUtils from "./owaspUtils.mjs";
-import * as cc from "./cc.mjs";
 import * as log from "./log.mjs";
 import * as rpcCall from "./rpcCall.mjs";
 
@@ -1178,8 +1177,8 @@ export async function ensureHaveWorker( opts ) {
                     }
                 }
             },
-            "cc": {
-                "isEnabled": cc.isEnabled()
+            "colorization": {
+                "isEnabled": log.isEnabledColorization()
             }
         }
     };
@@ -1340,6 +1339,19 @@ export function pickRandomSChainUrl( joSChain ) {
     const joNode = pickRandomSChainNode( joSChain );
     // eslint-disable-next-line dot-notation
     return "" + joNode["http_endpoint_ip"];
+}
+
+export function pickRandomSChainIndexAndNodeAndUrl( joSChain ) {
+    const idxNode = pickRandomSChainNodeIndex( joSChain );
+    const joNode = joSChain.data.computed.nodes[idxNode];
+    // eslint-disable-next-line dot-notation
+    const strURL = "" + joNode["http_endpoint_ip"];
+    const joPickResult = {
+        "strURL": strURL,
+        "joNode": joNode,
+        "idxNode": idxNode
+    };
+    return joPickResult;
 }
 
 export async function discoverChainId( strURL ) {

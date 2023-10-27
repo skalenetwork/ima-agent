@@ -28,7 +28,6 @@
 //     https://www.gitbook.com/download/pdf/book/checkmarx/JS-SCP
 // top 10 hit parade: https://owasp.org/www-project-top-ten/
 
-import * as cc from "./cc.mjs";
 import * as log from "./log.mjs";
 import * as ethersMod from "ethers";
 import * as fs from "fs";
@@ -36,8 +35,8 @@ import * as ethereumJsUtilModule from "ethereumjs-util";
 import * as ethereumJsWalletModule from "ethereumjs-wallet";
 const Wallet = ethereumJsWalletModule.default.default;
 
-const safeURL = cc.safeURL;
-const replaceAll = cc.replaceAll;
+const safeURL = log.safeURL;
+const replaceAll = log.replaceAll;
 
 export { ethersMod, safeURL, replaceAll };
 
@@ -805,4 +804,8 @@ export function clearInterval2( iv ) {
         return;
     clearInterval( iv.real_iv );
     iv.real_iv = null;
+}
+
+export function escapeShell( cmd ) {
+    return "\"" + cmd.replace( /(["'$`\\])/g,"\\$1" ) + "\"";
 }

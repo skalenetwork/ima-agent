@@ -29,6 +29,12 @@ import * as rpcCall from "./rpcCall.mjs";
 import * as imaHelperAPIs from "./imaHelperAPIs.mjs";
 import * as imaTransferErrorHandling from "./imaTransferErrorHandling.mjs";
 
+import * as childProcessModule from "child_process";
+import * as path from "path";
+import * as url from "url";
+
+const __dirname = path.dirname( url.fileURLToPath( import.meta.url ) );
+
 export function createProgressiveEventsScanPlan( details, nLatestBlockNumber ) {
     // assume Main Net mines 6 blocks per minute
     const blocksInOneMinute = 6;
@@ -82,6 +88,72 @@ export function createProgressiveEventsScanPlan( details, nLatestBlockNumber ) {
             { "nBlockFrom": 0, "nBlockTo": "latest", "type": "entire block range" } );
     }
     return arrProgressiveEventsScanPlan;
+}
+
+export function extractEventArg( arg ) {
+    if( arg && typeof arg == "object" && "type" in arg && typeof arg.type == "string" &&
+        arg.type == "BigNumber" && "hex" in arg && typeof arg.hex == "string" )
+        return owaspUtils.toBN( arg.hex );
+    return arg;
+}
+
+function generateWhileTransferringLogMessageSuffix( optsChainPair ) {
+    if( ! optsChainPair )
+        return "";
+    if( ! optsChainPair.strDirection )
+        return "";
+    if( optsChainPair.strDirection == "S2S" ) {
+        return log.fmtDebug( " (while performing ", log.fmtAttention( optsChainPair.strDirection ),
+            " transfer with external S-Chain ",
+            log.fmtInformation( optsChainPair.optsSpecificS2S.joSChain.data.name ), " / ",
+            log.fmtNotice( optsChainPair.optsSpecificS2S.joSChain.data.computed.chainId ),
+            " node ", optsChainPair.optsSpecificS2S.idxNode, ")" );
+    }
+    return log.fmtDebug( " (while performing ", log.fmtAttention( optsChainPair.strDirection ),
+        " transfer)" );
+}
+
+export async function safeGetPastEventsProgressiveExternal(
+    details, strLogPrefix, ethersProvider, attempts,
+    joContract, joABI, strEventName,
+    nBlockFrom, nBlockTo, joFilter, optsChainPair
+) {
+    if( joABI && typeof joABI == "object" ) {
+        const joArg = {
+            "url": owaspUtils.ethersProviderToUrl( ethersProvider ),
+            "attempts": attempts,
+            "strEventName": strEventName,
+            "nBlockFrom": nBlockFrom,
+            "nBlockTo": nBlockTo,
+            "joFilter": joFilter,
+            "address": joContract.address,
+            "abi": joABI
+        };
+        const cmd = "node " + path.join( __dirname, "imaExternalLogScan.mjs" ) + " " +
+            owaspUtils.escapeShell( JSON.stringify( joArg ) );
+        details.information( strLogPrefix,
+            "Will run external command to search logs for event ",
+            log.v( strEventName ), " via URL ", log.u( joArg.url ),
+            generateWhileTransferringLogMessageSuffix( optsChainPair ), "..." );
+        const res = childProcessModule.execSync( cmd );
+        if( "error" in res && res.error ) {
+            details.error( strLogPrefix,
+                "Got error from external command to search logs for event ",
+                log.v( strEventName ), " via URL ", log.u( joArg.url ),
+                generateWhileTransferringLogMessageSuffix( optsChainPair ),
+                ":", owaspUtils.extractErrorMessage( err ) );
+            throw new Error( res.error );
+        }
+        details.information( strLogPrefix,
+            "Done running external command to search logs for event ",
+            log.v( strEventName ), " via URL ", log.u( joArg.url ),
+            generateWhileTransferringLogMessageSuffix( optsChainPair ), "." );
+        return JSON.parse( res ).result;
+    }
+    return await safeGetPastEventsProgressive(
+        details, strLogPrefix, ethersProvider, attempts,
+        joContract, strEventName,
+        nBlockFrom, nBlockTo, joFilter );
 }
 
 export async function safeGetPastEventsProgressive(

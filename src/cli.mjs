@@ -26,7 +26,6 @@
 import * as path from "path";
 import * as url from "url";
 import * as os from "os";
-import * as cc from "./cc.mjs";
 import * as log from "./log.mjs";
 import * as owaspUtils from "./owaspUtils.mjs";
 import * as imaUtils from "./utils.mjs";
@@ -50,7 +49,7 @@ export function printAbout( isLog ) {
     const strMsg =
         log.fmtTrace( att( gStrAppName ), " version ", log.fmtNotice( gStrVersion ) );
     if( isLog )
-        log.write( strMsg + "\n" );
+        log.information( strMsg + "\n" );
     else
         console.log( strMsg );
     return true;
@@ -115,7 +114,7 @@ export function ensureHaveCredentials(
     strFriendlyChainName = strFriendlyChainName || "<UNKNOWN>";
     if( ! ( typeof joAccount == "object" ) ) {
         log.error( "ARGUMENTS VALIDATION WARNING: bad account specified for ",
-            log.v( strFriendlyChainName ), " chain" );
+            strFriendlyChainName, " chain" );
         if( isExitIfEmpty )
             process.exit( 126 );
     }
@@ -190,7 +189,7 @@ export function ensureHaveCredentials(
     }
     if( cntAccountVariantsSpecified == 0 ) {
         log.error( "ARGUMENTS VALIDATION WARNING: bad credentials information specified for ",
-            log.v( strFriendlyChainName ), " chain, no explicit SGX, no explicit private key, ",
+            strFriendlyChainName, " chain, no explicit SGX, no explicit private key, ",
             "no wallet address found" );
         if( isExitIfEmpty )
             process.exit( 126 );
@@ -999,11 +998,11 @@ function parseVersion( imaState, joArg ) { // exits process on "--version"
 
 function parseBasicArgs( imaState, joArg ) {
     if( joArg.name == "colors" ) {
-        cc.enable( true );
+        log.enableColorization( true );
         return true;
     }
     if( joArg.name == "no-colors" ) {
-        cc.enable( false );
+        log.enableColorization( false );
         return true;
     }
     if( joArg.name == "expose" ) {

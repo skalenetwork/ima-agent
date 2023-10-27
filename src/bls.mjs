@@ -99,19 +99,19 @@ function checkBlsThresholdAndBlsParticipants(
     nThreshold, nParticipants, strOperation, details ) {
     details = details || log;
     if( nThreshold <= 0 ) {
-        details.fatal( "Operation ", log.v( strOperation ),
+        details.fatal( "Operation ", strOperation,
             " will fail because discovered BLS threshold ", nThreshold,
             " is invalid number or bad value" );
         return false;
     }
     if( nParticipants <= 0 ) {
-        details.fatal( "Operation ", log.v( strOperation ),
+        details.fatal( "Operation ", strOperation,
             " will fail because discovered BLS number of participants ", nParticipants,
             " is invalid number or bad value" );
         return false;
     }
     if( nThreshold > nParticipants ) {
-        details.fatal( "Operation ", log.v( strOperation ),
+        details.fatal( "Operation ", strOperation,
             " will fail because discovered BLS threshold ", nThreshold,
             " is greater than BLS number of participants ", nParticipants );
         return false;

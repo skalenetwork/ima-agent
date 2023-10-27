@@ -188,6 +188,7 @@ const joMessageProxyDst = {
     },
     options: { "address": "0xd34e38f830736DB41CC6E10aA37A3C851A7a2B82" }
 };
+\const joMessageProxyDstABI = null;
 function getIncomingMessagesCounter( string ) {
     return { "call": callNum };
 }
@@ -200,6 +201,7 @@ const joMessageProxySrc = {
     "methods": { getOutgoingMessagesCounter: getOutgoingMessagesCounter },
     getPastEvents: getPastEvents
 };
+const joMessageProxySrcABI = null;
 function getOutgoingMessagesCounter( string ) {
     return { "call": callNum };
 }
@@ -508,9 +510,11 @@ describe( "tests for `IMA Core` 3", function() {
             joRuntimeOpts,
             ethersProviderSrc,
             joMessageProxySrc,
+            joMessageProxySrcABI,
             joAccountSrc,
             ethersProviderDst,
             joMessageProxyDst,
+            joMessageProxyDstABI,
             joAccountDst,
             chainNameSrc,
             chainNameDst,
@@ -548,9 +552,11 @@ describe( "tests for `IMA Core` 3", function() {
             joRuntimeOpts,
             ethersProviderSrc,
             joMessageProxySrc,
+            joMessageProxySrcABI,
             joAccountSrc,
             ethersProviderDst,
             joMessageProxyDst,
+            joMessageProxyDstABI,
             joAccountDst,
             chainNameSrc,
             chainNameDst,

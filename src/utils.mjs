@@ -23,7 +23,6 @@
  * @copyright SKALE Labs 2019-Present
  */
 
-import * as cc from "./cc.mjs";
 import * as log from "./log.mjs";
 import * as owaspUtils from "./owaspUtils.mjs";
 import * as fs from "fs";
@@ -150,7 +149,7 @@ export async function waitForClonedTokenToAppear(
     const strTokenSuffixUC =
         owaspUtils.replaceAll( strTokenSuffix.toUpperCase(), "_WITH_METADATA", "_with_metadata" );
     const strTokenSuffixLCshort = owaspUtils.replaceAll( strTokenSuffixLC, "_with_metadata", "" );
-    const ts0 = cc.timestampHR();
+    const ts0 = log.timestampHR();
     let ts1;
     log.information( "Waiting for ", log.v( strTokenSuffixUC ),
         " token to appear automatically deployed on S-Chain ",
@@ -171,21 +170,21 @@ export async function waitForClonedTokenToAppear(
             await imaHelperAPIs.sleep( gMillisecondsToSleepStepWaitForClonedTokenToAppear );
         const addressOnSChain =
             await contractTokenManager.callStatic[
-                "clones" + cc.capitalizeFirstLetter( strTokenSuffixLCshort )](
+                "clones" + log.capitalizeFirstLetter( strTokenSuffixLCshort )](
                 sc.ethersMod.ethers.utils.id( strMainnetName ),
                 tokensMN.joABI[strTokenSuffixUC + "_address"],
                 { from: addressCallFrom }
             );
         if( addressOnSChain != "0x0000000000000000000000000000000000000000" ) {
-            ts1 = cc.timestampHR();
-            log.success( "Done, duration is ", log.v( cc.getDurationString( ts0, ts1 ) ) );
+            ts1 = log.timestampHR();
+            log.success( "Done, duration is ", log.v( log.getDurationString( ts0, ts1 ) ) );
             log.success( "Discovered ", log.v( strTokenSuffixUC ),
                 " instantiated on S-Chain ", log.v( sc.chainName ),
                 " at address ", log.v( addressOnSChain ) );
             return addressOnSChain;
         }
     }
-    ts1 = cc.timestampHR();
+    ts1 = log.timestampHR();
     log.error( "Failed to discover ", log.v( strTokenSuffixUC ),
         " instantiated on S-Chain ", log.v( sc.chainName ) );
     throw new Error( "Failed to discover \"" + strTokenSuffixUC +

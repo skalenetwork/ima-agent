@@ -28,7 +28,6 @@ import bodyParser from "body-parser";
 import * as ws from "ws";
 import * as owaspUtils from "./owaspUtils.mjs";
 import * as log from "./log.mjs";
-import * as cc from "./cc.mjs";
 import * as imaCLI from "./cli.mjs";
 import * as loop from "./loop.mjs";
 import * as imaHelperAPIs from "./imaHelperAPIs.mjs";
@@ -46,7 +45,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
 
 function parseCommandLine() {
     const imaState = state.get();
-    cc.autoEnableFromCommandLineArgs();
+    log.autoEnableColorizationFromCommandLineArgs();
     const strPrintedArguments = process.argv.join( " " );
     imaCLI.parse( {
         "register": clpTools.commandLineTaskRegister,
@@ -403,7 +402,7 @@ async function doTheJob() {
 }
 
 async function main() {
-    cc.autoEnableFromCommandLineArgs();
+    log.autoEnableColorizationFromCommandLineArgs();
     const imaState = state.get();
     const strTmpAddressFromEnvMainNet =
         owaspUtils.toEthPrivateKey( process.env.ACCOUNT_FOR_ETHEREUM );
