@@ -42,13 +42,13 @@ const perMessageGasForTransfer = 1000000;
 const additionalS2MTransferOverhead = 200000;
 
 async function findOutReferenceLogRecord(
-    details, strLogPrefix, ethersProvider, joMessageProxy, joABI,
+    details, strLogPrefix, ethersProvider, joMessageProxy,
     bnBlockId, nMessageNumberToFind, isVerbose, optsChainPair
 ) {
     const bnMessageNumberToFind = owaspUtils.toBN( nMessageNumberToFind.toString() );
     const strEventName = "PreviousMessageReference";
-    const arrLogRecords = await imaEventLogScan.safeGetPastEventsProgressiveExternal(
-        details, strLogPrefix, ethersProvider, 10, joMessageProxy, joABI, strEventName,
+    const arrLogRecords = await imaEventLogScan.safeGetPastEventsProgressive(
+        details, strLogPrefix, ethersProvider, 10, joMessageProxy, strEventName,
         bnBlockId, bnBlockId, joMessageProxy.filters[strEventName](), optsChainPair );
     const cntLogRecord = arrLogRecords.length;
     if( isVerbose ) {
@@ -85,7 +85,7 @@ async function findOutReferenceLogRecord(
 }
 
 async function findOutAllReferenceLogRecords(
-    details, strLogPrefix, ethersProvider, joMessageProxy, joABI,
+    details, strLogPrefix, ethersProvider, joMessageProxy,
     bnBlockId, nIncMsgCnt, nOutMsgCnt, isVerbose, optsChainPair
 ) {
     if( isVerbose ) {
@@ -107,10 +107,9 @@ async function findOutAllReferenceLogRecords(
     let nWalkMsgNumber = nOutMsgCnt - 1;
     let nWalkBlockId = bnBlockId;
     for( ; nWalkMsgNumber >= nIncMsgCnt; -- nWalkMsgNumber ) {
-        const joReferenceLogRecord =
-            await findOutReferenceLogRecord(
-                details, strLogPrefix, ethersProvider, joMessageProxy, joABI,
-                nWalkBlockId, nWalkMsgNumber, isVerbose, optsChainPair );
+        const joReferenceLogRecord = await findOutReferenceLogRecord( details, strLogPrefix,
+            ethersProvider, joMessageProxy, nWalkBlockId, nWalkMsgNumber, isVerbose,
+            optsChainPair );
         if( joReferenceLogRecord == null )
             break;
         nWalkBlockId = owaspUtils.toBN( joReferenceLogRecord.previousOutgoingMessageBlockId );
@@ -234,9 +233,8 @@ async function doQueryOutgoingMessageCounter( optsTransfer ) {
             optsTransfer.arrLogRecordReferences =
                 await findOutAllReferenceLogRecords( optsTransfer.details,
                     optsTransfer.strLogPrefixShort, optsTransfer.ethersProviderSrc,
-                    optsTransfer.joMessageProxySrc, optsTransfer.joMessageProxySrcABI,
-                    bnBlockId, optsTransfer.nIncMsgCnt, optsTransfer.nOutMsgCnt, true,
-                    optsTransfer.optsChainPair );
+                    optsTransfer.joMessageProxySrc, bnBlockId, optsTransfer.nIncMsgCnt,
+                    optsTransfer.nOutMsgCnt, true, optsTransfer.optsChainPair );
             return true; // success, finish at this point
         } catch ( err ) {
             optsTransfer.arrLogRecordReferences = [];
@@ -267,10 +265,10 @@ async function doQueryOutgoingMessageCounter( optsTransfer ) {
             owaspUtils.ethersMod.ethers.utils.id( optsTransfer.chainNameDst ), // dstChainHash
             owaspUtils.toBN( nWalkMsgNumber ) );
         const arrLogRecordReferencesWalk =
-            await imaEventLogScan.safeGetPastEventsProgressiveExternal( optsTransfer.details,
+            await imaEventLogScan.safeGetPastEventsProgressive( optsTransfer.details,
                 optsTransfer.strLogPrefixShort, optsTransfer.ethersProviderSrc, attempts,
-                optsTransfer.joMessageProxySrc, optsTransfer.joMessageProxySrcABI,
-                strEventName, nBlockFrom, nBlockTo, joFilter, optsTransfer.optsChainPair );
+                optsTransfer.joMessageProxySrc, strEventName, nBlockFrom, nBlockTo, joFilter,
+                optsTransfer.optsChainPair );
         optsTransfer.arrLogRecordReferences =
             optsTransfer.arrLogRecordReferences.concat( arrLogRecordReferencesWalk );
     }
@@ -353,10 +351,9 @@ async function gatherMessages( optsTransfer ) {
         optsTransfer.details.debug( optsTransfer.strLogPrefix, "Will call ",
             log.v( optsTransfer.strActionName ), " for ",
             log.v( strEventName ), " event..." );
-        r = await imaEventLogScan.safeGetPastEventsProgressiveExternal(
-            optsTransfer.details, optsTransfer.strLogPrefixShort, optsTransfer.ethersProviderSrc,
-            10, optsTransfer.joMessageProxySrc, optsTransfer.joMessageProxySrcABI,
-            strEventName, nBlockFrom, nBlockTo,
+        r = await imaEventLogScan.safeGetPastEventsProgressive( optsTransfer.details,
+            optsTransfer.strLogPrefixShort, optsTransfer.ethersProviderSrc, 10,
+            optsTransfer.joMessageProxySrc, strEventName, nBlockFrom, nBlockTo,
             optsTransfer.joMessageProxySrc.filters[strEventName](
                 owaspUtils.ethersMod.ethers.utils.id( optsTransfer.chainNameDst ), // dstChainHash
                 owaspUtils.toBN( optsTransfer.nIdxCurrentMsg )
@@ -774,11 +771,10 @@ async function checkOutgoingMessageEvent( optsTransfer, joSChain ) {
                             sc.joAbiIMA.message_proxy_chain_address,
                             sc.joAbiIMA.message_proxy_chain_abi,
                             ethersProviderNode );
-                    const joMessageProxyNodeABI = sc.joAbiIMA.message_proxy_chain_abi;
                     const strEventName = "OutgoingMessage";
-                    const node_r = await imaEventLogScan.safeGetPastEventsProgressiveExternal(
+                    const node_r = await imaEventLogScan.safeGetPastEventsProgressive(
                         optsTransfer.details, optsTransfer.strLogPrefixShort, ethersProviderNode,
-                        10, joMessageProxyNode, joMessageProxyNodeABI, strEventName,
+                        10, joMessageProxyNode, strEventName,
                         joMessage.savedBlockNumberForOptimizations,
                         joMessage.savedBlockNumberForOptimizations,
                         joMessageProxyNode.filters[strEventName](

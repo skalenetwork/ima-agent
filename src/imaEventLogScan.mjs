@@ -29,12 +29,6 @@ import * as rpcCall from "./rpcCall.mjs";
 import * as imaHelperAPIs from "./imaHelperAPIs.mjs";
 import * as imaTransferErrorHandling from "./imaTransferErrorHandling.mjs";
 
-import * as childProcessModule from "child_process";
-import * as path from "path";
-import * as url from "url";
-
-const __dirname = path.dirname( url.fileURLToPath( import.meta.url ) );
-
 export function createProgressiveEventsScanPlan( details, nLatestBlockNumber ) {
     // assume Main Net mines 6 blocks per minute
     const blocksInOneMinute = 6;
@@ -113,54 +107,16 @@ function generateWhileTransferringLogMessageSuffix( optsChainPair ) {
         " transfer)" );
 }
 
-export async function safeGetPastEventsProgressiveExternal(
-    details, strLogPrefix, ethersProvider, attempts,
-    joContract, joABI, strEventName,
-    nBlockFrom, nBlockTo, joFilter, optsChainPair
-) {
-    if( joABI && typeof joABI == "object" ) {
-        const joArg = {
-            "url": owaspUtils.ethersProviderToUrl( ethersProvider ),
-            "attempts": attempts,
-            "strEventName": strEventName,
-            "nBlockFrom": nBlockFrom,
-            "nBlockTo": nBlockTo,
-            "joFilter": joFilter,
-            "address": joContract.address,
-            "abi": joABI
-        };
-        const cmd = "node " + path.join( __dirname, "imaExternalLogScan.mjs" ) + " " +
-            owaspUtils.escapeShell( JSON.stringify( joArg ) );
-        details.information( strLogPrefix,
-            "Will run external command to search logs for event ",
-            log.v( strEventName ), " via URL ", log.u( joArg.url ),
-            generateWhileTransferringLogMessageSuffix( optsChainPair ), "..." );
-        const res = childProcessModule.execSync( cmd );
-        if( "error" in res && res.error ) {
-            details.error( strLogPrefix,
-                "Got error from external command to search logs for event ",
-                log.v( strEventName ), " via URL ", log.u( joArg.url ),
-                generateWhileTransferringLogMessageSuffix( optsChainPair ),
-                ":", owaspUtils.extractErrorMessage( err ) );
-            throw new Error( res.error );
-        }
-        details.information( strLogPrefix,
-            "Done running external command to search logs for event ",
-            log.v( strEventName ), " via URL ", log.u( joArg.url ),
-            generateWhileTransferringLogMessageSuffix( optsChainPair ), "." );
-        return JSON.parse( res ).result;
-    }
-    return await safeGetPastEventsProgressive(
-        details, strLogPrefix, ethersProvider, attempts,
-        joContract, strEventName,
-        nBlockFrom, nBlockTo, joFilter );
-}
-
 export async function safeGetPastEventsProgressive(
     details, strLogPrefix,
     ethersProvider, attempts, joContract, strEventName,
-    nBlockFrom, nBlockTo, joFilter
+    nBlockFrom, nBlockTo, joFilter, optsChainPair
 ) {
+    const strURL = owaspUtils.ethersProviderToUrl( ethersProvider );
+    details.information( strLogPrefix,
+        "Will run progressive logs search for event ",
+        log.v( strEventName ), " via URL ", log.u( strURL ),
+        generateWhileTransferringLogMessageSuffix( optsChainPair ), "..." );
     if( ! imaTransferErrorHandling.getEnabledProgressiveEventsScan() ) {
         details.warning( strLogPrefix, "IMPORTANT NOTICE: Will skip progressive events scan " +
             "in block range from ", log.v( nBlockFrom ), " to ", log.v( nBlockTo ),
@@ -178,7 +134,7 @@ export async function safeGetPastEventsProgressive(
     if( nBlockTo == "latest" ) {
         isLastLatest = true;
         nBlockTo = nLatestBlockNumberPlus1;
-        details.trace( strLogPrefix, "Iterative scan up to latest block #",
+        details.trace( strLogPrefix, "Progressive event log records scan up to latest block #",
             log.v( nBlockTo.toHexString() ), " assumed instead of ", log.v( "latest" ) );
     } else {
         nBlockTo = owaspUtils.toBN( nBlockTo );
@@ -189,53 +145,52 @@ export async function safeGetPastEventsProgressive(
     const nBlockZero = owaspUtils.toBN( 0 );
     const isFirstZero = ( nBlockFrom.eq( nBlockZero ) ) ? true : false;
     if( ! ( isFirstZero && isLastLatest ) ) {
-        details.trace( strLogPrefix, "Will skip ", log.v( "progressive" ),
-            " scan and use scan in block range from ", log.v( nBlockFrom.toHexString() ),
-            " to ", log.v( nBlockTo.toHexString() ) );
+        details.trace( strLogPrefix,
+            "Will skip progressive event log records scan and use scan in block range from ",
+            log.v( nBlockFrom.toHexString() ), " to ", log.v( nBlockTo.toHexString() ) );
         return await safeGetPastEvents(
             details, strLogPrefix,
             ethersProvider, attempts, joContract, strEventName,
             nBlockFrom, nBlockTo, joFilter
         );
     }
-    details.trace( strLogPrefix, "Will run ", log.v( "progressive" ), " scan..." );
     details.trace( strLogPrefix, "Current latest block number is ",
         log.v( nLatestBlockNumber.toHexString() ) );
     const arrProgressiveEventsScanPlan =
         createProgressiveEventsScanPlan( details, nLatestBlockNumberPlus1 );
-    details.trace( "Composed ", log.v( "progressive" ),
-        " scan plan is: ", log.v( arrProgressiveEventsScanPlan ) );
+    details.trace( "Composed progressive event log records scan plan is: ",
+        log.v( arrProgressiveEventsScanPlan ) );
     let joLastPlan = { "nBlockFrom": 0, "nBlockTo": "latest", "type": "entire block range" };
     for( let idxPlan = 0; idxPlan < arrProgressiveEventsScanPlan.length; ++idxPlan ) {
         const joPlan = arrProgressiveEventsScanPlan[idxPlan];
         if( joPlan.nBlockFrom < 0 )
             continue;
         joLastPlan = joPlan;
-        details.trace( strLogPrefix, "Progressive scan of ", log.v( "getPastEvents" ),
-            "/", log.v( strEventName ), ", from block ", log.v( joPlan.nBlockFrom ),
+        details.trace( strLogPrefix, "Progressive event log records scan of ",
+            log.v( strEventName ), " event, from block ", log.v( joPlan.nBlockFrom ),
             ", to block ", log.v( joPlan.nBlockTo ), ", block range is ", log.v( joPlan.type ),
-            "..." );
+            " via URL ", log.u( strURL ),
+            generateWhileTransferringLogMessageSuffix( optsChainPair ), "..." );
         try {
-            const joAllEventsInBlock =
-                await safeGetPastEventsIterative(
-                    details, strLogPrefix,
-                    ethersProvider, attempts, joContract, strEventName,
-                    joPlan.nBlockFrom, joPlan.nBlockTo, joFilter
-                );
+            const joAllEventsInBlock = await safeGetPastEventsIterative( details, strLogPrefix,
+                ethersProvider, attempts, joContract, strEventName,
+                joPlan.nBlockFrom, joPlan.nBlockTo, joFilter );
             if( joAllEventsInBlock && joAllEventsInBlock.length > 0 ) {
-                details.success( strLogPrefix, "Progressive scan of ",
-                    log.v( "getPastEvents" ), "/", log.v( strEventName ),
-                    ", from block ", log.v( joPlan.nBlockFrom ), ", to block ",
-                    log.v( joPlan.nBlockTo ), ", block range is ", log.v( joPlan.type ),
+                details.success( strLogPrefix, "Progressive event log records scan of log event ",
+                    log.v( strEventName ), ", from block ", log.v( joPlan.nBlockFrom ),
+                    ", to block ", log.v( joPlan.nBlockTo ), ", block range is ",
+                    log.v( joPlan.type ), ", via URL ", log.u( strURL ),
+                    generateWhileTransferringLogMessageSuffix( optsChainPair ),
                     ", found ", log.v( joAllEventsInBlock.length ), " event(s)" );
                 return joAllEventsInBlock;
             }
         } catch ( err ) {}
     }
-    details.error( strLogPrefix, "Could not get Event \"", log.v( strEventName ),
-        "\", from block ", log.v( joLastPlan.nBlockFrom ), ", to block ",
+    details.error( strLogPrefix, "Was not found(progressive) event log record for event ",
+        log.v( strEventName ), ", from block ", log.v( joLastPlan.nBlockFrom ), ", to block ",
         log.v( joLastPlan.nBlockTo ), ", block range is ", log.v( joLastPlan.type ),
-        ", using ", log.v( "progressive" ), " event scan" );
+        ", via URL ", log.u( strURL ), generateWhileTransferringLogMessageSuffix( optsChainPair ),
+        ", using progressive event log records scan" );
     return [];
 }
 
