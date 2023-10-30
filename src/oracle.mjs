@@ -214,10 +214,10 @@ export function oracleGetGasPrice( oracleOpts, details ) {
                                     return;
                                 } );
                             } catch ( err ) {
-                                details.critical( "RPC call ", log.v( "oracle_checkResult" ),
-                                    " exception is: ",
+                                details.critical( "RPC call {} exception is: {}, stack is: {}{}",
+                                    "oracle_checkResult",
                                     log.em( owaspUtils.extractErrorMessage( err ) ),
-                                    ", stack is: ", "\n", log.s( err.stack ) );
+                                    "\n", log.s( err.stack ) );
                                 reject( err );
                                 await joCall.disconnect();
                                 return;
@@ -231,9 +231,9 @@ export function oracleGetGasPrice( oracleOpts, details ) {
                         return;
                     } );
                 } catch ( err ) {
-                    details.critical( "RPC call", log.v( "oracle_submitRequest" ),
-                        " exception is: ", log.em( owaspUtils.extractErrorMessage( err ) ) +
-                        ", stack is: ", "\n", log.s( err.stack ) );
+                    details.critical( "RPC call{} exception is: {}, stack is: {}{}",
+                        "oracle_submitRequest", log.em( owaspUtils.extractErrorMessage( err ) ),
+                        "\n", log.s( err.stack ) );
                     reject( err );
                 }
                 await joCall.disconnect();

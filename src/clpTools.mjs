@@ -101,8 +101,8 @@ export async function registerStep1( isPrintSummaryRegistrationCosts ) {
         clpTools.printSummaryRegistrationCosts();
     if( !bSuccess ) {
         const nRetCode = 163;
-        log.fatal( strLogPrefix, "failed to register S-Chain in deposit box, will return code ",
-            nRetCode );
+        log.fatal( "{}failed to register S-Chain in deposit box, will return code {}",
+            strLogPrefix, nRetCode );
         process.exit( nRetCode );
     }
     return true;
@@ -1209,8 +1209,7 @@ export function commandLineTaskPaymentS2S() {
                 );
             }
             // ETH payment
-            log.information( "one S->S single ETH payment: ",
-                log.v( imaState.nAmountOfWei ) );
+            log.information( "one S->S single ETH payment: {}", imaState.nAmountOfWei );
             lop.fatal( "S->S ETH payment(s) are neither supported nor allowed" );
             process.exit( 154 );
         }
@@ -1488,7 +1487,7 @@ export function commandLineTaskBrowseSChain() {
         "fn": async function() {
             const strLogPrefix = "S-Chain Browse: ";
             if( imaState.chainProperties.sc.strURL.length === 0 ) {
-                log.fatal( " missing S-Chain URL, please specify \"--url-s-chain\"" );
+                log.fatal( "Missing S-Chain URL, please specify {}", "--url-s-chain" );
                 process.exit( 155 );
             }
             log.information( strLogPrefix, "Downloading S-Chain network information ..." );
@@ -1512,7 +1511,7 @@ export function commandLineTaskBrowseSChain() {
                     await joCall.call( joDataIn, async function( joIn, joOut, err ) {
                         if( err ) {
                             const strError = owaspUtils.extractErrorMessage( err );
-                            log.fatal( "JSON RPC call to S-Chain failed, error: ",
+                            log.fatal( "JSON RPC call to S-Chain failed, error: {}",
                                 log.em( strError ) );
                             await joCall.disconnect();
                             process.exit( 157 );
@@ -1524,8 +1523,8 @@ export function commandLineTaskBrowseSChain() {
                         for( let i = 0; i < jarrNodes.length; ++ i ) {
                             const joNode = jarrNodes[i];
                             if( ! joNode ) {
-                                log.critical( strLogPrefix, "Discovery node ", i,
-                                    " is completely unknown and will be skipped" );
+                                log.critical( "{}Discovery node {} is completely unknown and " +
+                                    "will be skipped".strLogPrefix, i );
                                 continue;
                             }
                             const strNodeURL = imaUtils.composeSChainNodeUrl( joNode );
@@ -1550,7 +1549,7 @@ export function commandLineTaskBrowseSChain() {
                                         ++ nCountReceivedImaDescriptions;
                                         if( err ) {
                                             const strError = owaspUtils.extractErrorMessage( err );
-                                            log.fatal( "JSON RPC call to S-Chain failed,error: ",
+                                            log.fatal( "JSON RPC call to S-Chain failed,error: {}",
                                                 log.em( strError ) );
                                             process.exit( 159 );
                                         }
@@ -1582,7 +1581,7 @@ export function commandLineTaskBrowseSkaleNetwork() {
         "fn": async function() {
             const strLogPrefix = "SKALE NETWORK Browse: ";
             if( imaState.strPathAbiJsonSkaleManager.length === 0 ) {
-                log.fatal( "Missing Skale Manager ABI, please specify \"--abi-skale-manager\"" );
+                log.fatal( "Missing Skale Manager ABI, please specify {}", "--abi-skale-manager" );
                 process.exit( 160 );
             }
             log.information( strLogPrefix, "Downloading SKALE network information..." );
@@ -1608,7 +1607,7 @@ export function commandLineTaskBrowseConnectedSChains() {
         "fn": async function() {
             const strLogPrefix = "Browse connected S-Chains: ";
             if( imaState.strPathAbiJsonSkaleManager.length === 0 ) {
-                log.fatal( "Missing Skale Manager ABI, please specify \"--abi-skale-manager\"" );
+                log.fatal( "Missing Skale Manager ABI, please specify {}", "--abi-skale-manager" );
                 process.exit( 161 );
             }
             log.information( strLogPrefix, "Downloading SKALE network information..." );
@@ -1672,9 +1671,8 @@ export function commandLineTaskDiscoverChainId() {
                 } );
             }
             if( arrURLsToDiscover.length === 0 ) {
-                log.fatal( "No URLs provided to discover chain IDs, please " +
-                    "specify \"--url-main-net\" and/or \"--url-s-chain\" " +
-                    "and/or \"--url-t-chain\"." );
+                log.fatal( "No URLs provided to discover chain IDs, please specify {} and/or {} " +
+                    "and/or {}.", "--url-main-net", "--url-s-chain", "--url-t-chain" );
                 process.exit( 162 );
             }
             for( let i = 0; i < arrURLsToDiscover.length; ++ i ) {

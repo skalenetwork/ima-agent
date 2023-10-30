@@ -2549,7 +2549,7 @@ function commonInitCheckErc20() {
                 }
             } else {
                 if( n2 === 0 && imaState.chainProperties.tc.strPathJsonErc20.length > 0 ) {
-                    log.fatal( " S<->S Target S-Chain ERC20 token name ",
+                    log.fatal( "S<->S Target S-Chain ERC20 token name " +
                         "is not discovered(malformed JSON)" );
                 }
                 imaState.chainProperties.tc.joErc20 = null;
@@ -2612,14 +2612,10 @@ function commonInitCheckErc721() {
                     }
                 }
             } else {
-                if( n1 === 0 ) {
-                    log.fatal(
-                        "Main-net ERC721 token name  is not discovered(malformed JSON)" );
-                }
-                if( n2 === 0 && imaState.chainProperties.sc.strPathJsonErc721.length > 0 ) {
-                    log.fatal(
-                        "S-Chain ERC721 token name is not discovered(malformed JSON)" );
-                }
+                if( n1 === 0 )
+                    log.fatal( "Main-net ERC721 token name  is not discovered(malformed JSON)" );
+                if( n2 === 0 && imaState.chainProperties.sc.strPathJsonErc721.length > 0 )
+                    log.fatal( "S-Chain ERC721 token name is not discovered(malformed JSON)" );
                 imaState.chainProperties.mn.joErc721 = null;
                 imaState.chainProperties.sc.joErc721 = null;
                 imaState.chainProperties.mn.strCoinNameErc721 = "";
@@ -2629,10 +2625,8 @@ function commonInitCheckErc721() {
         } else {
             if( n1 === 0 )
                 log.fatal( "Main-net ERC721 JSON is invalid" );
-
             if( n2 === 0 && imaState.chainProperties.sc.strPathJsonErc721.length > 0 )
                 log.fatal( "S-Chain ERC721 JSON is invalid" );
-
             imaState.chainProperties.mn.joErc721 = null;
             imaState.chainProperties.sc.joErc721 = null;
             imaState.chainProperties.mn.strCoinNameErc721 = "";
@@ -2661,8 +2655,8 @@ function commonInitCheckErc721() {
                             att( imaState.chainProperties.sc.strCoinNameErc721 ) );
                     } else {
                         if( n2 === 0 && imaState.chainProperties.sc.strPathJsonErc721.length > 0 ) {
-                            log.fatal(
-                                "S-Chain ERC721 token name is not discovered(malformed JSON)" );
+                            log.fatal( "S-Chain ERC721 token name is not " +
+                                "discovered(malformed JSON)" );
                         }
                         imaState.chainProperties.mn.joErc721 = null;
                         imaState.chainProperties.sc.joErc721 = null;
@@ -2713,7 +2707,7 @@ function commonInitCheckErc721() {
                     imaState.chainProperties.tc.strPathJsonErc721.length > 0 &&
                     isPrintGathered
                 ) {
-                    log.fatal( "S<->S Target S-Chain ERC721 token name ",
+                    log.fatal( "S<->S Target S-Chain ERC721 token name " +
                         "is not discovered(malformed JSON)" );
                 }
                 imaState.chainProperties.tc.joErc721 = null;
@@ -2777,14 +2771,10 @@ function commonInitCheckErc1155() {
                     }
                 }
             } else {
-                if( n1 === 0 ) {
-                    log.fatal(
-                        " Main-net ERC1155 token name  is not discovered(malformed JSON)" );
-                }
-                if( n2 === 0 && imaState.chainProperties.sc.strPathJsonErc1155.length > 0 ) {
-                    log.fatal(
-                        " S-Chain ERC1155 token name is not discovered(malformed JSON)" );
-                }
+                if( n1 === 0 )
+                    log.fatal( "Main-net ERC1155 token name  is not discovered(malformed JSON)" );
+                if( n2 === 0 && imaState.chainProperties.sc.strPathJsonErc1155.length > 0 )
+                    log.fatal( "S-Chain ERC1155 token name is not discovered(malformed JSON)" );
                 imaState.chainProperties.mn.joErc1155 = null;
                 imaState.chainProperties.sc.joErc1155 = null;
                 imaState.chainProperties.mn.strCoinNameErc1155 = "";
@@ -2825,10 +2815,8 @@ function commonInitCheckErc1155() {
                             att( imaState.chainProperties.sc.strCoinNameErc1155 ) );
                     }
                 } else {
-                    if( n2 === 0 && imaState.chainProperties.sc.strPathJsonErc1155.length > 0 ) {
-                        log.fatal(
-                            " S-Chain ERC1155 token name  is not discovered(malformed JSON)" );
-                    }
+                    if( n2 === 0 && imaState.chainProperties.sc.strPathJsonErc1155.length > 0 )
+                        log.fatal( "S-Chain ERC1155 token name is not discovered(malformed JSON)" );
                     imaState.chainProperties.mn.joErc1155 = null;
                     imaState.chainProperties.sc.joErc1155 = null;
                     imaState.chainProperties.mn.strCoinNameErc1155 = "";
@@ -2879,7 +2867,7 @@ function commonInitCheckErc1155() {
                     imaState.chainProperties.tc.strPathJsonErc1155.length > 0 &&
                     isPrintGathered
                 ) {
-                    log.fatal( " S<->S Target S-Chain ERC1155 token name ",
+                    log.fatal( " S<->S Target S-Chain ERC1155 token name " +
                         "is not discovered(malformed JSON)" );
                 }
                 imaState.chainProperties.tc.joErc1155 = null;

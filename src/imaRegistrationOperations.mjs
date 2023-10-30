@@ -47,11 +47,11 @@ export async function invokeHasChain(
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != details.id ) {
-            log.critical( strLogPrefix, "Error in invokeHasChain() during ", strActionName, ": ",
-                log.em( strError ), ", stack is: ", "\n", log.s( err.stack ) );
+            log.critical( "{}Error in invokeHasChain() during {}: {}, stack is: {}{}",
+                strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
         }
-        details.critical( strLogPrefix, "Error in invokeHasChain() during ", strActionName, ": ",
-            log.em( strError ), ", stack is: ", "\n", log.s( err.stack ) );
+        details.critical( "{}Error in invokeHasChain() during {}: {}, stack is: {}{}",
+            strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
     }
     return false;
 }
@@ -112,15 +112,13 @@ export async function checkIsRegisteredSChainInDepositBoxes( // step 1
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != details.id ) {
-            log.critical( strLogPrefix,
-                "Error in checkIsRegisteredSChainInDepositBoxes(reg-step1)() during ",
-                strActionName, ": ", log.em( strError ),
-                ", stack is: ", "\n", log.s( err.stack ) );
+            log.critical( "{}Error in checkIsRegisteredSChainInDepositBoxes(reg-step1)() " +
+                "during {}: {}, stack is: {}{}", strLogPrefix, strActionName, log.em( strError ),
+            "\n", log.s( err.stack ) );
         }
-        details.critical( strLogPrefix,
-            "Error in checkIsRegisteredSChainInDepositBoxes(reg-step1)() during ",
-            strActionName, ": ", log.em( strError ),
-            ", stack is: ", "\n", log.s( err.stack ) );
+        details.critical( "{}Error in checkIsRegisteredSChainInDepositBoxes(reg-step1)() " +
+            "during {}: {}, stack is: {}{}", strLogPrefix, strActionName, log.em( strError ),
+        "\n", log.s( err.stack ) );
         details.exposeDetailsTo( log, "checkIsRegisteredSChainInDepositBoxes", false );
         details.close();
     }
@@ -213,13 +211,13 @@ export async function registerSChainInDepositBoxes( // step 1
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != details.id ) {
-            log.critical( strLogPrefix, "Error in registerSChainInDepositBoxes() during ",
-                strActionName, ": ", log.em( strError ),
-                ", stack is: ", "\n", log.s( err.stack ) );
+            log.critical( "{}Error in registerSChainInDepositBoxes() during {}: {}" +
+                ", stack is: {}{}", strLogPrefix, strActionName, log.em( strError ),
+            "\n", log.s( err.stack ) );
         }
-        details.critical( strLogPrefix, "Error in registerSChainInDepositBoxes() during ",
-            strActionName, ": ", log.em( strError ),
-            ", stack is: ", "\n", log.s( err.stack ) );
+        details.critical( "{}Error in registerSChainInDepositBoxes() during {}: {}" +
+            ", stack is: {}{}", strLogPrefix, strActionName, log.em( strError ),
+        "\n", log.s( err.stack ) );
         details.exposeDetailsTo( log, "registerSChainInDepositBoxes", false );
         details.close();
         return null;

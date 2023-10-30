@@ -547,21 +547,17 @@ export async function safeGetPastEventsIterative(
                 return joAllEventsInBlock;
             }
         } catch ( err ) {
-            details.critical( strLogPrefix, "Got scan error during interactive scan of ",
-                log.v( idxBlockSubRangeFrom.toHexString() ), "/",
-                log.v( idxBlockSubRangeTo.toHexString() ),
-                " block sub-range in ", log.v( nBlockFrom.toHexString() ),
-                "/", log.v( nBlockTo.toHexString() ),
-                " block range, error is: ",
-                log.em( owaspUtils.extractErrorMessage( err ) ),
-                ", stack is: ", "\n" + log.s( err.stack ) );
+            details.critical( "{}Got scan error during interactive scan of {}/{} block sub-range " +
+                "in {}/{} block range, error is: {}, stack is: {}{}", strLogPrefix,
+            idxBlockSubRangeFrom.toHexString(), idxBlockSubRangeTo.toHexString(),
+            nBlockFrom.toHexString(), nBlockTo.toHexString(),
+            log.em( owaspUtils.extractErrorMessage( err ) ), "\n" + log.s( err.stack ) );
         }
         idxBlockSubRangeTo = idxBlockSubRangeFrom;
         if( idxBlockSubRangeTo.lte( nBlockFrom ) )
             break;
     }
-    details.debug( strLogPrefix, "Result of ", log.v( "iterative" ), " scan in ",
-        log.v( nBlockFrom.toHexString() ), "/", log.v( nBlockTo.toHexString() ),
-        " block range is empty" );
+    details.debug( "{}Result of {} scan in {}/{} is {}", strLogPrefix, "iterative",
+        nBlockFrom.toHexString(), nBlockTo.toHexString(), "empty block range" );
     return "";
 }

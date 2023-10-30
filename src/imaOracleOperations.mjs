@@ -193,13 +193,14 @@ export async function doOracleGasPriceSetup(
             async function( strError, u256, joGlueResult ) {
                 if( strError ) {
                     if( log.id != optsGasPriseSetup.details.id ) {
-                        log.critical( optsGasPriseSetup.strLogPrefix,
-                            "Error in doOracleGasPriceSetup() during ",
-                            optsGasPriseSetup.strActionName, ": ", log.em( strError ) );
+                        log.critical( "{}Error in doOracleGasPriceSetup() during {}: {}",
+                            optsGasPriseSetup.strLogPrefix, optsGasPriseSetup.strActionName,
+                            log.em( strError ) );
                     }
-                    optsGasPriseSetup.details.critical( optsGasPriseSetup.strLogPrefix,
-                        "Error in doOracleGasPriceSetup() during ",
-                        optsGasPriseSetup.strActionName, ": ", log.em( strError ) );
+                    optsGasPriseSetup.details.critical(
+                        "{}Error in doOracleGasPriceSetup() during {}: {}",
+                        optsGasPriseSetup.strLogPrefix, optsGasPriseSetup.strActionName,
+                        log.em( strError ) );
                     optsGasPriseSetup.details.exposeDetailsTo(
                         log, "doOracleGasPriceSetup", false );
                     imaTransferErrorHandling.saveTransferError(
@@ -288,14 +289,14 @@ export async function doOracleGasPriceSetup(
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != optsGasPriseSetup.details.id ) {
-            log.critical( optsGasPriseSetup.strLogPrefix,
-                "Error in doOracleGasPriceSetup() during ",
-                optsGasPriseSetup.strActionName, ": ", log.em( strError ),
-                ", stack is: ", "\n", log.s( err.stack ) );
-            optsGasPriseSetup.details.critical( optsGasPriseSetup.strLogPrefix,
-                "Error in doOracleGasPriceSetup() during ",
-                optsGasPriseSetup.strActionName, ": ", log.em( strError ),
-                ", stack is: ", "\n", log.s( err.stack ) );
+            log.critical( "{}Error in doOracleGasPriceSetup() during {}: {}" +
+                ", stack is: {}{}", optsGasPriseSetup.strLogPrefix,
+            optsGasPriseSetup.strActionName, log.em( strError ),
+            "\n", log.s( err.stack ) );
+            optsGasPriseSetup.details.critical(
+                "{}Error in doOracleGasPriceSetup() during {}: {}, stack is: {}{}",
+                optsGasPriseSetup.strLogPrefix, optsGasPriseSetup.strActionName,
+                log.em( strError ), "\n", log.s( err.stack ) );
         }
         optsGasPriseSetup.details.exposeDetailsTo( log, "doOracleGasPriceSetup", false );
         imaTransferErrorHandling.saveTransferError(

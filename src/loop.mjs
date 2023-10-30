@@ -618,9 +618,8 @@ export async function ensureHaveWorkers( opts ) {
                     break;
                 }
                 aClient.errorLogicalInit = joMessage.error;
-                opts.details.critical( " Loop worker thread ",
-                    idxWorker, " reported/returned init error: ",
-                    log.em( owaspUtils.extractErrorMessage( joMessage.error ) ) );
+                opts.details.critical( " Loop worker thread {} reported/returned init error: {}",
+                    idxWorker, log.em( owaspUtils.extractErrorMessage( joMessage.error ) ) );
                 break;
             case "log":
                 log.information( "LOOP WORKER ", log.fmtNotice( workerData.url ),

@@ -1068,7 +1068,7 @@ export async function ensureHaveWorker( opts ) {
                 break;
             }
             gClient.errorLogicalInit = joMessage.error;
-            opts.details.critical( "SNB worker thread reported/returned init error: ",
+            opts.details.critical( "SNB worker thread reported/returned init error: {}",
                 log.em( owaspUtils.extractErrorMessage( joMessage.error ) ) );
             break;
         case "periodicCachingDoNow":

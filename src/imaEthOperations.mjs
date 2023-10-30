@@ -151,11 +151,11 @@ export async function doEthPaymentFromMainNet(
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != details.id ) {
-            log.critical( strLogPrefix, "Payment error in ", strActionName, ": ",
-                log.em( strError ), ", stack is: " , "\n", log.s( err.stack ) );
+            log.critical( "{}Payment error in {}: {}, stack is: {}{}",
+                strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
         }
-        details.critical( strLogPrefix, "Payment error in ", strActionName, ": ",
-            log.em( strError ), ", stack is: " , "\n", log.s( err.stack ) );
+        details.critical( "{}Payment error in {}: {}, stack is: {}{}",
+            strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
         details.exposeDetailsTo( log, "doEthPaymentFromMainNet", false );
         details.close();
         return false;
@@ -261,11 +261,11 @@ export async function doEthPaymentFromSChain(
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != details.id ) {
-            log.critical( strLogPrefix, "Payment error in ", strActionName, ": ",
-                log.em( strError ), ", stack is: ", "\n", log.s( err.stack ) );
+            log.critical( "{}Payment error in {}: {}, stack is: {}{}",
+                strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
         }
-        details.critical( strLogPrefix, "Payment error in ", strActionName, ": ",
-            log.em( strError ), ", stack is: ", "\n", log.s( err.stack ) );
+        details.critical( "{}Payment error in {}: {}, stack is: {}{}",
+            strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
         details.exposeDetailsTo( log, "doEthPaymentFromSChain", false );
         details.close();
         return false;
@@ -330,11 +330,11 @@ export async function receiveEthPaymentFromSchainOnMainNet(
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != details.id ) {
-            log.critical( strLogPrefix, "Receive payment error in ", strActionName, ": ",
-                log.em( strError ), ", stack is: ", "\n", log.s( err.stack ) );
+            log.critical( "{}Receive payment error in {}: {}, stack is: {}{}",
+                strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
         }
-        details.critical( strLogPrefix, "Receive payment error in ", strActionName, ": ",
-            log.em( strError ), ", stack is: ", "\n", log.s( err.stack ) );
+        details.critical( "{}Receive payment error in {}: {}, stack is: {}{}",
+            strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
         details.exposeDetailsTo( log, "receiveEthPaymentFromSchainOnMainNet", false );
         details.close();
         return false;
@@ -375,10 +375,11 @@ export async function viewEthPaymentFromSchainOnMainNet(
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != details.id ) {
-            log.critical( strLogPrefix, "View payment error in ", strActionName, ": ",
-                log.em( strError ), ", stack is: ", "\n" + log.s( err.stack ) );
+            log.critical( "{}View payment error in {}: {}, stack is: {}{}",
+                strLogPrefix, strActionName, log.em( strError ), "\n" + log.s( err.stack ) );
         }
-        details.critical( s );
+        details.critical( "{}View payment error in {}: {}, stack is: {}{}",
+            strLogPrefix, strActionName, log.em( strError ), "\n" + log.s( err.stack ) );
         details.exposeDetailsTo( log, "viewEthPaymentFromSchainOnMainNet", false );
         details.close();
         return null;

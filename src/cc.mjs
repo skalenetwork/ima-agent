@@ -37,7 +37,7 @@ export function enable( b ) {
 }
 
 export function isStringAlreadyColorized( s ) {
-    if( s && typeof s == "string" && s[0] != "\x1b" )
+    if( s && typeof s == "string" && s.length > 0 && s[0] == "\x1b" )
         return true;
     return false;
 }
@@ -566,6 +566,8 @@ export function syntaxHighlightJSON( jo, strKeyNamePrefix ) {
                 return "" + nanval( match );
             case "string":
                 return "" + strval( match );
+            case "number":
+                return "" + number( match );
             }
             return logArgToString( match );
         } );
@@ -792,7 +794,13 @@ export function yes( s ) {
 export function no( s ) {
     if( !gFlagIsEnabled )
         return s;
-    return "" + fgBlue + s + reset;
+    return "" + fgRed + s + reset;
+}
+
+export function number( s ) {
+    if( !gFlagIsEnabled )
+        return s;
+    return "" + fgBlue + enlight + s + reset;
 }
 
 export function real( s ) {

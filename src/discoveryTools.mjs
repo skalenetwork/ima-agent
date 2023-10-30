@@ -40,7 +40,7 @@ export function initialSkaleNetworkScanForS2S() {
         "fn": async function() {
             const strLogPrefix = "SKALE network scan for S2S: ";
             if( imaState.strPathAbiJsonSkaleManager.length === 0 ) {
-                log.fatal( "Missing Skale Manager ABI, please specify  \"--abi-skale-manager\"" );
+                log.fatal( "Missing Skale Manager ABI, please specify {}", "--abi-skale-manager" );
                 process.exit( 153 );
             }
             log.information( strLogPrefix, "Downloading SKALE network information..." );
@@ -192,7 +192,7 @@ export async function waitUntilSChainStarted() {
                         bSuccess = true;
                 }, isSilentReDiscovery, null, nCountToWait ).catch( ( err ) => {
                 const strError = owaspUtils.extractErrorMessage( err );
-                log.critical( "S-Chain network discovery failed: ", log.em( strError ) );
+                log.critical( "S-Chain network discovery failed: {}", log.em( strError ) );
             } );
             if( ! joSChainNetworkInfo )
                 bSuccess = false;
@@ -342,7 +342,7 @@ export async function continueSChainDiscoveryInBackgroundIfNeeded( isSilentReDis
                 continueSChainDiscoveryInBackgroundIfNeeded( isSilentReDiscovery, null );
             }, isSilentReDiscovery, imaState.joSChainNetworkInfo, nCountToWait ).catch( ( err ) => {
                 const strError = owaspUtils.extractErrorMessage( err );
-                log.critical( "S-Chain network re-discovery failed: ", log.em( strError ) );
+                log.critical( "S-Chain network re-discovery failed: {}", log.em( strError ) );
             } );
         } catch ( err ) { }
         gFlagIsInSChainDiscovery = false;
@@ -391,9 +391,8 @@ async function discoverSChainWalkNodes( optsDiscover ) {
                 async function( joCall, err ) {
                     if( err ) {
                         if( ! optsDiscover.isSilentReDiscovery ) {
-                            log.critical( optsDiscover.strLogPrefix,
-                                "JSON RPC call(creation) to S-Chain node ",
-                                strNodeDescColorized, " failed" );
+                            log.critical( "{}JSON RPC call(creation) to S-Chain node {} failed",
+                                optsDiscover.strLogPrefix, strNodeDescColorized );
                         }
                         ++ optsDiscover.cntFailed;
                         if( joCall )
@@ -410,10 +409,9 @@ async function discoverSChainWalkNodes( optsDiscover ) {
                         if( err ) {
                             const strError = owaspUtils.extractErrorMessage( err );
                             if( ! optsDiscover.isSilentReDiscovery ) {
-                                log.critical( optsDiscover.strLogPrefix,
-                                    "JSON RPC call(network) to S-Chain node ",
-                                    strNodeDescColorized, " failed, error: ",
-                                    log.em( strError ) );
+                                log.critical( "{}JSON RPC call(network) to S-Chain node {} " +
+                                    "failed, error: {}", optsDiscover.strLogPrefix,
+                                strNodeDescColorized, log.em( strError ) );
                             }
                             ++ optsDiscover.cntFailed;
                             return;
@@ -432,10 +430,9 @@ async function discoverSChainWalkNodes( optsDiscover ) {
         } catch ( err ) {
             if( ! optsDiscover.isSilentReDiscovery ) {
                 const strError = owaspUtils.extractErrorMessage( err );
-                log.critical( optsDiscover.strLogPrefix,
-                    "JSON RPC call(err) to S-Chain node ", strNodeDescColorized,
-                    " was not created: ", log.em( strError ), ", stack is: ", "\n",
-                    log.s( err.stack ) );
+                log.critical( "{}JSON RPC call(err) to S-Chain node {} was not created: {}" +
+                        ", stack is: {}{}", optsDiscover.strLogPrefix, strNodeDescColorized,
+                log.em( strError ), "\n", log.s( err.stack ) );
             }
             ++ optsDiscover.cntFailed;
         }
@@ -541,9 +538,8 @@ export async function discoverSChainNetwork(
                         if( err ) {
                             const strError = owaspUtils.extractErrorMessage( err );
                             if( ! optsDiscover.isSilentReDiscovery ) {
-                                log.critical( optsDiscover.strLogPrefix,
-                                    "JSON RPC call to (own) S-Chain ", log.u( scURL ),
-                                    " failed: ", log.em( strError ) );
+                                log.critical( "{}JSON RPC call to (own) S-Chain {} failed: {}",
+                                    optsDiscover.strLogPrefix, log.u( scURL ), log.em( strError ) );
                             }
                             optsDiscover.fnAfter( err, null );
                             if( joCall )
@@ -561,9 +557,9 @@ export async function discoverSChainNetwork(
                             if( err ) {
                                 if( ! optsDiscover.isSilentReDiscovery ) {
                                     const strError = owaspUtils.extractErrorMessage( err );
-                                    log.critical( optsDiscover.strLogPrefix,
-                                        "JSON RPC call to (own) S-Chain ", log.u( scURL ),
-                                        " failed, error: ", log.em( strError ) );
+                                    log.critical( "{}JSON RPC call to (own) S-Chain {} failed, " +
+                                        "error: {}", optsDiscover.strLogPrefix, log.u( scURL ),
+                                    log.em( strError ) );
                                 }
                                 optsDiscover.fnAfter( err, null );
                                 await joCall.disconnect();
@@ -583,9 +579,8 @@ export async function discoverSChainNetwork(
                                 if( ! optsDiscover.isSilentReDiscovery ) {
                                     const err2 = new Error( "Got wrong response, " +
                                         "network information description was not detected" );
-                                    log.critical( optsDiscover.strLogPrefix,
-                                        "Network was not detected via call to ",
-                                        log.u( scURL ), ": ", log.em( err2 ) );
+                                    log.critical( "{}Network was not detected via call to {}: {}",
+                                        optsDiscover.strLogPrefix, log.u( scURL ), log.em( err2 ) );
                                 }
                                 optsDiscover.fnAfter( err2, null );
                                 await joCall.disconnect();
@@ -619,11 +614,10 @@ export async function discoverSChainNetwork(
                             }
                             if( optsDiscover.nCountAvailable < optsDiscover.nCountToWait ) {
                                 if( ! optsDiscover.isSilentReDiscovery ) {
-                                    log.critical( optsDiscover.strLogPrefix,
-                                        "Not enough nodes available on S-Chain, total ",
-                                        optsDiscover.cntNodes, ", available ",
-                                        optsDiscover.nCountAvailable, ", expected at least ",
-                                        optsDiscover.nCountToWait );
+                                    log.critical( "{}Not enough nodes available on S-Chain, " +
+                                        "total {}, available {}, expected at least {}",
+                                    optsDiscover.strLogPrefix, optsDiscover.cntNodes,
+                                    optsDiscover.nCountAvailable, optsDiscover.nCountToWait );
                                 }
                                 const err = new Error(
                                     "Not enough nodes available on S-Chain, total " +
@@ -644,10 +638,9 @@ export async function discoverSChainNetwork(
             } catch ( err ) {
                 if( ! optsDiscover.isSilentReDiscovery ) {
                     const strError = owaspUtils.extractErrorMessage( err );
-                    log.critical( optsDiscover.strLogPrefix,
-                        "JSON RPC call(discoverSChainNetwork) to S-Chain was not created: ",
-                        log.em( strError ), ", stack is: ", "\n",
-                        log.s( err.stack ) );
+                    log.critical( "{}JSON RPC call(discoverSChainNetwork) to S-Chain was not " +
+                        "created: {}, stack is: {}{}", optsDiscover.strLogPrefix,
+                    log.em( strError ), "\n", log.s( err.stack ) );
                 }
                 optsDiscover.joSChainNetworkInfo = null;
                 optsDiscover.fnAfter( err, null );

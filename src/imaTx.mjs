@@ -200,9 +200,9 @@ async function payedCallTM( optsPayedCall ) {
                     "Hash of sent TM-transaction: ", log.v( txHashSent ) );
                 resolve( optsPayedCall.joReceipt );
             } catch ( err ) {
-                optsPayedCall.details.critical( optsPayedCall.strLogPrefix,
-                    "TM-transaction was not sent, underlying error is: ",
-                    log.em( err.toString() ) );
+                optsPayedCall.details.critical(
+                    "{}TM-transaction was not sent, underlying error is: {}",
+                    optsPayedCall.strLogPrefix, log.em( err.toString() ) );
                 if( log.id != optsPayedCall.details.id ) {
                     log.critical( optsPayedCall.strLogPrefix,
                         "TM-transaction was not sent, underlying error is: ",
@@ -359,13 +359,11 @@ export async function payedCall(
             break;
         default: {
             const strErrorPrefix = "Transaction sign and send error(INNER FLOW): ";
-            optsPayedCall.details.critical( strErrorPrefix,
-                "bad credentials information specified, " +
-                    "no explicit SGX and no explicit private key found" );
+            optsPayedCall.details.critical( "{}bad credentials information specified, " +
+                "no explicit SGX and no explicit private key found", strErrorPrefix );
             if( log.id != optsPayedCall.details.id ) {
-                log.critical( strErrorPrefix,
-                    "bad credentials information specified, " +
-                        "no explicit SGX and no explicit private key found" );
+                log.critical( "{}bad credentials information specified, no explicit SGX and " +
+                    "no explicit private key found", strErrorPrefix );
             }
             throw new Error( strErrorPrefix + "bad credentials information specified, " +
                 "no explicit SGX and no explicit private key found" );
@@ -373,13 +371,12 @@ export async function payedCall(
         } // switch( optsPayedCall.joACI.strType )
     } catch ( err ) {
         const strErrorPrefix = "Transaction sign and send error(outer flow):";
-        optsPayedCall.details.critical( optsPayedCall.strLogPrefix, strErrorPrefix, " ",
-            log.em( owaspUtils.extractErrorMessage( err ) ),
-            ", stack is: ", "\n", log.s( err.stack ) );
+        optsPayedCall.details.critical( "{}{} {}, stack is: {}{}", optsPayedCall.strLogPrefix,
+            strErrorPrefix, log.em( owaspUtils.extractErrorMessage( err ) ),
+            "\n", log.s( err.stack ) );
         if( log.id != optsPayedCall.details.id ) {
-            log.critical( optsPayedCall.strLogPrefix, strErrorPrefix, " ",
-                log.em( owaspUtils.extractErrorMessage( err ) ),
-                ", stack is: ", "\n", log.s( err.stack ) );
+            log.critical( "{}{} {}, stack is: {}{}", optsPayedCall.strLogPrefix, strErrorPrefix,
+                log.em( owaspUtils.extractErrorMessage( err ) ), "\n", log.s( err.stack ) );
         }
         throw new Error( strErrorPrefix +
             " invoking the " + optsPayedCall.strContractCallDescription +
@@ -466,10 +463,9 @@ export async function checkTransactionToSchain(
                 log.v( strFromAddress ), ", PoW-mining is not needed and will be skipped" );
         }
     } catch ( err ) {
-        details.critical( strLogPrefix,"PoW-mining error(checkTransactionToSchain):",
-            " exception occur before PoW-mining, error is: ",
-            log.em( owaspUtils.extractErrorMessage( err ) ),
-            ", stack is: ", "\n", log.s( err.stack ) );
+        details.critical( "{}PoW-mining error(checkTransactionToSchain): exception occur before " +
+            "PoW-mining, error is: {}, stack is: {}{}", strLogPrefix,
+        log.em( owaspUtils.extractErrorMessage( err ) ), "\n", log.s( err.stack ) );
     }
     return unsignedTx;
 }
@@ -488,10 +484,9 @@ export async function calculatePowNumber( address, nonce, gas, details, strLogPr
         details.trace( strLogPrefix, "Got PoW-mining execution result: ", log.v( res ) );
         return res;
     } catch ( err ) {
-        details.critical( strLogPrefix, "PoW-mining error(calculatePowNumber):",
-            " exception occur during PoW-mining, error is: ",
-            log.em( owaspUtils.extractErrorMessage( err ) ),
-            ", stack is: ", "\n", log.s( err.stack ) );
+        details.critical( "{}PoW-mining error(calculatePowNumber): exception occur during " +
+            "PoW-mining, error is: {}, stack is: {}{}", strLogPrefix,
+        log.em( owaspUtils.extractErrorMessage( err ) ), "\n", log.s( err.stack ) );
         throw err;
     }
 }

@@ -385,9 +385,9 @@ async function doTheJob() {
             }
         } catch ( err ) {
             ++cntFalse;
-            log.critical( strLogPrefix, "Exception occurred while executing action: ",
-                log.em( owaspUtils.extractErrorMessage( err ) ),
-                ", stack is: ", "\n", log.s( err.stack ) );
+            log.critical( "{}Exception occurred while executing action: {}, stack is: {}{}",
+                strLogPrefix, log.em( owaspUtils.extractErrorMessage( err ) ),
+                "\n", log.s( err.stack ) );
         }
     }
     log.information( strLogPrefix, imaHelperAPIs.longSeparator );
@@ -433,11 +433,11 @@ async function main() {
     };
     if( imaState.bSignMessages ) {
         if( imaState.strPathBlsGlue.length == 0 ) {
-            log.fatal( "Please specify --bls-glue parameter." );
+            log.fatal( "Please specify {} command line parameter.", "--bls-glue" );
             process.exit( 164 );
         }
         if( imaState.strPathHashG1.length == 0 ) {
-            log.fatal( "Please specify --hash-g1 parameter." );
+            log.fatal( "Please specify {} command line parameter.", "--hash-g1" );
             process.exit( 165 );
         }
         log.information( "S-Chain network was discovery uses ",
@@ -471,7 +471,7 @@ async function main() {
                 }, isSilentReDiscovery, imaState.joSChainNetworkInfo, nCountToWait
                 ).catch( ( err ) => {
                     const strError = owaspUtils.extractErrorMessage( err );
-                    log.critical( "S-Chain network discovery failed: ", log.em( strError ) );
+                    log.critical( "S-Chain network discovery failed: {}", log.em( strError ) );
                 } );
             } );
         }

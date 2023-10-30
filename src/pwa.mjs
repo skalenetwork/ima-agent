@@ -167,8 +167,8 @@ export async function checkOnLoopStart( imaState, strLoopWorkType, nIndexS2S ) {
         if( imaState.isPrintPWA )
             log.success( "PWA loop start condition check passed" );
     } catch ( err ) {
-        log.critical( "Exception in PWA check on loop start: ",
-            log.em( extractErrorMessage( err ) ), ", stack is: ", "\n", log.s( err.stack ) );
+        log.critical( "Exception in PWA check on loop start: {}, stack is: {}{}",
+            log.em( extractErrorMessage( err ) ), "\n", log.s( err.stack ) );
     }
     return true;
 }
@@ -221,11 +221,10 @@ export async function handleLoopStateArrived(
         isSuccess = true;
     } catch ( err ) {
         isSuccess = false;
-        log.critical( "Exception in PWA handler for loop-", log.v( se ),
-            " for node ", nNodeNumber, ", PWA state ",
-            log.v( ( joNode && "pwaState" in joNode ) ? joNode.pwaState : "N/A" ),
-            ", arrived signature is ", log.v( signature ), ", error is: ",
-            log.em( extractErrorMessage( err ) ), ", stack is: ", "\n", log.s( err.stack ) );
+        log.critical( "Exception in PWA handler for loop-{} for node {}, PWA state {}, arrived " +
+            "signature is {}, error is: {}, stack is: {}{}", se, nNodeNumber,
+        ( joNode && "pwaState" in joNode ) ? joNode.pwaState : "N/A",
+        signature, log.em( extractErrorMessage( err ) ), "\n", log.s( err.stack ) );
     }
     return isSuccess;
 }

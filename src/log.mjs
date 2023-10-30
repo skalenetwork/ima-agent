@@ -469,29 +469,83 @@ export function insertFileOutput( strFilePath, nMaxSizeBeforeRotation, nMaxFiles
     return true;
 }
 
+function tryToSplitFormatString( strFormat ) {
+    if( !( strFormat && typeof strFormat == "string" ) )
+        return null;
+    const arrParts = [];
+    let s = strFormat, cntFoundArgs = 0;
+    for( ; true; ) {
+        const nFound = s.indexOf( "{", nStart );
+        if( nFound < 0 )
+            break;
+        const nEnd = s.indexOf( "}", nStart );
+        if( nEnd < 0 )
+            break;
+        const strPart = s.substring( nStart, nFound );
+        const strArgDesc = s.substring( nFound + 1, nEnd );
+        s = s.substring( nEnd + 1 );
+        if( strPart.length > 0 )
+            arrParts.push( { "type": "text", "text": strPart } );
+        arrParts.push( { "type": "arg", "text": strArgDesc } );
+        ++ cntFoundArgs;
+        if( s.length == 0 )
+            break;
+    }
+    if( cntFoundArgs == 0 )
+        return null;
+    if( s.length > 0 )
+        arrParts.push( { "type": "text", "text": s } );
+    return arrParts;
+}
+
 export function fmtArgumentsArray( arrArgs, fnFormatter ) {
     fnFormatter = fnFormatter || function( arg ) { return arg; };
-    let s = "";
+    const arrParts = ( arrArgs && arrArgs.length > 0 )
+        ? tryToSplitFormatString( arrArgs[0] ) : null;
+    let s = "", isValueMode = false;
+    const fnFormatOneArgument = function( arg ) {
+        if( arg ) {
+            if( isValueMode )
+                return v( arg );
+            const t = typeof arg;
+            if( t == "string" ) {
+                if( arg.length > 0 ) {
+                    if( arg == " " || arg == "\n" ) {
+                        // skip
+                    } else if( ! cc.isStringAlreadyColorized( arg ) )
+                        arg = fnFormatter( arg );
+                }
+            } else
+                arg = cc.logArgToString( arg );
+
+        }
+        return arg;
+    };
     try {
-        for( let i = 0; i < arrArgs.length; ++i ) {
+        let idxArgNextPrinted = 0;
+        if( arrParts && arrParts.length > 0 ) {
+            idxArgNextPrinted = 1;
+            for( let i = 0; i < arrParts.length; ++i ) {
+                const joPart = arrParts[i];
+                if( joPart.type == "arg" ) {
+                    isValueMode = true;
+                    if( idxArgNextPrinted < arrArgs.length )
+                        s += fnFormatOneArgument( arrArgs[idxArgNextPrinted] );
+                    ++ idxArgNextPrinted;
+                    continue;
+                }
+                // assume joPart.type == "text" always here, at this point
+                if( ! cc.isStringAlreadyColorized( joPart.text ) )
+                    s += fnFormatter( joPart.text );
+                else
+                    s += joPart.text;
+            }
+        }
+        for( let i = idxArgNextPrinted; i < arrArgs.length; ++i ) {
             try {
                 // if( i > 0 && s.length > 0 )
                 //    s += " ";
-                let arg = arrArgs[i];
-                if( arg ) {
-                    const t = typeof arg;
-                    if( t == "string" ) {
-                        if( arg.length > 0 ) {
-                            if( arg == " " || arg == "\n" ) {
-                                // skip
-                            } else if( cc.isStringAlreadyColorized( arg[0] ) )
-                                arg = fnFormatter( arg );
-                        }
-                    } else
-                        arg = cc.logArgToString( arg );
-
-                }
-                s += arg;
+                s += fnFormatOneArgument( arrArgs[i] );
             } catch ( err ) {
             }
         }

@@ -390,9 +390,8 @@ export function checkKeyExistInABI( strName, strFile, joABI, strKey, isExitOnErr
     } catch ( err ) {
     }
     if( isExitOnError ) {
-        log.fatal( "Loaded ", log.v( strName ), " ABI JSON file ", log.v( strFile ),
-            " does not contain needed key ",
-            log.v( strKey ), ", stack is: ", "\n", log.s( err.stack ) );
+        log.fatal( "Loaded {} ABI JSON file {} does not contain needed key {}, stack is: {}{}",
+            strName, strFile, strKey, "\n", log.s( err.stack ) );
         process.exit( 126 );
     }
     return false;
