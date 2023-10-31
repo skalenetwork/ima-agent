@@ -113,8 +113,8 @@ export function ensureHaveCredentials(
 ) {
     strFriendlyChainName = strFriendlyChainName || "<UNKNOWN>";
     if( ! ( typeof joAccount == "object" ) ) {
-        log.error( "ARGUMENTS VALIDATION WARNING: bad account specified for ",
-            strFriendlyChainName, " chain" );
+        log.error( "ARGUMENTS VALIDATION WARNING: bad account specified for {} chain",
+            strFriendlyChainName );
         if( isExitIfEmpty )
             process.exit( 126 );
     }
@@ -188,9 +188,9 @@ export function ensureHaveCredentials(
         );
     }
     if( cntAccountVariantsSpecified == 0 ) {
-        log.error( "ARGUMENTS VALIDATION WARNING: bad credentials information specified for ",
-            strFriendlyChainName, " chain, no explicit SGX, no explicit private key, ",
-            "no wallet address found" );
+        log.error( "ARGUMENTS VALIDATION WARNING: bad credentials information specified for {} " +
+            "chain, no explicit SGX, no explicit private key, no wallet address found",
+        strFriendlyChainName );
         if( isExitIfEmpty )
             process.exit( 126 );
     }
@@ -2081,23 +2081,21 @@ async function asyncCheckUrlAtStartup( u, name ) {
     const details = log.createMemoryStream();
     const nTimeoutMilliseconds = 10 * 1000;
     try {
-        details.debug( "Will check URL ", log.u( u ), " connectivity for ",
-            log.v( name ), " at start-up..." );
+        details.debug( "Will check URL {} connectivity for {} at start-up...", log.u( u ), name );
         const isLog = false;
         const isOnLine = await rpcCall.checkUrl( u, nTimeoutMilliseconds, isLog );
         if( isOnLine ) {
-            details.success( "Done, start-up checking URL ", log.u( u ), " connectivity for ",
-                log.v( name ), ", URL is on-line." );
+            details.success( "Done, start-up checking URL {} connectivity for {}, URL is on-line.",
+                log.u( u ), name );
         } else {
-            details.error( "Done, start-up checking URL ", log.u( u ), " connectivity for ",
-                log.v( name ), ", URL is off-line." );
+            details.warning( "Done, start-up checking URL {} connectivity for {}, URL is off-line.",
+                log.u( u ), name );
         }
         return isOnLine;
     } catch ( err ) {
-        details.error( "Failed to check URL ", log.u( u ),
-            " connectivity for ", log.v( name ), " at start-up, error is: ",
-            log.em( owaspUtils.extractErrorMessage( err ) ),
-            ", stack is: ", "\n", log.s( err.stack ) );
+        details.error( "Failed to check URL {} connectivity for {} at start-up, error is: {}" +
+            ", stack is: {}{}", log.u( u ), name, log.em( owaspUtils.extractErrorMessage( err ) ),
+        "\n", log.s( err.stack ) );
     }
     return false;
 }
@@ -2447,20 +2445,20 @@ function commonInitCheckErc20() {
                     ( !imaState.bShowConfigMode )
                 ) {
                     if( isPrintGathered ) {
-                        log.information( "Loaded Main-net ERC20 ABI ",
+                        log.information( "Loaded Main-net ERC20 ABI {}",
                             att( imaState.chainProperties.tc.strCoinNameErc20 ) );
                     }
                     if( isPrintGathered && n2 > 0 ) {
-                        log.information( "Loaded S-Chain ERC20 ABI ",
+                        log.information( "Loaded S-Chain ERC20 ABI {}",
                             att( imaState.chainProperties.sc.strCoinNameErc20 ) );
                     }
                 }
             } else {
                 if( n1 === 0 )
-                    log.error( " Main-net ERC20 token name is not discovered(malformed JSON)" );
+                    log.error( "Main-net ERC20 token name is not discovered(malformed JSON)" );
 
                 if( n2 === 0 && imaState.chainProperties.sc.strPathJsonErc20.length > 0 )
-                    log.error( " S-Chain ERC20 token name is not discovered(malformed JSON)" );
+                    log.error( "S-Chain ERC20 token name is not discovered(malformed JSON)" );
 
                 imaState.chainProperties.mn.joErc20 = null;
                 imaState.chainProperties.sc.joErc20 = null;
@@ -2500,10 +2498,8 @@ function commonInitCheckErc20() {
                             att( imaState.chainProperties.sc.strCoinNameErc20 ) );
                     }
                 } else {
-                    if( n2 === 0 && imaState.chainProperties.sc.strPathJsonErc20.length > 0 ) {
-                        log.error(
-                            "S-Chain ERC20 token name is not discovered(malformed JSON)" );
-                    }
+                    if( n2 === 0 && imaState.chainProperties.sc.strPathJsonErc20.length > 0 )
+                        log.error( "S-Chain ERC20 token name is not discovered(malformed JSON)" );
                     imaState.chainProperties.mn.joErc20 = null;
                     imaState.chainProperties.sc.joErc20 = null;
                     imaState.chainProperties.tc.strCoinNameErc20 = "";

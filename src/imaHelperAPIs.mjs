@@ -98,10 +98,9 @@ export async function safeGetBlockNumber(
         return ret;
     } catch ( err ) {
         ret = retValOnFail;
-        details.error( "Failed call attempt ", idxAttempt, " to ", strFnName + "()",
-            " via ", log.u( u ), ", error is: ",
-            log.em( owaspUtils.extractErrorMessage( err ) ),
-            ", stack is: ", "\n", log.s( err.stack ) );
+        details.error( "Failed call attempt {} to {} via {}, error is: {}, stack is: [][]",
+            idxAttempt, strFnName + "()", log.u( u ),
+            log.em( owaspUtils.extractErrorMessage( err ) ), "\n", log.s( err.stack ) );
     }
     ++ idxAttempt;
     while( ret === "" && idxAttempt <= cntAttempts ) {
@@ -110,10 +109,10 @@ export async function safeGetBlockNumber(
             ret = retValOnFail;
             if( ! throwIfServerOffline )
                 return ret;
-            details.error( "Cannot call ", strFnName + "()", " via ", log.u( u ),
-                " because server is off-line" );
+            details.error( "Cannot call {} via {} because server is off-line",
+                strFnName + "()", log.u( u ) );
             throw new Error( "Cannot " + strFnName + "() via " + u.toString() +
-            " because server is off-line" );
+                " because server is off-line" );
         }
         details.trace( "Repeat call to ", strFnName + "()", " via ", log.u( u ),
             ", attempt ", idxAttempt );
@@ -122,18 +121,17 @@ export async function safeGetBlockNumber(
             return ret;
         } catch ( err ) {
             ret = retValOnFail;
-            details.error( "Failed call attempt ", idxAttempt, " to ",
-                strFnName + "()", " via ", log.u( u ), ", error is: ",
-                log.em( owaspUtils.extractErrorMessage( err ) ),
-                ", stack is: ", "\n", log.s( err.stack ) );
+            details.error( "Failed call attempt {} to  via {}, error is: {}, stack is: {}{}",
+                idxAttempt, strFnName + "()", log.u( u ),
+                log.em( owaspUtils.extractErrorMessage( err ) ), "\n", log.s( err.stack ) );
         }
         ++ idxAttempt;
     }
     if( ( idxAttempt + 1 ) > cntAttempts && ret === "" ) {
-        details.error( "Failed call to ", strFnName + "()",
-            " via ", log.u( u ), " after ", cntAttempts, " attempts " );
-        throw new Error( "Failed call to " + strFnName + "() via " +
-        u.toString() + " after " + cntAttempts + " attempts" );
+        details.error( "Failed call to {} via {} after {} attempts ",
+            strFnName + "()", log.u( u ), cntAttempts );
+        throw new Error( "Failed call to " + strFnName + "() via " + u.toString() + " after " +
+            cntAttempts + " attempts" );
     }
     return ret;
 }

@@ -151,7 +151,7 @@ function initMonitoringServer() {
         if( !ip )
             ip = "N/A";
         if( imaState.bLogMonitoringServer )
-            log.debug( strLogPrefix, "New connection from ", log.v( ip ) );
+            log.debug( strLogPrefix, "New connection from ", ip );
         wsPeer.on( "message", function( message ) {
             const joAnswer = {
                 "method": null,
@@ -161,7 +161,7 @@ function initMonitoringServer() {
             try {
                 const joMessage = JSON.parse( message );
                 if( imaState.bLogMonitoringServer ) {
-                    log.trace( strLogPrefix, "<<< message from ", log.v( ip ), ": ",
+                    log.trace( strLogPrefix, "<<< message from ", ip, ": ",
                         log.v( joMessage ) );
                 }
                 if( ! ( "method" in joMessage ) )
@@ -231,21 +231,17 @@ function initMonitoringServer() {
                 } // switch( joMessage.method )
             } catch ( err ) {
                 const strError = owaspUtils.extractErrorMessage( err );
-                log.error( strLogPrefix, "Bad message from ", log.v( ip ), ": ",
-                    log.v( message ), ", error is: ", log.em( strError ),
-                    ", stack is: ", "\n", log.s( err.stack ) );
+                log.error( "{}Bad message from {}: {}, error is: {}, stack is: {}{}",
+                    strLogPrefix, ip, message, log.em( strError ), "\n", log.s( err.stack ) );
             }
             try {
-                if( imaState.bLogMonitoringServer ) {
-                    log.trace( strLogPrefix, ">>> answer to ", log.v( ip ), ": ",
-                        log.v( joAnswer ) );
-                }
+                if( imaState.bLogMonitoringServer )
+                    log.trace( "{}>>> answer to {}: {}", strLogPrefix, ip, joAnswer );
                 wsPeer.send( JSON.stringify( joAnswer ) );
             } catch ( err ) {
                 const strError = owaspUtils.extractErrorMessage( err );
-                log.error( strLogPrefix, "Failed to sent answer to ", log.v( ip ),
-                    ", error is: ", log.em( strError ),
-                    ", stack is: ", "\n", log.s( err.stack ) );
+                log.error( "{}Failed to sent answer to {}, error is: {}, stack is:{}{}",
+                    strLogPrefix, ip, log.em( strError ), "\n", log.s( err.stack ) );
             }
         } );
     } );
@@ -269,13 +265,12 @@ function initJsonRpcServer() {
             try {
                 res.header( "Content-Type", "application/json" );
                 res.status( 200 ).send( JSON.stringify( joAnswer ) );
-                log.trace( strLogPrefix, ">>> did sent answer to ", log.v( ip ), ": ",
-                    log.v( joAnswer ) );
+                log.trace( strLogPrefix, ">>> did sent answer to ", ip, ": ",
+                    joAnswer );
             } catch ( err ) {
                 const strError = owaspUtils.extractErrorMessage( err );
-                log.error( strLogPrefix, "Failed to sent answer ", log.v( joAnswer ), " to ",
-                    log.v( ip ), ", error is: ", log.em( strError ),
-                    ", stack is: ", "\n", log.s( err.stack ) );
+                log.error( "{}Failed to sent answer {} to {}, error is: {}, stack is:{}{}",
+                    strLogPrefix, joAnswer, ip, log.em( strError ), "\n", log.s( err.stack ) );
             }
         };
         let joAnswer = {
@@ -285,7 +280,7 @@ function initJsonRpcServer() {
         };
         try {
             const joMessage = JSON.parse( message );
-            log.trace( strLogPrefix, "<<< Peer message from ", log.v( ip ), ": ",
+            log.trace( strLogPrefix, "<<< Peer message from ", ip, ": ",
                 log.v( joMessage ) );
             if( ! ( "method" in joMessage ) )
                 throw new Error( "\"method\" field was not specified" );
@@ -354,8 +349,8 @@ function initJsonRpcServer() {
             } // switch( joMessage.method )
         } catch ( err ) {
             const strError = owaspUtils.extractErrorMessage( err );
-            log.error( strLogPrefix, "Bad message from ", log.v( ip ), ": ", log.v( message ),
-                ", error is: ", log.em( strError ), ", stack is: ", "\n", log.s( err.stack ) );
+            log.error( "{}Bad message from {}: {}, error is: {}, stack is: {}{}",
+                strLogPrefix, ip, message, log.em( strError ), "\n", log.s( err.stack ) );
         }
         if( ! isSkipMode )
             fnSendAnswer( joAnswer );
@@ -378,10 +373,10 @@ async function doTheJob() {
         try {
             if( await joAction.fn() ) {
                 ++cntTrue;
-                log.success( strLogPrefix, "Succeeded action: ", joAction.name );
+                log.success( "{}Succeeded action: {}", strLogPrefix, joAction.name );
             } else {
                 ++cntFalse;
-                log.error( strLogPrefix, "Failed action: ", joAction.name );
+                log.error( "{}Failed action: {}", strLogPrefix, joAction.name );
             }
         } catch ( err ) {
             ++cntFalse;

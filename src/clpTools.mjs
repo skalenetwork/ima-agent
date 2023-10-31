@@ -1680,16 +1680,14 @@ export function commandLineTaskDiscoverChainId() {
                 const chainId = await
                 skaleObserver.discoverChainId( joDiscoverEntry.strURL );
                 if( chainId === null ) {
-                    log.error( strLogPrefix, "Failed to detect ",
-                        log.v( joDiscoverEntry.name ), " chain ID" );
+                    log.error( "{}Failed to detect {} chain ID",
+                        strLogPrefix, joDiscoverEntry.name );
                 } else {
                     const cid16 =
-                        owaspUtils.ensureStartsWith0x(
-                            owaspUtils.toBN( chainId ).toHexString() );
+                        owaspUtils.ensureStartsWith0x( owaspUtils.toBN( chainId ).toHexString() );
                     const cid10 = "" + owaspUtils.toBN( chainId ).toString();
-                    log.information( strLogPrefix, "Got ", log.v( joDiscoverEntry.name ),
-                        " chain ID=", log.v( cid16 ), "=", log.v( cid10 ),
-                        " from URL ", log.u( joDiscoverEntry.strURL ) );
+                    log.information( "{}Got {} chain ID={}={} from URL {}", strLogPrefix,
+                        joDiscoverEntry.name, cid16, cid10, log.u( joDiscoverEntry.strURL ) );
                     joDiscoverEntry.fnSave( chainId );
                 }
             }

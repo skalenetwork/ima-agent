@@ -64,8 +64,7 @@ export function initialSkaleNetworkScanForS2S() {
                 log.success( strLogPrefix, "Done, did started periodic S-Chains caching." );
             } ).catch( function( err ) {
                 const strError = owaspUtils.extractErrorMessage( err );
-                log.error( "Failed to start periodic S-Chains caching",
-                    log.em( strError ) );
+                log.error( "Failed to start periodic S-Chains caching {}", log.em( strError ) );
             } );
             return true;
         }

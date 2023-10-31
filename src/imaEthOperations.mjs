@@ -51,8 +51,8 @@ export async function getBalanceEth(
         return balance;
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
-        log.error( strLogPrefix, "balance fetching error details: ",
-            log.em( strError ), ", stack is: ", "\n", log.s( err.stack ) );
+        log.error( "{}balance fetching error details: {}, stack is: {}{}",
+            strLogPrefix, log.em( strError ), "\n", log.s( err.stack ) );
     }
     return "<no-data-or-error>";
 }

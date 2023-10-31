@@ -29,45 +29,45 @@ function postConvertBN( jo, name ) {
 async function run() {
     try {
         if( gIsDebugLogging )
-            log.debug( "Process startup arguments array is ", log.v( process.argv ) );
+            log.debug( "Process startup arguments array is {}", process.argv );
 
         const strSgxWalletURL = process.argv[3];
         if( gIsDebugLogging )
-            log.debug( "SGX Wallet URL is ", log.u( strSgxWalletURL ) );
+            log.debug( "SGX Wallet URL is {}", log.u( strSgxWalletURL ) );
         const strSgxKeyName = process.argv[4];
         if( gIsDebugLogging )
-            log.debug( "SGX key name is ", log.u( strSgxWalletURL ) );
+            log.debug( "SGX key name is {}", log.u( strSgxWalletURL ) );
         const strURL = process.argv[5];
         if( gIsDebugLogging )
-            log.debug( "Chain URL is ", log.u( strURL ) );
+            log.debug( "Chain URL is {}", log.u( strURL ) );
         const chainId = process.argv[6];
         if( gIsDebugLogging )
-            log.debug( "Chain ID is ", log.v( chainId ) );
+            log.debug( "Chain ID is {}", chainId );
         const tcData = process.argv[7];
         if( gIsDebugLogging )
-            log.debug( "TX data is ", log.v( tcData ) );
+            log.debug( "TX data is {}", tcData );
         const txTo = process.argv[8];
         if( gIsDebugLogging )
-            log.debug( "TX destination is ", log.v( txTo ) );
+            log.debug( "TX destination is {}", txTo );
         const txValue = process.argv[9];
         if( gIsDebugLogging )
-            log.debug( "TX value is ", log.v( txValue ) );
+            log.debug( "TX value is {}", txValue );
         const gasPrice = process.argv[10];
         if( gIsDebugLogging )
-            log.debug( "TX gas price is ", log.v( gasPrice ) );
+            log.debug( "TX gas price is {}", gasPrice );
         const gasLimit = process.argv[11];
         if( gIsDebugLogging )
-            log.debug( "TX gas limit is ", log.v( gasLimit ) );
+            log.debug( "TX gas limit is {}", gasLimit );
         const txNonce = process.argv[12];
         if( gIsDebugLogging )
-            log.debug( "TX nonce is ", log.v( txNonce ) );
+            log.debug( "TX nonce is {}", txNonce );
         const strPathCert = process.argv[13];
         if( gIsDebugLogging )
-            log.debug( "Path to SGX certificate file is ", log.v( strPathCert ) );
+            log.debug( "Path to SGX certificate file is {}", strPathCert );
 
         const strPathKey = process.argv[14];
         if( gIsDebugLogging )
-            log.debug( "Path to SGX key file is ", log.v( strPathKey ) );
+            log.debug( "Path to SGX key file is {}", strPathKey );
 
         const ethersProvider = owaspUtils.getEthersProviderFromURL( strURL );
 
@@ -81,13 +81,13 @@ async function run() {
             nonce: owaspUtils.toBN( txNonce )
         };
         if( gIsDebugLogging )
-            log.debug( "--- Source TX ---> ", log.v( tx ) );
+            log.debug( "--- Source TX ---> {}", tx );
         let rawTX = owaspUtils.ethersMod.ethers.utils.serializeTransaction( tx );
         if( gIsDebugLogging )
-            log.debug( "--- RAW unsigned TX ---> ", log.v( rawTX ) );
+            log.debug( "--- RAW unsigned TX ---> {}", rawTX );
         const txHash = owaspUtils.ethersMod.ethers.utils.keccak256( rawTX );
         if( gIsDebugLogging )
-            log.debug( "--- TX hash ---> ", log.v( txHash ) );
+            log.debug( "--- TX hash ---> {}", txHash );
 
         const rpcCallOpts = {
             "cert": fs.readFileSync( strPathCert, "utf8" ),
@@ -99,7 +99,7 @@ async function run() {
             async function( joCall, err ) {
                 if( err ) {
                     if( gIsDebugLogging )
-                        log.error( "Failed to create RPC call: ", log.v( err ) );
+                        log.error( "Failed to create RPC call: {}", log.em( err ) );
                     finalizeOutput( { "error": owaspUtils.extractErrorMessage( err ) } );
                     process.exit( 1 );
                 }
@@ -114,13 +114,13 @@ async function run() {
                 await joCall.call( joIn, async function( joIn, joOut, err ) {
                     if( err ) {
                         if( gIsDebugLogging )
-                            log.error( "RPC call error: ", log.v( err ) );
+                            log.error( "RPC call error: {}", log.em( err ) );
                         finalizeOutput( { "error": owaspUtils.extractErrorMessage( err ) } );
                         process.exit( 1 );
                     }
                     try {
                         if( gIsDebugLogging )
-                            log.debug( "SGX wallet ECDSA sign result is: ", log.v( joOut ) );
+                            log.debug( "SGX wallet ECDSA sign result is: {}", joOut );
 
                         const v = parseInt( joOut.result.signature_v );
                         const eth_v = v + owaspUtils.parseIntOrHex( chainId ) * 2 + 35;
@@ -131,20 +131,19 @@ async function run() {
                             "s": joOut.result.signature_s
                         };
                         if( gIsDebugLogging )
-                            log.debug( "--- Expanded signature ---> ", log.v( joExpanded ) );
+                            log.debug( "--- Expanded signature ---> {}", joExpanded );
                         rawTX = owaspUtils.ethersMod.ethers.utils
                             .serializeTransaction( tx, joExpanded );
                         if( gIsDebugLogging )
-                            log.debug( "--- Raw transaction with signature ---> ", log.v( rawTX ) );
+                            log.debug( "--- Raw transaction with signature ---> {}", rawTX );
 
                         const sr = await ethersProvider.sendTransaction( rawTX );
-                        if( gIsDebugLogging ) {
-                            log.debug( "--- Raw-sent transaction result ---> ",
-                                log.v( sr ) );
-                        }
+                        if( gIsDebugLogging )
+                            log.debug( "--- Raw-sent transaction result ---> {}", sr );
+
                         const joReceipt = await ethersProvider.waitForTransaction( sr.hash );
                         if( gIsDebugLogging )
-                            log.debug( "--- Transaction receipt ---> ", log.v( sr ) );
+                            log.debug( "--- Transaction receipt ---> {}", joReceipt );
                         joReceipt.chainId = tx.chainId;
                         joReceipt.rawTX = rawTX;
                         joReceipt.signature = joExpanded;
@@ -159,7 +158,7 @@ async function run() {
                         process.exit( 0 );
                     } catch ( err ) {
                         if( gIsDebugLogging )
-                            log.debug( "--- Call error ---> ", log.v( err ) );
+                            log.debug( "--- Call error ---> {}", log.em,( err ) );
                         finalizeOutput( { "error": owaspUtils.extractErrorMessage( err ) } );
                         process.exit( 1 );
                     }
@@ -168,7 +167,7 @@ async function run() {
             } );
     } catch ( err ) {
         if( gIsDebugLogging )
-            log.error( "Failed to create RPC call: ", log.v( err ) );
+            log.error( "Failed to create RPC call: {}", log.em( err ) );
         finalizeOutput( { "error": owaspUtils.extractErrorMessage( err ) } );
         process.exit( 1 );
     }

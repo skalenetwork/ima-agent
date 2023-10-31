@@ -56,8 +56,8 @@ export async function getBalanceErc20(
         return balance;
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
-        log.error( strLogPrefix, "ERC20 balance fetching error: ", log.em( strError ),
-            ", stack is: ", "\n", log.s( err.stack ) );
+        log.error( "{}ERC20 balance fetching error: {}, stack is:{}{}",
+            strLogPrefix, log.em( strError ), "\n", log.s( err.stack ) );
     }
     return "<no-data-or-error>";
 }
@@ -89,8 +89,8 @@ export async function getOwnerOfErc721(
         return owner;
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
-        log.error( strLogPrefix, "ERC721 owner fetching error: ", log.em( strError ),
-            ", stack is: ", "\n", log.s( err.stack ) );
+        log.error( "{}ERC721 owner fetching error: {}, stack is:{}{}",
+            strLogPrefix, log.em( strError ), "\n", log.s( err.stack ) );
     }
     return "<no-data-or-error>";
 }
@@ -123,8 +123,8 @@ export async function getBalanceErc1155(
         return balance;
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
-        log.error( strLogPrefix, "ERC1155 balance fetching error: ", log.em( strError ),
-            ", stack is: ", "\n", log.s( err.stack ) );
+        log.error( "{}ERC1155 balance fetching error: {}, stack is:{}{}",
+            strLogPrefix, log.em( strError ), "\n", log.s( err.stack ) );
     }
     return "<no-data-or-error>";
 }

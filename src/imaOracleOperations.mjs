@@ -107,9 +107,9 @@ async function prepareOracleGasPriceSetup( optsGasPriseSetup ) {
         } catch ( err ) {
             optsGasPriseSetup.gasPriceOnMainNet = null;
             optsGasPriseSetup.details.error(
-                "Failed to fetch Main Net gas price via call to Oracle, error is: ",
-                log.em( owaspUtils.extractErrorMessage( err ) ),
-                ", stack is: ", "\n", log.s( err.stack ) );
+                "Failed to fetch Main Net gas price via call to Oracle, error is: {}, " +
+                "stack is: {}{}", log.em( owaspUtils.extractErrorMessage( err ) ),
+                "\n", log.s( err.stack ) );
         }
     }
     if( optsGasPriseSetup.gasPriceOnMainNet === null ) {
