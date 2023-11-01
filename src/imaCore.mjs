@@ -71,8 +71,8 @@ async function findOutReferenceLogRecord(
             owaspUtils.toBN( joReferenceLogRecord.currentMessage.toString() );
         if( bnCurrentMessage.eq( bnMessageNumberToFind ) ) {
             if( isVerbose ) {
-                details.success( strLogPrefix, "Found ", strEventName, " log record ",
-                    log.v( joReferenceLogRecord ), " for message ", nMessageNumberToFind );
+                details.success( "{}Found {} log record {} for message {}",
+                    strLogPrefix, strEventName, joReferenceLogRecord, nMessageNumberToFind );
             }
             return joReferenceLogRecord;
         }
@@ -98,7 +98,7 @@ async function findOutAllReferenceLogRecords(
     const cntExpected = nOutMsgCnt - nIncMsgCnt;
     if( cntExpected <= 0 ) {
         if( isVerbose ) {
-            details.success( "Optimized IMA message search algorithm success, " +
+            details.success( "{}Optimized IMA message search algorithm success, " +
                 "nothing to search, result is empty", strLogPrefix );
         }
         return arrLogRecordReferences; // nothing to search
@@ -151,29 +151,25 @@ let gTransferLoopCounter = 0;
 //            )
 async function doQueryOutgoingMessageCounter( optsTransfer ) {
     let nPossibleIntegerValue = 0;
-    optsTransfer.details.debug( optsTransfer.strLogPrefixShort, "SRC MessageProxy address is.....",
-        log.v( optsTransfer.joMessageProxySrc.address ) );
-    optsTransfer.details.debug( optsTransfer.strLogPrefixShort, "DST MessageProxy address is.....",
-        log.v( optsTransfer.joMessageProxyDst.address ) );
+    optsTransfer.details.debug( "{}SRC MessageProxy address is.....{}",
+        optsTransfer.strLogPrefixShort,optsTransfer.joMessageProxySrc.address );
+    optsTransfer.details.debug( "{}DST MessageProxy address is.....",
+        optsTransfer.strLogPrefixShort, optsTransfer.joMessageProxyDst.address );
     optsTransfer.strActionName = "src-chain.MessageProxy.getOutgoingMessagesCounter()";
     try {
-        optsTransfer.details.debug( optsTransfer.strLogPrefix,
-            "Will call ", log.v( optsTransfer.strActionName ), "..." );
+        optsTransfer.details.debug( "{}Will call {}...",
+            optsTransfer.strLogPrefix, optsTransfer.strActionName );
         nPossibleIntegerValue =
             await optsTransfer.joMessageProxySrc.callStatic.getOutgoingMessagesCounter(
                 optsTransfer.chainNameDst,
                 { from: optsTransfer.joAccountSrc.address() } );
         if( !owaspUtils.validateInteger( nPossibleIntegerValue ) ) {
-            throw new Error(
-                "DST chain " + optsTransfer.chainNameDst +
-                " returned outgoing message counter " +
-                nPossibleIntegerValue + " which is not a valid integer"
-            );
+            throw new Error( "DST chain " + optsTransfer.chainNameDst + " returned outgoing " +
+                "message counter " + nPossibleIntegerValue + " which is not a valid integer" );
         }
         optsTransfer.nOutMsgCnt = owaspUtils.toInteger( nPossibleIntegerValue );
-        optsTransfer.details.information( optsTransfer.strLogPrefix,
-            "Result of ", log.v( optsTransfer.strActionName ), " call: ",
-            log.v( optsTransfer.nOutMsgCnt ) );
+        optsTransfer.details.information( "{}Result of {} call: {}",
+            optsTransfer.strLogPrefix, optsTransfer.strActionName, optsTransfer.nOutMsgCnt );
     } catch ( err ) {
         optsTransfer.details.critical( "(IMMEDIATE) error caught during {}, error " +
             "optsTransfer.details: {}, stack is: {}{}", optsTransfer.strActionName,
@@ -186,33 +182,30 @@ async function doQueryOutgoingMessageCounter( optsTransfer ) {
     }
 
     optsTransfer.strActionName = "dst-chain.MessageProxy.getIncomingMessagesCounter()";
-    optsTransfer.details.debug( optsTransfer.strLogPrefix,
-        "Will call ", log.v( optsTransfer.strActionName ), "..." );
+    optsTransfer.details.debug( "{}Will call {}...",
+        optsTransfer.strLogPrefix, optsTransfer.strActionName );
     nPossibleIntegerValue =
         await optsTransfer.joMessageProxyDst.callStatic.getIncomingMessagesCounter(
-            optsTransfer.chainNameSrc,
-            { from: optsTransfer.joAccountDst.address() } );
+            optsTransfer.chainNameSrc, { from: optsTransfer.joAccountDst.address() } );
     if( !owaspUtils.validateInteger( nPossibleIntegerValue ) ) {
-        throw new Error(
-            "SRC chain " + optsTransfer.chainNameSrc + " returned incoming message counter " +
-            nPossibleIntegerValue + " which is not a valid integer" );
+        throw new Error( "SRC chain " + optsTransfer.chainNameSrc + " returned incoming message " +
+            "counter " + nPossibleIntegerValue + " which is not a valid integer" );
     }
     optsTransfer.nIncMsgCnt = owaspUtils.toInteger( nPossibleIntegerValue );
-    optsTransfer.details.debug( optsTransfer.strLogPrefix, "Result of ",
-        log.v( optsTransfer.strActionName ), " call: ", log.v( optsTransfer.nIncMsgCnt ) );
+    optsTransfer.details.debug( "{}Result of {} call: {}",
+        optsTransfer.strLogPrefix, optsTransfer.strActionName, optsTransfer.nIncMsgCnt );
     optsTransfer.strActionName = "src-chain.MessageProxy.getIncomingMessagesCounter()";
     nPossibleIntegerValue =
         await optsTransfer.joMessageProxySrc.callStatic.getIncomingMessagesCounter(
-            optsTransfer.chainNameDst,
-            { from: optsTransfer.joAccountSrc.address() } );
+            optsTransfer.chainNameDst, { from: optsTransfer.joAccountSrc.address() } );
     if( !owaspUtils.validateInteger( nPossibleIntegerValue ) ) {
         throw new Error(
             "DST chain " + optsTransfer.chainNameDst + " returned incoming message counter " +
             nPossibleIntegerValue + " which is not a valid integer" );
     }
     const idxLastToPopNotIncluding = owaspUtils.toInteger( nPossibleIntegerValue );
-    optsTransfer.details.debug( optsTransfer.strLogPrefix, "Result of ",
-        log.v( optsTransfer.strActionName ), " call: ", log.v( idxLastToPopNotIncluding ) );
+    optsTransfer.details.debug( "{}Result of {} call: {}",
+        optsTransfer.strLogPrefix, optsTransfer.strActionName, idxLastToPopNotIncluding );
     // first, try optimized scanner
     optsTransfer.arrLogRecordReferences = [];
     try {
@@ -273,14 +266,13 @@ async function analyzeGatheredRecords( optsTransfer, r ) {
     let joValues = "";
     const strChainHashWeAreLookingFor =
         owaspUtils.ethersMod.ethers.utils.id( optsTransfer.chainNameDst );
-    optsTransfer.details.debug( optsTransfer.strLogPrefix, "Will review ", r.length,
-        " found event records(in reverse order, newest to oldest) while looking for hash ",
-        log.v( strChainHashWeAreLookingFor ), " of destination chain ",
-        log.v( optsTransfer.chainNameDst ) );
+    optsTransfer.details.debug( "{}Will review {} found event records(in reverse order, newest " +
+        "to oldest) while looking for hash {} of destination chain {}", optsTransfer.strLogPrefix,
+    r.length, strChainHashWeAreLookingFor, optsTransfer.chainNameDst );
     for( let i = r.length - 1; i >= 0; i-- ) {
         const joEvent = r[i];
-        optsTransfer.details.debug( optsTransfer.strLogPrefix,
-            "Will review found event record ", i, " with data ", log.v( joEvent ) );
+        optsTransfer.details.debug( "{}Will review found event record {} with data {}",
+            optsTransfer.strLogPrefix, i, joEvent );
         const eventValuesByName = {
             "dstChainHash": imaEventLogScan.extractEventArg( joEvent.args[0] ),
             "msgCounter": imaEventLogScan.extractEventArg( joEvent.args[1] ),
@@ -291,15 +283,13 @@ async function analyzeGatheredRecords( optsTransfer, r ) {
         if( eventValuesByName.dstChainHash == strChainHashWeAreLookingFor ) {
             joValues = eventValuesByName;
             joValues.savedBlockNumberForOptimizations = r[i].blockNumber;
-            optsTransfer.details.success( optsTransfer.strLogPrefix,
-                "Found event record ", i, " reviewed and ",
-                "accepted for processing, found event values are ",
-                log.v( joValues ), ", found block number is ",
-                log.v( joValues.savedBlockNumberForOptimizations ) );
+            optsTransfer.details.success( "{}Found event record {} reviewed and accepted for " +
+                "processing, found event values are {}, found block number is {}",
+            optsTransfer.strLogPrefix, i, joValues, joValues.savedBlockNumberForOptimizations );
             break;
         } else {
-            optsTransfer.details.debug( optsTransfer.strLogPrefix, "Found event record ", i,
-                " reviewed and skipped" );
+            optsTransfer.details.debug( "{}Found event record {} reviewed and skipped",
+                optsTransfer.strLogPrefix, i );
         }
     }
     if( joValues == "" ) {
@@ -339,9 +329,8 @@ async function gatherMessages( optsTransfer ) {
         }
         optsTransfer.strActionName = "src-chain->MessageProxy->scan-past-events()";
         const strEventName = "OutgoingMessage";
-        optsTransfer.details.debug( optsTransfer.strLogPrefix, "Will call ",
-            log.v( optsTransfer.strActionName ), " for ",
-            strEventName, " event..." );
+        optsTransfer.details.debug( "{}Will call {} for {} event...",
+            optsTransfer.strLogPrefix, optsTransfer.strActionName, strEventName );
         r = await imaEventLogScan.safeGetPastEventsProgressive( optsTransfer.details,
             optsTransfer.strLogPrefixShort, optsTransfer.ethersProviderSrc, 10,
             optsTransfer.joMessageProxySrc, strEventName, nBlockFrom, nBlockTo,
@@ -358,21 +347,20 @@ async function gatherMessages( optsTransfer ) {
             optsTransfer.strActionName = "security check: evaluate block depth";
             try {
                 const transactionHash = r[0].transactionHash;
-                optsTransfer.details.debug( optsTransfer.strLogPrefix,
-                    "Event transactionHash is ", log.v( transactionHash ) );
+                optsTransfer.details.debug( "{}Event transactionHash is {}",
+                    optsTransfer.strLogPrefix, transactionHash );
                 const blockNumber = r[0].blockNumber;
-                optsTransfer.details.debug( optsTransfer.strLogPrefix,
-                    "Event blockNumber is ", log.v( blockNumber ) );
+                optsTransfer.details.debug( "{}Event blockNumber is {}",
+                    optsTransfer.strLogPrefix, blockNumber );
                 const nLatestBlockNumber = await imaHelperAPIs.safeGetBlockNumber(
                     optsTransfer.details, 10, optsTransfer.ethersProviderSrc );
-                optsTransfer.details.debug( optsTransfer.strLogPrefix,
-                    "Latest blockNumber is ", log.v( nLatestBlockNumber ) );
+                optsTransfer.details.debug( "{}Latest blockNumber is {}",
+                    optsTransfer.strLogPrefix, nLatestBlockNumber );
                 const nDist = nLatestBlockNumber - blockNumber;
                 if( nDist < optsTransfer.nBlockAwaitDepth )
                     bSecurityCheckPassed = false;
-                optsTransfer.details.debug( optsTransfer.strLogPrefix,
-                    "Distance by blockNumber is ", log.v( nDist ),
-                    ", await check is ",
+                optsTransfer.details.debug( "{}Distance by blockNumber is {}, await check is {}",
+                    optsTransfer.strLogPrefix, nDist,
                     log.posNeg( bSecurityCheckPassed, "PASSED", "FAILED" ) );
             } catch ( err ) {
                 bSecurityCheckPassed = false;
@@ -396,11 +384,12 @@ async function gatherMessages( optsTransfer ) {
             }
             optsTransfer.strActionName = "" + strActionNameOld;
             if( !bSecurityCheckPassed ) {
-                const s = optsTransfer.strLogPrefix + log.em( "Block depth check was " +
-                    "not passed, canceling search for transfer events" );
-                optsTransfer.details.warning( s );
-                if( log.id != optsTransfer.details.id )
-                    log.warning( s );
+                optsTransfer.details.warning( "{}Block depth check was not passed, canceling " +
+                    "search for transfer events", optsTransfer.strLogPrefix );
+                if( log.id != optsTransfer.details.id ) {
+                    log.warning( "{}Block depth check was not passed, canceling " +
+                        "search for transfer events", optsTransfer.strLogPrefix );
+                }
                 break;
             }
         }
@@ -410,31 +399,31 @@ async function gatherMessages( optsTransfer ) {
             optsTransfer.strActionName = "security check: evaluate block age";
             try {
                 const transactionHash = r[0].transactionHash;
-                optsTransfer.details.debug( optsTransfer.strLogPrefix,
-                    "Event transactionHash is ", log.v( transactionHash ) );
+                optsTransfer.details.debug( "{}Event transactionHash is {}",
+                    optsTransfer.strLogPrefix, transactionHash );
                 const blockNumber = r[0].blockNumber;
-                optsTransfer.details.debug( optsTransfer.strLogPrefix,
-                    "Event blockNumber is ", log.v( blockNumber ) );
+                optsTransfer.details.debug( "{}Event blockNumber is {}",
+                    optsTransfer.strLogPrefix, blockNumber );
                 const joBlock = await optsTransfer.ethersProviderSrc.getBlock( blockNumber );
                 if( !owaspUtils.validateInteger( joBlock.timestamp ) ) {
                     throw new Error( "Block \"timestamp\" is not a valid integer value: " +
                         joBlock.timestamp );
                 }
                 const timestampBlock = owaspUtils.toInteger( joBlock.timestamp );
-                optsTransfer.details.debug( optsTransfer.strLogPrefix,
-                    "Block   TS is ", log.v( timestampBlock ) );
+                optsTransfer.details.debug( "{}Block   TS is {}",
+                    optsTransfer.strLogPrefix, timestampBlock );
                 const timestampCurrent = imaHelperAPIs.currentTimestamp();
-                optsTransfer.details.debug( optsTransfer.strLogPrefix,
-                    "Current TS is ", log.v( timestampCurrent ) );
+                optsTransfer.details.debug( "{}Current TS is {}",
+                    optsTransfer.strLogPrefix, timestampCurrent );
                 const tsDiff = timestampCurrent - timestampBlock;
-                optsTransfer.details.debug( optsTransfer.strLogPrefix,
-                    "Diff    TS is ", log.v( tsDiff ) );
-                optsTransfer.details.debug( optsTransfer.strLogPrefix,
-                    "Expected diff ", log.v( optsTransfer.nBlockAge ) );
+                optsTransfer.details.debug( "{}Diff    TS is {}",
+                    optsTransfer.strLogPrefix, tsDiff );
+                optsTransfer.details.debug( "{}Expected diff {}",
+                    optsTransfer.strLogPrefix, optsTransfer.nBlockAge );
                 if( tsDiff < optsTransfer.nBlockAge )
                     bSecurityCheckPassed = false;
-                optsTransfer.details.debug( optsTransfer.strLogPrefix,
-                    "Block age check is ",
+                optsTransfer.details.debug( "{}Block age check is {}",
+                    optsTransfer.strLogPrefix,
                     log.posNeg( bSecurityCheckPassed, "PASSED", "FAILED" ) );
             } catch ( err ) {
                 bSecurityCheckPassed = false;
@@ -463,12 +452,12 @@ async function gatherMessages( optsTransfer ) {
                 break;
             }
         }
-        optsTransfer.details.success( optsTransfer.strLogPrefix, "Got event optsTransfer.details " +
-            "from getPastEvents() event invoked with msgCounter set to ",
-        log.v( optsTransfer.nIdxCurrentMsg ), " and dstChain set to ",
-        log.v( optsTransfer.chainNameDst ), ", event description: ", log.v( joValues ) );
-        optsTransfer.details.debug( optsTransfer.strLogPrefix,
-            "Will process message counter value ", log.v( optsTransfer.nIdxCurrentMsg ) );
+        optsTransfer.details.success( "{}Got event optsTransfer.details from getPastEvents() " +
+            "event invoked with msgCounter set to {} and dstChain set to {}, event description: ",
+        optsTransfer.strLogPrefix, optsTransfer.nIdxCurrentMsg, optsTransfer.chainNameDst,
+        joValues );
+        optsTransfer.details.debug( "{}Will process message counter value {}",
+            optsTransfer.strLogPrefix, optsTransfer.nIdxCurrentMsg );
         optsTransfer.arrMessageCounters.push( optsTransfer.nIdxCurrentMsg );
         const joMessage = {
             "sender": joValues.srcContract,
@@ -484,10 +473,10 @@ async function gatherMessages( optsTransfer ) {
 }
 
 async function preCheckAllMessagesSign( optsTransfer, err, jarrMessages, joGlueResult ) {
-    const strDidInvokedSigningCallbackMessage = log.fmtDebug( optsTransfer.strLogPrefix,
-        "Did invoked message signing callback, first real message index is: ",
-        optsTransfer.nIdxCurrentMsgBlockStart, ", have ", optsTransfer.jarrMessages.length,
-        " message(s) to process ", log.v( optsTransfer.jarrMessages ) );
+    const strDidInvokedSigningCallbackMessage = log.fmtDebug( "{}Did invoked message signing " +
+        "callback, first real message index is: {}, have {} message(s) to process {}",
+    optsTransfer.strLogPrefix, optsTransfer.nIdxCurrentMsgBlockStart,
+    optsTransfer.jarrMessages.length, optsTransfer.jarrMessages );
     optsTransfer.details.debug( strDidInvokedSigningCallbackMessage );
     if( log.id != optsTransfer.details.id )
         log.debug( strDidInvokedSigningCallbackMessage );
@@ -507,11 +496,12 @@ async function preCheckAllMessagesSign( optsTransfer, err, jarrMessages, joGlueR
     if( ! loop.checkTimeFraming(
         null, optsTransfer.strDirection, optsTransfer.joRuntimeOpts )
     ) {
-        const strWarning = optsTransfer.strLogPrefix +
-            log.em( "Time framing overflow (after signing messages)" );
-        optsTransfer.details.warning( strWarning );
-        if( log.id != optsTransfer.details.id )
-            log.warning( strWarning );
+        optsTransfer.details.warning( "{}Time framing overflow (after signing messages)",
+            optsTransfer.strLogPrefix );
+        if( log.id != optsTransfer.details.id ) {
+            log.warning( "{}Time framing overflow (after signing messages)",
+                optsTransfer.strLogPrefix );
+        }
         imaTransferErrorHandling.saveTransferSuccessAll();
         return false;
     }
@@ -523,10 +513,9 @@ async function callbackAllMessagesSign( optsTransfer, err, jarrMessages, joGlueR
         return;
     const nBlockSize = optsTransfer.arrMessageCounters.length;
     optsTransfer.strActionName = "dst-chain.MessageProxy.postIncomingMessages()";
-    const strWillCallPostIncomingMessagesAction = log.fmtDebug( optsTransfer.strLogPrefix,
-        "Will call ", optsTransfer.strActionName, " for block size set to ", log.v( nBlockSize ),
-        ", message counters = are ", log.v( optsTransfer.arrMessageCounters ),
-        "..." );
+    const strWillCallPostIncomingMessagesAction = log.fmtDebug( "{}Will call {} for block size " +
+        "set to {}, message counters = are {}...", optsTransfer.strLogPrefix,
+    optsTransfer.strActionName, nBlockSize, optsTransfer.arrMessageCounters );
     optsTransfer.details.debug( strWillCallPostIncomingMessagesAction );
     if( log.id != optsTransfer.details.id )
         log.debug( strWillCallPostIncomingMessagesAction );
@@ -555,15 +544,15 @@ async function callbackAllMessagesSign( optsTransfer, err, jarrMessages, joGlueR
         hashPoint.X, // G1.X from joGlueResult.hashSrc
         hashPoint.Y, // G1.Y from joGlueResult.hashSrc
         hint ];
-    optsTransfer.details.debug( optsTransfer.strLogPrefix, "....debug args for msgCounter set to ",
-        log.v( optsTransfer.nIdxCurrentMsgBlockStart ), ": ", log.v( joDebugArgs ) );
+    optsTransfer.details.debug( "{}....debug args for msgCounter set to {}: {}",
+        optsTransfer.strLogPrefix, optsTransfer.nIdxCurrentMsgBlockStart, joDebugArgs );
     optsTransfer.strActionName = optsTransfer.strDirection + " - Post incoming messages";
     const weiHowMuchPostIncomingMessages = undefined;
     const gasPrice =
         await optsTransfer.transactionCustomizerDst.computeGasPrice(
             optsTransfer.ethersProviderDst, 200000000000 );
-    optsTransfer.details.debug( optsTransfer.strLogPrefix, "Using computed ",
-        log.v( "gasPrice" ), "=", log.v( gasPrice ) );
+    optsTransfer.details.debug( "{}Using computed gasPrice{}={}",
+        optsTransfer.strLogPrefix, gasPrice );
     let estimatedGasPostIncomingMessages =
         await optsTransfer.transactionCustomizerDst.computeGas(
             optsTransfer.details, optsTransfer.ethersProviderDst,
@@ -571,8 +560,8 @@ async function callbackAllMessagesSign( optsTransfer, err, jarrMessages, joGlueR
             "postIncomingMessages", arrArgumentsPostIncomingMessages,
             optsTransfer.joAccountDst, optsTransfer.strActionName,
             gasPrice, 10000000, weiHowMuchPostIncomingMessages, null );
-    optsTransfer.details.debug( optsTransfer.strLogPrefix, "Using estimated gas=",
-        log.v( estimatedGasPostIncomingMessages ) );
+    optsTransfer.details.debug( "{}Using estimated gas={}",
+        optsTransfer.strLogPrefix, estimatedGasPostIncomingMessages );
     if( optsTransfer.strDirection == "S2M" ) {
         const expectedGasLimit = perMessageGasForTransfer * optsTransfer.jarrMessages.length +
             additionalS2MTransferOverhead;
@@ -580,29 +569,27 @@ async function callbackAllMessagesSign( optsTransfer, err, jarrMessages, joGlueR
             Math.max( estimatedGasPostIncomingMessages, expectedGasLimit );
     }
     const isIgnorePostIncomingMessages = false;
-    const strErrorOfDryRun =
-        await imaTx.dryRunCall(
-            optsTransfer.details, optsTransfer.ethersProviderDst,
-            "MessageProxy", optsTransfer.joMessageProxyDst,
-            "postIncomingMessages", arrArgumentsPostIncomingMessages,
-            optsTransfer.joAccountDst, optsTransfer.strActionName,
-            isIgnorePostIncomingMessages,
-            gasPrice, estimatedGasPostIncomingMessages,
-            weiHowMuchPostIncomingMessages, null );
+    const strErrorOfDryRun = await imaTx.dryRunCall(
+        optsTransfer.details, optsTransfer.ethersProviderDst,
+        "MessageProxy", optsTransfer.joMessageProxyDst,
+        "postIncomingMessages", arrArgumentsPostIncomingMessages,
+        optsTransfer.joAccountDst, optsTransfer.strActionName,
+        isIgnorePostIncomingMessages,
+        gasPrice, estimatedGasPostIncomingMessages,
+        weiHowMuchPostIncomingMessages, null );
     if( strErrorOfDryRun )
         throw new Error( strErrorOfDryRun );
     const opts = {
         isCheckTransactionToSchain:
             ( optsTransfer.chainNameDst !== "Mainnet" ) ? true : false
     };
-    const joReceipt =
-        await imaTx.payedCall(
-            optsTransfer.details, optsTransfer.ethersProviderDst,
-            "MessageProxy", optsTransfer.joMessageProxyDst,
-            "postIncomingMessages", arrArgumentsPostIncomingMessages,
-            optsTransfer.joAccountDst, optsTransfer.strActionName,
-            gasPrice, estimatedGasPostIncomingMessages,
-            weiHowMuchPostIncomingMessages, opts );
+    const joReceipt = await imaTx.payedCall(
+        optsTransfer.details, optsTransfer.ethersProviderDst,
+        "MessageProxy", optsTransfer.joMessageProxyDst,
+        "postIncomingMessages", arrArgumentsPostIncomingMessages,
+        optsTransfer.joAccountDst, optsTransfer.strActionName,
+        gasPrice, estimatedGasPostIncomingMessages,
+        weiHowMuchPostIncomingMessages, opts );
     if( joReceipt && typeof joReceipt == "object" ) {
         optsTransfer.jarrReceipts.push( {
             "description": "doTransfer/postIncomingMessages()",
@@ -615,43 +602,37 @@ async function callbackAllMessagesSign( optsTransfer, err, jarrMessages, joGlueR
         optsTransfer.jarrReceipts, optsTransfer.details );
     }
     optsTransfer.cntProcessed += optsTransfer.cntAccumulatedForBlock;
-    optsTransfer.details.information( optsTransfer.strLogPrefix,
-        "Validating transfer from ", log.v( optsTransfer.chainNameSrc ), " to ",
-        log.v( optsTransfer.chainNameDst ), "..." );
+    optsTransfer.details.information( "{}Validating transfer from {} to {}...",
+        optsTransfer.strLogPrefix, optsTransfer.chainNameSrc, optsTransfer.chainNameDst );
     // check DepositBox -> Error on Mainnet only
     if( optsTransfer.chainNameDst == "Mainnet" ) {
-        optsTransfer.details.debug( optsTransfer.strLogPrefix,
-            "Validating transfer to Main Net via MessageProxy error absence on Main Net..." );
+        optsTransfer.details.debug( "{}Validating transfer to Main Net via MessageProxy error " +
+            "absence on Main Net...", optsTransfer.strLogPrefix );
         if( optsTransfer.joDepositBoxMainNet ) {
             if( joReceipt && "blockNumber" in joReceipt &&
                 "transactionHash" in joReceipt ) {
                 const strEventName = "PostMessageError";
-                optsTransfer.details.debug( optsTransfer.strLogPrefix,
-                    "Verifying the ", strEventName, " event of the ",
-                    log.v( "MessageProxy" ), "/",
-                    log.v( optsTransfer.joMessageProxyDst.address ),
-                    " contract..." );
+                optsTransfer.details.debug( "{}Verifying the {} event of the MessageProxy/{} " +
+                    "contract...", optsTransfer.strLogPrefix, strEventName,
+                optsTransfer.joMessageProxyDst.address );
                 const joEvents = await imaEventLogScan.getContractCallEvents(
                     optsTransfer.details, optsTransfer.strLogPrefixShort,
-                    optsTransfer.ethersProviderDst,
-                    optsTransfer.joMessageProxyDst, strEventName,
+                    optsTransfer.ethersProviderDst, optsTransfer.joMessageProxyDst, strEventName,
                     joReceipt.blockNumber, joReceipt.transactionHash,
                     optsTransfer.joMessageProxyDst.filters[strEventName]() );
                 if( joEvents.length == 0 ) {
-                    optsTransfer.details.success( optsTransfer.strLogPrefix,
-                        "Success, verified the ", strEventName, " event of the ",
-                        log.v( "MessageProxy" ), "/",
-                        log.v( optsTransfer.joMessageProxyDst.address ),
-                        " contract, no events found" );
+                    optsTransfer.details.success( "{}Success, verified the {} event of the " +
+                        "MessageProxy/{} contract, no events found", optsTransfer.strLogPrefix,
+                    strEventName, optsTransfer.joMessageProxyDst.address );
                 } else {
                     optsTransfer.details.critical( "{}Failed verification of the {} event of " +
-                            "the {}/{} contract, found event(s): {}",
-                    optsTransfer.strLogPrefix, "PostMessageError", "MessageProxy",
-                    optsTransfer.joMessageProxyDst.address, joEvents );
+                        "the {}/{} contract, found event(s): {}", optsTransfer.strLogPrefix,
+                    "PostMessageError", "MessageProxy", optsTransfer.joMessageProxyDst.address,
+                    joEvents );
                     if( log.id != optsTransfer.details.id ) {
                         log.critical( "{}Failed verification of the {} event of " +
-                                "the {}/{} contract, found event(s): {}",
-                        optsTransfer.strLogPrefix, "PostMessageError", "MessageProxy",
+                            "the {}/{} contract, found event(s): {}", optsTransfer.strLogPrefix,
+                        "PostMessageError", "MessageProxy",
                         optsTransfer.joMessageProxyDst.address, joEvents );
                     }
                     imaTransferErrorHandling.saveTransferError(
@@ -661,15 +642,15 @@ async function callbackAllMessagesSign( optsTransfer, err, jarrMessages, joGlueR
                         "event of the \"MessageProxy\"/" + optsTransfer.joMessageProxyDst.address +
                         " contract, error events found" );
                 }
-                optsTransfer.details.success( optsTransfer.strLogPrefix, "Done, validated " +
-                    "transfer to Main Net via MessageProxy error absence on Main Net" );
+                optsTransfer.details.success( "{}Done, validated transfer to Main Net via " +
+                    "MessageProxy error absence on Main Net", optsTransfer.strLogPrefix );
             } else {
-                optsTransfer.details.warning( " Cannot validate transfer to Main Net via " +
+                optsTransfer.details.warning( "{}Cannot validate transfer to Main Net via " +
                     "MessageProxy error absence on Main Net, no valid transaction receipt provided",
                 optsTransfer.strLogPrefix );
             }
         } else {
-            optsTransfer.details.warning( " Cannot validate transfer to Main Net via " +
+            optsTransfer.details.warning( "{}Cannot validate transfer to Main Net via " +
                 "MessageProxy error absence on Main Net, no MessageProxy provided",
             optsTransfer.strLogPrefix );
         }
@@ -911,20 +892,19 @@ async function doMainTransferLoopActions( optsTransfer ) {
             imaTransferErrorHandling.saveTransferSuccessAll();
             return false;
         }
-        optsTransfer.details.trace( optsTransfer.strLogPrefix,
-            "Entering block former iteration with message counter set to ",
-            log.v( optsTransfer.nIdxCurrentMsg ), ", transfer step number is ",
-            log.v( optsTransfer.nStepsDone ), ", can transfer up to ",
-            log.v( optsTransfer.nMaxTransactionsCount ), " message(s) per step",
-            ", can perform up to ", log.v( optsTransfer.nTransferSteps ),
-            " transfer step(s)" );
+        optsTransfer.details.trace( "{}Entering block former iteration with message counter " +
+                "set to {}, transfer step number is {}, can transfer up to {}",
+        " message(s) per step, can perform up to {} transfer step(s)",
+        optsTransfer.strLogPrefix, optsTransfer.nIdxCurrentMsg, optsTransfer.nStepsDone,
+        optsTransfer.nMaxTransactionsCount, optsTransfer.nTransferSteps );
         if( ! loop.checkTimeFraming(
             null, optsTransfer.strDirection, optsTransfer.joRuntimeOpts ) ) {
-            const strWarning = optsTransfer.strLogPrefix + log.em( "WARNING:" ) + " " +
-            log.em( "Time framing overflow (after entering block former iteration loop)" );
-            optsTransfer.details.warning( strWarning );
-            if( log.id != optsTransfer.details.id )
-                log.warning( strWarning );
+            optsTransfer.details.warning( "{}WARNING: Time framing overflow" +
+                "(after entering block former iteration loop)", optsTransfer.strLogPrefix );
+            if( log.id != optsTransfer.details.id ) {
+                log.warning( "{}WARNING: Time framing overflow" +
+                    "(after entering block former iteration loop)", optsTransfer.strLogPrefix );
+            }
             optsTransfer.details.close();
             imaTransferErrorHandling.saveTransferSuccessAll();
             return false;
@@ -986,25 +966,21 @@ async function doMainTransferLoopActions( optsTransfer ) {
                             )
                     );
             optsTransfer.cntNodesMayFail = cntNodes - optsTransfer.cntNodesShouldPass;
-            optsTransfer.details.trace( optsTransfer.strLogPrefix,
-                optsTransfer.strDirection,
-                " message analysis will be performed o S-Chain ",
-                log.v( optsTransfer.chainNameSrc ), " with ",
-                log.v( cntNodes ), " node(s), ",
-                log.v( optsTransfer.cntNodesShouldPass ),
-                " node(s) should have same message(s), ",
-                log.v( optsTransfer.cntNodesMayFail ) +
-                " node(s) allowed to fail message(s) comparison, ",
-                log.v( cntMessages ), " message(s) to check..." );
+            optsTransfer.details.trace( "{}{} message analysis will be performed o S-Chain {}" +
+                " with {} node(s), {} node(s) should have same message(s), {} node(s) allowed " +
+                "to fail message(s) comparison, {} message(s) to check...",
+            optsTransfer.strLogPrefix, optsTransfer.strDirection, optsTransfer.chainNameSrc,
+            cntNodes, optsTransfer.cntNodesShouldPass, optsTransfer.cntNodesMayFail,
+            cntMessages );
             if( ! ( await checkOutgoingMessageEvent( optsTransfer, joSChain ) ) )
                 return false;
         }
 
         optsTransfer.strActionName = "sign messages";
-        const strWillInvokeSigningCallbackMessage = log.fmtDebug( optsTransfer.strLogPrefix,
-            "Will invoke message signing callback, first real message index is: ",
-            optsTransfer.nIdxCurrentMsgBlockStart, ", have ", optsTransfer.jarrMessages.length,
-            " message(s) to process ", optsTransfer.jarrMessages );
+        const strWillInvokeSigningCallbackMessage = log.fmtDebug( "{}Will invoke message signing " +
+            "callback, first real message index is: {}, have {} message(s) to process {}",
+        optsTransfer.strLogPrefix, optsTransfer.nIdxCurrentMsgBlockStart,
+        optsTransfer.jarrMessages.length, optsTransfer.jarrMessages );
         optsTransfer.details.information( strWillInvokeSigningCallbackMessage );
         if( log.id != optsTransfer.details.id )
             log.information( strWillInvokeSigningCallbackMessage );
@@ -1122,27 +1098,26 @@ export async function doTransfer(
     }
     try {
         gIsOneTransferInProgressInThisThread = true;
-        optsTransfer.details.debug( optsTransfer.strLogPrefix, "Message signing is ",
-            log.onOff( optsTransfer.imaState.bSignMessages ) );
+        optsTransfer.details.debug( "{}Message signing is {}",
+            optsTransfer.strLogPrefix, log.onOff( optsTransfer.imaState.bSignMessages ) );
         if( optsTransfer.fnSignMessages == null || optsTransfer.fnSignMessages == undefined ||
             ( ! optsTransfer.imaState.bSignMessages )
         ) {
-            optsTransfer.details.debug( optsTransfer.strLogPrefix,
-                "Using internal signing stub function" );
+            optsTransfer.details.debug( "{}Using internal signing stub function",
+                optsTransfer.strLogPrefix );
             optsTransfer.fnSignMessages = async function(
                 nTransferLoopCounter, jarrMessages, nIdxCurrentMsgBlockStart, strFromChainName,
                 joExtraSignOpts, fnAfter
             ) {
-                optsTransfer.details.debug( optsTransfer.strLogPrefix,
-                    "Message signing callback was not provided to IMA, " +
-                    "first real message index is:", log.v( nIdxCurrentMsgBlockStart ), ", have ",
-                    log.v( optsTransfer.jarrMessages.length ), " message(s) to process ",
-                    log.v( optsTransfer.jarrMessages ) );
+                optsTransfer.details.debug( "{}Message signing callback was not provided " +
+                    "to IMA, first real message index is: {}, have {} message(s) to process {}",
+                optsTransfer.strLogPrefix, nIdxCurrentMsgBlockStart,
+                optsTransfer.jarrMessages.length, optsTransfer.jarrMessages );
                 await fnAfter( null, jarrMessages, null ); // null - no error, null - no signatures
             };
         } else {
-            optsTransfer.details.debug( optsTransfer.strLogPrefix +
-                "Using externally provided signing function" );
+            optsTransfer.details.debug( "{}Using externally provided signing function",
+                optsTransfer.strLogPrefix );
         }
         optsTransfer.nTransactionsCountInBlock = optsTransfer.nTransactionsCountInBlock || 5;
         optsTransfer.nTransferSteps = optsTransfer.nTransferSteps || Number.MAX_SAFE_INTEGER;
@@ -1236,9 +1211,8 @@ export async function doAllS2S( // s-chain --> s-chain
     const strDirection = "S2S";
     const arrSChainsCached = skaleObserver.getLastCachedSChains();
     const cntSChains = arrSChainsCached.length;
-    log.information( "Have ", cntSChains,
-        " S-Chain(s) connected to this S-Chain for performing S2S transfers in ",
-        threadInfo.threadDescription(), "." );
+    log.information( "Have {} S-Chain(s) connected to this S-Chain for performing " +
+        "S2S transfers in {}.", cntSChains, threadInfo.threadDescription() );
     for( let idxSChain = 0; idxSChain < cntSChains; ++ idxSChain ) {
         const joSChain = arrSChainsCached[idxSChain];
         const joPickResult = skaleObserver.pickRandomSChainIndexAndNodeAndUrl( joSChain );
@@ -1247,15 +1221,14 @@ export async function doAllS2S( // s-chain --> s-chain
         const joAccountSrc = joAccountDst; // ???
         const chainNameSrc = "" + joSChain.data.name;
         const chainIdSrc = "" + joSChain.data.computed.chainId;
-        log.information( "S2S transfer walk trough ", chainNameSrc,
-            "/", log.v( chainIdSrc ), " S-Chain in ",
-            threadInfo.threadDescription(), "..." );
+        log.information( "S2S transfer walk trough {}/{} S-Chain in {}...",
+            chainNameSrc, chainIdSrc, threadInfo.threadDescription() );
         let bOK = false;
         try {
             nIndexS2S = idxSChain;
             if( ! await pwa.checkOnLoopStart( imaState, "s2s", nIndexS2S ) ) {
                 imaState.loopState.s2s.wasInProgress = false;
-                log.notice( "Skipped(s2s) due to cancel mode reported from PWA in ",
+                log.notice( "Skipped(s2s) due to cancel mode reported from PWA in {}",
                     threadInfo.threadDescription() );
             } else {
                 if( loop.checkTimeFraming( null, "s2s", joRuntimeOpts ) ) {
@@ -1331,8 +1304,8 @@ export async function doAllS2S( // s-chain --> s-chain
                 } else {
                     bOK = true;
                     const strLogPrefix = "S2S Loop: ";
-                    log.notice( strLogPrefix, "Skipped(s2s) in ",
-                        threadInfo.threadDescription(), " due to time framing check" );
+                    log.notice( strLogPrefix, "Skipped(s2s) in {} due to time framing check",
+                        threadInfo.threadDescription() );
                 }
             }
         } catch ( err ) {

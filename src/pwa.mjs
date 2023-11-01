@@ -286,8 +286,8 @@ async function notifyOnLoopImpl( imaState, strLoopWorkType, nIndexS2S, isStart )
                             return;
                         }
                         if( imaState.isPrintPWA ) {
-                            log.success( "Was successfully sent PWA loop-", se,
-                                " notification to node #", i, " with URL ", log.u( strNodeURL ) );
+                            log.success( "Was successfully sent PWA loop-{} notification to " +
+                                "node #{} with URL {}", se, i, log.u( strNodeURL ) );
                         }
                         await joCall.disconnect();
                     } ); // joCall.call ...

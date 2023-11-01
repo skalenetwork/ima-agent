@@ -120,7 +120,7 @@ class ObserverServer extends SocketServer {
                 const isFlush = true;
                 socket.send( jo, isFlush );
             } );
-            log.debug( "Loop worker ", log.v( workerData.url ),
+            log.debug( "Loop worker ", workerData.url,
                 " will save cached S-Chains..." );
             skaleObserver.setLastCachedSChains( self.opts.imaState.arrSChainsCached );
             self.opts.imaState.chainProperties.mn.joAccount.address = owaspUtils.fnAddressImpl_;
@@ -165,35 +165,33 @@ class ObserverServer extends SocketServer {
             state.set( imaState );
             imaCLI.initContracts();
             self.initComplete = true;
-            self.information( "IMA loop worker ", log.v( workerData.url ),
-                " will do the following work:\n    ", log.v( "Oracle" ), " operations.....",
+            self.information( "IMA loop worker ", workerData.url,
+                " will do the following work:\n    Oracle operations.....",
                 log.yn( self.opts.imaState.optsLoop.enableStepOracle ), "\n",
-                "    ", log.v( "M2S" ), log.fmtDebug( " transfers........." ),
+                "    M2S", log.fmtDebug( " transfers........." ),
                 log.yn( self.opts.imaState.optsLoop.enableStepM2S ), "\n" +
-                "    ", log.v( "S2M" ), log.fmtDebug( " transfers........." ),
+                "    S2M", log.fmtDebug( " transfers........." ),
                 log.yn( self.opts.imaState.optsLoop.enableStepS2M ), "\n",
-                "    ", log.v( "S2S" ), log.fmtDebug( " transfers........." ),
+                "    S2S", log.fmtDebug( " transfers........." ),
                 log.yn( self.opts.imaState.optsLoop.enableStepS2S ) );
             /* await */
             loop.runTransferLoop( self.opts.imaState.optsLoop );
-            self.information( "Full init compete for in-worker IMA loop ",
-                log.v( workerData.url ), " in ", threadInfo.threadDescription() );
+            self.information( "Full init compete for in-worker IMA loop {} in {}",
+                workerData.url, threadInfo.threadDescription() );
             return joAnswer;
         };
         self.mapApiHandlers.spreadUpdatedSChainNetwork =
             function( joMessage, joAnswer, eventData, socket ) {
-                self.debug( "New own S-Chains network information is arrived to ",
-                    log.v( workerData.url ), " loop worker in ",
-                    threadInfo.threadDescription(), ": ",
-                    log.v( joMessage.joSChainNetworkInfo ),
-                    ", this own S-Chain update is ",
-                    log.posNeg( joMessage.isFinal, "final", "partial" ) );
+                self.debug( "New own S-Chains network information is arrived to {}" +
+                    " loop worker in {}: {}, this own S-Chain update is {}",
+                workerData.url, threadInfo.threadDescription(), joMessage.joSChainNetworkInfo,
+                log.posNeg( joMessage.isFinal, "final", "partial" ) );
                 imaState.joSChainNetworkInfo = joMessage.joSChainNetworkInfo;
             };
         self.mapApiHandlers.schainsCached = function( joMessage, joAnswer, eventData, socket ) {
-            self.debug( "S-Chains cache did arrived to ", log.v( workerData.url ),
-                " loop worker in ", threadInfo.threadDescription(), ": ",
-                log.v( joMessage.message.arrSChainsCached ) );
+            self.debug( "S-Chains cache did arrived to {} loop worker in {}: {}",
+                workerData.url, threadInfo.threadDescription(),
+                joMessage.message.arrSChainsCached );
             skaleObserver.setLastCachedSChains( joMessage.message.arrSChainsCached );
         };
         // eslint-disable-next-line dot-notation
@@ -209,8 +207,8 @@ class ObserverServer extends SocketServer {
                     joMessage.params.signature
                 );
             };
-        console.log( "Initialized in-worker IMA loop ", workerData.url, " server in ",
-            threadInfo.threadDescription() );
+        console.log( "Initialized in-worker IMA loop {} server in {}",
+            workerData.url, threadInfo.threadDescription() );
     }
     dispose() {
         const self = this;
@@ -302,6 +300,6 @@ const acceptor = new networkLayer.InWorkerSocketServerAcceptor( workerData.url, 
 const server = new ObserverServer( acceptor );
 server.on( "dispose", function() {
     const self = server;
-    self.debug( "Disposed in-worker in ", threadInfo.threadDescription(), " IMA loop", " ",
-        log.v( workerData.url ) );
+    self.debug( "Disposed in-worker in {} IMA loop {}",
+        threadInfo.threadDescription(), workerData.url );
 } );

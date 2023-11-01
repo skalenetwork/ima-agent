@@ -170,13 +170,13 @@ async function singleTransferLoopPartM2S( optsLoop, strLogPrefix ) {
     const imaState = state.get();
     let b1 = true;
     if( optsLoop.enableStepM2S ) {
-        log.notice( strLogPrefix, "Will invoke M2S transfer in ",
-            threadInfo.threadDescription(), "..." );
+        log.notice( "{}Will invoke M2S transfer in {}...",
+            strLogPrefix, threadInfo.threadDescription() );
         try {
             if( ! await pwa.checkOnLoopStart( imaState, "m2s" ) ) {
                 imaState.loopState.m2s.wasInProgress = false;
-                log.notice( strLogPrefix, "Skipped(m2s) in ", threadInfo.threadDescription(),
-                    " due to cancel mode reported from PWA" );
+                log.notice( "{}Skipped(m2s) in {} due to cancel mode reported from PWA",
+                    strLogPrefix, threadInfo.threadDescription() );
             } else {
                 if( checkTimeFraming( null, "m2s", optsLoop.joRuntimeOpts ) ) {
                     imaState.loopState.m2s.isInProgress = true;
@@ -216,8 +216,8 @@ async function singleTransferLoopPartM2S( optsLoop, strLogPrefix ) {
                     imaState.loopState.m2s.isInProgress = false;
                     await pwa.notifyOnLoopEnd( imaState, "m2s" );
                 } else {
-                    log.notice( strLogPrefix, "Skipped(m2s) in ", threadInfo.threadDescription(),
-                        " due to time framing check" );
+                    log.notice( "{}Skipped(m2s) in {} due to time framing check",
+                        strLogPrefix, threadInfo.threadDescription() );
                 }
             }
         } catch ( err ) {
@@ -240,14 +240,13 @@ async function singleTransferLoopPartS2M( optsLoop, strLogPrefix ) {
     const imaState = state.get();
     let b2 = true;
     if( optsLoop.enableStepS2M ) {
-        log.notice( strLogPrefix, "Will invoke S2M transfer in ",
-            threadInfo.threadDescription(), "..." );
+        log.notice( "{}Will invoke S2M transfer in {}...",
+            strLogPrefix, threadInfo.threadDescription() );
         try {
             if( ! await pwa.checkOnLoopStart( imaState, "s2m" ) ) {
                 imaState.loopState.s2m.wasInProgress = false;
-                log.notice( strLogPrefix, "Skipped(s2m) in ",
-                    threadInfo.threadDescription(),
-                    " due to cancel mode reported from PWA" );
+                log.notice( "{}Skipped(s2m) in {} due to cancel mode reported from PWA",
+                    strLogPrefix, threadInfo.threadDescription() );
             } else {
                 if( checkTimeFraming( null, "s2m", optsLoop.joRuntimeOpts ) ) {
                     imaState.loopState.s2m.isInProgress = true;
@@ -287,8 +286,8 @@ async function singleTransferLoopPartS2M( optsLoop, strLogPrefix ) {
                     imaState.loopState.s2m.isInProgress = false;
                     await pwa.notifyOnLoopEnd( imaState, "s2m" );
                 } else {
-                    log.notice( strLogPrefix, "Skipped(s2m) in ", threadInfo.threadDescription(),
-                        " due to time framing check" );
+                    log.notice( "{}Skipped(s2m) in {} due to time framing check",
+                        strLogPrefix, threadInfo.threadDescription() );
                 }
             }
         } catch ( err ) {
@@ -299,11 +298,11 @@ async function singleTransferLoopPartS2M( optsLoop, strLogPrefix ) {
             await pwa.notifyOnLoopEnd( imaState, "s2m" );
             throw err;
         }
-        log.information( strLogPrefix, "S2M transfer done in ",
-            threadInfo.threadDescription(), ": ", log.v( b2 ) );
+        log.information( "{}S2M transfer done in {}: {}",
+            strLogPrefix, threadInfo.threadDescription(), b2 );
     } else {
-        log.debug( strLogPrefix, "Skipped S2M transfer in ",
-            threadInfo.threadDescription(), "." );
+        log.debug( "{}Skipped S2M transfer in {}.",
+            strLogPrefix, threadInfo.threadDescription() );
     }
     return b2;
 }
@@ -312,7 +311,7 @@ async function singleTransferLoopPartS2S( optsLoop, strLogPrefix ) {
     const imaState = state.get();
     let b3 = true;
     if( optsLoop.enableStepS2S && imaState.optsS2S.isEnabled ) {
-        log.notice( strLogPrefix, "Will invoke all S2S transfers..." );
+        log.notice( "{}Will invoke all S2S transfers...", strLogPrefix );
         try {
             b3 = await IMA.doAllS2S( // s-chain --> s-chain
                 optsLoop.joRuntimeOpts,
@@ -339,13 +338,12 @@ async function singleTransferLoopPartS2S( optsLoop, strLogPrefix ) {
                 log.em( owaspUtils.extractErrorMessage( err ) ), "\n", log.s( err.stack ) );
             throw err;
         }
-        log.information( strLogPrefix, "All S2S transfers done in ",
-            threadInfo.threadDescription(), ": ", log.v( b3 ) );
+        log.information( "{}All S2S transfers done in {}: {}",
+            strLogPrefix, threadInfo.threadDescription(), b3 );
 
-    } else {
-        log.debug( strLogPrefix, "Skipped S2S transfer in ",
-            threadInfo.threadDescription(), "." );
-    }
+    } else
+        log.debug( "{}Skipped S2S transfer in {}.", strLogPrefix, threadInfo.threadDescription() );
+
     return b3;
 }
 
@@ -403,9 +401,8 @@ export async function singleTransferLoop( optsLoop ) {
             b3 = true;
         // Final status check loop part:
         const bResult = b0 && b1 && b2 && b3;
-        log.notice( strLogPrefix,
-            "Final completion status for all performed transfer loop parts is ",
-            log.v( bResult ) );
+        log.notice( "{}Final completion status for all performed transfer loop parts is {}",
+            strLogPrefix, bResult );
         return bResult;
     } catch ( err ) {
         log.error( "{}Exception in transfer loop: {}, stack is: {}{}", strLogPrefix,
@@ -614,8 +611,7 @@ export async function ensureHaveWorkers( opts ) {
                     idxWorker, log.em( owaspUtils.extractErrorMessage( joMessage.error ) ) );
                 break;
             case "log":
-                log.information( "LOOP WORKER ", log.fmtNotice( workerData.url ),
-                    " ", joMessage.message );
+                log.information( "LOOP WORKER {} {}", workerData.url, joMessage.message );
                 break;
             case "saveTransferError":
                 imaTransferErrorHandling.saveTransferError(
@@ -744,7 +740,7 @@ export async function ensureHaveWorkers( opts ) {
     }
     log.debug( "Loop module did created its ",
         gArrWorkers.length, " worker(s) in ", threadInfo.threadDescription() );
-    log.trace( "Subscribe to inThread-arrSChainsCached event in ",
+    log.trace( "Subscribe to inThread-arrSChainsCached event in {}",
         threadInfo.threadDescription() );
     skaleObserver.events.on( "inThread-arrSChainsCached", function( eventData ) {
         log.trace( "Did arrived inThread-arrSChainsCached event in ",
@@ -754,19 +750,16 @@ export async function ensureHaveWorkers( opts ) {
     } );
     // Force broadcast what we have in SNB right now because works above can start later than SNB
     // is finished download connected chains quickly
-    log.debug( "Loop module will do first initial broadcast of arrSChainsCached to its ",
-        cntWorkers, " worker(s) in ", threadInfo.threadDescription(), "..." );
+    log.debug( "Loop module will do first initial broadcast of arrSChainsCached to its {}" +
+        " worker(s) in {}...", cntWorkers, threadInfo.threadDescription() );
     notifyCacheChangedSNB( skaleObserver.getLastCachedSChains() );
 }
 
 export async function runParallelLoops( opts ) {
-    log.notice( "Will start parallel IMA transfer loops in ",
-        threadInfo.threadDescription(), "..." );
+    log.notice( "Will start parallel IMA transfer loops in {}...", threadInfo.threadDescription() );
     await ensureHaveWorkers( opts );
-    log.success( "Done, did started parallel IMA transfer loops in ",
-        threadInfo.threadDescription(), ", have ",
-        gArrWorkers.length, " worker(s) and " +
-        gArrClients.length, " clients(s)." );
+    log.success( "Done, did started parallel IMA transfer loops in {}, have {} worker(s) and {} " +
+        "clients(s).", threadInfo.threadDescription(), gArrWorkers.length, gArrClients.length );
     return true;
 }
 

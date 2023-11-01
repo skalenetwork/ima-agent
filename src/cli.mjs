@@ -104,7 +104,7 @@ export function ensureHaveValue(
     for( ; n > 0; --n )
         strDots += ".";
     if( isPrintValue )
-        log.debug( fnNameColorizer( name ), strDots, fnValueColorizer( value ) );
+        log.debug( "{}{}{}", fnNameColorizer( name ), strDots, fnValueColorizer( value ) );
     return retVal;
 }
 
@@ -2409,16 +2409,16 @@ function commonInitCheckErc20() {
     let n2 = 0;
     if( imaState.chainProperties.mn.strPathJsonErc20.length > 0 ) {
         if( isPrintGathered ) {
-            log.information( "Loading Main-net ERC20 ABI from ",
-                log.fmtNotice( imaState.chainProperties.mn.strPathJsonErc20 ) );
+            log.information( "Loading Main-net ERC20 ABI from {}",
+                imaState.chainProperties.mn.strPathJsonErc20 );
         }
         imaState.chainProperties.mn.joErc20 =
             imaUtils.jsonFileLoad( imaState.chainProperties.mn.strPathJsonErc20, null );
         n1 = Object.keys( imaState.chainProperties.mn.joErc20 ).length;
         if( imaState.chainProperties.sc.strPathJsonErc20.length > 0 ) {
             if( isPrintGathered ) {
-                log.information( "Loading S-Chain ERC20 ABI from ",
-                    log.fmtNotice( imaState.chainProperties.sc.strPathJsonErc20 ) );
+                log.information( "Loading S-Chain ERC20 ABI from {}",
+                    imaState.chainProperties.sc.strPathJsonErc20 );
             }
             imaState.chainProperties.sc.joErc20 =
                 imaUtils.jsonFileLoad( imaState.chainProperties.sc.strPathJsonErc20, null );
@@ -2440,11 +2440,11 @@ function commonInitCheckErc20() {
                 ) {
                     if( isPrintGathered ) {
                         log.information( "Loaded Main-net ERC20 ABI {}",
-                            att( imaState.chainProperties.tc.strCoinNameErc20 ) );
+                            imaState.chainProperties.tc.strCoinNameErc20 );
                     }
                     if( isPrintGathered && n2 > 0 ) {
                         log.information( "Loaded S-Chain ERC20 ABI {}",
-                            att( imaState.chainProperties.sc.strCoinNameErc20 ) );
+                            imaState.chainProperties.sc.strCoinNameErc20 );
                     }
                 }
             } else {
@@ -2476,8 +2476,8 @@ function commonInitCheckErc20() {
             n1 = 0;
             n2 = 0;
             if( isPrintGathered ) {
-                log.information( "Loading S-Chain ERC20 ABI from ",
-                    log.fmtNotice( imaState.chainProperties.sc.strPathJsonErc20 ) );
+                log.information( "Loading S-Chain ERC20 ABI from {}",
+                    imaState.chainProperties.sc.strPathJsonErc20 );
             }
             imaState.chainProperties.sc.joErc20 =
             imaUtils.jsonFileLoad( imaState.chainProperties.sc.strPathJsonErc20, null );
@@ -2488,8 +2488,8 @@ function commonInitCheckErc20() {
                 n2 = imaState.chainProperties.sc.strCoinNameErc20.length;
                 if( n2 > 0 ) {
                     if( isPrintGathered ) {
-                        log.information( "Loaded S-Chain ERC20 ABI ",
-                            att( imaState.chainProperties.sc.strCoinNameErc20 ) );
+                        log.information( "Loaded S-Chain ERC20 ABI {}",
+                            imaState.chainProperties.sc.strCoinNameErc20 );
                     }
                 } else {
                     if( n2 === 0 && imaState.chainProperties.sc.strPathJsonErc20.length > 0 )
@@ -2522,8 +2522,8 @@ function commonInitCheckErc20() {
 
     if( imaState.chainProperties.tc.strPathJsonErc20.length > 0 ) {
         if( isPrintGathered ) {
-            log.information( "Loading S<->S Target S-Chain ERC20 ABI from ",
-                log.fmtNotice( imaState.chainProperties.tc.strPathJsonErc20 ) );
+            log.information( "Loading S<->S Target S-Chain ERC20 ABI from {}",
+                imaState.chainProperties.tc.strPathJsonErc20 );
         }
         imaState.chainProperties.tc.joErc20 =
             imaUtils.jsonFileLoad( imaState.chainProperties.tc.strPathJsonErc20, null );
@@ -2534,8 +2534,8 @@ function commonInitCheckErc20() {
             n2 = imaState.chainProperties.tc.strCoinNameErc20.length;
             if( n2 > 0 ) {
                 if( isPrintGathered ) {
-                    log.information( "Loaded S<->S Target S-Chain ERC20 ABI ",
-                        att( imaState.chainProperties.tc.strCoinNameErc20 ) );
+                    log.information( "Loaded S<->S Target S-Chain ERC20 ABI {}",
+                        imaState.chainProperties.tc.strCoinNameErc20 );
                 }
             } else {
                 if( n2 === 0 && imaState.chainProperties.tc.strPathJsonErc20.length > 0 ) {
@@ -2565,16 +2565,16 @@ function commonInitCheckErc721() {
     let n2 = 0;
     if( imaState.chainProperties.mn.strPathJsonErc721.length > 0 ) {
         if( isPrintGathered ) {
-            log.information( "Loading Main-net ERC721 ABI from ",
-                log.fmtNotice( imaState.chainProperties.mn.strPathJsonErc721 ) );
+            log.information( "Loading Main-net ERC721 ABI from {}",
+                imaState.chainProperties.mn.strPathJsonErc721 );
         }
         imaState.chainProperties.mn.joErc721 =
             imaUtils.jsonFileLoad( imaState.chainProperties.mn.strPathJsonErc721, null );
         n1 = Object.keys( imaState.chainProperties.mn.joErc721 ).length;
         if( imaState.chainProperties.sc.strPathJsonErc721.length > 0 ) {
             if( isPrintGathered ) {
-                log.information( "Loading S-Chain ERC721 ABI from ",
-                    log.fmtNotice( imaState.chainProperties.sc.strPathJsonErc721 ) );
+                log.information( "Loading S-Chain ERC721 ABI from {}",
+                    imaState.chainProperties.sc.strPathJsonErc721 );
             }
             imaState.chainProperties.sc.joErc721 =
                 imaUtils.jsonFileLoad( imaState.chainProperties.sc.strPathJsonErc721, null );
@@ -2593,12 +2593,12 @@ function commonInitCheckErc721() {
             if( n1 > 0 ) {
                 if( ! imaState.bShowConfigMode ) {
                     if( isPrintGathered ) {
-                        log.information( "Loaded Main-net ERC721 ABI ",
-                            att( imaState.chainProperties.mn.strCoinNameErc721 ) );
+                        log.information( "Loaded Main-net ERC721 ABI {}",
+                            imaState.chainProperties.mn.strCoinNameErc721 );
                     }
                     if( n2 > 0 && isPrintGathered ) {
-                        log.information( "Loaded S-Chain ERC721 ABI ",
-                            att( imaState.chainProperties.sc.strCoinNameErc721 ) );
+                        log.information( "Loaded S-Chain ERC721 ABI {}",
+                            imaState.chainProperties.sc.strCoinNameErc721 );
                     }
                 }
             } else {
@@ -2628,8 +2628,8 @@ function commonInitCheckErc721() {
             n1 = 0;
             n2 = 0;
             if( isPrintGathered ) {
-                log.information( "Loading S-Chain ERC721 ABI from ",
-                    log.fmtNotice( imaState.chainProperties.sc.strPathJsonErc721 ) );
+                log.information( "Loading S-Chain ERC721 ABI from {}",
+                    imaState.chainProperties.sc.strPathJsonErc721 );
             }
             imaState.chainProperties.sc.joErc721 =
                 imaUtils.jsonFileLoad( imaState.chainProperties.sc.strPathJsonErc721, null );
@@ -2641,8 +2641,8 @@ function commonInitCheckErc721() {
                 n2 = imaState.chainProperties.sc.strCoinNameErc721.length;
                 if( n2 > 0 ) {
                     if( isPrintGathered ) {
-                        log.information( "Loaded S-Chain ERC721 ABI ",
-                            att( imaState.chainProperties.sc.strCoinNameErc721 ) );
+                        log.information( "Loaded S-Chain ERC721 ABI {}",
+                            imaState.chainProperties.sc.strCoinNameErc721 );
                     } else {
                         if( n2 === 0 && imaState.chainProperties.sc.strPathJsonErc721.length > 0 ) {
                             log.fatal( "S-Chain ERC721 token name is not " +
@@ -2680,8 +2680,8 @@ function commonInitCheckErc721() {
     if( imaState.chainProperties.tc.strPathJsonErc721.length > 0 &&
         isPrintGathered
     ) {
-        log.information( "Loading S<->S Target S-Chain ERC721 ABI from ",
-            log.fmtNotice( imaState.chainProperties.tc.strPathJsonErc721 ) );
+        log.information( "Loading S<->S Target S-Chain ERC721 ABI from {}",
+            imaState.chainProperties.tc.strPathJsonErc721 );
         imaState.chainProperties.tc.joErc721 =
             imaUtils.jsonFileLoad( imaState.chainProperties.tc.strPathJsonErc721, null );
         n2 = Object.keys( imaState.chainProperties.tc.joErc721 ).length;
@@ -2690,8 +2690,8 @@ function commonInitCheckErc721() {
                 imaUtils.discoverCoinNameInJSON( imaState.chainProperties.tc.joErc721 );
             n2 = imaState.chainProperties.tc.strCoinNameErc721.length;
             if( n2 > 0 && isPrintGathered ) {
-                log.information( "Loaded S<->S Target S-Chain ERC721 ABI ",
-                    att( imaState.chainProperties.tc.strCoinNameErc721 ) );
+                log.information( "Loaded S<->S Target S-Chain ERC721 ABI {}",
+                    imaState.chainProperties.tc.strCoinNameErc721 );
             } else {
                 if( n2 === 0 &&
                     imaState.chainProperties.tc.strPathJsonErc721.length > 0 &&
@@ -2723,16 +2723,16 @@ function commonInitCheckErc1155() {
     let n2 = 0;
     if( imaState.chainProperties.mn.strPathJsonErc1155.length > 0 ) {
         if( isPrintGathered ) {
-            log.information( "Loading Main-net ERC1155 ABI from ",
-                log.fmtNotice( imaState.chainProperties.mn.strPathJsonErc1155 ) );
+            log.information( "Loading Main-net ERC1155 ABI from {}",
+                imaState.chainProperties.mn.strPathJsonErc1155 );
         }
         imaState.chainProperties.mn.joErc1155 =
             imaUtils.jsonFileLoad( imaState.chainProperties.mn.strPathJsonErc1155, null );
         n1 = Object.keys( imaState.chainProperties.mn.joErc1155 ).length;
         if( imaState.chainProperties.sc.strPathJsonErc1155.length > 0 ) {
             if( isPrintGathered ) {
-                log.information( "Loading S-Chain ERC1155 ABI from ",
-                    log.fmtNotice( imaState.chainProperties.sc.strPathJsonErc1155 ) );
+                log.information( "Loading S-Chain ERC1155 ABI from {}",
+                    imaState.chainProperties.sc.strPathJsonErc1155 );
             }
             imaState.chainProperties.sc.joErc1155 =
                 imaUtils.jsonFileLoad( imaState.chainProperties.sc.strPathJsonErc1155, null );
@@ -2751,12 +2751,12 @@ function commonInitCheckErc1155() {
             if( n1 > 0 ) {
                 if( ! imaState.bShowConfigMode ) {
                     if( isPrintGathered ) {
-                        log.information( "Loaded Main-net ERC1155 ABI ",
-                            att( imaState.chainProperties.mn.strCoinNameErc1155 ) );
+                        log.information( "Loaded Main-net ERC1155 ABI {}",
+                            imaState.chainProperties.mn.strCoinNameErc1155 );
                     }
                     if( n2 > 0 && isPrintGathered ) {
-                        log.information( "Loaded S-Chain ERC1155 ABI ",
-                            att( imaState.chainProperties.sc.strCoinNameErc1155 ) );
+                        log.information( "Loaded S-Chain ERC1155 ABI {}",
+                            imaState.chainProperties.sc.strCoinNameErc1155 );
                     }
                 }
             } else {
@@ -2787,8 +2787,8 @@ function commonInitCheckErc1155() {
             n1 = 0;
             n2 = 0;
             if( isPrintGathered ) {
-                log.information( "Loading S-Chain ERC1155 ABI from ",
-                    log.fmtNotice( imaState.chainProperties.sc.strPathJsonErc1155 ) );
+                log.information( "Loading S-Chain ERC1155 ABI from {}",
+                    imaState.chainProperties.sc.strPathJsonErc1155 );
             }
             imaState.chainProperties.sc.joErc1155 =
                 imaUtils.jsonFileLoad( imaState.chainProperties.sc.strPathJsonErc1155, null );
@@ -2800,8 +2800,8 @@ function commonInitCheckErc1155() {
                 n2 = imaState.chainProperties.sc.strCoinNameErc1155.length;
                 if( n2 > 0 ) {
                     if( isPrintGathered ) {
-                        log.information( "Loaded S-Chain ERC1155 ABI ",
-                            att( imaState.chainProperties.sc.strCoinNameErc1155 ) );
+                        log.information( "Loaded S-Chain ERC1155 ABI {}",
+                            imaState.chainProperties.sc.strCoinNameErc1155 );
                     }
                 } else {
                     if( n2 === 0 && imaState.chainProperties.sc.strPathJsonErc1155.length > 0 )
@@ -2836,8 +2836,8 @@ function commonInitCheckErc1155() {
 
     if( imaState.chainProperties.tc.strPathJsonErc1155.length > 0 ) {
         if( isPrintGathered ) {
-            log.information( "Loading S<->S Target S-Chain ERC1155 ABI from ",
-                log.fmtNotice( imaState.chainProperties.tc.strPathJsonErc1155 ) );
+            log.information( "Loading S<->S Target S-Chain ERC1155 ABI from {}",
+                imaState.chainProperties.tc.strPathJsonErc1155 );
         }
         imaState.chainProperties.tc.joErc1155 =
         imaUtils.jsonFileLoad( imaState.chainProperties.tc.strPathJsonErc1155, null );
@@ -2848,8 +2848,8 @@ function commonInitCheckErc1155() {
             n2 = imaState.chainProperties.tc.strCoinNameErc1155.length;
             if( n2 > 0 ) {
                 if( isPrintGathered ) {
-                    log.information( "Loaded S<->S Target S-Chain ERC1155 ABI ",
-                        att( imaState.chainProperties.tc.strCoinNameErc1155 ) );
+                    log.information( "Loaded S<->S Target S-Chain ERC1155 ABI {}",
+                        imaState.chainProperties.tc.strCoinNameErc1155 );
                 }
             } else {
                 if( n2 === 0 &&
@@ -3201,8 +3201,8 @@ function commonInitErcTokensArgs() {
                 return log.fmtInformation( x );
             } );
         if( isPrintGathered ) {
-            log.information( "ERC20 explicit S-Chain address is ",
-                att( imaState.strAddrErc20Explicit ) );
+            log.information( "ERC20 explicit S-Chain address is {}",
+                imaState.strAddrErc20Explicit );
         }
     }
     if( imaState.chainProperties.tc.strCoinNameErc20.length > 0 ) {
@@ -3233,8 +3233,8 @@ function commonInitErcTokensArgs() {
                 return log.fmtInformation( x );
             } );
         if( isPrintGathered ) {
-            log.information( "ERC721 explicit S-Chain address is ",
-                att( imaState.strAddrErc721Explicit ) );
+            log.information( "ERC721 explicit S-Chain address is {}",
+                imaState.strAddrErc721Explicit );
         }
     }
     if( imaState.chainProperties.tc.strCoinNameErc721.length > 0 ) {

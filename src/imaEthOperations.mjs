@@ -82,8 +82,8 @@ export async function doEthPaymentFromMainNet(
     let strActionName = "";
     const strLogPrefix = "M2S ETH Payment: ";
     try {
-        details.debug( strLogPrefix, "Doing payment from mainnet with chainIdSChain=",
-            log.v( chainIdSChain ), "..." );
+        details.debug( "{}Doing payment from mainnet with chainIdSChain={}...",
+            strLogPrefix, chainIdSChain );
         strActionName = "ETH payment from Main Net, deposit";
         const arrArguments = [
             chainIdSChain
@@ -125,9 +125,8 @@ export async function doEthPaymentFromMainNet(
         // Must-have event(s) analysis as indicator(s) of success
         const strEventName = "OutgoingMessage";
         if( joMessageProxyMainNet ) {
-            details.debug( strLogPrefix, "Verifying the ", log.v( strEventName ),
-                " event of the ", log.v( "MessageProxy" ), "/",
-                log.v( joMessageProxyMainNet.address ), " contract ..." );
+            details.debug( "{}Verifying the {} event of the ", "MessageProxy/{} contract ...",
+                strLogPrefix, strEventName, joMessageProxyMainNet.address );
             await imaHelperAPIs.sleep(
                 imaHelperAPIs.getMillisecondsSleepBeforeFetchOutgoingMessageEvent() );
             const joEvents = await imaEventLogScan.getContractCallEvents(
@@ -137,15 +136,13 @@ export async function doEthPaymentFromMainNet(
                 joMessageProxyMainNet.filters[strEventName]()
             );
             if( joEvents.length > 0 ) {
-                details.success( strLogPrefix, "Success, verified the ", log.v( strEventName ),
-                    " event of the ", log.v( "MessageProxy" ), "/",
-                    log.v( joMessageProxyMainNet.address ), " contract, found event(s): ",
-                    log.v( joEvents ) );
+                details.success( "{}Success, verified the {} event of the MessageProxy/{} " +
+                    "contract, found event(s): {}", strLogPrefix, strEventName,
+                joMessageProxyMainNet.address, joEvents );
             } else {
-                throw new Error(
-                    "Verification failed for the \"OutgoingMessage\" " +
-                        "event of the \"MessageProxy\"/" +
-                    joMessageProxyMainNet.address + " contract, no events found" );
+                throw new Error( "Verification failed for the \"OutgoingMessage\" event of the " +
+                    "\"MessageProxy\"/" + joMessageProxyMainNet.address +
+                    " contract, no events found" );
             }
         }
     } catch ( err ) {
@@ -235,9 +232,8 @@ export async function doEthPaymentFromSChain(
         // Must-have event(s) analysis as indicator(s) of success
         const strEventName = "OutgoingMessage";
         if( joMessageProxySChain ) {
-            details.debug( strLogPrefix, "Verifying the ", log.v( strEventName ), " event of the ",
-                log.v( "MessageProxy" ), "/", log.v( joMessageProxySChain.address ),
-                " contract ..." );
+            details.debug( "{}Verifying the {} event of the MessageProxy/{} contract ...",
+                strLogPrefix, strEventName, joMessageProxySChain.address );
             await imaHelperAPIs.sleep(
                 imaHelperAPIs.getMillisecondsSleepBeforeFetchOutgoingMessageEvent() );
             const joEvents = await imaEventLogScan.getContractCallEvents(
@@ -247,13 +243,11 @@ export async function doEthPaymentFromSChain(
                 joMessageProxySChain.filters[strEventName]()
             );
             if( joEvents.length > 0 ) {
-                details.success( strLogPrefix, "Success, verified the ",
-                    log.v( strEventName ), " event of the ", log.v( "MessageProxy" ),
-                    "/", log.v( joMessageProxySChain.address ), " contract, found event(s): ",
-                    log.v( joEvents ) );
+                details.success( "{}Success, verified the {} event of the MessageProxy/{} " +
+                    "contract, found event(s): {}", strLogPrefix, strEventName,
+                joMessageProxySChain.address, joEvents );
             } else {
-                throw new Error(
-                    "Verification failed for the \"OutgoingMessage\" " +
+                throw new Error( "Verification failed for the \"OutgoingMessage\" " +
                         "event of the \"MessageProxy\"/" +
                     joMessageProxySChain.address + " contract, no events found" );
             }
@@ -362,12 +356,11 @@ export async function viewEthPaymentFromSchainOnMainNet(
             await joDepositBoxETH.callStatic.approveTransfers(
                 addressFrom,
                 { from: addressFrom } );
-        details.success( strLogPrefix, "You can receive(wei): ", log.v( xWei ) );
+        details.success( "{}You can receive(wei): {}", strLogPrefix, xWei );
         const xEth = owaspUtils.ethersMod.ethers.utils.formatEther( owaspUtils.toBN( xWei ) );
-        const s = log.fmtSuccess( strLogPrefix, "You can receive(eth): ", log.v( xEth ) );
         if( log.id != details.id )
-            log.success( s );
-        details.success( s );
+            log.success( "{}You can receive(eth): {}", strLogPrefix, xEth );
+        details.success( "{}You can receive(eth): {}", strLogPrefix, xEth );
         if( log.exposeDetailsGet() )
             details.exposeDetailsTo( log, "viewEthPaymentFromSchainOnMainNet", true );
         details.close();

@@ -113,10 +113,9 @@ export async function safeGetPastEventsProgressive(
     nBlockFrom, nBlockTo, joFilter, optsChainPair
 ) {
     const strURL = owaspUtils.ethersProviderToUrl( ethersProvider );
-    details.information( strLogPrefix,
-        "Will run progressive logs search for event ",
-        strEventName, " via URL ", log.u( strURL ),
-        generateWhileTransferringLogMessageSuffix( optsChainPair ), "..." );
+    details.information( "{}Will run progressive logs search for event {} via URL {} {}...",
+        strLogPrefix, strEventName, log.u( strURL ),
+        generateWhileTransferringLogMessageSuffix( optsChainPair ) );
     if( ! imaTransferErrorHandling.getEnabledProgressiveEventsScan() ) {
         details.warning( "{}IMPORTANT NOTICE: Will skip progressive events scan " +
             "in block range from {} to {} because it's {}",
@@ -163,22 +162,21 @@ export async function safeGetPastEventsProgressive(
         if( joPlan.nBlockFrom < 0 )
             continue;
         joLastPlan = joPlan;
-        details.trace( strLogPrefix, "Progressive event log records scan of ",
-            strEventName, " event, from block ", log.v( joPlan.nBlockFrom ),
-            ", to block ", log.v( joPlan.nBlockTo ), ", block range is ", log.v( joPlan.type ),
-            " via URL ", log.u( strURL ),
-            generateWhileTransferringLogMessageSuffix( optsChainPair ), "..." );
+        details.trace( "{}Progressive event log records scan of {} event, from block {}" +
+                ", to block {}, block range is {} via URL {} {}...", strLogPrefix, strEventName,
+        joPlan.nBlockFrom, joPlan.nBlockTo, joPlan.type, log.u( strURL ),
+        generateWhileTransferringLogMessageSuffix( optsChainPair ) );
         try {
             const joAllEventsInBlock = await safeGetPastEventsIterative( details, strLogPrefix,
                 ethersProvider, attempts, joContract, strEventName,
                 joPlan.nBlockFrom, joPlan.nBlockTo, joFilter );
             if( joAllEventsInBlock && joAllEventsInBlock.length > 0 ) {
-                details.success( strLogPrefix, "Progressive event log records scan of log event ",
-                    strEventName, ", from block ", log.v( joPlan.nBlockFrom ),
-                    ", to block ", log.v( joPlan.nBlockTo ), ", block range is ",
-                    log.v( joPlan.type ), ", via URL ", log.u( strURL ),
-                    generateWhileTransferringLogMessageSuffix( optsChainPair ),
-                    ", found ", log.v( joAllEventsInBlock.length ), " event(s)" );
+                details.success( "{}Progressive event log records scan of log event {}" +
+                        ", from block {}, to block {}, block range is {}, via URL {} {}" +
+                        ", found {} event(s)", strLogPrefix, strEventName, joPlan.nBlockFrom,
+                joPlan.nBlockTo, joPlan.type, log.u( strURL ),
+                generateWhileTransferringLogMessageSuffix( optsChainPair ),
+                joAllEventsInBlock.length );
                 return joAllEventsInBlock;
             }
         } catch ( err ) {}
@@ -463,9 +461,8 @@ export async function safeGetPastEventsIterative(
     if( nBlockTo == "latest" ) {
         isLastLatest = true;
         nBlockTo = nLatestBlockNumberPlus1;
-        details.trace( strLogPrefix, "Iterative scan up to latest block #",
-            nBlockTo.toHexString(),
-            " assumed instead of ", log.v( "latest" ) );
+        details.trace( "{}Iterative scan up to latest block #{} assumed instead of {}",
+            strLogPrefix, nBlockTo.toHexString(), "latest" );
     } else {
         nBlockTo = owaspUtils.toBN( nBlockTo );
         if( nBlockTo.gte( nLatestBlockNumber ) )
@@ -489,8 +486,8 @@ export async function safeGetPastEventsIterative(
             );
         }
     }
-    details.trace( strLogPrefix, "Iterative scan in ", nBlockFrom.toHexString(), "/",
-        nBlockTo.toHexString(), " block range..." );
+    details.trace( "{}Iterative scan in {}/{} block range...",
+        strLogPrefix, nBlockFrom.toHexString(), nBlockTo.toHexString() );
     let idxBlockSubRangeTo = nBlockTo;
     for( ; true; ) {
         let idxBlockSubRangeFrom = idxBlockSubRangeTo.sub(
@@ -498,22 +495,16 @@ export async function safeGetPastEventsIterative(
         if( idxBlockSubRangeFrom.lt( nBlockFrom ) )
             idxBlockSubRangeFrom = nBlockFrom;
         try {
-            details.trace( strLogPrefix, "Iterative scan of ",
-                log.v( idxBlockSubRangeFrom.toHexString() ), "/",
-                log.v( idxBlockSubRangeTo.toHexString() ),
-                " block sub-range in ",
-                nBlockFrom.toHexString(), "/",
-                nBlockTo.toHexString(), " block range..." );
-            const joAllEventsInBlock = await safeGetPastEvents(
-                details, strLogPrefix,
+            details.trace( "{}Iterative scan of {}/{} block sub-range in {}/{} block range...",
+                strLogPrefix, idxBlockSubRangeFrom.toHexString(), idxBlockSubRangeTo.toHexString(),
+                nBlockFrom.toHexString(), nBlockTo.toHexString() );
+            const joAllEventsInBlock = await safeGetPastEvents( details, strLogPrefix,
                 ethersProvider, attempts, joContract, strEventName,
-                idxBlockSubRangeFrom, idxBlockSubRangeTo, joFilter
-            );
+                idxBlockSubRangeFrom, idxBlockSubRangeTo, joFilter );
             if( joAllEventsInBlock && joAllEventsInBlock != "" && joAllEventsInBlock.length > 0 ) {
-                details.success( strLogPrefix, "Result of ", log.v( "iterative" ),
-                    " scan in ", nBlockFrom.toHexString(), "/",
-                    nBlockTo.toHexString(), " block range is ",
-                    log.v( joAllEventsInBlock ) );
+                details.success( "{}Result of iterative scan in {}/{} block range is {}",
+                    strLogPrefix, nBlockFrom.toHexString(), nBlockTo.toHexString(),
+                    joAllEventsInBlock );
                 return joAllEventsInBlock;
             }
         } catch ( err ) {

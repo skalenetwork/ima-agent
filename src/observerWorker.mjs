@@ -115,7 +115,7 @@ class ObserverServer extends SocketServer {
                     owaspUtils.getEthersProviderFromURL( u );
             } else {
                 self.warning( "WARNING: No Main-net URL specified in command line arguments" +
-                    "(needed for particular operations only) in {}",
+                        "(needed for particular operations only) in {}",
                 threadInfo.threadDescription() );
             }
 
@@ -128,7 +128,7 @@ class ObserverServer extends SocketServer {
                     owaspUtils.getEthersProviderFromURL( u );
             } else {
                 self.warning( "WARNING: No Main-net URL specified in command line arguments" +
-                    "(needed for particular operations only) in {}",
+                        "(needed for particular operations only) in {}",
                 threadInfo.threadDescription() );
             }
             self.opts.imaState.joNodes =

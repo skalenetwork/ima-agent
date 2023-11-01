@@ -53,10 +53,8 @@ export function getSChainIndexInNode( computedSChainId, arrChainIdsOnNode ) {
             return i;
         ++ i;
     }
-    throw new Error(
-        "S-Chain " + computedSChainId + " is not found in the list: " +
-        JSON.stringify( arrChainIdsOnNode ) + "in " +
-        threadInfo.threadDescription( false ) );
+    throw new Error( "S-Chain " + computedSChainId + " is not found in the list: " +
+        JSON.stringify( arrChainIdsOnNode ) + "in " + threadInfo.threadDescription( false ) );
 }
 
 export function getSChainBasePortOnNode( computedSChainId, arrChainIdsOnNode, basePortOfNode ) {
@@ -351,30 +349,29 @@ function process_sc_data( rawData ) {
 export async function loadSChain( idxSChain, hash, joData, cntSChains, opts ) {
     owaspUtils.ensureObserverOptionsInitialized( opts );
     if( ! opts.imaState ) {
-        throw new Error(
-            "Cannot load S-Chain description in observer, no imaState is provided in " +
-            threadInfo.threadDescription( false ) );
+        throw new Error( "Cannot load S-Chain description in observer, no imaState " +
+            "is provided in " + threadInfo.threadDescription( false ) );
     }
     if( opts && opts.details ) {
-        opts.details.trace( "Loading S-Chain #", idxSChain + 1, " of ", cntSChains,
-            " in ", threadInfo.threadDescription(), "..." );
+        opts.details.trace( "Loading S-Chain #{} of {} in {}...",
+            idxSChain + 1, cntSChains, threadInfo.threadDescription() );
     }
     hash = hash || await opts.imaState.joSChainsInternal.callStatic.schainsAtSystem( idxSChain );
     if( opts && opts.details )
-        opts.details.trace( "    Hash ", log.v( hash ) );
+        opts.details.trace( "    Hash {}", hash );
     if( opts && opts.bStopNeeded )
         return null;
     joData = joData ||
         process_sc_data( await opts.imaState.joSChainsInternal.callStatic.schains( hash ) );
     if( opts && opts.details )
-        opts.details.trace( "    Data of chain is ", log.v( joData ) );
+        opts.details.trace( "    Data of chain is {}", joData );
     const joSChain = { "data": joData };
     removeSChainDescDataNumKeys( joSChain.data );
     if( opts && opts.bStopNeeded )
         return null;
     await loadSChainParts( joSChain, opts );
     if( opts && opts.details ) {
-        opts.details.trace( "    SNB did loaded parts of S-chain ", log.v( joSChain.data ) );
+        opts.details.trace( "    SNB did loaded parts of S-chain {}", joSChain.data );
         opts.details.success( "Done" );
     }
     joSChain.isConnected = false;
@@ -389,8 +386,7 @@ export async function loadSChainsDefault( opts ) {
 export async function loadSChains( opts ) {
     owaspUtils.ensureObserverOptionsInitialized( opts );
     if( ! opts.imaState ) {
-        throw new Error(
-            "Cannot load S-Chains parts in observer, no imaState is provided in " +
+        throw new Error( "Cannot load S-Chains parts in observer, no imaState is provided in " +
             threadInfo.threadDescription( false ) );
     }
     let isEMC = false;
@@ -404,8 +400,8 @@ export async function loadSChains( opts ) {
 export async function loadSChainsWithEMC( opts ) {
     const cntSChains = await getSChainsCount( opts );
     if( opts && opts.details ) {
-        opts.details.trace( "Have ", cntSChains, " S-Chain(s) to EMC-load in ",
-            threadInfo.threadDescription(), "..." );
+        opts.details.trace( "Have {} S-Chain(s) to EMC-load in {}...",
+            cntSChains, threadInfo.threadDescription() );
     }
     const isLoadConnectedOnly = ( "isLoadConnectedOnly" in opts )
         ? ( !!opts.isLoadConnectedOnly ) : true;
@@ -417,11 +413,11 @@ export async function loadSChainsWithEMC( opts ) {
     const bHaveExtraGroup = ( cntLastExtraGroup > 0 ) ? true : false;
     const cntGroups = Math.floor( cntSChains / cntGroupMax ) + ( bHaveExtraGroup ? 1 : 0 );
     if( opts && opts.details ) {
-        opts.details.trace( "    Have ", cntGroups, " multicall group(s), max possible ",
-            cntGroupMax, " call(s) in each" );
+        opts.details.trace( "    Have {} multicall group(s), max possible {} call(s) in each",
+            cntGroups, cntGroupMax );
         if( bHaveExtraGroup ) {
-            opts.details.trace( "    Have last extra multicall group with ", cntLastExtraGroup,
-                " call(s) in it" );
+            opts.details.trace( "    Have last extra multicall group with {} call(s) in it",
+                cntLastExtraGroup );
         }
     }
     const arrSChainHashes = [];
@@ -432,8 +428,8 @@ export async function loadSChainsWithEMC( opts ) {
         const cntInThisGroup = ( idxGroup == ( cntGroups - 1 ) && bHaveExtraGroup )
             ? cntLastExtraGroup : cntGroupMax;
         if( opts && opts.details ) {
-            opts.details.trace( "    Processing chain hashes in multicall group #", idxGroup,
-                " with ", cntInThisGroup, " call(s) in it..." );
+            opts.details.trace( "    Processing chain hashes in multicall group #{}" +
+                " with {} call(s) in it...", idxGroup, cntInThisGroup );
         }
         const strRef3 = "SchainsInternal-schainsAtSystem";
         const contractCallContext = [ {
@@ -463,8 +459,8 @@ export async function loadSChainsWithEMC( opts ) {
                 rawResults.results[strRef3].callsReturnContext[idxResult].returnValues;
             const hash = values3[0];
             if( opts && opts.details ) {
-                opts.details.trace( "    Hash of chain #",
-                    idxFirstChainInGroup + idxSChain, " is ", log.v( hash ) );
+                opts.details.trace( "    Hash of chain #{} is {}",
+                    idxFirstChainInGroup + idxSChain, hash );
             }
             arrSChainHashes.push( hash );
         }
@@ -481,8 +477,8 @@ export async function loadSChainsWithEMC( opts ) {
         const cntInThisGroup = ( idxGroup == ( cntGroups - 1 ) && bHaveExtraGroup )
             ? cntLastExtraGroup : cntGroupMax;
         if( opts && opts.details ) {
-            opts.details.trace( "    Processing chain data in multicall group #",
-                idxGroup, " with ", cntInThisGroup, " call(s) in it..." );
+            opts.details.trace( "    Processing chain data in multicall group #{} with {} " +
+                "call(s) in it...", idxGroup, cntInThisGroup );
         }
         const strRef3 = "SchainsInternal-schains";
         const contractCallContext = [ {
@@ -513,8 +509,8 @@ export async function loadSChainsWithEMC( opts ) {
                 rawResults.results[strRef3].callsReturnContext[idxResult].returnValues;
             const joData = process_sc_data( values3 );
             if( opts && opts.details ) {
-                opts.details.trace( "    Data of chain #", idxFirstChainInGroup + idxSChain,
-                    " is ", log.v( joData ) );
+                opts.details.trace( "    Data of chain #{} is {}",
+                    idxFirstChainInGroup + idxSChain, joData );
             }
             arrSChainDataRecords.push( joData );
         }
@@ -548,10 +544,8 @@ export async function loadSChainsWithEMC( opts ) {
         joSChain.isConnected = isConnected;
         arrSChains.push( joSChain );
     }
-    if( opts && opts.details ) {
-        opts.details.success( "All ", cntSChains,
-            " S-Chain(s) EMC-loaded:", log.v( arrSChains ) );
-    }
+    if( opts && opts.details )
+        opts.details.success( "All {} S-Chain(s) EMC-loaded:{}", cntSChains, arrSChains );
     return arrSChains;
 }
 
@@ -565,8 +559,8 @@ export async function loadSChainsOptimal( opts ) {
         ? ( !!opts.isLoadConnectedOnly ) : true;
     const cntSChains = await getSChainsCount( opts );
     if( opts && opts.details ) {
-        opts.details.trace( "Have ", cntSChains, " un-filtered S-Chain(s) to optimal-load in ",
-            threadInfo.threadDescription(), "..." );
+        opts.details.trace( "Have {} un-filtered S-Chain(s) to optimal-load in {}...",
+            cntSChains, threadInfo.threadDescription() );
     }
     const joMessageProxySChain = isLoadConnectedOnly
         ? new owaspUtils.ethersMod.ethers.Contract(
@@ -593,8 +587,8 @@ export async function loadSChainsOptimal( opts ) {
         arrSChains.push( joSChain );
     }
     if( opts && opts.details ) {
-        opts.details.success( "All ", cntSChains, " un-filtered S-Chain(s) optimal-loaded in ",
-            threadInfo.threadDescription(), ": ", log.v( arrSChains ) );
+        opts.details.success( "All {} un-filtered S-Chain(s) optimal-loaded in {}: {}",
+            cntSChains, threadInfo.threadDescription(), arrSChains );
     }
     return arrSChains;
 }
@@ -637,9 +631,8 @@ export async function getAllSchainNames( arrSChainHashes, opts ) {
             arrSChainNames.push( strSChainName );
             ++ idxResult;
             if( opts && opts.details ) {
-                opts.details.trace( "S-Chain ", idxSChain, " hash ", strSChainHash,
-                    " corresponds to S-Chain name ", strSChainName,
-                    " (fetched via EMC)" );
+                opts.details.trace( "S-Chain {} hash{} corresponds to S-Chain name {}" +
+                    "(fetched via EMC)", idxSChain, strSChainHash, strSChainName );
             }
         }
     } else {
@@ -650,9 +643,8 @@ export async function getAllSchainNames( arrSChainHashes, opts ) {
             const strSChainName =
                 await opts.imaState.joSChainsInternal.callStatic.getSchainName( strSChainHash );
             if( opts && opts.details ) {
-                opts.details.trace( "S-Chain ", idxSChain, " hash ", strSChainHash,
-                    " corresponds to S-Chain name ", strSChainName,
-                    " (fetched via single call)" );
+                opts.details.trace( "S-Chain {} hash {} corresponds to S-Chain name {}" +
+                    "(fetched via single call)", idxSChain, strSChainHash, strSChainName );
             }
             arrSChainNames.push( strSChainName );
         }
@@ -667,18 +659,17 @@ export async function loadCachedSChainsSimplified( opts ) {
             "no imaState is provided in " + threadInfo.threadDescription( false ) );
     }
     if( opts && opts.details ) {
-        opts.details.trace( "Will request all S-Chain(s) hashes in ",
-            threadInfo.threadDescription(), "..." );
+        opts.details.trace( "Will request all S-Chain(s) hashes in {}...",
+            threadInfo.threadDescription() );
     }
     const isLoadConnectedOnly = ( "isLoadConnectedOnly" in opts )
         ? ( !!opts.isLoadConnectedOnly ) : true;
     const arrSChainHashes =
         await opts.imaState.joSChainsInternal.callStatic.getSchains();
     const cntSChains = arrSChainHashes.length;
-    if( opts && opts.details ) {
-        opts.details.trace( "Have all ", cntSChains,
-            " S-Chain(s) hashes: ", arrSChainHashes );
-    }
+    if( opts && opts.details )
+        opts.details.trace( "Have all {} S-Chain(s) hashes: {}", cntSChains, arrSChainHashes );
+
     const joMessageProxySChain = isLoadConnectedOnly
         ? new owaspUtils.ethersMod.ethers.Contract(
             opts.imaState.chainProperties.sc.joAbiIMA.message_proxy_chain_address,
@@ -707,8 +698,8 @@ export async function loadCachedSChainsSimplified( opts ) {
         arrSChains.push( joSChain );
     }
     if( opts && opts.details ) {
-        opts.details.success( "All ", cntSChains, " S-Chain(s) simplified-loaded in ",
-            threadInfo.threadDescription(), ": ", log.v( arrSChains ) );
+        opts.details.success( "All {} S-Chain(s) simplified-loaded in {}: {}",
+            cntSChains, threadInfo.threadDescription(), arrSChains );
     }
     return arrSChains;
 }
@@ -1075,7 +1066,7 @@ export async function ensureHaveWorker( opts ) {
             }
             break;
         case "log":
-            log.attention( "SNB WORKER ", joMessage.message );
+            log.attention( "SNB WORKER {}", joMessage.message );
             break;
         } // switch ( joMessage.method )
     } );

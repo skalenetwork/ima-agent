@@ -63,14 +63,14 @@ export async function registerStep1( isPrintSummaryRegistrationCosts ) {
     const imaState = state.get();
     imaCLI.initContracts();
     const strLogPrefix = "Reg 1: ";
-    log.information( strLogPrefix, "Will check chain registration now..." );
+    log.information( "{}Will check chain registration now...", strLogPrefix );
     let bSuccess = await imaReg.checkIsRegisteredSChainInDepositBoxes( // step 1
         imaState.chainProperties.mn.ethersProvider,
         imaState.joLinker,
         imaState.chainProperties.mn.joAccount,
         imaState.chainProperties.sc.strChainName
     );
-    log.information( strLogPrefix, "Chain is ",
+    log.information( "{}Chain is {}", strLogPrefix,
         log.posNeg( bSuccess, "already registered", "not registered yet" ) );
     if( bSuccess )
         return true;
@@ -91,7 +91,7 @@ export async function registerStep1( isPrintSummaryRegistrationCosts ) {
             imaState.chainProperties.mn.transactionCustomizer //,
         );
     bSuccess = ( jarrReceipts != null && jarrReceipts.length > 0 ) ? true : false;
-    log.information( strLogPrefix, "Chain was ",
+    log.information( "{}Chain was {}", strLogPrefix,
         log.posNeg( bSuccess, "registered successfully", "not registered" ) );
     if( bSuccess ) {
         gInfoRegistrationCost.mn =
@@ -161,7 +161,7 @@ export function commandLineTaskCheckRegistration() {
             const b = await checkRegistrationAll();
             // nExitCode is: 0 - OKay - registered; non-zero -  not registered or error
             const nExitCode = b ? 0 : 150;
-            log.notice( "Exiting with code ", nExitCode );
+            log.notice( "Exiting with code {}", nExitCode );
             process.exit( nExitCode );
         }
     } );
@@ -177,7 +177,7 @@ export function commandLineTaskCheckRegistration1() {
             const b = await checkRegistrationStep1();
             // nExitCode is: 0 - OKay - registered; non-zero -  not registered or error
             const nExitCode = b ? 0 : 152;
-            log.notice( "Exiting with code ", nExitCode );
+            log.notice( "Exiting with code {}", nExitCode );
             process.exit( nExitCode );
         }
     } );
@@ -702,34 +702,31 @@ export function commandLineTaskShowBalance() {
             if( arrBalancesMN.length > 0 || arrBalancesSC.length > 0 || arrBalancesTC.length > 0 ) {
                 if( arrBalancesMN.length > 0 ) {
                     const strAddress = imaState.chainProperties.mn.joAccount.address();
-                    log.information( "Main Net ",
-                        ( arrBalancesMN.length > 1 ? "balances" : "balance" ),
-                        " of ", log.v( strAddress ), ":" );
+                    log.information( "Main Net {} of {}:",
+                        ( arrBalancesMN.length > 1 ? "balances" : "balance" ), strAddress );
                     for( let i = 0; i < arrBalancesMN.length; ++ i ) {
                         const bi = arrBalancesMN[i];
-                        log.information( "    ",
+                        log.information( "    {}",
                             discoveryTools.formatBalanceInfo( bi, strAddress ) );
                     }
                 }
                 if( arrBalancesSC.length > 0 ) {
                     const strAddress = imaState.chainProperties.sc.joAccount.address();
-                    log.information( "S-Chain ",
-                        ( arrBalancesMN.length > 1 ? "balances" : "balance" ),
-                        " of ", log.v( strAddress ), ":" );
+                    log.information( "S-Chain {} of {}:",
+                        ( arrBalancesMN.length > 1 ? "balances" : "balance" ), strAddress );
                     for( let i = 0; i < arrBalancesSC.length; ++ i ) {
                         const bi = arrBalancesSC[i];
-                        log.information( "    ",
+                        log.information( "    {}",
                             discoveryTools.formatBalanceInfo( bi, strAddress ) );
                     }
                 }
                 if( arrBalancesTC.length > 0 ) {
                     const strAddress = imaState.chainProperties.mn.joAccount.address();
-                    log.information( "Target S-Chain ",
-                        ( arrBalancesTC.length > 1 ? "balances" : "balance" ),
-                        " of ", log.v( strAddress ), ":" );
+                    log.information( "Target S-Chain {} of {}:",
+                        arrBalancesTC.length > 1 ? "balances" : "balance", strAddress );
                     for( let i = 0; i < arrBalancesTC.length; ++ i ) {
                         const bi = arrBalancesTC[i];
-                        log.information( "    ",
+                        log.information( "    {}",
                             discoveryTools.formatBalanceInfo( bi, strAddress ) );
                     }
                 }
@@ -747,8 +744,7 @@ export function commandLineTaskPaymentM2S() {
         "fn": async function() {
             if( imaState.chainProperties.mn.strCoinNameErc721.length > 0 ) {
                 // ERC721 payment
-                log.information( "one M->S single ERC721 payment: ",
-                    log.v( imaState.idToken ) );
+                log.information( "one M->S single ERC721 payment: {}", imaState.idToken );
                 return await imaToken.doErc721PaymentFromMainNet(
                     imaState.chainProperties.mn.ethersProvider,
                     imaState.chainProperties.sc.ethersProvider,
@@ -775,8 +771,7 @@ export function commandLineTaskPaymentM2S() {
             }
             if( imaState.chainProperties.tc.strCoinNameErc20.length > 0 ) {
                 // ERC20 payment
-                log.information( "one M->S single ERC20 payment: ",
-                    log.v( imaState.nAmountOfToken ) );
+                log.information( "one M->S single ERC20 payment: {}", imaState.nAmountOfToken );
                 return await imaToken.doErc20PaymentFromMainNet(
                     imaState.chainProperties.mn.ethersProvider,
                     imaState.chainProperties.sc.ethersProvider,
@@ -813,9 +808,8 @@ export function commandLineTaskPaymentM2S() {
                     imaState.arrAmountsOfTokens === undefined )
             ) {
                 // ERC1155 payment
-                log.information( "one M->S single ERC1155 payment: ",
-                    log.v( imaState.idToken ), " ",
-                    log.v( imaState.nAmountOfToken ) );
+                log.information( "one M->S single ERC1155 payment: {} {}",
+                    imaState.idToken, imaState.nAmountOfToken );
                 return await imaToken.doErc1155PaymentFromMainNet(
                     imaState.chainProperties.mn.ethersProvider,
                     imaState.chainProperties.sc.ethersProvider,
@@ -853,9 +847,8 @@ export function commandLineTaskPaymentM2S() {
                     imaState.nAmountOfToken === undefined )
             ) {
                 // ERC1155 Batch payment
-                log.information( "one M->S single ERC1155 Batch payment: ",
-                    log.v( imaState.idTokens ), " ",
-                    log.v( imaState.arrAmountsOfTokens ) );
+                log.information( "one M->S single ERC1155 Batch payment: {} {}",
+                    imaState.idTokens, imaState.arrAmountsOfTokens );
                 return await imaToken.doErc1155BatchPaymentFromMainNet(
                     imaState.chainProperties.mn.ethersProvider,
                     imaState.chainProperties.sc.ethersProvider,
@@ -878,8 +871,7 @@ export function commandLineTaskPaymentM2S() {
                 );
             }
             // ETH payment
-            log.information( "one M->S single ETH payment: ",
-                log.v( imaState.nAmountOfWei ) );
+            log.information( "one M->S single ETH payment: {}", imaState.nAmountOfWei );
             return await imaEth.doEthPaymentFromMainNet(
                 imaState.chainProperties.mn.ethersProvider,
                 imaState.chainProperties.mn.chainId,
@@ -902,8 +894,7 @@ export function commandLineTaskPaymentS2M() {
         "fn": async function() {
             if( imaState.chainProperties.sc.strCoinNameErc721.length > 0 ) {
                 // ERC721 payment
-                log.information( "one S->M single ERC721 payment: ",
-                    log.v( imaState.idToken ) );
+                log.information( "one S->M single ERC721 payment: {}", imaState.idToken );
                 return await imaToken.doErc721PaymentFromSChain(
                     imaState.chainProperties.mn.ethersProvider,
                     imaState.chainProperties.sc.ethersProvider,
@@ -929,8 +920,7 @@ export function commandLineTaskPaymentS2M() {
             }
             if( imaState.chainProperties.sc.strCoinNameErc20.length > 0 ) {
                 // ERC20 payment
-                log.information( "one S->M single ERC20 payment: ",
-                    log.v( imaState.nAmountOfToken ) );
+                log.information( "one S->M single ERC20 payment: {}", imaState.nAmountOfToken );
                 return await imaToken.doErc20PaymentFromSChain(
                     imaState.chainProperties.mn.ethersProvider,
                     imaState.chainProperties.sc.ethersProvider,
@@ -966,9 +956,8 @@ export function commandLineTaskPaymentS2M() {
                     imaState.arrAmountsOfTokens === undefined )
             ) {
                 // ERC1155 payment
-                log.information( "one S->M single ERC1155 payment: ",
-                    log.v( imaState.idToken ), " ",
-                    log.v( imaState.nAmountOfToken ) );
+                log.information( "one S->M single ERC1155 payment: {} {}",
+                    imaState.idToken, imaState.nAmountOfToken );
                 return await imaToken.doErc1155PaymentFromSChain(
                     imaState.chainProperties.mn.ethersProvider,
                     imaState.chainProperties.sc.ethersProvider,
@@ -1005,9 +994,8 @@ export function commandLineTaskPaymentS2M() {
                     imaState.nAmountOfToken === undefined )
             ) {
                 // ERC1155 payment
-                log.information( "one S->M single ERC1155 payment: ",
-                    log.v( imaState.idTokens ), " ",
-                    log.v( imaState.arrAmountsOfTokens ) );
+                log.information( "one S->M single ERC1155 payment: {} {}",
+                    imaState.idTokens, imaState.arrAmountsOfTokens );
                 return await imaToken.doErc1155BatchPaymentFromSChain(
                     imaState.chainProperties.mn.ethersProvider,
                     imaState.chainProperties.sc.ethersProvider,
@@ -1029,8 +1017,7 @@ export function commandLineTaskPaymentS2M() {
                 );
             }
             // ETH payment
-            log.information( "one S->M single ETH payment: ",
-                log.v( imaState.nAmountOfWei ) );
+            log.information( "one S->M single ETH payment: {}", imaState.nAmountOfWei );
             return await imaEth.doEthPaymentFromSChain(
                 imaState.chainProperties.sc.ethersProvider,
                 imaState.chainProperties.sc.chainId,
@@ -1102,8 +1089,7 @@ export function commandLineTaskPaymentS2S() {
             const tx_customizer = isForward ? sc.transactionCustomizer : tc.transactionCustomizer;
             if( strCoinNameErc721Src.length > 0 ) {
                 // ERC721 payment
-                log.information( "one S->S single ERC721 payment: ",
-                    log.v( imaState.idToken ) );
+                log.information( "one S->S single ERC721 payment: {}", imaState.idToken );
                 return await imaToken.doErc721PaymentS2S(
                     isForward,
                     ethersProviderSrc,
@@ -1121,8 +1107,7 @@ export function commandLineTaskPaymentS2S() {
             }
             if( strCoinNameErc20Src.length > 0 ) {
                 // ERC20 payment
-                log.information( "one S->S single ERC20 payment: ",
-                    log.v( imaState.nAmountOfToken ) );
+                log.information( "one S->S single ERC20 payment: {}", imaState.nAmountOfToken );
                 return await imaToken.doErc20PaymentS2S(
                     isForward,
                     ethersProviderSrc,
@@ -1154,9 +1139,8 @@ export function commandLineTaskPaymentS2S() {
                     imaState.arrAmountsOfTokens === undefined )
             ) {
                 // ERC1155 payment
-                log.information( "one S->S single ERC1155 payment: ",
-                    log.v( imaState.idToken ), " ",
-                    log.v( imaState.nAmountOfToken ) );
+                log.information( "one S->S single ERC1155 payment: {} {}",
+                    imaState.idToken, imaState.nAmountOfToken );
                 return await imaToken.doErc1155PaymentS2S(
                     isForward,
                     ethersProviderSrc,
@@ -1189,9 +1173,8 @@ export function commandLineTaskPaymentS2S() {
                     imaState.nAmountOfToken === undefined )
             ) {
                 // ERC1155 Batch payment
-                log.information( "one S->S single ERC1155 Batch payment: ",
-                    log.v( imaState.idTokens ), " ",
-                    log.v( imaState.arrAmountsOfTokens ) );
+                log.information( "one S->S single ERC1155 Batch payment: {} {}",
+                    imaState.idTokens, imaState.arrAmountsOfTokens );
                 return await imaToken.doErc1155BatchPaymentS2S(
                     isForward,
                     ethersProviderSrc,
@@ -1221,7 +1204,7 @@ export function commandLineTaskReceiveS2M() {
     imaState.arrActions.push( {
         "name": "receive one S->M single ETH payment",
         "fn": async function() {
-            log.information( "receive one S->M single ETH payment: " );
+            log.information( "receive one S->M single ETH payment:" );
             return await imaEth.receiveEthPaymentFromSchainOnMainNet(
                 imaState.chainProperties.mn.ethersProvider,
                 imaState.chainProperties.mn.chainId,
@@ -1238,7 +1221,7 @@ export function commandLineTaskViewS2M() {
     imaState.arrActions.push( {
         "name": "view one S->M single ETH payment",
         "fn": async function() {
-            log.information( "view one S->M single ETH payment: " );
+            log.information( "view one S->M single ETH payment:" );
             const xWei = await imaEth.viewEthPaymentFromSchainOnMainNet(
                 imaState.chainProperties.mn.ethersProvider,
                 imaState.chainProperties.mn.joAccount,
@@ -1248,8 +1231,7 @@ export function commandLineTaskViewS2M() {
                 return false;
             const xEth =
                 owaspUtils.ethersMod.ethers.utils.formatEther( owaspUtils.toBN( xWei ) );
-            log.success( "Main-net user can receive: ", log.v( xWei ),
-                " wei = ", log.v( xEth ), " eth" );
+            log.success( "Main-net user can receive: {} wei = {} eth", xWei, xEth );
             return true;
         }
     } );
@@ -1490,7 +1472,7 @@ export function commandLineTaskBrowseSChain() {
                 log.fatal( "Missing S-Chain URL, please specify {}", "--url-s-chain" );
                 process.exit( 155 );
             }
-            log.information( strLogPrefix, "Downloading S-Chain network information ..." );
+            log.information( "{}Downloading S-Chain network information...", strLogPrefix );
             const rpcCallOpts = null;
             await rpcCall.create(
                 imaState.chainProperties.sc.strURL,
@@ -1516,8 +1498,8 @@ export function commandLineTaskBrowseSChain() {
                             await joCall.disconnect();
                             process.exit( 157 );
                         }
-                        log.information( strLogPrefix, "S-Chain network information: "
-                            .log.v( joOut.result ) );
+                        log.information( "{}S-Chain network information: {}",
+                            strLogPrefix, joOut.result );
                         let nCountReceivedImaDescriptions = 0;
                         const jarrNodes = joOut.result.network;
                         for( let i = 0; i < jarrNodes.length; ++ i ) {
@@ -1553,9 +1535,8 @@ export function commandLineTaskBrowseSChain() {
                                                 log.em( strError ) );
                                             process.exit( 159 );
                                         }
-                                        log.information( strLogPrefix, "Node ",
-                                            log.v( joNode.nodeID ), " IMA information: ",
-                                            log.v( joOut.result ) );
+                                        log.information( "{}Node {} IMA information: {}",
+                                            strLogPrefix, joNode.nodeID, joOut.result );
                                         await joCall.disconnect();
                                     } );
                                 } );
@@ -1584,7 +1565,7 @@ export function commandLineTaskBrowseSkaleNetwork() {
                 log.fatal( "Missing Skale Manager ABI, please specify {}", "--abi-skale-manager" );
                 process.exit( 160 );
             }
-            log.information( strLogPrefix, "Downloading SKALE network information..." );
+            log.information( "{}Downloading SKALE network information...", strLogPrefix );
             const opts = {
                 imaState: imaState,
                 "details": log,
@@ -1593,8 +1574,8 @@ export function commandLineTaskBrowseSkaleNetwork() {
             };
             const arrSChains = await skaleObserver.loadSChainsDefault( opts );
             const cnt = arrSChains.length;
-            log.information( strLogPrefix, "Got ", cnt,
-                " S-Chains(s) in SKALE NETWORK information: ", log.v( arrSChains ) );
+            log.information( "{}Got {} S-Chains(s) in SKALE NETWORK information: {}",
+                strLogPrefix, cnt, arrSChains );
             return true;
         }
     } );
@@ -1610,7 +1591,7 @@ export function commandLineTaskBrowseConnectedSChains() {
                 log.fatal( "Missing Skale Manager ABI, please specify {}", "--abi-skale-manager" );
                 process.exit( 161 );
             }
-            log.information( strLogPrefix, "Downloading SKALE network information..." );
+            log.information( "{}Downloading SKALE network information...", strLogPrefix );
             const opts = {
                 "imaState": imaState,
                 "details": log,
@@ -1620,8 +1601,8 @@ export function commandLineTaskBrowseConnectedSChains() {
             const arrSChainsCached = await skaleObserver.loadSChainsConnectedOnly(
                 imaState.chainProperties.sc.strChainName, opts );
             const cnt = arrSChainsCached.length;
-            log.information( strLogPrefix, "Got ", cnt, " connected S-Chain(s): ",
-                log.v( arrSChainsCached ) );
+            log.information( "{}Got {} connected S-Chain(s): {}",
+                strLogPrefix, cnt, arrSChainsCached );
             return true;
         }
     } );

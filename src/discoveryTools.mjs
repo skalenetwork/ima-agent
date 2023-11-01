@@ -43,8 +43,8 @@ export function initialSkaleNetworkScanForS2S() {
                 log.fatal( "Missing Skale Manager ABI, please specify {}", "--abi-skale-manager" );
                 process.exit( 153 );
             }
-            log.information( strLogPrefix, "Downloading SKALE network information..." );
-            log.information( strLogPrefix, "Will init periodic S-Chains caching now..." );
+            log.information( "{}Downloading SKALE network information...", strLogPrefix );
+            log.information( "{}Will init periodic S-Chains caching now...", strLogPrefix );
             const opts = {
                 imaState: imaState,
                 "details": log,
@@ -58,10 +58,9 @@ export function initialSkaleNetworkScanForS2S() {
                 "isForceMultiAttemptsUntilSuccess": true
             };
             await skaleObserver.periodicCachingStart(
-                imaState.chainProperties.sc.strChainName,
-                opts
+                imaState.chainProperties.sc.strChainName, opts
             ).then( function() {
-                log.success( strLogPrefix, "Done, did started periodic S-Chains caching." );
+                log.success( "{}Done, did started periodic S-Chains caching.", strLogPrefix );
             } ).catch( function( err ) {
                 const strError = owaspUtils.extractErrorMessage( err );
                 log.error( "Failed to start periodic S-Chains caching {}", log.em( strError ) );
@@ -237,7 +236,7 @@ export async function continueSChainDiscoveryInBackgroundIfNeeded( isSilentReDis
     let cntDiscovered = getSChainDiscoveredNodesCount( imaState.joSChainNetworkInfo );
     if( cntDiscovered >= cntNodesOnChain ) {
         if( ! isSilentReDiscovery ) {
-            log.attention( "Everything is discovered about this S-Chain. ",
+            log.attention( "Everything is discovered about this S-Chain. " +
                 "No re-discovery is needed" );
         }
         if( gTimerSChainDiscovery != null ) {
@@ -252,8 +251,8 @@ export async function continueSChainDiscoveryInBackgroundIfNeeded( isSilentReDis
     if( cntDiscovered < cntNodesOnChain ) {
         if( ! isSilentReDiscovery ) {
             const cntUnDiscoveredYet = cntNodesOnChain - cntDiscovered;
-            log.information( "Have ", cntUnDiscoveredYet, " of ", cntNodesOnChain,
-                " nodes of this S-Chain not discovered yet  before continuing re-discovery." );
+            log.information( "Have {} of {} nodes of this S-Chain not discovered yet before " +
+                "continuing re-discovery.", cntUnDiscoveredYet, cntNodesOnChain );
         }
     }
     const fnAsyncHandler = async function() {
@@ -288,14 +287,14 @@ export async function continueSChainDiscoveryInBackgroundIfNeeded( isSilentReDis
             if( cntDiscovered < cntNodesOnChain ) {
                 if( ! isSilentReDiscovery ) {
                     const cntUnDiscoveredYet = cntNodesOnChain - cntDiscovered;
-                    log.information( "Have ", cntUnDiscoveredYet, " of ", cntNodesOnChain,
-                        " nodes of this S-Chain not discovered yet on re-discovery step." );
+                    log.information( "Have {} of {} nodes of this S-Chain not discovered yet " +
+                        "on re-discovery step.", cntUnDiscoveredYet, cntNodesOnChain );
                 }
             }
             if( ! isSilentReDiscovery ) {
                 log.information( "This S-Chain discovery will be done for re-discover task" );
-                log.information( "Will re-discover ", nCountToWait, "-node S-Chain network, ",
-                    cntDiscovered, " node(s) already discovered..." );
+                log.information( "Will re-discover {}-node S-Chain network, {} node(s) already " +
+                    "discovered...", nCountToWait, cntDiscovered );
             }
             await discoverSChainNetwork( function( err, joSChainNetworkInfo ) {
                 if( ! err ) {
@@ -364,8 +363,8 @@ async function discoverSChainWalkNodes( optsDiscover ) {
         const strNodeDescColorized = log.fmtAttention( "#", nCurrentNodeIdx, "(",
             log.u( strNodeURL ), ")" );
         if( ! optsDiscover.isSilentReDiscovery ) {
-            log.information( optsDiscover.strLogPrefix,
-                "Will try to discover S-Chain node ", strNodeDescColorized, "..." );
+            log.information( "{}Will try to discover S-Chain node {}...",
+                optsDiscover.strLogPrefix, strNodeDescColorized );
         }
         try {
             if( optsDiscover.joPrevSChainNetworkInfo &&
@@ -376,9 +375,9 @@ async function discoverSChainWalkNodes( optsDiscover ) {
                 if( isSChainNodeFullyDiscovered( joPrevNode ) ) {
                     joNode.imaInfo = JSON.parse( JSON.stringify( joPrevNode.imaInfo ) );
                     if( ! optsDiscover.isSilentReDiscovery ) {
-                        log.information( optsDiscover.strLogPrefix, "OK, in case of ",
-                            strNodeDescColorized, " node ", log.v( joNode.nodeID ),
-                            " will use previous discovery result." );
+                        log.information( "{}OK, in case of {} node {} will use previous " +
+                            "discovery result.", optsDiscover.strLogPrefix,
+                        strNodeDescColorized, joNode.nodeID );
                     }
                     continue; // skip this node discovery, enrich rest of nodes
                 }
@@ -419,10 +418,9 @@ async function discoverSChainWalkNodes( optsDiscover ) {
                         if( isSChainNodeFullyDiscovered( joNode ) )
                             ++ optsDiscover.nCountReceivedImaDescriptions;
                         if( !optsDiscover.isSilentReDiscovery ) {
-                            log.success( optsDiscover.strLogPrefix, "OK, got ",
-                                strNodeDescColorized, " node ", log.v( joNode.nodeID ),
-                                " IMA information(", optsDiscover.nCountReceivedImaDescriptions,
-                                " of ", optsDiscover.cntNodes, ")." );
+                            log.success( "{}OK, got {} node {} IMA information({} of {}).",
+                                optsDiscover.strLogPrefix, strNodeDescColorized, joNode.nodeID,
+                                optsDiscover.nCountReceivedImaDescriptions, optsDiscover.cntNodes );
                         }
                     } );
                 } );
@@ -440,8 +438,8 @@ async function discoverSChainWalkNodes( optsDiscover ) {
 
 async function discoverSChainWait( optsDiscover ) {
     if( ! optsDiscover.isSilentReDiscovery ) {
-        log.debug( optsDiscover.strLogPrefix, "Waiting for response from at least ",
-            optsDiscover.nCountToWait, " node(s)..." );
+        log.debug( "{}Waiting for response from at least {} node(s)...",
+            optsDiscover.strLogPrefix, optsDiscover.nCountToWait );
     }
     let nWaitAttempt = 0;
     const nWaitStepMilliseconds = 1 * 1000; // step can be small here
@@ -457,22 +455,21 @@ async function discoverSChainWait( optsDiscover ) {
         optsDiscover.nCountReceivedImaDescriptions =
             getSChainDiscoveredNodesCount( optsDiscover.joSChainNetworkInfo );
         if( ! optsDiscover.isSilentReDiscovery ) {
-            log.debug( "Waiting (S-Chain discovery) attempt ", nWaitAttempt, " of ",
-                cntWaitAttempts, " for S-Chain nodes, total ", optsDiscover.cntNodes,
-                ", available ", optsDiscover.nCountAvailable, ", expected at least ",
-                optsDiscover.nCountToWait, ", discovered ",
-                optsDiscover.nCountReceivedImaDescriptions );
+            log.debug( "Waiting (S-Chain discovery) attempt {} of {} for S-Chain nodes, " +
+                "total {}, available {}, expected at least {}, discovered {}",
+            nWaitAttempt, cntWaitAttempts, optsDiscover.cntNodes, optsDiscover.nCountAvailable,
+            optsDiscover.nCountToWait, optsDiscover.nCountReceivedImaDescriptions );
         }
         if( !optsDiscover.isSilentReDiscovery ) {
-            log.information( optsDiscover.strLogPrefix, "Have S-Chain description response about ",
-                optsDiscover.nCountReceivedImaDescriptions, " of ", optsDiscover.cntNodes,
-                " node(s)." );
+            log.information( "{}Have S-Chain description response about {} of {} node(s).",
+                optsDiscover.strLogPrefix, optsDiscover.nCountReceivedImaDescriptions,
+                optsDiscover.cntNodes );
         }
         if( optsDiscover.nCountReceivedImaDescriptions >= optsDiscover.nCountToWait ) {
             if( !optsDiscover.isSilentReDiscovery ) {
-                log.success( optsDiscover.strLogPrefix, "This S-Chain discovery will finish with ",
-                    optsDiscover.nCountReceivedImaDescriptions, " of ", optsDiscover.cntNodes,
-                    " node(s) discovered." );
+                log.success( "{}This S-Chain discovery will finish with {} of {} node(s) " +
+                    "discovered.", optsDiscover.strLogPrefix,
+                optsDiscover.nCountReceivedImaDescriptions, optsDiscover.cntNodes );
             }
             clearInterval( iv );
             optsDiscover.fnAfter( null, optsDiscover.joSChainNetworkInfo );
@@ -523,7 +520,7 @@ export async function discoverSChainNetwork(
         optsDiscover.nCountToWait = 0;
     optsDiscover.fnAfter = optsDiscover.fnAfter || function() {};
     if( !optsDiscover.isSilentReDiscovery )
-        log.information( optsDiscover.strLogPrefix, "This S-Chain discovery will start..." );
+        log.information( "{}This S-Chain discovery will start...", optsDiscover.strLogPrefix );
     const promiseComplete = new Promise( function( resolve, reject ) {
         const doCompoundSChainDiscoveryWork = async function() {
             const rpcCallOpts = null;
@@ -563,11 +560,10 @@ export async function discoverSChainNetwork(
                                 return;
                             }
                             if( ! optsDiscover.isSilentReDiscovery ) {
-                                log.trace( optsDiscover.strLogPrefix,
-                                    "OK, got (own) S-Chain network information: ",
-                                    log.v( joOut.result ) );
-                                log.success( optsDiscover.strLogPrefix, "OK, got S-Chain ",
-                                    log.u( scURL ), " network information." );
+                                log.trace( "{}OK, got (own) S-Chain network information: {}",
+                                    optsDiscover.strLogPrefix, joOut.result );
+                                log.success( "{}OK, got S-Chain {} network information.",
+                                    optsDiscover.strLogPrefix, log.u( scURL ) );
                             }
                             optsDiscover.nCountReceivedImaDescriptions = 0;
                             optsDiscover.joSChainNetworkInfo = joOut.result;
@@ -595,18 +591,17 @@ export async function discoverSChainNetwork(
                             if( optsDiscover.nCountToWait > optsDiscover.cntNodes )
                                 optsDiscover.nCountToWait = optsDiscover.cntNodes;
                             if( ! optsDiscover.isSilentReDiscovery ) {
-                                log.information( optsDiscover.strLogPrefix,
-                                    "Will gather details of ", optsDiscover.nCountToWait,
-                                    " of ", optsDiscover.cntNodes, " node(s)..." );
+                                log.information( "{}Will gather details of {} of {} node(s)...",
+                                    optsDiscover.strLogPrefix, optsDiscover.nCountToWait,
+                                    optsDiscover.cntNodes );
                             }
                             await discoverSChainWalkNodes( optsDiscover );
                             optsDiscover.nCountAvailable =
                                 optsDiscover.cntNodes - optsDiscover.cntFailed;
                             if( ! optsDiscover.isSilentReDiscovery ) {
-                                log.debug( "Waiting for S-Chain nodes, total ",
-                                    optsDiscover.cntNodes, ", available ",
-                                    optsDiscover.nCountAvailable, ", expected at least ",
-                                    optsDiscover.nCountToWait );
+                                log.debug( "Waiting for S-Chain nodes, total {}, available {}" +
+                                    ", expected at least {}", optsDiscover.cntNodes,
+                                optsDiscover.nCountAvailable, optsDiscover.nCountToWait );
                             }
                             if( optsDiscover.nCountAvailable < optsDiscover.nCountToWait ) {
                                 if( ! optsDiscover.isSilentReDiscovery ) {
@@ -658,8 +653,8 @@ function checkPeriodicDiscoveryNoLongerNeeded( joSChainNetworkInfo, isSilentReDi
     const cntNodesOnChain = getSChainNodesCount( imaState.joSChainNetworkInfo );
     const cntAlreadyDiscovered = getSChainDiscoveredNodesCount( joSChainNetworkInfo );
     if( ! isSilentReDiscovery ) {
-        log.notice( "Periodic S-Chain re-discovery already have ",
-            cntAlreadyDiscovered, " of ", cntNodesOnChain, " node(s) discovered" );
+        log.notice( "Periodic S-Chain re-discovery already have {} of {} node(s) discovered",
+            cntAlreadyDiscovered, cntNodesOnChain );
     }
     if( cntAlreadyDiscovered >= cntNodesOnChain ) {
         if( gIntervalPeriodicDiscovery ) {
@@ -689,8 +684,8 @@ export async function doPeriodicSChainNetworkDiscoveryIfNeeded(
     if( periodicDiscoveryInterval <= 0 )
         periodicDiscoveryInterval = 5 * 60 * 1000;
     if( ! isSilentReDiscovery ) {
-        log.debug( "Periodic S-Chain re-discovery will be done with ",
-            periodicDiscoveryInterval, " interval..." );
+        log.debug( "Periodic S-Chain re-discovery will be done with {} interval...",
+            periodicDiscoveryInterval );
     }
     fnAfterRediscover = fnAfterRediscover || function() { };
     gIntervalPeriodicDiscovery = setInterval( async function() {
@@ -718,7 +713,7 @@ export async function doPeriodicSChainNetworkDiscoveryIfNeeded(
         fnAfterRediscover( false );
     }, periodicDiscoveryInterval );
     if( ! isSilentReDiscovery ) {
-        log.information( "Periodic S-Chain re-discovery was started with interval ",
-            periodicDiscoveryInterval, " millisecond(s)" );
+        log.information( "Periodic S-Chain re-discovery was started with interval {}" +
+            " millisecond(s)", periodicDiscoveryInterval );
     }
 }

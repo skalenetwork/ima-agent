@@ -113,12 +113,12 @@ function parseCommandLine() {
     } else
         log.warning( "Automatic exit was not requested, skipping it." );
     if( imaState.strLogFilePath.length > 0 ) {
-        log.information( "Will print message to file ", imaState.strLogFilePath );
+        log.information( "Will print message to file {}", imaState.strLogFilePath );
         log.add( imaState.strLogFilePath, imaState.nLogMaxSizeBeforeRotation,
             imaState.nLogMaxFilesCount );
     }
-    log.information( "Agent was started with ", process.argv.length,
-        " command line argument(s) as: ", strPrintedArguments );
+    log.information( "Agent was started with {} command line argument(s) as: {}",
+        process.argv.length, strPrintedArguments );
     if( imaState.bIsNeededCommonInit ) {
         imaCLI.commonInit();
         imaCLI.initContracts();
@@ -137,8 +137,8 @@ function initMonitoringServer() {
         return;
     const strLogPrefix = "Monitoring: ";
     if( imaState.bLogMonitoringServer ) {
-        log.trace( strLogPrefix, "Will start monitoring WS server on port ",
-            imaState.nMonitoringPort );
+        log.trace( "{}Will start monitoring WS server on port {}",
+            strLogPrefix, imaState.nMonitoringPort );
     }
     gServerMonitoringWS = new ws.WebSocketServer( { port: 0 + imaState.nMonitoringPort } );
     gServerMonitoringWS.on( "connection", function( wsPeer, req ) {
@@ -151,7 +151,7 @@ function initMonitoringServer() {
         if( !ip )
             ip = "N/A";
         if( imaState.bLogMonitoringServer )
-            log.debug( strLogPrefix, "New connection from ", ip );
+            log.debug( "{}New connection from {}", strLogPrefix, ip );
         wsPeer.on( "message", function( message ) {
             const joAnswer = {
                 "method": null,
@@ -160,10 +160,9 @@ function initMonitoringServer() {
             };
             try {
                 const joMessage = JSON.parse( message );
-                if( imaState.bLogMonitoringServer ) {
-                    log.trace( strLogPrefix, "<<< message from ", ip, ": ",
-                        log.v( joMessage ) );
-                }
+                if( imaState.bLogMonitoringServer )
+                    log.trace( "{}<<< message from {}: {}", strLogPrefix, ip, joMessage );
+
                 if( ! ( "method" in joMessage ) )
                     throw new Error( "\"method\" field was not specified" );
                 joAnswer.method = joMessage.method;
@@ -280,8 +279,7 @@ function initJsonRpcServer() {
         };
         try {
             const joMessage = JSON.parse( message );
-            log.trace( strLogPrefix, "<<< Peer message from ", ip, ": ",
-                log.v( joMessage ) );
+            log.trace( "{}<<< Peer message from {}: ", strLogPrefix, ip, joMessage );
             if( ! ( "method" in joMessage ) )
                 throw new Error( "\"method\" field was not specified" );
             joAnswer.method = joMessage.method;
@@ -366,10 +364,10 @@ async function doTheJob() {
     let cntFalse = 0;
     let cntTrue = 0;
     for( idxAction = 0; idxAction < cntActions; ++idxAction ) {
-        log.information( strLogPrefix, log.fmtDebug( imaHelperAPIs.longSeparator ) );
+        log.information( "{}{}", strLogPrefix, log.fmtDebug( imaHelperAPIs.longSeparator ) );
         const joAction = imaState.arrActions[idxAction];
-        log.debug( strLogPrefix, "Will execute action: ", joAction.name, " (",
-            idxAction + 1, " of ", cntActions, ")" );
+        log.debug( "{}Will execute action: {} ({} of {})" ,
+            strLogPrefix, joAction.name, idxAction + 1, cntActions );
         try {
             if( await joAction.fn() ) {
                 ++cntTrue;
@@ -385,12 +383,12 @@ async function doTheJob() {
                 "\n", log.s( err.stack ) );
         }
     }
-    log.information( strLogPrefix, imaHelperAPIs.longSeparator );
-    log.information( strLogPrefix, "FINISH:" );
-    log.information( strLogPrefix, cntActions, " task(s) executed" );
-    log.information( strLogPrefix, cntTrue, log.fmtSuccess( " task(s) succeeded" ) );
-    log.information( strLogPrefix, cntFalse, log.fmtError( " task(s) failed" ) );
-    log.information( strLogPrefix, imaHelperAPIs.longSeparator );
+    log.information( "{}{}", strLogPrefix, imaHelperAPIs.longSeparator );
+    log.information( "{}{}", strLogPrefix, "FINISH:" );
+    log.information( "{}task(s) executed {}", strLogPrefix, cntActions );
+    log.information( "{}{}{}", strLogPrefix, cntTrue, log.fmtSuccess( " task(s) succeeded" ) );
+    log.information( "{}{}{}", strLogPrefix, cntFalse, log.fmtError( " task(s) failed" ) );
+    log.information( "{}{}", strLogPrefix, imaHelperAPIs.longSeparator );
     process.exitCode = ( cntFalse > 0 ) ? cntFalse : 0;
     if( ! state.isPreventExitAfterLastAction() )
         process.exit( process.exitCode );
@@ -435,10 +433,9 @@ async function main() {
             log.fatal( "Please specify {} command line parameter.", "--hash-g1" );
             process.exit( 165 );
         }
-        log.information( "S-Chain network was discovery uses ",
+        log.information( "S-Chain network was discovery uses {} mode",
             ( isSilentReDiscovery
-                ? log.fmtWarning( "silent" ) : log.fmtSuccess( "exposed details" ) ),
-            " mode" );
+                ? log.fmtWarning( "silent" ) : log.fmtSuccess( "exposed details" ) ) );
         if( ! imaState.bNoWaitSChainStarted ) {
             discoveryTools.waitUntilSChainStarted().then( function() {
                 // uses call to discoveryTools.discoverSChainNetwork()
@@ -452,7 +449,7 @@ async function main() {
                         // error information is printed by discoveryTools.discoverSChainNetwork()
                         process.exit( 166 );
                     }
-                    log.success( "S-Chain network was discovered: ", log.v( joSChainNetworkInfo ) );
+                    log.success( "S-Chain network was discovered: {}", joSChainNetworkInfo );
                     imaState.joSChainNetworkInfo = joSChainNetworkInfo;
                     discoveryTools.continueSChainDiscoveryInBackgroundIfNeeded(
                         isSilentReDiscovery, function() {

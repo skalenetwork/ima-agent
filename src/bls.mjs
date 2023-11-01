@@ -340,7 +340,7 @@ function performBlsGlue(
         joGlueResult = imaUtils.jsonFileLoad( strActionDir + "/glue-result.json" );
         details.trace( "{}BLS glue result is: {}", strLogPrefix, joGlueResult );
         if( "X" in joGlueResult.signature && "Y" in joGlueResult.signature ) {
-            details.success( strLogPrefix, "BLS glue success" );
+            details.success( "{}BLS glue success", strLogPrefix );
             joGlueResult.hashSrc = strMessageHash;
             details.trace( "{}Computing G1 hash point...", strLogPrefix );
             const strPath = strActionDir + "/hash.json";
@@ -413,7 +413,7 @@ function performBlsGlueU256( details, u256, arrSignResults ) {
         for( let i = 0; i < cnt; ++i ) {
             const jo = arrSignResults[i];
             const strPath = strActionDir + "/sign-result" + jo.index + ".json";
-            details.trace( strLogPrefix, "Saving ", CC.notice( strPath ), " file..." );
+            details.trace( "{}Saving {} file...", strLogPrefix, strPath );
             imaUtils.jsonFileSave( strPath, jo );
             strInput += " --input " + strPath;
         }
@@ -910,8 +910,8 @@ async function prepareSignMessagesImpl( optsSignOperation ) {
 }
 
 async function gatherSigningStartImpl( optsSignOperation ) {
-    optsSignOperation.details.debug( optsSignOperation.strLogPrefix,
-        "Waiting for BLS glue result " );
+    optsSignOperation.details.debug( "{}Waiting for BLS glue result...",
+        optsSignOperation.strLogPrefix );
     optsSignOperation.errGathering = null;
     optsSignOperation.promiseCompleteGathering = new Promise( ( resolve, reject ) => {
         const iv = setInterval( function() {
@@ -1508,8 +1508,7 @@ async function doSignMessagesImpl(
             } );
         }
     }
-    optsSignOperation.details.success(
-        log.v( optsSignOperation.strGatheredDetailsName ), " completed" );
+    optsSignOperation.details.success( "{} completed", optsSignOperation.strGatheredDetailsName );
     if( optsSignOperation.details ) {
         optsSignOperation.details.exposeDetailsTo(
             log, optsSignOperation.strGatheredDetailsName, true );
@@ -1960,8 +1959,8 @@ export async function doSignU256( u256, details, fn ) {
             log.em( optsSignU256.errGathering.toString() ) );
         return;
     }
-    optsSignU256.details.information( optsSignU256.strLogPrefix,
-        "Completed signing u256 procedure " );
+    optsSignU256.details.information( "{}Completed signing u256 procedure",
+        optsSignU256.strLogPrefix );
 }
 
 export async function doVerifyReadyHash(
@@ -2180,8 +2179,8 @@ export async function doSignReadyHash( strMessageHash, isExposeOutput ) {
 }
 
 async function prepareHandlingOfSkaleImaVerifyAndSign( optsHandleVerifyAndSign ) {
-    optsHandleVerifyAndSign.details.debug( optsHandleVerifyAndSign.strLogPrefix,
-        "Will verify and sign ", log.v( optsHandleVerifyAndSign.joCallData ) );
+    optsHandleVerifyAndSign.details.debug( "{}Will verify and sign {}",
+        optsHandleVerifyAndSign.strLogPrefix, optsHandleVerifyAndSign.joCallData );
     optsHandleVerifyAndSign.nIdxCurrentMsgBlockStart =
         optsHandleVerifyAndSign.joCallData.params.startMessageIdx;
     optsHandleVerifyAndSign.strFromChainName =
@@ -2446,8 +2445,8 @@ export async function handleSkaleImaVerifyAndSign( joCallData ) {
 }
 
 async function handleSkaleImaBSU256Prepare( optsBSU256 ) {
-    optsBSU256.details.debug( optsBSU256.strLogPrefix +
-        "Will U256-BLS-sign ", log.v( optsBSU256.joCallData ) );
+    optsBSU256.details.debug( "{}Will U256-BLS-sign {}",
+        optsBSU256.strLogPrefix, optsBSU256.joCallData );
     optsBSU256.nThreshold = discoverBlsThreshold( optsBSU256.imaState.joSChainNetworkInfo );
     optsBSU256.nParticipants = discoverBlsParticipants( optsBSU256.imaState.joSChainNetworkInfo );
     optsBSU256.details.trace( "{}Discovered BLS threshold is {}.",

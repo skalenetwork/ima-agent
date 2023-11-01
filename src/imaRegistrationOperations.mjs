@@ -38,11 +38,11 @@ export async function invokeHasChain(
     const strLogPrefix = "Wait for added chain status: ";
     const strActionName = "invokeHasChain(hasSchain): joLinker.hasSchain";
     try {
-        details.debug( strLogPrefix, "Will call ", log.v( strActionName ), "..." );
+        details.debug( "{}Will call {}...", strLogPrefix, strActionName );
         const addressFrom = joAccount.address();
         const bHasSchain =
             await joLinker.callStatic.hasSchain( chainIdSChain, { from: addressFrom } );
-        details.success( strLogPrefix, "Got joLinker.hasSchain() status is: ", bHasSchain );
+        details.success( "{}Got joLinker.hasSchain() status is: {}", strLogPrefix, bHasSchain );
         return bHasSchain;
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
@@ -74,7 +74,7 @@ export async function waitForHasChain(
             details, ethersProvider, joLinker, joAccount, chainIdSChain
         ) )
             return true;
-        details.trace( "Sleeping ", nSleepMilliseconds, " milliseconds..." );
+        details.trace( "Sleeping {} milliseconds...", nSleepMilliseconds );
         await imaHelperAPIs.sleep( nSleepMilliseconds );
     }
     return false;
@@ -91,20 +91,20 @@ export async function checkIsRegisteredSChainInDepositBoxes( // step 1
     chainIdSChain
 ) {
     const details = log.createMemoryStream();
-    details.debug( "Main-net Linker address is...........", log.v( joLinker.address ) );
-    details.debug( "S-Chain  ID is.......................", log.v( chainIdSChain ) );
+    details.debug( "Main-net Linker address is...........{}", joLinker.address );
+    details.debug( "S-Chain  ID is.......................{}", chainIdSChain );
     const strLogPrefix = "RegChk S in depositBox: ";
-    details.debug( strLogPrefix, imaHelperAPIs.longSeparator );
-    details.debug( strLogPrefix, "checkIsRegisteredSChainInDepositBoxes(reg-step1)" );
-    details.debug( strLogPrefix, imaHelperAPIs.longSeparator );
+    details.debug( "{}{}", strLogPrefix, imaHelperAPIs.longSeparator );
+    details.debug( "{}{}", strLogPrefix, "checkIsRegisteredSChainInDepositBoxes(reg-step1)" );
+    details.debug( "{}{}", strLogPrefix, imaHelperAPIs.longSeparator );
     let strActionName = "";
     try {
         strActionName = "checkIsRegisteredSChainInDepositBoxes(reg-step1)";
         const addressFrom = joAccountMN.address();
         const bIsRegistered =
             await joLinker.callStatic.hasSchain( chainIdSChain, { from: addressFrom } );
-        details.success( strLogPrefix,
-            "checkIsRegisteredSChainInDepositBoxes(reg-step1) status is: ", bIsRegistered );
+        details.success( "{}checkIsRegisteredSChainInDepositBoxes(reg-step1) status is: {}",
+            strLogPrefix, bIsRegistered );
         if( log.exposeDetailsGet() )
             details.exposeDetailsTo( log, "checkIsRegisteredSChainInDepositBoxes", true );
         details.close();
@@ -144,16 +144,16 @@ export async function registerSChainInDepositBoxes( // step 1
 ) {
     const details = log.createMemoryStream();
     const jarrReceipts = [];
-    details.debug( "Main-net Linker address is..........", log.v( joLinker.address ) );
-    details.debug( "S-Chain ID is.......................", + log.v( chainNameSChain ) );
+    details.debug( "Main-net Linker address is..........{}", joLinker.address );
+    details.debug( "S-Chain ID is.......................{}", chainNameSChain );
     const strLogPrefix = "Reg S in depositBoxes: ";
-    details.debug( strLogPrefix, imaHelperAPIs.longSeparator );
-    details.debug( strLogPrefix, "reg-step1:registerSChainInDepositBoxes" );
-    details.debug( strLogPrefix, imaHelperAPIs.longSeparator );
+    details.debug( "{}{}", strLogPrefix, imaHelperAPIs.longSeparator );
+    details.debug( "{}reg-step1:registerSChainInDepositBoxes", strLogPrefix );
+    details.debug( "{}{}", strLogPrefix, imaHelperAPIs.longSeparator );
     let strActionName = "";
     try {
         strActionName = "Register S-chain in deposit boxes, step 1, connectSchain";
-        details.debug( strLogPrefix, "Will register S-Chain in lock_and_data on Main-net" );
+        details.debug( "{}Will register S-Chain in lock_and_data on Main-net", strLogPrefix );
         const arrArguments = [
             chainNameSChain,
             [
@@ -169,33 +169,24 @@ export async function registerSChainInDepositBoxes( // step 1
         const weiHowMuch = undefined;
         const gasPrice = await transactionCustomizerMainNet.computeGasPrice(
             ethersProviderMainNet, 200000000000 );
-        details.trace( strLogPrefix, "Using computed gasPrice = ", log.v( gasPrice ) );
-        const estimatedGas =
-            await transactionCustomizerMainNet.computeGas(
-                details,
-                ethersProviderMainNet,
-                "Linker", joLinker, "connectSchain", arrArguments,
-                joAccountMN, strActionName,
-                gasPrice, 3000000, weiHowMuch,
-                null
-            );
-        details.trace( strLogPrefix, "Using estimated gas = ", log.v( estimatedGas ) );
+        details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
+        const estimatedGas = await transactionCustomizerMainNet.computeGas( details,
+            ethersProviderMainNet, "Linker", joLinker, "connectSchain", arrArguments,
+            joAccountMN, strActionName, gasPrice, 3000000, weiHowMuch, null );
+        details.trace( "{}Using estimated gas={}", strLogPrefix, estimatedGas );
         const isIgnore = false;
-        const strErrorOfDryRun =
-            await imaTx.dryRunCall(
-                details, ethersProviderMainNet,
-                "Linker", joLinker, "connectSchain", arrArguments,
-                joAccountMN, strActionName, isIgnore,
-                gasPrice, estimatedGas, weiHowMuch, null );
+        const strErrorOfDryRun = await imaTx.dryRunCall( details, ethersProviderMainNet,
+            "Linker", joLinker, "connectSchain", arrArguments,
+            joAccountMN, strActionName, isIgnore,
+            gasPrice, estimatedGas, weiHowMuch, null );
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
-        const joReceipt =
-            await imaTx.payedCall(
-                details, ethersProviderMainNet,
-                "Linker", joLinker, "connectSchain", arrArguments,
-                joAccountMN, strActionName,
-                gasPrice, estimatedGas, weiHowMuch, null );
+        const joReceipt = await imaTx.payedCall(
+            details, ethersProviderMainNet,
+            "Linker", joLinker, "connectSchain", arrArguments,
+            joAccountMN, strActionName,
+            gasPrice, estimatedGas, weiHowMuch, null );
         if( joReceipt && typeof joReceipt == "object" ) {
             jarrReceipts.push( {
                 "description": "registerSChainInDepositBoxes",

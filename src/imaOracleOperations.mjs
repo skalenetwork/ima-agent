@@ -98,8 +98,7 @@ async function prepareOracleGasPriceSetup( optsGasPriseSetup ) {
                 ( log.verboseGet() >= log.verboseReversed().debug ) ? true : false
         };
         optsGasPriseSetup.details.debug(
-            "Will fetch Main Net gas price via call to Oracle with options ",
-            log.v( oracleOpts ), "..." );
+            "Will fetch Main Net gas price via call to Oracle with options {}...", oracleOpts );
         try {
             optsGasPriseSetup.gasPriceOnMainNet = owaspUtils.ensureStartsWith0x(
                 ( await imaOracle.oracleGetGasPrice(
@@ -118,9 +117,9 @@ async function prepareOracleGasPriceSetup( optsGasPriseSetup ) {
             owaspUtils.toBN(
                 await optsGasPriseSetup.ethersProviderMainNet.getGasPrice() ).toHexString() );
     }
-    optsGasPriseSetup.details.success( "Done, Oracle did computed new Main Net gas price =",
-        log.v( owaspUtils.toBN( optsGasPriseSetup.gasPriceOnMainNet ).toString() ),
-        "=", log.v( optsGasPriseSetup.gasPriceOnMainNet ) );
+    optsGasPriseSetup.details.success( "Done, Oracle did computed new Main Net gas price={}={}",
+        owaspUtils.toBN( optsGasPriseSetup.gasPriceOnMainNet ).toString(),
+        optsGasPriseSetup.gasPriceOnMainNet );
     const joGasPriceOnMainNetOld =
         await optsGasPriseSetup.joCommunityLocker.callStatic.mainnetGasPrice(
             { from: optsGasPriseSetup.joAccountSC.address() } );
@@ -238,8 +237,8 @@ export async function doOracleGasPriceSetup(
                     hashPoint.Y, // G1.Y from joGlueResult.hashSrc
                     hint
                 ];
-                optsGasPriseSetup.details.debug( optsGasPriseSetup.strLogPrefix,
-                    "....debug args for : ", log.v( joDebugArgs ) );
+                optsGasPriseSetup.details.debug( "{}....debug args for : {}",
+                    optsGasPriseSetup.strLogPrefix, joDebugArgs );
                 const weiHowMuch = undefined;
                 const gasPrice =
                     await optsGasPriseSetup.transactionCustomizerSChain.computeGasPrice(
