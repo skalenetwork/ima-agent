@@ -201,8 +201,8 @@ export async function waitUntilSChainStarted() {
         if( !bSuccess )
             ++ idxWaitAttempt;
         if( idxWaitAttempt >= imaState.nMaxWaitSChainAttempts ) {
-            log.warning( "Incomplete, S-Chain sanity check failed after ",
-                idxWaitAttempt, " attempts." );
+            log.warning( "Incomplete, S-Chain sanity check failed after {} attempts.",
+                idxWaitAttempt );
             return;
         }
         await imaHelperAPIs.sleep( 1000 );
@@ -484,22 +484,19 @@ async function discoverSChainWait( optsDiscover ) {
             const strErrorDescription =
                 "S-Chain network discovery wait timeout, network will be re-discovered later";
             if( ! optsDiscover.isSilentReDiscovery ) {
-                log.warning( optsDiscover.strLogPrefix,
-                    "This S-Chain discovery will finish due to: ",
-                    log.em( strErrorDescription ) );
+                log.warning( "{}This S-Chain discovery will finish due to: {}",
+                    optsDiscover.strLogPrefix, log.em( strErrorDescription ) );
             }
-            if( getSChainDiscoveredNodesCount(
-                optsDiscover.joSChainNetworkInfo ) > 0 )
+            if( getSChainDiscoveredNodesCount( optsDiscover.joSChainNetworkInfo ) > 0 )
                 optsDiscover.fnAfter( null, optsDiscover.joSChainNetworkInfo );
             else
                 optsDiscover.fnAfter( new Error( strErrorDescription ), null );
             return;
         }
         if( ! optsDiscover.isSilentReDiscovery ) {
-            log.debug( optsDiscover.strLogPrefix, "S-Chain discovery waiting attempt ",
-                nWaitAttempt, " of ", cntWaitAttempts, " for ",
-                ( optsDiscover.nCountToWait - optsDiscover.nCountReceivedImaDescriptions ),
-                " node answer(s)" );
+            log.debug( "{}S-Chain discovery waiting attempt {} of {} for {} node answer(s)",
+                optsDiscover.strLogPrefix, nWaitAttempt, cntWaitAttempts,
+                ( optsDiscover.nCountToWait - optsDiscover.nCountReceivedImaDescriptions ) );
         }
     }, nWaitStepMilliseconds );
 }

@@ -115,7 +115,7 @@ class ObserverServer extends SocketServer {
                     owaspUtils.getEthersProviderFromURL( u );
             } else {
                 self.warning( "WARNING: No Main-net URL specified in command line arguments" +
-                    "(needed for particular operations only) in ",
+                    "(needed for particular operations only) in {}",
                 threadInfo.threadDescription() );
             }
 
@@ -128,7 +128,7 @@ class ObserverServer extends SocketServer {
                     owaspUtils.getEthersProviderFromURL( u );
             } else {
                 self.warning( "WARNING: No Main-net URL specified in command line arguments" +
-                    "(needed for particular operations only)) in ",
+                    "(needed for particular operations only) in {}",
                 threadInfo.threadDescription() );
             }
             self.opts.imaState.joNodes =
@@ -157,15 +157,14 @@ class ObserverServer extends SocketServer {
                     self.opts.imaState.chainProperties.sc.ethersProvider
                 );
             self.initComplete = true;
-            self.information( "Full init compete for in-worker SNB server in ",
-                threadInfo.threadDescription(), " ",
-                log.v( gURL ) );
+            self.information( "Full init compete for in-worker SNB server in {}, U={}",
+                threadInfo.threadDescription(), gURL );
             return joAnswer;
         };
         self.mapApiHandlers.periodicCachingStart =
             function( joMessage, joAnswer, eventData, socket ) {
-                self.opts.details.debug( threadInfo.threadDescription(),
-                    " will start periodic SNB refresh ..." );
+                self.opts.details.debug( "{} will start periodic SNB refresh ..."
+                    .threadInfo.threadDescription() );
                 self.periodicCachingStart(
                     socket,
                     joMessage.message.secondsToReDiscoverSkaleNetwork,
@@ -187,8 +186,8 @@ class ObserverServer extends SocketServer {
             };
             return joAnswer;
         };
-        console.log( "Initialized in-worker SNB server in ", threadInfo.threadDescription(),
-            " is ", gURL );
+        console.log( "Initialized in-worker SNB server in {}, U=",
+            threadInfo.threadDescription(), gURL );
     }
     dispose() {
         const self = this;
@@ -210,25 +209,18 @@ class ObserverServer extends SocketServer {
             return null;
         let strError = null;
         self.bIsPeriodicCachingStepInProgress = true;
-        self.opts.details.debug( threadInfo.threadDescription(),
-            " thread will invoke S-Chains caching in ",
-            ( isForceMultiAttemptsUntilSuccess
-                ? log.fmtWarning( "forced" ) : log.fmtSuccess( "normal" ) ) +
-            " mode..." );
+        self.opts.details.debug( "{} thread will invoke S-Chains caching in {} mode...",
+            threadInfo.threadDescription(), ( isForceMultiAttemptsUntilSuccess
+                ? log.fmtWarning( "forced" ) : log.fmtSuccess( "normal" ) ) );
         for( let idxAttempt = 0;
             // eslint-disable-next-line no-unmodified-loop-condition
             idxAttempt < 10 || isForceMultiAttemptsUntilSuccess;
             ++ idxAttempt
         ) {
             try {
-                self.opts.details.debug( threadInfo.threadDescription(),
-                    " thread will invoke S-Chains caching(attempt + ",
-                    idxAttempt, ")..." );
-                strError =
-                    await skaleObserver.cacheSChains(
-                        strChainNameConnectedTo,
-                        self.opts
-                    );
+                self.opts.details.debug( "{} thread will invoke S-Chains caching(attempt {})...",
+                    threadInfo.threadDescription(), idxAttempt );
+                strError = await skaleObserver.cacheSChains( strChainNameConnectedTo, self.opts );
                 if( ! strError )
                     break;
             } catch ( err ) {
@@ -242,12 +234,12 @@ class ObserverServer extends SocketServer {
         }
         self.bIsPeriodicCachingStepInProgress = false;
         if( strError ) {
-            self.error( "Parallel periodic SNB caching came across with error: ",
-                log.em( strError ), " in ", threadInfo.threadDescription() );
+            self.error( "Parallel periodic SNB caching came across with error: {} in {}",
+                log.em( strError ), threadInfo.threadDescription() );
             return strError;
         }
-        self.debug( "Parallel periodic SNB caching in ",
-            threadInfo.threadDescription(), " will notify main thread now" );
+        self.debug( "Parallel periodic SNB caching in {} will notify main thread now",
+            threadInfo.threadDescription() );
         const arrSChains = skaleObserver.getLastCachedSChains();
         const jo = {
             "method": "periodicCachingDoNow",
@@ -256,8 +248,8 @@ class ObserverServer extends SocketServer {
         };
         const isFlush = true;
         socket.send( jo, isFlush );
-        self.debug( "Parallel periodic SNB caching in ",
-            threadInfo.threadDescription(), " did notified main thread now" );
+        self.debug( "Parallel periodic SNB caching in {} did notified main thread now",
+            threadInfo.threadDescription() );
         return null;
     }
     async periodicCachingStart(
@@ -270,14 +262,14 @@ class ObserverServer extends SocketServer {
         await self.periodicCachingStop();
         if( secondsToReDiscoverSkaleNetwork <= 0 )
             return false;
-        self.opts.details.debug( "SKALE Observer in ", threadInfo.threadDescription(),
-            " will do pre-configured periodic SNB refresh each ",
-            secondsToReDiscoverSkaleNetwork, " second(s)..." );
+        self.opts.details.debug( "SKALE Observer in {} will do pre-configured periodic " +
+            "SNB refresh each {} second(s)...", threadInfo.threadDescription(),
+        secondsToReDiscoverSkaleNetwork );
         const fnAsyncHandler = async function() {
             try {
-                self.opts.details.debug( "SKALE Observer in ", threadInfo.threadDescription(),
-                    " will do immediate periodic SNB refresh (one of each ",
-                    secondsToReDiscoverSkaleNetwork, " second(s))..." );
+                self.opts.details.debug( "SKALE Observer in {} will do immediate periodic " +
+                    "SNB refresh (one of each {} second(s))...", threadInfo.threadDescription(),
+                secondsToReDiscoverSkaleNetwork );
                 while( true ) {
                     const strError =
                         await self.periodicCachingDoNow(
@@ -292,8 +284,8 @@ class ObserverServer extends SocketServer {
                     break;
                 }
             } catch ( err ) {
-                self.error( "Periodic SNB caching(async) error in ",
-                    threadInfo.threadDescription(), ": ", log.em( strError ) );
+                self.error( "Periodic SNB caching(async) error in {}: {}",
+                    threadInfo.threadDescription(), log.em( strError ) );
             }
         };
         const fnPeriodicCaching = function() {
@@ -303,19 +295,19 @@ class ObserverServer extends SocketServer {
                 fnAsyncHandler()
                     .then( () => {
                     } ).catch( ( err ) => {
-                        self.error( "Periodic SNB caching(sync-delayed) in ",
-                            threadInfo.threadDescription()," error: ",
+                        self.error( "Periodic SNB caching(sync-delayed) in {} error: {}",
+                            threadInfo.threadDescription(),
                             log.em( owaspUtils.extractErrorMessage( err ) ) );
                     } );
             } catch ( err ) {
-                self.error( "Periodic SNB caching(sync) in ",
-                    threadInfo.threadDescription(), " error: ",
+                self.error( "Periodic SNB caching(sync) in {} error: {}",
+                    threadInfo.threadDescription(),
                     log.em( owaspUtils.extractErrorMessage( err ) ) );
             }
         };
         await fnPeriodicCaching();
-        self.opts.details.debug( "SKALE Observer in ", threadInfo.threadDescription(),
-            " did invoked periodic SNB refresh" );
+        self.opts.details.debug( "SKALE Observer in {} did invoked periodic SNB refresh",
+            threadInfo.threadDescription() );
         self.intervalPeriodicSchainsCaching = owaspUtils.setInterval2(
             fnPeriodicCaching, secondsToReDiscoverSkaleNetwork * 1000 );
         fnAsyncHandler(); // initial async call
@@ -411,6 +403,5 @@ const acceptor = new networkLayer.InWorkerSocketServerAcceptor( gURL, doSendMess
 const server = new ObserverServer( acceptor );
 server.on( "dispose", function() {
     const self = server;
-    self.debug( "Disposed in-worker in ", threadInfo.threadDescription(), " SNB server ",
-        log.v( gURL ) );
+    self.debug( "Disposed in-worker in {} SNB server U=", threadInfo.threadDescription(), gURL );
 } );

@@ -89,7 +89,8 @@ export async function doConnect( joCall, opts, fn ) {
             } );
             joCall.wsConn.on( "error", async function( err ) {
                 strWsError = err.toString() || "internal web socket error";
-                log.error( log.u( joCall.url ), " web socket error: ", log.em( err.toString() ) );
+                log.error( "{} web socket error: {}",
+                    log.u( joCall.url ), log.em( err.toString() ) );
                 const wsConn = joCall.wsConn;
                 joCall.wsConn = null;
                 wsConn.close();
@@ -97,7 +98,8 @@ export async function doConnect( joCall, opts, fn ) {
             } );
             joCall.wsConn.on( "fail", async function( err ) {
                 strWsError = err.toString() || "internal web socket failure";
-                log.error( log.u( joCall.url ), " web socket fail: ", log.em( err.toString() ) );
+                log.error( "{} web socket fail: {}",
+                    log.u( joCall.url ), log.em( err.toString() ) );
                 const wsConn = joCall.wsConn;
                 joCall.wsConn = null;
                 wsConn.close();
@@ -121,13 +123,13 @@ export async function doConnect( joCall, opts, fn ) {
                 },
                 async function( nStep ) { // step handler
                     if( strWsError && typeof strWsError == "string" && strWsError.length > 0 ) {
-                        log.error( log.u( joCall.url ), " web socket wait error detected: ",
-                            log.em( strWsError ) );
+                        log.error( "{} web socket wait error detected: {}",
+                            log.u( joCall.url ), log.em( strWsError ) );
                         return false;
                     }
                     if( nStep >= gSecondsConnectionTimeout ) {
                         strWsError = "wait timeout, web socket is connecting too long";
-                        log.error( log.u( joCall.url ), " web socket wait timeout detected" );
+                        log.error( "{} web socket wait timeout detected", log.u( joCall.url ) );
                         const wsConn = joCall.wsConn;
                         joCall.wsConn = null;
                         wsConn.close();
@@ -261,8 +263,7 @@ export async function doCall( joCall, joIn, fn ) {
                     res.on( "end", function() {
                         if( res.statusCode !== 200 ) {
                             joOut = null;
-                            errCall =
-                                "Response ends with bad status code: " +
+                            errCall = "Response ends with bad status code: " +
                                 res.statusCode.toString();
                             reject( errCall );
                         }
@@ -278,7 +279,7 @@ export async function doCall( joCall, joIn, fn ) {
                     } );
                 } );
                 req.on( "error", err => {
-                    log.error( log.u( joCall.url ), " REST error ", log.em( err.toString() ) );
+                    log.error( "{} REST error {}", log.u( joCall.url ), log.em( err.toString() ) );
                     joOut = null;
                     errCall = "RPC call error: " + err.toString();
                     reject( errCall );
@@ -312,12 +313,12 @@ export async function doCall( joCall, joIn, fn ) {
                 } );
                 const body = response.data.toString( "utf8" );
                 if( response && response.statusCode && response.statusCode !== 200 )
-                    log.warning( " REST call status code is ", log.v( response.statusCode ) );
+                    log.warning( "REST call status code is {}", response.statusCode );
 
                 joOut = JSON.parse( body );
                 errCall = null;
             } catch ( err ) {
-                log.error( log.u( joCall.url ), " request error ", log.em( err.toString() ) );
+                log.error( "{} request error {}", log.u( joCall.url ), log.em( err.toString() ) );
                 joOut = null;
                 errCall = "request error: " + err.toString();
             }

@@ -458,8 +458,8 @@ async function gatherMessages( optsTransfer ) {
             }
             optsTransfer.strActionName = "" + strActionNameOld;
             if( !bSecurityCheckPassed ) {
-                optsTransfer.details.warning( optsTransfer.strLogPrefix,
-                    "Block age check was not passed, canceling search for transfer events" );
+                optsTransfer.details.warning( "{}Block age check was not passed, " +
+                    "canceling search for transfer events", optsTransfer.strLogPrefix );
                 break;
             }
         }
@@ -664,15 +664,14 @@ async function callbackAllMessagesSign( optsTransfer, err, jarrMessages, joGlueR
                 optsTransfer.details.success( optsTransfer.strLogPrefix, "Done, validated " +
                     "transfer to Main Net via MessageProxy error absence on Main Net" );
             } else {
-                optsTransfer.details.warning( optsTransfer.strLogPrefix,
-                    " Cannot validate transfer to Main Net via " +
-                        "MessageProxy error absence on Main Net, " +
-                        "no valid transaction receipt provided" );
+                optsTransfer.details.warning( " Cannot validate transfer to Main Net via " +
+                    "MessageProxy error absence on Main Net, no valid transaction receipt provided",
+                optsTransfer.strLogPrefix );
             }
         } else {
-            optsTransfer.details.warning( optsTransfer.strLogPrefix,
-                " Cannot validate transfer to Main Net " +
-                    "via MessageProxy error absence on Main Net, no MessageProxy provided" );
+            optsTransfer.details.warning( " Cannot validate transfer to Main Net via " +
+                "MessageProxy error absence on Main Net, no MessageProxy provided",
+            optsTransfer.strLogPrefix );
         }
     }
 }
@@ -904,12 +903,10 @@ async function doMainTransferLoopActions( optsTransfer ) {
     optsTransfer.nIdxCurrentMsg = optsTransfer.nIncMsgCnt;
     while( optsTransfer.nIdxCurrentMsg < optsTransfer.nOutMsgCnt ) {
         if( optsTransfer.nStepsDone > optsTransfer.nTransferSteps ) {
-            optsTransfer.details.warning( optsTransfer.strLogPrefix,
-                "Transfer step count overflow" );
-            if( log.id != optsTransfer.details.id ) {
-                log.warning( optsTransfer.strLogPrefix,
-                    "Transfer step count overflow" );
-            }
+            optsTransfer.details.warning( "{}Transfer step count overflow",
+                optsTransfer.strLogPrefix );
+            if( log.id != optsTransfer.details.id )
+                log.warning( "{}Transfer step count overflow", optsTransfer.strLogPrefix );
             optsTransfer.details.close();
             imaTransferErrorHandling.saveTransferSuccessAll();
             return false;
@@ -938,11 +935,11 @@ async function doMainTransferLoopActions( optsTransfer ) {
         if( ! loop.checkTimeFraming(
             null, optsTransfer.strDirection, optsTransfer.joRuntimeOpts )
         ) {
-            optsTransfer.details.warning( optsTransfer.strLogPrefix,
-                "Time framing overflow (after forming block of messages)" );
+            optsTransfer.details.warning( "{}Time framing overflow" +
+                "(after forming block of messages)", optsTransfer.strLogPrefix );
             if( log.id != optsTransfer.details.id ) {
-                log.warning( optsTransfer.strLogPrefix,
-                    "Time framing overflow (after forming block of messages)" );
+                log.warning( "{}Time framing overflow" +
+                    "(after forming block of messages)", optsTransfer.strLogPrefix );
             }
             optsTransfer.details.close();
             imaTransferErrorHandling.saveTransferSuccessAll();
@@ -951,30 +948,25 @@ async function doMainTransferLoopActions( optsTransfer ) {
         if( optsTransfer.strDirection == "S2S" ) {
             optsTransfer.strActionName = "S2S message analysis";
             if( ! optsTransfer.joExtraSignOpts ) {
-                throw new Error(
-                    "Could not validate S2S messages, " +
-                        "no extra options provided to transfer algorithm" );
+                throw new Error( "Could not validate S2S messages, " +
+                    "no extra options provided to transfer algorithm" );
             }
             if( ! optsTransfer.joExtraSignOpts.skaleObserver ) {
-                throw new Error(
-                    "Could not validate S2S messages, " +
-                        "no SKALE NETWORK observer provided to transfer algorithm" );
+                throw new Error( "Could not validate S2S messages, " +
+                    "no SKALE NETWORK observer provided to transfer algorithm" );
             }
             const arrSChainsCached =
                 optsTransfer.joExtraSignOpts.skaleObserver.getLastCachedSChains();
             if( ( !arrSChainsCached ) || arrSChainsCached.length == 0 ) {
-                throw new Error(
-                    "Could not validate S2S messages, " +
-                        "no S-Chains in SKALE NETWORK observer cached yet, try again later" );
+                throw new Error( "Could not validate S2S messages, " +
+                    "no S-Chains in SKALE NETWORK observer cached yet, try again later" );
             }
             const idxSChain =
                 optsTransfer.joExtraSignOpts.skaleObserver.findSChainIndexInArrayByName(
                     arrSChainsCached, optsTransfer.chainNameSrc );
             if( idxSChain < 0 ) {
-                throw new Error(
-                    "Could not validate S2S messages, source S-Chain \"" +
-                    optsTransfer.chainNameSrc +
-                    "\" is not in SKALE NETWORK observer " +
+                throw new Error( "Could not validate S2S messages, source S-Chain \"" +
+                    optsTransfer.chainNameSrc + "\" is not in SKALE NETWORK observer " +
                     "cache yet or it's not connected to this \"" + optsTransfer.chainNameDst +
                     "\" S-Chain yet, try again later" );
             }
@@ -1119,8 +1111,8 @@ export async function doTransfer(
     optsTransfer.strLogPrefix = optsTransfer.strLogPrefixShort + "transfer loop from " +
         optsTransfer.chainNameSrc + " to " + optsTransfer.chainNameDst + ": ";
     if( gIsOneTransferInProgressInThisThread ) {
-        optsTransfer.details.warning( optsTransfer.strLogPrefix,
-            "Transfer loop step is skipped because previous one is still in progress" );
+        optsTransfer.details.warning( "{}Transfer loop step is skipped because previous one " +
+            "is still in progress", optsTransfer.strLogPrefix );
         if( log.exposeDetailsGet() && optsTransfer.details.exposeDetailsTo ) {
             optsTransfer.details.exposeDetailsTo(
                 log, optsTransfer.strGatheredDetailsName, true );

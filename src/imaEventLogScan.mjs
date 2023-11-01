@@ -118,14 +118,11 @@ export async function safeGetPastEventsProgressive(
         strEventName, " via URL ", log.u( strURL ),
         generateWhileTransferringLogMessageSuffix( optsChainPair ), "..." );
     if( ! imaTransferErrorHandling.getEnabledProgressiveEventsScan() ) {
-        details.warning( strLogPrefix, "IMPORTANT NOTICE: Will skip progressive events scan " +
-            "in block range from ", log.v( nBlockFrom ), " to ", log.v( nBlockTo ),
-        " because it's ", log.fmtError( "DISABLED" ) );
-        return await safeGetPastEvents(
-            details, strLogPrefix,
-            ethersProvider, attempts, joContract, strEventName,
-            nBlockFrom, nBlockTo, joFilter
-        );
+        details.warning( "{}IMPORTANT NOTICE: Will skip progressive events scan " +
+            "in block range from {} to {} because it's {}",
+        strLogPrefix, nBlockFrom, nBlockTo, log.fmtError( "DISABLED" ) );
+        return await safeGetPastEvents( details, strLogPrefix, ethersProvider, attempts,
+            joContract, strEventName, nBlockFrom, nBlockTo, joFilter );
     }
     const nLatestBlockNumber = owaspUtils.toBN(
         await imaHelperAPIs.safeGetBlockNumber( details, 10, ethersProvider ) );
@@ -453,14 +450,11 @@ export async function safeGetPastEventsIterative(
 ) {
     if( imaHelperAPIs.getBlocksCountInInIterativeStepOfEventsScan() <= 0 ||
         imaHelperAPIs.getMaxIterationsInAllRangeEventsScan() <= 0 ) {
-        details.warning( strLogPrefix, "IMPORTANT NOTICE: Will skip iterative events scan " +
-            "in block range from ", log.v( nBlockFrom ), " to ", log.v( nBlockTo ),
-        " because it's ", log.fmtError( "DISABLED" ) );
-        return await safeGetPastEvents(
-            details, strLogPrefix,
-            ethersProvider, attempts, joContract,
-            strEventName, nBlockFrom, nBlockTo, joFilter
-        );
+        details.warning( "{}IMPORTANT NOTICE: Will skip iterative events scan " +
+            "in block range from {} to {} because it's {}",
+        strLogPrefix, nBlockFrom, nBlockTo, log.fmtError( "DISABLED" ) );
+        return await safeGetPastEvents( details, strLogPrefix, ethersProvider, attempts,
+            joContract, strEventName, nBlockFrom, nBlockTo, joFilter );
     }
     const nLatestBlockNumber = owaspUtils.toBN(
         await imaHelperAPIs.safeGetBlockNumber( details, 10, ethersProvider ) );
@@ -485,9 +479,9 @@ export async function safeGetPastEventsIterative(
             owaspUtils.toBN( imaHelperAPIs.getBlocksCountInInIterativeStepOfEventsScan() )
         ).gt( owaspUtils.toBN( imaHelperAPIs.getMaxIterationsInAllRangeEventsScan() ) )
         ) {
-            details.warning( strLogPrefix, "IMPORTANT NOTICE: Will skip iterative scan and " +
-                "use scan in block range from ", nBlockFrom.toHexString(), " to ",
-            nBlockTo.toHexString() );
+            details.warning( "{}IMPORTANT NOTICE: Will skip iterative scan and " +
+                "use scan in block range from {} to {}",
+            strLogPrefix, nBlockFrom.toHexString(), nBlockTo.toHexString() );
             return await safeGetPastEvents(
                 details, strLogPrefix,
                 ethersProvider, attempts, joContract, strEventName,

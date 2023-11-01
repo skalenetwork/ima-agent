@@ -2157,9 +2157,8 @@ function commonInitCheckAbiPaths() {
         imaState.bHaveSkaleManagerABI = true;
     } else {
         imaState.bHaveSkaleManagerABI = false;
-        log.warning( "WARNING: No ", att( "Skale Manager" ),
-            " ABI file path is provided in command line arguments" +
-            "(needed for particular operations only)" );
+        log.warning( "WARNING: No Skale Manager ABI file path is provided in command line " +
+            "arguments(needed for particular operations only)" );
     }
 
     if( imaState.chainProperties.mn.strPathAbiJson &&
@@ -2170,9 +2169,8 @@ function commonInitCheckAbiPaths() {
         imaState.chainProperties.mn.bHaveAbiIMA = true;
     } else {
         imaState.chainProperties.mn.bHaveAbiIMA = false;
-        log.warning( "WARNING: No ", att( "Main-net" ),
-            " IMA ABI file path is provided in command line arguments",
-            "(needed for particular operations only)" );
+        log.warning( "WARNING: No Main-net IMA ABI file path is provided in command line " +
+            "arguments(needed for particular operations only)" );
     }
 
     if( imaState.chainProperties.sc.strPathAbiJson &&
@@ -2184,8 +2182,7 @@ function commonInitCheckAbiPaths() {
         imaState.chainProperties.sc.bHaveAbiIMA = true;
     } else {
         imaState.chainProperties.sc.bHaveAbiIMA = false;
-        log.warning( "WARNING: No ", att( "S-Chain" ),
-            " IMA ABI file path is provided in command line arguments",
+        log.warning( "WARNING: No S-Chain IMA ABI file path is provided in command line arguments" +
             "(needed for particular operations only)" );
     }
 
@@ -2198,9 +2195,8 @@ function commonInitCheckAbiPaths() {
         imaState.chainProperties.tc.bHaveAbiIMA = true;
     } else {
         imaState.chainProperties.tc.bHaveAbiIMA = false;
-        log.warning( "WARNING: No ", att( "S<->S Target S-Chain" ),
-            " IMA ABI file path is provided in command line arguments",
-            "(needed for particular operations only)" );
+        log.warning( "WARNING: No S<->S Target S-Chain IMA ABI file path is provided " +
+            "in command line arguments(needed for particular operations only)" );
     }
 }
 
@@ -2232,10 +2228,8 @@ function commonInitCheckContractPresences() {
                 "wallets_abi",
                 "wallets_address"
             ] );
-    } else if( imaState.optsS2S.isEnabled ) {
-        log.warning( "WARNING: Missing ", att( "Skale Manager" ),
-            " ABI path for ", att( "S-Chain" ), " to ", att( "S-Chain" ), " transfers" );
-    }
+    } else if( imaState.optsS2S.isEnabled )
+        log.warning( "WARNING: Missing Skale Manager ABI path for S-Chain to S-Chain transfers" );
 
     if( imaState.chainProperties.mn.bHaveAbiIMA ) {
         imaUtils.checkKeysExistInABI( "main-net",
@@ -2717,8 +2711,7 @@ function commonInitCheckErc721() {
         imaState.chainProperties.tc.strCoinNameErc721.length === 0 &&
         imaState.chainProperties.sc.strCoinNameErc721.length > 0
     ) {
-        log.warning(
-            "IMPORTANT NOTICE: Both S<->S Target S-Chain ERC721 JSON and ",
+        log.warning( "IMPORTANT NOTICE: Both S<->S Target S-Chain ERC721 JSON and " +
             "explicit ERC721 address are not specified" );
     }
 }
@@ -2877,8 +2870,7 @@ function commonInitCheckErc1155() {
         imaState.chainProperties.tc.strCoinNameErc1155.length === 0 &&
         imaState.chainProperties.sc.strCoinNameErc1155.length > 0
     ) {
-        log.warning(
-            "IMPORTANT NOTICE: Both S<->S Target S-Chain ERC1155 JSON and ",
+        log.warning( "IMPORTANT NOTICE: Both S<->S Target S-Chain ERC1155 JSON and " +
             "explicit ERC1155 address are not specified" );
     }
 }
@@ -3289,14 +3281,14 @@ function commonInitErcTokensArgs() {
                     } );
             } catch ( e2 ) {
                 log.warning( "Please check your params in ERC1155 transfer" );
-                log.warning( "Error 1", e1 );
-                log.warning( "Error 2", e2 );
+                log.warning( "Error 1 {}", e1 );
+                log.warning( "Error 2 {}", e2 );
                 process.exit( 126 );
             }
         }
         if( isPrintGathered ) {
-            log.information( "ERC1155 explicit S-Chain address is ",
-                att( imaState.strAddrErc1155Explicit ) );
+            log.information( "ERC1155 explicit S-Chain address is {}",
+                imaState.strAddrErc1155Explicit );
         }
     }
     if( imaState.chainProperties.tc.strCoinNameErc1155.length > 0 ) {
@@ -3461,7 +3453,7 @@ export function imaInitEthersProviders() {
         asyncCheckUrlAtStartup( u, "Main-net" );
         imaState.chainProperties.mn.ethersProvider = owaspUtils.getEthersProviderFromURL( u );
     } else {
-        log.warning( " No Main-net URL specified in command line arguments" +
+        log.warning( "No Main-net URL specified in command line arguments" +
             "(needed for particular operations only)" );
     }
 
@@ -3473,7 +3465,7 @@ export function imaInitEthersProviders() {
         asyncCheckUrlAtStartup( u, "S-Chain" );
         imaState.chainProperties.sc.ethersProvider = owaspUtils.getEthersProviderFromURL( u );
     } else {
-        log.warning( " No S-Chain URL specified in command line arguments" +
+        log.warning( "No S-Chain URL specified in command line arguments" +
             "(needed for particular operations only)" );
     }
 
@@ -3485,7 +3477,7 @@ export function imaInitEthersProviders() {
         asyncCheckUrlAtStartup( u, "S<->S Target S-Chain" );
         imaState.chainProperties.tc.ethersProvider = owaspUtils.getEthersProviderFromURL( u );
     } else {
-        log.warning( " No S<->S Target S-Chain URL specified in command line arguments" +
+        log.warning( "No S<->S Target S-Chain URL specified in command line arguments" +
             "(needed for particular operations only)" );
     }
 

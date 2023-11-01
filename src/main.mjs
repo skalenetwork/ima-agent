@@ -102,11 +102,11 @@ function parseCommandLine() {
     if( imaState.nReimbursementRange >= 0 )
         clpTools.commandLineTaskReimbursementSetRange();
     if( imaState.nAutoExitAfterSeconds > 0 ) {
-        log.warning( "Automatic exit after ", imaState.nAutoExitAfterSeconds,
-            " second(s) is requested." );
+        log.warning( "Automatic exit after {} second(s) is requested.",
+            imaState.nAutoExitAfterSeconds );
         const iv = owaspUtils.setInterval2( function() {
-            log.warning( "Performing automatic exit after ", imaState.nAutoExitAfterSeconds,
-                " second(s)..." );
+            log.warning( "Performing automatic exit after {} second(s)...",
+                imaState.nAutoExitAfterSeconds );
             owaspUtils.clearInterval2( iv );
             process.exit( 0 );
         }, imaState.nAutoExitAfterSeconds * 1000 );

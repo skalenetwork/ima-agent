@@ -350,9 +350,8 @@ async function singleTransferLoopPartS2S( optsLoop, strLogPrefix ) {
 }
 
 function printLoopPartSkippedWarning( strLoopPartName ) {
-    log.warning( strLogPrefix, "Skipped ", log.v( strLoopPartName ),
-        " transfer loop part due to other single ",
-        "transfer loop is in progress right now" );
+    log.warning( "{}Skipped {} transfer loop part due to other single transfer loop is in " +
+        "progress right now", strLogPrefix, strLoopPartName );
 }
 
 export async function singleTransferLoop( optsLoop ) {
