@@ -120,8 +120,7 @@ class ObserverServer extends SocketServer {
                 const isFlush = true;
                 socket.send( jo, isFlush );
             } );
-            log.debug( "Loop worker ", workerData.url,
-                " will save cached S-Chains..." );
+            log.debug( "Loop worker {} will save cached S-Chains...", workerData.url );
             skaleObserver.setLastCachedSChains( self.opts.imaState.arrSChainsCached );
             self.opts.imaState.chainProperties.mn.joAccount.address = owaspUtils.fnAddressImpl_;
             self.opts.imaState.chainProperties.sc.joAccount.address = owaspUtils.fnAddressImpl_;

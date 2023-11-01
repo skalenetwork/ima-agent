@@ -2071,7 +2071,7 @@ export async function mintErc20(
     const strLogPrefix = "mintErc20() call ";
     const details = log.createMemoryStream();
     try {
-        details.debug( strLogPrefix, "Mint ERC20 token amount ", log.v( nAmount ) );
+        details.debug( "{}Mint ERC20 token amount {}", strLogPrefix, nAmount );
         if( ! ( ethersProvider && joAccount && strAddressMintTo &&
             typeof strAddressMintTo == "string" && strAddressMintTo.length > 0 &&
             strTokenContractAddress && typeof strTokenContractAddress == "string" &&
@@ -2100,24 +2100,22 @@ export async function mintErc20(
         details.trace( "{}Using estimated gas={}", strLogPrefix, estimatedGasMint );
         strActionName = "Mint ERC20";
         const isIgnoreMint = false;
-        const strErrorOfDryRun =
-            await imaTx.dryRunCall(
-                details, ethersProvider,
-                "ERC20", contract, "mint", arrArgumentsMint,
-                joAccount, strActionName, isIgnoreMint,
-                gasPrice, estimatedGasMint, weiHowMuchMint, null );
+        const strErrorOfDryRun = await imaTx.dryRunCall(
+            details, ethersProvider,
+            "ERC20", contract, "mint", arrArgumentsMint,
+            joAccount, strActionName, isIgnoreMint,
+            gasPrice, estimatedGasMint, weiHowMuchMint, null );
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
         const opts = {
             isCheckTransactionToSchain: ( chainNameDst !== "Mainnet" ) ? true : false
         };
-        const joReceipt =
-            await imaTx.payedCall(
-                details, ethersProvider,
-                "ERC20", contract, "mint", arrArgumentsMint,
-                joAccount, strActionName,
-                gasPrice, estimatedGasMint, weiHowMuchMint, opts );
+        const joReceipt = await imaTx.payedCall(
+            details, ethersProvider,
+            "ERC20", contract, "mint", arrArgumentsMint,
+            joAccount, strActionName,
+            gasPrice, estimatedGasMint, weiHowMuchMint, opts );
         imaGasUsage.printGasUsageReportFromArray( "MINT ERC20 ", [ {
             "description": "mintErc20()/mint",
             "receipt": joReceipt
@@ -2155,7 +2153,7 @@ export async function mintErc721(
     const strLogPrefix = "mintErc721() call ";
     const details = log.createMemoryStream();
     try {
-        details.debug( strLogPrefix, "Mint ERC721 token ID ", log.v( idToken ) );
+        details.debug( "{}Mint ERC721 token ID {}", strLogPrefix, idToken );
         if( ! ( ethersProvider && joAccount && strAddressMintTo &&
             typeof strAddressMintTo == "string" && strAddressMintTo.length > 0 &&
             strTokenContractAddress && typeof strTokenContractAddress == "string" &&
@@ -2163,12 +2161,10 @@ export async function mintErc721(
         ) )
             throw new Error( "Missing valid arguments" );
         strActionName = "mintErc721() instantiate token contract";
-        const contract =
-            new owaspUtils.ethersMod.ethers.Contract(
-                strTokenContractAddress,
-                joTokenContractABI,
-                ethersProvider
-            );
+        const contract = new owaspUtils.ethersMod.ethers.Contract(
+            strTokenContractAddress,
+            joTokenContractABI,
+            ethersProvider );
         const arrArgumentsMint = [
             strAddressMintTo,
             owaspUtils.ensureStartsWith0x(
@@ -2177,33 +2173,30 @@ export async function mintErc721(
         const weiHowMuchMint = undefined;
         const gasPrice = await tc.computeGasPrice( ethersProvider, 200000000000 );
         details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
-        const estimatedGasMint =
-            await tc.computeGas(
-                details, ethersProvider,
-                "ERC721", contract, "mint", arrArgumentsMint,
-                joAccount, strActionName,
-                gasPrice, 10000000, weiHowMuchMint, null );
+        const estimatedGasMint = await tc.computeGas(
+            details, ethersProvider,
+            "ERC721", contract, "mint", arrArgumentsMint,
+            joAccount, strActionName,
+            gasPrice, 10000000, weiHowMuchMint, null );
         details.trace( "{}Using estimated gas={}", strLogPrefix, estimatedGasMint );
         strActionName = "Mint ERC721";
         const isIgnoreMint = false;
-        const strErrorOfDryRun =
-            await imaTx.dryRunCall(
-                details, ethersProvider,
-                "ERC721", contract, "mint", arrArgumentsMint,
-                joAccount, strActionName, isIgnoreMint,
-                gasPrice, estimatedGasMint, weiHowMuchMint, null );
+        const strErrorOfDryRun = await imaTx.dryRunCall(
+            details, ethersProvider,
+            "ERC721", contract, "mint", arrArgumentsMint,
+            joAccount, strActionName, isIgnoreMint,
+            gasPrice, estimatedGasMint, weiHowMuchMint, null );
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
         const opts = {
             isCheckTransactionToSchain: ( chainNameDst !== "Mainnet" ) ? true : false
         };
-        const joReceipt =
-            await imaTx.payedCall(
-                details, ethersProvider,
-                "ERC721", contract, "mint", arrArgumentsMint,
-                joAccount, strActionName,
-                gasPrice, estimatedGasMint, weiHowMuchMint, opts );
+        const joReceipt = await imaTx.payedCall(
+            details, ethersProvider,
+            "ERC721", contract, "mint", arrArgumentsMint,
+            joAccount, strActionName,
+            gasPrice, estimatedGasMint, weiHowMuchMint, opts );
         imaGasUsage.printGasUsageReportFromArray( "MINT ERC721 ", [ {
             "description": "mintErc721()/mint",
             "receipt": joReceipt
@@ -2242,8 +2235,8 @@ export async function mintErc1155(
     const strLogPrefix = "mintErc1155() call ";
     const details = log.createMemoryStream();
     try {
-        details.debug( strLogPrefix, "Mint ERC1155 token ID ", log.v( idToken ),
-            " token amount ", log.v( nAmount ) );
+        details.debug( "{}Mint ERC1155 token ID {} token amount {}",
+            strLogPrefix, idToken, nAmount );
         if( ! ( ethersProvider && joAccount && strAddressMintTo &&
             typeof strAddressMintTo == "string" && strAddressMintTo.length > 0 &&
             strTokenContractAddress && typeof strTokenContractAddress == "string" &&
@@ -2266,33 +2259,30 @@ export async function mintErc1155(
         const weiHowMuchMint = undefined;
         const gasPrice = await tc.computeGasPrice( ethersProvider, 200000000000 );
         details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
-        const estimatedGasMint =
-            await tc.computeGas(
-                details, ethersProvider,
-                "ERC1155", contract, "mint", arrArgumentsMint,
-                joAccount, strActionName,
-                gasPrice, 10000000, weiHowMuchMint, null );
+        const estimatedGasMint = await tc.computeGas(
+            details, ethersProvider,
+            "ERC1155", contract, "mint", arrArgumentsMint,
+            joAccount, strActionName,
+            gasPrice, 10000000, weiHowMuchMint, null );
         details.trace( "{}Using estimated gas={}", strLogPrefix, estimatedGasMint );
         strActionName = "Mint ERC1155";
         const isIgnoreMint = false;
-        const strErrorOfDryRun =
-            await imaTx.dryRunCall(
-                details, ethersProvider,
-                "ERC1155", contract, "mint", arrArgumentsMint,
-                joAccount, strActionName, isIgnoreMint,
-                gasPrice, estimatedGasMint, weiHowMuchMint, null );
+        const strErrorOfDryRun = await imaTx.dryRunCall(
+            details, ethersProvider,
+            "ERC1155", contract, "mint", arrArgumentsMint,
+            joAccount, strActionName, isIgnoreMint,
+            gasPrice, estimatedGasMint, weiHowMuchMint, null );
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
         const opts = {
             isCheckTransactionToSchain: ( chainNameDst !== "Mainnet" ) ? true : false
         };
-        const joReceipt =
-            await imaTx.payedCall(
-                details, ethersProvider,
-                "ERC1155", contract, "mint", arrArgumentsMint,
-                joAccount, strActionName,
-                gasPrice, estimatedGasMint, weiHowMuchMint, opts );
+        const joReceipt = await imaTx.payedCall(
+            details, ethersProvider,
+            "ERC1155", contract, "mint", arrArgumentsMint,
+            joAccount, strActionName,
+            gasPrice, estimatedGasMint, weiHowMuchMint, opts );
         imaGasUsage.printGasUsageReportFromArray( "MINT ERC1155 ", [ {
             "description": "mintErc1155()/mint",
             "receipt": joReceipt
@@ -2330,7 +2320,7 @@ export async function burnErc20(
     const strLogPrefix = "burnErc20() call ";
     const details = log.createMemoryStream();
     try {
-        details.debug( strLogPrefix, "Burn ERC20 token amount ", log.v( nAmount ) );
+        details.debug( "{}Burn ERC20 token amount {}", strLogPrefix, nAmount );
         if( ! ( ethersProvider && joAccount && strAddressBurnFrom &&
             typeof strAddressBurnFrom == "string" && strAddressBurnFrom.length > 0 &&
             strTokenContractAddress && typeof strTokenContractAddress == "string" &&
@@ -2338,12 +2328,10 @@ export async function burnErc20(
         ) )
             throw new Error( "Missing valid arguments" );
         strActionName = "burnErc20() instantiate token contract";
-        const contract =
-            new owaspUtils.ethersMod.ethers.Contract(
-                strTokenContractAddress,
-                joTokenContractABI,
-                ethersProvider
-            );
+        const contract = new owaspUtils.ethersMod.ethers.Contract(
+            strTokenContractAddress,
+            joTokenContractABI,
+            ethersProvider );
         const arrArgumentsBurn = [
             strAddressBurnFrom,
             owaspUtils.ensureStartsWith0x( owaspUtils.toBN( nAmount ).toHexString() )
@@ -2351,33 +2339,30 @@ export async function burnErc20(
         const weiHowMuchBurn = undefined;
         const gasPrice = await tc.computeGasPrice( ethersProvider, 200000000000 );
         details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
-        const estimatedGasBurn =
-            await tc.computeGas(
-                details, ethersProvider,
-                "ERC20", contract, "burnFrom", arrArgumentsBurn,
-                joAccount, strActionName,
-                gasPrice, 10000000, weiHowMuchBurn, null );
+        const estimatedGasBurn = await tc.computeGas(
+            details, ethersProvider,
+            "ERC20", contract, "burnFrom", arrArgumentsBurn,
+            joAccount, strActionName,
+            gasPrice, 10000000, weiHowMuchBurn, null );
         details.trace( "{}Using estimated gas={}", strLogPrefix, estimatedGasBurn );
         strActionName = "Burn ERC20";
         const isIgnoreBurn = false;
-        const strErrorOfDryRun =
-            await imaTx.dryRunCall(
-                details, ethersProvider,
-                "ERC20", contract, "burnFrom", arrArgumentsBurn,
-                joAccount, strActionName, isIgnoreBurn,
-                gasPrice, estimatedGasBurn, weiHowMuchBurn, null );
+        const strErrorOfDryRun = await imaTx.dryRunCall(
+            details, ethersProvider,
+            "ERC20", contract, "burnFrom", arrArgumentsBurn,
+            joAccount, strActionName, isIgnoreBurn,
+            gasPrice, estimatedGasBurn, weiHowMuchBurn, null );
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
         const opts = {
             isCheckTransactionToSchain: ( chainNameDst !== "Mainnet" ) ? true : false
         };
-        const joReceipt =
-            await imaTx.payedCall(
-                details, ethersProvider,
-                "ERC20", contract, "burnFrom", arrArgumentsBurn,
-                joAccount, strActionName,
-                gasPrice, estimatedGasBurn, weiHowMuchBurn, opts );
+        const joReceipt = await imaTx.payedCall(
+            details, ethersProvider,
+            "ERC20", contract, "burnFrom", arrArgumentsBurn,
+            joAccount, strActionName,
+            gasPrice, estimatedGasBurn, weiHowMuchBurn, opts );
         imaGasUsage.printGasUsageReportFromArray( "BURN ERC20 ", [ {
             "description": "burnErc20()/burn",
             "receipt": joReceipt
@@ -2414,52 +2399,47 @@ export async function burnErc721(
     const strLogPrefix = "burnErc721() call ";
     const details = log.createMemoryStream();
     try {
-        details.debug( strLogPrefix, "Burn ERC721 token ID ", log.v( idToken ) );
+        details.debug( "{}Burn ERC721 token ID {}", strLogPrefix, idToken );
         if( ! ( ethersProvider && joAccount &&
             strTokenContractAddress && typeof strTokenContractAddress == "string" &&
             strTokenContractAddress.length > 0 && joTokenContractABI
         ) )
             throw new Error( "Missing valid arguments" );
         strActionName = "burnErc721() instantiate token contract";
-        const contract =
-            new owaspUtils.ethersMod.ethers.Contract(
-                strTokenContractAddress,
-                joTokenContractABI,
-                ethersProvider
-            );
+        const contract = new owaspUtils.ethersMod.ethers.Contract(
+            strTokenContractAddress,
+            joTokenContractABI,
+            ethersProvider );
         const arrArgumentsBurn = [
             owaspUtils.ensureStartsWith0x( owaspUtils.toBN( idToken ).toHexString() )
         ];
         const weiHowMuchBurn = undefined;
         const gasPrice = await tc.computeGasPrice( ethersProvider, 200000000000 );
         details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
-        const estimatedGasBurn =
-            await tc.computeGas(
-                details, ethersProvider,
-                "ERC721", contract, "burn", arrArgumentsBurn,
-                joAccount, strActionName,
-                gasPrice, 10000000, weiHowMuchBurn, null );
+        const estimatedGasBurn = await tc.computeGas(
+            details, ethersProvider,
+            "ERC721", contract, "burn", arrArgumentsBurn,
+            joAccount, strActionName,
+            gasPrice, 10000000, weiHowMuchBurn, null );
         details.trace( "{}Using estimated gas={}", strLogPrefix, estimatedGasBurn );
         strActionName = "Burn ERC721";
         const isIgnoreBurn = false;
-        const strErrorOfDryRun =
-            await imaTx.dryRunCall(
-                details, ethersProvider,
-                "ERC721", contract, "burn", arrArgumentsBurn,
-                joAccount, strActionName, isIgnoreBurn,
-                gasPrice, estimatedGasBurn, weiHowMuchBurn, null );
+        const strErrorOfDryRun = await imaTx.dryRunCall(
+            details, ethersProvider,
+            "ERC721", contract, "burn", arrArgumentsBurn,
+            joAccount, strActionName, isIgnoreBurn,
+            gasPrice, estimatedGasBurn, weiHowMuchBurn, null );
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
         const opts = {
             isCheckTransactionToSchain: ( chainNameDst !== "Mainnet" ) ? true : false
         };
-        const joReceipt =
-            await imaTx.payedCall(
-                details, ethersProvider,
-                "ERC721", contract, "burn", arrArgumentsBurn,
-                joAccount, strActionName,
-                gasPrice, estimatedGasBurn, weiHowMuchBurn, opts );
+        const joReceipt = await imaTx.payedCall(
+            details, ethersProvider,
+            "ERC721", contract, "burn", arrArgumentsBurn,
+            joAccount, strActionName,
+            gasPrice, estimatedGasBurn, weiHowMuchBurn, opts );
         imaGasUsage.printGasUsageReportFromArray( "BURN ERC721 ", [ {
             "description": "burnErc721()/burn",
             "receipt": joReceipt
@@ -2498,8 +2478,8 @@ export async function burnErc1155(
     const strLogPrefix = "burnErc1155() call ";
     const details = log.createMemoryStream();
     try {
-        details.debug( strLogPrefix, "Burn ERC1155 token ID ", log.v( idToken ),
-            " token amount ", log.v( nAmount ) );
+        details.debug( "{}Burn ERC1155 token ID {} token amount {}",
+            strLogPrefix, idToken, nAmount );
         if( ! ( ethersProvider && joAccount && strAddressBurnFrom &&
             typeof strAddressBurnFrom == "string" && strAddressBurnFrom.length > 0 &&
             strTokenContractAddress && typeof strTokenContractAddress == "string" &&
@@ -2507,12 +2487,10 @@ export async function burnErc1155(
         ) )
             throw new Error( "Missing valid arguments" );
         strActionName = "burnErc1155() instantiate token contract";
-        const contract =
-            new owaspUtils.ethersMod.ethers.Contract(
-                strTokenContractAddress,
-                joTokenContractABI,
-                ethersProvider
-            );
+        const contract = new owaspUtils.ethersMod.ethers.Contract(
+            strTokenContractAddress,
+            joTokenContractABI,
+            ethersProvider );
         const arrArgumentsBurn = [
             strAddressBurnFrom,
             owaspUtils.ensureStartsWith0x( owaspUtils.toBN( idToken ).toHexString() ),
@@ -2521,33 +2499,30 @@ export async function burnErc1155(
         const weiHowMuchBurn = undefined;
         const gasPrice = await tc.computeGasPrice( ethersProvider, 200000000000 );
         details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
-        const estimatedGasBurn =
-            await tc.computeGas(
-                details, ethersProvider,
-                "ERC1155", contract, "burn", arrArgumentsBurn,
-                joAccount, strActionName,
-                gasPrice, 10000000, weiHowMuchBurn, null );
+        const estimatedGasBurn = await tc.computeGas(
+            details, ethersProvider,
+            "ERC1155", contract, "burn", arrArgumentsBurn,
+            joAccount, strActionName,
+            gasPrice, 10000000, weiHowMuchBurn, null );
         details.trace( "{}Using estimated gas={}", strLogPrefix, estimatedGasBurn );
         strActionName = "Burn ERC1155";
         const isIgnoreBurn = false;
-        const strErrorOfDryRun =
-            await imaTx.dryRunCall(
-                details, ethersProvider,
-                "ERC1155", contract, "burn", arrArgumentsBurn,
-                joAccount, strActionName, isIgnoreBurn,
-                gasPrice, estimatedGasBurn, weiHowMuchBurn, null );
+        const strErrorOfDryRun = await imaTx.dryRunCall(
+            details, ethersProvider,
+            "ERC1155", contract, "burn", arrArgumentsBurn,
+            joAccount, strActionName, isIgnoreBurn,
+            gasPrice, estimatedGasBurn, weiHowMuchBurn, null );
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
         const opts = {
             ToSchain: ( chainNameDst !== "Mainnet" ) ? true : false
         };
-        const joReceipt =
-            await imaTx.payedCall(
-                details, ethersProvider,
-                "ERC1155", contract, "burn", arrArgumentsBurn,
-                joAccount, strActionName,
-                gasPrice, estimatedGasBurn, weiHowMuchBurn, opts );
+        const joReceipt = await imaTx.payedCall(
+            details, ethersProvider,
+            "ERC1155", contract, "burn", arrArgumentsBurn,
+            joAccount, strActionName,
+            gasPrice, estimatedGasBurn, weiHowMuchBurn, opts );
         imaGasUsage.printGasUsageReportFromArray( "BURN ERC1155 ", [ {
             "description": "burnErc1155()/burn",
             "receipt": joReceipt

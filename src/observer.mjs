@@ -1167,7 +1167,6 @@ export async function ensureHaveWorker( opts ) {
     };
     while( ! gClient.logicalInitComplete ) {
         log.debug( "SNB server is not initialized yet..." );
-
         await threadInfo.sleep( 1000 );
         gClient.send( jo );
     }

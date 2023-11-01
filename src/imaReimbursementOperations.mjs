@@ -43,11 +43,10 @@ export async function reimbursementShowBalance(
     const strLogPrefix = "Gas Reimbursement - Show Balance ";
     try {
         const addressFrom = joReceiverMainNet;
-        details.debug( strLogPrefix, "Querying wallet ", log.v( strReimbursementChain ), "/",
-            log.v( addressFrom ), " balance..." );
-        const xWei =
-            await joCommunityPool.callStatic.getBalance(
-                addressFrom, strReimbursementChain, { from: addressFrom } );
+        details.debug( "{}Querying wallet {}/{} balance...",
+            strLogPrefix, strReimbursementChain, addressFrom );
+        const xWei = await joCommunityPool.callStatic.getBalance(
+            addressFrom, strReimbursementChain, { from: addressFrom } );
         s = strLogPrefix + log.fmtSuccess( "Balance(wei): ", log.v( xWei ) );
         if( isForcePrintOut )
             log.information( s );
@@ -89,8 +88,8 @@ export async function reimbursementEstimateAmount(
     let s = "";
     const strLogPrefix = "Gas Reimbursement - Estimate Amount To Recharge ";
     try {
-        details.debug( strLogPrefix, "Querying wallet ",
-            log.v( strReimbursementChain ), " balance..." );
+        details.debug( "{}Querying wallet {} balance...",
+            strLogPrefix, strReimbursementChain );
         const addressReceiver = joReceiverMainNet;
         const xWei =
         await joCommunityPool.callStatic.getBalance(
@@ -115,7 +114,7 @@ export async function reimbursementEstimateAmount(
 
         const gasPrice = await transactionCustomizerMainNet.computeGasPrice(
             ethersProviderMainNet, 200000000000 );
-        s = strLogPrefix + log.fmtSuccess( "Multiplied Gas Price: ", log.v( gasPrice ) );
+        s = strLogPrefix + log.fmtSuccess( "Multiplied Gas Price: ", gasPrice );
         if( isForcePrintOut )
             log.information( s );
         details.information( s );
@@ -180,8 +179,8 @@ export async function reimbursementWalletRecharge(
     let strActionName = "";
     const strLogPrefix = "Gas Reimbursement - Wallet Recharge ";
     try {
-        details.debug( strLogPrefix, "Recharging wallet ",
-            log.v( strReimbursementChain ), "..." );
+        details.debug( "{}Recharging wallet {}...",
+            strLogPrefix, strReimbursementChain );
         strActionName = "Recharge reimbursement wallet on Main Net";
         const addressReceiver = joAccountMN.address();
         const arrArguments = [
@@ -190,30 +189,28 @@ export async function reimbursementWalletRecharge(
         ];
         const gasPrice = await transactionCustomizerMainNet.computeGasPrice(
             ethersProviderMainNet, 200000000000 );
-        details.trace( strLogPrefix, "Using computed gasPrice=", log.v( gasPrice ) );
+        details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const estimatedGas =
             await transactionCustomizerMainNet.computeGas(
                 details, ethersProviderMainNet,
                 "CommunityPool", joCommunityPool, "rechargeUserWallet", arrArguments,
                 joAccountMN, strActionName,
                 gasPrice, 3000000, nReimbursementRecharge, null );
-        details.trace( strLogPrefix, "Using estimated gas=", log.v( estimatedGas ) );
+        details.trace( "{}Using estimated gas={}", strLogPrefix, estimatedGas );
         const isIgnore = false;
-        const strErrorOfDryRun =
-            await imaTx.dryRunCall(
-                details, ethersProviderMainNet,
-                "CommunityPool", joCommunityPool, "rechargeUserWallet", arrArguments,
-                joAccountMN, strActionName, isIgnore,
-                gasPrice, estimatedGas, nReimbursementRecharge, null );
+        const strErrorOfDryRun = await imaTx.dryRunCall(
+            details, ethersProviderMainNet,
+            "CommunityPool", joCommunityPool, "rechargeUserWallet", arrArguments,
+            joAccountMN, strActionName, isIgnore,
+            gasPrice, estimatedGas, nReimbursementRecharge, null );
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
-        const joReceipt =
-            await imaTx.payedCall(
-                details, ethersProviderMainNet,
-                "CommunityPool", joCommunityPool, "rechargeUserWallet", arrArguments,
-                joAccountMN, strActionName,
-                gasPrice, estimatedGas, nReimbursementRecharge, null );
+        const joReceipt = await imaTx.payedCall(
+            details, ethersProviderMainNet,
+            "CommunityPool", joCommunityPool, "rechargeUserWallet", arrArguments,
+            joAccountMN, strActionName,
+            gasPrice, estimatedGas, nReimbursementRecharge, null );
         if( joReceipt && typeof joReceipt == "object" ) {
             jarrReceipts.push( {
                 "description": "reimbursementWalletRecharge",
@@ -255,8 +252,8 @@ export async function reimbursementWalletWithdraw(
     let strActionName = "";
     const strLogPrefix = "Gas Reimbursement - Wallet Withdraw ";
     try {
-        details.debug( strLogPrefix, "Withdrawing wallet ",
-            log.v( strReimbursementChain ), "..." );
+        details.debug( "{}Withdrawing wallet {}...",
+            strLogPrefix, strReimbursementChain );
         strActionName = "Withdraw reimbursement wallet";
         const arrArguments = [
             strReimbursementChain,
@@ -266,30 +263,28 @@ export async function reimbursementWalletWithdraw(
         const weiHowMuch = undefined;
         const gasPrice = await transactionCustomizerMainNet.computeGasPrice(
             ethersProviderMainNet, 200000000000 );
-        details.trace( strLogPrefix, "Using computed gasPrice=", log.v( gasPrice ) );
+        details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const estimatedGas =
             await transactionCustomizerMainNet.computeGas(
                 details, ethersProviderMainNet,
                 "CommunityPool", joCommunityPool, "withdrawFunds", arrArguments,
                 joAccountMN, strActionName,
                 gasPrice, 3000000, weiHowMuch, null );
-        details.trace( strLogPrefix, "Using estimated gas=", log.v( estimatedGas ) );
+        details.trace( "{}Using estimated gas={}", strLogPrefix, estimatedGas );
         const isIgnore = false;
-        const strErrorOfDryRun =
-            await imaTx.dryRunCall(
-                details, ethersProviderMainNet,
-                "CommunityPool", joCommunityPool, "withdrawFunds", arrArguments,
-                joAccountMN, strActionName, isIgnore,
-                gasPrice, estimatedGas, weiHowMuch, null );
+        const strErrorOfDryRun = await imaTx.dryRunCall(
+            details, ethersProviderMainNet,
+            "CommunityPool", joCommunityPool, "withdrawFunds", arrArguments,
+            joAccountMN, strActionName, isIgnore,
+            gasPrice, estimatedGas, weiHowMuch, null );
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
-        const joReceipt =
-            await imaTx.payedCall(
-                details, ethersProviderMainNet,
-                "CommunityPool", joCommunityPool, "withdrawFunds", arrArguments,
-                joAccountMN, strActionName,
-                gasPrice, estimatedGas, weiHowMuch, null );
+        const joReceipt = await imaTx.payedCall(
+            details, ethersProviderMainNet,
+            "CommunityPool", joCommunityPool, "withdrawFunds", arrArguments,
+            joAccountMN, strActionName,
+            gasPrice, estimatedGas, weiHowMuch, null );
         if( joReceipt && typeof joReceipt == "object" ) {
             jarrReceipts.push( {
                 "description": "reimbursementWalletWithdraw",
@@ -331,8 +326,8 @@ export async function reimbursementSetRange(
     let strActionName = "";
     const strLogPrefix = "Gas Reimbursement - Set Minimal time interval from S2M transfers ";
     try {
-        details.debug( strLogPrefix, "Setting minimal S2M interval to ",
-            log.v( nReimbursementRange ), "..." );
+        details.debug( "{}Setting minimal S2M interval to {}...",
+            strLogPrefix, nReimbursementRange );
         strActionName = "Set reimbursement range";
         const arrArguments = [
             strChainNameOriginChain,
@@ -341,7 +336,7 @@ export async function reimbursementSetRange(
         const weiHowMuch = undefined;
         const gasPrice = await transactionCustomizerSChain.computeGasPrice(
             ethersProviderSChain, 200000000000 );
-        details.trace( strLogPrefix, "Using computed gasPrice=", log.v( gasPrice ) );
+        details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const estimatedGas =
             await transactionCustomizerSChain.computeGas(
                 details, ethersProviderSChain,
@@ -349,7 +344,7 @@ export async function reimbursementSetRange(
                 "setTimeLimitPerMessage", arrArguments,
                 joAccountSC, strActionName,
                 gasPrice, 3000000, weiHowMuch, null );
-        details.trace( strLogPrefix, "Using estimated gas=", log.v( estimatedGas ) );
+        details.trace( "{}Using estimated gas={}", strLogPrefix, estimatedGas );
         const isIgnore = false;
         const strErrorOfDryRun =
             await imaTx.dryRunCall(
