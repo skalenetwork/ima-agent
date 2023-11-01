@@ -711,31 +711,27 @@ async function checkOutgoingMessageEvent( optsTransfer, joSChain ) {
     for( let idxMessage = 0; idxMessage < cntMessages; ++ idxMessage ) {
         const idxImaMessage = optsTransfer.arrMessageCounters[idxMessage];
         const joMessage = optsTransfer.jarrMessages[idxMessage];
-        optsTransfer.details.trace( optsTransfer.strLogPrefix,
-            optsTransfer.strDirection,
-            " message analysis for message ", idxMessage + 1, " of ",
-            log.v( cntMessages ), " with IMA message index ", log.v( idxImaMessage ),
-            " and message envelope data:", log.v( joMessage ) );
+        optsTransfer.details.trace( "{}{} message analysis for message {} of {} with IMA message " +
+            "index {} and message envelope data: {}", optsTransfer.strLogPrefix,
+        optsTransfer.strDirection, idxMessage + 1, cntMessages, idxImaMessage, joMessage );
         let cntPassedNodes = 0, cntFailedNodes = 0, joNode = null;
         try {
             for( let idxNode = 0; idxNode < cntNodes; ++ idxNode ) {
                 joNode = joSChain.data.computed.nodes[idxNode];
                 // eslint-disable-next-line dot-notation
                 const strUrlHttp = joNode["http_endpoint_ip"];
-                optsTransfer.details.trace( optsTransfer.strLogPrefix, "Validating ",
-                    optsTransfer.strDirection, " message ", idxMessage + 1,
-                    " on node ", joNode.name, " using URL ", log.u( strUrlHttp ),
-                    "..." );
+                optsTransfer.details.trace( "{}Validating {} message {} on node {} using URL {}...",
+                    optsTransfer.strLogPrefix, optsTransfer.strDirection, idxMessage + 1,
+                    joNode.name, log.u( strUrlHttp ) );
                 let bEventIsFound = false;
                 try {
                     // eslint-disable-next-line dot-notation
                     const ethersProviderNode =
                         owaspUtils.getEthersProviderFromURL( strUrlHttp );
-                    const joMessageProxyNode =
-                        new owaspUtils.ethersMod.ethers.Contract(
-                            sc.joAbiIMA.message_proxy_chain_address,
-                            sc.joAbiIMA.message_proxy_chain_abi,
-                            ethersProviderNode );
+                    const joMessageProxyNode = new owaspUtils.ethersMod.ethers.Contract(
+                        sc.joAbiIMA.message_proxy_chain_address,
+                        sc.joAbiIMA.message_proxy_chain_abi,
+                        ethersProviderNode );
                     const strEventName = "OutgoingMessage";
                     const node_r = await imaEventLogScan.safeGetPastEventsProgressive(
                         optsTransfer.details, optsTransfer.strLogPrefixShort, ethersProviderNode,
@@ -746,9 +742,8 @@ async function checkOutgoingMessageEvent( optsTransfer, joSChain ) {
                             owaspUtils.ethersMod.ethers.utils.id( optsTransfer.chainNameDst ),
                             owaspUtils.toBN( idxImaMessage ) ), optsTransfer.optsChainPair );
                     const cntEvents = node_r.length;
-                    optsTransfer.details.trace( optsTransfer.strLogPrefix, "Got ",
-                        cntEvents, " event(s) (", strEventName, ") on node ",
-                        joNode.name, " with data: ", log.v( node_r ) );
+                    optsTransfer.details.trace( "{}Got {} event(s) ({}) on node {} with data: {}",
+                        optsTransfer.strLogPrefix, cntEvents, strEventName, joNode.name, node_r );
                     for( let idxEvent = 0; idxEvent < cntEvents; ++ idxEvent ) {
                         const joEvent = node_r[idxEvent];
                         const eventValuesByName = {

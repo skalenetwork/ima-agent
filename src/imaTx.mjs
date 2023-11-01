@@ -92,8 +92,8 @@ export async function dryRunCall(
     const strContractCallDescription = strContractMethodDescription + strArgumentsDescription;
     const strLogPrefix = strContractMethodDescription + " ";
     try {
-        details.trace( "Dry-run of action ", strActionName, "..." );
-        details.trace( "Will dry-run ", strContractCallDescription, "..." );
+        details.trace( "Dry-run of action {}...", strActionName );
+        details.trace( "Will dry-run {}...", strContractCallDescription );
         const strAccountWalletAddress = joAccount.address();
         const callOpts = {
             from: strAccountWalletAddress
@@ -106,7 +106,7 @@ export async function dryRunCall(
             callOpts.value = owaspUtils.toBN( weiHowMuch ).toHexString();
         const joDryRunResult =
             await joContract.callStatic[strMethodName]( ...arrArguments, callOpts );
-        details.trace( strLogPrefix, "dry-run success: ", log.v( joDryRunResult ) );
+        details.trace( "{}dry-run success: {}", strLogPrefix, joDryRunResult );
         return null; // success
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
@@ -131,11 +131,11 @@ async function payedCallPrepare( optsPayedCall ) {
         optsPayedCall.callOpts.value =
             owaspUtils.toBN( optsPayedCall.weiHowMuch ).toHexString();
     }
-    optsPayedCall.details.trace(
-        "{}Payed-call of action {} will do payed-call {} with call options {} via {}" +
-            "-sign-and-send using from address {}...", optsPayedCall.strLogPrefix,
-        optsPayedCall.strActionName, optsPayedCall.strContractCallDescription,
-        optsPayedCall.callOpts, optsPayedCall.joACI.strType, optsPayedCall.joAccount.address() );
+    optsPayedCall.details.trace( "{}Payed-call of action {} will do payed-call {} with " +
+            "call options {} via {}-sign-and-send using from address {}...",
+    optsPayedCall.strLogPrefix, optsPayedCall.strActionName,
+    optsPayedCall.strContractCallDescription, optsPayedCall.callOpts,
+    optsPayedCall.joACI.strType, optsPayedCall.joAccount.address() );
     optsPayedCall.unsignedTx =
         await optsPayedCall.joContract.populateTransaction[optsPayedCall.strMethodName](
             ...optsPayedCall.arrArguments, optsPayedCall.callOpts );
@@ -218,8 +218,8 @@ async function payedCallSGX( optsPayedCall ) {
     let { chainId } = await optsPayedCall.ethersProvider.getNetwork();
     if( chainId == "string" )
         chainId = owaspUtils.parseIntOrHex( chainId );
-    optsPayedCall.details.trace( optsPayedCall.strLogPrefix,
-        "Chain ID is: ", chainId );
+    optsPayedCall.details.trace( "{}Chain ID is: {}",
+        optsPayedCall.strLogPrefix, chainId );
     const strCmd = "" + process.argv[0] + " --no-warnings ./imaSgxExternalSigner.mjs " +
         ( log.isEnabledColorization() ? "true" : "false" ) + " " +
         "\"" + optsPayedCall.joAccount.strSgxURL + "\" " +

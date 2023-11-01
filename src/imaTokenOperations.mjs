@@ -822,47 +822,42 @@ export async function doErc20PaymentFromSChain(
                 "receipt": joReceiptApprove
             } );
         }
-        if( imaHelperAPIs.getSleepBetweenTransactionsOnSChainMilliseconds() > 0 ) {
-            details.trace( "Sleeping ",
-                imaHelperAPIs.getSleepBetweenTransactionsOnSChainMilliseconds(),
-                " milliseconds between transactions..." );
-            await imaHelperAPIs.sleep(
-                imaHelperAPIs.getSleepBetweenTransactionsOnSChainMilliseconds() );
+        const nSleep = imaHelperAPIs.getSleepBetweenTransactionsOnSChainMilliseconds();
+        if( nSleep > 0 ) {
+            details.trace( "Sleeping {} milliseconds between transactions...", nSleep );
+            await imaHelperAPIs.sleep( nSleep );
         }
         if( imaHelperAPIs.getWaitForNextBlockOnSChain() )
             await imaHelperAPIs.safeWaitForNextBlockToAppear( details, ethersProviderSChain );
         strActionName = "ERC20 payment from S-Chain, exitToMainERC20";
         const weiHowMuchExitToMainERC20 = undefined;
-        const estimatedGasExitToMainERC20 =
-            await transactionCustomizerSChain.computeGas(
-                details, ethersProviderSChain,
-                "TokenManagerERC20", joTokenManagerERC20,
-                "exitToMainERC20", arrArgumentsExitToMainERC20,
-                joAccountSrc, strActionName,
-                gasPrice, 8000000, weiHowMuchExitToMainERC20, null );
+        const estimatedGasExitToMainERC20 = await transactionCustomizerSChain.computeGas(
+            details, ethersProviderSChain,
+            "TokenManagerERC20", joTokenManagerERC20,
+            "exitToMainERC20", arrArgumentsExitToMainERC20,
+            joAccountSrc, strActionName,
+            gasPrice, 8000000, weiHowMuchExitToMainERC20, null );
         details.trace( "{}Using estimated(approve) gas={}",
             strLogPrefix, estimatedGasExitToMainERC20 );
         gasPrice = await transactionCustomizerSChain.computeGasPrice(
             ethersProviderSChain, 200000000000 );
         details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const isIgnoreExitToMainERC20 = true;
-        const strErrorOfDryRunExitToMainERC20 =
-            await imaTx.dryRunCall(
-                details, ethersProviderSChain,
-                "TokenManagerERC20", joTokenManagerERC20,
-                "exitToMainERC20", arrArgumentsExitToMainERC20,
-                joAccountSrc, strActionName, isIgnoreExitToMainERC20,
-                gasPrice, estimatedGasExitToMainERC20, weiHowMuchExitToMainERC20, null );
+        const strErrorOfDryRunExitToMainERC20 = await imaTx.dryRunCall(
+            details, ethersProviderSChain,
+            "TokenManagerERC20", joTokenManagerERC20,
+            "exitToMainERC20", arrArgumentsExitToMainERC20,
+            joAccountSrc, strActionName, isIgnoreExitToMainERC20,
+            gasPrice, estimatedGasExitToMainERC20, weiHowMuchExitToMainERC20, null );
         if( strErrorOfDryRunExitToMainERC20 )
             throw new Error( strErrorOfDryRunExitToMainERC20 );
         opts.isCheckTransactionToSchain = true;
-        const joReceiptExitToMainERC20 =
-            await imaTx.payedCall(
-                details, ethersProviderSChain,
-                "TokenManagerERC20", joTokenManagerERC20,
-                "exitToMainERC20", arrArgumentsExitToMainERC20,
-                joAccountSrc, strActionName, gasPrice,
-                estimatedGasExitToMainERC20, weiHowMuchExitToMainERC20, opts );
+        const joReceiptExitToMainERC20 = await imaTx.payedCall(
+            details, ethersProviderSChain,
+            "TokenManagerERC20", joTokenManagerERC20,
+            "exitToMainERC20", arrArgumentsExitToMainERC20,
+            joAccountSrc, strActionName, gasPrice,
+            estimatedGasExitToMainERC20, weiHowMuchExitToMainERC20, opts );
         if( joReceiptExitToMainERC20 && typeof joReceiptExitToMainERC20 == "object" ) {
             jarrReceipts.push( {
                 "description": "doErc20PaymentFromSChain/exit-to-main",
@@ -986,12 +981,10 @@ export async function doErc721PaymentFromSChain(
                 "receipt": joReceiptApprove
             } );
         }
-        if( imaHelperAPIs.getSleepBetweenTransactionsOnSChainMilliseconds() > 0 ) {
-            details.trace( "Sleeping ",
-                imaHelperAPIs.getSleepBetweenTransactionsOnSChainMilliseconds(),
-                " milliseconds between transactions..." );
-            await imaHelperAPIs.sleep(
-                imaHelperAPIs.getSleepBetweenTransactionsOnSChainMilliseconds() );
+        const nSleep = imaHelperAPIs.getSleepBetweenTransactionsOnSChainMilliseconds();
+        if( nSleep > 0 ) {
+            details.trace( "Sleeping {} milliseconds between transactions...", nSleep );
+            await imaHelperAPIs.sleep( nSleep );
         }
         if( imaHelperAPIs.getWaitForNextBlockOnSChain() )
             await imaHelperAPIs.safeWaitForNextBlockToAppear( details, ethersProviderSChain );
@@ -1000,33 +993,30 @@ export async function doErc721PaymentFromSChain(
         gasPrice = await transactionCustomizerSChain.computeGasPrice(
             ethersProviderSChain, 200000000000 );
         details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
-        const estimatedGasExitToMainERC721 =
-            await transactionCustomizerSChain.computeGas(
-                details, ethersProviderSChain,
-                "TokenManagerERC721", joTokenManagerERC721,
-                "exitToMainERC721", arrArgumentsExitToMainERC721,
-                joAccountSrc, strActionName,
-                gasPrice, 8000000, weiHowMuchExitToMainERC721, null );
+        const estimatedGasExitToMainERC721 = await transactionCustomizerSChain.computeGas(
+            details, ethersProviderSChain,
+            "TokenManagerERC721", joTokenManagerERC721,
+            "exitToMainERC721", arrArgumentsExitToMainERC721,
+            joAccountSrc, strActionName,
+            gasPrice, 8000000, weiHowMuchExitToMainERC721, null );
         details.trace( "{}Using estimated(exit to main) gas={}",
             strLogPrefix, estimatedGasExitToMainERC721 );
         const isIgnoreExitToMainERC721 = true;
-        const strErrorOfDryRunExitToMainERC721 =
-            await imaTx.dryRunCall(
-                details, ethersProviderSChain,
-                "TokenManagerERC721", joTokenManagerERC721,
-                "exitToMainERC721", arrArgumentsExitToMainERC721,
-                joAccountSrc, strActionName, isIgnoreExitToMainERC721, gasPrice,
-                estimatedGasExitToMainERC721, weiHowMuchExitToMainERC721, null );
+        const strErrorOfDryRunExitToMainERC721 = await imaTx.dryRunCall(
+            details, ethersProviderSChain,
+            "TokenManagerERC721", joTokenManagerERC721,
+            "exitToMainERC721", arrArgumentsExitToMainERC721,
+            joAccountSrc, strActionName, isIgnoreExitToMainERC721, gasPrice,
+            estimatedGasExitToMainERC721, weiHowMuchExitToMainERC721, null );
         if( strErrorOfDryRunExitToMainERC721 )
             throw new Error( strErrorOfDryRunExitToMainERC721 );
         opts.isCheckTransactionToSchain = true;
-        const joReceiptExitToMainERC721 =
-            await imaTx.payedCall(
-                details, ethersProviderSChain,
-                "TokenManagerERC721", joTokenManagerERC721,
-                "exitToMainERC721", arrArgumentsExitToMainERC721,
-                joAccountSrc, strActionName, gasPrice,
-                estimatedGasExitToMainERC721, weiHowMuchExitToMainERC721, opts );
+        const joReceiptExitToMainERC721 = await imaTx.payedCall(
+            details, ethersProviderSChain,
+            "TokenManagerERC721", joTokenManagerERC721,
+            "exitToMainERC721", arrArgumentsExitToMainERC721,
+            joAccountSrc, strActionName, gasPrice,
+            estimatedGasExitToMainERC721, weiHowMuchExitToMainERC721, opts );
         if( joReceiptExitToMainERC721 && typeof joReceiptExitToMainERC721 == "object" ) {
             jarrReceipts.push( {
                 "description": "doErc721PaymentFromSChain/exit-to-main",
@@ -1152,12 +1142,10 @@ export async function doErc1155PaymentFromSChain(
                 "receipt": joReceiptApprove
             } );
         }
-        if( imaHelperAPIs.getSleepBetweenTransactionsOnSChainMilliseconds() > 0 ) {
-            details.trace( "Sleeping ",
-                imaHelperAPIs.getSleepBetweenTransactionsOnSChainMilliseconds(),
-                " milliseconds between transactions..." );
-            await imaHelperAPIs.sleep(
-                imaHelperAPIs.getSleepBetweenTransactionsOnSChainMilliseconds() );
+        const nSleep = imaHelperAPIs.getSleepBetweenTransactionsOnSChainMilliseconds();
+        if( nSleep > 0 ) {
+            details.trace( "Sleeping {} milliseconds between transactions...", nSleep );
+            await imaHelperAPIs.sleep( nSleep );
         }
         if( imaHelperAPIs.getWaitForNextBlockOnSChain() )
             await imaHelperAPIs.safeWaitForNextBlockToAppear( details, ethersProviderSChain );
@@ -1166,34 +1154,29 @@ export async function doErc1155PaymentFromSChain(
         gasPrice = await transactionCustomizerSChain.computeGasPrice(
             ethersProviderSChain, 200000000000 );
         details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
-        const estimatedGasExitToMainERC1155 =
-            await transactionCustomizerSChain.computeGas(
-                details, ethersProviderSChain,
-                "TokenManagerERC1155", joTokenManagerERC1155,
-                "exitToMainERC1155", arrArgumentsExitToMainERC1155,
-                joAccountSrc, strActionName, gasPrice, 8000000, weiHowMuchExitToMainERC1155,
-                null );
+        const estimatedGasExitToMainERC1155 = await transactionCustomizerSChain.computeGas(
+            details, ethersProviderSChain,
+            "TokenManagerERC1155", joTokenManagerERC1155,
+            "exitToMainERC1155", arrArgumentsExitToMainERC1155,
+            joAccountSrc, strActionName, gasPrice, 8000000, weiHowMuchExitToMainERC1155, null );
         details.trace( "{}Using estimated(exit to main) gas={}",
             strLogPrefix, estimatedGasExitToMainERC1155 );
         const isIgnoreExitToMainERC1155 = true;
-        const strErrorOfDryRunExitToMainERC1155 =
-            await imaTx.dryRunCall(
-                details, ethersProviderSChain,
-                "TokenManagerERC1155", joTokenManagerERC1155,
-                "exitToMainERC1155", arrArgumentsExitToMainERC1155,
-                joAccountSrc, strActionName, isIgnoreExitToMainERC1155,
-                gasPrice, estimatedGasExitToMainERC1155, weiHowMuchExitToMainERC1155,
-                null );
+        const strErrorOfDryRunExitToMainERC1155 = await imaTx.dryRunCall(
+            details, ethersProviderSChain,
+            "TokenManagerERC1155", joTokenManagerERC1155,
+            "exitToMainERC1155", arrArgumentsExitToMainERC1155,
+            joAccountSrc, strActionName, isIgnoreExitToMainERC1155,
+            gasPrice, estimatedGasExitToMainERC1155, weiHowMuchExitToMainERC1155, null );
         if( strErrorOfDryRunExitToMainERC1155 )
             throw new Error( strErrorOfDryRunExitToMainERC1155 );
         opts.isCheckTransactionToSchain = true;
-        const joReceiptExitToMainERC1155 =
-            await imaTx.payedCall(
-                details, ethersProviderSChain,
-                "TokenManagerERC1155", joTokenManagerERC1155,
-                "exitToMainERC1155", arrArgumentsExitToMainERC1155,
-                joAccountSrc, strActionName, gasPrice,
-                estimatedGasExitToMainERC1155, weiHowMuchExitToMainERC1155, opts );
+        const joReceiptExitToMainERC1155 = await imaTx.payedCall(
+            details, ethersProviderSChain,
+            "TokenManagerERC1155", joTokenManagerERC1155,
+            "exitToMainERC1155", arrArgumentsExitToMainERC1155,
+            joAccountSrc, strActionName, gasPrice,
+            estimatedGasExitToMainERC1155, weiHowMuchExitToMainERC1155, opts );
         if( joReceiptExitToMainERC1155 && typeof joReceiptExitToMainERC1155 == "object" ) {
             jarrReceipts.push( {
                 "description": "doErc1155PaymentFromSChain/exit-to-main",
@@ -1320,12 +1303,10 @@ export async function doErc1155BatchPaymentFromSChain(
                 "receipt": joReceiptApprove
             } );
         }
-        if( imaHelperAPIs.getSleepBetweenTransactionsOnSChainMilliseconds() > 0 ) {
-            details.trace( "Sleeping ",
-                imaHelperAPIs.getSleepBetweenTransactionsOnSChainMilliseconds(),
-                " milliseconds between transactions..." );
-            await imaHelperAPIs.sleep(
-                imaHelperAPIs.getSleepBetweenTransactionsOnSChainMilliseconds() );
+        const nSleep = imaHelperAPIs.getSleepBetweenTransactionsOnSChainMilliseconds();
+        if( nSleep > 0 ) {
+            details.trace( "Sleeping {} milliseconds between transactions...", nSleep );
+            await imaHelperAPIs.sleep( nSleep );
         }
         if( imaHelperAPIs.getWaitForNextBlockOnSChain() )
             await imaHelperAPIs.safeWaitForNextBlockToAppear( details, ethersProviderSChain );
@@ -1334,33 +1315,30 @@ export async function doErc1155BatchPaymentFromSChain(
         gasPrice = await transactionCustomizerSChain.computeGasPrice(
             ethersProviderSChain, 200000000000 );
         details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
-        const estimatedGasExitToMainERC1155Batch =
-            await transactionCustomizerSChain.computeGas(
-                details, ethersProviderSChain,
-                "TokenManagerERC1155", joTokenManagerERC1155,
-                "exitToMainERC1155Batch", arrArgumentsExitToMainERC1155Batch,
-                joAccountSrc, strActionName, gasPrice, 8000000,
-                weiHowMuchExitToMainERC1155Batch, null );
+        const estimatedGasExitToMainERC1155Batch = await transactionCustomizerSChain.computeGas(
+            details, ethersProviderSChain,
+            "TokenManagerERC1155", joTokenManagerERC1155,
+            "exitToMainERC1155Batch", arrArgumentsExitToMainERC1155Batch,
+            joAccountSrc, strActionName, gasPrice, 8000000,
+            weiHowMuchExitToMainERC1155Batch, null );
         details.trace( "{}Using estimated(exit to main) gas={}",
             strLogPrefix, estimatedGasExitToMainERC1155Batch );
         const isIgnoreExitToMainERC1155Batch = true;
-        const strErrorOfDryRunExitToMainERC1155Batch =
-            await imaTx.dryRunCall(
-                details, ethersProviderSChain,
-                "TokenManagerERC1155", joTokenManagerERC1155,
-                "exitToMainERC1155Batch", arrArgumentsExitToMainERC1155Batch,
-                joAccountSrc, strActionName, isIgnoreExitToMainERC1155Batch, gasPrice,
-                estimatedGasExitToMainERC1155Batch, weiHowMuchExitToMainERC1155Batch, null );
+        const strErrorOfDryRunExitToMainERC1155Batch = await imaTx.dryRunCall(
+            details, ethersProviderSChain,
+            "TokenManagerERC1155", joTokenManagerERC1155,
+            "exitToMainERC1155Batch", arrArgumentsExitToMainERC1155Batch,
+            joAccountSrc, strActionName, isIgnoreExitToMainERC1155Batch, gasPrice,
+            estimatedGasExitToMainERC1155Batch, weiHowMuchExitToMainERC1155Batch, null );
         if( strErrorOfDryRunExitToMainERC1155Batch )
             throw new Error( strErrorOfDryRunExitToMainERC1155Batch );
         opts.isCheckTransactionToSchain = true;
-        const joReceiptExitToMainERC1155Batch =
-            await imaTx.payedCall(
-                details, ethersProviderSChain,
-                "TokenManagerERC1155", joTokenManagerERC1155,
-                "exitToMainERC1155Batch", arrArgumentsExitToMainERC1155Batch,
-                joAccountSrc, strActionName, gasPrice,
-                estimatedGasExitToMainERC1155Batch, weiHowMuchExitToMainERC1155Batch, opts );
+        const joReceiptExitToMainERC1155Batch = await imaTx.payedCall(
+            details, ethersProviderSChain,
+            "TokenManagerERC1155", joTokenManagerERC1155,
+            "exitToMainERC1155Batch", arrArgumentsExitToMainERC1155Batch,
+            joAccountSrc, strActionName, gasPrice,
+            estimatedGasExitToMainERC1155Batch, weiHowMuchExitToMainERC1155Batch, opts );
         if( joReceiptExitToMainERC1155Batch &&
             typeof joReceiptExitToMainERC1155Batch == "object"
         ) {
@@ -1453,24 +1431,23 @@ export async function doErc20PaymentS2S(
             throw new Error( "No transaction customizer provided" );
         const ercSrcAbi20 = joSrcErc20[strCoinNameErc20Src + "_abi"];
         const ercSrcAddress20 = joSrcErc20[strCoinNameErc20Src + "_address"];
-        details.trace( strLogPrefix, "Token Manager ERC20 address on source chain....",
-            log.v( joTokenManagerERC20Src.address ) );
-        details.trace( strLogPrefix, "Source ERC20 coin name.........................",
-            log.v( strCoinNameErc20Src ) );
-        details.trace( strLogPrefix, "Source ERC20 token address.....................",
-            log.v( ercSrcAddress20 ) );
+        details.trace( "{}Token Manager ERC20 address on source chain....{}",
+            strLogPrefix, joTokenManagerERC20Src.address );
+        details.trace( "{}Source ERC20 coin name.........................{}",
+            strLogPrefix, strCoinNameErc20Src );
+        details.trace( "{}Source ERC20 token address.....................{}",
+            strLogPrefix, ercSrcAddress20 );
         if( isReverse || ercDstAddress20 ) {
-            details.trace( strLogPrefix, "Destination ERC20 token address................",
-                log.v( ercDstAddress20 ) );
+            details.trace( "{}Destination ERC20 token address................{}",
+                strLogPrefix, ercDstAddress20 );
         }
-        details.trace( strLogPrefix, "Destination chain name.........................",
-            log.v( strChainNameDst ) );
-        details.trace( strLogPrefix, "Amount of tokens to transfer...................",
-            log.v( nAmountOfToken ) );
+        details.trace( "{}Destination chain name.........................{}",
+            strLogPrefix, strChainNameDst );
+        details.trace( "{}Amount of tokens to transfer...................{}",
+            strLogPrefix, nAmountOfToken );
         strActionName = "ERC20 payment S2S, approve, " + ( isForward ? "forward" : "reverse" );
-        const contractERC20 =
-            new owaspUtils.ethersMod.ethers.Contract(
-                ercSrcAddress20, ercSrcAbi20, ethersProviderSrc );
+        const contractERC20 = new owaspUtils.ethersMod.ethers.Contract(
+            ercSrcAddress20, ercSrcAbi20, ethersProviderSrc );
         const arrArgumentsApprove = [
             joTokenManagerERC20Src.address,
             owaspUtils.ensureStartsWith0x( owaspUtils.toBN( nAmountOfToken ).toHexString() )
@@ -1483,27 +1460,24 @@ export async function doErc20PaymentS2S(
         const weiHowMuchApprove = undefined;
         let gasPrice = await tc.computeGasPrice( ethersProviderSrc, 200000000000 );
         details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
-        const estimatedGasApprove =
-            await tc.computeGas(
-                details, ethersProviderSrc,
-                "ERC20", contractERC20, "approve", arrArgumentsApprove,
-                joAccountSrc, strActionName, gasPrice, 8000000, weiHowMuchApprove, null );
+        const estimatedGasApprove = await tc.computeGas(
+            details, ethersProviderSrc,
+            "ERC20", contractERC20, "approve", arrArgumentsApprove,
+            joAccountSrc, strActionName, gasPrice, 8000000, weiHowMuchApprove, null );
         details.trace( "{}Using estimated(approve) gas={}", strLogPrefix, estimatedGasApprove );
         const isIgnoreApprove = false;
-        const strErrorOfDryRunApprove =
-            await imaTx.dryRunCall(
-                details, ethersProviderSrc,
-                "ERC20", contractERC20, "approve", arrArgumentsApprove,
-                joAccountSrc, strActionName, isIgnoreApprove,
-                gasPrice, estimatedGasApprove, weiHowMuchApprove, null );
+        const strErrorOfDryRunApprove = await imaTx.dryRunCall(
+            details, ethersProviderSrc,
+            "ERC20", contractERC20, "approve", arrArgumentsApprove,
+            joAccountSrc, strActionName, isIgnoreApprove,
+            gasPrice, estimatedGasApprove, weiHowMuchApprove, null );
         if( strErrorOfDryRunApprove )
             throw new Error( strErrorOfDryRunApprove );
-        const joReceiptApprove =
-            await imaTx.payedCall(
-                details, ethersProviderSrc,
-                "ERC20", contractERC20, "approve", arrArgumentsApprove,
-                joAccountSrc, strActionName, gasPrice,
-                estimatedGasApprove, weiHowMuchApprove, null );
+        const joReceiptApprove = await imaTx.payedCall(
+            details, ethersProviderSrc,
+            "ERC20", contractERC20, "approve", arrArgumentsApprove,
+            joAccountSrc, strActionName, gasPrice,
+            estimatedGasApprove, weiHowMuchApprove, null );
         if( joReceiptApprove && typeof joReceiptApprove == "object" ) {
             jarrReceipts.push( {
                 "description":
@@ -1511,36 +1485,32 @@ export async function doErc20PaymentS2S(
                 "receipt": joReceiptApprove
             } );
         }
-        strActionName =
-            "ERC20 payment S2S, transferERC20 " + ( isForward ? "forward" : "reverse" );
+        strActionName = "ERC20 payment S2S, transferERC20 " + ( isForward ? "forward" : "reverse" );
         const weiHowMuchTransferERC20 = undefined;
         gasPrice = await tc.computeGasPrice( ethersProviderSrc, 200000000000 );
         details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
-        const estimatedGasTransfer =
-            await tc.computeGas(
-                details, ethersProviderSrc,
-                "TokenManagerERC20", joTokenManagerERC20Src,
-                "transferToSchainERC20", arrArgumentsTransfer,
-                joAccountSrc, strActionName, gasPrice,
-                8000000, weiHowMuchTransferERC20, null );
+        const estimatedGasTransfer = await tc.computeGas(
+            details, ethersProviderSrc,
+            "TokenManagerERC20", joTokenManagerERC20Src,
+            "transferToSchainERC20", arrArgumentsTransfer,
+            joAccountSrc, strActionName, gasPrice,
+            8000000, weiHowMuchTransferERC20, null );
         details.trace( "{}Using estimated(transfer) gas={}", strLogPrefix, estimatedGasTransfer );
         const isIgnoreTransferERC20 = true;
-        const strErrorOfDryRunTransferERC20 =
-            await imaTx.dryRunCall(
-                details, ethersProviderSrc,
-                "TokenManagerERC20", joTokenManagerERC20Src,
-                "transferToSchainERC20", arrArgumentsTransfer,
-                joAccountSrc, strActionName, isIgnoreTransferERC20,
-                gasPrice, estimatedGasTransfer, weiHowMuchTransferERC20, null );
+        const strErrorOfDryRunTransferERC20 = await imaTx.dryRunCall(
+            details, ethersProviderSrc,
+            "TokenManagerERC20", joTokenManagerERC20Src,
+            "transferToSchainERC20", arrArgumentsTransfer,
+            joAccountSrc, strActionName, isIgnoreTransferERC20,
+            gasPrice, estimatedGasTransfer, weiHowMuchTransferERC20, null );
         if( strErrorOfDryRunTransferERC20 )
             throw new Error( strErrorOfDryRunTransferERC20 );
-        const joReceiptTransfer =
-            await imaTx.payedCall(
-                details, ethersProviderSrc,
-                "TokenManagerERC20", joTokenManagerERC20Src,
-                "transferToSchainERC20", arrArgumentsTransfer,
-                joAccountSrc, strActionName, gasPrice,
-                estimatedGasTransfer, weiHowMuchTransferERC20, null );
+        const joReceiptTransfer = await imaTx.payedCall(
+            details, ethersProviderSrc,
+            "TokenManagerERC20", joTokenManagerERC20Src,
+            "transferToSchainERC20", arrArgumentsTransfer,
+            joAccountSrc, strActionName, gasPrice,
+            estimatedGasTransfer, weiHowMuchTransferERC20, null );
         if( joReceiptTransfer && typeof joReceiptTransfer == "object" ) {
             jarrReceipts.push( {
                 "description": "doErc20PaymentS2S/transfer",
@@ -1610,24 +1580,23 @@ export async function doErc721PaymentS2S(
             throw new Error( "No transaction customizer provided" );
         const ercSrcAbi721 = joSrcErc721[strCoinNameErc721Src + "_abi"];
         const ercSrcAddress721 = joSrcErc721[strCoinNameErc721Src + "_address"];
-        details.trace( strLogPrefix, "Token Manager ERC721 address on source chain....",
-            log.v( joTokenManagerERC721Src.address ) );
-        details.trace( strLogPrefix, "Source ERC721 coin name.........................",
-            log.v( strCoinNameErc721Src ) );
-        details.trace( strLogPrefix, "Source ERC721 token address.....................",
-            log.v( ercSrcAddress721 ) );
+        details.trace( "{}Token Manager ERC721 address on source chain....{}",
+            strLogPrefix, joTokenManagerERC721Src.address );
+        details.trace( "{}Source ERC721 coin name.........................{}",
+            strLogPrefix, strCoinNameErc721Src );
+        details.trace( "{}Source ERC721 token address.....................{}",
+            strLogPrefix, ercSrcAddress721 );
         if( isReverse || ercDstAddress721 ) {
-            details.trace( strLogPrefix, "Destination ERC721 token address................",
-                log.v( ercDstAddress721 ) );
+            details.trace( "{}Destination ERC721 token address................{}",
+                strLogPrefix, ercDstAddress721 );
         }
-        details.trace( strLogPrefix, "Destination chain name.........................",
-            log.v( strChainNameDst ) );
-        details.trace( strLogPrefix, "Token ID to transfer...........................",
-            log.v( tokenId ) );
+        details.trace( "{}Destination chain name.........................{}",
+            strLogPrefix, strChainNameDst );
+        details.trace( "{}Token ID to transfer...........................{}",
+            strLogPrefix, tokenId );
         strActionName = "ERC721 payment S2S, approve, " + ( isForward ? "forward" : "reverse" );
-        const contractERC721 =
-            new owaspUtils.ethersMod.ethers.Contract(
-                ercSrcAddress721, ercSrcAbi721, ethersProviderSrc );
+        const contractERC721 = new owaspUtils.ethersMod.ethers.Contract(
+            ercSrcAddress721, ercSrcAbi721, ethersProviderSrc );
         const arrArgumentsApprove = [
             joTokenManagerERC721Src.address,
             owaspUtils.ensureStartsWith0x( owaspUtils.toBN( tokenId ).toHexString() )
@@ -1640,27 +1609,24 @@ export async function doErc721PaymentS2S(
         const weiHowMuchApprove = undefined;
         let gasPrice = await tc.computeGasPrice( ethersProviderSrc, 200000000000 );
         details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
-        const estimatedGasApprove =
-            await tc.computeGas(
-                details, ethersProviderSrc,
-                "ERC721", contractERC721, "approve", arrArgumentsApprove,
-                joAccountSrc, strActionName, gasPrice, 8000000, weiHowMuchApprove, null );
+        const estimatedGasApprove = await tc.computeGas(
+            details, ethersProviderSrc,
+            "ERC721", contractERC721, "approve", arrArgumentsApprove,
+            joAccountSrc, strActionName, gasPrice, 8000000, weiHowMuchApprove, null );
         details.trace( "{}Using estimated(approve) gas={}", strLogPrefix, estimatedGasApprove );
         const isIgnoreApprove = false;
-        const strErrorOfDryRunApprove =
-            await imaTx.dryRunCall(
-                details, ethersProviderSrc,
-                "ERC721", contractERC721, "approve", arrArgumentsApprove,
-                joAccountSrc, strActionName, isIgnoreApprove,
-                gasPrice, estimatedGasApprove, weiHowMuchApprove, null );
+        const strErrorOfDryRunApprove = await imaTx.dryRunCall(
+            details, ethersProviderSrc,
+            "ERC721", contractERC721, "approve", arrArgumentsApprove,
+            joAccountSrc, strActionName, isIgnoreApprove,
+            gasPrice, estimatedGasApprove, weiHowMuchApprove, null );
         if( strErrorOfDryRunApprove )
             throw new Error( strErrorOfDryRunApprove );
-        const joReceiptApprove =
-            await imaTx.payedCall(
-                details, ethersProviderSrc,
-                "ERC721", contractERC721, "approve", arrArgumentsApprove,
-                joAccountSrc, strActionName,
-                gasPrice, estimatedGasApprove, weiHowMuchApprove, null );
+        const joReceiptApprove = await imaTx.payedCall(
+            details, ethersProviderSrc,
+            "ERC721", contractERC721, "approve", arrArgumentsApprove,
+            joAccountSrc, strActionName,
+            gasPrice, estimatedGasApprove, weiHowMuchApprove, null );
         if( joReceiptApprove && typeof joReceiptApprove == "object" ) {
             jarrReceipts.push( {
                 "description":
@@ -1674,30 +1640,27 @@ export async function doErc721PaymentS2S(
         const weiHowMuchTransferERC721 = undefined;
         gasPrice = await tc.computeGasPrice( ethersProviderSrc, 200000000000 );
         details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
-        const estimatedGasTransfer =
-            await tc.computeGas(
-                details, ethersProviderSrc,
-                "TokenManagerERC721", joTokenManagerERC721Src,
-                "transferToSchainERC721", arrArgumentsTransfer,
-                joAccountSrc, strActionName, isIgnoreTransferERC721,
-                gasPrice, 8000000, weiHowMuchTransferERC721, null );
+        const estimatedGasTransfer = await tc.computeGas(
+            details, ethersProviderSrc,
+            "TokenManagerERC721", joTokenManagerERC721Src,
+            "transferToSchainERC721", arrArgumentsTransfer,
+            joAccountSrc, strActionName, isIgnoreTransferERC721,
+            gasPrice, 8000000, weiHowMuchTransferERC721, null );
         details.trace( "{}Using estimated(transfer) gas={}", strLogPrefix, estimatedGasTransfer );
-        const strErrorOfDryRunTransferERC721 =
-            await imaTx.dryRunCall(
-                details, ethersProviderSrc,
-                "TokenManagerERC721", joTokenManagerERC721Src,
-                "transferToSchainERC721", arrArgumentsTransfer,
-                joAccountSrc, strActionName, isIgnoreTransferERC721,
-                gasPrice, estimatedGasTransfer, weiHowMuchTransferERC721, null );
+        const strErrorOfDryRunTransferERC721 = await imaTx.dryRunCall(
+            details, ethersProviderSrc,
+            "TokenManagerERC721", joTokenManagerERC721Src,
+            "transferToSchainERC721", arrArgumentsTransfer,
+            joAccountSrc, strActionName, isIgnoreTransferERC721,
+            gasPrice, estimatedGasTransfer, weiHowMuchTransferERC721, null );
         if( strErrorOfDryRunTransferERC721 )
             throw new Error( strErrorOfDryRunTransferERC721 );
-        const joReceiptTransfer =
-            await imaTx.payedCall(
-                details, ethersProviderSrc,
-                "TokenManagerERC721", joTokenManagerERC721Src,
-                "transferToSchainERC721", arrArgumentsTransfer,
-                joAccountSrc, strActionName,
-                gasPrice, estimatedGasTransfer, weiHowMuchTransferERC721, null );
+        const joReceiptTransfer = await imaTx.payedCall(
+            details, ethersProviderSrc,
+            "TokenManagerERC721", joTokenManagerERC721Src,
+            "transferToSchainERC721", arrArgumentsTransfer,
+            joAccountSrc, strActionName,
+            gasPrice, estimatedGasTransfer, weiHowMuchTransferERC721, null );
         if( joReceiptTransfer && typeof joReceiptTransfer == "object" ) {
             jarrReceipts.push( {
                 "description": "doErc721PaymentS2S/transfer",
@@ -1771,26 +1734,25 @@ export async function doErc1155PaymentS2S(
             throw new Error( "No transaction customizer provided" );
         const ercSrcAbi1155 = joSrcErc1155[strCoinNameErc1155Src + "_abi"];
         const ercSrcAddress1155 = joSrcErc1155[strCoinNameErc1155Src + "_address"];
-        details.trace( strLogPrefix, "Token Manager ERC1155 address on source chain....",
-            log.v( joTokenManagerERC1155Src.address ) );
-        details.trace( strLogPrefix, "Source ERC1155 coin name.........................",
-            log.v( strCoinNameErc1155Src ) );
-        details.trace( strLogPrefix, "Source ERC1155 token address.....................",
-            log.v( ercSrcAddress1155 ) );
+        details.trace( "{}Token Manager ERC1155 address on source chain....{}",
+            strLogPrefix, joTokenManagerERC1155Src.address );
+        details.trace( "{}Source ERC1155 coin name.........................{}",
+            strLogPrefix, strCoinNameErc1155Src );
+        details.trace( "{}Source ERC1155 token address.....................{}",
+            strLogPrefix, ercSrcAddress1155 );
         if( isReverse || ercDstAddress1155 ) {
-            details.trace( strLogPrefix, "Destination ERC1155 token address................",
-                log.v( ercDstAddress1155 ) );
+            details.trace( "{}Destination ERC1155 token address................{}",
+                strLogPrefix, ercDstAddress1155 );
         }
-        details.trace( strLogPrefix, "Destination chain name.........................",
-            log.v( strChainNameDst ) );
-        details.trace( strLogPrefix, "Token ID to transfer...........................",
-            log.v( tokenId ) );
-        details.trace( strLogPrefix, "Amount of tokens to transfer...................",
-            log.v( nAmountOfToken ) );
+        details.trace( "{}Destination chain name.........................{}",
+            strLogPrefix, strChainNameDst );
+        details.trace( "{}Token ID to transfer...........................{}",
+            strLogPrefix, tokenId );
+        details.trace( "{}Amount of tokens to transfer...................{}",
+            strLogPrefix, nAmountOfToken );
         strActionName = "ERC1155 payment S2S, approve, " + ( isForward ? "forward" : "reverse" );
-        const contractERC1155 =
-            new owaspUtils.ethersMod.ethers.Contract(
-                ercSrcAddress1155, ercSrcAbi1155, ethersProviderSrc );
+        const contractERC1155 = new owaspUtils.ethersMod.ethers.Contract(
+            ercSrcAddress1155, ercSrcAbi1155, ethersProviderSrc );
         const arrArgumentsApprove = [
             joTokenManagerERC1155Src.address,
             true
@@ -1804,27 +1766,24 @@ export async function doErc1155PaymentS2S(
         const weiHowMuchApprove = undefined;
         let gasPrice = await tc.computeGasPrice( ethersProviderSrc, 200000000000 );
         details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
-        const estimatedGasApprove =
-            await tc.computeGas(
-                details, ethersProviderSrc,
-                "ERC1155", contractERC1155, "setApprovalForAll", arrArgumentsApprove,
-                joAccountSrc, strActionName, gasPrice, 8000000, weiHowMuchApprove, null );
+        const estimatedGasApprove = await tc.computeGas(
+            details, ethersProviderSrc,
+            "ERC1155", contractERC1155, "setApprovalForAll", arrArgumentsApprove,
+            joAccountSrc, strActionName, gasPrice, 8000000, weiHowMuchApprove, null );
         details.trace( "P{Using estimated(approve) gas={}", strLogPrefix, estimatedGasApprove );
         const isIgnoreApprove = false;
-        const strErrorOfDryRunApprove =
-            await imaTx.dryRunCall(
-                details, ethersProviderSrc,
-                "ERC1155", contractERC1155, "setApprovalForAll", arrArgumentsApprove,
-                joAccountSrc, strActionName, isIgnoreApprove,
-                gasPrice, estimatedGasApprove, weiHowMuchApprove, null );
+        const strErrorOfDryRunApprove = await imaTx.dryRunCall(
+            details, ethersProviderSrc,
+            "ERC1155", contractERC1155, "setApprovalForAll", arrArgumentsApprove,
+            joAccountSrc, strActionName, isIgnoreApprove,
+            gasPrice, estimatedGasApprove, weiHowMuchApprove, null );
         if( strErrorOfDryRunApprove )
             throw new Error( strErrorOfDryRunApprove );
-        const joReceiptApprove =
-            await imaTx.payedCall(
-                details, ethersProviderSrc,
-                "ERC1155", contractERC1155, "setApprovalForAll", arrArgumentsApprove,
-                joAccountSrc, strActionName, gasPrice,
-                estimatedGasApprove, weiHowMuchApprove, null );
+        const joReceiptApprove = await imaTx.payedCall(
+            details, ethersProviderSrc,
+            "ERC1155", contractERC1155, "setApprovalForAll", arrArgumentsApprove,
+            joAccountSrc, strActionName, gasPrice,
+            estimatedGasApprove, weiHowMuchApprove, null );
         if( joReceiptApprove && typeof joReceiptApprove == "object" ) {
             jarrReceipts.push( {
                 "description":
@@ -1837,31 +1796,28 @@ export async function doErc1155PaymentS2S(
         const weiHowMuchTransferERC1155 = undefined;
         gasPrice = await tc.computeGasPrice( ethersProviderSrc, 200000000000 );
         details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
-        const estimatedGasTransfer =
-            await tc.computeGas(
-                details, ethersProviderSrc,
-                "TokenManagerERC1155", joTokenManagerERC1155Src,
-                "transferToSchainERC1155", arrArgumentsTransfer,
-                joAccountSrc, strActionName, gasPrice,
-                8000000, weiHowMuchTransferERC1155, null );
+        const estimatedGasTransfer = await tc.computeGas(
+            details, ethersProviderSrc,
+            "TokenManagerERC1155", joTokenManagerERC1155Src,
+            "transferToSchainERC1155", arrArgumentsTransfer,
+            joAccountSrc, strActionName, gasPrice,
+            8000000, weiHowMuchTransferERC1155, null );
         details.trace( "{}Using estimated(transfer) gas={}", strLogPrefix, estimatedGasTransfer );
         const isIgnoreTransferERC1155 = true;
-        const strErrorOfDryRunTransferERC1155 =
-            await imaTx.dryRunCall(
-                details, ethersProviderSrc,
-                "TokenManagerERC1155", joTokenManagerERC1155Src,
-                "transferToSchainERC1155", arrArgumentsTransfer,
-                joAccountSrc, strActionName, isIgnoreTransferERC1155, gasPrice,
-                estimatedGasTransfer, weiHowMuchTransferERC1155, null );
+        const strErrorOfDryRunTransferERC1155 = await imaTx.dryRunCall(
+            details, ethersProviderSrc,
+            "TokenManagerERC1155", joTokenManagerERC1155Src,
+            "transferToSchainERC1155", arrArgumentsTransfer,
+            joAccountSrc, strActionName, isIgnoreTransferERC1155, gasPrice,
+            estimatedGasTransfer, weiHowMuchTransferERC1155, null );
         if( strErrorOfDryRunTransferERC1155 )
             throw new Error( strErrorOfDryRunTransferERC1155 );
-        const joReceiptTransfer =
-            await imaTx.payedCall(
-                details, ethersProviderSrc,
-                "TokenManagerERC1155", joTokenManagerERC1155Src,
-                "transferToSchainERC1155", arrArgumentsTransfer,
-                joAccountSrc, strActionName, gasPrice, estimatedGasTransfer,
-                weiHowMuchTransferERC1155, null );
+        const joReceiptTransfer = await imaTx.payedCall(
+            details, ethersProviderSrc,
+            "TokenManagerERC1155", joTokenManagerERC1155Src,
+            "transferToSchainERC1155", arrArgumentsTransfer,
+            joAccountSrc, strActionName, gasPrice, estimatedGasTransfer,
+            weiHowMuchTransferERC1155, null );
         if( joReceiptTransfer && typeof joReceiptTransfer == "object" ) {
             jarrReceipts.push( {
                 "description": "doErc1155PaymentS2S/transfer",
@@ -1934,27 +1890,26 @@ export async function doErc1155BatchPaymentS2S(
             throw new Error( "No transaction customizer provided" );
         const ercSrcAbi1155 = joSrcErc1155[strCoinNameErc1155Src + "_abi"];
         const ercSrcAddress1155 = joSrcErc1155[strCoinNameErc1155Src + "_address"];
-        details.trace( strLogPrefix, "Token Manager ERC1155 address on source chain....",
-            log.v( joTokenManagerERC1155Src.address ) );
-        details.trace( strLogPrefix, "Source ERC1155 coin name.........................",
-            log.v( strCoinNameErc1155Src ) );
-        details.trace( strLogPrefix, "Source ERC1155 token address.....................",
-            log.v( ercSrcAddress1155 ) );
+        details.trace( "{}Token Manager ERC1155 address on source chain....{}",
+            strLogPrefix, joTokenManagerERC1155Src.address );
+        details.trace( "{}Source ERC1155 coin name.........................{}",
+            strLogPrefix, strCoinNameErc1155Src );
+        details.trace( "{}Source ERC1155 token address.....................{}",
+            strLogPrefix, ercSrcAddress1155 );
         if( isReverse || ercDstAddress1155 ) {
-            details.trace( strLogPrefix, "Destination ERC1155 token address................",
-                log.v( ercDstAddress1155 ) );
+            details.trace( "{}Destination ERC1155 token address................{}",
+                strLogPrefix, ercDstAddress1155 );
         }
-        details.trace( strLogPrefix, "Destination chain name.........................",
-            log.v( strChainNameDst ) );
-        details.trace( strLogPrefix, "Token IDs to transfer..........................",
-            log.v( arrTokenIds ) );
-        details.trace( strLogPrefix, "Amounts of tokens to transfer..................",
-            log.v( arrTokenAmounts ) );
+        details.trace( "{}Destination chain name.........................{}",
+            strLogPrefix, strChainNameDst );
+        details.trace( "{}Token IDs to transfer..........................{}",
+            strLogPrefix, arrTokenIds );
+        details.trace( "{}Amounts of tokens to transfer..................{}",
+            strLogPrefix, arrTokenAmounts );
         strActionName =
             "ERC1155 batch-payment S2S, approve, " + ( isForward ? "forward" : "reverse" );
-        const contractERC1155 =
-            new owaspUtils.ethersMod.ethers.Contract(
-                ercSrcAddress1155, ercSrcAbi1155, ethersProviderSrc );
+        const contractERC1155 = new owaspUtils.ethersMod.ethers.Contract(
+            ercSrcAddress1155, ercSrcAbi1155, ethersProviderSrc );
         const arrArgumentsApprove = [
             joTokenManagerERC1155Src.address,
             true
@@ -1968,27 +1923,24 @@ export async function doErc1155BatchPaymentS2S(
         const weiHowMuchApprove = undefined;
         let gasPrice = await tc.computeGasPrice( ethersProviderSrc, 200000000000 );
         details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
-        const estimatedGasApprove =
-            await tc.computeGas(
-                details, ethersProviderSrc,
-                "ERC1155", contractERC1155, "setApprovalForAll", arrArgumentsApprove,
-                joAccountSrc, strActionName, gasPrice, 8000000, weiHowMuchApprove, null );
+        const estimatedGasApprove = await tc.computeGas(
+            details, ethersProviderSrc,
+            "ERC1155", contractERC1155, "setApprovalForAll", arrArgumentsApprove,
+            joAccountSrc, strActionName, gasPrice, 8000000, weiHowMuchApprove, null );
         details.trace( "{}Using estimated(approve) gas={}", strLogPrefix, estimatedGasApprove );
         const isIgnoreApprove = false;
-        const strErrorOfDryRunApprove =
-            await imaTx.dryRunCall(
-                details, ethersProviderSrc,
-                "ERC1155", contractERC1155, "setApprovalForAll", arrArgumentsApprove,
-                joAccountSrc, strActionName, isIgnoreApprove,
-                gasPrice, estimatedGasApprove, weiHowMuchApprove, null );
+        const strErrorOfDryRunApprove = await imaTx.dryRunCall(
+            details, ethersProviderSrc,
+            "ERC1155", contractERC1155, "setApprovalForAll", arrArgumentsApprove,
+            joAccountSrc, strActionName, isIgnoreApprove,
+            gasPrice, estimatedGasApprove, weiHowMuchApprove, null );
         if( strErrorOfDryRunApprove )
             throw new Error( strErrorOfDryRunApprove );
-        const joReceiptApprove =
-            await imaTx.payedCall(
-                details, ethersProviderSrc,
-                "ERC1155", contractERC1155, "setApprovalForAll", arrArgumentsApprove,
-                joAccountSrc, strActionName,
-                gasPrice, estimatedGasApprove, weiHowMuchApprove, null );
+        const joReceiptApprove = await imaTx.payedCall(
+            details, ethersProviderSrc,
+            "ERC1155", contractERC1155, "setApprovalForAll", arrArgumentsApprove,
+            joAccountSrc, strActionName,
+            gasPrice, estimatedGasApprove, weiHowMuchApprove, null );
         if( joReceiptApprove && typeof joReceiptApprove == "object" ) {
             jarrReceipts.push( {
                 "description":
@@ -2002,31 +1954,28 @@ export async function doErc1155BatchPaymentS2S(
         const weiHowMuchTransferERC1155 = undefined;
         gasPrice = await tc.computeGasPrice( ethersProviderSrc, 200000000000 );
         details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
-        const estimatedGasTransfer =
-            await tc.computeGas(
-                details, ethersProviderSrc,
-                "TokenManagerERC1155", joTokenManagerERC1155Src,
-                "transferToSchainERC1155Batch", arrArgumentsTransfer,
-                joAccountSrc, strActionName,
-                gasPrice, 8000000, weiHowMuchTransferERC1155, null );
+        const estimatedGasTransfer = await tc.computeGas(
+            details, ethersProviderSrc,
+            "TokenManagerERC1155", joTokenManagerERC1155Src,
+            "transferToSchainERC1155Batch", arrArgumentsTransfer,
+            joAccountSrc, strActionName,
+            gasPrice, 8000000, weiHowMuchTransferERC1155, null );
         details.trace( "{}Using estimated(transfer) gas={}", strLogPrefix, estimatedGasTransfer );
         const isIgnoreTransferERC1155 = true;
-        const strErrorOfDryRunTransferERC1155 =
-            await imaTx.dryRunCall(
-                details, ethersProviderSrc,
-                "TokenManagerERC1155", joTokenManagerERC1155Src,
-                "transferToSchainERC1155Batch", arrArgumentsTransfer,
-                joAccountSrc, strActionName, isIgnoreTransferERC1155,
-                gasPrice, estimatedGasTransfer, weiHowMuchTransferERC1155, null );
+        const strErrorOfDryRunTransferERC1155 = await imaTx.dryRunCall(
+            details, ethersProviderSrc,
+            "TokenManagerERC1155", joTokenManagerERC1155Src,
+            "transferToSchainERC1155Batch", arrArgumentsTransfer,
+            joAccountSrc, strActionName, isIgnoreTransferERC1155,
+            gasPrice, estimatedGasTransfer, weiHowMuchTransferERC1155, null );
         if( strErrorOfDryRunTransferERC1155 )
             throw new Error( strErrorOfDryRunTransferERC1155 );
-        const joReceiptTransfer =
-            await imaTx.payedCall(
-                details, ethersProviderSrc,
-                "TokenManagerERC1155", joTokenManagerERC1155Src,
-                "transferToSchainERC1155Batch", arrArgumentsTransfer,
-                joAccountSrc, strActionName,
-                gasPrice, estimatedGasTransfer, weiHowMuchTransferERC1155, null );
+        const joReceiptTransfer = await imaTx.payedCall(
+            details, ethersProviderSrc,
+            "TokenManagerERC1155", joTokenManagerERC1155Src,
+            "transferToSchainERC1155Batch", arrArgumentsTransfer,
+            joAccountSrc, strActionName,
+            gasPrice, estimatedGasTransfer, weiHowMuchTransferERC1155, null );
         if( joReceiptTransfer && typeof joReceiptTransfer == "object" ) {
             jarrReceipts.push( {
                 "description": "doErc1155PaymentS2S/transfer",

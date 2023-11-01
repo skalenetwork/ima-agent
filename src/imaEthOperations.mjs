@@ -90,31 +90,27 @@ export async function doEthPaymentFromMainNet(
         ];
         const gasPrice = await transactionCustomizerMainNet.computeGasPrice(
             ethersProviderMainNet, 200000000000 );
-        details.trace( strLogPrefix, "Using computed gasPrice=",
-            log.v( gasPrice ) );
-        const estimatedGas =
-            await transactionCustomizerMainNet.computeGas(
-                details, ethersProviderMainNet,
-                "DepositBox", joDepositBox, "deposit", arrArguments,
-                joAccountSrc, strActionName,
-                gasPrice, 3000000, weiHowMuch, null );
-        details.trace( strLogPrefix, "Using estimated gas=", log.v( estimatedGas ) );
+        details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
+        const estimatedGas = await transactionCustomizerMainNet.computeGas(
+            details, ethersProviderMainNet,
+            "DepositBox", joDepositBox, "deposit", arrArguments,
+            joAccountSrc, strActionName,
+            gasPrice, 3000000, weiHowMuch, null );
+        details.trace( "{}Using estimated gas={}", strLogPrefix, estimatedGas );
         const isIgnore = false;
-        const strErrorOfDryRun =
-            await imaTx.dryRunCall(
-                details, ethersProviderMainNet,
-                "DepositBox", joDepositBox, "deposit", arrArguments,
-                joAccountSrc, strActionName, isIgnore,
-                gasPrice, estimatedGas, weiHowMuch, null );
+        const strErrorOfDryRun = await imaTx.dryRunCall(
+            details, ethersProviderMainNet,
+            "DepositBox", joDepositBox, "deposit", arrArguments,
+            joAccountSrc, strActionName, isIgnore,
+            gasPrice, estimatedGas, weiHowMuch, null );
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
-        const joReceipt =
-            await imaTx.payedCall(
-                details, ethersProviderMainNet,
-                "DepositBox", joDepositBox, "deposit", arrArguments,
-                joAccountSrc, strActionName,
-                gasPrice, estimatedGas, weiHowMuch, null );
+        const joReceipt = await imaTx.payedCall(
+            details, ethersProviderMainNet,
+            "DepositBox", joDepositBox, "deposit", arrArguments,
+            joAccountSrc, strActionName,
+            gasPrice, estimatedGas, weiHowMuch, null );
         if( joReceipt && typeof joReceipt == "object" ) {
             jarrReceipts.push( {
                 "description": "doEthPaymentFromMainNet",
@@ -193,35 +189,30 @@ export async function doEthPaymentFromSChain(
         ];
         const gasPrice = await transactionCustomizerSChain.computeGasPrice(
             ethersProviderSChain, 200000000000 );
-        details.trace( strLogPrefix, "Using computed gasPrice=",
-            log.v( gasPrice ) );
-        const estimatedGas =
-            await transactionCustomizerSChain.computeGas(
-                details, ethersProviderSChain,
-                "TokenManagerETH", joTokenManagerETH, "exitToMain", arrArguments,
-                joAccountSrc, strActionName,
-                gasPrice, 6000000, 0, null );
-        details.trace( strLogPrefix, "Using estimated gas=", log.v( estimatedGas ) );
+        details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
+        const estimatedGas = await transactionCustomizerSChain.computeGas(
+            details, ethersProviderSChain,
+            "TokenManagerETH", joTokenManagerETH, "exitToMain", arrArguments,
+            joAccountSrc, strActionName,
+            gasPrice, 6000000, 0, null );
+        details.trace( "{}Using estimated gas={}", strLogPrefix, estimatedGas );
         const isIgnore = true;
-        const strErrorOfDryRun =
-            await imaTx.dryRunCall(
-                details, ethersProviderSChain,
-                "TokenManagerETH", joTokenManagerETH, "exitToMain", arrArguments,
-                joAccountSrc, strActionName, isIgnore,
-                gasPrice, estimatedGas, 0, null
-            );
+        const strErrorOfDryRun = await imaTx.dryRunCall(
+            details, ethersProviderSChain,
+            "TokenManagerETH", joTokenManagerETH, "exitToMain", arrArguments,
+            joAccountSrc, strActionName, isIgnore,
+            gasPrice, estimatedGas, 0, null );
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
         const opts = {
             isCheckTransactionToSchain: true
         };
-        const joReceipt =
-            await imaTx.payedCall(
-                details, ethersProviderSChain,
-                "TokenManagerETH", joTokenManagerETH, "exitToMain", arrArguments,
-                joAccountSrc, strActionName,
-                gasPrice, estimatedGas, 0, opts );
+        const joReceipt = await imaTx.payedCall(
+            details, ethersProviderSChain,
+            "TokenManagerETH", joTokenManagerETH, "exitToMain", arrArguments,
+            joAccountSrc, strActionName,
+            gasPrice, estimatedGas, 0, opts );
         if( joReceipt && typeof joReceipt == "object" ) {
             jarrReceipts.push( {
                 "description": "doEthPaymentFromSChain",
@@ -288,33 +279,29 @@ export async function receiveEthPaymentFromSchainOnMainNet(
         const weiHowMuch = undefined;
         const gasPrice = await transactionCustomizerMainNet.computeGasPrice(
             ethersProviderMainNet, 200000000000 );
-        details.trace( strLogPrefix, "Using computed gasPrice=",
-            log.v( gasPrice ) );
-        const estimatedGas =
-            await transactionCustomizerMainNet.computeGas(
-                details, ethersProviderMainNet,
-                "DepositBoxETH", joDepositBoxETH, "getMyEth", arrArguments,
-                joAccountMN, strActionName,
-                gasPrice, 3000000, weiHowMuch, null );
-        details.trace( strLogPrefix, "Using estimated gas=", log.v( estimatedGas ) );
+        details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
+        const estimatedGas = await transactionCustomizerMainNet.computeGas(
+            details, ethersProviderMainNet,
+            "DepositBoxETH", joDepositBoxETH, "getMyEth", arrArguments,
+            joAccountMN, strActionName,
+            gasPrice, 3000000, weiHowMuch, null );
+        details.trace( "{}Using estimated gas={}", strLogPrefix, estimatedGas );
         const isIgnore = false;
-        const strErrorOfDryRun =
-            await imaTx.dryRunCall(
-                details, ethersProviderMainNet,
-                "DepositBoxETH", joDepositBoxETH,
-                "getMyEth", arrArguments,
-                joAccountMN, strActionName, isIgnore,
-                gasPrice, estimatedGas, weiHowMuch, null );
+        const strErrorOfDryRun = await imaTx.dryRunCall(
+            details, ethersProviderMainNet,
+            "DepositBoxETH", joDepositBoxETH,
+            "getMyEth", arrArguments,
+            joAccountMN, strActionName, isIgnore,
+            gasPrice, estimatedGas, weiHowMuch, null );
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
-        const joReceipt =
-            await imaTx.payedCall(
-                details, ethersProviderMainNet,
-                "DepositBoxETH", joDepositBoxETH,
-                "getMyEth", arrArguments,
-                joAccountMN, strActionName,
-                gasPrice, estimatedGas, weiHowMuch, null );
+        const joReceipt = await imaTx.payedCall(
+            details, ethersProviderMainNet,
+            "DepositBoxETH", joDepositBoxETH,
+            "getMyEth", arrArguments,
+            joAccountMN, strActionName,
+            gasPrice, estimatedGas, weiHowMuch, null );
         if( joReceipt && typeof joReceipt == "object" ) {
             jarrReceipts.push( {
                 "description": "receiveEthPaymentFromSchainOnMainNet",

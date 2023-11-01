@@ -458,13 +458,13 @@ export function notifyCacheChangedSNB( arrSChainsCached ) {
         log.debug( "S-Chains cache did sent to ",
             log.v( gArrClients[idxWorker].url ), " loop worker" );
     }
-    log.debug( "Loop module did finished broadcasting arrSChainsCached event to its ",
-        cntWorkers, " worker(s) in ", threadInfo.threadDescription(), "..." );
+    log.debug( "Loop module did finished broadcasting arrSChainsCached event " +
+        "to its {} worker(s) in {}...", cntWorkers, threadInfo.threadDescription() );
 }
 
-log.trace( "Subscribe to chainsCacheChanged event in ", threadInfo.threadDescription() );
+log.trace( "Subscribe to chainsCacheChanged event in {}", threadInfo.threadDescription() );
 skaleObserver.events.on( "chainsCacheChanged", function( eventData ) {
-    log.trace( "Did arrived chainsCacheChanged event in ", threadInfo.threadDescription() );
+    log.trace( "Did arrived chainsCacheChanged event in {}", threadInfo.threadDescription() );
     notifyCacheChangedSNB( eventData.detail.arrSChainsCached );
 } );
 
@@ -743,7 +743,7 @@ export async function ensureHaveWorkers( opts ) {
     log.trace( "Subscribe to inThread-arrSChainsCached event in {}",
         threadInfo.threadDescription() );
     skaleObserver.events.on( "inThread-arrSChainsCached", function( eventData ) {
-        log.trace( "Did arrived inThread-arrSChainsCached event in ",
+        log.trace( "Did arrived inThread-arrSChainsCached event in {}",
             threadInfo.threadDescription() );
         if( threadInfo.isMainThread() )
             notifyCacheChangedSNB( eventData.detail.arrSChainsCached );

@@ -333,8 +333,7 @@ function performBlsGlue(
             " --n " + nParticipants +
             strInput +
             " --output " + strActionDir + "/glue-result.json";
-        details.trace( strLogPrefix, "Will execute BLS glue command:", "\n",
-            strGlueCommand );
+        details.trace( "{}Will execute BLS glue command:{}{}", strLogPrefix, "\n", strGlueCommand );
         strOutput = childProcessModule.execSync( strGlueCommand, { cwd: strActionDir } );
         details.trace( "{}BLS glue output is:{}{}", strLogPrefix, "\n", strOutput );
         joGlueResult = imaUtils.jsonFileLoad( strActionDir + "/glue-result.json" );
@@ -350,8 +349,8 @@ function performBlsGlue(
                 imaState.strPathHashG1 +
                 " --t " + nThreshold +
                 " --n " + nParticipants;
-            details.trace( strLogPrefix, "Will execute HashG1 command:", "\n",
-                log.v( strHasG1Command ) );
+            details.trace( "{}Will execute HashG1 command:{}{}",
+                strLogPrefix, "\n", strHasG1Command );
             strOutput = childProcessModule.execSync( strHasG1Command, { cwd: strActionDir } );
             details.trace( "{}HashG1 output is:{}{}", strLogPrefix, "\n", strOutput );
             const joResultHashG1 = imaUtils.jsonFileLoad( strActionDir + "/g1.json" );
@@ -396,8 +395,7 @@ function performBlsGlueU256( details, u256, arrSignResults ) {
     if( ! checkBlsThresholdAndBlsParticipants(
         nThreshold, nParticipants, "BLS glue-256", details ) )
         return null;
-    details.trace( strLogPrefix, "Original long message is ",
-        log.v( keccak256U256( u256, false ) ) );
+    details.trace( "{}Original long message is {}", strLogPrefix, keccak256U256( u256, false ) );
     const strMessageHash = keccak256U256( u256, true );
     details.trace( "{}Message hash to sign is {}", strLogPrefix, strMessageHash );
     const strActionDir = allocBlsTmpActionDir();
@@ -439,8 +437,8 @@ function performBlsGlueU256( details, u256, arrSignResults ) {
                 imaState.strPathHashG1 +
                 " --t " + nThreshold +
                 " --n " + nParticipants;
-            details.trace( strLogPrefix, "Will execute HashG1 command:", "\n",
-                log.v( strHasG1Command ) );
+            details.trace( "{}Will execute HashG1 command:{}{}", strLogPrefix,
+                "\n", strHasG1Command );
             strOutput = childProcessModule.execSync( strHasG1Command, { cwd: strActionDir } );
             details.trace( "{}HashG1 output is:{}{}", strLogPrefix, "\n", strOutput );
             const joResultHashG1 = imaUtils.jsonFileLoad( strActionDir + "/g1.json" );
@@ -1074,8 +1072,8 @@ async function gatherSigningStartImpl( optsSignOperation ) {
 }
 
 async function gatherSigningFinishImpl( optsSignOperation ) {
-    optsSignOperation.details.trace( optsSignOperation.strLogPrefix,
-        "Will await for message BLS verification and sending..." );
+    optsSignOperation.details.trace( "{}Will await for message BLS verification and sending...",
+        optsSignOperation.strLogPrefix );
     await withTimeout(
         "BLS verification and sending",
         optsSignOperation.promiseCompleteGathering,
@@ -1809,7 +1807,7 @@ async function doSignU256Gathering( optsSignU256 ) {
                         strLogPrefixB, log.em( strError ) );
                 }
                 optsSignU256.details.trace( "Will call signed-256 answer-sending callback {}" +
-                    ", u256 is {}, glue result is {}",
+                        ", u256 is {}, glue result is {}",
                 strError ? ( " with error " + log.em( strError ) ) : "",
                 optsSignU256.u256, joGlueResult );
                 optsSignU256.fn(
@@ -1919,7 +1917,7 @@ export async function doSignU256( u256, details, fn ) {
         promiseCompleteGathering: null
     };
     optsSignU256.jarrNodes = optsSignU256.imaState.joSChainNetworkInfo.network;
-    optsSignU256.details.trace( optsSignU256.strLogPrefix, "Invoking signing u256 procedure " );
+    optsSignU256.details.trace( "{}Invoking signing u256 procedure...", optsSignU256.strLogPrefix );
     optsSignU256.fn = optsSignU256.fn || function() {};
     if( !(
         optsSignU256.imaState.strPathBlsGlue.length > 0 &&
@@ -2109,8 +2107,7 @@ export async function doSignReadyHash( strMessageHash, isExposeOutput ) {
                     "signerIndex": signerIndex + 0 // 1-based
                 }
             };
-            details.trace( strLogPrefix, "Will invoke ", "SGX with call data ",
-                log.v( joCallSGX ) );
+            details.trace( "{}Will invoke SGX with call data {}", strLogPrefix, joCallSGX );
             await joCall.call( joCallSGX, async function( joIn, joOut, err ) {
                 if( err ) {
                     const jsErrorObject = new Error(
@@ -2358,10 +2355,9 @@ export async function handleSkaleImaVerifyAndSign( joCallData ) {
                     "signerIndex": signerIndex + 0 // 1-based
                 }
             };
-            optsHandleVerifyAndSign.details.trace( optsHandleVerifyAndSign.strLogPrefix,
-                optsHandleVerifyAndSign.strDirection,
-                " verification algorithm will invoke ", "SGX with call data ",
-                log.v( joCallSGX ) );
+            optsHandleVerifyAndSign.details.trace( "{}{} verification algorithm will invoke " +
+                "SGX with call data {}", optsHandleVerifyAndSign.strLogPrefix,
+            optsHandleVerifyAndSign.strDirection, joCallSGX );
             await joCall.call( joCallSGX, async function( joIn, joOut, err ) {
                 if( err ) {
                     const strError =
@@ -2386,9 +2382,9 @@ export async function handleSkaleImaVerifyAndSign( joCallData ) {
                     await joCall.disconnect();
                     throw jsErrorObject;
                 }
-                optsHandleVerifyAndSign.details.trace( optsHandleVerifyAndSign.strLogPrefix,
-                    optsHandleVerifyAndSign.strDirection +
-                    " Call to SGX done, answer is: ", joOut );
+                optsHandleVerifyAndSign.details.trace( "{}{} Call to SGX done, answer is: {}",
+                    optsHandleVerifyAndSign.strLogPrefix, optsHandleVerifyAndSign.strDirection,
+                    joOut );
                 let joSignResult = joOut;
                 if( joOut.result != null && joOut.result != undefined &&
                     typeof joOut.result == "object" )
@@ -2540,8 +2536,8 @@ export async function handleSkaleImaBSU256( joCallData ) {
                         "signerIndex": signerIndex + 0 // 1-based
                     }
                 };
-                optsBSU256.details.trace( optsBSU256.strLogPrefix,
-                    "Will invoke SGX with call data ", log.v( joCallSGX ) );
+                optsBSU256.details.trace( "{}Will invoke SGX with call data {}",
+                    optsBSU256.strLogPrefix, joCallSGX );
                 await joCall.call( joCallSGX, async function( joIn, joOut, err ) {
                     if( err ) {
                         const jsErrorObject = new Error(
@@ -2563,8 +2559,8 @@ export async function handleSkaleImaBSU256( joCallData ) {
                         await joCall.disconnect();
                         throw jsErrorObject;
                     }
-                    optsBSU256.details.trace( optsBSU256.strLogPrefix,
-                        "Call to SGX done, answer is: ", joOut );
+                    optsBSU256.details.trace( "{}Call to SGX done, answer is: {}",
+                        optsBSU256.strLogPrefix, joOut );
                     let joSignResult = joOut;
                     if( joOut.result != null && joOut.result != undefined &&
                         typeof joOut.result == "object" )

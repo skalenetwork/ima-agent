@@ -67,7 +67,7 @@ export async function safeWaitForNextBlockToAppear( details, ethersProvider ) {
     const nBlockNumber =
         owaspUtils.toBN( await safeGetBlockNumber( details, 10, ethersProvider ) );
     details.trace( "Waiting for next block to appear..." );
-    details.trace( "    ...have block ", log.v( nBlockNumber.toHexString() ) );
+    details.trace( "    ...have block {}", nBlockNumber.toHexString() );
     for( ; true; ) {
         await sleep( 1000 );
         const nBlockNumber2 =
@@ -114,8 +114,8 @@ export async function safeGetBlockNumber(
             throw new Error( "Cannot " + strFnName + "() via " + u.toString() +
                 " because server is off-line" );
         }
-        details.trace( "Repeat call to ", strFnName + "()", " via ", log.u( u ),
-            ", attempt ", idxAttempt );
+        details.trace( "Repeat call to {} via {}, attempt {}",
+            strFnName + "()", log.u( u ), idxAttempt );
         try {
             ret = await ethersProvider[strFnName]();
             return ret;

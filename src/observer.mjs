@@ -1060,9 +1060,9 @@ export async function ensureHaveWorker( opts ) {
             setLastCachedSChains( joMessage.message );
             gFlagHaveParallelResult = true;
             if( opts && opts.details ) {
-                opts.details.trace(
-                    "Connected S-Chains cache was updated using data arrived from SNB worker " +
-                    "in {}: {}", threadInfo.threadDescription(), gArrSChainsCached );
+                opts.details.trace( "Connected S-Chains cache was updated using data arrived " +
+                    "from SNB worker in {}: {}", threadInfo.threadDescription(),
+                gArrSChainsCached );
             }
             break;
         case "log":

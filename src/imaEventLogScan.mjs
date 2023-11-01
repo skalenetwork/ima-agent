@@ -130,8 +130,8 @@ export async function safeGetPastEventsProgressive(
     if( nBlockTo == "latest" ) {
         isLastLatest = true;
         nBlockTo = nLatestBlockNumberPlus1;
-        details.trace( strLogPrefix, "Progressive event log records scan up to latest block #",
-            nBlockTo.toHexString(), " assumed instead of ", log.v( "latest" ) );
+        details.trace( "{}Progressive event log records scan up to latest block #{} " +
+            "assumed instead of {}", strLogPrefix, nBlockTo.toHexString(), "latest" );
     } else {
         nBlockTo = owaspUtils.toBN( nBlockTo );
         if( nBlockTo.gte( nLatestBlockNumber ) )
@@ -141,21 +141,20 @@ export async function safeGetPastEventsProgressive(
     const nBlockZero = owaspUtils.toBN( 0 );
     const isFirstZero = ( nBlockFrom.eq( nBlockZero ) ) ? true : false;
     if( ! ( isFirstZero && isLastLatest ) ) {
-        details.trace( strLogPrefix,
-            "Will skip progressive event log records scan and use scan in block range from ",
-            nBlockFrom.toHexString(), " to ", nBlockTo.toHexString() );
+        details.trace( "{}Will skip progressive event log records scan and use scan in block " +
+            "range from {} to {}", strLogPrefix, nBlockFrom.toHexString(), nBlockTo.toHexString() );
         return await safeGetPastEvents(
             details, strLogPrefix,
             ethersProvider, attempts, joContract, strEventName,
             nBlockFrom, nBlockTo, joFilter
         );
     }
-    details.trace( strLogPrefix, "Current latest block number is ",
-        log.v( nLatestBlockNumber.toHexString() ) );
+    details.trace( "{}Current latest block number is {}",
+        strLogPrefix, nLatestBlockNumber.toHexString() );
     const arrProgressiveEventsScanPlan =
         createProgressiveEventsScanPlan( details, nLatestBlockNumberPlus1 );
-    details.trace( "Composed progressive event log records scan plan is: ",
-        log.v( arrProgressiveEventsScanPlan ) );
+    details.trace( "Composed progressive event log records scan plan is: {}",
+        arrProgressiveEventsScanPlan );
     let joLastPlan = { "nBlockFrom": 0, "nBlockTo": "latest", "type": "entire block range" };
     for( let idxPlan = 0; idxPlan < arrProgressiveEventsScanPlan.length; ++idxPlan ) {
         const joPlan = arrProgressiveEventsScanPlan[idxPlan];
@@ -255,8 +254,8 @@ export async function safeGetTransactionCount(
             throw new Error( "Cannot " + strFnName + "() via " + u.toString() +
                 " because server is off-line" );
         }
-        details.trace( "Repeat call to ", strFnName + "()",
-            " via ", log.u( u ), ", attempt ", idxAttempt );
+        details.trace( "Repeat call to {} via {}, attempt {}",
+            strFnName + "()", log.u( u ), idxAttempt );
         try {
             ret = await ethersProvider[strFnName]( address, param );
             return ret;
@@ -364,11 +363,10 @@ export async function safeGetPastEvents(
         nBlockTo = owaspUtils.toBN( nBlockTo );
     nBlockFrom = owaspUtils.toBN( nBlockFrom );
     try {
-        details.trace( strLogPrefix, "First time, will query filter ", joFilter,
-            " on contract ", joContract.address, " from block ",
-            nBlockFrom.toHexString(), " to block ", nBlockTo.toHexString(),
-            " while current latest block number on chain is ",
-            log.v( nLatestBlockNumber.toHexString() ) );
+        details.trace( "{}First time, will query filter {} on contract {} from block {} to " +
+            "block {} while current latest block number on chain is {}",
+        strLogPrefix, joFilter, joContract.address, nBlockFrom.toHexString(),
+        nBlockTo.toHexString(), log.v( nLatestBlockNumber.toHexString() ) );
         ret =
             await joContract.queryFilter(
                 joFilter,

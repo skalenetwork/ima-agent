@@ -264,8 +264,7 @@ function initJsonRpcServer() {
             try {
                 res.header( "Content-Type", "application/json" );
                 res.status( 200 ).send( JSON.stringify( joAnswer ) );
-                log.trace( strLogPrefix, ">>> did sent answer to ", ip, ": ",
-                    joAnswer );
+                log.trace( "{}>>> did sent answer to {}: ", strLogPrefix, ip, joAnswer );
             } catch ( err ) {
                 const strError = owaspUtils.extractErrorMessage( err );
                 log.error( "{}Failed to sent answer {} to {}, error is: {}, stack is:{}{}",
