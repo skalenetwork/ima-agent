@@ -112,9 +112,9 @@ export async function safeGetPastEventsProgressive(
     nBlockFrom, nBlockTo, joFilter, optsChainPair
 ) {
     const strURL = owaspUtils.ethersProviderToUrl( ethersProvider );
-    details.information( "{p}Will run progressive logs search for event {} via URL {url} {}...",
-        strLogPrefix, strEventName, strURL,
-        generateWhileTransferringLogMessageSuffix( optsChainPair ) );
+    details.information( "{p}Will run progressive logs search for event {} via URL {url} {}, " +
+        "from block {}, to block...", strLogPrefix, strEventName, strURL,
+    generateWhileTransferringLogMessageSuffix( optsChainPair ), nBlockFrom, nBlockTo );
     if( ! imaTransferErrorHandling.getEnabledProgressiveEventsScan() ) {
         details.warning( "{p}IMPORTANT NOTICE: Will skip progressive events scan " +
                 "in block range from {} to {} because it's {}",

@@ -322,8 +322,11 @@ async function gatherMessages( optsTransfer ) {
         let nBlockFrom = 0, nBlockTo = "latest";
         if( optsTransfer.arrLogRecordReferences.length > 0 ) {
             const joReferenceLogRecord = optsTransfer.arrLogRecordReferences.shift();
-            nBlockFrom = joReferenceLogRecord.currentBlockId;
-            nBlockTo = joReferenceLogRecord.currentBlockId;
+            if( joReferenceLogRecord && "currentBlockId" in joReferenceLogRecord &&
+                joReferenceLogRecord.currentBlockId ) {
+                nBlockFrom = joReferenceLogRecord.currentBlockId;
+                nBlockTo = joReferenceLogRecord.currentBlockId;
+            }
         }
         optsTransfer.strActionName = "src-chain->MessageProxy->scan-past-events()";
         const strEventName = "OutgoingMessage";
