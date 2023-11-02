@@ -216,14 +216,16 @@ async function doQueryOutgoingMessageCounter( optsTransfer ) {
                     optsTransfer.chainNameDst,
                     { from: optsTransfer.joAccountSrc.address() } ) );
         try {
-            optsTransfer.strActionName =
-                "in-getOutgoingMessagesCounter()--findOutAllReferenceLogRecords()";
-            optsTransfer.arrLogRecordReferences =
-                await findOutAllReferenceLogRecords( optsTransfer.details,
-                    optsTransfer.strLogPrefixShort, optsTransfer.ethersProviderSrc,
-                    optsTransfer.joMessageProxySrc, bnBlockId, optsTransfer.nIncMsgCnt,
-                    optsTransfer.nOutMsgCnt, true, optsTransfer.optsChainPair );
-            return true; // success, finish at this point
+            if( bnBlockId ) {
+                optsTransfer.strActionName =
+                    "in-getOutgoingMessagesCounter()--findOutAllReferenceLogRecords()";
+                optsTransfer.arrLogRecordReferences =
+                    await findOutAllReferenceLogRecords( optsTransfer.details,
+                        optsTransfer.strLogPrefixShort, optsTransfer.ethersProviderSrc,
+                        optsTransfer.joMessageProxySrc, bnBlockId, optsTransfer.nIncMsgCnt,
+                        optsTransfer.nOutMsgCnt, true, optsTransfer.optsChainPair );
+                return true; // success, finish at this point
+            }
         } catch ( err ) {
             optsTransfer.arrLogRecordReferences = [];
             optsTransfer.details.error( "{p}Optimized log search is off. Running old IMA " +
