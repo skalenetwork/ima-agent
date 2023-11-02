@@ -13,7 +13,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
 function finalizeOutput( jo ) {
     if( ! jo )
         return;
-    process.stdout.write( log.v( jo ) );
+    process.stdout.write( log.fmtInformation( "{}", jo ) );
 }
 
 function postConvertBN( jo, name ) {
@@ -33,13 +33,13 @@ async function run() {
 
         const strSgxWalletURL = process.argv[3];
         if( gIsDebugLogging )
-            log.debug( "SGX Wallet URL is {}", log.u( strSgxWalletURL ) );
+            log.debug( "SGX Wallet URL is {url}", strSgxWalletURL );
         const strSgxKeyName = process.argv[4];
         if( gIsDebugLogging )
-            log.debug( "SGX key name is {}", log.u( strSgxWalletURL ) );
+            log.debug( "SGX key name is {url}", strSgxWalletURL );
         const strURL = process.argv[5];
         if( gIsDebugLogging )
-            log.debug( "Chain URL is {}", log.u( strURL ) );
+            log.debug( "Chain URL is {url}", strURL );
         const chainId = process.argv[6];
         if( gIsDebugLogging )
             log.debug( "Chain ID is {}", chainId );
@@ -99,7 +99,7 @@ async function run() {
             async function( joCall, err ) {
                 if( err ) {
                     if( gIsDebugLogging )
-                        log.error( "Failed to create RPC call: {}", log.em( err ) );
+                        log.error( "Failed to create RPC call: {err}", err );
                     finalizeOutput( { "error": owaspUtils.extractErrorMessage( err ) } );
                     process.exit( 1 );
                 }
@@ -114,7 +114,7 @@ async function run() {
                 await joCall.call( joIn, async function( joIn, joOut, err ) {
                     if( err ) {
                         if( gIsDebugLogging )
-                            log.error( "RPC call error: {}", log.em( err ) );
+                            log.error( "RPC call error: {err}", err );
                         finalizeOutput( { "error": owaspUtils.extractErrorMessage( err ) } );
                         process.exit( 1 );
                     }
@@ -167,7 +167,7 @@ async function run() {
             } );
     } catch ( err ) {
         if( gIsDebugLogging )
-            log.error( "Failed to create RPC call: {}", log.em( err ) );
+            log.error( "Failed to create RPC call: {err}", err );
         finalizeOutput( { "error": owaspUtils.extractErrorMessage( err ) } );
         process.exit( 1 );
     }

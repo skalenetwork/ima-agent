@@ -234,8 +234,8 @@ class ObserverServer extends SocketServer {
         }
         self.bIsPeriodicCachingStepInProgress = false;
         if( strError ) {
-            self.error( "Parallel periodic SNB caching came across with error: {} in {}",
-                log.em( strError ), threadInfo.threadDescription() );
+            self.error( "Parallel periodic SNB caching came across with error: {err} in {}",
+                strError, threadInfo.threadDescription() );
             return strError;
         }
         self.debug( "Parallel periodic SNB caching in {} will notify main thread now",
@@ -284,8 +284,8 @@ class ObserverServer extends SocketServer {
                     break;
                 }
             } catch ( err ) {
-                self.error( "Periodic SNB caching(async) error in {}: {}",
-                    threadInfo.threadDescription(), log.em( strError ) );
+                self.error( "Periodic SNB caching(async) error in {}: {err}",
+                    threadInfo.threadDescription(), strError );
             }
         };
         const fnPeriodicCaching = function() {
@@ -295,14 +295,12 @@ class ObserverServer extends SocketServer {
                 fnAsyncHandler()
                     .then( () => {
                     } ).catch( ( err ) => {
-                        self.error( "Periodic SNB caching(sync-delayed) in {} error: {}",
-                            threadInfo.threadDescription(),
-                            log.em( owaspUtils.extractErrorMessage( err ) ) );
+                        self.error( "Periodic SNB caching(sync-delayed) in {} error: {err}",
+                            threadInfo.threadDescription(), err );
                     } );
             } catch ( err ) {
-                self.error( "Periodic SNB caching(sync) in {} error: {}",
-                    threadInfo.threadDescription(),
-                    log.em( owaspUtils.extractErrorMessage( err ) ) );
+                self.error( "Periodic SNB caching(sync) in {} error: {err}",
+                    threadInfo.threadDescription(), err );
             }
         };
         await fnPeriodicCaching();

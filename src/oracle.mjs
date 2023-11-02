@@ -74,7 +74,7 @@ export function findPowNumber( strRequestPart, details, isVerbose ) {
                 details.debug( "computed f={}={}", f.toString(),
                     owaspUtils.ensureStartsWith0x( f.toString( 16 ) ) );
                 details.debug( "computed r={}={}={}", "(2**256-1)/f", r.toString(),
-                    log.v( owaspUtils.ensureStartsWith0x( r.toString( 16 ) ) ) );
+                    owaspUtils.ensureStartsWith0x( r.toString( 16 ) ) );
                 details.debug( "computed s={}", s );
             }
             break;
@@ -103,8 +103,8 @@ export function oracleGetGasPrice( oracleOpts, details ) {
                 cntAttempts = 1;
             rpcCall.create( url, callOpts || { }, async function( joCall, err ) {
                 if( err ) {
-                    details.error( "RPC connection problem for url {}, error description: {}",
-                        log.u( url ), log.em( owaspUtils.extractErrorMessage( err ) ) );
+                    details.error( "RPC connection problem for URL {url}, error description: {err}",
+                        url, err );
                     if( joCall )
                         await joCall.disconnect();
                     reject( new Error( "CRITICAL ORACLE ERROR: RPC connection problem for url \"" +
@@ -126,7 +126,7 @@ export function oracleGetGasPrice( oracleOpts, details ) {
                         if( err ) {
                             if( isVerboseTraceDetails ) {
                                 details.error( "JSON RPC call(oracle_submitRequest) failed, " +
-                                    "error: {}", log.em( owaspUtils.extractErrorMessage( err ) ) );
+                                    "error: {err}", err );
                             }
                             await joCall.disconnect();
                             reject( new Error( "JSON RPC call(oracle_submitRequest) failed, " +
@@ -162,8 +162,7 @@ export function oracleGetGasPrice( oracleOpts, details ) {
                                     if( err ) {
                                         if( isVerboseTraceDetails ) {
                                             details.error( "JSON RPC call(oracle_checkResult) " +
-                                                "failed, error: {}",
-                                            log.em( owaspUtils.extractErrorMessage( err ) ) );
+                                                "failed, error: {err}", err );
                                         }
                                         await joCall.disconnect();
                                         return;
@@ -197,10 +196,9 @@ export function oracleGetGasPrice( oracleOpts, details ) {
                                     return;
                                 } );
                             } catch ( err ) {
-                                details.critical( "RPC call {} exception is: {}, stack is: {}{}",
-                                    "oracle_checkResult",
-                                    log.em( owaspUtils.extractErrorMessage( err ) ),
-                                    "\n", log.s( err.stack ) );
+                                details.critical( "RPC call {} exception is: {err}, " +
+                                    "stack is:{}{stack}", "oracle_checkResult",
+                                err, "\n", err.stack );
                                 reject( err );
                                 await joCall.disconnect();
                                 return;
@@ -213,16 +211,15 @@ export function oracleGetGasPrice( oracleOpts, details ) {
                         return;
                     } );
                 } catch ( err ) {
-                    details.critical( "RPC call{} exception is: {}, stack is: {}{}",
-                        "oracle_submitRequest", log.em( owaspUtils.extractErrorMessage( err ) ),
-                        "\n", log.s( err.stack ) );
+                    details.critical( "RPC call{} exception is: {err}, stack is:{}{stack}",
+                        "oracle_submitRequest", err, "\n", err.stack );
                     reject( err );
                 }
                 await joCall.disconnect();
             } );
         } catch ( err ) {
-            details.error( "RPC call object creation failed, error is: {}, stack is: {}{}",
-                log.em( owaspUtils.extractErrorMessage( err ) ), "\n", log.s( err.stack ) );
+            details.error( "RPC call object creation failed, error is: {err}, stack is:{}{stack}",
+                err, "\n", err.stack );
             reject( err );
             return;
         }

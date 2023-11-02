@@ -96,10 +96,8 @@ async function prepareOracleGasPriceSetup( optsGasPriseSetup ) {
                     oracleOpts, optsGasPriseSetup.details ) ).toString( 16 ) );
         } catch ( err ) {
             optsGasPriseSetup.gasPriceOnMainNet = null;
-            optsGasPriseSetup.details.error(
-                "Failed to fetch Main Net gas price via call to Oracle, error is: {}, " +
-                "stack is: {}{}", log.em( owaspUtils.extractErrorMessage( err ) ),
-                "\n", log.s( err.stack ) );
+            optsGasPriseSetup.details.error( "Failed to fetch Main Net gas price via call " +
+                "to Oracle, error is: {err}, stack is:{}{stack}", err, "\n", err.stack );
         }
     }
     if( optsGasPriseSetup.gasPriceOnMainNet === null ) {
@@ -162,15 +160,15 @@ export async function doOracleGasPriceSetup(
 
     if( optsGasPriseSetup.fnSignMsgOracle == null ||
         optsGasPriseSetup.fnSignMsgOracle == undefined ) {
-        optsGasPriseSetup.details.trace( "{}Using internal u256 signing stub function",
+        optsGasPriseSetup.details.trace( "{p}Using internal u256 signing stub function",
             optsGasPriseSetup.strLogPrefix );
         optsGasPriseSetup.fnSignMsgOracle = async function( u256, details, fnAfter ) {
-            details.trace( "{}u256 signing callback was not provided",
+            details.trace( "{p}u256 signing callback was not provided",
                 optsGasPriseSetup.strLogPrefix );
             await fnAfter( null, u256, null ); // null - no error, null - no signatures
         };
     } else {
-        optsGasPriseSetup.details.trace( "{}Using externally provided u256 signing function",
+        optsGasPriseSetup.details.trace( "{p}Using externally provided u256 signing function",
             optsGasPriseSetup.strLogPrefix );
     }
     try {
@@ -182,14 +180,14 @@ export async function doOracleGasPriceSetup(
             async function( strError, u256, joGlueResult ) {
                 if( strError ) {
                     if( log.id != optsGasPriseSetup.details.id ) {
-                        log.critical( "{}Error in doOracleGasPriceSetup() during {}: {}",
+                        log.critical( "{p}Error in doOracleGasPriceSetup() during {}: {err}",
                             optsGasPriseSetup.strLogPrefix, optsGasPriseSetup.strActionName,
-                            log.em( strError ) );
+                            strError );
                     }
                     optsGasPriseSetup.details.critical(
-                        "{}Error in doOracleGasPriceSetup() during {}: {}",
+                        "{p}Error in doOracleGasPriceSetup() during {}: {err}",
                         optsGasPriseSetup.strLogPrefix, optsGasPriseSetup.strActionName,
-                        log.em( strError ) );
+                        strError );
                     optsGasPriseSetup.details.exposeDetailsTo(
                         log, "doOracleGasPriceSetup", false );
                     imaTransferErrorHandling.saveTransferError(
@@ -227,13 +225,13 @@ export async function doOracleGasPriceSetup(
                     hashPoint.Y, // G1.Y from joGlueResult.hashSrc
                     hint
                 ];
-                optsGasPriseSetup.details.debug( "{}....debug args for : {}",
+                optsGasPriseSetup.details.debug( "{p}....debug args for : {}",
                     optsGasPriseSetup.strLogPrefix, joDebugArgs );
                 const weiHowMuch = undefined;
                 const gasPrice =
                     await optsGasPriseSetup.transactionCustomizerSChain.computeGasPrice(
                         optsGasPriseSetup.ethersProviderSChain, 200000000000 );
-                optsGasPriseSetup.details.trace( "{}Using computed gasPrice={}",
+                optsGasPriseSetup.details.trace( "{p}Using computed gasPrice={}",
                     optsGasPriseSetup.strLogPrefix, gasPrice );
                 const estimatedGasSetGasPrice =
                     await optsGasPriseSetup.transactionCustomizerSChain.computeGas(
@@ -241,7 +239,7 @@ export async function doOracleGasPriceSetup(
                         "CommunityLocker", optsGasPriseSetup.joCommunityLocker,
                         "setGasPrice", arrArgumentsSetGasPrice, optsGasPriseSetup.joAccountSC,
                         optsGasPriseSetup.strActionName, gasPrice, 10000000, weiHowMuch, null );
-                optsGasPriseSetup.details.trace( "{}Using estimated gas={}",
+                optsGasPriseSetup.details.trace( "{p}Using estimated gas={}",
                     optsGasPriseSetup.strLogPrefix, estimatedGasSetGasPrice );
                 const isIgnoreSetGasPrice = false;
                 const strErrorOfDryRun = await imaTx.dryRunCall( optsGasPriseSetup.details,
@@ -278,14 +276,13 @@ export async function doOracleGasPriceSetup(
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != optsGasPriseSetup.details.id ) {
-            log.critical( "{}Error in doOracleGasPriceSetup() during {}: {}" +
-                ", stack is: {}{}", optsGasPriseSetup.strLogPrefix,
-            optsGasPriseSetup.strActionName, log.em( strError ),
-            "\n", log.s( err.stack ) );
+            log.critical( "{p}Error in doOracleGasPriceSetup() during {}: {err}" +
+                ", stack is:{}{stack}", optsGasPriseSetup.strLogPrefix,
+            optsGasPriseSetup.strActionName, strError, "\n", err.stack );
             optsGasPriseSetup.details.critical(
-                "{}Error in doOracleGasPriceSetup() during {}: {}, stack is: {}{}",
+                "{p}Error in doOracleGasPriceSetup() during {}: {err}, stack is:{}{stack}",
                 optsGasPriseSetup.strLogPrefix, optsGasPriseSetup.strActionName,
-                log.em( strError ), "\n", log.s( err.stack ) );
+                strError, "\n", err.stack );
         }
         optsGasPriseSetup.details.exposeDetailsTo( log, "doOracleGasPriceSetup", false );
         imaTransferErrorHandling.saveTransferError(

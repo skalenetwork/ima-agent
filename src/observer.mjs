@@ -721,19 +721,18 @@ async function checkWhetherSChainIsConnected( strSChainName, joMessageProxySChai
             isConnected = false;
             if( opts && opts.details ) {
                 opts.details.error( "Failed attempt {} of {} to query connected state of {} " +
-                    "S-Chain, got error: {}, stack is: {}{}", idxAttempt, cntAttempts,
-                strSChainName, log.em( owaspUtils.extractErrorMessage( err ) ),
-                "\n", log.s( err.stack ) );
+                    "S-Chain, got error: {err}, stack is:{}{stack}", idxAttempt, cntAttempts,
+                strSChainName, err, "\n", err.stack );
             }
         }
     }
     if( opts && opts.details ) {
         if( ! isQueryPassed ) {
-            opts.details.warning( "Will assume S-Chain {} connected status: {}",
-                strSChainName, log.yn( isConnected ) );
+            opts.details.warning( "Will assume S-Chain {} connected status: {yn}",
+                strSChainName, isConnected );
         } else {
-            opts.details.trace( "Got S-Chain {} connected status: {}",
-                strSChainName, log.yn( isConnected ) );
+            opts.details.trace( "Got S-Chain {} connected status: {yn}",
+                strSChainName, isConnected );
         }
     }
     return isConnected;
@@ -792,10 +791,8 @@ export async function loadSChainsConnectedOnly( strChainNameConnectedTo, opts ) 
             joSChain.isConnected = isConnected;
             arrSChains.push( joSChain );
         } catch ( err ) {
-            if( opts && opts.details ) {
-                opts.details.error( "Got error: {}, stack is: {}{}",
-                    log.em( owaspUtils.extractErrorMessage( err ) ), "\n", log.s( err.stack ) );
-            }
+            if( opts && opts.details )
+                opts.details.error( "Got error: {err}, stack is:{}{stack}", err, "\n", err.stack );
         }
     }
     return arrSChains;
@@ -818,23 +815,20 @@ export async function checkConnectedSChains( strChainNameConnectedTo, arrSChains
         try {
             const url = pickRandomSChainUrl( joSChain );
             if( opts && opts.details ) {
-                opts.details.trace( "Querying(2) via URL {} to S-Chain {} whether it's connected " +
-                    "to S-Chain {}...", log.u( url ), joSChain.data.name, strChainNameConnectedTo );
+                opts.details.trace( "Querying(2) via URL {url} to S-Chain {} whether " +
+                    "it's connected to S-Chain {}...", url, joSChain.data.name,
+                strChainNameConnectedTo );
             }
             const ethersProvider = owaspUtils.getEthersProviderFromURL( url );
-            const joMessageProxySChain =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    opts.imaState.chainProperties.sc.joAbiIMA.message_proxy_chain_address,
-                    opts.imaState.chainProperties.sc.joAbiIMA.message_proxy_chain_abi,
-                    ethersProvider
-                );
+            const joMessageProxySChain = new owaspUtils.ethersMod.ethers.Contract(
+                opts.imaState.chainProperties.sc.joAbiIMA.message_proxy_chain_address,
+                opts.imaState.chainProperties.sc.joAbiIMA.message_proxy_chain_abi,
+                ethersProvider );
             joSChain.isConnected = await checkWhetherSChainIsConnected(
                 strChainNameConnectedTo, joMessageProxySChain, opts );
         } catch ( err ) {
-            if( opts && opts.details ) {
-                opts.details.error( "Got error: {}, stack is: {}{}",
-                    log.em( owaspUtils.extractErrorMessage( err ) ), "\n", log.s( err.stack ) );
-            }
+            if( opts && opts.details )
+                opts.details.error( "Got error: {err}, stack is:{}{stack}", err, "\n", err.stack );
         }
     }
     return arrSChains;
@@ -968,8 +962,8 @@ export async function cacheSChains( strChainNameConnectedTo, opts ) {
         if( opts.fnCacheChanged )
             opts.fnCacheChanged( gArrSChainsCached, strError );
         if( opts && opts.details ) {
-            opts.details.error( "Failed to cache: {}, stack is: {}{}", log.em( err ),
-                "\n", log.s( err.stack ) );
+            opts.details.error( "Failed to cache: {err}, stack is:{}{stack}",
+                err, "\n", err.stack );
         }
     }
     return strError; // null on success
@@ -1051,8 +1045,8 @@ export async function ensureHaveWorker( opts ) {
                 break;
             }
             gClient.errorLogicalInit = joMessage.error;
-            opts.details.critical( "SNB worker thread reported/returned init error: {}",
-                log.em( owaspUtils.extractErrorMessage( joMessage.error ) ) );
+            opts.details.critical( "SNB worker thread reported/returned init error: {err}",
+                joMessage.error );
             break;
         case "periodicCachingDoNow":
             opts.details.debug( "Parallel periodic SNB caching result did arrived to {}",
@@ -1186,9 +1180,8 @@ async function inThreadPeriodicCachingStart( strChainNameConnectedTo, opts ) {
         await fnDoCachingNow();
         return true;
     } catch ( err ) {
-        log.error( "Failed to start in-thread periodic SNB refresh in {}, error is: {}" +
-            ", stack is: {}{}", threadInfo.threadDescription(),
-        log.em( owaspUtils.extractErrorMessage( err ) ), "\n", log.s( err.stack ) );
+        log.error( "Failed to start in-thread periodic SNB refresh in {}, error is: {err}" +
+            ", stack is:{}{stack}", threadInfo.threadDescription(), err, "\n", err.stack );
     }
     return false;
 }
@@ -1236,9 +1229,8 @@ async function parallelPeriodicCachingStart( strChainNameConnectedTo, opts ) {
             threadInfo.threadDescription(),opts.secondsToReDiscoverSkaleNetwork );
         return true;
     } catch ( err ) {
-        log.error( "Failed to start parallel periodic SNB refresh in {}, error is: {}" +
-            ", stack is: {}{}", threadInfo.threadDescription(),
-        log.em( owaspUtils.extractErrorMessage( err ) ), "\n", log.s( err.stack ) );
+        log.error( "Failed to start parallel periodic SNB refresh in {}, error is: {err}" +
+            ", stack is:{}{stack}", threadInfo.threadDescription(), err, "\n", err.stack );
     }
     return false;
 }
@@ -1275,9 +1267,8 @@ export async function periodicCachingStop() {
             refClient.dispose();
             await refWorker.terminate();
         } catch ( err ) {
-            log.error( "Failed to stop parallel periodic SNB refresh in {}, error is: {}, " +
-                "stack is: {}{}", threadInfo.threadDescription(),
-            log.em( owaspUtils.extractErrorMessage( err ) ), "\n", log.s( err.stack ) );
+            log.error( "Failed to stop parallel periodic SNB refresh in {}, error is: {err}, " +
+                "stack is:{}{stack}", threadInfo.threadDescription(), err, "\n", err.stack );
         }
     }
     if( gIntervalPeriodicCaching ) {
@@ -1286,9 +1277,8 @@ export async function periodicCachingStop() {
             clearInterval( gIntervalPeriodicCaching );
             gIntervalPeriodicCaching = null;
         } catch ( err ) {
-            log.error( "Failed to stop in-thread periodic SNB refresh in {}, error is: {}, " +
-                "stack is: {}{}", threadInfo.threadDescription(),
-            log.em( owaspUtils.extractErrorMessage( err ) ), "\n", log.s( err.stack ) );
+            log.error( "Failed to stop in-thread periodic SNB refresh in {}, error is: {err}, " +
+                "stack is:{}{stack}", threadInfo.threadDescription(), err, "\n", err.stack );
             gIntervalPeriodicCaching = null; // clear it anyway
         }
     }

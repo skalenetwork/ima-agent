@@ -79,43 +79,45 @@ export function checkTimeFraming( d, strDirection, joRuntimeOpts ) {
             }
         }
         log.debug( "\n",
-            "Unix UTC time stamp", "........", log.v( nUtcUnixTimeStamp ), "\n",
+            "Unix UTC time stamp", "........",
+            log.fmtInformation( "{}", nUtcUnixTimeStamp ), "\n",
             "All Chains Range", "...........", nSecondsRangeForAllSChains, "\n",
-            "S-Chain Range Mod", "..........", log.v( nMod ), "\n",
-            "Active Node Frame Index", "....", log.v( nActiveNodeFrameIndex ), "\n",
-            "Testing Frame Index", "........", log.v( imaState.nNodeNumber ), "\n",
-            "Transfer Direction", ".........", log.v( strDirection || "NA" ) );
+            "S-Chain Range Mod", "..........", log.fmtInformation( "{}", nMod ), "\n",
+            "Active Node Frame Index", "....",
+            log.fmtInformation( "{}", nActiveNodeFrameIndex ), "\n",
+            "Testing Frame Index", "........",
+            log.fmtInformation( "{}", imaState.nNodeNumber ), "\n",
+            "Transfer Direction", ".........", log.fmtInformation( "{}", strDirection || "NA" ) );
         if( nFrameShift > 0 ) {
             log.debug(
-                "Frame Shift", "................", log.v( nFrameShift ), "\n",
+                "Frame Shift", "................", log.fmtInformation( "{}", nFrameShift ), "\n",
                 "S2S known chain index", "......",
-                log.v( joRuntimeOpts.idxChainKnownForS2S ), "\n",
+                log.fmtInformation( "{}", joRuntimeOpts.idxChainKnownForS2S ), "\n",
                 "S2S known chains count", ".....",
-                log.v( joRuntimeOpts.cntChainsKnownForS2S ), "\n"
+                log.fmtInformation( "{}", joRuntimeOpts.cntChainsKnownForS2S ), "\n"
             );
             if( "joExtraSignOpts" in joRuntimeOpts &&
                 typeof joRuntimeOpts.joExtraSignOpts == "object" ) {
                 log.debug( "S-Chain source", ".............",
-                    log.v( joRuntimeOpts.joExtraSignOpts.chainNameSrc ),
-                    "/", log.v( joRuntimeOpts.joExtraSignOpts.chainIdSrc ) );
+                    log.fmtInformation( "{}", joRuntimeOpts.joExtraSignOpts.chainNameSrc ),
+                    "/", log.fmtInformation( "{}", joRuntimeOpts.joExtraSignOpts.chainIdSrc ) );
             } else {
                 log.debug( "S-Chain destination", "........",
-                    log.v( joRuntimeOpts.joExtraSignOpts.chainNameDst ),
-                    "/", log.v( joRuntimeOpts.joExtraSignOpts.chainIdDst ) );
+                    log.fmtInformation( "{}", joRuntimeOpts.joExtraSignOpts.chainNameDst ),
+                    "/", log.fmtInformation( "{}", joRuntimeOpts.joExtraSignOpts.chainIdDst ) );
             }
         }
         log.debug( "\n",
             "Is skip", "....................", log.yn( bSkip ), "\n",
             "Is inside gap", "..............", log.yn( bInsideGap ), "\n",
-            "Range Start", "................", log.v( nRangeStart ), "\n",
-            "Frame Start", "................", log.v( nFrameStart ), "\n",
-            "Gap Start", "..................", log.v( nGapStart ) );
+            "Range Start", "................", log.fmtInformation( "{}", nRangeStart ), "\n",
+            "Frame Start", "................", log.fmtInformation( "{}", nFrameStart ), "\n",
+            "Gap Start", "..................", log.fmtInformation( "{}", nGapStart ) );
         if( bSkip )
             return false;
     } catch ( err ) {
-        log.error( "Exception in time framing check in {}: {}, stack is: {}{}",
-            threadInfo.threadDescription(), log.em( owaspUtils.extractErrorMessage( err ) ),
-            "\n", log.s( err.stack ) );
+        log.error( "Exception in time framing check in {}: {err}, stack is:{}{stack}",
+            threadInfo.threadDescription(), err, "\n", err.stack );
     }
     return true;
 };
@@ -124,12 +126,12 @@ async function singleTransferLoopPartOracle( optsLoop, strLogPrefix ) {
     const imaState = state.get();
     let b0 = true;
     if( optsLoop.enableStepOracle && imaOracleOperations.getEnabledOracle() ) {
-        log.notice( "{}Will invoke Oracle gas price setup in {}...",
+        log.notice( "{p}Will invoke Oracle gas price setup in {}...",
             strLogPrefix, threadInfo.threadDescription() );
         try {
             if( ! await pwa.checkOnLoopStart( imaState, "oracle" ) ) {
                 imaState.loopState.oracle.wasInProgress = false;
-                log.notice( "{}Skipped(oracle) in {} due to cancel mode reported from PWA",
+                log.notice( "{p}Skipped(oracle) in {} due to cancel mode reported from PWA",
                     strLogPrefix, threadInfo.threadDescription() );
             } else {
                 if( checkTimeFraming( null, "oracle", optsLoop.joRuntimeOpts ) ) {
@@ -148,19 +150,18 @@ async function singleTransferLoopPartOracle( optsLoop, strLogPrefix ) {
                     imaState.loopState.oracle.isInProgress = false;
                     await pwa.notifyOnLoopEnd( imaState, "oracle" );
                 } else {
-                    log.notice( "{}Skipped(oracle) in {} due to time framing check",
+                    log.notice( "{p}Skipped(oracle) in {} due to time framing check",
                         strLogPrefix, threadInfo.threadDescription() );
                 }
             }
         } catch ( err ) {
-            log.error( "{}Oracle operation exception: {} in {}, stack is: {}{}",
-                strLogPrefix, log.em( owaspUtils.extractErrorMessage( err ) ),
-                threadInfo.threadDescription(), "\n", log.s( err.stack ) );
+            log.error( "{p}Oracle operation exception: {} in {err}, stack is:{}{stack}",
+                strLogPrefix, err, threadInfo.threadDescription(), "\n", err.stack );
             imaState.loopState.oracle.isInProgress = false;
             await pwa.notifyOnLoopEnd( imaState, "oracle" );
             throw err;
         }
-        log.information( "{}Oracle gas price setup done in {}: {}",
+        log.information( "{p}Oracle gas price setup done in {}: {}",
             strLogPrefix, threadInfo.threadDescription(), b0 );
     }
     return b0;
@@ -170,12 +171,12 @@ async function singleTransferLoopPartM2S( optsLoop, strLogPrefix ) {
     const imaState = state.get();
     let b1 = true;
     if( optsLoop.enableStepM2S ) {
-        log.notice( "{}Will invoke M2S transfer in {}...",
+        log.notice( "{p}Will invoke M2S transfer in {}...",
             strLogPrefix, threadInfo.threadDescription() );
         try {
             if( ! await pwa.checkOnLoopStart( imaState, "m2s" ) ) {
                 imaState.loopState.m2s.wasInProgress = false;
-                log.notice( "{}Skipped(m2s) in {} due to cancel mode reported from PWA",
+                log.notice( "{p}Skipped(m2s) in {} due to cancel mode reported from PWA",
                     strLogPrefix, threadInfo.threadDescription() );
             } else {
                 if( checkTimeFraming( null, "m2s", optsLoop.joRuntimeOpts ) ) {
@@ -216,22 +217,21 @@ async function singleTransferLoopPartM2S( optsLoop, strLogPrefix ) {
                     imaState.loopState.m2s.isInProgress = false;
                     await pwa.notifyOnLoopEnd( imaState, "m2s" );
                 } else {
-                    log.notice( "{}Skipped(m2s) in {} due to time framing check",
+                    log.notice( "{p}Skipped(m2s) in {} due to time framing check",
                         strLogPrefix, threadInfo.threadDescription() );
                 }
             }
         } catch ( err ) {
-            log.error( "{}M2S transfer exception in {}: {}, stack is: {}{}",
-                strLogPrefix, threadInfo.threadDescription(),
-                log.em( owaspUtils.extractErrorMessage( err ) ), "\n", log.s( err.stack ) );
+            log.error( "{p}M2S transfer exception in {}: {err}, stack is:{}{stack}",
+                strLogPrefix, threadInfo.threadDescription(), err, "\n", err.stack );
             imaState.loopState.m2s.isInProgress = false;
             await pwa.notifyOnLoopEnd( imaState, "m2s" );
             throw err;
         }
-        log.information( "{}M2S transfer done in {}: {}",
+        log.information( "{p}M2S transfer done in {}: {}",
             strLogPrefix, threadInfo.threadDescription(), b1 );
     } else
-        log.debug( "{}Skipped M2S transfer in {}.", strLogPrefix, threadInfo.threadDescription() );
+        log.debug( "{p}Skipped M2S transfer in {}.", strLogPrefix, threadInfo.threadDescription() );
 
     return b1;
 }
@@ -240,12 +240,12 @@ async function singleTransferLoopPartS2M( optsLoop, strLogPrefix ) {
     const imaState = state.get();
     let b2 = true;
     if( optsLoop.enableStepS2M ) {
-        log.notice( "{}Will invoke S2M transfer in {}...",
+        log.notice( "{p}Will invoke S2M transfer in {}...",
             strLogPrefix, threadInfo.threadDescription() );
         try {
             if( ! await pwa.checkOnLoopStart( imaState, "s2m" ) ) {
                 imaState.loopState.s2m.wasInProgress = false;
-                log.notice( "{}Skipped(s2m) in {} due to cancel mode reported from PWA",
+                log.notice( "{p}Skipped(s2m) in {} due to cancel mode reported from PWA",
                     strLogPrefix, threadInfo.threadDescription() );
             } else {
                 if( checkTimeFraming( null, "s2m", optsLoop.joRuntimeOpts ) ) {
@@ -286,22 +286,21 @@ async function singleTransferLoopPartS2M( optsLoop, strLogPrefix ) {
                     imaState.loopState.s2m.isInProgress = false;
                     await pwa.notifyOnLoopEnd( imaState, "s2m" );
                 } else {
-                    log.notice( "{}Skipped(s2m) in {} due to time framing check",
+                    log.notice( "{p}Skipped(s2m) in {} due to time framing check",
                         strLogPrefix, threadInfo.threadDescription() );
                 }
             }
         } catch ( err ) {
-            log.error( "{}S2M transfer exception in {}: , stack is: {}{}",
-                strLogPrefix, threadInfo.threadDescription(),
-                log.em( owaspUtils.extractErrorMessage( err ) ), "\n", log.s( err.stack ) );
+            log.error( "{p}S2M transfer exception in {err}: , stack is:{}{stack}",
+                strLogPrefix, threadInfo.threadDescription(), err, "\n", err.stack );
             imaState.loopState.s2m.isInProgress = false;
             await pwa.notifyOnLoopEnd( imaState, "s2m" );
             throw err;
         }
-        log.information( "{}S2M transfer done in {}: {}",
+        log.information( "{p}S2M transfer done in {}: {}",
             strLogPrefix, threadInfo.threadDescription(), b2 );
     } else {
-        log.debug( "{}Skipped S2M transfer in {}.",
+        log.debug( "{p}Skipped S2M transfer in {}.",
             strLogPrefix, threadInfo.threadDescription() );
     }
     return b2;
@@ -311,7 +310,7 @@ async function singleTransferLoopPartS2S( optsLoop, strLogPrefix ) {
     const imaState = state.get();
     let b3 = true;
     if( optsLoop.enableStepS2S && imaState.optsS2S.isEnabled ) {
-        log.notice( "{}Will invoke all S2S transfers...", strLogPrefix );
+        log.notice( "{p}Will invoke all S2S transfers...", strLogPrefix );
         try {
             b3 = await IMA.doAllS2S( // s-chain --> s-chain
                 optsLoop.joRuntimeOpts,
@@ -333,31 +332,29 @@ async function singleTransferLoopPartS2S( optsLoop, strLogPrefix ) {
                 imaState.chainProperties.sc.transactionCustomizer
             );
         } catch ( err ) {
-            log.error( "{}S2S transfer exception in {}: {}, stack is: {}{}",
-                strLogPrefix, threadInfo.threadDescription(),
-                log.em( owaspUtils.extractErrorMessage( err ) ), "\n", log.s( err.stack ) );
+            log.error( "{p}S2S transfer exception in {}: {err}, stack is:{}{stack}",
+                strLogPrefix, threadInfo.threadDescription(), err, "\n", err.stack );
             throw err;
         }
-        log.information( "{}All S2S transfers done in {}: {}",
+        log.information( "{p}All S2S transfers done in {}: {}",
             strLogPrefix, threadInfo.threadDescription(), b3 );
 
     } else
-        log.debug( "{}Skipped S2S transfer in {}.", strLogPrefix, threadInfo.threadDescription() );
+        log.debug( "{p}Skipped S2S transfer in {}.", strLogPrefix, threadInfo.threadDescription() );
 
     return b3;
 }
 
 function printLoopPartSkippedWarning( strLoopPartName ) {
-    log.warning( "{}Skipped {} transfer loop part due to other single transfer loop is in " +
+    log.warning( "{p}Skipped {} transfer loop part due to other single transfer loop is in " +
         "progress right now", strLogPrefix, strLoopPartName );
 }
 
 export async function singleTransferLoop( optsLoop ) {
     const imaState = state.get();
-    const strLogPrefix = log.fmtAttention( "Single Loop in ",
-        threadInfo.threadDescription(), ": " );
+    const strLogPrefix = log.fmtAttention( "Single Loop in {}: ", threadInfo.threadDescription() );
     try {
-        log.debug( strLogPrefix, imaHelperAPIs.longSeparator );
+        log.debug( "{p}{p}", strLogPrefix, imaHelperAPIs.longSeparator );
         let b0 = false, b1 = false, b2 = false, b3 = false;
         // Oracle loop part:
         if( optsLoop.enableStepOracle ) {
@@ -401,12 +398,12 @@ export async function singleTransferLoop( optsLoop ) {
             b3 = true;
         // Final status check loop part:
         const bResult = b0 && b1 && b2 && b3;
-        log.notice( "{}Final completion status for all performed transfer loop parts is {}",
+        log.notice( "{p}Final completion status for all performed transfer loop parts is {}",
             strLogPrefix, bResult );
         return bResult;
     } catch ( err ) {
-        log.error( "{}Exception in transfer loop: {}, stack is: {}{}", strLogPrefix,
-            log.em( owaspUtils.extractErrorMessage( err ) ), "\n", log.s( err.stack ) );
+        log.error( "{p}Exception in transfer loop: {err}, stack is:{}{stack}", strLogPrefix,
+            err, "\n", err.stack );
     }
     imaState.loopState.oracle.isInProgress = false;
     imaState.loopState.m2s.isInProgress = false;
@@ -452,11 +449,9 @@ export function notifyCacheChangedSNB( arrSChainsCached ) {
             "method": "schainsCached",
             "message": { "arrSChainsCached": arrSChainsCached }
         };
-        log.debug( "S-Chains cache will be sent to ",
-            log.v( gArrClients[idxWorker].url ), " loop worker..." );
+        log.debug( "S-Chains cache will be sent to {} loop worker...", gArrClients[idxWorker].url );
         gArrClients[idxWorker].send( jo );
-        log.debug( "S-Chains cache did sent to ",
-            log.v( gArrClients[idxWorker].url ), " loop worker" );
+        log.debug( "S-Chains cache did sent to {} loop worker", gArrClients[idxWorker].url );
     }
     log.debug( "Loop module did finished broadcasting arrSChainsCached event " +
         "to its {} worker(s) in {}...", cntWorkers, threadInfo.threadDescription() );
@@ -607,8 +602,8 @@ export async function ensureHaveWorkers( opts ) {
                     break;
                 }
                 aClient.errorLogicalInit = joMessage.error;
-                opts.details.critical( " Loop worker thread {} reported/returned init error: {}",
-                    idxWorker, log.em( owaspUtils.extractErrorMessage( joMessage.error ) ) );
+                opts.details.critical( " Loop worker thread {} reported/returned init error: {err}",
+                    idxWorker, joMessage.error );
                 break;
             case "log":
                 log.information( "LOOP WORKER {} {}", workerData.url, joMessage.message );

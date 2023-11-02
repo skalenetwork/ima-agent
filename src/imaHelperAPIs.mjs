@@ -72,7 +72,7 @@ export async function safeWaitForNextBlockToAppear( details, ethersProvider ) {
         await sleep( 1000 );
         const nBlockNumber2 =
             owaspUtils.toBN( await safeGetBlockNumber( details, 10, ethersProvider ) );
-        details.trace( "    ...have block ", log.v( nBlockNumber2.toHexString() ) );
+        details.trace( "    ...have block {}", nBlockNumber2.toHexString() );
         if( nBlockNumber2.gt( nBlockNumber ) )
             break;
     }
@@ -98,9 +98,8 @@ export async function safeGetBlockNumber(
         return ret;
     } catch ( err ) {
         ret = retValOnFail;
-        details.error( "Failed call attempt {} to {} via {}, error is: {}, stack is: [][]",
-            idxAttempt, strFnName + "()", log.u( u ),
-            log.em( owaspUtils.extractErrorMessage( err ) ), "\n", log.s( err.stack ) );
+        details.error( "Failed call attempt {} to {} via {url}, error is: {err}, stack is: [][]",
+            idxAttempt, strFnName + "()", u, err, "\n", err.stack );
     }
     ++ idxAttempt;
     while( ret === "" && idxAttempt <= cntAttempts ) {
@@ -109,27 +108,25 @@ export async function safeGetBlockNumber(
             ret = retValOnFail;
             if( ! throwIfServerOffline )
                 return ret;
-            details.error( "Cannot call {} via {} because server is off-line",
-                strFnName + "()", log.u( u ) );
+            details.error( "Cannot call {} via {url} because server is off-line",
+                strFnName + "()", u );
             throw new Error( "Cannot " + strFnName + "() via " + u.toString() +
                 " because server is off-line" );
         }
-        details.trace( "Repeat call to {} via {}, attempt {}",
-            strFnName + "()", log.u( u ), idxAttempt );
+        details.trace( "Repeat call to {} via {url}, attempt {}", strFnName + "()", u, idxAttempt );
         try {
             ret = await ethersProvider[strFnName]();
             return ret;
         } catch ( err ) {
             ret = retValOnFail;
-            details.error( "Failed call attempt {} to  via {}, error is: {}, stack is: {}{}",
-                idxAttempt, strFnName + "()", log.u( u ),
-                log.em( owaspUtils.extractErrorMessage( err ) ), "\n", log.s( err.stack ) );
+            details.error( "Failed call attempt {} to  via {url}, error is: {err}, " +
+                "stack is:{}{stack}", idxAttempt, strFnName + "()", u, err, "\n", err.stack );
         }
         ++ idxAttempt;
     }
     if( ( idxAttempt + 1 ) > cntAttempts && ret === "" ) {
-        details.error( "Failed call to {} via {} after {} attempts ",
-            strFnName + "()", log.u( u ), cntAttempts );
+        details.error( "Failed call to {} via {url} after {} attempts ",
+            strFnName + "()", u, cntAttempts );
         throw new Error( "Failed call to " + strFnName + "() via " + u.toString() + " after " +
             cntAttempts + " attempts" );
     }

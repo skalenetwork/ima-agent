@@ -56,8 +56,8 @@ export async function getBalanceErc20(
         return balance;
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
-        log.error( "{}ERC20 balance fetching error: {}, stack is:{}{}",
-            strLogPrefix, log.em( strError ), "\n", log.s( err.stack ) );
+        log.error( "{p}ERC20 balance fetching error: {err}, stack is:{}{stack}",
+            strLogPrefix, strError, "\n", err.stack );
     }
     return "<no-data-or-error>";
 }
@@ -89,8 +89,8 @@ export async function getOwnerOfErc721(
         return owner;
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
-        log.error( "{}ERC721 owner fetching error: {}, stack is:{}{}",
-            strLogPrefix, log.em( strError ), "\n", log.s( err.stack ) );
+        log.error( "{p}ERC721 owner fetching error: {err}, stack is:{}{stack}",
+            strLogPrefix, strError, "\n", err.stack );
     }
     return "<no-data-or-error>";
 }
@@ -123,8 +123,8 @@ export async function getBalanceErc1155(
         return balance;
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
-        log.error( "{}ERC1155 balance fetching error: {}, stack is:{}{}",
-            strLogPrefix, log.em( strError ), "\n", log.s( err.stack ) );
+        log.error( "{p}ERC1155 balance fetching error: {err}, stack is:{}{stack}",
+            strLogPrefix, strError, "\n", err.stack );
     }
     return "<no-data-or-error>";
 }
@@ -176,14 +176,14 @@ export async function doErc721PaymentFromMainNet(
         const weiHowMuchApprove = undefined;
         let gasPrice = await transactionCustomizerMainNet.computeGasPrice(
             ethersProviderMainNet, 200000000000 );
-        details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
+        details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const estimatedGasApprove =
             await transactionCustomizerMainNet.computeGas(
                 details, ethersProviderMainNet,
                 "ERC721", contractERC721, "approve", arrArgumentsApprove,
                 joAccountSrc, strActionName,
                 gasPrice, 8000000, weiHowMuchApprove, null );
-        details.trace( "{}Using estimated(approve) gas={}", strLogPrefix, estimatedGasApprove );
+        details.trace( "{p}Using estimated(approve) gas={}", strLogPrefix, estimatedGasApprove );
         const isIgnoreApprove = false;
         const strErrorOfDryRunApprove =
             await imaTx.dryRunCall(
@@ -211,7 +211,7 @@ export async function doErc721PaymentFromMainNet(
         const weiHowMuchDepositERC721 = undefined;
         gasPrice = await transactionCustomizerMainNet.computeGasPrice(
             ethersProviderMainNet, 200000000000 );
-        details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
+        details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const estimatedGasDeposit =
             await transactionCustomizerMainNet.computeGas(
                 details, ethersProviderMainNet,
@@ -219,7 +219,7 @@ export async function doErc721PaymentFromMainNet(
                 "depositERC721", arrArgumentsDepositERC721,
                 joAccountSrc, strActionName,
                 gasPrice, 8000000, weiHowMuchDepositERC721, null );
-        details.trace( "{}Using estimated(deposit) gas={}", strLogPrefix, estimatedGasDeposit );
+        details.trace( "{p}Using estimated(deposit) gas={}", strLogPrefix, estimatedGasDeposit );
         const isIgnoreDepositERC721 = true;
         const strErrorOfDryRunDepositERC721 =
             await imaTx.dryRunCall(
@@ -248,7 +248,7 @@ export async function doErc721PaymentFromMainNet(
         // Must-have event(s) analysis as indicator(s) of success
         const strEventName = "OutgoingMessage";
         if( joMessageProxyMainNet ) {
-            details.debug( "{}Verifying the {} event of the MessageProxy/{} contract...",
+            details.debug( "{p}Verifying the {} event of the MessageProxy/{} contract...",
                 strLogPrefix, strEventName, joMessageProxyMainNet.address );
             await imaHelperAPIs.sleep(
                 imaHelperAPIs.getMillisecondsSleepBeforeFetchOutgoingMessageEvent() );
@@ -259,7 +259,7 @@ export async function doErc721PaymentFromMainNet(
                 joMessageProxyMainNet.filters[strEventName]()
             );
             if( joEvents.length > 0 ) {
-                details.success( "{}Success, verified the {} event of the MessageProxy/{}" +
+                details.success( "{p}Success, verified the {} event of the MessageProxy/{}" +
                     " contract, found event(s): {}", strLogPrefix, strEventName,
                 joMessageProxyMainNet.address, joEvents );
             } else {
@@ -271,11 +271,11 @@ export async function doErc721PaymentFromMainNet(
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != details.id ) {
-            log.critical( "{}Payment error in {}: {}, stack is: {}{}",
-                strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
+            log.critical( "{p}Payment error in {}: {err}, stack is:{}{stack}",
+                strLogPrefix, strActionName, strError, "\n", err.stack );
         }
-        details.critical( "{}Payment error in {}: {}, stack is: {}{}",
-            strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
+        details.critical( "{p}Payment error in {}: {err}, stack is:{}{stack}",
+            strLogPrefix, strActionName, strError, "\n", err.stack );
         details.exposeDetailsTo( log, "doErc721PaymentFromMainNet", false );
         details.close();
         return false;
@@ -335,14 +335,14 @@ export async function doErc20PaymentFromMainNet(
         const weiHowMuchApprove = undefined;
         let gasPrice = await transactionCustomizerMainNet.computeGasPrice(
             ethersProviderMainNet, 200000000000 );
-        details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
+        details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const estimatedGasApprove =
             await transactionCustomizerMainNet.computeGas(
                 details, ethersProviderMainNet,
                 "ERC20", contractERC20, "approve", arrArgumentsApprove,
                 joAccountSrc, strActionName,
                 gasPrice, 8000000, weiHowMuchApprove, null );
-        details.trace( "{}Using estimated(approve) gas={}", strLogPrefix, estimatedGasApprove );
+        details.trace( "{p}Using estimated(approve) gas={}", strLogPrefix, estimatedGasApprove );
         const isIgnoreApprove = false;
         const strErrorOfDryRunApprove =
             await imaTx.dryRunCall(
@@ -370,7 +370,7 @@ export async function doErc20PaymentFromMainNet(
         const weiHowMuchDepositERC20 = undefined;
         gasPrice = await transactionCustomizerMainNet.computeGasPrice(
             ethersProviderMainNet, 200000000000 );
-        details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
+        details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const estimatedGasDeposit =
             await transactionCustomizerMainNet.computeGas(
                 details, ethersProviderMainNet,
@@ -378,7 +378,7 @@ export async function doErc20PaymentFromMainNet(
                 "depositERC20", arrArgumentsDepositERC20,
                 joAccountSrc, strActionName,
                 gasPrice, 8000000, weiHowMuchDepositERC20, null );
-        details.trace( "{}Using estimated(deposit) gas={}", strLogPrefix, estimatedGasDeposit );
+        details.trace( "{p}Using estimated(deposit) gas={}", strLogPrefix, estimatedGasDeposit );
         const isIgnoreDepositERC20 = true;
         const strErrorOfDryRunDepositERC20 =
             await imaTx.dryRunCall(
@@ -407,7 +407,7 @@ export async function doErc20PaymentFromMainNet(
         // Must-have event(s) analysis as indicator(s) of success
         const strEventName = "OutgoingMessage";
         if( joMessageProxyMainNet ) {
-            details.debug( "{}Verifying the {} event of the MessageProxy/{} contract...",
+            details.debug( "{p}Verifying the {} event of the MessageProxy/{} contract...",
                 strLogPrefix, strEventName, joMessageProxyMainNet.address );
             await imaHelperAPIs.sleep(
                 imaHelperAPIs.getMillisecondsSleepBeforeFetchOutgoingMessageEvent() );
@@ -418,7 +418,7 @@ export async function doErc20PaymentFromMainNet(
                 joMessageProxyMainNet.filters[strEventName]()
             );
             if( joEvents.length > 0 ) {
-                details.success( "{}Success, verified the {} event of the MessageProxy/{}" +
+                details.success( "{p}Success, verified the {} event of the MessageProxy/{}" +
                     " contract, found event(s): {}", strLogPrefix, strEventName,
                 joMessageProxyMainNet.address, joEvents );
             } else {
@@ -430,11 +430,11 @@ export async function doErc20PaymentFromMainNet(
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != details.id ) {
-            log.critical( "{}Payment error in {}: {}, stack is: {}{}",
-                strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
+            log.critical( "{p}Payment error in {}: {err}, stack is:{}{stack}",
+                strLogPrefix, strActionName, strError, "\n", err.stack );
         }
-        details.critical( "{}Payment error in {}: {}, stack is: {}{}",
-            strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
+        details.critical( "{p}Payment error in {}: {err}, stack is:{}{stack}",
+            strLogPrefix, strActionName, strError, "\n", err.stack );
         details.exposeDetailsTo( log, "doErc20PaymentFromMainNet", false );
         details.close();
         return false;
@@ -493,13 +493,13 @@ export async function doErc1155PaymentFromMainNet(
         const weiHowMuchApprove = undefined;
         let gasPrice = await transactionCustomizerMainNet.computeGasPrice(
             ethersProviderMainNet, 200000000000 );
-        details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
+        details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const estimatedGasApprove =
             await transactionCustomizerMainNet.computeGas(
                 details, ethersProviderMainNet,
                 "ERC1155", contractERC1155, "setApprovalForAll", arrArgumentsApprove,
                 joAccountSrc, strActionName, gasPrice, 8000000, weiHowMuchApprove, null );
-        details.trace( "{}Using estimated(approve) gas={}", strLogPrefix, estimatedGasApprove );
+        details.trace( "{p}Using estimated(approve) gas={}", strLogPrefix, estimatedGasApprove );
         const isIgnoreApprove = false;
         const strErrorOfDryRunApprove =
             await imaTx.dryRunCall(
@@ -525,7 +525,7 @@ export async function doErc1155PaymentFromMainNet(
         const weiHowMuchDepositERC1155 = undefined;
         gasPrice = await transactionCustomizerMainNet.computeGasPrice(
             ethersProviderMainNet, 200000000000 );
-        details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
+        details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const estimatedGasDeposit =
             await transactionCustomizerMainNet.computeGas(
                 details, ethersProviderMainNet,
@@ -533,7 +533,7 @@ export async function doErc1155PaymentFromMainNet(
                 "depositERC1155", arrArgumentsDepositERC1155,
                 joAccountSrc, strActionName,
                 gasPrice, 8000000, weiHowMuchDepositERC1155, null );
-        details.trace( "{}Using estimated(deposit) gas={}", strLogPrefix, estimatedGasDeposit );
+        details.trace( "{p}Using estimated(deposit) gas={}", strLogPrefix, estimatedGasDeposit );
         const isIgnoreDepositERC1155 = true;
         const strErrorOfDryRunDepositERC1155 =
             await imaTx.dryRunCall(
@@ -560,7 +560,7 @@ export async function doErc1155PaymentFromMainNet(
         // Must-have event(s) analysis as indicator(s) of success
         const strEventName = "OutgoingMessage";
         if( joMessageProxyMainNet ) {
-            details.trace( "{}Verifying the {} event of the MessageProxy/{} contract...",
+            details.trace( "{p}Verifying the {} event of the MessageProxy/{} contract...",
                 strLogPrefix, strEventName, joMessageProxyMainNet.address );
             await imaHelperAPIs.sleep(
                 imaHelperAPIs.getMillisecondsSleepBeforeFetchOutgoingMessageEvent() );
@@ -571,7 +571,7 @@ export async function doErc1155PaymentFromMainNet(
                 joMessageProxyMainNet.filters[strEventName]()
             );
             if( joEvents.length > 0 ) {
-                details.success( "{}Success, verified the {} event of the MessageProxy/{}" +
+                details.success( "{p}Success, verified the {} event of the MessageProxy/{}" +
                     " contract, found event(s): ",
                 strLogPrefix, strEventName, joMessageProxyMainNet.address, joEvents );
             } else {
@@ -584,11 +584,11 @@ export async function doErc1155PaymentFromMainNet(
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != details.id ) {
-            log.critical( "{}Payment error in {}: {}, stack is: {}{}",
-                strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
+            log.critical( "{p}Payment error in {}: {err}, stack is:{}{stack}",
+                strLogPrefix, strActionName, strError, "\n", err.stack );
         }
-        details.critical( "{}Payment error in {}: {}, stack is: {}{}",
-            strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
+        details.critical( "{p}Payment error in {}: {err}, stack is:{}{stack}",
+            strLogPrefix, strActionName, strError, "\n", err.stack );
         details.exposeDetailsTo( log, "doErc1155PaymentFromMainNet", false );
         details.close();
         return false;
@@ -643,13 +643,13 @@ export async function doErc1155BatchPaymentFromMainNet(
         const weiHowMuchApprove = undefined;
         let gasPrice = await transactionCustomizerMainNet.computeGasPrice(
             ethersProviderMainNet, 200000000000 );
-        details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
+        details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const estimatedGasApprove =
             await transactionCustomizerMainNet.computeGas(
                 details, ethersProviderMainNet,
                 "ERC1155", contractERC1155, "setApprovalForAll", arrArgumentsApprove,
                 joAccountSrc, strActionName, gasPrice, 8000000, weiHowMuchApprove, null );
-        details.trace( "{}Using estimated(approve) gas={}", strLogPrefix, estimatedGasApprove );
+        details.trace( "{p}Using estimated(approve) gas={}", strLogPrefix, estimatedGasApprove );
         const isIgnoreApprove = false;
         const strErrorOfDryRunApprove =
             await imaTx.dryRunCall(
@@ -675,7 +675,7 @@ export async function doErc1155BatchPaymentFromMainNet(
         const weiHowMuchDepositERC1155Batch = undefined;
         gasPrice = await transactionCustomizerMainNet.computeGasPrice(
             ethersProviderMainNet, 200000000000 );
-        details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
+        details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const estimatedGasDeposit =
             await transactionCustomizerMainNet.computeGas(
                 details, ethersProviderMainNet,
@@ -683,7 +683,7 @@ export async function doErc1155BatchPaymentFromMainNet(
                 "depositERC1155Batch", arrArgumentsDepositERC1155Batch,
                 joAccountSrc, strActionName,
                 gasPrice, 8000000, weiHowMuchDepositERC1155Batch, null );
-        details.trace( "{}Using estimated(deposit) gas={}", strLogPrefix, estimatedGasDeposit );
+        details.trace( "{p}Using estimated(deposit) gas={}", strLogPrefix, estimatedGasDeposit );
         const isIgnoreDepositERC1155Batch = true;
         const strErrorOfDryRunDepositERC1155Batch =
             await imaTx.dryRunCall(
@@ -710,7 +710,7 @@ export async function doErc1155BatchPaymentFromMainNet(
         // Must-have event(s) analysis as indicator(s) of success
         const strEventName = "OutgoingMessage";
         if( joMessageProxyMainNet ) {
-            details.debug( "{}Verifying the {} event of the MessageProxy/{} contract...",
+            details.debug( "{p}Verifying the {} event of the MessageProxy/{} contract...",
                 strLogPrefix, strEventName, joMessageProxyMainNet.address );
             await imaHelperAPIs.sleep(
                 imaHelperAPIs.getMillisecondsSleepBeforeFetchOutgoingMessageEvent() );
@@ -721,7 +721,7 @@ export async function doErc1155BatchPaymentFromMainNet(
                 joMessageProxyMainNet.filters[strEventName]()
             );
             if( joEvents.length > 0 ) {
-                details.success( "{}Success, verified the {} event of the MessageProxy/{}" +
+                details.success( "{p}Success, verified the {} event of the MessageProxy/{}" +
                     " contract, found event(s): {}",
                 strLogPrefix, strEventName, joMessageProxyMainNet.address, joEvents );
             } else {
@@ -733,11 +733,11 @@ export async function doErc1155BatchPaymentFromMainNet(
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != details.id ) {
-            log.critical( "{}Payment error in {}: {}, stack is: {}{}",
-                strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
+            log.critical( "{p}Payment error in {}: {err}, stack is:{}{stack}",
+                strLogPrefix, strActionName, strError, "\n", err.stack );
         }
-        details.critical( "{}Payment error in {}: {}, stack is: {}{}",
-            strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
+        details.critical( "{p}Payment error in {}: {err}, stack is:{}{stack}",
+            strLogPrefix, strActionName, strError, "\n", err.stack );
         details.exposeDetailsTo( log, "doErc1155BatchPaymentFromMainNet", false );
         details.close();
         return false;
@@ -792,14 +792,14 @@ export async function doErc20PaymentFromSChain(
         const weiHowMuchApprove = undefined;
         let gasPrice = await transactionCustomizerSChain.computeGasPrice(
             ethersProviderSChain, 200000000000 );
-        details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
+        details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const estimatedGasApprove =
             await transactionCustomizerSChain.computeGas(
                 details, ethersProviderSChain,
                 "ERC20", contractERC20, "approve", arrArgumentsApprove,
                 joAccountSrc, strActionName,
                 gasPrice, 8000000, weiHowMuchApprove, null );
-        details.trace( "{}Using estimated(approve) gas={}", strLogPrefix, estimatedGasApprove );
+        details.trace( "{p}Using estimated(approve) gas={}", strLogPrefix, estimatedGasApprove );
         const isIgnoreApprove = false;
         const strErrorOfDryRunApprove =
             await imaTx.dryRunCall(
@@ -837,11 +837,11 @@ export async function doErc20PaymentFromSChain(
             "exitToMainERC20", arrArgumentsExitToMainERC20,
             joAccountSrc, strActionName,
             gasPrice, 8000000, weiHowMuchExitToMainERC20, null );
-        details.trace( "{}Using estimated(approve) gas={}",
+        details.trace( "{p}Using estimated(approve) gas={}",
             strLogPrefix, estimatedGasExitToMainERC20 );
         gasPrice = await transactionCustomizerSChain.computeGasPrice(
             ethersProviderSChain, 200000000000 );
-        details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
+        details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const isIgnoreExitToMainERC20 = true;
         const strErrorOfDryRunExitToMainERC20 = await imaTx.dryRunCall(
             details, ethersProviderSChain,
@@ -867,7 +867,7 @@ export async function doErc20PaymentFromSChain(
         // Must-have event(s) analysis as indicator(s) of success
         const strEventName = "OutgoingMessage";
         if( joMessageProxySChain ) {
-            details.debug( "{}Verifying the {} event of the MessageProxy/{} contract...",
+            details.debug( "{p}Verifying the {} event of the MessageProxy/{} contract...",
                 strLogPrefix, strEventName, joMessageProxySChain.address );
             await imaHelperAPIs.sleep(
                 imaHelperAPIs.getMillisecondsSleepBeforeFetchOutgoingMessageEvent() );
@@ -877,7 +877,7 @@ export async function doErc20PaymentFromSChain(
                 joReceiptExitToMainERC20.blockNumber, joReceiptExitToMainERC20.transactionHash,
                 joMessageProxySChain.filters[strEventName]() );
             if( joEvents.length > 0 ) {
-                details.success( "{}Success, verified the {} event of the MessageProxy/{}" +
+                details.success( "{p}Success, verified the {} event of the MessageProxy/{}" +
                     " contract, found event(s): {}",
                 strLogPrefix, strEventName, joMessageProxySChain.address, joEvents );
             } else {
@@ -890,11 +890,11 @@ export async function doErc20PaymentFromSChain(
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != details.id ) {
-            log.critical( "{}Payment error in {}: {}, stack is: {}{}",
-                strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
+            log.critical( "{p}Payment error in {}: {err}, stack is:{}{stack}",
+                strLogPrefix, strActionName, strError, "\n", err.stack );
         }
-        details.critical( "{}Payment error in {}: {}, stack is: {}{}",
-            strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
+        details.critical( "{p}Payment error in {}: {err}, stack is:{}{stack}",
+            strLogPrefix, strActionName, strError, "\n", err.stack );
         details.exposeDetailsTo( log, "doErc20PaymentFromSChain", false );
         details.close();
         return false;
@@ -950,14 +950,14 @@ export async function doErc721PaymentFromSChain(
         const weiHowMuchApprove = undefined;
         let gasPrice = await transactionCustomizerSChain.computeGasPrice(
             ethersProviderSChain, 200000000000 );
-        details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
+        details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const estimatedGasApprove =
             await transactionCustomizerSChain.computeGas(
                 details, ethersProviderSChain,
                 "ERC721", contractERC721, "approve", arrArgumentsApprove,
                 joAccountSrc, strActionName,
                 gasPrice, 8000000, weiHowMuchApprove, null );
-        details.trace( "{}Using estimated(transfer from) gas={}",
+        details.trace( "{p}Using estimated(transfer from) gas={}",
             strLogPrefix, estimatedGasApprove );
         const isIgnoreApprove = false;
         const strErrorOfDryRunApprove =
@@ -992,14 +992,14 @@ export async function doErc721PaymentFromSChain(
         const weiHowMuchExitToMainERC721 = undefined;
         gasPrice = await transactionCustomizerSChain.computeGasPrice(
             ethersProviderSChain, 200000000000 );
-        details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
+        details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const estimatedGasExitToMainERC721 = await transactionCustomizerSChain.computeGas(
             details, ethersProviderSChain,
             "TokenManagerERC721", joTokenManagerERC721,
             "exitToMainERC721", arrArgumentsExitToMainERC721,
             joAccountSrc, strActionName,
             gasPrice, 8000000, weiHowMuchExitToMainERC721, null );
-        details.trace( "{}Using estimated(exit to main) gas={}",
+        details.trace( "{p}Using estimated(exit to main) gas={}",
             strLogPrefix, estimatedGasExitToMainERC721 );
         const isIgnoreExitToMainERC721 = true;
         const strErrorOfDryRunExitToMainERC721 = await imaTx.dryRunCall(
@@ -1026,7 +1026,7 @@ export async function doErc721PaymentFromSChain(
         // Must-have event(s) analysis as indicator(s) of success
         const strEventName = "OutgoingMessage";
         if( joMessageProxySChain ) {
-            details.debug( "{}Verifying the {} event of the MessageProxy/{} contract...",
+            details.debug( "{p}Verifying the {} event of the MessageProxy/{} contract...",
                 strLogPrefix, strEventName,joMessageProxySChain.address );
             await imaHelperAPIs.sleep(
                 imaHelperAPIs.getMillisecondsSleepBeforeFetchOutgoingMessageEvent() );
@@ -1037,7 +1037,7 @@ export async function doErc721PaymentFromSChain(
                 joReceiptExitToMainERC721.transactionHash,
                 joMessageProxySChain.filters[strEventName]() );
             if( joEvents.length > 0 ) {
-                details.success( "{}Success, verified the {} event of the MessageProxy/{}" +
+                details.success( "{p}Success, verified the {} event of the MessageProxy/{}" +
                     " contract, found event(s): {}",
                 strLogPrefix, strEventName, joMessageProxySChain.address, joEvents );
             } else {
@@ -1049,11 +1049,11 @@ export async function doErc721PaymentFromSChain(
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != details.id ) {
-            log.critical( "{}Payment error in {}: {}, stack is: {}{}",
-                strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
+            log.critical( "{p}Payment error in {}: {err}, stack is:{}{stack}",
+                strLogPrefix, strActionName, strError, "\n", err.stack );
         }
-        details.critical( "{}Payment error in {}: {}, stack is: {}{}",
-            strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
+        details.critical( "{p}Payment error in {}: {err}, stack is:{}{stack}",
+            strLogPrefix, strActionName, strError, "\n", err.stack );
         details.exposeDetailsTo( log, "doErc721PaymentFromSChain", false );
         details.close();
         return false;
@@ -1112,13 +1112,13 @@ export async function doErc1155PaymentFromSChain(
         const weiHowMuchApprove = undefined;
         let gasPrice = await transactionCustomizerSChain.computeGasPrice(
             ethersProviderSChain, 200000000000 );
-        details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
+        details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const estimatedGasApprove =
             await transactionCustomizerSChain.computeGas(
                 details, ethersProviderSChain,
                 "ERC1155", contractERC1155, "setApprovalForAll", arrArgumentsApprove,
                 joAccountSrc, strActionName, gasPrice, 8000000, weiHowMuchApprove, null );
-        details.trace( "{}Using estimated(transfer from) gas={}",
+        details.trace( "{p}Using estimated(transfer from) gas={}",
             strLogPrefix, estimatedGasApprove );
         const isIgnoreApprove = false;
         const strErrorOfDryRunApprove =
@@ -1153,13 +1153,13 @@ export async function doErc1155PaymentFromSChain(
         const weiHowMuchExitToMainERC1155 = undefined;
         gasPrice = await transactionCustomizerSChain.computeGasPrice(
             ethersProviderSChain, 200000000000 );
-        details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
+        details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const estimatedGasExitToMainERC1155 = await transactionCustomizerSChain.computeGas(
             details, ethersProviderSChain,
             "TokenManagerERC1155", joTokenManagerERC1155,
             "exitToMainERC1155", arrArgumentsExitToMainERC1155,
             joAccountSrc, strActionName, gasPrice, 8000000, weiHowMuchExitToMainERC1155, null );
-        details.trace( "{}Using estimated(exit to main) gas={}",
+        details.trace( "{p}Using estimated(exit to main) gas={}",
             strLogPrefix, estimatedGasExitToMainERC1155 );
         const isIgnoreExitToMainERC1155 = true;
         const strErrorOfDryRunExitToMainERC1155 = await imaTx.dryRunCall(
@@ -1186,7 +1186,7 @@ export async function doErc1155PaymentFromSChain(
         // Must-have event(s) analysis as indicator(s) of success
         const strEventName = "OutgoingMessage";
         if( joMessageProxySChain ) {
-            details.debug( "{}Verifying the {} event of the MessageProxy/{} contract...",
+            details.debug( "{p}Verifying the {} event of the MessageProxy/{} contract...",
                 strLogPrefix, strEventName, joMessageProxySChain.address );
             await imaHelperAPIs.sleep(
                 imaHelperAPIs.getMillisecondsSleepBeforeFetchOutgoingMessageEvent() );
@@ -1197,7 +1197,7 @@ export async function doErc1155PaymentFromSChain(
                 joReceiptExitToMainERC1155.transactionHash,
                 joMessageProxySChain.filters[strEventName]() );
             if( joEvents.length > 0 ) {
-                details.success( "{}Success, verified the {} event of the MessageProxy/{}" +
+                details.success( "{p}Success, verified the {} event of the MessageProxy/{}" +
                     " contract, found event(s): {}",
                 strLogPrefix, strEventName, joMessageProxySChain.address, joEvents );
             } else {
@@ -1210,11 +1210,11 @@ export async function doErc1155PaymentFromSChain(
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != details.id ) {
-            log.critical( "{}Payment error in {}: {}, stack is: {}{}",
-                strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
+            log.critical( "{p}Payment error in {}: {err}, stack is:{}{stack}",
+                strLogPrefix, strActionName, strError, "\n", err.stack );
         }
-        details.critical( "{}Payment error in {}: {}, stack is: {}{}",
-            strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
+        details.critical( "{p}Payment error in {}: {err}, stack is:{}{stack}",
+            strLogPrefix, strActionName, strError, "\n", err.stack );
         details.exposeDetailsTo( log, "doErc1155PaymentFromSChain", false );
         details.close();
         return false;
@@ -1272,13 +1272,13 @@ export async function doErc1155BatchPaymentFromSChain(
         const weiHowMuchApprove = undefined;
         let gasPrice = await transactionCustomizerSChain.computeGasPrice(
             ethersProviderSChain, 200000000000 );
-        details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
+        details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const estimatedGasApprove =
             await transactionCustomizerSChain.computeGas(
                 details, ethersProviderSChain,
                 "ERC1155", contractERC1155, "setApprovalForAll", arrArgumentsApprove,
                 joAccountSrc, strActionName, gasPrice, 8000000, weiHowMuchApprove, null );
-        details.trace( "{}Using estimated(transfer from) gas={}",
+        details.trace( "{p}Using estimated(transfer from) gas={}",
             strLogPrefix, estimatedGasApprove );
         const isIgnoreApprove = false;
         const strErrorOfDryRunApprove =
@@ -1314,14 +1314,14 @@ export async function doErc1155BatchPaymentFromSChain(
         const weiHowMuchExitToMainERC1155Batch = undefined;
         gasPrice = await transactionCustomizerSChain.computeGasPrice(
             ethersProviderSChain, 200000000000 );
-        details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
+        details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const estimatedGasExitToMainERC1155Batch = await transactionCustomizerSChain.computeGas(
             details, ethersProviderSChain,
             "TokenManagerERC1155", joTokenManagerERC1155,
             "exitToMainERC1155Batch", arrArgumentsExitToMainERC1155Batch,
             joAccountSrc, strActionName, gasPrice, 8000000,
             weiHowMuchExitToMainERC1155Batch, null );
-        details.trace( "{}Using estimated(exit to main) gas={}",
+        details.trace( "{p}Using estimated(exit to main) gas={}",
             strLogPrefix, estimatedGasExitToMainERC1155Batch );
         const isIgnoreExitToMainERC1155Batch = true;
         const strErrorOfDryRunExitToMainERC1155Batch = await imaTx.dryRunCall(
@@ -1350,7 +1350,7 @@ export async function doErc1155BatchPaymentFromSChain(
         // Must-have event(s) analysis as indicator(s) of success
         const strEventName = "OutgoingMessage";
         if( joMessageProxySChain ) {
-            details.debug( "{}Verifying the {} event of the MessageProxy/{} contract...",
+            details.debug( "{p}Verifying the {} event of the MessageProxy/{} contract...",
                 strLogPrefix, strEventName,joMessageProxySChain.address );
             await imaHelperAPIs.sleep(
                 imaHelperAPIs.getMillisecondsSleepBeforeFetchOutgoingMessageEvent() );
@@ -1361,7 +1361,7 @@ export async function doErc1155BatchPaymentFromSChain(
                 joReceiptExitToMainERC1155Batch.transactionHash,
                 joMessageProxySChain.filters[strEventName]() );
             if( joEvents.length > 0 ) {
-                details.success( "{}Success, verified the {} event of the MessageProxy/{}" +
+                details.success( "{p}Success, verified the {} event of the MessageProxy/{}" +
                     " contract, found event(s): {}",
                 strLogPrefix, strEventName, joMessageProxySChain.address, joEvents );
             } else {
@@ -1374,11 +1374,11 @@ export async function doErc1155BatchPaymentFromSChain(
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != details.id ) {
-            log.critical( "{}Payment error in {}: {}, stack is: {}{}",
-                strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
+            log.critical( "{p}Payment error in {}: {err}, stack is:{}{stack}",
+                strLogPrefix, strActionName, strError, "\n", err.stack );
         }
-        details.critical( "{}Payment error in {}: {}, stack is: {}{}",
-            strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
+        details.critical( "{p}Payment error in {}: {err}, stack is:{}{stack}",
+            strLogPrefix, strActionName, strError, "\n", err.stack );
         details.exposeDetailsTo( log, "doErc1155BatchPaymentFromSChain", false );
         details.close();
         return false;
@@ -1431,19 +1431,19 @@ export async function doErc20PaymentS2S(
             throw new Error( "No transaction customizer provided" );
         const ercSrcAbi20 = joSrcErc20[strCoinNameErc20Src + "_abi"];
         const ercSrcAddress20 = joSrcErc20[strCoinNameErc20Src + "_address"];
-        details.trace( "{}Token Manager ERC20 address on source chain....{}",
+        details.trace( "{p}Token Manager ERC20 address on source chain....{}",
             strLogPrefix, joTokenManagerERC20Src.address );
-        details.trace( "{}Source ERC20 coin name.........................{}",
+        details.trace( "{p}Source ERC20 coin name.........................{}",
             strLogPrefix, strCoinNameErc20Src );
-        details.trace( "{}Source ERC20 token address.....................{}",
+        details.trace( "{p}Source ERC20 token address.....................{}",
             strLogPrefix, ercSrcAddress20 );
         if( isReverse || ercDstAddress20 ) {
-            details.trace( "{}Destination ERC20 token address................{}",
+            details.trace( "{p}Destination ERC20 token address................{}",
                 strLogPrefix, ercDstAddress20 );
         }
-        details.trace( "{}Destination chain name.........................{}",
+        details.trace( "{p}Destination chain name.........................{}",
             strLogPrefix, strChainNameDst );
-        details.trace( "{}Amount of tokens to transfer...................{}",
+        details.trace( "{p}Amount of tokens to transfer...................{}",
             strLogPrefix, nAmountOfToken );
         strActionName = "ERC20 payment S2S, approve, " + ( isForward ? "forward" : "reverse" );
         const contractERC20 = new owaspUtils.ethersMod.ethers.Contract(
@@ -1459,12 +1459,12 @@ export async function doErc20PaymentS2S(
         ];
         const weiHowMuchApprove = undefined;
         let gasPrice = await tc.computeGasPrice( ethersProviderSrc, 200000000000 );
-        details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
+        details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const estimatedGasApprove = await tc.computeGas(
             details, ethersProviderSrc,
             "ERC20", contractERC20, "approve", arrArgumentsApprove,
             joAccountSrc, strActionName, gasPrice, 8000000, weiHowMuchApprove, null );
-        details.trace( "{}Using estimated(approve) gas={}", strLogPrefix, estimatedGasApprove );
+        details.trace( "{p}Using estimated(approve) gas={}", strLogPrefix, estimatedGasApprove );
         const isIgnoreApprove = false;
         const strErrorOfDryRunApprove = await imaTx.dryRunCall(
             details, ethersProviderSrc,
@@ -1488,14 +1488,14 @@ export async function doErc20PaymentS2S(
         strActionName = "ERC20 payment S2S, transferERC20 " + ( isForward ? "forward" : "reverse" );
         const weiHowMuchTransferERC20 = undefined;
         gasPrice = await tc.computeGasPrice( ethersProviderSrc, 200000000000 );
-        details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
+        details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const estimatedGasTransfer = await tc.computeGas(
             details, ethersProviderSrc,
             "TokenManagerERC20", joTokenManagerERC20Src,
             "transferToSchainERC20", arrArgumentsTransfer,
             joAccountSrc, strActionName, gasPrice,
             8000000, weiHowMuchTransferERC20, null );
-        details.trace( "{}Using estimated(transfer) gas={}", strLogPrefix, estimatedGasTransfer );
+        details.trace( "{p}Using estimated(transfer) gas={}", strLogPrefix, estimatedGasTransfer );
         const isIgnoreTransferERC20 = true;
         const strErrorOfDryRunTransferERC20 = await imaTx.dryRunCall(
             details, ethersProviderSrc,
@@ -1520,11 +1520,11 @@ export async function doErc20PaymentS2S(
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != details.id ) {
-            log.critical( "{}Payment error in {}: {}, stack is: {}{}",
-                strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
+            log.critical( "{p}Payment error in {}: {err}, stack is:{}{stack}",
+                strLogPrefix, strActionName, strError, "\n", err.stack );
         }
-        details.critical( "{}Payment error in {}: {}, stack is: {}{}",
-            strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
+        details.critical( "{p}Payment error in {}: {err}, stack is:{}{stack}",
+            strLogPrefix, strActionName, strError, "\n", err.stack );
         details.exposeDetailsTo(
             log, "doErc20PaymentS2S/" + ( isForward ? "forward" : "reverse" ), false );
         details.close();
@@ -1580,19 +1580,19 @@ export async function doErc721PaymentS2S(
             throw new Error( "No transaction customizer provided" );
         const ercSrcAbi721 = joSrcErc721[strCoinNameErc721Src + "_abi"];
         const ercSrcAddress721 = joSrcErc721[strCoinNameErc721Src + "_address"];
-        details.trace( "{}Token Manager ERC721 address on source chain....{}",
+        details.trace( "{p}Token Manager ERC721 address on source chain....{}",
             strLogPrefix, joTokenManagerERC721Src.address );
-        details.trace( "{}Source ERC721 coin name.........................{}",
+        details.trace( "{p}Source ERC721 coin name.........................{}",
             strLogPrefix, strCoinNameErc721Src );
-        details.trace( "{}Source ERC721 token address.....................{}",
+        details.trace( "{p}Source ERC721 token address.....................{}",
             strLogPrefix, ercSrcAddress721 );
         if( isReverse || ercDstAddress721 ) {
-            details.trace( "{}Destination ERC721 token address................{}",
+            details.trace( "{p}Destination ERC721 token address................{}",
                 strLogPrefix, ercDstAddress721 );
         }
-        details.trace( "{}Destination chain name.........................{}",
+        details.trace( "{p}Destination chain name.........................{}",
             strLogPrefix, strChainNameDst );
-        details.trace( "{}Token ID to transfer...........................{}",
+        details.trace( "{p}Token ID to transfer...........................{}",
             strLogPrefix, tokenId );
         strActionName = "ERC721 payment S2S, approve, " + ( isForward ? "forward" : "reverse" );
         const contractERC721 = new owaspUtils.ethersMod.ethers.Contract(
@@ -1608,12 +1608,12 @@ export async function doErc721PaymentS2S(
         ];
         const weiHowMuchApprove = undefined;
         let gasPrice = await tc.computeGasPrice( ethersProviderSrc, 200000000000 );
-        details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
+        details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const estimatedGasApprove = await tc.computeGas(
             details, ethersProviderSrc,
             "ERC721", contractERC721, "approve", arrArgumentsApprove,
             joAccountSrc, strActionName, gasPrice, 8000000, weiHowMuchApprove, null );
-        details.trace( "{}Using estimated(approve) gas={}", strLogPrefix, estimatedGasApprove );
+        details.trace( "{p}Using estimated(approve) gas={}", strLogPrefix, estimatedGasApprove );
         const isIgnoreApprove = false;
         const strErrorOfDryRunApprove = await imaTx.dryRunCall(
             details, ethersProviderSrc,
@@ -1639,14 +1639,14 @@ export async function doErc721PaymentS2S(
             "ERC721 payment S2S, transferERC721 " + ( isForward ? "forward" : "reverse" );
         const weiHowMuchTransferERC721 = undefined;
         gasPrice = await tc.computeGasPrice( ethersProviderSrc, 200000000000 );
-        details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
+        details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const estimatedGasTransfer = await tc.computeGas(
             details, ethersProviderSrc,
             "TokenManagerERC721", joTokenManagerERC721Src,
             "transferToSchainERC721", arrArgumentsTransfer,
             joAccountSrc, strActionName, isIgnoreTransferERC721,
             gasPrice, 8000000, weiHowMuchTransferERC721, null );
-        details.trace( "{}Using estimated(transfer) gas={}", strLogPrefix, estimatedGasTransfer );
+        details.trace( "{p}Using estimated(transfer) gas={}", strLogPrefix, estimatedGasTransfer );
         const strErrorOfDryRunTransferERC721 = await imaTx.dryRunCall(
             details, ethersProviderSrc,
             "TokenManagerERC721", joTokenManagerERC721Src,
@@ -1670,11 +1670,11 @@ export async function doErc721PaymentS2S(
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != details.id ) {
-            log.critical( "{}Payment error in {}: {}, stack is: {}{}",
-                strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
+            log.critical( "{p}Payment error in {}: {err}, stack is:{}{stack}",
+                strLogPrefix, strActionName, strError, "\n", err.stack );
         }
-        details.critical( "{}Payment error in {}: {}, stack is: {}{}",
-            strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
+        details.critical( "{p}Payment error in {}: {err}, stack is:{}{stack}",
+            strLogPrefix, strActionName, strError, "\n", err.stack );
         details.exposeDetailsTo(
             log,
             "doErc721PaymentS2S/" + ( isForward ? "forward" : "reverse" ), false );
@@ -1734,21 +1734,21 @@ export async function doErc1155PaymentS2S(
             throw new Error( "No transaction customizer provided" );
         const ercSrcAbi1155 = joSrcErc1155[strCoinNameErc1155Src + "_abi"];
         const ercSrcAddress1155 = joSrcErc1155[strCoinNameErc1155Src + "_address"];
-        details.trace( "{}Token Manager ERC1155 address on source chain....{}",
+        details.trace( "{p}Token Manager ERC1155 address on source chain....{}",
             strLogPrefix, joTokenManagerERC1155Src.address );
-        details.trace( "{}Source ERC1155 coin name.........................{}",
+        details.trace( "{p}Source ERC1155 coin name.........................{}",
             strLogPrefix, strCoinNameErc1155Src );
-        details.trace( "{}Source ERC1155 token address.....................{}",
+        details.trace( "{p}Source ERC1155 token address.....................{}",
             strLogPrefix, ercSrcAddress1155 );
         if( isReverse || ercDstAddress1155 ) {
-            details.trace( "{}Destination ERC1155 token address................{}",
+            details.trace( "{p}Destination ERC1155 token address................{}",
                 strLogPrefix, ercDstAddress1155 );
         }
-        details.trace( "{}Destination chain name.........................{}",
+        details.trace( "{p}Destination chain name.........................{}",
             strLogPrefix, strChainNameDst );
-        details.trace( "{}Token ID to transfer...........................{}",
+        details.trace( "{p}Token ID to transfer...........................{}",
             strLogPrefix, tokenId );
-        details.trace( "{}Amount of tokens to transfer...................{}",
+        details.trace( "{p}Amount of tokens to transfer...................{}",
             strLogPrefix, nAmountOfToken );
         strActionName = "ERC1155 payment S2S, approve, " + ( isForward ? "forward" : "reverse" );
         const contractERC1155 = new owaspUtils.ethersMod.ethers.Contract(
@@ -1765,12 +1765,12 @@ export async function doErc1155PaymentS2S(
         ];
         const weiHowMuchApprove = undefined;
         let gasPrice = await tc.computeGasPrice( ethersProviderSrc, 200000000000 );
-        details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
+        details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const estimatedGasApprove = await tc.computeGas(
             details, ethersProviderSrc,
             "ERC1155", contractERC1155, "setApprovalForAll", arrArgumentsApprove,
             joAccountSrc, strActionName, gasPrice, 8000000, weiHowMuchApprove, null );
-        details.trace( "P{Using estimated(approve) gas={}", strLogPrefix, estimatedGasApprove );
+        details.trace( "{p}Using estimated(approve) gas={}", strLogPrefix, estimatedGasApprove );
         const isIgnoreApprove = false;
         const strErrorOfDryRunApprove = await imaTx.dryRunCall(
             details, ethersProviderSrc,
@@ -1795,14 +1795,14 @@ export async function doErc1155PaymentS2S(
             "ERC1155 payment S2S, transferERC1155 " + ( isForward ? "forward" : "reverse" );
         const weiHowMuchTransferERC1155 = undefined;
         gasPrice = await tc.computeGasPrice( ethersProviderSrc, 200000000000 );
-        details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
+        details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const estimatedGasTransfer = await tc.computeGas(
             details, ethersProviderSrc,
             "TokenManagerERC1155", joTokenManagerERC1155Src,
             "transferToSchainERC1155", arrArgumentsTransfer,
             joAccountSrc, strActionName, gasPrice,
             8000000, weiHowMuchTransferERC1155, null );
-        details.trace( "{}Using estimated(transfer) gas={}", strLogPrefix, estimatedGasTransfer );
+        details.trace( "{p}Using estimated(transfer) gas={}", strLogPrefix, estimatedGasTransfer );
         const isIgnoreTransferERC1155 = true;
         const strErrorOfDryRunTransferERC1155 = await imaTx.dryRunCall(
             details, ethersProviderSrc,
@@ -1827,11 +1827,11 @@ export async function doErc1155PaymentS2S(
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != details.id ) {
-            log.critical( "{}Payment error in {}: {}, stack is: {}{}",
-                strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
+            log.critical( "{p}Payment error in {}: {err}, stack is:{}{stack}",
+                strLogPrefix, strActionName, strError, "\n", err.stack );
         }
-        details.critical( "{}Payment error in {}: {}, stack is: {}{}",
-            strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
+        details.critical( "{p}Payment error in {}: {err}, stack is:{}{stack}",
+            strLogPrefix, strActionName, strError, "\n", err.stack );
         details.exposeDetailsTo(
             log, "doErc1155PaymentS2S/" + ( isForward ? "forward" : "reverse" ), false );
         details.close();
@@ -1890,21 +1890,21 @@ export async function doErc1155BatchPaymentS2S(
             throw new Error( "No transaction customizer provided" );
         const ercSrcAbi1155 = joSrcErc1155[strCoinNameErc1155Src + "_abi"];
         const ercSrcAddress1155 = joSrcErc1155[strCoinNameErc1155Src + "_address"];
-        details.trace( "{}Token Manager ERC1155 address on source chain....{}",
+        details.trace( "{p}Token Manager ERC1155 address on source chain....{}",
             strLogPrefix, joTokenManagerERC1155Src.address );
-        details.trace( "{}Source ERC1155 coin name.........................{}",
+        details.trace( "{p}Source ERC1155 coin name.........................{}",
             strLogPrefix, strCoinNameErc1155Src );
-        details.trace( "{}Source ERC1155 token address.....................{}",
+        details.trace( "{p}Source ERC1155 token address.....................{}",
             strLogPrefix, ercSrcAddress1155 );
         if( isReverse || ercDstAddress1155 ) {
-            details.trace( "{}Destination ERC1155 token address................{}",
+            details.trace( "{p}Destination ERC1155 token address................{}",
                 strLogPrefix, ercDstAddress1155 );
         }
-        details.trace( "{}Destination chain name.........................{}",
+        details.trace( "{p}Destination chain name.........................{}",
             strLogPrefix, strChainNameDst );
-        details.trace( "{}Token IDs to transfer..........................{}",
+        details.trace( "{p}Token IDs to transfer..........................{}",
             strLogPrefix, arrTokenIds );
-        details.trace( "{}Amounts of tokens to transfer..................{}",
+        details.trace( "{p}Amounts of tokens to transfer..................{}",
             strLogPrefix, arrTokenAmounts );
         strActionName =
             "ERC1155 batch-payment S2S, approve, " + ( isForward ? "forward" : "reverse" );
@@ -1922,12 +1922,12 @@ export async function doErc1155BatchPaymentS2S(
         ];
         const weiHowMuchApprove = undefined;
         let gasPrice = await tc.computeGasPrice( ethersProviderSrc, 200000000000 );
-        details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
+        details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const estimatedGasApprove = await tc.computeGas(
             details, ethersProviderSrc,
             "ERC1155", contractERC1155, "setApprovalForAll", arrArgumentsApprove,
             joAccountSrc, strActionName, gasPrice, 8000000, weiHowMuchApprove, null );
-        details.trace( "{}Using estimated(approve) gas={}", strLogPrefix, estimatedGasApprove );
+        details.trace( "{p}Using estimated(approve) gas={}", strLogPrefix, estimatedGasApprove );
         const isIgnoreApprove = false;
         const strErrorOfDryRunApprove = await imaTx.dryRunCall(
             details, ethersProviderSrc,
@@ -1953,14 +1953,14 @@ export async function doErc1155BatchPaymentS2S(
             "ERC1155 batch-payment S2S, transferERC1155 " + ( isForward ? "forward" : "reverse" );
         const weiHowMuchTransferERC1155 = undefined;
         gasPrice = await tc.computeGasPrice( ethersProviderSrc, 200000000000 );
-        details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
+        details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const estimatedGasTransfer = await tc.computeGas(
             details, ethersProviderSrc,
             "TokenManagerERC1155", joTokenManagerERC1155Src,
             "transferToSchainERC1155Batch", arrArgumentsTransfer,
             joAccountSrc, strActionName,
             gasPrice, 8000000, weiHowMuchTransferERC1155, null );
-        details.trace( "{}Using estimated(transfer) gas={}", strLogPrefix, estimatedGasTransfer );
+        details.trace( "{p}Using estimated(transfer) gas={}", strLogPrefix, estimatedGasTransfer );
         const isIgnoreTransferERC1155 = true;
         const strErrorOfDryRunTransferERC1155 = await imaTx.dryRunCall(
             details, ethersProviderSrc,
@@ -1985,11 +1985,11 @@ export async function doErc1155BatchPaymentS2S(
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != details.id ) {
-            log.critical( "{}Payment error in {}: {}, stack is: {}{}",
-                strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
+            log.critical( "{p}Payment error in {}: {err}, stack is:{}{stack}",
+                strLogPrefix, strActionName, strError, "\n", err.stack );
         }
-        details.critical( "{}Payment error in {}: {}, stack is: {}{}",
-            strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
+        details.critical( "{p}Payment error in {}: {err}, stack is:{}{stack}",
+            strLogPrefix, strActionName, strError, "\n", err.stack );
         details.exposeDetailsTo(
             log, "doErc1155BatchPaymentS2S/" + ( isForward ? "forward" : "reverse" ), false );
         details.close();
@@ -2020,7 +2020,7 @@ export async function mintErc20(
     const strLogPrefix = "mintErc20() call ";
     const details = log.createMemoryStream();
     try {
-        details.debug( "{}Mint ERC20 token amount {}", strLogPrefix, nAmount );
+        details.debug( "{p}Mint ERC20 token amount {}", strLogPrefix, nAmount );
         if( ! ( ethersProvider && joAccount && strAddressMintTo &&
             typeof strAddressMintTo == "string" && strAddressMintTo.length > 0 &&
             strTokenContractAddress && typeof strTokenContractAddress == "string" &&
@@ -2039,14 +2039,14 @@ export async function mintErc20(
         ];
         const weiHowMuchMint = undefined;
         const gasPrice = await tc.computeGasPrice( ethersProvider, 200000000000 );
-        details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
+        details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const estimatedGasMint =
             await tc.computeGas(
                 details, ethersProvider,
                 "ERC20", contract, "mint", arrArgumentsMint,
                 joAccount, strActionName,
                 gasPrice, 10000000, weiHowMuchMint, null );
-        details.trace( "{}Using estimated gas={}", strLogPrefix, estimatedGasMint );
+        details.trace( "{p}Using estimated gas={}", strLogPrefix, estimatedGasMint );
         strActionName = "Mint ERC20";
         const isIgnoreMint = false;
         const strErrorOfDryRun = await imaTx.dryRunCall(
@@ -2076,11 +2076,11 @@ export async function mintErc20(
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != details.id ) {
-            log.critical( "{}Payment error in {}: {}, stack is: {}{}",
-                strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
+            log.critical( "{p}Payment error in {}: {err}, stack is:{}{stack}",
+                strLogPrefix, strActionName, strError, "\n", err.stack );
         }
-        details.critical( "{}Payment error in {}: {}, stack is: {}{}",
-            strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
+        details.critical( "{p}Payment error in {}: {err}, stack is:{}{stack}",
+            strLogPrefix, strActionName, strError, "\n", err.stack );
         details.exposeDetailsTo( log, "mintErc20()", false );
         details.close();
         return false;
@@ -2102,7 +2102,7 @@ export async function mintErc721(
     const strLogPrefix = "mintErc721() call ";
     const details = log.createMemoryStream();
     try {
-        details.debug( "{}Mint ERC721 token ID {}", strLogPrefix, idToken );
+        details.debug( "{p}Mint ERC721 token ID {}", strLogPrefix, idToken );
         if( ! ( ethersProvider && joAccount && strAddressMintTo &&
             typeof strAddressMintTo == "string" && strAddressMintTo.length > 0 &&
             strTokenContractAddress && typeof strTokenContractAddress == "string" &&
@@ -2121,13 +2121,13 @@ export async function mintErc721(
         ];
         const weiHowMuchMint = undefined;
         const gasPrice = await tc.computeGasPrice( ethersProvider, 200000000000 );
-        details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
+        details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const estimatedGasMint = await tc.computeGas(
             details, ethersProvider,
             "ERC721", contract, "mint", arrArgumentsMint,
             joAccount, strActionName,
             gasPrice, 10000000, weiHowMuchMint, null );
-        details.trace( "{}Using estimated gas={}", strLogPrefix, estimatedGasMint );
+        details.trace( "{p}Using estimated gas={}", strLogPrefix, estimatedGasMint );
         strActionName = "Mint ERC721";
         const isIgnoreMint = false;
         const strErrorOfDryRun = await imaTx.dryRunCall(
@@ -2157,11 +2157,11 @@ export async function mintErc721(
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != details.id ) {
-            log.critical( "{}Payment error in {}: {}, stack is: {}{}",
-                strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
+            log.critical( "{p}Payment error in {}: {err}, stack is:{}{stack}",
+                strLogPrefix, strActionName, strError, "\n", err.stack );
         }
-        details.critical( "{}Payment error in {}: {}, stack is: {}{}",
-            strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
+        details.critical( "{p}Payment error in {}: {err}, stack is:{}{stack}",
+            strLogPrefix, strActionName, strError, "\n", err.stack );
         details.exposeDetailsTo( log, "mintErc721()", false );
         details.close();
         return false;
@@ -2184,7 +2184,7 @@ export async function mintErc1155(
     const strLogPrefix = "mintErc1155() call ";
     const details = log.createMemoryStream();
     try {
-        details.debug( "{}Mint ERC1155 token ID {} token amount {}",
+        details.debug( "{p}Mint ERC1155 token ID {} token amount {}",
             strLogPrefix, idToken, nAmount );
         if( ! ( ethersProvider && joAccount && strAddressMintTo &&
             typeof strAddressMintTo == "string" && strAddressMintTo.length > 0 &&
@@ -2207,13 +2207,13 @@ export async function mintErc1155(
         ];
         const weiHowMuchMint = undefined;
         const gasPrice = await tc.computeGasPrice( ethersProvider, 200000000000 );
-        details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
+        details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const estimatedGasMint = await tc.computeGas(
             details, ethersProvider,
             "ERC1155", contract, "mint", arrArgumentsMint,
             joAccount, strActionName,
             gasPrice, 10000000, weiHowMuchMint, null );
-        details.trace( "{}Using estimated gas={}", strLogPrefix, estimatedGasMint );
+        details.trace( "{p}Using estimated gas={}", strLogPrefix, estimatedGasMint );
         strActionName = "Mint ERC1155";
         const isIgnoreMint = false;
         const strErrorOfDryRun = await imaTx.dryRunCall(
@@ -2243,11 +2243,11 @@ export async function mintErc1155(
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != details.id ) {
-            log.critical( "{}Payment error in {}: {}, stack is: {}{}",
-                strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
+            log.critical( "{p}Payment error in {}: {err}, stack is:{}{stack}",
+                strLogPrefix, strActionName, strError, "\n", err.stack );
         }
-        details.critical( "{}Payment error in {}: {}, stack is: {}{}",
-            strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
+        details.critical( "{p}Payment error in {}: {err}, stack is:{}{stack}",
+            strLogPrefix, strActionName, strError, "\n", err.stack );
         details.exposeDetailsTo( log, "mintErc1155()", false );
         details.close();
         return false;
@@ -2269,7 +2269,7 @@ export async function burnErc20(
     const strLogPrefix = "burnErc20() call ";
     const details = log.createMemoryStream();
     try {
-        details.debug( "{}Burn ERC20 token amount {}", strLogPrefix, nAmount );
+        details.debug( "{p}Burn ERC20 token amount {}", strLogPrefix, nAmount );
         if( ! ( ethersProvider && joAccount && strAddressBurnFrom &&
             typeof strAddressBurnFrom == "string" && strAddressBurnFrom.length > 0 &&
             strTokenContractAddress && typeof strTokenContractAddress == "string" &&
@@ -2287,13 +2287,13 @@ export async function burnErc20(
         ];
         const weiHowMuchBurn = undefined;
         const gasPrice = await tc.computeGasPrice( ethersProvider, 200000000000 );
-        details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
+        details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const estimatedGasBurn = await tc.computeGas(
             details, ethersProvider,
             "ERC20", contract, "burnFrom", arrArgumentsBurn,
             joAccount, strActionName,
             gasPrice, 10000000, weiHowMuchBurn, null );
-        details.trace( "{}Using estimated gas={}", strLogPrefix, estimatedGasBurn );
+        details.trace( "{p}Using estimated gas={}", strLogPrefix, estimatedGasBurn );
         strActionName = "Burn ERC20";
         const isIgnoreBurn = false;
         const strErrorOfDryRun = await imaTx.dryRunCall(
@@ -2323,11 +2323,11 @@ export async function burnErc20(
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != details.id ) {
-            log.critical( "{}Payment error in {}: {}, stack is: {}{}",
-                strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
+            log.critical( "{p}Payment error in {}: {err}, stack is:{}{stack}",
+                strLogPrefix, strActionName, strError, "\n", err.stack );
         }
-        details.critical( "{}Payment error in {}: {}, stack is: {}{}",
-            strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
+        details.critical( "{p}Payment error in {}: {err}, stack is:{}{stack}",
+            strLogPrefix, strActionName, strError, "\n", err.stack );
         details.exposeDetailsTo( log, "burnErc20()", false );
         details.close();
         return false;
@@ -2348,7 +2348,7 @@ export async function burnErc721(
     const strLogPrefix = "burnErc721() call ";
     const details = log.createMemoryStream();
     try {
-        details.debug( "{}Burn ERC721 token ID {}", strLogPrefix, idToken );
+        details.debug( "{p}Burn ERC721 token ID {}", strLogPrefix, idToken );
         if( ! ( ethersProvider && joAccount &&
             strTokenContractAddress && typeof strTokenContractAddress == "string" &&
             strTokenContractAddress.length > 0 && joTokenContractABI
@@ -2364,13 +2364,13 @@ export async function burnErc721(
         ];
         const weiHowMuchBurn = undefined;
         const gasPrice = await tc.computeGasPrice( ethersProvider, 200000000000 );
-        details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
+        details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const estimatedGasBurn = await tc.computeGas(
             details, ethersProvider,
             "ERC721", contract, "burn", arrArgumentsBurn,
             joAccount, strActionName,
             gasPrice, 10000000, weiHowMuchBurn, null );
-        details.trace( "{}Using estimated gas={}", strLogPrefix, estimatedGasBurn );
+        details.trace( "{p}Using estimated gas={}", strLogPrefix, estimatedGasBurn );
         strActionName = "Burn ERC721";
         const isIgnoreBurn = false;
         const strErrorOfDryRun = await imaTx.dryRunCall(
@@ -2400,11 +2400,11 @@ export async function burnErc721(
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != details.id ) {
-            log.critical( "{}Payment error in {}: {}, stack is: {}{}",
-                strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
+            log.critical( "{p}Payment error in {}: {err}, stack is:{}{stack}",
+                strLogPrefix, strActionName, strError, "\n", err.stack );
         }
-        details.critical( "{}Payment error in {}: {}, stack is: {}{}",
-            strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
+        details.critical( "{p}Payment error in {}: {err}, stack is:{}{stack}",
+            strLogPrefix, strActionName, strError, "\n", err.stack );
         details.exposeDetailsTo( log, "burnErc721()", false );
         details.close();
         return false;
@@ -2427,7 +2427,7 @@ export async function burnErc1155(
     const strLogPrefix = "burnErc1155() call ";
     const details = log.createMemoryStream();
     try {
-        details.debug( "{}Burn ERC1155 token ID {} token amount {}",
+        details.debug( "{p}Burn ERC1155 token ID {} token amount {}",
             strLogPrefix, idToken, nAmount );
         if( ! ( ethersProvider && joAccount && strAddressBurnFrom &&
             typeof strAddressBurnFrom == "string" && strAddressBurnFrom.length > 0 &&
@@ -2447,13 +2447,13 @@ export async function burnErc1155(
         ];
         const weiHowMuchBurn = undefined;
         const gasPrice = await tc.computeGasPrice( ethersProvider, 200000000000 );
-        details.trace( "{}Using computed gasPrice={}", strLogPrefix, gasPrice );
+        details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const estimatedGasBurn = await tc.computeGas(
             details, ethersProvider,
             "ERC1155", contract, "burn", arrArgumentsBurn,
             joAccount, strActionName,
             gasPrice, 10000000, weiHowMuchBurn, null );
-        details.trace( "{}Using estimated gas={}", strLogPrefix, estimatedGasBurn );
+        details.trace( "{p}Using estimated gas={}", strLogPrefix, estimatedGasBurn );
         strActionName = "Burn ERC1155";
         const isIgnoreBurn = false;
         const strErrorOfDryRun = await imaTx.dryRunCall(
@@ -2483,11 +2483,11 @@ export async function burnErc1155(
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != details.id ) {
-            log.critical( "{}Payment error in {}: {}, stack is: {}{}",
-                strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
+            log.critical( "{p}Payment error in {}: {err}, stack is:{}{stack}",
+                strLogPrefix, strActionName, strError, "\n", err.stack );
         }
-        details.critical( "{}Payment error in {}: {}, stack is: {}{}",
-            strLogPrefix, strActionName, log.em( strError ), "\n", log.s( err.stack ) );
+        details.critical( "{p}Payment error in {}: {err}, stack is:{}{stack}",
+            strLogPrefix, strActionName, strError, "\n", err.stack );
         details.exposeDetailsTo( log, "burnErc1155()", false );
         details.close();
         return false;

@@ -40,16 +40,15 @@ const __dirname = path.dirname( url.fileURLToPath( import.meta.url ) );
 
 const gStrAppName = "IMA AGENT";
 const gStrVersion =
-    imaUtils.jsonFileLoad( path.join( __dirname, "package.json" ), null ).version;
+    imaUtils.fileLoad( path.join( __dirname, "../VERSION" ), "N.A" ).toString().trim();
 
 function att() { return log.fmtAttention( ...arguments ); };
 
 export function printAbout( isLog ) {
     isLog = isLog || false;
-    const strMsg =
-        log.fmtTrace( att( gStrAppName ), " version ", log.fmtNotice( gStrVersion ) );
+    const strMsg = log.fmtTrace( att( gStrAppName ), " version ", log.fmtNotice( gStrVersion ) );
     if( isLog )
-        log.information( strMsg + "\n" );
+        log.information( strMsg );
     else
         console.log( strMsg );
     return true;
@@ -2070,8 +2069,8 @@ export function parse( joExternalHandlers, argv ) {
             joExternalHandlers[joArg.name]();
             continue;
         }
-        console.log( log.fmtFatal( "COMMAND LINE PARSER ERROR: unknown command line argument ",
-            log.v( joArg.name ) ) );
+        console.log( log.fmtFatal( "COMMAND LINE PARSER ERROR: unknown command line argument {}",
+            joArg.name ) );
         return 666;
     }
     return 0;
@@ -2081,21 +2080,20 @@ async function asyncCheckUrlAtStartup( u, name ) {
     const details = log.createMemoryStream();
     const nTimeoutMilliseconds = 10 * 1000;
     try {
-        details.debug( "Will check URL {} connectivity for {} at start-up...", log.u( u ), name );
+        details.debug( "Will check URL {url} connectivity for {} at start-up...", u, name );
         const isLog = false;
         const isOnLine = await rpcCall.checkUrl( u, nTimeoutMilliseconds, isLog );
         if( isOnLine ) {
-            details.success( "Done, start-up checking URL {} connectivity for {}, URL is on-line.",
-                log.u( u ), name );
+            details.success( "Done, start-up checking URL {url} connectivity for {}, " +
+                "URL is on-line.", u, name );
         } else {
-            details.warning( "Done, start-up checking URL {} connectivity for {}, URL is off-line.",
-                log.u( u ), name );
+            details.warning( "Done, start-up checking URL {url} connectivity for {}, " +
+                "URL is off-line.", u, name );
         }
         return isOnLine;
     } catch ( err ) {
-        details.error( "Failed to check URL {} connectivity for {} at start-up, error is: {}" +
-            ", stack is: {}{}", log.u( u ), name, log.em( owaspUtils.extractErrorMessage( err ) ),
-        "\n", log.s( err.stack ) );
+        details.error( "Failed to check URL {url} connectivity for {} at start-up, " +
+            "error is: {err}, stack is:{}{stack}", u, name, err, "\n", err.stack );
     }
     return false;
 }
@@ -2110,14 +2108,18 @@ function commonInitPrintSysInfo() {
         log.debug( "This process ", att( "EUID" ), " is ", att( process.geteuid() ) );
         log.debug( "This process ", att( "GID" ), " is ", att( process.getgid() ) );
         log.debug( "This process ", att( "UID" ), " is ", att( process.getuid() ) );
-        log.debug( "This process ", att( "groups" ), " are ", log.v( process.getgroups() ) );
+        log.debug( "This process ", att( "groups" ), " are ",
+            log.fmtInformation( process.getgroups() ) );
         log.debug( "This process ", att( "CWD" ), " is ", att( process.cwd() ) );
         log.debug( "This process ", att( "platform" ), " is ", att( process.platform ) );
-        log.debug( "This process ", att( "release" ), " is ", log.v( process.release ) );
-        log.debug( "This process ", att( "report" ), " is ", log.v( process.report ) );
-        log.debug( "This process ", att( "config" ), " is ", log.v( process.config ) );
+        log.debug( "This process ", att( "release" ), " is ",
+            log.fmtInformation( process.release ) );
+        log.debug( "This process ", att( "report" ), " is ",
+            log.fmtInformation( process.report ) );
+        log.debug( "This process ", att( "config" ), " is ",
+            log.fmtInformation( process.config ) );
         log.debug( att( "Node JS" ), " ", att( "detailed version information" ),
-            " is ", log.v( process.versions ) );
+            " is ", log.fmtInformation( process.versions ) );
         log.debug( att( "OS" ), " ", att( "type" ), " is ", att( os.type() ) );
         log.debug( att( "OS" ), " ", att( "platform" ),
             " is ", att( os.platform() ) );
@@ -2129,20 +2131,20 @@ function commonInitPrintSysInfo() {
             " is ", att( os.endianness() ) );
         log.debug( att( "OS" ), " ", att( "host name" ),
             " is ", att( os.hostname() ) );
-        log.debug( att( "OS" ), " ", att( "CPUs" ), " are ", log.v( os.cpus() ) );
+        log.debug( att( "OS" ), " ", att( "CPUs" ), " are ", log.fmtInformation( os.cpus() ) );
         log.debug( att( "OS" ), " ", att( "network interfaces" ),
-            " are ", log.v( os.networkInterfaces() ) );
+            " are ", log.fmtInformation( os.networkInterfaces() ) );
         log.debug( att( "OS" ), " ", att( "home dir" ),
             " is ", att( os.homedir() ) );
         log.debug( att( "OS" ), " ", att( "tmp dir" ),
             " is ", att( os.tmpdir() ) );
         log.debug( att( "OS" ), " ", att( "uptime" ), " is ", att( os.uptime() ) );
-        log.debug( att( "OS" ), " ", att( "user" ), " is ", log.v( os.userInfo() ) );
+        log.debug( att( "OS" ), " ", att( "user" ), " is ", log.fmtInformation( os.userInfo() ) );
         const joMemory = { total: os.totalmem(), free: os.freemem() };
         joMemory.freePercent = ( joMemory.free / joMemory.total ) * 100.0;
-        log.debug( att( "OS" ), " ", att( "memory" ), " is ", log.v( joMemory ) );
+        log.debug( att( "OS" ), " ", att( "memory" ), " is ", log.fmtInformation( joMemory ) );
         const joLA = os.loadavg();
-        log.debug( att( "OS" ), " ", att( "average load" ), " is ", log.v( joLA ) );
+        log.debug( att( "OS" ), " ", att( "average load" ), " is ", log.fmtInformation( joLA ) );
     }
 }
 

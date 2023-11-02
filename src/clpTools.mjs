@@ -63,14 +63,14 @@ export async function registerStep1( isPrintSummaryRegistrationCosts ) {
     const imaState = state.get();
     imaCLI.initContracts();
     const strLogPrefix = "Reg 1: ";
-    log.information( "{}Will check chain registration now...", strLogPrefix );
+    log.information( "{p}Will check chain registration now...", strLogPrefix );
     let bSuccess = await imaReg.checkIsRegisteredSChainInDepositBoxes( // step 1
         imaState.chainProperties.mn.ethersProvider,
         imaState.joLinker,
         imaState.chainProperties.mn.joAccount,
         imaState.chainProperties.sc.strChainName
     );
-    log.information( "{}Chain is {}", strLogPrefix,
+    log.information( "{p}Chain is {}", strLogPrefix,
         log.posNeg( bSuccess, "already registered", "not registered yet" ) );
     if( bSuccess )
         return true;
@@ -91,7 +91,7 @@ export async function registerStep1( isPrintSummaryRegistrationCosts ) {
             imaState.chainProperties.mn.transactionCustomizer //,
         );
     bSuccess = ( jarrReceipts != null && jarrReceipts.length > 0 ) ? true : false;
-    log.information( "{}Chain was {}", strLogPrefix,
+    log.information( "{p}Chain was {}", strLogPrefix,
         log.posNeg( bSuccess, "registered successfully", "not registered" ) );
     if( bSuccess ) {
         gInfoRegistrationCost.mn =
@@ -101,7 +101,7 @@ export async function registerStep1( isPrintSummaryRegistrationCosts ) {
         clpTools.printSummaryRegistrationCosts();
     if( !bSuccess ) {
         const nRetCode = 163;
-        log.fatal( "{}failed to register S-Chain in deposit box, will return code {}",
+        log.fatal( "{p}failed to register S-Chain in deposit box, will return code {}",
             strLogPrefix, nRetCode );
         process.exit( nRetCode );
     }
@@ -1472,7 +1472,7 @@ export function commandLineTaskBrowseSChain() {
                 log.fatal( "Missing S-Chain URL, please specify {}", "--url-s-chain" );
                 process.exit( 155 );
             }
-            log.information( "{}Downloading S-Chain network information...", strLogPrefix );
+            log.information( "{p}Downloading S-Chain network information...", strLogPrefix );
             const rpcCallOpts = null;
             await rpcCall.create(
                 imaState.chainProperties.sc.strURL,
@@ -1493,19 +1493,18 @@ export function commandLineTaskBrowseSChain() {
                     await joCall.call( joDataIn, async function( joIn, joOut, err ) {
                         if( err ) {
                             const strError = owaspUtils.extractErrorMessage( err );
-                            log.fatal( "JSON RPC call to S-Chain failed, error: {}",
-                                log.em( strError ) );
+                            log.fatal( "JSON RPC call to S-Chain failed, error: {err}", strError );
                             await joCall.disconnect();
                             process.exit( 157 );
                         }
-                        log.information( "{}S-Chain network information: {}",
+                        log.information( "{p}S-Chain network information: {}",
                             strLogPrefix, joOut.result );
                         let nCountReceivedImaDescriptions = 0;
                         const jarrNodes = joOut.result.network;
                         for( let i = 0; i < jarrNodes.length; ++ i ) {
                             const joNode = jarrNodes[i];
                             if( ! joNode ) {
-                                log.critical( "{}Discovery node {} is completely unknown and " +
+                                log.critical( "{p}Discovery node {} is completely unknown and " +
                                     "will be skipped".strLogPrefix, i );
                                 continue;
                             }
@@ -1531,11 +1530,11 @@ export function commandLineTaskBrowseSChain() {
                                         ++ nCountReceivedImaDescriptions;
                                         if( err ) {
                                             const strError = owaspUtils.extractErrorMessage( err );
-                                            log.fatal( "JSON RPC call to S-Chain failed,error: {}",
-                                                log.em( strError ) );
+                                            log.fatal( "JSON RPC call to S-Chain failed, " +
+                                                "error: {err}", strError );
                                             process.exit( 159 );
                                         }
-                                        log.information( "{}Node {} IMA information: {}",
+                                        log.information( "{p}Node {} IMA information: {}",
                                             strLogPrefix, joNode.nodeID, joOut.result );
                                         await joCall.disconnect();
                                     } );
@@ -1565,7 +1564,7 @@ export function commandLineTaskBrowseSkaleNetwork() {
                 log.fatal( "Missing Skale Manager ABI, please specify {}", "--abi-skale-manager" );
                 process.exit( 160 );
             }
-            log.information( "{}Downloading SKALE network information...", strLogPrefix );
+            log.information( "{p}Downloading SKALE network information...", strLogPrefix );
             const opts = {
                 imaState: imaState,
                 "details": log,
@@ -1574,7 +1573,7 @@ export function commandLineTaskBrowseSkaleNetwork() {
             };
             const arrSChains = await skaleObserver.loadSChainsDefault( opts );
             const cnt = arrSChains.length;
-            log.information( "{}Got {} S-Chains(s) in SKALE NETWORK information: {}",
+            log.information( "{p}Got {} S-Chains(s) in SKALE NETWORK information: {}",
                 strLogPrefix, cnt, arrSChains );
             return true;
         }
@@ -1591,7 +1590,7 @@ export function commandLineTaskBrowseConnectedSChains() {
                 log.fatal( "Missing Skale Manager ABI, please specify {}", "--abi-skale-manager" );
                 process.exit( 161 );
             }
-            log.information( "{}Downloading SKALE network information...", strLogPrefix );
+            log.information( "{p}Downloading SKALE network information...", strLogPrefix );
             const opts = {
                 "imaState": imaState,
                 "details": log,
@@ -1601,7 +1600,7 @@ export function commandLineTaskBrowseConnectedSChains() {
             const arrSChainsCached = await skaleObserver.loadSChainsConnectedOnly(
                 imaState.chainProperties.sc.strChainName, opts );
             const cnt = arrSChainsCached.length;
-            log.information( "{}Got {} connected S-Chain(s): {}",
+            log.information( "{p}Got {} connected S-Chain(s): {}",
                 strLogPrefix, cnt, arrSChainsCached );
             return true;
         }
@@ -1661,14 +1660,14 @@ export function commandLineTaskDiscoverChainId() {
                 const chainId = await
                 skaleObserver.discoverChainId( joDiscoverEntry.strURL );
                 if( chainId === null ) {
-                    log.error( "{}Failed to detect {} chain ID",
+                    log.error( "{p}Failed to detect {} chain ID",
                         strLogPrefix, joDiscoverEntry.name );
                 } else {
                     const cid16 =
                         owaspUtils.ensureStartsWith0x( owaspUtils.toBN( chainId ).toHexString() );
                     const cid10 = "" + owaspUtils.toBN( chainId ).toString();
-                    log.information( "{}Got {} chain ID={}={} from URL {}", strLogPrefix,
-                        joDiscoverEntry.name, cid16, cid10, log.u( joDiscoverEntry.strURL ) );
+                    log.information( "{p}Got {} chain ID={}={} from URL {url}", strLogPrefix,
+                        joDiscoverEntry.name, cid16, cid10, joDiscoverEntry.strURL );
                     joDiscoverEntry.fnSave( chainId );
                 }
             }

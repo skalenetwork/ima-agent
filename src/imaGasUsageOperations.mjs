@@ -30,16 +30,18 @@ export function composeGasUsageReportFromArray( strName, jarrReceipts ) {
     if( ! ( strName && typeof strName == "string" && jarrReceipts ) )
         return "";
     let i, sumGasUsed = owaspUtils.toBN( "0" ),
-        s = "\n" + log.fmtInformation( "Gas usage report for " ) + log.v( strName ) + "\n";
+        s = "\n" + log.fmtInformation( "Gas usage report for " ) +
+            log.fmtInformation( "{}", strName ) + "\n";
     for( i = 0; i < jarrReceipts.length; ++ i ) {
         try {
             sumGasUsed = sumGasUsed.add( owaspUtils.toBN( jarrReceipts[i].receipt.gasUsed ) );
-            s += "    " + log.v( jarrReceipts[i].description ) + log.fmtDebug( "....." ) +
-                log.v( jarrReceipts[i].receipt.gasUsed.toString() ) + "\n";
+            s += "    " + log.fmtInformation( "{}", jarrReceipts[i].description ) +
+                log.fmtDebug( "....." ) +
+                log.fmtInformation( "{}", jarrReceipts[i].receipt.gasUsed.toString() ) + "\n";
         } catch ( err ) { }
     }
     s += "    " + log.fmtAttention( "SUM" ) + log.fmtDebug( "....." ) +
-        log.v( sumGasUsed.toString() );
+        log.fmtInformation( "{}", sumGasUsed.toString() );
     return { "sumGasUsed": sumGasUsed, "strReport": s };
 }
 

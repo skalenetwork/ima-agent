@@ -469,20 +469,46 @@ export function insertFileOutput( strFilePath, nMaxSizeBeforeRotation, nMaxFiles
     return true;
 }
 
+export function extractErrorMessage( jo, strDefaultErrorText ) {
+    strDefaultErrorText = strDefaultErrorText || "unknown error or error without a description";
+    try {
+        const isError = function( err ) {
+            return err && err.stack && err.message;
+        };
+        if( ! isError( jo ) ) {
+            if( "error" in jo ) {
+                jo = jo.error;
+                if( typeof jo == "string" )
+                    return jo;
+                if( typeof jo != "object" )
+                    return strDefaultErrorText + "(" + jo.toString() + ")";
+            }
+            if( typeof jo == "string" && jo )
+                return strDefaultErrorText + "(" + jo.toString() + ")";
+            return strDefaultErrorText;
+        }
+        if( typeof jo.message == "string" && jo.message.length > 0 )
+            return jo.message; // + jo.stack;
+        strDefaultErrorText += "(" + jo.toString() + ")"; // + jo.stack;
+    } catch ( err ) {
+    }
+    return strDefaultErrorText;
+}
+
 function tryToSplitFormatString( strFormat ) {
     if( !( strFormat && typeof strFormat == "string" ) )
         return null;
     const arrParts = [];
     let s = strFormat, cntFoundArgs = 0;
     for( ; true; ) {
-        const nFound = s.indexOf( "{", nStart );
-        if( nFound < 0 )
+        const nStart = s.indexOf( "{" );
+        if( nStart < 0 )
             break;
-        const nEnd = s.indexOf( "}", nStart );
+        const nEnd = s.indexOf( "}", nStart + 1 );
         if( nEnd < 0 )
             break;
-        const strPart = s.substring( nStart, nFound );
-        const strArgDesc = s.substring( nFound + 1, nEnd );
+        const strPart = s.substring( 0, nStart );
+        const strArgDesc = s.substring( nStart + 1, nEnd ).trim().toLowerCase();
         s = s.substring( nEnd + 1 );
         if( strPart.length > 0 )
             arrParts.push( { "type": "text", "text": strPart } );
@@ -503,23 +529,49 @@ export function fmtArgumentsArray( arrArgs, fnFormatter ) {
     const arrParts = ( arrArgs && arrArgs.length > 0 )
         ? tryToSplitFormatString( arrArgs[0] ) : null;
     let s = "", isValueMode = false;
-    const fnFormatOneArgument = function( arg ) {
-        if( arg ) {
-            if( isValueMode )
-                return v( arg );
-            const t = typeof arg;
-            if( t == "string" ) {
-                if( arg.length > 0 ) {
-                    if( arg == " " || arg == "\n" ) {
-                        // skip
-                    } else if( ! cc.isStringAlreadyColorized( arg ) )
-                        arg = fnFormatter( arg );
-                }
-            } else
-                arg = cc.logArgToString( arg );
-
-        }
+    const fnDefaultOneArgumentFormatter = function( arg, fnCustomFormatter ) {
+        if( ! fnCustomFormatter )
+            fnCustomFormatter = fnFormatter;
+        const t = typeof arg;
+        if( t == "string" ) {
+            if( arg.length > 0 ) {
+                if( arg == " " || arg == "\n" ) {
+                    // skip
+                } else if( ! cc.isStringAlreadyColorized( arg ) )
+                    return fnCustomFormatter( arg );
+            }
+        } else
+            return cc.logArgToString( arg );
         return arg;
+    };
+    const fnFormatOneArgument = function( arg, fmt ) {
+        if( ! arg )
+            return arg;
+        if( ! isValueMode )
+            return fnDefaultOneArgumentFormatter( arg, null );
+        if( fmt && typeof "fmt" == "string" ) {
+            if( fmt == "p" )
+                return fnDefaultOneArgumentFormatter( arg, null );
+            if( fmt == "url" )
+                return u( arg );
+            if( fmt == "yn" )
+                return yn( arg );
+            if( fmt == "oo" )
+                return onOff( arg );
+            if( fmt == "stack" )
+                return stack( arg );
+            if( fmt == "em" )
+                return em( arg );
+            if( fmt == "err" )
+                return em( extractErrorMessage( arg ) );
+            if( fmt == "bright" )
+                return fnDefaultOneArgumentFormatter( arg, cc.bright );
+            if( fmt == "sunny" )
+                return fnDefaultOneArgumentFormatter( arg, cc.sunny );
+            if( fmt == "rainbow" )
+                return fnDefaultOneArgumentFormatter( arg, cc.rainbow );
+        }
+        return v( arg );
     };
     try {
         let idxArgNextPrinted = 0;
@@ -530,7 +582,7 @@ export function fmtArgumentsArray( arrArgs, fnFormatter ) {
                 if( joPart.type == "arg" ) {
                     isValueMode = true;
                     if( idxArgNextPrinted < arrArgs.length )
-                        s += fnFormatOneArgument( arrArgs[idxArgNextPrinted] );
+                        s += fnFormatOneArgument( arrArgs[idxArgNextPrinted], joPart.text );
                     ++ idxArgNextPrinted;
                     continue;
                 }
@@ -545,7 +597,7 @@ export function fmtArgumentsArray( arrArgs, fnFormatter ) {
             try {
                 // if( i > 0 && s.length > 0 )
                 //    s += " ";
-                s += fnFormatOneArgument( arrArgs[i] );
+                s += fnFormatOneArgument( arrArgs[i], null );
             } catch ( err ) {
             }
         }
@@ -848,7 +900,7 @@ export function em( x ) {
     return cc.isStringAlreadyColorized( x ) ? x : cc.warning( x );
 }
 
-export function s( x ) {
+export function stack( x ) {
     return cc.isStringAlreadyColorized( x ) ? x : cc.stack( x );
 }
 

@@ -24,7 +24,6 @@
  */
 
 import * as log from "./log.mjs";
-import { extractErrorMessage } from "./owaspUtils.mjs";
 import * as rpcCall from "./rpcCall.mjs";
 import * as imaBLS from "./bls.mjs";
 import * as imaUtils from "./utils.mjs";
@@ -163,8 +162,8 @@ export async function checkOnLoopStart( imaState, strLoopWorkType, nIndexS2S ) {
         if( imaState.isPrintPWA )
             log.success( "PWA loop start condition check passed" );
     } catch ( err ) {
-        log.critical( "Exception in PWA check on loop start: {}, stack is: {}{}",
-            log.em( extractErrorMessage( err ) ), "\n", log.s( err.stack ) );
+        log.critical( "Exception in PWA check on loop start: {err}, stack is:{}{stack}",
+            err, "\n", err.stack );
     }
     return true;
 }
@@ -216,9 +215,9 @@ export async function handleLoopStateArrived(
     } catch ( err ) {
         isSuccess = false;
         log.critical( "Exception in PWA handler for loop-{} for node {}, PWA state {}, arrived " +
-            "signature is {}, error is: {}, stack is: {}{}", se, nNodeNumber,
-        ( joNode && "pwaState" in joNode ) ? joNode.pwaState : "N/A",
-        signature, log.em( extractErrorMessage( err ) ), "\n", log.s( err.stack ) );
+            "signature is {}, error is: {err}, stack is:{}{stack}", se, nNodeNumber,
+        ( joNode && "pwaState" in joNode ) ? joNode.pwaState : "N/A", signature,
+        err, "\n", err.stack );
     }
     return isSuccess;
 }
@@ -263,8 +262,8 @@ async function notifyOnLoopImpl( imaState, strLoopWorkType, nIndexS2S, isStart )
                 strNodeURL, rpcCallOpts, async function( joCall, err ) {
                     if( err ) {
                         log.error( "PWA failed to create loop-{} notification RPC call " +
-                            "to node #{} with URL {}, error is: ", se, i, log.u( strNodeURL ),
-                        log.em( extractErrorMessage( err ) ) );
+                            "to node #{} with URL {url}, error is: {err}", se, i, strNodeURL,
+                        err );
                         return;
                     }
                     joCall.call( { // NOTICE: no await here, executed async
@@ -280,22 +279,22 @@ async function notifyOnLoopImpl( imaState, strLoopWorkType, nIndexS2S, isStart )
                     }, async function( joIn, joOut, err ) {
                         if( err ) {
                             log.error( "PWA failed to perform loop-{} notification RPC call to " +
-                                "node #{} with URL {}, error is: {}", se, i, log.u( strNodeURL ),
-                            log.em( extractErrorMessage( err ) ) );
+                                "node #{} with URL {url}, error is: {err}", se, i, strNodeURL,
+                            err );
                             await joCall.disconnect();
                             return;
                         }
                         if( imaState.isPrintPWA ) {
                             log.success( "Was successfully sent PWA loop-{} notification to " +
-                                "node #{} with URL {}", se, i, log.u( strNodeURL ) );
+                                "node #{} with URL {url}", se, i, strNodeURL );
                         }
                         await joCall.disconnect();
                     } ); // joCall.call ...
                 } ); // rpcCall.create ...
         }
     } catch ( err ) {
-        log.error( "Exception in PWA notify on loop {}: {}, stack is: {}{}", se,
-            log.em( extractErrorMessage( err ) ), "\n", log.s( err.stack ) );
+        log.error( "Exception in PWA notify on loop {}: {err}, stack is:{}{stack}", se,
+            err, "\n", err.stack );
     }
     return true;
 }

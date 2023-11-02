@@ -47,6 +47,7 @@ export function threadDescription( isColorized ) {
     const tid = getCurrentThreadID();
     const st = isMainThread() ? "main" : "worker";
     return isColorized
-        ? ( log.fmtAttention( st ) + log.fmtDebug( " thread " ) + log.v( tid ) )
+        ? ( log.fmtAttention( st ) + log.fmtDebug( " thread " ) +
+                log.fmtInformation( tid ) )
         : ( st + " thread " + tid );
 }

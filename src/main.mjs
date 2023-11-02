@@ -137,7 +137,7 @@ function initMonitoringServer() {
         return;
     const strLogPrefix = "Monitoring: ";
     if( imaState.bLogMonitoringServer ) {
-        log.trace( "{}Will start monitoring WS server on port {}",
+        log.trace( "{p}Will start monitoring WS server on port {}",
             strLogPrefix, imaState.nMonitoringPort );
     }
     gServerMonitoringWS = new ws.WebSocketServer( { port: 0 + imaState.nMonitoringPort } );
@@ -151,7 +151,7 @@ function initMonitoringServer() {
         if( !ip )
             ip = "N/A";
         if( imaState.bLogMonitoringServer )
-            log.debug( "{}New connection from {}", strLogPrefix, ip );
+            log.debug( "{p}New connection from {}", strLogPrefix, ip );
         wsPeer.on( "message", function( message ) {
             const joAnswer = {
                 "method": null,
@@ -161,7 +161,7 @@ function initMonitoringServer() {
             try {
                 const joMessage = JSON.parse( message );
                 if( imaState.bLogMonitoringServer )
-                    log.trace( "{}<<< message from {}: {}", strLogPrefix, ip, joMessage );
+                    log.trace( "{p}<<< message from {}: {}", strLogPrefix, ip, joMessage );
 
                 if( ! ( "method" in joMessage ) )
                     throw new Error( "\"method\" field was not specified" );
@@ -230,17 +230,17 @@ function initMonitoringServer() {
                 } // switch( joMessage.method )
             } catch ( err ) {
                 const strError = owaspUtils.extractErrorMessage( err );
-                log.error( "{}Bad message from {}: {}, error is: {}, stack is: {}{}",
-                    strLogPrefix, ip, message, log.em( strError ), "\n", log.s( err.stack ) );
+                log.error( "{p}Bad message from {}: {}, error is: {err}, stack is:{}{stack}",
+                    strLogPrefix, ip, message, strError, "\n", err.stack );
             }
             try {
                 if( imaState.bLogMonitoringServer )
-                    log.trace( "{}>>> answer to {}: {}", strLogPrefix, ip, joAnswer );
+                    log.trace( "{p}>>> answer to {}: {}", strLogPrefix, ip, joAnswer );
                 wsPeer.send( JSON.stringify( joAnswer ) );
             } catch ( err ) {
                 const strError = owaspUtils.extractErrorMessage( err );
-                log.error( "{}Failed to sent answer to {}, error is: {}, stack is:{}{}",
-                    strLogPrefix, ip, log.em( strError ), "\n", log.s( err.stack ) );
+                log.error( "{p}Failed to sent answer to {}, error is: {err}, stack is:{}{stack}",
+                    strLogPrefix, ip, strError, "\n", err.stack );
             }
         } );
     } );
@@ -264,11 +264,11 @@ function initJsonRpcServer() {
             try {
                 res.header( "Content-Type", "application/json" );
                 res.status( 200 ).send( JSON.stringify( joAnswer ) );
-                log.trace( "{}>>> did sent answer to {}: ", strLogPrefix, ip, joAnswer );
+                log.trace( "{p}>>> did sent answer to {}: ", strLogPrefix, ip, joAnswer );
             } catch ( err ) {
                 const strError = owaspUtils.extractErrorMessage( err );
-                log.error( "{}Failed to sent answer {} to {}, error is: {}, stack is:{}{}",
-                    strLogPrefix, joAnswer, ip, log.em( strError ), "\n", log.s( err.stack ) );
+                log.error( "{p}Failed to sent answer {} to {}, error is: {err}, stack is:{}{stack}",
+                    strLogPrefix, joAnswer, ip, strError, "\n", err.stack );
             }
         };
         let joAnswer = {
@@ -278,7 +278,7 @@ function initJsonRpcServer() {
         };
         try {
             const joMessage = JSON.parse( message );
-            log.trace( "{}<<< Peer message from {}: ", strLogPrefix, ip, joMessage );
+            log.trace( "{p}<<< Peer message from {}: ", strLogPrefix, ip, joMessage );
             if( ! ( "method" in joMessage ) )
                 throw new Error( "\"method\" field was not specified" );
             joAnswer.method = joMessage.method;
@@ -346,8 +346,8 @@ function initJsonRpcServer() {
             } // switch( joMessage.method )
         } catch ( err ) {
             const strError = owaspUtils.extractErrorMessage( err );
-            log.error( "{}Bad message from {}: {}, error is: {}, stack is: {}{}",
-                strLogPrefix, ip, message, log.em( strError ), "\n", log.s( err.stack ) );
+            log.error( "{p}Bad message from {}: {}, error is: {err}, stack is:{}{stack}",
+                strLogPrefix, ip, message, strError, "\n", err.stack );
         }
         if( ! isSkipMode )
             fnSendAnswer( joAnswer );
@@ -363,31 +363,30 @@ async function doTheJob() {
     let cntFalse = 0;
     let cntTrue = 0;
     for( idxAction = 0; idxAction < cntActions; ++idxAction ) {
-        log.information( "{}{}", strLogPrefix, log.fmtDebug( imaHelperAPIs.longSeparator ) );
+        log.information( "{p}{p}", strLogPrefix, log.fmtDebug( imaHelperAPIs.longSeparator ) );
         const joAction = imaState.arrActions[idxAction];
-        log.debug( "{}Will execute action: {} ({} of {})" ,
+        log.debug( "{p}Will execute action: {} ({} of {})" ,
             strLogPrefix, joAction.name, idxAction + 1, cntActions );
         try {
             if( await joAction.fn() ) {
                 ++cntTrue;
-                log.success( "{}Succeeded action: {}", strLogPrefix, joAction.name );
+                log.success( "{p}Succeeded action: {}", strLogPrefix, joAction.name );
             } else {
                 ++cntFalse;
-                log.error( "{}Failed action: {}", strLogPrefix, joAction.name );
+                log.error( "{p}Failed action: {}", strLogPrefix, joAction.name );
             }
         } catch ( err ) {
             ++cntFalse;
-            log.critical( "{}Exception occurred while executing action: {}, stack is: {}{}",
-                strLogPrefix, log.em( owaspUtils.extractErrorMessage( err ) ),
-                "\n", log.s( err.stack ) );
+            log.critical( "{p}Exception occurred while executing action: {err}, stack is:{}{stack}",
+                strLogPrefix, err, "\n", err.stack );
         }
     }
-    log.information( "{}{}", strLogPrefix, imaHelperAPIs.longSeparator );
-    log.information( "{}{}", strLogPrefix, "FINISH:" );
-    log.information( "{}task(s) executed {}", strLogPrefix, cntActions );
-    log.information( "{}{}{}", strLogPrefix, cntTrue, log.fmtSuccess( " task(s) succeeded" ) );
-    log.information( "{}{}{}", strLogPrefix, cntFalse, log.fmtError( " task(s) failed" ) );
-    log.information( "{}{}", strLogPrefix, imaHelperAPIs.longSeparator );
+    log.information( "{p}{p}", strLogPrefix, imaHelperAPIs.longSeparator );
+    log.information( "{p}{}", strLogPrefix, "FINISH:" );
+    log.information( "{p}task(s) executed {}", strLogPrefix, cntActions );
+    log.information( "{p}{}{}", strLogPrefix, cntTrue, log.fmtSuccess( " task(s) succeeded" ) );
+    log.information( "{p}{}{}", strLogPrefix, cntFalse, log.fmtError( " task(s) failed" ) );
+    log.information( "{p}{p}", strLogPrefix, imaHelperAPIs.longSeparator );
     process.exitCode = ( cntFalse > 0 ) ? cntFalse : 0;
     if( ! state.isPreventExitAfterLastAction() )
         process.exit( process.exitCode );
@@ -462,7 +461,7 @@ async function main() {
                 }, isSilentReDiscovery, imaState.joSChainNetworkInfo, nCountToWait
                 ).catch( ( err ) => {
                     const strError = owaspUtils.extractErrorMessage( err );
-                    log.critical( "S-Chain network discovery failed: {}", log.em( strError ) );
+                    log.critical( "S-Chain network discovery failed: {err}", strError );
                 } );
             } );
         }
