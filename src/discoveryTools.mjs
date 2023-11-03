@@ -294,7 +294,7 @@ export async function continueSChainDiscoveryInBackgroundIfNeeded( isSilentReDis
             }
             if( ! isSilentReDiscovery ) {
                 log.information( "This S-Chain discovery will be done for re-discover task" );
-                log.information( "Will re-discover {}-node S-Chain network, {} node(s) already " +
+                log.information( "Will re-discover {}-nodes S-Chain network, {} node(s) already " +
                     "discovered...", nCountToWait, cntDiscovered );
             }
             await discoverSChainNetwork( function( err, joSChainNetworkInfo ) {
@@ -427,8 +427,8 @@ async function discoverSChainWalkNodes( optsDiscover ) {
             if( ! optsDiscover.isSilentReDiscovery ) {
                 const strError = owaspUtils.extractErrorMessage( err );
                 log.critical( "{p}JSON RPC call(err) to S-Chain node {} was not created: {err}" +
-                        ", stack is:{}{stack}", optsDiscover.strLogPrefix, strNodeDescColorized,
-                strError, "\n", err.stack );
+                        ", stack is:\n{stack}", optsDiscover.strLogPrefix, strNodeDescColorized,
+                strError, err.stack );
             }
             ++ optsDiscover.cntFailed;
         }
@@ -631,8 +631,8 @@ export async function discoverSChainNetwork(
                 if( ! optsDiscover.isSilentReDiscovery ) {
                     const strError = owaspUtils.extractErrorMessage( err );
                     log.critical( "{p}JSON RPC call(discoverSChainNetwork) to S-Chain was not " +
-                        "created: {err}, stack is:{}{stack}", optsDiscover.strLogPrefix,
-                    strError, "\n", err.stack );
+                        "created: {err}, stack is:\n{stack}", optsDiscover.strLogPrefix,
+                    strError, err.stack );
                 }
                 optsDiscover.joSChainNetworkInfo = null;
                 optsDiscover.fnAfter( err, null );

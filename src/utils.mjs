@@ -107,8 +107,8 @@ export function jsonFileLoad( strPath, joDefault, bLogOutput ) {
         return jo;
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
-        log.error( "Failed to load JSON file {}, error is: {err}, stack is:{}{stack}",
-            strPath, strError, "\n", err.stack );
+        log.error( "Failed to load JSON file {}, error is: {err}, stack is:\n{stack}",
+            strPath, strError, err.stack );
     }
     return joDefault;
 }
@@ -126,8 +126,8 @@ export function jsonFileSave( strPath, jo, bLogOutput ) {
         return true;
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
-        log.error( " failed to save JSON file {}, error is: {err}, stack is:{}{stack}",
-            strPath, strError, "\n", err.stack );
+        log.error( " failed to save JSON file {}, error is: {err}, stack is:\n{stack}",
+            strPath, strError, err.stack );
     }
     return false;
 }
@@ -375,8 +375,8 @@ export function checkKeyExistInABI( strName, strFile, joABI, strKey, isExitOnErr
     } catch ( err ) {
     }
     if( isExitOnError ) {
-        log.fatal( "Loaded {} ABI JSON file {} does not contain needed key {}, stack is:{}{stack}",
-            strName, strFile, strKey, "\n", err.stack );
+        log.fatal( "Loaded {} ABI JSON file {} does not contain needed key {}, stack is:\n{stack}",
+            strName, strFile, strKey, err.stack );
         process.exit( 126 );
     }
     return false;

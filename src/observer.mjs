@@ -721,8 +721,8 @@ async function checkWhetherSChainIsConnected( strSChainName, joMessageProxySChai
             isConnected = false;
             if( opts && opts.details ) {
                 opts.details.error( "Failed attempt {} of {} to query connected state of {} " +
-                    "S-Chain, got error: {err}, stack is:{}{stack}", idxAttempt, cntAttempts,
-                strSChainName, err, "\n", err.stack );
+                    "S-Chain, got error: {err}, stack is:\n{stack}", idxAttempt, cntAttempts,
+                strSChainName, err, err.stack );
             }
         }
     }
@@ -792,7 +792,7 @@ export async function loadSChainsConnectedOnly( strChainNameConnectedTo, opts ) 
             arrSChains.push( joSChain );
         } catch ( err ) {
             if( opts && opts.details )
-                opts.details.error( "Got error: {err}, stack is:{}{stack}", err, "\n", err.stack );
+                opts.details.error( "Got error: {err}, stack is:\n{stack}", err, err.stack );
         }
     }
     return arrSChains;
@@ -828,7 +828,7 @@ export async function checkConnectedSChains( strChainNameConnectedTo, arrSChains
                 strChainNameConnectedTo, joMessageProxySChain, opts );
         } catch ( err ) {
             if( opts && opts.details )
-                opts.details.error( "Got error: {err}, stack is:{}{stack}", err, "\n", err.stack );
+                opts.details.error( "Got error: {err}, stack is:\n{stack}", err, err.stack );
         }
     }
     return arrSChains;
@@ -961,10 +961,8 @@ export async function cacheSChains( strChainNameConnectedTo, opts ) {
         }
         if( opts.fnCacheChanged )
             opts.fnCacheChanged( gArrSChainsCached, strError );
-        if( opts && opts.details ) {
-            opts.details.error( "Failed to cache: {err}, stack is:{}{stack}",
-                err, "\n", err.stack );
-        }
+        if( opts && opts.details )
+            opts.details.error( "Failed to cache: {err}, stack is:\n{stack}", err, err.stack );
     }
     return strError; // null on success
 }
@@ -1181,7 +1179,7 @@ async function inThreadPeriodicCachingStart( strChainNameConnectedTo, opts ) {
         return true;
     } catch ( err ) {
         log.error( "Failed to start in-thread periodic SNB refresh in {}, error is: {err}" +
-            ", stack is:{}{stack}", threadInfo.threadDescription(), err, "\n", err.stack );
+            ", stack is:\n{stack}", threadInfo.threadDescription(), err, err.stack );
     }
     return false;
 }
@@ -1230,7 +1228,7 @@ async function parallelPeriodicCachingStart( strChainNameConnectedTo, opts ) {
         return true;
     } catch ( err ) {
         log.error( "Failed to start parallel periodic SNB refresh in {}, error is: {err}" +
-            ", stack is:{}{stack}", threadInfo.threadDescription(), err, "\n", err.stack );
+            ", stack is:\n{stack}", threadInfo.threadDescription(), err, err.stack );
     }
     return false;
 }
@@ -1268,7 +1266,7 @@ export async function periodicCachingStop() {
             await refWorker.terminate();
         } catch ( err ) {
             log.error( "Failed to stop parallel periodic SNB refresh in {}, error is: {err}, " +
-                "stack is:{}{stack}", threadInfo.threadDescription(), err, "\n", err.stack );
+                "stack is:\n{stack}", threadInfo.threadDescription(), err, err.stack );
         }
     }
     if( gIntervalPeriodicCaching ) {
@@ -1278,7 +1276,7 @@ export async function periodicCachingStop() {
             gIntervalPeriodicCaching = null;
         } catch ( err ) {
             log.error( "Failed to stop in-thread periodic SNB refresh in {}, error is: {err}, " +
-                "stack is:{}{stack}", threadInfo.threadDescription(), err, "\n", err.stack );
+                "stack is:\n{stack}", threadInfo.threadDescription(), err, err.stack );
             gIntervalPeriodicCaching = null; // clear it anyway
         }
     }

@@ -131,31 +131,22 @@ class ObserverServer extends SocketServer {
                         "(needed for particular operations only) in {}",
                 threadInfo.threadDescription() );
             }
-            self.opts.imaState.joNodes =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    self.opts.imaState.joAbiSkaleManager.nodes_address,
-                    self.opts.imaState.joAbiSkaleManager.nodes_abi,
-                    self.opts.imaState.chainProperties.mn.ethersProvider
-                );
-            self.opts.imaState.joSChains =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    self.opts.imaState.joAbiSkaleManager.schains_address,
-                    self.opts.imaState.joAbiSkaleManager.schains_abi,
-                    self.opts.imaState.chainProperties.mn.ethersProvider
-                );
-            self.opts.imaState.joSChainsInternal =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    self.opts.imaState.joAbiSkaleManager.schains_internal_address,
-                    self.opts.imaState.joAbiSkaleManager.schains_internal_abi,
-                    self.opts.imaState.chainProperties.mn.ethersProvider
-                );
-
-            self.opts.imaState.joMessageProxySChain =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    self.opts.imaState.chainProperties.sc.joAbiIMA.message_proxy_chain_address,
-                    self.opts.imaState.chainProperties.sc.joAbiIMA.message_proxy_chain_abi,
-                    self.opts.imaState.chainProperties.sc.ethersProvider
-                );
+            self.opts.imaState.joNodes = new owaspUtils.ethersMod.ethers.Contract(
+                self.opts.imaState.joAbiSkaleManager.nodes_address,
+                self.opts.imaState.joAbiSkaleManager.nodes_abi,
+                self.opts.imaState.chainProperties.mn.ethersProvider );
+            self.opts.imaState.joSChains = new owaspUtils.ethersMod.ethers.Contract(
+                self.opts.imaState.joAbiSkaleManager.schains_address,
+                self.opts.imaState.joAbiSkaleManager.schains_abi,
+                self.opts.imaState.chainProperties.mn.ethersProvider );
+            self.opts.imaState.joSChainsInternal = new owaspUtils.ethersMod.ethers.Contract(
+                self.opts.imaState.joAbiSkaleManager.schains_internal_address,
+                self.opts.imaState.joAbiSkaleManager.schains_internal_abi,
+                self.opts.imaState.chainProperties.mn.ethersProvider );
+            self.opts.imaState.joMessageProxySChain = new owaspUtils.ethersMod.ethers.Contract(
+                self.opts.imaState.chainProperties.sc.joAbiIMA.message_proxy_chain_address,
+                self.opts.imaState.chainProperties.sc.joAbiIMA.message_proxy_chain_abi,
+                self.opts.imaState.chainProperties.sc.ethersProvider );
             self.initComplete = true;
             self.information( "Full init compete for in-worker SNB server in {}, U={}",
                 threadInfo.threadDescription(), gURL );
@@ -163,14 +154,12 @@ class ObserverServer extends SocketServer {
         };
         self.mapApiHandlers.periodicCachingStart =
             function( joMessage, joAnswer, eventData, socket ) {
-                self.opts.details.debug( "{} will start periodic SNB refresh ..."
-                    .threadInfo.threadDescription() );
-                self.periodicCachingStart(
-                    socket,
+                self.opts.details.debug( "{} will start periodic SNB refresh ...",
+                    threadInfo.threadDescription() );
+                self.periodicCachingStart( socket,
                     joMessage.message.secondsToReDiscoverSkaleNetwork,
                     joMessage.message.strChainNameConnectedTo,
-                    joMessage.message.isForceMultiAttemptsUntilSuccess
-                );
+                    joMessage.message.isForceMultiAttemptsUntilSuccess );
                 joAnswer.message = {
                     "method": "" + joMessage.method,
                     "error": null
@@ -271,13 +260,11 @@ class ObserverServer extends SocketServer {
                     "SNB refresh (one of each {} second(s))...", threadInfo.threadDescription(),
                 secondsToReDiscoverSkaleNetwork );
                 while( true ) {
-                    const strError =
-                        await self.periodicCachingDoNow(
-                            socket,
-                            secondsToReDiscoverSkaleNetwork,
-                            strChainNameConnectedTo,
-                            ( !!isForceMultiAttemptsUntilSuccess )
-                        );
+                    const strError = await self.periodicCachingDoNow(
+                        socket,
+                        secondsToReDiscoverSkaleNetwork,
+                        strChainNameConnectedTo,
+                        ( !!isForceMultiAttemptsUntilSuccess ) );
                     if( strError && isForceMultiAttemptsUntilSuccess )
                         continue;
                     isForceMultiAttemptsUntilSuccess = false;

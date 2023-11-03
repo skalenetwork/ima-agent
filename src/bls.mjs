@@ -311,8 +311,8 @@ function performBlsGlue(
         );
     details.debug( "{p}Message hash to sign is {}", strLogPrefix, strMessageHash );
     const strActionDir = allocBlsTmpActionDir();
-    details.trace( "{p}performBlsGlue will work in {} director with {} sign results...",
-        strLogPrefix, strActionDir, arrSignResults.length );
+    details.trace( "{p}{sunny} will work in {} director with {} sign results...",
+        strLogPrefix, "performBlsGlue", strActionDir, arrSignResults.length );
     const fnShellRestore = function() {
         shell.rm( "-rf", strActionDir );
     };
@@ -333,10 +333,9 @@ function performBlsGlue(
             " --n " + nParticipants +
             strInput +
             " --output " + strActionDir + "/glue-result.json";
-        details.trace( "{p}Will execute BLS glue command:{}{}", strLogPrefix,
-            "\n", strGlueCommand );
+        details.trace( "{p}Will execute BLS glue command: {}", strLogPrefix, strGlueCommand );
         strOutput = childProcessModule.execSync( strGlueCommand, { cwd: strActionDir } );
-        details.trace( "{p}BLS glue output is:{}{}", strLogPrefix, "\n", strOutput );
+        details.trace( "{p}BLS glue output is:\n{raw}", strLogPrefix, strOutput || "<<EMPTY>>" );
         joGlueResult = imaUtils.jsonFileLoad( strActionDir + "/glue-result.json" );
         details.trace( "{p}BLS glue result is: {}", strLogPrefix, joGlueResult );
         if( "X" in joGlueResult.signature && "Y" in joGlueResult.signature ) {
@@ -350,10 +349,9 @@ function performBlsGlue(
                 imaState.strPathHashG1 +
                 " --t " + nThreshold +
                 " --n " + nParticipants;
-            details.trace( "{p}Will execute HashG1 command:{}{}",
-                strLogPrefix, "\n", strHasG1Command );
+            details.trace( "{p}Will execute HashG1 command {}", strLogPrefix, strHasG1Command );
             strOutput = childProcessModule.execSync( strHasG1Command, { cwd: strActionDir } );
-            details.trace( "{p}HashG1 output is:{}{}", strLogPrefix, "\n", strOutput );
+            details.trace( "{p}HashG1 output is:\n{raw}", strLogPrefix, strOutput || "<<EMPTY>>" );
             const joResultHashG1 = imaUtils.jsonFileLoad( strActionDir + "/g1.json" );
             details.trace( "{p}HashG1 result is: {}", strLogPrefix, joResultHashG1 );
             if( "g1" in joResultHashG1 &&
@@ -375,9 +373,9 @@ function performBlsGlue(
         }
         fnShellRestore();
     } catch ( err ) {
-        details.critical( "{p}BLS glue error description is: {err}, stack is: {}{stack}",
-            strLogPrefix, err, "\n", err.stack );
-        details.critical( "{p}BLS glue output is:{}{}", strLogPrefix, "\n", strOutput );
+        details.critical( "{p}BLS glue error description is: {err}, stack is: \n{stack}",
+            strLogPrefix, err, err.stack );
+        details.critical( "{p}BLS glue output is:\n{raw}", strLogPrefix, strOutput || "<<EMPTY>>" );
         fnShellRestore();
         joGlueResult = null;
     }
@@ -421,12 +419,11 @@ function performBlsGlueU256( details, u256, arrSignResults ) {
             " --n " + nParticipants +
             strInput +
             " --output " + strActionDir + "/glue-result.json";
-        details.trace( "{p}Will execute BLS glue command:{}{}", strLogPrefix,
-            "\n", strGlueCommand );
+        details.trace( "{p}Will execute BLS glue command: {}", strLogPrefix, strGlueCommand );
         strOutput = childProcessModule.execSync( strGlueCommand, { cwd: strActionDir } );
-        details.trace( "{p}BLS glue output is:{}{}", strLogPrefix, "\n", strOutput );
+        details.trace( "{p}BLS glue output is:\n{raw}", strLogPrefix, strOutput || "<<EMPTY>>" );
         joGlueResult = imaUtils.jsonFileLoad( strActionDir + "/glue-result.json" );
-        details.trace( "{p}BLS glue result is: {}", strLogPrefix, joGlueResult );
+        details.trace( "{p}BLS glue result is:\n{}", strLogPrefix, joGlueResult );
         if( "X" in joGlueResult.signature && "Y" in joGlueResult.signature ) {
             details.success( "{p}BLS glue success", strLogPrefix );
             joGlueResult.hashSrc = strMessageHash;
@@ -438,10 +435,9 @@ function performBlsGlueU256( details, u256, arrSignResults ) {
                 imaState.strPathHashG1 +
                 " --t " + nThreshold +
                 " --n " + nParticipants;
-            details.trace( "{p}Will execute HashG1 command:{}{}", strLogPrefix,
-                "\n", strHasG1Command );
+            details.trace( "{p}Will execute HashG1 command: {}", strLogPrefix, strHasG1Command );
             strOutput = childProcessModule.execSync( strHasG1Command, { cwd: strActionDir } );
-            details.trace( "{p}HashG1 output is:{}{}", strLogPrefix, "\n", strOutput );
+            details.trace( "{p}HashG1 output is:\n{raw}", strLogPrefix, strOutput || "<<EMPTY>>" );
             const joResultHashG1 = imaUtils.jsonFileLoad( strActionDir + "/g1.json" );
             details.trace( "{p}HashG1 result is: {}", strLogPrefix, joResultHashG1 );
             if( "g1" in joResultHashG1 &&
@@ -463,9 +459,9 @@ function performBlsGlueU256( details, u256, arrSignResults ) {
         }
         fnShellRestore();
     } catch ( err ) {
-        details.critical( "BLS glue error description is: {err}, stack is: {}{stack}",
-            err, "\n", err.stack );
-        details.critical( "BLS glue output is:{}{}", "\n", strOutput );
+        details.critical( "BLS glue error description is: {err}, stack is: \n{stack}",
+            err, err.stack );
+        details.critical( "BLS glue output is:\n{raw}", strOutput || "<<EMPTY>>" );
         fnShellRestore();
         joGlueResult = null;
     }
@@ -521,19 +517,19 @@ function performBlsVerifyI(
             " --j " + nZeroBasedNodeIndex +
             " --input " + strSignResultFileName
             ;
-        details.trace( "{p}Will execute node #{} BLS verify command:{}{}", strLogPrefix,
-            nZeroBasedNodeIndex, "\n", strVerifyCommand );
+        details.trace( "{p}Will execute node #{} BLS verify command: {}", strLogPrefix,
+            nZeroBasedNodeIndex, strVerifyCommand );
         strOutput = childProcessModule.execSync( strVerifyCommand, { cwd: strActionDir } );
-        details.trace( "{p}BLS node #{} verify output is:{}{}", strLogPrefix,
-            nZeroBasedNodeIndex, "\n", strOutput );
+        details.trace( "{p}BLS node #{} verify output is:\n{raw}", strLogPrefix,
+            nZeroBasedNodeIndex, strOutput || "<<EMPTY>>" );
         details.success( "{p}BLS node #{} verify success", strLogPrefix, nZeroBasedNodeIndex );
         fnShellRestore();
         return true;
     } catch ( err ) {
         details.critical( "{p}BLS node #{} verify error:, error description is: {err}, " +
-            "stack is: {}{stack}", strLogPrefix, nZeroBasedNodeIndex, err, "\n", err.stack );
-        details.critical( "{p}BLS node #{} verify output is:{}{}",
-            strLogPrefix, nZeroBasedNodeIndex, "\n", strOutput );
+            "stack is: \n{stack}", strLogPrefix, nZeroBasedNodeIndex, err, err.stack );
+        details.critical( "{p}BLS node #{} verify output is:\n{raw}",
+            strLogPrefix, nZeroBasedNodeIndex, strOutput || "<<EMPTY>>" );
         fnShellRestore();
     }
     return false;
@@ -577,19 +573,19 @@ function performBlsVerifyIU256(
             " --j " + nZeroBasedNodeIndex +
             " --input " + strSignResultFileName
             ;
-        details.trace( "{p}Will execute node #{} BLS u256 verify command:{}{}",
-            strLogPrefix, nZeroBasedNodeIndex, "\n", strVerifyCommand );
+        details.trace( "{p}Will execute node #{} BLS u256 verify command: {}",
+            strLogPrefix, nZeroBasedNodeIndex, strVerifyCommand );
         strOutput = childProcessModule.execSync( strVerifyCommand, { cwd: strActionDir } );
-        details.trace( "{p}BLS u256 node #{} verify output is:{}{}", strLogPrefix,
-            nZeroBasedNodeIndex, "\n", strOutput );
+        details.trace( "{p}BLS u256 node #{} verify output is:\n{raw}", strLogPrefix,
+            nZeroBasedNodeIndex, strOutput || "<<EMPTY>>" );
         details.success( "{p}BLS u256 node #{} verify success", strLogPrefix, nZeroBasedNodeIndex );
         fnShellRestore();
         return true;
     } catch ( err ) {
         details.error( "{p}BLS u256 node #{} verify error, error description is: {err}, " +
-            "stack is: {}{stack}", strLogPrefix, nZeroBasedNodeIndex, err, "\n", err.stack );
-        details.error( "{p}BLS u256 node #{} verify output is:{}{}",
-            strLogPrefix, nZeroBasedNodeIndex, "\n", strOutput );
+            "stack is: \n{stack}", strLogPrefix, nZeroBasedNodeIndex, err, err.stack );
+        details.error( "{p}BLS u256 node #{} verify output is:\n{raw}",
+            strLogPrefix, nZeroBasedNodeIndex, strOutput || "<<EMPTY>>" );
         fnShellRestore();
     }
     return false;
@@ -640,25 +636,26 @@ function performBlsVerify(
             commonBLSPublicKey3: joCommonPublicKey.commonBLSPublicKey3
         };
         imaUtils.jsonFileSave( strActionDir + "/common_public_key.json", joCommonPublicKeyToSave );
-        details.trace( "{p}BLS common public key for verification is:{}{}",
-            strLogPrefix, "\n", joCommonPublicKey );
+        details.trace( "{p}BLS common public key for verification is:\n{}",
+            strLogPrefix, joCommonPublicKey );
         const strVerifyCommand = "" +
             imaState.strPathBlsVerify +
             " --t " + nThreshold +
             " --n " + nParticipants +
             " --input " + "./glue-result.json"
             ;
-        details.trace( "{p}Will execute BLS/summary verify command:{}{}",
-            strLogPrefix, "\n", strVerifyCommand );
+        details.trace( "{p}Will execute BLS/summary verify command: {}",
+            strLogPrefix, strVerifyCommand );
         strOutput = childProcessModule.execSync( strVerifyCommand, { cwd: strActionDir } );
-        details.trace( "{p}BLS/summary verify output is:{}{}", strLogPrefix, "\n", strOutput );
+        details.trace( "{p}BLS/summary verify output is:\n{raw}", strLogPrefix,
+            strOutput || "<<EMPTY>>" );
         details.success( "{p}BLS/summary verify success", strLogPrefix );
         fnShellRestore();
         return true;
     } catch ( err ) {
-        details.error( "{p}BLS/summary verify error description is: {err}, stack is:{}{stack}",
-            strLogPrefix, err, "\n", err.stack );
-        details.error( "BLS/summary verify output is:{}{}", "\n", strOutput );
+        details.error( "{p}BLS/summary verify error description is: {err}, stack is:\n{stack}",
+            strLogPrefix, err, err.stack );
+        details.error( "BLS/summary verify output is:\n{raw}", strOutput || "<<EMPTY>>" );
         fnShellRestore();
     }
     return false;
@@ -693,25 +690,27 @@ function performBlsVerifyU256( details, joGlueResult, u256, joCommonPublicKey ) 
             commonBLSPublicKey3: joCommonPublicKey.commonBLSPublicKey3
         };
         imaUtils.jsonFileSave( strActionDir + "/common_public_key.json", joCommonPublicKeyToSave );
-        details.trace( "{p}BLS u256 common public key for verification is:{}{}",
-            strLogPrefix, "\n", joCommonPublicKey );
+        details.trace( "{p}BLS u256 common public key for verification is:\n{}",
+            strLogPrefix, joCommonPublicKey );
         const strVerifyCommand = "" +
             imaState.strPathBlsVerify +
             " --t " + nThreshold +
             " --n " + nParticipants +
             " --input " + "./glue-result.json"
             ;
-        details.trace( "{p}Will execute BLS u256/summary verify command:{}{}",
-            strLogPrefix, "\n", strVerifyCommand );
+        details.trace( "{p}Will execute BLS u256/summary verify command: {}",
+            strLogPrefix, strVerifyCommand );
         strOutput = childProcessModule.execSync( strVerifyCommand, { cwd: strActionDir } );
-        details.trace( "{p}BLS u256/summary verify output is:{}{}", strLogPrefix, "\n", strOutput );
+        details.trace( "{p}BLS u256/summary verify output is:\n{raw}", strLogPrefix,
+            strOutput || "<<EMPTY>>" );
         details.success( "{p}BLS u256/summary verify success", strLogPrefix );
         fnShellRestore();
         return true;
     } catch ( err ) {
-        details.error( "{p}BLS u256/summary  error description is: {err}, stack is: {}{stack}",
-            strLogPrefix, err, "\n", err.stack );
-        details.error( "{p}BLS u256/summary verify output is:{}{}", strLogPrefix, "\n", strOutput );
+        details.error( "{p}BLS u256/summary  error description is: {err}, stack is: \n{stack}",
+            strLogPrefix, err, err.stack );
+        details.error( "{p}BLS u256/summary verify output is:\n{raw}", strLogPrefix,
+            strOutput || "<<EMPTY>>" );
         fnShellRestore();
     }
     return false;
@@ -801,15 +800,15 @@ async function checkCorrectnessOfMessagesToSign(
                 if( log.id != details.id ) {
                     log.critical( "{p}{bright} Correctness validation failed " +
                             "for message {} sent to {}, message is: {}, " +
-                            "error information: {err}, stack is:{}{stack}",
+                            "error information: {err}, stack is:\n{stack}",
                     strLogPrefix, strDirection, idxMessage, joChainName, joMessage,
-                    err, "\n", err.stack );
+                    err, err.stack );
                 }
                 details.critical( "{p}{bright} Correctness validation failed " +
                         "for message {} sent to {}, message is: {}, " +
-                        "error information: {err}, stack is:{}{stack}",
+                        "error information: {err}, stack is:\n{stack}",
                 strLogPrefix, strDirection, idxMessage, joChainName, joMessage,
-                err, "\n", err.stack );
+                err, err.stack );
             }
         }
     }
@@ -961,7 +960,7 @@ async function gatherSigningStartImpl( optsSignOperation ) {
                         ) ) {
                             strSuccessfulResultDescription =
                                 "Got successful summary BLS verification result";
-                            optsSignOperation.details.success( "{p}{}",
+                            optsSignOperation.details.success( "{p}{bright}",
                                 optsSignOperation.strLogPrefixB, strSuccessfulResultDescription );
                         } else {
                             strError = "BLS verification failed";
@@ -1207,10 +1206,10 @@ async function doSignProcessHandleCall(
         await joCall.disconnect();
         return;
     }
-    optsSignOperation.details.trace( "{p}{} Got answer from skale_imaVerifyAndSign(node #{} " +
+    optsSignOperation.details.trace( "{p}{} Got answer from {bright}(node #{} " +
             "via {url} for transfer from chain {} to chain {} with params {}, answer is {}, " +
             "sequence ID is {}", optsSignOperation.strLogPrefix,
-    log.generateTimestampString( null, true ), i, strNodeURL,
+    log.generateTimestampString( null, true ), "skale_imaVerifyAndSign", i, strNodeURL,
     optsSignOperation.fromChainName, optsSignOperation.targetChainName,
     joParams, joOut, optsSignOperation.sequenceId );
     if( joOut.result == null || joOut.result == undefined ||
@@ -1287,15 +1286,15 @@ async function doSignProcessHandleCall(
             } catch ( err ) {
                 if( log.id != optsSignOperation.details.id ) {
                     log.critical( "{p}S-Chain node {} partial signature fail from with index {}" +
-                            ", error is {err}, sequence ID is {}, stack is:{}{stack}",
+                            ", error is {err}, sequence ID is {}, stack is:\n{stack}",
                     optsSignOperation.strLogPrefixA, strNodeDescColorized, nZeroBasedNodeIndex,
-                    err, optsSignOperation.sequenceId, "\n", err.stack );
+                    err, optsSignOperation.sequenceId, err.stack );
                 }
                 optsSignOperation.details.critical(
                     "{p}S-Chain node {} partial signature fail from with index {}" +
-                        ", error is {err}, sequence ID is {}, stack is:{}{stack}",
+                        ", error is {err}, sequence ID is {}, stack is:\n{stack}",
                     optsSignOperation.strLogPrefixA, strNodeDescColorized, nZeroBasedNodeIndex,
-                    err, optsSignOperation.sequenceId, "\n", err.stack );
+                    err, optsSignOperation.sequenceId, err.stack );
             }
             if( bNodeSignatureOKay ) {
                 optsSignOperation.arrSignResults.push( {
@@ -1314,16 +1313,16 @@ async function doSignProcessHandleCall(
         ++optsSignOperation.joGatheringTracker.nCountErrors;
         if( log.id != optsSignOperation.details.id ) {
             log.critical( "{p}S-Chain node {} signature fail from node {}, error is {err}" +
-                    ", sequence ID is {}, stack is:{}{stack}",
+                    ", sequence ID is {}, stack is:\n{stack}",
             optsSignOperation.strLogPrefix, strNodeDescColorized, joNode.nodeID,
             err, optsSignOperation.sequenceId,
-            "\n", err.stack );
+            err.stack );
         }
         optsSignOperation.details.critical(
             "{p}S-Chain node {} signature fail from node {}, error is {err}" +
-                ", sequence ID is {}, stack is:{}{stack}",
+                ", sequence ID is {}, stack is:\n{stack}",
             optsSignOperation.strLogPrefix, strNodeDescColorized, joNode.nodeID,
-            err, optsSignOperation.sequenceId, "\n", err.stack );
+            err, optsSignOperation.sequenceId, err.stack );
     }
     await joCall.disconnect();
 }
@@ -1373,10 +1372,10 @@ async function doSignProcessOneImpl( i, optsSignOperation ) {
                     "ts": "" + log.generateTimestampString( null, false )
                 }
             };
-            optsSignOperation.details.trace( "{p}{} Will invoke skale_imaVerifyAndSign " +
+            optsSignOperation.details.trace( "{p}{} Will invoke {bright} " +
                     "to node #{} via {url} for transfer from chain {} to chain {} with params {}" +
                     ", sequence ID is {}", optsSignOperation.strLogPrefix,
-            log.generateTimestampString( null, true ), i, strNodeURL,
+            log.generateTimestampString( null, true ), "skale_imaVerifyAndSign", i, strNodeURL,
             optsSignOperation.fromChainName, optsSignOperation.targetChainName,
             joParams, optsSignOperation.sequenceId );
             await joCall.call( {
@@ -1451,11 +1450,11 @@ async function doSignMessagesImpl(
                 optsSignOperation.joGatheringTracker.nCountReceived -
                 optsSignOperation.joGatheringTracker.nCountErrors;
             if( optsSignOperation.cntSuccess >= optsSignOperation.nCountOfBlsPartsToCollect ) {
-                optsSignOperation.details.trace( "{p}{} Stop invoking skale_imaVerifyAndSign" +
+                optsSignOperation.details.trace( "{p}{} Stop invoking {bright}" +
                     " for transfer from chain {} at #{} because successfully gathered count is " +
                     "reached ", optsSignOperation.strLogPrefix,
-                log.generateTimestampString( null, true ), fromChainName, i,
-                optsSignOperation.cntSuccess );
+                log.generateTimestampString( null, true ), "skale_imaVerifyAndSign", fromChainName,
+                i, optsSignOperation.cntSuccess );
                 break;
             }
             doSignProcessOneImpl( i, optsSignOperation );
@@ -1464,21 +1463,17 @@ async function doSignMessagesImpl(
         await gatherSigningFinishImpl( optsSignOperation );
     } catch ( err ) {
         if( ( !optsSignOperation.details ) || log.id != optsSignOperation.details.id ) {
-            log.critical( "Failed BLS sign due to generic flow exception: err}, stack is:{}{stack}",
-                err, "\n", err.stack );
+            log.critical( "Failed BLS sign due to generic " +
+                "flow exception: {err}, stack is:\n{stack}", err, err.stack );
         }
         if( optsSignOperation.details ) {
-            optsSignOperation.details.critical(
-                "Failed BLS sign due to generic flow exception: {err}, stack is:{}{stack}",
-                err, "\n", err.stack );
+            optsSignOperation.details.critical( "Failed BLS sign due to generic " +
+                "flow exception: {err}, stack is:\n{stack}", err, err.stack );
         }
         if( ! optsSignOperation.bHaveResultReportCalled ) {
             optsSignOperation.bHaveResultReportCalled = true;
-            await optsSignOperation.fn(
-                "Failed BLS sign due to exception: " +
-                owaspUtils.extractErrorMessage( err ),
-                optsSignOperation.jarrMessages,
-                null
+            await optsSignOperation.fn( "Failed BLS sign due to exception: " +
+                owaspUtils.extractErrorMessage( err ), optsSignOperation.jarrMessages, null
             ).catch( ( err ) => {
                 log.critical( "Failed BLS sign due to error-reporting callback exception: {err}",
                     err );
@@ -1690,15 +1685,15 @@ async function doSignU256OneImpl( i, optsSignU256 ) {
                         if( log.id != optsSignU256.details.id ) {
                             log.critical( "{p}S-Chain node {} sign CRITICAL ERROR:" +
                                     " partial signature fail from with index {}, " +
-                                    "error is {err}, stack is:{}{stack}",
+                                    "error is {err}, stack is:\n{stack}",
                             strLogPrefixA, strNodeDescColorized, nZeroBasedNodeIndex,
-                            err, "\n", err.stack );
+                            err, err.stack );
                         }
                         optsSignU256.details.critical( "{p}S-Chain node {} sign CRITICAL ERROR:" +
                                 " partial signature fail from with index {}, " +
-                                "error is {err}, stack is:{}{stack}",
+                                "error is {err}, stack is:\n{stack}",
                         strLogPrefixA, strNodeDescColorized, nZeroBasedNodeIndex,
-                        err, "\n", err.stack );
+                        err, err.stack );
                     }
                     if( bNodeSignatureOKay ) {
                         optsSignU256.arrSignResults.push( {
@@ -1715,14 +1710,14 @@ async function doSignU256OneImpl( i, optsSignU256 ) {
                 ++optsSignU256.joGatheringTracker.nCountErrors;
                 if( log.id != optsSignU256.details.id ) {
                     log.critical( "{p}S-Chain node {} signature fail from node {}" +
-                            ", error is {err}, stack is:{}{stack}",
+                            ", error is {err}, stack is:\n{stack}",
                     optsSignU256.strLogPrefix, strNodeDescColorized, joNode.nodeID,
-                    err, "\n", err.stack );
+                    err, err.stack );
                 }
                 optsSignU256.details.critical( "{p}S-Chain node {} signature fail from node {}" +
-                        ", error is {err}, stack is:{}{stack}",
+                        ", error is {err}, stack is:\n{stack}",
                 optsSignU256.strLogPrefix, strNodeDescColorized, joNode.nodeID,
-                err, "\n", err.stack );
+                err, err.stack );
             }
             await joCall.disconnect();
         } ); // joCall.call ...
@@ -1992,25 +1987,25 @@ export async function doVerifyReadyHash(
             " --j " + nZeroBasedNodeIndex +
             " --input " + strSignResultFileName
             ;
-        details.trace( "{p}Will execute node #{} BLS verify command:{}{}",
-            strLogPrefix, nZeroBasedNodeIndex, "\n", strVerifyCommand );
+        details.trace( "{p}Will execute node #{} BLS verify command: {}",
+            strLogPrefix, nZeroBasedNodeIndex, strVerifyCommand );
         strOutput = childProcessModule.execSync( strVerifyCommand, { cwd: strActionDir } );
-        details.trace( "{p}BLS node #{} verify output is:{}{}", strLogPrefix, nZeroBasedNodeIndex,
-            "\n", strOutput );
+        details.trace( "{p}BLS node #{} verify output is:\n{raw}", strLogPrefix,
+            nZeroBasedNodeIndex, strOutput || "<<EMPTY>>" );
         details.success( "{p}BLS node #{} verify success", strLogPrefix, nZeroBasedNodeIndex );
         fnShellRestore();
         isSuccess = true;
     } catch ( err ) {
         if( log.id != details.id ) {
             log.critical( "{p}BLS node #{} verify error, error description is: {err}, " +
-                "stack is:{}{stack}", strLogPrefix, nZeroBasedNodeIndex, err, "\n" + err.stack );
-            log.critical( "{p}BLS node#{} verify output is:{}{err}",
-                strLogPrefix, nZeroBasedNodeIndex, "\n", strOutput );
+                "stack is:\n{stack}", strLogPrefix, nZeroBasedNodeIndex, err, err.stack );
+            log.critical( "{p}BLS node#{} verify output is:\n{raw}",
+                strLogPrefix, nZeroBasedNodeIndex, strOutput || "<<EMPTY>>" );
         }
         details.critical( "{p}BLS node #{} verify error, error description is: {err}" +
-                ", stack is:{}{stack}", strLogPrefix, nZeroBasedNodeIndex, err, "\n", err.stack );
-        details.critical( "{p}BLS node #{} verify output is:{}{err}",
-            strLogPrefix, nZeroBasedNodeIndex, "\n", strOutput );
+                ", stack is:\n{stack}", strLogPrefix, nZeroBasedNodeIndex, err, err.stack );
+        details.critical( "{p}BLS node #{} verify output is:\n{raw}",
+            strLogPrefix, nZeroBasedNodeIndex, strOutput || "<<EMPTY>>" );
         fnShellRestore();
         isSuccess = false;
     }
@@ -2091,12 +2086,12 @@ export async function doSignReadyHash( strMessageHash, isExposeOutput ) {
                     );
                     if( log.id != details.id ) {
                         log.error( "{p}JSON RPC call(doSignReadyHash) to SGX failed, " +
-                            "RPC call reported error: {err}, stack is:{}{stack}",
-                        strLogPrefix, err, "\n", jsErrorObject.stack );
+                            "RPC call reported error: {err}, stack is:\n{stack}",
+                        strLogPrefix, err, jsErrorObject.stack );
                     }
                     details.error( "{p}JSON RPC call(doSignReadyHash) to SGX failed, " +
-                        "RPC call reported error: {err}, stack is:{}{stack}",
-                    strLogPrefix, err, "\n", jsErrorObject.stack );
+                        "RPC call reported error: {err}, stack is:\n{stack}",
+                    strLogPrefix, err, jsErrorObject.stack );
                     await joCall.disconnect();
                     throw jsErrorObject;
                 }
@@ -2133,11 +2128,11 @@ export async function doSignReadyHash( strMessageHash, isExposeOutput ) {
         joSignResult = { };
         joSignResult.error = strError;
         if( log.id != details.id ) {
-            log.error( "{p}BLS-raw-signer error: {err}, stack is:{}{stack}",
-                strLogPrefix, strError, "\n", err.stack );
+            log.error( "{p}BLS-raw-signer error: {err}, stack is:\n{stack}",
+                strLogPrefix, strError, err.stack );
         }
-        details.error( "{p}BLS-raw-signer error: {err}, stack is:{}{stack}",
-            strLogPrefix, strError, "\n", err.stack );
+        details.error( "{p}BLS-raw-signer error: {err}, stack is:\n{stack}",
+            strLogPrefix, strError, err.stack );
     }
     const isSuccess = (
         joSignResult && typeof joSignResult == "object" && ( !joSignResult.error ) )
@@ -2342,13 +2337,13 @@ export async function handleSkaleImaVerifyAndSign( joCallData ) {
                     const jsErrorObject = new Error( strError );
                     if( log.id != optsHandleVerifyAndSign.details.id ) {
                         log.error( "{p}JSON RPC call(handleSkaleImaVerifyAndSign) " +
-                            "to SGX failed, RPC call reported error: {err}, stack is:{}{stack}",
-                        optsHandleVerifyAndSign.strLogPrefix, err, "\n", jsErrorObject.stack );
+                            "to SGX failed, RPC call reported error: {err}, stack is:\n{stack}",
+                        optsHandleVerifyAndSign.strLogPrefix, err, jsErrorObject.stack );
                     }
                     optsHandleVerifyAndSign.details.error(
                         "{p}JSON RPC call(handleSkaleImaVerifyAndSign) " +
-                        "to SGX failed, RPC call reported error: {err}, stack is:{}{stack}",
-                        optsHandleVerifyAndSign.strLogPrefix, err, "\n", jsErrorObject.stack );
+                        "to SGX failed, RPC call reported error: {err}, stack is:\n{stack}",
+                        optsHandleVerifyAndSign.strLogPrefix, err, jsErrorObject.stack );
                     await joCall.disconnect();
                     throw jsErrorObject;
                 }
@@ -2395,12 +2390,12 @@ export async function handleSkaleImaVerifyAndSign( joCallData ) {
         const strError = owaspUtils.extractErrorMessage( err );
         optsHandleVerifyAndSign.joRetVal.error = strError;
         if( log.id != optsHandleVerifyAndSign.details.id ) {
-            log.critical( "{p}IMA messages verifier/signer error: {err}, stack is:{}{stack}",
-                optsHandleVerifyAndSign.strLogPrefix, strError, "\n", err.stack );
+            log.critical( "{p}IMA messages verifier/signer error: {err}, stack is:\n{stack}",
+                optsHandleVerifyAndSign.strLogPrefix, strError, err.stack );
         }
         optsHandleVerifyAndSign.details.critical(
-            "{p}IMA messages verifier/signer error: {err}, stack is:{}{stack}",
-            optsHandleVerifyAndSign.strLogPrefix, strError, "\n", err.stack );
+            "{p}IMA messages verifier/signer error: {err}, stack is:\n{stack}",
+            optsHandleVerifyAndSign.strLogPrefix, strError, err.stack );
     }
     optsHandleVerifyAndSign.details.exposeDetailsTo(
         log, "IMA messages verifier/signer", optsHandleVerifyAndSign.isSuccess );
@@ -2512,12 +2507,12 @@ export async function handleSkaleImaBSU256( joCallData ) {
                             owaspUtils.extractErrorMessage( err ) );
                         if( log.id != optsBSU256.details.id ) {
                             log.error( "{p}JSON RPC call(handleSkaleImaBSU256) " +
-                                "to SGX failed, RPC call reported error: {err}, stack is:{}{stack}",
-                            optsBSU256.strLogPrefix, err, "\n", jsErrorObject.stack );
+                                "to SGX failed, RPC call reported error: {err}, stack is:\n{stack}",
+                            optsBSU256.strLogPrefix, err, jsErrorObject.stack );
                         }
                         optsBSU256.details.error( "{p}JSON RPC call(handleSkaleImaBSU256) " +
-                            "to SGX failed, RPC call reported error: {err}, stack is:{}{stack}",
-                        optsBSU256.strLogPrefix, err, "\n", jsErrorObject.stack );
+                            "to SGX failed, RPC call reported error: {err}, stack is:\n{stack}",
+                        optsBSU256.strLogPrefix, err, jsErrorObject.stack );
                         await joCall.disconnect();
                         throw jsErrorObject;
                     }
@@ -2558,11 +2553,11 @@ export async function handleSkaleImaBSU256( joCallData ) {
         const strError = owaspUtils.extractErrorMessage( err );
         optsBSU256.joRetVal.error = strError;
         if( log.id != optsBSU256.details.id ) {
-            log.critical( "{p}U256-BLS-signer error: {err}, stack is:{}{stack}",
-                optsBSU256.strLogPrefix, strError, "\n", err.stack );
+            log.critical( "{p}U256-BLS-signer error: {err}, stack is:\n{stack}",
+                optsBSU256.strLogPrefix, strError, err.stack );
         }
-        optsBSU256.details.critical( "{p}U256-BLS-signer error: {err}, stack is:{}{stack}",
-            optsBSU256.strLogPrefix, strError, "\n", err.stack );
+        optsBSU256.details.critical( "{p}U256-BLS-signer error: {err}, stack is:\n{stack}",
+            optsBSU256.strLogPrefix, strError, err.stack );
     }
     optsBSU256.details.exposeDetailsTo( log, "U256-BLS-signer", optsBSU256.isSuccess );
     optsBSU256.details.close();

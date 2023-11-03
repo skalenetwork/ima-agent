@@ -230,8 +230,8 @@ function initMonitoringServer() {
                 } // switch( joMessage.method )
             } catch ( err ) {
                 const strError = owaspUtils.extractErrorMessage( err );
-                log.error( "{p}Bad message from {}: {}, error is: {err}, stack is:{}{stack}",
-                    strLogPrefix, ip, message, strError, "\n", err.stack );
+                log.error( "{p}Bad message from {}: {}, error is: {err}, stack is:\n{stack}",
+                    strLogPrefix, ip, message, strError, err.stack );
             }
             try {
                 if( imaState.bLogMonitoringServer )
@@ -239,8 +239,8 @@ function initMonitoringServer() {
                 wsPeer.send( JSON.stringify( joAnswer ) );
             } catch ( err ) {
                 const strError = owaspUtils.extractErrorMessage( err );
-                log.error( "{p}Failed to sent answer to {}, error is: {err}, stack is:{}{stack}",
-                    strLogPrefix, ip, strError, "\n", err.stack );
+                log.error( "{p}Failed to sent answer to {}, error is: {err}, stack is:\n{stack}",
+                    strLogPrefix, ip, strError, err.stack );
             }
         } );
     } );
@@ -267,8 +267,8 @@ function initJsonRpcServer() {
                 log.trace( "{p}>>> did sent answer to {}: ", strLogPrefix, ip, joAnswer );
             } catch ( err ) {
                 const strError = owaspUtils.extractErrorMessage( err );
-                log.error( "{p}Failed to sent answer {} to {}, error is: {err}, stack is:{}{stack}",
-                    strLogPrefix, joAnswer, ip, strError, "\n", err.stack );
+                log.error( "{p}Failed to sent answer {} to {}, error is: {err}, stack is:\n{stack}",
+                    strLogPrefix, joAnswer, ip, strError, err.stack );
             }
         };
         let joAnswer = {
@@ -346,8 +346,8 @@ function initJsonRpcServer() {
             } // switch( joMessage.method )
         } catch ( err ) {
             const strError = owaspUtils.extractErrorMessage( err );
-            log.error( "{p}Bad message from {}: {}, error is: {err}, stack is:{}{stack}",
-                strLogPrefix, ip, message, strError, "\n", err.stack );
+            log.error( "{p}Bad message from {}: {}, error is: {err}, stack is:\n{stack}",
+                strLogPrefix, ip, message, strError, err.stack );
         }
         if( ! isSkipMode )
             fnSendAnswer( joAnswer );
@@ -365,20 +365,20 @@ async function doTheJob() {
     for( idxAction = 0; idxAction < cntActions; ++idxAction ) {
         log.information( "{p}{p}", strLogPrefix, log.fmtDebug( imaHelperAPIs.longSeparator ) );
         const joAction = imaState.arrActions[idxAction];
-        log.debug( "{p}Will execute action: {} ({} of {})" ,
+        log.debug( "{p}Will execute action: {bright} ({} of {})" ,
             strLogPrefix, joAction.name, idxAction + 1, cntActions );
         try {
             if( await joAction.fn() ) {
                 ++cntTrue;
-                log.success( "{p}Succeeded action: {}", strLogPrefix, joAction.name );
+                log.success( "{p}Succeeded action: {bright}", strLogPrefix, joAction.name );
             } else {
                 ++cntFalse;
-                log.error( "{p}Failed action: {}", strLogPrefix, joAction.name );
+                log.error( "{p}Failed action: {bright}", strLogPrefix, joAction.name );
             }
         } catch ( err ) {
             ++cntFalse;
-            log.critical( "{p}Exception occurred while executing action: {err}, stack is:{}{stack}",
-                strLogPrefix, err, "\n", err.stack );
+            log.critical( "{p}Exception occurred while executing action: {err}, stack is:\n{stack}",
+                strLogPrefix, err, err.stack );
         }
     }
     log.information( "{p}{p}", strLogPrefix, imaHelperAPIs.longSeparator );

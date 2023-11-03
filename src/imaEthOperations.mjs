@@ -51,8 +51,8 @@ export async function getBalanceEth(
         return balance;
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
-        log.error( "{p}balance fetching error details: {err}, stack is:{}{stack}",
-            strLogPrefix, strError, "\n", err.stack );
+        log.error( "{p}balance fetching error details: {err}, stack is:\n{stack}",
+            strLogPrefix, strError, err.stack );
     }
     return "<no-data-or-error>";
 }
@@ -144,11 +144,11 @@ export async function doEthPaymentFromMainNet(
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != details.id ) {
-            log.critical( "{p}Payment error in {}: {err}, stack is:{}{stack}",
-                strLogPrefix, strActionName, strError, "\n", err.stack );
+            log.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
+                strLogPrefix, strActionName, strError, err.stack );
         }
-        details.critical( "{p}Payment error in {}: {err}, stack is:{}{stack}",
-            strLogPrefix, strActionName, strError, "\n", err.stack );
+        details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
+            strLogPrefix, strActionName, strError, err.stack );
         details.exposeDetailsTo( log, "doEthPaymentFromMainNet", false );
         details.close();
         return false;
@@ -246,11 +246,11 @@ export async function doEthPaymentFromSChain(
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != details.id ) {
-            log.critical( "{p}Payment error in {}: {err}, stack is:{}{stack}",
-                strLogPrefix, strActionName, strError, "\n", err.stack );
+            log.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
+                strLogPrefix, strActionName, strError, err.stack );
         }
-        details.critical( "{p}Payment error in {}: {err}, stack is:{}{stack}",
-            strLogPrefix, strActionName, strError, "\n", err.stack );
+        details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
+            strLogPrefix, strActionName, strError, err.stack );
         details.exposeDetailsTo( log, "doEthPaymentFromSChain", false );
         details.close();
         return false;
@@ -311,11 +311,11 @@ export async function receiveEthPaymentFromSchainOnMainNet(
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != details.id ) {
-            log.critical( "{p}Receive payment error in {}: {err}, stack is:{}{stack}",
-                strLogPrefix, strActionName, strError, "\n", err.stack );
+            log.critical( "{p}Receive payment error in {bright}: {err}, stack is:\n{stack}",
+                strLogPrefix, strActionName, strError, err.stack );
         }
-        details.critical( "{p}Receive payment error in {}: {err}, stack is:{}{stack}",
-            strLogPrefix, strActionName, strError, "\n", err.stack );
+        details.critical( "{p}Receive payment error in {bright}: {err}, stack is:\n{stack}",
+            strLogPrefix, strActionName, strError, err.stack );
         details.exposeDetailsTo( log, "receiveEthPaymentFromSchainOnMainNet", false );
         details.close();
         return false;
@@ -355,11 +355,11 @@ export async function viewEthPaymentFromSchainOnMainNet(
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != details.id ) {
-            log.critical( "{p}View payment error in {}: {err}, stack is:{}{stack}",
-                strLogPrefix, strActionName, strError, "\n" + err.stack );
+            log.critical( "{p}View payment error in {bright}: {err}, stack is:\n{stack}",
+                strLogPrefix, strActionName, strError, err.stack );
         }
-        details.critical( "{p}View payment error in {}: {err}, stack is:{}{stack}",
-            strLogPrefix, strActionName, strError, "\n" + err.stack );
+        details.critical( "{p}View payment error in {bright}: {err}, stack is:\n{stack}",
+            strLogPrefix, strActionName, strError, err.stack );
         details.exposeDetailsTo( log, "viewEthPaymentFromSchainOnMainNet", false );
         details.close();
         return null;

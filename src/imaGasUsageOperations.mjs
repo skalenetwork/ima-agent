@@ -31,13 +31,13 @@ export function composeGasUsageReportFromArray( strName, jarrReceipts ) {
         return "";
     let i, sumGasUsed = owaspUtils.toBN( "0" ),
         s = "\n" + log.fmtInformation( "Gas usage report for " ) +
-            log.fmtInformation( "{}", strName ) + "\n";
+            log.fmtInformation( "{p}\n", strName );
     for( i = 0; i < jarrReceipts.length; ++ i ) {
         try {
             sumGasUsed = sumGasUsed.add( owaspUtils.toBN( jarrReceipts[i].receipt.gasUsed ) );
-            s += "    " + log.fmtInformation( "{}", jarrReceipts[i].description ) +
+            s += log.fmtInformation( "    {p}", jarrReceipts[i].description ) +
                 log.fmtDebug( "....." ) +
-                log.fmtInformation( "{}", jarrReceipts[i].receipt.gasUsed.toString() ) + "\n";
+                log.fmtInformation( "{p}\n", jarrReceipts[i].receipt.gasUsed.toString() );
         } catch ( err ) { }
     }
     s += "    " + log.fmtAttention( "SUM" ) + log.fmtDebug( "....." ) +

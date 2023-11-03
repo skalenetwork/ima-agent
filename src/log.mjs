@@ -153,8 +153,10 @@ export function createStandardOutputStream() {
                     this.write( getLogLinePrefixFatal() + fmtFatal( ...arguments ) );
             },
             "critical": function() {
-                if( verboseGet() >= verboseReversed().critical )
-                    this.write( getLogLinePrefixCritical() + fmtCritical( ...arguments ) );
+                if( verboseGet() >= verboseReversed().critical ) {
+                    this.write(
+                        getLogLinePrefixCritical() + fmtCritical( ...arguments ) );
+                }
             },
             "error": function() {
                 if( verboseGet() >= verboseReversed().error )
@@ -165,16 +167,22 @@ export function createStandardOutputStream() {
                     this.write( getLogLinePrefixWarning() + fmtWarning( ...arguments ) );
             },
             "attention": function() {
-                if( verboseGet() >= verboseReversed().attention )
-                    this.write( getLogLinePrefixAttention() + fmtAttention( ...arguments ) );
+                if( verboseGet() >= verboseReversed().attention ) {
+                    this.write(
+                        getLogLinePrefixAttention() + fmtAttention( ...arguments ) );
+                }
             },
             "information": function() {
-                if( verboseGet() >= verboseReversed().information )
-                    this.write( getLogLinePrefixInformation() + fmtInformation( ...arguments ) );
+                if( verboseGet() >= verboseReversed().information ) {
+                    this.write(
+                        getLogLinePrefixInformation() + fmtInformation( ...arguments ) );
+                }
             },
             "info": function() {
-                if( verboseGet() >= verboseReversed().information )
-                    this.write( getLogLinePrefixInformation() + fmtInformation( ...arguments ) );
+                if( verboseGet() >= verboseReversed().information ) {
+                    this.write(
+                        getLogLinePrefixInformation() + fmtInformation( ...arguments ) );
+                }
             },
             "notice": function() {
                 if( verboseGet() >= verboseReversed().notice )
@@ -222,47 +230,66 @@ export function createMemoryOutputStream() {
             "strPath": "memory",
             "nMaxSizeBeforeRotation": -1,
             "nMaxFilesCount": -1,
-            "strAccumulatedLogText": "",
+            "arrAccumulatedLogTextLines": [],
             "haveOwnTimestamps": true,
             "strOwnIndent": "    ",
+            "isLastLineEndsWithCarriageReturn": function() {
+                if( this.arrAccumulatedLogTextLines.length == 0 )
+                    return false;
+                const s = this.arrAccumulatedLogTextLines[
+                    this.arrAccumulatedLogTextLines.length - 1];
+                if( ! s )
+                    return false;
+                if( s[s.length - 1] == "\n" )
+                    return true;
+                return false;
+            },
             "write": function() {
                 const s = fmtArgumentsArray( arguments );
-                if( this.strAccumulatedLogText.length == 0 ||
-                    this.strAccumulatedLogText[this.strAccumulatedLogText.length - 1] == "\n"
-                ) {
-                    this.strAccumulatedLogText += ( this.strOwnIndent ? this.strOwnIndent : "" );
-                    if( this.haveOwnTimestamps )
-                        this.strAccumulatedLogText += generateTimestampPrefix( null, true );
+                const arr = s.split( "\n" );
+                for( let i = 0; i < arr.length; ++ i ) {
+                    const strLine = arr[i];
+                    let strHeader = "";
+                    if( this.isLastLineEndsWithCarriageReturn() ) {
+                        strHeader = ( this.strOwnIndent ? this.strOwnIndent : "" );
+                        if( this.haveOwnTimestamps )
+                            strHeader += generateTimestampPrefix( null, true );
+                    }
+                    this.arrAccumulatedLogTextLines.push( strHeader + strLine + "\n" );
                 }
-                this.strAccumulatedLogText += s;
             },
-            "clear": function() { this.strAccumulatedLogText = ""; },
+            "clear": function() { this.arrAccumulatedLogTextLines = []; },
             "close": function() { this.clear(); },
             "open": function() { this.clear(); },
             "size": function() { return 0; },
-            "rotate": function( nBytesToWrite ) { this.strAccumulatedLogText = ""; },
-            "toString": function() { return "" + this.strAccumulatedLogText; },
+            "rotate": function( nBytesToWrite ) { this.this.arrAccumulatedLogTextLines = []; },
+            "toString": function() {
+                let s = "";
+                for( let i = 0; i < this.arrAccumulatedLogTextLines.length; ++ i )
+                    s += this.arrAccumulatedLogTextLines[i];
+                return s;
+            },
             "exposeDetailsTo": function( otherStream, strTitle, isSuccess ) {
-                if( ! ( this.strAccumulatedLogText &&
-                    typeof this.strAccumulatedLogText == "string" &&
-                    this.strAccumulatedLogText.length > 0 ) )
+                if( ! ( this.arrAccumulatedLogTextLines &&
+                    this.arrAccumulatedLogTextLines.length > 0 ) )
                     return;
                 strTitle = strTitle
                     ? ( cc.bright( " (" ) + cc.attention( strTitle ) + cc.bright( ")" ) ) : "";
                 const strSuccessPrefix = isSuccess
                     ? cc.success( "SUCCESS" ) : cc.error( "ERROR" );
-                otherStream.write(
-                    cc.bright( "\n--- --- --- --- --- GATHERED " ) + strSuccessPrefix +
-                    cc.bright( " DETAILS FOR LATEST(" ) + cc.sunny( strTitle ) +
+                otherStream.write( "\n" );
+                otherStream.write( cc.bright( "--- --- --- --- --- GATHERED " ) +
+                    strSuccessPrefix + cc.bright( " DETAILS FOR LATEST(" ) + cc.sunny( strTitle ) +
                     cc.bright( " action (" ) + cc.sunny( "BEGIN" ) +
-                    cc.bright( ") --- --- ------ --- \n" ) +
-                    this.strAccumulatedLogText +
-                    cc.bright( "--- --- --- --- --- GATHERED " ) + strSuccessPrefix +
-                    cc.bright( " DETAILS FOR LATEST(" ) + cc.sunny( strTitle ) +
+                    cc.bright( ") --- --- ------ --- " ) );
+                otherStream.write( "\n" );
+                for( let i = 0; i < this.arrAccumulatedLogTextLines.length; ++ i )
+                    otherStream.write( this.arrAccumulatedLogTextLines[i] );
+                otherStream.write( cc.bright( "--- --- --- --- --- GATHERED " ) +
+                    strSuccessPrefix + cc.bright( " DETAILS FOR LATEST(" ) + cc.sunny( strTitle ) +
                     cc.bright( " action (" ) + cc.sunny( "END" ) +
-                    cc.bright( ") --- --- --- --- ---\n"
-                    )
-                );
+                    cc.bright( ") --- --- --- --- ---" ) );
+                otherStream.write( "\n" );
             },
             // high-level formatters
             "fatal": function() {
@@ -282,16 +309,22 @@ export function createMemoryOutputStream() {
                     this.write( getLogLinePrefixWarning() + fmtWarning( ...arguments ) );
             },
             "attention": function() {
-                if( verboseGet() >= verboseReversed().attention )
-                    this.write( getLogLinePrefixAttention() + fmtAttention( ...arguments ) );
+                if( verboseGet() >= verboseReversed().attention ) {
+                    this.write(
+                        getLogLinePrefixAttention() + fmtAttention( ...arguments ) );
+                }
             },
             "information": function() {
-                if( verboseGet() >= verboseReversed().information )
-                    this.write( getLogLinePrefixInformation() + fmtInformation( ...arguments ) );
+                if( verboseGet() >= verboseReversed().information ) {
+                    this.write(
+                        getLogLinePrefixInformation() + fmtInformation( ...arguments ) );
+                }
             },
             "info": function() {
-                if( verboseGet() >= verboseReversed().information )
-                    this.write( getLogLinePrefixInformation() + fmtInformation( ...arguments ) );
+                if( verboseGet() >= verboseReversed().information ) {
+                    this.write(
+                        getLogLinePrefixInformation() + fmtInformation( ...arguments ) );
+                }
             },
             "notice": function() {
                 if( verboseGet() >= verboseReversed().notice )
@@ -404,8 +437,10 @@ export function createFileOutput( strFilePath, nMaxSizeBeforeRotation, nMaxFiles
                     this.write( getLogLinePrefixFatal() + fmtFatal( ...arguments ) );
             },
             "critical": function() {
-                if( verboseGet() >= verboseReversed().critical )
-                    this.write( getLogLinePrefixCritical() + fmtCritical( ...arguments ) );
+                if( verboseGet() >= verboseReversed().critical ) {
+                    this.write(
+                        getLogLinePrefixCritical() + fmtCritical( ...arguments ) );
+                }
             },
             "error": function() {
                 if( verboseGet() >= verboseReversed().error )
@@ -416,16 +451,22 @@ export function createFileOutput( strFilePath, nMaxSizeBeforeRotation, nMaxFiles
                     this.write( getLogLinePrefixWarning() + fmtWarning( ...arguments ) );
             },
             "attention": function() {
-                if( verboseGet() >= verboseReversed().attention )
-                    this.write( getLogLinePrefixAttention() + fmtAttention( ...arguments ) );
+                if( verboseGet() >= verboseReversed().attention ) {
+                    this.write(
+                        getLogLinePrefixAttention() + fmtAttention( ...arguments ) );
+                }
             },
             "information": function() {
-                if( verboseGet() >= verboseReversed().information )
-                    this.write( getLogLinePrefixInformation() + fmtInformation( ...arguments ) );
+                if( verboseGet() >= verboseReversed().information ) {
+                    this.write(
+                        getLogLinePrefixInformation() + fmtInformation( ...arguments ) );
+                }
             },
             "info": function() {
-                if( verboseGet() >= verboseReversed().information )
-                    this.write( getLogLinePrefixInformation() + fmtInformation( ...arguments ) );
+                if( verboseGet() >= verboseReversed().information ) {
+                    this.write(
+                        getLogLinePrefixInformation() + fmtInformation( ...arguments ) );
+                }
             },
             "notice": function() {
                 if( verboseGet() >= verboseReversed().notice )
@@ -547,9 +588,13 @@ export function fmtArgumentsArray( arrArgs, fnFormatter ) {
     const fnFormatOneArgument = function( arg, fmt ) {
         if( ! arg )
             return arg;
+        if( arg == " " || arg == "\n" )
+            return arg;
         if( ! isValueMode )
             return fnDefaultOneArgumentFormatter( arg, null );
         if( fmt && typeof "fmt" == "string" ) {
+            if( fmt == "raw" )
+                return arg;
             if( fmt == "p" )
                 return fnDefaultOneArgumentFormatter( arg, null );
             if( fmt == "url" )

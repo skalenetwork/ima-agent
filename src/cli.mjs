@@ -2093,7 +2093,7 @@ async function asyncCheckUrlAtStartup( u, name ) {
         return isOnLine;
     } catch ( err ) {
         details.error( "Failed to check URL {url} connectivity for {} at start-up, " +
-            "error is: {err}, stack is:{}{stack}", u, name, err, "\n", err.stack );
+            "error is: {err}, stack is:\n{stack}", u, name, err, err.stack );
     }
     return false;
 }

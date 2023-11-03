@@ -76,7 +76,7 @@ export async function dryRunCall(
         return null; // success
     isDryRunResultIgnore = ( isDryRunResultIgnore != null && isDryRunResultIgnore != undefined )
         ? ( !!isDryRunResultIgnore ) : false;
-    const strContractMethodDescription = log.fmtDebug( "{p}({}).{}",
+    const strContractMethodDescription = log.fmtDebug( "{p}({}).{sunny}",
         strContractName, joContract.address, strMethodName );
     let strArgumentsDescription = "";
     if( arrArguments.length > 0 ) {
@@ -84,7 +84,7 @@ export async function dryRunCall(
         for( let i = 0; i < arrArguments.length; ++ i ) {
             if( i > 0 )
                 strArgumentsDescription += log.fmtDebug( ", " );
-            strArgumentsDescription += log.fmtInformation( "{p}", arrArguments[i] );
+            strArgumentsDescription += log.fmtInformation( "{}", arrArguments[i] );
         }
         strArgumentsDescription += log.fmtDebug( " )" );
     } else
@@ -92,7 +92,7 @@ export async function dryRunCall(
     const strContractCallDescription = strContractMethodDescription + strArgumentsDescription;
     const strLogPrefix = strContractMethodDescription + " ";
     try {
-        details.trace( "Dry-run of action {}...", strActionName );
+        details.trace( "Dry-run of action {bright}...", strActionName );
         details.trace( "Will dry-run {}...", strContractCallDescription );
         const strAccountWalletAddress = joAccount.address();
         const callOpts = {
@@ -131,8 +131,8 @@ async function payedCallPrepare( optsPayedCall ) {
         optsPayedCall.callOpts.value =
             owaspUtils.toBN( optsPayedCall.weiHowMuch ).toHexString();
     }
-    optsPayedCall.details.trace( "{p}payed-call of action {} will do payed-call {} with " +
-            "call options {} via {}-sign-and-send using from address {}...",
+    optsPayedCall.details.trace( "{p}payed-call of action {bright} will do payed-call {p} with " +
+            "call options {} via {sunny}-sign-and-send using from address {}...",
     optsPayedCall.strLogPrefix, optsPayedCall.strActionName,
     optsPayedCall.strContractCallDescription, optsPayedCall.callOpts,
     optsPayedCall.joACI.strType, optsPayedCall.joAccount.address() );
@@ -325,15 +325,16 @@ export async function payedCall(
         callOpts: {
         }
     };
-    const strContractMethodDescription = log.fmtDebug( "{p}({}).{}", optsPayedCall.strContractName,
-        optsPayedCall.joContract.address, optsPayedCall.strMethodName );
+    const strContractMethodDescription = log.fmtDebug( "{p}({}).{sunny}",
+        optsPayedCall.strContractName, optsPayedCall.joContract.address,
+        optsPayedCall.strMethodName );
     let strArgumentsDescription = "";
     if( optsPayedCall.arrArguments.length > 0 ) {
         strArgumentsDescription += log.fmtDebug( "( " );
         for( let i = 0; i < optsPayedCall.arrArguments.length; ++ i ) {
             if( i > 0 )
                 strArgumentsDescription += log.fmtDebug( ", " );
-            strArgumentsDescription += log.fmtInformation( "{p}", optsPayedCall.arrArguments[i] );
+            strArgumentsDescription += log.fmtInformation( "{}", optsPayedCall.arrArguments[i] );
         }
         strArgumentsDescription += log.fmtDebug( " )" );
     } else
@@ -367,17 +368,17 @@ export async function payedCall(
         } // switch( optsPayedCall.joACI.strType )
     } catch ( err ) {
         const strErrorPrefix = "Transaction sign and send error(outer flow):";
-        optsPayedCall.details.critical( "{p}{} {err}, stack is:{}{stack}",
-            optsPayedCall.strLogPrefix, strErrorPrefix, err, "\n", err.stack );
+        optsPayedCall.details.critical( "{p}{} {err}, stack is:\n{stack}",
+            optsPayedCall.strLogPrefix, strErrorPrefix, err, err.stack );
         if( log.id != optsPayedCall.details.id ) {
-            log.critical( "{p}{} {err}, stack is:{}{stack}", optsPayedCall.strLogPrefix,
-                strErrorPrefix, err, "\n", err.stack );
+            log.critical( "{p}{} {err}, stack is:\n{stack}", optsPayedCall.strLogPrefix,
+                strErrorPrefix, err, err.stack );
         }
         throw new Error( strErrorPrefix +
             " invoking the " + optsPayedCall.strContractCallDescription +
             ", error is: " + owaspUtils.extractErrorMessage( err ) );
     }
-    optsPayedCall.details.success( "{p}Done, TX was {}-signed-and-sent, receipt is {}",
+    optsPayedCall.details.success( "{p}Done, TX was {sunny}-signed-and-sent, receipt is {}",
         optsPayedCall.strLogPrefix, optsPayedCall.joACI ? optsPayedCall.joACI.strType : "N/A",
         optsPayedCall.joReceipt );
     try {
@@ -393,8 +394,8 @@ export async function payedCall(
         optsPayedCall.details.trace( "{p}gas spent: {}", optsPayedCall.strLogPrefix, gasSpent );
         optsPayedCall.details.trace( "{p}ETH spent: {}", optsPayedCall.strLogPrefix, ethSpent );
     } catch ( err ) {
-        optsPayedCall.details.warning( "{p}TX stats computation error {err}, stack is:{}{stack}",
-            optsPayedCall.strLogPrefix, err, "\n", err.stack );
+        optsPayedCall.details.warning( "{p}TX stats computation error {err}, stack is:\n{stack}",
+            optsPayedCall.strLogPrefix, err, err.stack );
     }
     return optsPayedCall.joReceipt;
 }
@@ -444,7 +445,7 @@ export async function checkTransactionToSchain(
         }
     } catch ( err ) {
         details.critical( "{p}PoW-mining error(checkTransactionToSchain): exception occur before " +
-            "PoW-mining, error is: {err}, stack is:{}{stack}", strLogPrefix, err, "\n", err.stack );
+            "PoW-mining, error is: {err}, stack is:\n{stack}", strLogPrefix, err, err.stack );
     }
     return unsignedTx;
 }
@@ -464,7 +465,7 @@ export async function calculatePowNumber( address, nonce, gas, details, strLogPr
         return res;
     } catch ( err ) {
         details.critical( "{p}PoW-mining error(calculatePowNumber): exception occur during " +
-            "PoW-mining, error is: {err}, stack is:{}{stack}", strLogPrefix, err, "\n", err.stack );
+            "PoW-mining, error is: {err}, stack is:\n{stack}", strLogPrefix, err, err.stack );
         throw err;
     }
 }
@@ -691,7 +692,7 @@ export class TransactionCustomizer {
         opts
     ) {
         let estimatedGas = 0;
-        const strContractMethodDescription = log.fmtDebug( "{p}({}).{}",
+        const strContractMethodDescription = log.fmtDebug( "{p}({}).{sunny}",
             strContractName, joContract.address, strMethodName );
         let strArgumentsDescription = "";
         if( arrArguments.length > 0 ) {
@@ -699,7 +700,7 @@ export class TransactionCustomizer {
             for( let i = 0; i < arrArguments.length; ++ i ) {
                 if( i > 0 )
                     strArgumentsDescription += log.fmtDebug( ", " );
-                strArgumentsDescription += log.fmtInformation( "{p}", arrArguments[i] );
+                strArgumentsDescription += log.fmtInformation( "{}", arrArguments[i] );
             }
             strArgumentsDescription += log.fmtDebug( " )" );
         } else
@@ -711,7 +712,7 @@ export class TransactionCustomizer {
             const promiseComplete = new Promise( function( resolve, reject ) {
                 const doEstimation = async function() {
                     try {
-                        details.trace( "Estimate-gas of action {}...", strActionName );
+                        details.trace( "Estimate-gas of action {bright}...", strActionName );
                         details.trace( "Will estimate-gas {}...", strContractCallDescription );
                         const strAccountWalletAddress = joAccount.address();
                         const callOpts = { from: strAccountWalletAddress };
@@ -739,8 +740,8 @@ export class TransactionCustomizer {
         } catch ( err ) {
             const strError = owaspUtils.extractErrorMessage( err );
             details.error( "{p}Estimate-gas error: {err}, default recommended gas value " +
-                    "will be used instead of estimated, stack is:{}{stack}",
-            strLogPrefix, strError, "\n", err.stack );
+                    "will be used instead of estimated, stack is:\n{stack}",
+            strLogPrefix, strError, err.stack );
         }
         estimatedGas = owaspUtils.parseIntOrHex( owaspUtils.toBN( estimatedGas ).toString() );
         if( estimatedGas == 0 ) {

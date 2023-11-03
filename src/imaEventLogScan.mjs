@@ -97,13 +97,13 @@ function generateWhileTransferringLogMessageSuffix( optsChainPair ) {
     if( ! optsChainPair.strDirection )
         return "";
     if( optsChainPair.strDirection == "S2S" ) {
-        return log.fmtDebug( " (while performing {bright} transfer with external " +
+        return log.fmtDebug( "(while performing {bright} transfer with external " +
             "S-Chain {} / {} node {})", optsChainPair.strDirection,
         optsChainPair.optsSpecificS2S.joSChain.data.name,
         optsChainPair.optsSpecificS2S.joSChain.data.computed.chainId,
         optsChainPair.optsSpecificS2S.idxNode );
     }
-    return log.fmtDebug( " (while performing {} transfer)", optsChainPair.strDirection );
+    return log.fmtDebug( "(while performing {bright} transfer)", optsChainPair.strDirection );
 }
 
 export async function safeGetPastEventsProgressive(
@@ -239,7 +239,7 @@ export async function safeGetTransactionCount(
     } catch ( err ) {
         ret = retValOnFail;
         details.error( "Failed call attempt {} to {} via {url}, error is: {err}, " +
-            "stack is:{}{stack}", idxAttempt, strFnName + "()", u, err, "\n", err.stack );
+            "stack is:\n{stack}", idxAttempt, strFnName + "()", u, err, err.stack );
     }
     ++ idxAttempt;
     while( ret === "" && idxAttempt <= cntAttempts ) {
@@ -260,7 +260,7 @@ export async function safeGetTransactionCount(
         } catch ( err ) {
             ret = retValOnFail;
             details.error( "Failed call attempt {} to {} via {url}, error is: {err}, " +
-                "stack is:{}{stack}", idxAttempt, strFnName + "()", u, err, "\n", err.stack );
+                "stack is:\n{stack}", idxAttempt, strFnName + "()", u, err, err.stack );
         }
         ++ idxAttempt;
     }
@@ -295,7 +295,7 @@ export async function safeGetTransactionReceipt(
     } catch ( err ) {
         ret = retValOnFail;
         details.error( "Failed call attempt {} to {} via {url}, error is: {err}, " +
-            "stack is:{}{stack}", idxAttempt, strFnName + "()", u, err, "\n", err.stack );
+            "stack is:\n{stack}", idxAttempt, strFnName + "()", u, err, err.stack );
     }
     ++ idxAttempt;
     while( txReceipt === "" && idxAttempt <= cntAttempts ) {
@@ -316,7 +316,7 @@ export async function safeGetTransactionReceipt(
         } catch ( err ) {
             ret = retValOnFail;
             details.error( "Failed call attempt {} to {} via {url}, error is: {err}, " +
-                "stack is:{}{stack}", idxAttempt, strFnName + "()", u, err, "\n", err.stack );
+                "stack is:\n{stack}", idxAttempt, strFnName + "()", u, err, err.stack );
         }
         ++ idxAttempt;
     }
@@ -371,9 +371,9 @@ export async function safeGetPastEvents(
     } catch ( err ) {
         ret = retValOnFail;
         details.error( "{p}Failed filtering attempt {} for event {} via {url}, from block {}" +
-            ", to block {}, error is: {err}, stack is:{}{stack}", strLogPrefix, idxAttempt,
+            ", to block {}, error is: {err}, stack is:\n{stack}", strLogPrefix, idxAttempt,
         strEventName, u, nBlockFrom.toHexString(), nBlockTo.toHexString(),
-        err, "\n", err.stack );
+        err, err.stack );
         if( owaspUtils.extractErrorMessage( err )
             .indexOf( strErrorTextAboutNotExistingEvent ) >= 0 ) {
             details.error( "{p}Did stopped filtering of {} event because no such event exist " +
@@ -407,9 +407,9 @@ export async function safeGetPastEvents(
         } catch ( err ) {
             ret = retValOnFail;
             details.error( "{p}Failed filtering attempt {} for event {} via {url}, from block {}" +
-                ", to block{}, error is: {err}, stack is:{}{stack}", strLogPrefix, idxAttempt,
+                ", to block{}, error is: {err}, stack is:\n{stack}", strLogPrefix, idxAttempt,
             strEventName, u, nBlockFrom.toHexString(), nBlockTo.toHexString(),
-            err, "\n", err.stack );
+            err, err.stack );
             if( owaspUtils.extractErrorMessage( err )
                 .indexOf( strErrorTextAboutNotExistingEvent ) >= 0
             ) {
@@ -499,15 +499,15 @@ export async function safeGetPastEventsIterative(
             }
         } catch ( err ) {
             details.critical( "{p}Got scan error during interactive scan of {}/{} " +
-                "block sub-range in {}/{} block range, error is: {err}, stack is:{}{stack}",
+                "block sub-range in {}/{} block range, error is: {err}, stack is:\n{stack}",
             strLogPrefix, idxBlockSubRangeFrom.toHexString(), idxBlockSubRangeTo.toHexString(),
-            nBlockFrom.toHexString(), nBlockTo.toHexString(), err, "\n" + err.stack );
+            nBlockFrom.toHexString(), nBlockTo.toHexString(), err, err.stack );
         }
         idxBlockSubRangeTo = idxBlockSubRangeFrom;
         if( idxBlockSubRangeTo.lte( nBlockFrom ) )
             break;
     }
-    details.debug( "{p}Result of {} scan in {}/{} is {}", strLogPrefix, "iterative",
+    details.debug( "{p}Result of iterative scan in {}/{} is {}", strLogPrefix,
         nBlockFrom.toHexString(), nBlockTo.toHexString(), "empty block range" );
     return "";
 }
