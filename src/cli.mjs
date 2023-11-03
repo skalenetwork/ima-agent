@@ -103,7 +103,7 @@ export function ensureHaveValue(
     for( ; n > 0; --n )
         strDots += ".";
     if( isPrintValue )
-        log.debug( "{}{}{}", fnNameColorizer( name ), strDots, fnValueColorizer( value ) );
+        log.debug( "{sunny}{raw}{}", fnNameColorizer( name ), strDots, fnValueColorizer( value ) );
     return retVal;
 }
 
@@ -187,9 +187,9 @@ export function ensureHaveCredentials(
         );
     }
     if( cntAccountVariantsSpecified == 0 ) {
-        log.error( "ARGUMENTS VALIDATION WARNING: bad credentials information specified for {} " +
-            "chain, no explicit SGX, no explicit private key, no wallet address found",
-        strFriendlyChainName );
+        log.error( "ARGUMENTS VALIDATION WARNING: bad credentials information " +
+            "specified for {bright} chain, no explicit SGX, no explicit private key, " +
+            "no wallet address found", strFriendlyChainName );
         if( isExitIfEmpty )
             process.exit( 126 );
     }
@@ -2102,49 +2102,36 @@ function commonInitPrintSysInfo() {
     const imaState = state.get();
     const isPrintGathered = ( !!( imaState.isPrintGathered ) );
     if( isPrintGathered ) {
-        log.debug( "This process ", att( "PID" ), " is ", att( process.pid ) );
-        log.debug( "This process ", att( "PPID" ), " is ", att( process.ppid ) );
-        log.debug( "This process ", att( "EGID" ), " is ", att( process.getegid() ) );
-        log.debug( "This process ", att( "EUID" ), " is ", att( process.geteuid() ) );
-        log.debug( "This process ", att( "GID" ), " is ", att( process.getgid() ) );
-        log.debug( "This process ", att( "UID" ), " is ", att( process.getuid() ) );
-        log.debug( "This process ", att( "groups" ), " are ",
-            log.fmtInformation( process.getgroups() ) );
-        log.debug( "This process ", att( "CWD" ), " is ", att( process.cwd() ) );
-        log.debug( "This process ", att( "platform" ), " is ", att( process.platform ) );
-        log.debug( "This process ", att( "release" ), " is ",
-            log.fmtInformation( process.release ) );
-        log.debug( "This process ", att( "report" ), " is ",
-            log.fmtInformation( process.report ) );
-        log.debug( "This process ", att( "config" ), " is ",
-            log.fmtInformation( process.config ) );
-        log.debug( att( "Node JS" ), " ", att( "detailed version information" ),
-            " is ", log.fmtInformation( process.versions ) );
-        log.debug( att( "OS" ), " ", att( "type" ), " is ", att( os.type() ) );
-        log.debug( att( "OS" ), " ", att( "platform" ),
-            " is ", att( os.platform() ) );
-        log.debug( att( "OS" ), " ", att( "release" ),
-            " is ", att( os.release() ) );
-        log.debug( att( "OS" ), " ", att( "architecture" ),
-            " is ", att( os.arch() ) );
-        log.debug( att( "OS" ), " ", att( "endianness" ),
-            " is ", att( os.endianness() ) );
-        log.debug( att( "OS" ), " ", att( "host name" ),
-            " is ", att( os.hostname() ) );
-        log.debug( att( "OS" ), " ", att( "CPUs" ), " are ", log.fmtInformation( os.cpus() ) );
-        log.debug( att( "OS" ), " ", att( "network interfaces" ),
-            " are ", log.fmtInformation( os.networkInterfaces() ) );
-        log.debug( att( "OS" ), " ", att( "home dir" ),
-            " is ", att( os.homedir() ) );
-        log.debug( att( "OS" ), " ", att( "tmp dir" ),
-            " is ", att( os.tmpdir() ) );
-        log.debug( att( "OS" ), " ", att( "uptime" ), " is ", att( os.uptime() ) );
-        log.debug( att( "OS" ), " ", att( "user" ), " is ", log.fmtInformation( os.userInfo() ) );
+        log.debug( "This process {sunny} is {}", "PID", process.pid );
+        log.debug( "This process {sunny} is {}", "PPID", process.ppid );
+        log.debug( "This process {sunny} is {}", "EGID", process.getegid() );
+        log.debug( "This process {sunny} is {}", "EUID", process.geteuid() );
+        log.debug( "This process {sunny} is {}", "GID", process.getgid() );
+        log.debug( "This process {sunny} is {}", "UID", process.getuid() );
+        log.debug( "This process {sunny} are {}", "groups", process.getgroups() );
+        log.debug( "This process {sunny} is {}", "CWD", process.cwd() );
+        log.debug( "This process {sunny} is {}", "platform", process.platform );
+        log.debug( "This process {sunny} is {}", "release",process.release );
+        log.debug( "This process {sunny} is {}", "report", process.report );
+        log.debug( "This process {sunny} is {}", "config", process.config );
+        log.debug( "Node JS {sunny} is {}", "detailed version information", process.versions );
+        log.debug( "OS {sunny} is {}", "type", os.type() );
+        log.debug( "OS {sunny} is {}", "platform", os.platform() );
+        log.debug( "OS {sunny} is {}", "release", os.release() );
+        log.debug( "OS {sunny} is {}", "architecture", os.arch() );
+        log.debug( "OS {sunny} is {}", "endianness", os.endianness() );
+        log.debug( "OS {sunny} is {}", "host name", os.hostname() );
+        log.debug( "OS {sunny} is {}", "CPUs are ", os.cpus() );
+        log.debug( "OS {sunny} are {}", "network interfaces", os.networkInterfaces() );
+        log.debug( "OS {sunny} is {}", "home dir", os.homedir() );
+        log.debug( "OS {sunny} is {}", "tmp dir", os.tmpdir() );
+        log.debug( "OS {sunny} is {}", "uptime", os.uptime() );
+        log.debug( "OS {sunny} is {}", "user", os.userInfo() );
         const joMemory = { total: os.totalmem(), free: os.freemem() };
         joMemory.freePercent = ( joMemory.free / joMemory.total ) * 100.0;
-        log.debug( att( "OS" ), " ", att( "memory" ), " is ", log.fmtInformation( joMemory ) );
+        log.debug( "OS {sunny} is {}", "memory", joMemory );
         const joLA = os.loadavg();
-        log.debug( att( "OS" ), " ", att( "average load" ), " is ", log.fmtInformation( joLA ) );
+        log.debug( "OS {sunny} is {}", "average load", joLA );
     }
 }
 
@@ -2320,86 +2307,86 @@ function commonInitPrintFoundContracts() {
     // message_proxy_chain_address                --> message_proxy_chain_abi
 
     const oct = function( joContract ) { // optional contract address
-        if( joContract && "options" in joContract && "address" in joContract.options )
-            return att( joContract.address );
+        if( joContract && "address" in joContract && joContract.address )
+            return log.fmtInformation( "{}", joContract.address );
         return log.fmtError( "contract is not available" );
     };
 
     if( isPrintGathered ) {
-        log.debug( att( "IMA contracts(Main Net):" ) );
-        log.debug( att( "DepositBoxEth" ), "...................address is.....",
+        log.debug( "IMA contracts(Main Net):" );
+        log.debug( "{sunny}...................address is.....{}", "DepositBoxEth",
             oct( imaState.joDepositBoxETH ) );
-        log.debug( att( "DepositBoxERC20" ), ".................address is.....",
+        log.debug( "{sunny}.................address is.....{}", "DepositBoxERC20",
             oct( imaState.joDepositBoxERC20 ) );
-        log.debug( att( "DepositBoxERC721" ), "................address is.....",
+        log.debug( "{sunny}................address is.....{}", "DepositBoxERC721",
             oct( imaState.joDepositBoxERC721 ) );
-        log.debug( att( "DepositBoxERC1155" ), "...............address is.....",
+        log.debug( "{sunny}...............address is.....{}", "DepositBoxERC1155",
             oct( imaState.joDepositBoxERC1155 ) );
-        log.debug( att( "DepositBoxERC721WithMetadata" ), "....address is.....",
+        log.debug( "{sunny}....address is.....{}", "DepositBoxERC721WithMetadata",
             oct( imaState.joDepositBoxERC721WithMetadata ) );
-        log.debug( att( "CommunityPool" ), "...................address is.....",
+        log.debug( "{sunny}...................address is.....{}", "CommunityPool",
             oct( imaState.joCommunityPool ) );
-        log.debug( att( "MessageProxy" ), "....................address is.....",
+        log.debug( "{sunny}....................address is.....{}", "MessageProxy",
             oct( imaState.joMessageProxyMainNet ) );
-        log.debug( att( "Linker" ), "..........................address is.....",
+        log.debug( "{sunny}..........................address is.....{}", "Linker",
             oct( imaState.joLinker ) );
-        log.debug( att( "IMA contracts(S-Chain):" ) );
-        log.debug( att( "TokenManagerEth" ), ".................address is.....",
+        log.debug( "IMA contracts(S-Chain):" );
+        log.debug( "{sunny}.................address is.....{}", "TokenManagerEth",
             oct( imaState.joTokenManagerETH ) );
-        log.debug( att( "TokenManagerERC20" ), "...............address is.....",
+        log.debug( "{sunny}...............address is.....{}", "TokenManagerERC20",
             oct( imaState.joTokenManagerERC20 ) );
-        log.debug( att( "TokenManagerERC721" ), "..............address is.....",
+        log.debug( "{sunny}..............address is.....{}", "TokenManagerERC721",
             oct( imaState.joTokenManagerERC721 ) );
-        log.debug( att( "TokenManagerERC1155" ), ".............address is.....",
+        log.debug( "{sunny}.............address is.....{}", "TokenManagerERC1155",
             oct( imaState.joTokenManagerERC1155 ) );
-        log.debug( att( "TokenManagerERC721WithMetadata" ), "..address is.....",
+        log.debug( "{sunny}..address is.....{}", "TokenManagerERC721WithMetadata",
             oct( imaState.joTokenManagerERC721WithMetadata ) );
-        log.debug( att( "CommunityLocker" ), ".................address is.....",
+        log.debug( "{sunny}.................address is.....{}", "CommunityLocker",
             oct( imaState.joCommunityLocker ) );
-        log.debug( att( "MessageProxy" ), "....................address is.....",
+        log.debug( "{sunny}....................address is.....{}", "MessageProxy",
             oct( imaState.joMessageProxySChain ) );
-        log.debug( att( "TokenManagerLinker" ), "..............address is.....",
+        log.debug( "{sunny}..............address is.....{}", "TokenManagerLinker",
             oct( imaState.joTokenManagerLinker ) );
-        log.debug( att( "ERC20" ), " ..........................address is.....",
+        log.debug( "{sunny} ..........................address is.....{}", "ERC20",
             oct( imaState.joEthErc20 ) );
-        log.debug( att( "IMA contracts(Target S-Chain):" ) );
-        log.debug( att( "TokenManagerERC20" ), "...............address is.....",
+        log.debug( "IMA contracts(Target S-Chain):" );
+        log.debug( "{sunny}...............address is.....{}", "TokenManagerERC20",
             oct( imaState.joTokenManagerERC20Target ) );
-        log.debug( att( "TokenManagerERC721" ), "..............address is.....",
+        log.debug( "{sunny}..............address is.....{}", "TokenManagerERC721",
             oct( imaState.joTokenManagerERC721Target ) );
-        log.debug( att( "TokenManagerERC1155" ), ".............address is.....",
+        log.debug( "{sunny}.............address is.....{}", "TokenManagerERC1155",
             oct( imaState.joTokenManagerERC1155Target ) );
-        log.debug( att( "TokenManagerERC721WithMetadata" ), "..address is.....",
+        log.debug( "{sunny}..address is.....{}", "TokenManagerERC721WithMetadata",
             oct( imaState.joTokenManagerERC721WithMetadataTarget ) );
-        log.debug( att( "CommunityLocker" ), ".................address is.....",
+        log.debug( "{sunny}.................address is.....{}", "CommunityLocker",
             oct( imaState.joCommunityLockerTarget ) );
-        log.debug( att( "MessageProxy" ), "....................address is.....",
+        log.debug( "{sunny}....................address is.....{}", "MessageProxy",
             oct( imaState.joMessageProxySChainTarget ) );
-        log.debug( att( "TokenManagerLinker" ), "..............address is.....",
+        log.debug( "{sunny}..............address is.....{}", "TokenManagerLinker",
             oct( imaState.joTokenManagerLinkerTarget ) );
-        log.debug( att( "ERC20" ), " ..........................address is.....",
+        log.debug( "{sunny} ..........................address is.....{}", "ERC20",
             oct( imaState.joEthErc20Target ) );
 
-        log.debug( att( "Skale Manager contracts:" ) );
-        log.debug( att( "ConstantsHolder" ), ".................address is.....",
+        log.debug( "Skale Manager contracts:" );
+        log.debug( "{sunny}.................address is.....{}", "ConstantsHolder",
             oct( imaState.joConstantsHolder ) );
-        log.debug( att( "Nodes" ), "...........................address is.....",
+        log.debug( "{sunny}...........................address is.....{}", "Nodes",
             oct( imaState.joNodes ) );
-        log.debug( att( "KeyStorage" ), "......................address is.....",
+        log.debug( "{sunny}......................address is.....{}", "KeyStorage",
             oct( imaState.joKeyStorage ) );
-        log.debug( att( "Schains" ), ".........................address is.....",
+        log.debug( "{sunny}.........................address is.....{}", "Schains",
             oct( imaState.joSChains ) );
-        log.debug( att( "SchainsInternal" ), ".................address is.....",
+        log.debug( "{sunny}.................address is.....{}", "SchainsInternal",
             oct( imaState.joSChainsInternal ) );
-        log.debug( att( "SkaleDKG" ), "........................address is.....",
+        log.debug( "{sunny}........................address is.....{}", "SkaleDKG",
             oct( imaState.joSkaleDKG ) );
-        log.debug( att( "SkaleManager" ), "....................address is.....",
+        log.debug( "{sunny}....................address is.....{}", "SkaleManager",
             oct( imaState.joSkaleManager ) );
-        log.debug( att( "SkaleToken" ), "......................address is.....",
+        log.debug( "{sunny}......................address is.....{}", "SkaleToken",
             oct( imaState.joSkaleToken ) );
-        log.debug( att( "ValidatorService" ), "................address is.....",
+        log.debug( "{sunny}................address is.....{}", "ValidatorService",
             oct( imaState.joValidatorService ) );
-        log.debug( att( "Wallets" ), ".........................address is.....",
+        log.debug( "{sunny}.........................address is.....{}", "Wallets",
             oct( imaState.joWallets ) );
     }
 }
@@ -3428,7 +3415,7 @@ export function commonInit() {
     commonInitPrintSysInfo();
     commonInitCheckAbiPaths();
     commonInitCheckContractPresences();
-    commonInitPrintFoundContracts();
+    //commonInitPrintFoundContracts();
     commonInitCheckErc20();
     commonInitCheckErc721();
     commonInitCheckErc1155();
@@ -3699,4 +3686,5 @@ export function initContracts() {
     imaInitEthersProviders();
     initContractsIMA();
     initContractsSkaleManager();
+    commonInitPrintFoundContracts();
 }

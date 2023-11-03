@@ -79,40 +79,42 @@ export function checkTimeFraming( d, strDirection, joRuntimeOpts ) {
             }
         }
         log.debug( "\n",
-            "Unix UTC time stamp", "........",
+            "    Unix UTC time stamp", "........",
             log.fmtInformation( "{}", nUtcUnixTimeStamp ), "\n",
-            "All Chains Range", "...........", nSecondsRangeForAllSChains, "\n",
-            "S-Chain Range Mod", "..........", log.fmtInformation( "{}", nMod ), "\n",
-            "Active Node Frame Index", "....",
+            "    All Chains Range", "...........", nSecondsRangeForAllSChains, "\n",
+            "    S-Chain Range Mod", "..........", log.fmtInformation( "{}", nMod ), "\n",
+            "    Active Node Frame Index", "....",
             log.fmtInformation( "{}", nActiveNodeFrameIndex ), "\n",
-            "Testing Frame Index", "........",
+            "    Testing Frame Index", "........",
             log.fmtInformation( "{}", imaState.nNodeNumber ), "\n",
-            "Transfer Direction", ".........", log.fmtInformation( "{}", strDirection || "NA" ) );
+            "    Transfer Direction", ".........",
+            log.fmtInformation( "{bright}", strDirection || "NA" ) );
         if( nFrameShift > 0 ) {
             log.debug(
-                "Frame Shift", "................", log.fmtInformation( "{}", nFrameShift ), "\n",
-                "S2S known chain index", "......",
+                "    Frame Shift", "................",
+                log.fmtInformation( "{}", nFrameShift ), "\n",
+                "    S2S known chain index", "......",
                 log.fmtInformation( "{}", joRuntimeOpts.idxChainKnownForS2S ), "\n",
-                "S2S known chains count", ".....",
+                "    S2S known chains count", ".....",
                 log.fmtInformation( "{}", joRuntimeOpts.cntChainsKnownForS2S ), "\n"
             );
             if( "joExtraSignOpts" in joRuntimeOpts &&
                 typeof joRuntimeOpts.joExtraSignOpts == "object" ) {
-                log.debug( "S-Chain source", ".............",
+                log.debug( "    S-Chain source", ".............",
                     log.fmtInformation( "{}", joRuntimeOpts.joExtraSignOpts.chainNameSrc ),
                     "/", log.fmtInformation( "{}", joRuntimeOpts.joExtraSignOpts.chainIdSrc ) );
             } else {
-                log.debug( "S-Chain destination", "........",
+                log.debug( "    S-Chain destination", "........",
                     log.fmtInformation( "{}", joRuntimeOpts.joExtraSignOpts.chainNameDst ),
                     "/", log.fmtInformation( "{}", joRuntimeOpts.joExtraSignOpts.chainIdDst ) );
             }
         }
         log.debug( "\n",
-            "Is skip", "....................", log.yn( bSkip ), "\n",
-            "Is inside gap", "..............", log.yn( bInsideGap ), "\n",
-            "Range Start", "................", log.fmtInformation( "{}", nRangeStart ), "\n",
-            "Frame Start", "................", log.fmtInformation( "{}", nFrameStart ), "\n",
-            "Gap Start", "..................", log.fmtInformation( "{}", nGapStart ) );
+            "    Is skip", "....................", log.yn( bSkip ), "\n",
+            "    Is inside gap", "..............", log.yn( bInsideGap ), "\n",
+            "    Range Start", "................", log.fmtInformation( "{}", nRangeStart ), "\n",
+            "    Frame Start", "................", log.fmtInformation( "{}", nFrameStart ), "\n",
+            "    Gap Start", "..................", log.fmtInformation( "{}", nGapStart ) );
         if( bSkip )
             return false;
     } catch ( err ) {

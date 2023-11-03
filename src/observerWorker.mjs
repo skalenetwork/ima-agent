@@ -148,8 +148,9 @@ class ObserverServer extends SocketServer {
                 self.opts.imaState.chainProperties.sc.joAbiIMA.message_proxy_chain_abi,
                 self.opts.imaState.chainProperties.sc.ethersProvider );
             self.initComplete = true;
-            self.information( "Full init compete for in-worker SNB server in {}, U={}",
-                threadInfo.threadDescription(), gURL );
+            self.information( log.fmtInformation(
+                "Full init compete for in-worker SNB server in {}, U={}",
+                threadInfo.threadDescription(), gURL ) );
             return joAnswer;
         };
         self.mapApiHandlers.periodicCachingStart =
@@ -175,8 +176,9 @@ class ObserverServer extends SocketServer {
             };
             return joAnswer;
         };
-        console.log( "Initialized in-worker SNB server in {}, U=",
-            threadInfo.threadDescription(), gURL );
+        console.log( log.fmtInformation(
+            "Initialized in-worker SNB server in {}, U={}",
+            threadInfo.threadDescription(), gURL ) );
     }
     dispose() {
         const self = this;
@@ -312,73 +314,73 @@ class ObserverServer extends SocketServer {
         self.fatal = function() {
             if( log.verboseGet() >= log.verboseReversed().fatal ) {
                 self.log( log.getLogLinePrefixFatal() +
-                log.fmtFatal( ...arguments ) + "\n" );
+                log.fmtFatal( ...arguments ) );
             }
         };
         self.critical = function() {
             if( log.verboseGet() >= log.verboseReversed().critical ) {
                 self.log( log.getLogLinePrefixCritical() +
-                log.fmtCritical( ...arguments ) + "\n" );
+                log.fmtCritical( ...arguments ) );
             }
         };
         self.error = function() {
             if( log.verboseGet() >= log.verboseReversed().error ) {
                 self.log( log.getLogLinePrefixError() +
-                log.fmtError( ...arguments ) + "\n" );
+                log.fmtError( ...arguments ) );
             }
         };
         self.warning = function() {
             if( log.verboseGet() >= log.verboseReversed().warning ) {
                 self.log( log.getLogLinePrefixWarning() +
-                log.fmtWarning( ...arguments ) + "\n" );
+                log.fmtWarning( ...arguments ) );
             }
         };
         self.attention = function() {
             if( log.verboseGet() >= log.verboseReversed().attention ) {
                 self.log( log.getLogLinePrefixAttention() +
-                log.fmtAttention( ...arguments ) + "\n" );
+                log.fmtAttention( ...arguments ) );
             }
         };
         self.information = function() {
             if( log.verboseGet() >= log.verboseReversed().information ) {
                 self.log( log.getLogLinePrefixInformation() +
-                log.fmtInformation( ...arguments ) + "\n" );
+                log.fmtInformation( ...arguments ) );
             }
         };
         self.info = function() {
             if( log.verboseGet() >= log.verboseReversed().information ) {
                 self.log( log.getLogLinePrefixInformation() +
-                log.fmtInformation( ...arguments ) + "\n" );
+                log.fmtInformation( ...arguments ) );
             }
         };
         self.notice = function() {
             if( log.verboseGet() >= log.verboseReversed().notice ) {
                 self.log( log.getLogLinePrefixNotice() +
-                log.fmtNotice( ...arguments ) + "\n" );
+                log.fmtNotice( ...arguments ) );
             }
         };
         self.note = function() {
             if( log.verboseGet() >= log.verboseReversed().notice ) {
                 self.log( log.getLogLinePrefixNote() +
-                log.fmtNote( ...arguments ) + "\n" );
+                log.fmtNote( ...arguments ) );
             }
         };
         self.debug = function() {
             if( log.verboseGet() >= log.verboseReversed().debug ) {
                 self.log( log.getLogLinePrefixDebug() +
-                log.fmtDebug( ...arguments ) + "\n" );
+                log.fmtDebug( ...arguments ) );
             }
         };
         self.trace = function() {
             if( log.verboseGet() >= log.verboseReversed().trace ) {
                 self.log( log.getLogLinePrefixTrace() +
-                log.fmtTrace( ...arguments ) + "\n" );
+                log.fmtTrace( ...arguments ) );
             }
         };
         self.success = function() {
             if( log.verboseGet() >= log.verboseReversed().information ) {
                 self.log( log.getLogLinePrefixSuccess() +
-                log.fmtSuccess( ...arguments ) + "\n" );
+                log.fmtSuccess( ...arguments ) );
             }
         };
     }

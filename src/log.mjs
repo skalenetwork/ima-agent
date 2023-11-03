@@ -131,11 +131,20 @@ export function createStandardOutputStream() {
             "nMaxFilesCount": -1,
             "objStream": null,
             "haveOwnTimestamps": false,
+            "isPausedTimeStamps": false,
             "strOwnIndent": "",
             "write": function() {
                 let s = ( this.strOwnIndent ? this.strOwnIndent : "" ) +
-                    ( this.haveOwnTimestamps ? generateTimestampPrefix( null, true ) : "" );
+                    ( ( this.haveOwnTimestamps && ( !this.isPausedTimeStamps ) )
+                        ? generateTimestampPrefix( null, true ) : "" );
                 s += fmtArgumentsArray( arguments );
+                try {
+                    if( this.objStream && s.length > 0 )
+                        this.objStream.write( s );
+                } catch ( err ) { }
+            },
+            "writeRaw": function() {
+                const s = fmtArgumentsArray( arguments );
                 try {
                     if( this.objStream && s.length > 0 )
                         this.objStream.write( s );
@@ -232,7 +241,13 @@ export function createMemoryOutputStream() {
             "nMaxFilesCount": -1,
             "arrAccumulatedLogTextLines": [],
             "haveOwnTimestamps": true,
+            "isPausedTimeStamps": false,
             "strOwnIndent": "    ",
+            "isBeginningOfAccumulatedLog": function() {
+                if( this.arrAccumulatedLogTextLines.length == 0 )
+                    return true;
+                return false;
+            },
             "isLastLineEndsWithCarriageReturn": function() {
                 if( this.arrAccumulatedLogTextLines.length == 0 )
                     return false;
@@ -250,12 +265,21 @@ export function createMemoryOutputStream() {
                 for( let i = 0; i < arr.length; ++ i ) {
                     const strLine = arr[i];
                     let strHeader = "";
-                    if( this.isLastLineEndsWithCarriageReturn() ) {
+                    if( this.isLastLineEndsWithCarriageReturn() ||
+                        this.isBeginningOfAccumulatedLog() ) {
                         strHeader = ( this.strOwnIndent ? this.strOwnIndent : "" );
-                        if( this.haveOwnTimestamps )
+                        if( this.haveOwnTimestamps && ( !this.isPausedTimeStamps ) )
                             strHeader += generateTimestampPrefix( null, true );
                     }
                     this.arrAccumulatedLogTextLines.push( strHeader + strLine + "\n" );
+                }
+            },
+            "writeRaw": function() {
+                const s = fmtArgumentsArray( arguments );
+                const arr = s.split( "\n" );
+                for( let i = 0; i < arr.length; ++ i ) {
+                    const strLine = arr[i];
+                    this.arrAccumulatedLogTextLines.push( strLine + "\n" );
                 }
             },
             "clear": function() { this.arrAccumulatedLogTextLines = []; },
@@ -273,23 +297,40 @@ export function createMemoryOutputStream() {
                 if( ! ( this.arrAccumulatedLogTextLines &&
                     this.arrAccumulatedLogTextLines.length > 0 ) )
                     return;
-                strTitle = strTitle
-                    ? ( cc.bright( " (" ) + cc.attention( strTitle ) + cc.bright( ")" ) ) : "";
-                const strSuccessPrefix = isSuccess
-                    ? cc.success( "SUCCESS" ) : cc.error( "ERROR" );
-                otherStream.write( "\n" );
-                otherStream.write( cc.bright( "--- --- --- --- --- GATHERED " ) +
-                    strSuccessPrefix + cc.bright( " DETAILS FOR LATEST(" ) + cc.sunny( strTitle ) +
-                    cc.bright( " action (" ) + cc.sunny( "BEGIN" ) +
-                    cc.bright( ") --- --- ------ --- " ) );
-                otherStream.write( "\n" );
-                for( let i = 0; i < this.arrAccumulatedLogTextLines.length; ++ i )
-                    otherStream.write( this.arrAccumulatedLogTextLines[i] );
-                otherStream.write( cc.bright( "--- --- --- --- --- GATHERED " ) +
-                    strSuccessPrefix + cc.bright( " DETAILS FOR LATEST(" ) + cc.sunny( strTitle ) +
-                    cc.bright( " action (" ) + cc.sunny( "END" ) +
-                    cc.bright( ") --- --- --- --- ---" ) );
-                otherStream.write( "\n" );
+                let werePausedTimeStamps = false;
+                try {
+                    werePausedTimeStamps = ( !!otherStream.isPausedTimeStamps );
+                    otherStream.isPausedTimeStamps = true;
+                } catch ( err ) {
+                }
+                try {
+                    strTitle = strTitle
+                        ? ( cc.bright( " (" ) + cc.attention( strTitle ) + cc.bright( ")" ) ) : "";
+                    const strSuccessPrefix = isSuccess
+                        ? cc.success( "SUCCESS" ) : cc.error( "ERROR" );
+                    otherStream.write( "\n" );
+                    otherStream.write( cc.bright( "--- --- --- --- --- GATHERED " ) +
+                        strSuccessPrefix + cc.bright( " DETAILS FOR LATEST(" ) +
+                        cc.sunny( strTitle ) + cc.bright( " action (" ) + cc.sunny( "BEGIN" ) +
+                        cc.bright( ") --- --- ------ --- " ) );
+                    otherStream.write( "\n" );
+                    for( let i = 0; i < this.arrAccumulatedLogTextLines.length; ++ i ) {
+                        try {
+                            otherStream.writeRaw( this.arrAccumulatedLogTextLines[i] );
+                        } catch ( err ) {
+                        }
+                    }
+                    otherStream.write( cc.bright( "--- --- --- --- --- GATHERED " ) +
+                        strSuccessPrefix + cc.bright( " DETAILS FOR LATEST(" ) +
+                        cc.sunny( strTitle ) + cc.bright( " action (" ) + cc.sunny( "END" ) +
+                        cc.bright( ") --- --- --- --- ---" ) );
+                    otherStream.write( "\n" );
+                } catch ( err ) {
+                }
+                try {
+                    otherStream.isPausedTimeStamps = werePausedTimeStamps;
+                } catch ( err ) {
+                }
             },
             // high-level formatters
             "fatal": function() {
@@ -374,11 +415,22 @@ export function createFileOutput( strFilePath, nMaxSizeBeforeRotation, nMaxFiles
             "nMaxFilesCount": 0 + nMaxFilesCount,
             "objStream": null,
             "haveOwnTimestamps": false,
+            "isPausedTimeStamps": false,
             "strOwnIndent": "",
             "write": function() {
                 let s = ( this.strOwnIndent ? this.strOwnIndent : "" ) +
-                    ( this.haveOwnTimestamps ? generateTimestampPrefix( null, true ) : "" );
+                    ( ( this.haveOwnTimestamps && ( !this.isPausedTimeStamps ) )
+                        ? generateTimestampPrefix( null, true ) : "" );
                 s += fmtArgumentsArray( arguments );
+                try {
+                    if( s.length > 0 ) {
+                        this.rotate( s.length );
+                        fs.appendFileSync( this.objStream, s, "utf8" );
+                    }
+                } catch ( err ) { }
+            },
+            "writeRaw": function() {
+                const s = fmtArgumentsArray( arguments );
                 try {
                     if( s.length > 0 ) {
                         this.rotate( s.length );
@@ -536,12 +588,14 @@ export function extractErrorMessage( jo, strDefaultErrorText ) {
     return strDefaultErrorText;
 }
 
-function tryToSplitFormatString( strFormat ) {
+function tryToSplitFormatString( strFormat, cntArgsMax ) {
     if( !( strFormat && typeof strFormat == "string" ) )
         return null;
     const arrParts = [];
     let s = strFormat, cntFoundArgs = 0;
     for( ; true; ) {
+        if( cntFoundArgs >= cntArgsMax )
+            break; // nothing to do split for
         const nStart = s.indexOf( "{" );
         if( nStart < 0 )
             break;
@@ -568,7 +622,7 @@ function tryToSplitFormatString( strFormat ) {
 export function fmtArgumentsArray( arrArgs, fnFormatter ) {
     fnFormatter = fnFormatter || function( arg ) { return arg; };
     const arrParts = ( arrArgs && arrArgs.length > 0 )
-        ? tryToSplitFormatString( arrArgs[0] ) : null;
+        ? tryToSplitFormatString( arrArgs[0], arrArgs.length - 1 ) : null;
     let s = "", isValueMode = false;
     const fnDefaultOneArgumentFormatter = function( arg, fnCustomFormatter ) {
         if( ! fnCustomFormatter )
@@ -670,6 +724,10 @@ export function outputStringToAllStreams( s ) {
 export function write() {
     let s = getPrintTimestamps() ? generateTimestampPrefix( null, true ) : "";
     s += fmtArgumentsArray( arguments );
+    outputStringToAllStreams( s );
+}
+export function writeRaw() {
+    const s = fmtArgumentsArray( arguments );
     outputStringToAllStreams( s );
 }
 
