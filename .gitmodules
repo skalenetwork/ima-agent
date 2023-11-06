@@ -1,0 +1,3 @@
+[submodule "IMA"]
+	path = IMA
+	url = https://github.com/skalenetwork/IMA.git
