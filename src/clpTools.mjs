@@ -1474,81 +1474,71 @@ export function commandLineTaskBrowseSChain() {
             }
             log.information( "{p}Downloading S-Chain network information...", strLogPrefix );
             const rpcCallOpts = null;
-            await rpcCall.create(
-                imaState.chainProperties.sc.strURL,
-                rpcCallOpts,
-                async function( joCall, err ) {
-                    if( err ) {
-                        log.fatal( "JSON RPC call to S-Chain failed" );
-                        if( joCall )
-                            await joCall.disconnect();
-                        process.exit( 156 );
-                    }
-                    const joDataIn = {
-                        "method": "skale_nodesRpcInfo",
-                        "params": { }
-                    };
-                    if( discoveryTools.isSendImaAgentIndex() )
-                        joDataIn.params.fromImaAgentIndex = imaState.nNodeNumber;
-                    await joCall.call( joDataIn, async function( joIn, joOut, err ) {
-                        if( err ) {
-                            const strError = owaspUtils.extractErrorMessage( err );
-                            log.fatal( "JSON RPC call to S-Chain failed, error: {err}", strError );
-                            await joCall.disconnect();
-                            process.exit( 157 );
-                        }
-                        log.information( "{p}S-Chain network information: {}",
-                            strLogPrefix, joOut.result );
-                        let nCountReceivedImaDescriptions = 0;
-                        const jarrNodes = joOut.result.network;
-                        for( let i = 0; i < jarrNodes.length; ++ i ) {
-                            const joNode = jarrNodes[i];
-                            if( ! joNode ) {
-                                log.critical( "{p}Discovery node {} is completely unknown and " +
-                                    "will be skipped".strLogPrefix, i );
-                                continue;
-                            }
-                            const strNodeURL = imaUtils.composeSChainNodeUrl( joNode );
-                            const rpcCallOpts = null;
-                            await rpcCall.create(
-                                strNodeURL,
-                                rpcCallOpts,
-                                async function( joCall, err ) {
-                                    if( err ) {
-                                        log.fatal( "JSON RPC call to S-Chain failed" );
-                                        await joCall.disconnect();
-                                        process.exit( 158 );
-                                    }
-                                    const joDataIn = {
-                                        "method": "skale_imaInfo",
-                                        "params": { }
-                                    };
-                                    if( discoveryTools.isSendImaAgentIndex() )
-                                        joDataIn.params.fromImaAgentIndex = imaState.nNodeNumber;
-                                    await joCall.call( joDataIn, async function(
-                                        joIn, joOut, err ) {
-                                        ++ nCountReceivedImaDescriptions;
-                                        if( err ) {
-                                            const strError = owaspUtils.extractErrorMessage( err );
-                                            log.fatal( "JSON RPC call to S-Chain failed, " +
-                                                "error: {err}", strError );
-                                            process.exit( 159 );
-                                        }
-                                        log.information( "{p}Node {} IMA information: {}",
-                                            strLogPrefix, joNode.nodeID, joOut.result );
-                                        await joCall.disconnect();
-                                    } );
-                                } );
-                        }
-                        const iv = setInterval( function() {
-                            if( nCountReceivedImaDescriptions == jarrNodes.length ) {
-                                clearInterval( iv );
-                                process.exit( 0 );
-                            }
-                        }, 100 );
+            const strURL = imaState.chainProperties.sc.strURL;
+            await rpcCall.create( strURL, rpcCallOpts, async function( joCall, err ) {
+                if( err ) {
+                    log.fatal( "JSON RPC call to S-Chain failed" );
+                    if( joCall )
                         await joCall.disconnect();
-                    } );
+                    process.exit( 156 );
+                }
+                const joDataIn = { "method": "skale_nodesRpcInfo", "params": { } };
+                if( discoveryTools.isSendImaAgentIndex() )
+                    joDataIn.params.fromImaAgentIndex = imaState.nNodeNumber;
+                await joCall.call( joDataIn, async function( joIn, joOut, err ) {
+                    if( err ) {
+                        const strError = owaspUtils.extractErrorMessage( err );
+                        log.fatal( "JSON RPC call to S-Chain failed, error: {err}", strError );
+                        await joCall.disconnect();
+                        process.exit( 157 );
+                    }
+                    log.information( "{p}S-Chain network information: {}",
+                        strLogPrefix, joOut.result );
+                    let nCountReceivedImaDescriptions = 0;
+                    const jarrNodes = joOut.result.network;
+                    for( let i = 0; i < jarrNodes.length; ++ i ) {
+                        const joNode = jarrNodes[i];
+                        if( ! joNode ) {
+                            log.critical( "{p}Discovery node {} is completely unknown and " +
+                                "will be skipped".strLogPrefix, i );
+                            continue;
+                        }
+                        const strNodeURL = imaUtils.composeSChainNodeUrl( joNode );
+                        const rpcCallOpts = null;
+                        await rpcCall.create( strNodeURL, rpcCallOpts,
+                            async function( joCall, err ) {
+                                if( err ) {
+                                    log.fatal( "JSON RPC call to S-Chain failed" );
+                                    await joCall.disconnect();
+                                    process.exit( 158 );
+                                }
+                                const joDataIn = { "method": "skale_imaInfo", "params": { } };
+                                if( discoveryTools.isSendImaAgentIndex() )
+                                    joDataIn.params.fromImaAgentIndex = imaState.nNodeNumber;
+                                await joCall.call( joDataIn, async function(
+                                    joIn, joOut, err ) {
+                                    ++ nCountReceivedImaDescriptions;
+                                    if( err ) {
+                                        const strError = owaspUtils.extractErrorMessage( err );
+                                        log.fatal( "JSON RPC call to S-Chain failed, " +
+                                            "error: {err}", strError );
+                                        process.exit( 159 );
+                                    }
+                                    log.information( "{p}Node {} IMA information: {}",
+                                        strLogPrefix, joNode.nodeID, joOut.result );
+                                    await joCall.disconnect();
+                                } );
+                            } );
+                    }
+                    const iv = setInterval( function() {
+                        if( nCountReceivedImaDescriptions == jarrNodes.length ) {
+                            clearInterval( iv );
+                            process.exit( 0 );
+                        }
+                    }, 100 );
+                    await joCall.disconnect();
                 } );
+            } );
             return true;
         }
     } );

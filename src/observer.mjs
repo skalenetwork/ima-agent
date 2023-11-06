@@ -1323,10 +1323,8 @@ export async function discoverChainId( strURL ) {
                 await joCall.disconnect();
             return;
         }
-        await joCall.call( {
-            "method": "eth_chainId",
-            "params": []
-        }, async function( joIn, joOut, err ) {
+        const joIn = { "method": "eth_chainId", "params": [] };
+        await joCall.call( joIn, async function( joIn, joOut, err ) {
             if( err ) {
                 await joCall.disconnect();
                 return;
@@ -1337,7 +1335,7 @@ export async function discoverChainId( strURL ) {
             }
             ret = joOut.result;
             await joCall.disconnect();
-        } ); // joCall.call ...
-    } ); // rpcCall.create ...
+        } );
+    } );
     return ret;
 }

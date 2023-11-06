@@ -2048,7 +2048,7 @@ export async function doVerifyReadyHash(
     return isSuccess;
 }
 
-export async function doSignReadyHashCallHandler(
+async function doSignReadyHashCallHandler(
     details, strLogPrefix, strMessageHash, isExposeOutput, joCall,
     joAccount, nParticipants, nThreshold, signerIndex, joOut
 ) {
@@ -2078,7 +2078,7 @@ export async function doSignReadyHashCallHandler(
     return joSignResult;
 }
 
-export async function doSignReadyHashCallPerformer(
+async function doSignReadyHashCallPerformer(
     details, strLogPrefix, strMessageHash, isExposeOutput, joCall,
     joAccount, nParticipants, nThreshold, signerIndex
 ) {
@@ -2287,6 +2287,93 @@ async function prepareS2sOfSkaleImaVerifyAndSign( optsHandleVerifyAndSign ) {
     };
 }
 
+async function signMessageHashCallHandler(
+    optsHandleVerifyAndSign, joCall, joAccount, signerIndex, joOut
+) {
+    optsHandleVerifyAndSign.details.trace( "{p}{bright} Call to SGX done, " +
+        "answer is: {}", optsHandleVerifyAndSign.strLogPrefix,
+    optsHandleVerifyAndSign.strDirection, joOut );
+    let joSignResult = joOut;
+    if( joOut.result != null && joOut.result != undefined &&
+        typeof joOut.result == "object" )
+        joSignResult = joOut.result;
+    if( joOut.signResult != null && joOut.signResult != undefined &&
+        typeof joOut.signResult == "object" )
+        joSignResult = joOut.signResult;
+    if( "qa" in optsHandleVerifyAndSign.joCallData )
+        optsHandleVerifyAndSign.joRetVal.qa = optsHandleVerifyAndSign.joCallData.qa;
+    if( "errorMessage" in joSignResult &&
+        typeof joSignResult.errorMessage == "string" &&
+        joSignResult.errorMessage.length > 0
+    ) {
+        optsHandleVerifyAndSign.isSuccess = false;
+        const strError =
+            "BLS signing finished with error: " + joSignResult.errorMessage;
+        optsHandleVerifyAndSign.joRetVal.error = strError;
+        if( log.id != optsHandleVerifyAndSign.details.id ) {
+            log.error( "{p}BLS signing(2) finished with error: {err}",
+                optsHandleVerifyAndSign.strLogPrefix,
+                joSignResult.errorMessage );
+        }
+        optsHandleVerifyAndSign.details.error(
+            "{p}BLS signing(2) finished with error: {err}",
+            optsHandleVerifyAndSign.strLogPrefix, joSignResult.errorMessage );
+        await joCall.disconnect();
+        throw new Error( strError );
+    }
+    optsHandleVerifyAndSign.isSuccess = true;
+    optsHandleVerifyAndSign.joRetVal.result = { signResult: joSignResult };
+    if( "qa" in optsHandleVerifyAndSign.joCallData )
+        optsHandleVerifyAndSign.joRetVal.qa = optsHandleVerifyAndSign.joCallData.qa;
+    await joCall.disconnect();
+    return joSignResult;
+}
+
+async function signMessageHashCallPerformer(
+    optsHandleVerifyAndSign, joCall, joAccount, signerIndex
+) {
+    let joSignResult = null;
+    const joCallSGX = {
+        "jsonrpc": "2.0",
+        "id": randomCallID(),
+        "method": "blsSignMessageHash",
+        "params": {
+            "keyShareName": joAccount.strBlsKeyName,
+            "messageHash": optsHandleVerifyAndSign.strMessageHash,
+            "n": optsHandleVerifyAndSign.nParticipants,
+            "t": optsHandleVerifyAndSign.nThreshold,
+            "signerIndex": signerIndex + 0 // 1-based
+        }
+    };
+    optsHandleVerifyAndSign.details.trace( "{p}{bright} verification algorithm " +
+        "will invoke SGX with call data {}", optsHandleVerifyAndSign.strLogPrefix,
+    optsHandleVerifyAndSign.strDirection, joCallSGX );
+    await joCall.call( joCallSGX, async function( joIn, joOut, err ) {
+        if( err ) {
+            const strError =
+                "JSON RPC call(handleSkaleImaVerifyAndSign) " +
+                "to SGX failed, RPC call reported error: " +
+                owaspUtils.extractErrorMessage( err );
+            optsHandleVerifyAndSign.joRetVal.error = strError;
+            const jsErrorObject = new Error( strError );
+            if( log.id != optsHandleVerifyAndSign.details.id ) {
+                log.error( "{p}JSON RPC call(handleSkaleImaVerifyAndSign) " +
+                    "to SGX failed, RPC call reported error: {err}, stack is:\n{stack}",
+                optsHandleVerifyAndSign.strLogPrefix, err, jsErrorObject.stack );
+            }
+            optsHandleVerifyAndSign.details.error(
+                "{p}JSON RPC call(handleSkaleImaVerifyAndSign) " +
+                "to SGX failed, RPC call reported error: {err}, stack is:\n{stack}",
+                optsHandleVerifyAndSign.strLogPrefix, err, jsErrorObject.stack );
+            await joCall.disconnect();
+            throw jsErrorObject;
+        }
+        joSignResult = await signMessageHashCallHandler(
+            optsHandleVerifyAndSign, joCall, joAccount, signerIndex, joOut );
+    } );
+    return joSignResult;
+}
+
 export async function handleSkaleImaVerifyAndSign( joCallData ) {
     const optsHandleVerifyAndSign = {
         joCallData: joCallData,
@@ -2363,79 +2450,9 @@ export async function handleSkaleImaVerifyAndSign( joCallData ) {
                     owaspUtils.extractErrorMessage( err )
                 );
             }
-            const joCallSGX = {
-                "jsonrpc": "2.0",
-                "id": randomCallID(),
-                "method": "blsSignMessageHash",
-                "params": {
-                    "keyShareName": joAccount.strBlsKeyName,
-                    "messageHash": optsHandleVerifyAndSign.strMessageHash,
-                    "n": optsHandleVerifyAndSign.nParticipants,
-                    "t": optsHandleVerifyAndSign.nThreshold,
-                    "signerIndex": signerIndex + 0 // 1-based
-                }
-            };
-            optsHandleVerifyAndSign.details.trace( "{p}{bright} verification algorithm " +
-                "will invoke SGX with call data {}", optsHandleVerifyAndSign.strLogPrefix,
-            optsHandleVerifyAndSign.strDirection, joCallSGX );
-            await joCall.call( joCallSGX, async function( joIn, joOut, err ) {
-                if( err ) {
-                    const strError =
-                        "JSON RPC call(handleSkaleImaVerifyAndSign) " +
-                        "to SGX failed, RPC call reported error: " +
-                        owaspUtils.extractErrorMessage( err );
-                    optsHandleVerifyAndSign.joRetVal.error = strError;
-                    const jsErrorObject = new Error( strError );
-                    if( log.id != optsHandleVerifyAndSign.details.id ) {
-                        log.error( "{p}JSON RPC call(handleSkaleImaVerifyAndSign) " +
-                            "to SGX failed, RPC call reported error: {err}, stack is:\n{stack}",
-                        optsHandleVerifyAndSign.strLogPrefix, err, jsErrorObject.stack );
-                    }
-                    optsHandleVerifyAndSign.details.error(
-                        "{p}JSON RPC call(handleSkaleImaVerifyAndSign) " +
-                        "to SGX failed, RPC call reported error: {err}, stack is:\n{stack}",
-                        optsHandleVerifyAndSign.strLogPrefix, err, jsErrorObject.stack );
-                    await joCall.disconnect();
-                    throw jsErrorObject;
-                }
-                optsHandleVerifyAndSign.details.trace( "{p}{bright} Call to SGX done, " +
-                    "answer is: {}", optsHandleVerifyAndSign.strLogPrefix,
-                optsHandleVerifyAndSign.strDirection, joOut );
-                let joSignResult = joOut;
-                if( joOut.result != null && joOut.result != undefined &&
-                    typeof joOut.result == "object" )
-                    joSignResult = joOut.result;
-                if( joOut.signResult != null && joOut.signResult != undefined &&
-                    typeof joOut.signResult == "object" )
-                    joSignResult = joOut.signResult;
-                if( "qa" in optsHandleVerifyAndSign.joCallData )
-                    optsHandleVerifyAndSign.joRetVal.qa = optsHandleVerifyAndSign.joCallData.qa;
-                if( "errorMessage" in joSignResult &&
-                    typeof joSignResult.errorMessage == "string" &&
-                    joSignResult.errorMessage.length > 0
-                ) {
-                    optsHandleVerifyAndSign.isSuccess = false;
-                    const strError =
-                        "BLS signing finished with error: " + joSignResult.errorMessage;
-                    optsHandleVerifyAndSign.joRetVal.error = strError;
-                    if( log.id != optsHandleVerifyAndSign.details.id ) {
-                        log.error( "{p}BLS signing(2) finished with error: {err}",
-                            optsHandleVerifyAndSign.strLogPrefix,
-                            joSignResult.errorMessage );
-                    }
-                    optsHandleVerifyAndSign.details.error(
-                        "{p}BLS signing(2) finished with error: {err}",
-                        optsHandleVerifyAndSign.strLogPrefix, joSignResult.errorMessage );
-                    await joCall.disconnect();
-                    throw new Error( strError );
-                }
-                optsHandleVerifyAndSign.isSuccess = true;
-                optsHandleVerifyAndSign.joRetVal.result = { signResult: joSignResult };
-                if( "qa" in optsHandleVerifyAndSign.joCallData )
-                    optsHandleVerifyAndSign.joRetVal.qa = optsHandleVerifyAndSign.joCallData.qa;
-                await joCall.disconnect();
-            } ); // joCall.call ...
-        } ); // rpcCall.create ...
+            return await signMessageHashCallPerformer(
+                optsHandleVerifyAndSign, joCall, joAccount, signerIndex );
+        } );
     } catch ( err ) {
         optsHandleVerifyAndSign.isSuccess = false;
         const strError = owaspUtils.extractErrorMessage( err );
@@ -2487,6 +2504,78 @@ async function handleSkaleImaBSU256Prepare( optsBSU256 ) {
     return true;
 }
 
+async function signBSU256CallHandler( optsBSU256, joCall, signerIndex, joOut ) {
+    optsBSU256.details.trace( "{p}Call to SGX done, answer is: {}",
+        optsBSU256.strLogPrefix, joOut );
+    let joSignResult = joOut;
+    if( joOut.result != null && joOut.result != undefined &&
+        typeof joOut.result == "object" )
+        joSignResult = joOut.result;
+    if( joOut.signResult != null && joOut.signResult != undefined &&
+        typeof joOut.signResult == "object" )
+        joSignResult = joOut.signResult;
+    if( "errorMessage" in joSignResult &&
+        typeof joSignResult.errorMessage == "string" &&
+        joSignResult.errorMessage.length > 0 ) {
+        optsBSU256.isSuccess = false;
+        const strError =
+            "BLS signing finished with error: " + joSignResult.errorMessage;
+        optsBSU256.joRetVal.error = strError;
+        if( log.id != optsBSU256.details.id ) {
+            log.error( "{p}BLS signing(3) finished with error: {err}",
+                optsBSU256.strLogPrefix, joSignResult.errorMessage );
+        }
+        optsBSU256.details.error( "{p}BLS signing(3) finished with error: {err}",
+            optsBSU256.strLogPrefix, joSignResult.errorMessage );
+        await joCall.disconnect();
+        throw new Error( strError );
+    }
+    optsBSU256.isSuccess = true;
+    optsBSU256.joRetVal.result = { signResult: joSignResult };
+    if( "qa" in optsBSU256.joCallData )
+        optsBSU256.joRetVal.qa = optsBSU256.joCallData.qa;
+    await joCall.disconnect();
+    return joSignResult;
+}
+
+async function signBSU256CallPerformer( optsBSU256, joCall, signerIndex ) {
+    let joSignResult = null;
+    const joCallSGX = {
+        "jsonrpc": "2.0",
+        "id": randomCallID(),
+        "method": "blsSignMessageHash",
+        "params": {
+            "keyShareName": optsBSU256.joAccount.strBlsKeyName,
+            "messageHash": optsBSU256.strMessageHash,
+            "n": optsBSU256.nParticipants,
+            "t": optsBSU256.nThreshold,
+            "signerIndex": signerIndex + 0 // 1-based
+        }
+    };
+    optsBSU256.details.trace( "{p}Will invoke SGX with call data {}",
+        optsBSU256.strLogPrefix, joCallSGX );
+    await joCall.call( joCallSGX, async function( joIn, joOut, err ) {
+        if( err ) {
+            const jsErrorObject = new Error(
+                "JSON RPC call(handleSkaleImaBSU256) to SGX failed, " +
+                "RPC call reported error: " +
+                owaspUtils.extractErrorMessage( err ) );
+            if( log.id != optsBSU256.details.id ) {
+                log.error( "{p}JSON RPC call(handleSkaleImaBSU256) " +
+                    "to SGX failed, RPC call reported error: {err}, stack is:\n{stack}",
+                optsBSU256.strLogPrefix, err, jsErrorObject.stack );
+            }
+            optsBSU256.details.error( "{p}JSON RPC call(handleSkaleImaBSU256) " +
+                "to SGX failed, RPC call reported error: {err}, stack is:\n{stack}",
+            optsBSU256.strLogPrefix, err, jsErrorObject.stack );
+            await joCall.disconnect();
+            throw jsErrorObject;
+        }
+        joSignResult = await signBSU256CallHandler( optsBSU256, joCall, signerIndex, joOut );
+    } );
+    return joSignResult;
+}
+
 export async function handleSkaleImaBSU256( joCallData ) {
     const optsBSU256 = {
         joCallData: joCallData,
@@ -2519,86 +2608,25 @@ export async function handleSkaleImaBSU256( joCallData ) {
         } else
             optsBSU256.details.warning( "Will sign via SGX without SSL options" );
         const signerIndex = optsBSU256.imaState.nNodeNumber;
-        await rpcCall.create( optsBSU256.joAccount.strSgxURL, rpcCallOpts,
-            async function( joCall, err ) {
-                if( err ) {
-                    if( log.id != optsBSU256.details.id ) {
-                        log.error( "{p}JSON RPC call(handleSkaleImaBSU256) " +
-                            "to SGX failed, RPC call was not created, error is: {err}",
-                        optsBSU256.strLogPrefix, err );
-                    }
-                    optsBSU256.details.error( "{p}JSON RPC call(handleSkaleImaBSU256) " +
+        const strURL = optsBSU256.joAccount.strSgxURL;
+        await rpcCall.create( strURL, rpcCallOpts, async function( joCall, err ) {
+            if( err ) {
+                if( log.id != optsBSU256.details.id ) {
+                    log.error( "{p}JSON RPC call(handleSkaleImaBSU256) " +
                         "to SGX failed, RPC call was not created, error is: {err}",
                     optsBSU256.strLogPrefix, err );
-                    if( joCall )
-                        await joCall.disconnect();
-                    throw new Error( "JSON RPC call(handleSkaleImaBSU256) to SGX failed, " +
-                        "RPC call was not created, error is: " +
-                        owaspUtils.extractErrorMessage( err ) );
                 }
-                const joCallSGX = {
-                    "jsonrpc": "2.0",
-                    "id": randomCallID(),
-                    "method": "blsSignMessageHash",
-                    "params": {
-                        "keyShareName": optsBSU256.joAccount.strBlsKeyName,
-                        "messageHash": optsBSU256.strMessageHash,
-                        "n": optsBSU256.nParticipants,
-                        "t": optsBSU256.nThreshold,
-                        "signerIndex": signerIndex + 0 // 1-based
-                    }
-                };
-                optsBSU256.details.trace( "{p}Will invoke SGX with call data {}",
-                    optsBSU256.strLogPrefix, joCallSGX );
-                await joCall.call( joCallSGX, async function( joIn, joOut, err ) {
-                    if( err ) {
-                        const jsErrorObject = new Error(
-                            "JSON RPC call(handleSkaleImaBSU256) to SGX failed, " +
-                            "RPC call reported error: " +
-                            owaspUtils.extractErrorMessage( err ) );
-                        if( log.id != optsBSU256.details.id ) {
-                            log.error( "{p}JSON RPC call(handleSkaleImaBSU256) " +
-                                "to SGX failed, RPC call reported error: {err}, stack is:\n{stack}",
-                            optsBSU256.strLogPrefix, err, jsErrorObject.stack );
-                        }
-                        optsBSU256.details.error( "{p}JSON RPC call(handleSkaleImaBSU256) " +
-                            "to SGX failed, RPC call reported error: {err}, stack is:\n{stack}",
-                        optsBSU256.strLogPrefix, err, jsErrorObject.stack );
-                        await joCall.disconnect();
-                        throw jsErrorObject;
-                    }
-                    optsBSU256.details.trace( "{p}Call to SGX done, answer is: {}",
-                        optsBSU256.strLogPrefix, joOut );
-                    let joSignResult = joOut;
-                    if( joOut.result != null && joOut.result != undefined &&
-                        typeof joOut.result == "object" )
-                        joSignResult = joOut.result;
-                    if( joOut.signResult != null && joOut.signResult != undefined &&
-                        typeof joOut.signResult == "object" )
-                        joSignResult = joOut.signResult;
-                    if( "errorMessage" in joSignResult &&
-                        typeof joSignResult.errorMessage == "string" &&
-                        joSignResult.errorMessage.length > 0 ) {
-                        optsBSU256.isSuccess = false;
-                        const strError =
-                            "BLS signing finished with error: " + joSignResult.errorMessage;
-                        optsBSU256.joRetVal.error = strError;
-                        if( log.id != optsBSU256.details.id ) {
-                            log.error( "{p}BLS signing(3) finished with error: {err}",
-                                optsBSU256.strLogPrefix, joSignResult.errorMessage );
-                        }
-                        optsBSU256.details.error( "{p}BLS signing(3) finished with error: {err}",
-                            optsBSU256.strLogPrefix, joSignResult.errorMessage );
-                        await joCall.disconnect();
-                        throw new Error( strError );
-                    }
-                    optsBSU256.isSuccess = true;
-                    optsBSU256.joRetVal.result = { signResult: joSignResult };
-                    if( "qa" in optsBSU256.joCallData )
-                        optsBSU256.joRetVal.qa = optsBSU256.joCallData.qa;
+                optsBSU256.details.error( "{p}JSON RPC call(handleSkaleImaBSU256) " +
+                    "to SGX failed, RPC call was not created, error is: {err}",
+                optsBSU256.strLogPrefix, err );
+                if( joCall )
                     await joCall.disconnect();
-                } ); // joCall.call ...
-            } ); // rpcCall.create ...
+                throw new Error( "JSON RPC call(handleSkaleImaBSU256) to SGX failed, " +
+                    "RPC call was not created, error is: " +
+                    owaspUtils.extractErrorMessage( err ) );
+            }
+            await signBSU256CallPerformer( optsBSU256, joCall, signerIndex );
+        } );
     } catch ( err ) {
         optsBSU256.isSuccess = false;
         const strError = owaspUtils.extractErrorMessage( err );
