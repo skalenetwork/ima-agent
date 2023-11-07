@@ -53,8 +53,8 @@ export function getSChainIndexInNode( computedSChainId, arrChainIdsOnNode ) {
             return i;
         ++ i;
     }
-    throw new Error( "S-Chain " + computedSChainId + " is not found in the list: " +
-        JSON.stringify( arrChainIdsOnNode ) + "in " + threadInfo.threadDescription( false ) );
+    throw new Error( `S-Chain ${computedSChainId} is not found in the list: ` +
+        `${JSON.stringify( arrChainIdsOnNode )} in ${threadInfo.threadDescription( false )}` );
 }
 
 export function getSChainBasePortOnNode( computedSChainId, arrChainIdsOnNode, basePortOfNode ) {
@@ -177,8 +177,8 @@ async function isMulticallAvailable( mn ) {
 export async function loadSChainParts( joSChain, opts ) {
     owaspUtils.ensureObserverOptionsInitialized( opts );
     if( ! opts.imaState ) {
-        throw new Error( "Cannot load S-Chain parts in observer, no imaState is provided in " +
-            threadInfo.threadDescription( false ) );
+        throw new Error( "Cannot load S-Chain parts in observer, " +
+            `no imaState is provided in ${threadInfo.threadDescription( false )}` );
     }
     let isEMC = false;
     if( opts.imaState.isEnabledMultiCall )
@@ -318,8 +318,8 @@ export async function loadSChainParts( joSChain, opts ) {
 export async function getSChainsCount( opts ) {
     owaspUtils.ensureObserverOptionsInitialized( opts );
     if( ! opts.imaState ) {
-        throw new Error( "Cannot get S-Chains count, no imaState is provided in " +
-            threadInfo.threadDescription( false ) );
+        throw new Error( "Cannot get S-Chains count, " +
+            `no imaState is provided in ${threadInfo.threadDescription( false )}` );
     }
     const cntSChains = await opts.imaState.joSChainsInternal.callStatic.numberOfSchains();
     return cntSChains;
@@ -349,8 +349,8 @@ function process_sc_data( rawData ) {
 export async function loadSChain( idxSChain, hash, joData, cntSChains, opts ) {
     owaspUtils.ensureObserverOptionsInitialized( opts );
     if( ! opts.imaState ) {
-        throw new Error( "Cannot load S-Chain description in observer, no imaState " +
-            "is provided in " + threadInfo.threadDescription( false ) );
+        throw new Error( "Cannot load S-Chain description in observer, " +
+            `no imaState is provided in ${threadInfo.threadDescription( false )}` );
     }
     if( opts && opts.details ) {
         opts.details.trace( "Loading S-Chain #{} of {} in {}...",
@@ -386,8 +386,8 @@ export async function loadSChainsDefault( opts ) {
 export async function loadSChains( opts ) {
     owaspUtils.ensureObserverOptionsInitialized( opts );
     if( ! opts.imaState ) {
-        throw new Error( "Cannot load S-Chains parts in observer, no imaState is provided in " +
-            threadInfo.threadDescription( false ) );
+        throw new Error( "Cannot load S-Chains parts in observer, " +
+            `no imaState is provided in ${threadInfo.threadDescription( false )}` );
     }
     let isEMC = false;
     if( opts.imaState.isEnabledMultiCall )
@@ -553,7 +553,7 @@ export async function loadSChainsOptimal( opts ) {
     owaspUtils.ensureObserverOptionsInitialized( opts );
     if( ! opts.imaState ) {
         throw new Error( "Cannot un-filtered optimal-load S-Chains in observer, " +
-            "no imaState is provided in " + threadInfo.threadDescription( false ) );
+            `no imaState is provided in ${threadInfo.threadDescription( false )}` );
     }
     const isLoadConnectedOnly = ( "isLoadConnectedOnly" in opts )
         ? ( !!opts.isLoadConnectedOnly ) : true;
@@ -656,7 +656,7 @@ export async function getAllSchainNames( arrSChainHashes, opts ) {
 export async function loadCachedSChainsSimplified( opts ) {
     if( ! opts.imaState ) {
         throw new Error( "Cannot simplified-load S-Chains in observer, " +
-            "no imaState is provided in " + threadInfo.threadDescription( false ) );
+            `no imaState is provided in ${threadInfo.threadDescription( false )}` );
     }
     if( opts && opts.details ) {
         opts.details.trace( "Will request all S-Chain(s) hashes in {}...",
@@ -740,8 +740,8 @@ async function checkWhetherSChainIsConnected( strSChainName, joMessageProxySChai
 
 export async function loadSChainsConnectedOnly( strChainNameConnectedTo, opts ) {
     if( ! opts.imaState ) {
-        throw new Error( "Cannot load S-Chains in observer, no imaState is provided in {}",
-            threadInfo.threadDescription( false ) );
+        throw new Error( "Cannot load S-Chains in observer, " +
+            `no imaState is provided in ${threadInfo.threadDescription( false )}` );
     }
     if( opts && opts.details ) {
         opts.details.trace( "Will request all S-Chain(s) hashes in {}...",
@@ -801,8 +801,8 @@ export async function loadSChainsConnectedOnly( strChainNameConnectedTo, opts ) 
 export async function checkConnectedSChains( strChainNameConnectedTo, arrSChains, opts ) {
     owaspUtils.ensureObserverOptionsInitialized( opts );
     if( ! opts.imaState ) {
-        throw new Error( "Cannot load S-Chains in observer, no imaState is provided in {}",
-            threadInfo.threadDescription( false ) );
+        throw new Error( "Cannot load S-Chains in observer, ",
+            `no imaState is provided in ${threadInfo.threadDescription( false )}` );
     }
     const cntSChains = arrSChains.length;
     for( let idxSChain = 0; idxSChain < cntSChains; ++ idxSChain ) {

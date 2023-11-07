@@ -178,8 +178,8 @@ export async function waitForClonedTokenToAppear(
     }
     ts1 = log.timestampHR();
     log.error( "Failed to discover {} instantiated on S-Chain {}", strTokenSuffixUC, sc.chainName );
-    throw new Error( "Failed to discover \"" + strTokenSuffixUC +
-        "\" instantiated on S-Chain \"" + sc.chainName + "\"" );
+    throw new Error( `Failed to discover ${strTokenSuffixUC} instantiated ` +
+        `on S-Chain ${sc.chainName}` );
 }
 
 export async function waitForClonedTokenAppearErc20(

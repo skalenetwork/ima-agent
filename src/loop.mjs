@@ -194,11 +194,9 @@ async function singleTransferLoopPartM2S( optsLoop, strLogPrefix ) {
                         optsLoop.joRuntimeOpts,
                         imaState.chainProperties.mn.ethersProvider,
                         imaState.joMessageProxyMainNet,
-                        imaState.chainProperties.mn.joAbiIMA.message_proxy_mainnet_abi,
                         imaState.chainProperties.mn.joAccount,
                         imaState.chainProperties.sc.ethersProvider,
                         imaState.joMessageProxySChain,
-                        imaState.chainProperties.sc.joAbiIMA.message_proxy_chain_abi,
                         imaState.chainProperties.sc.joAccount,
                         imaState.chainProperties.mn.strChainName,
                         imaState.chainProperties.sc.strChainName,
@@ -263,11 +261,9 @@ async function singleTransferLoopPartS2M( optsLoop, strLogPrefix ) {
                         optsLoop.joRuntimeOpts,
                         imaState.chainProperties.sc.ethersProvider,
                         imaState.joMessageProxySChain,
-                        imaState.chainProperties.sc.joAbiIMA.message_proxy_chain_abi,
                         imaState.chainProperties.sc.joAccount,
                         imaState.chainProperties.mn.ethersProvider,
                         imaState.joMessageProxyMainNet,
-                        imaState.chainProperties.mn.joAbiIMA.message_proxy_mainnet_abi,
                         imaState.chainProperties.mn.joAccount,
                         imaState.chainProperties.sc.strChainName,
                         imaState.chainProperties.mn.strChainName,
@@ -320,7 +316,6 @@ async function singleTransferLoopPartS2S( optsLoop, strLogPrefix ) {
                 skaleObserver,
                 imaState.chainProperties.sc.ethersProvider,
                 imaState.joMessageProxySChain,
-                imaState.chainProperties.sc.joAbiIMA.message_proxy_chain_abi,
                 imaState.chainProperties.sc.joAccount,
                 imaState.chainProperties.sc.strChainName,
                 imaState.chainProperties.sc.chainId,
@@ -354,7 +349,7 @@ function printLoopPartSkippedWarning( strLoopPartName ) {
 
 export async function singleTransferLoop( optsLoop ) {
     const imaState = state.get();
-    const strLogPrefix = log.fmtAttention( "Single Loop in {}: ", threadInfo.threadDescription() );
+    const strLogPrefix = `Single Loop in ${threadInfo.threadDescription( false )}`;
     try {
         log.debug( "{p}{p}", strLogPrefix, imaHelperAPIs.longSeparator );
         let b0 = false, b1 = false, b2 = false, b3 = false;

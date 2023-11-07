@@ -84,13 +84,6 @@ export function createProgressiveEventsScanPlan( details, nLatestBlockNumber ) {
     return arrProgressiveEventsScanPlan;
 }
 
-export function extractEventArg( arg ) {
-    if( arg && typeof arg == "object" && "type" in arg && typeof arg.type == "string" &&
-        arg.type == "BigNumber" && "hex" in arg && typeof arg.hex == "string" )
-        return owaspUtils.toBN( arg.hex );
-    return arg;
-}
-
 function generateWhileTransferringLogMessageSuffix( optsChainPair ) {
     if( ! optsChainPair )
         return "";
@@ -250,8 +243,7 @@ export async function safeGetTransactionCount(
                 return ret;
             details.error( "Cannot call {} via {url} because server is off-line",
                 strFnName + "()", u );
-            throw new Error( "Cannot " + strFnName + "() via " + u.toString() +
-                " because server is off-line" );
+            throw new Error( `Cannot ${strFnName}() via ${u} because server is off-line` );
         }
         details.trace( "Repeat call to {} via {url}, attempt {}", strFnName + "()", u, idxAttempt );
         try {
@@ -267,8 +259,7 @@ export async function safeGetTransactionCount(
     if( ( idxAttempt + 1 ) > cntAttempts && ret === "" ) {
         details.error( "Failed call to {} via {url} after {} attempts",
             strFnName + "()", u, cntAttempts );
-        throw new Error( "Failed call to " + strFnName + "() via " + u.toString() +
-            " after " + cntAttempts + " attempts" );
+        throw new Error( `Failed call to ${strFnName}() via ${u} after ${cntAttempts} attempts` );
     }
     return ret;
 }
@@ -306,8 +297,7 @@ export async function safeGetTransactionReceipt(
                 return ret;
             details.error( "Cannot call {} via {url} because server is off-line",
                 strFnName + "()", u );
-            throw new Error( "Cannot " + strFnName + "() via " + u.toString() +
-                " because server is off-line" );
+            throw new Error( `Cannot ${strFnName}() via ${u} because server is off-line` );
         }
         details.trace( "Repeat call to {} via {url}, attempt {}", strFnName + "()", u, idxAttempt );
         try {
@@ -323,8 +313,7 @@ export async function safeGetTransactionReceipt(
     if( ( idxAttempt + 1 ) > cntAttempts && ( txReceipt === "" || txReceipt === undefined ) ) {
         details.error( "Failed call to {} via {url} after {} attempts",
             strFnName + "()", u, cntAttempts );
-        throw new Error( "Failed call to " + strFnName + "() via " + u.toString() +
-            " after " + cntAttempts + " attempts" );
+        throw new Error( `Failed call to ${strFnName}() via ${u} after ${cntAttempts} attempts` );
     }
     return ret;
 }
@@ -390,9 +379,9 @@ export async function safeGetPastEvents(
                 return ret;
             details.error( "{p}Cannot do {} event filtering via {url} because server is off-line",
                 strLogPrefix, strEventName, u );
-            throw new Error( "Cannot do " + strEventName + " event filtering, from block " +
-                nBlockFrom.toHexString() + ", to block " + nBlockTo.toHexString() +
-                " via " + u.toString() + " because server is off-line" );
+            throw new Error( `Cannot do ${strEventName} event filtering, ` +
+                `from block ${nBlockFrom.toHexString()} , to block ${nBlockTo.toHexString()} ` +
+                `via ${u} because server is off-line` );
         }
         details.trace( "{p}Repeat {} event filtering via {url}, attempt {}",
             strLogPrefix, strEventName, u, idxAttempt );
@@ -424,9 +413,9 @@ export async function safeGetPastEvents(
         details.error( "{p}Failed filtering attempt for {} event via {url}, from block {}, " +
             "to block {} after {} attempts", strLogPrefix, strEventName, u,
         nBlockFrom.toHexString(), nBlockTo.toHexString(), cntAttempts );
-        throw new Error( "Failed filtering attempt for " + strEventName + " event, from block " +
-            nBlockFrom.toHexString() + ", to block " + nBlockTo.toHexString() +
-            " via " + u.toString() + " after " + cntAttempts + " attempts" );
+        throw new Error( `Failed filtering attempt for ${strEventName} event, ` +
+            `from block ${nBlockFrom.toHexString()}, to block ${nBlockTo.toHexString()} ` +
+            `via ${u} after ${cntAttempts} attempts` );
     }
     return ret;
 }

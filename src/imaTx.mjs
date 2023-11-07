@@ -90,7 +90,7 @@ export async function dryRunCall(
     } else
         strArgumentsDescription += log.fmtDebug( "()" );
     const strContractCallDescription = strContractMethodDescription + strArgumentsDescription;
-    const strLogPrefix = strContractMethodDescription + " ";
+    const strLogPrefix = `${strContractMethodDescription} `;
     try {
         details.trace( "Dry-run of action {bright}...", strActionName );
         details.trace( "Will dry-run {}...", strContractCallDescription );
@@ -341,7 +341,7 @@ export async function payedCall(
         strArgumentsDescription += log.fmtDebug( "()" );
     optsPayedCall.strContractCallDescription =
         strContractMethodDescription + strArgumentsDescription;
-    optsPayedCall.strLogPrefix = strContractMethodDescription + " ";
+    optsPayedCall.strLogPrefix = `${strContractMethodDescription} `;
     try {
         await payedCallPrepare( optsPayedCall );
         switch ( optsPayedCall.joACI.strType ) {
@@ -362,7 +362,7 @@ export async function payedCall(
                 log.critical( "{p}bad credentials information specified, no explicit SGX and " +
                     "no explicit private key found", strErrorPrefix );
             }
-            throw new Error( strErrorPrefix + "bad credentials information specified, " +
+            throw new Error( `${strErrorPrefix} bad credentials information specified, ` +
                 "no explicit SGX and no explicit private key found" );
         } // NOTICE: "break;" is not needed here because of "throw" above
         } // switch( optsPayedCall.joACI.strType )
@@ -374,9 +374,9 @@ export async function payedCall(
             log.critical( "{p}{} {err}, stack is:\n{stack}", optsPayedCall.strLogPrefix,
                 strErrorPrefix, err, err.stack );
         }
-        throw new Error( strErrorPrefix +
-            " invoking the " + optsPayedCall.strContractCallDescription +
-            ", error is: " + owaspUtils.extractErrorMessage( err ) );
+        throw new Error( `${strErrorPrefix} invoking ` +
+            `the ${optsPayedCall.strContractCallDescription}, ` +
+            `error is: ${owaspUtils.extractErrorMessage( err )}` );
     }
     optsPayedCall.details.success( "{p}Done, TX was {sunny}-signed-and-sent, receipt is {}",
         optsPayedCall.strLogPrefix, optsPayedCall.joACI ? optsPayedCall.joACI.strType : "N/A",
@@ -640,7 +640,7 @@ async function tmEnsureTransaction(
         details.error( "{p}TM TX {} transaction has been dropped", strPrefixDetails, txId );
         if( log.id != details.id )
             log.error( "{p}TM TX {} transaction has been dropped", strPrefixLog, txId );
-        throw new Error( "TM unsuccessful transaction " + txId );
+        throw new Error( `TM unsuccessful transaction ${txId}` );
     }
     details.information( "{p}TM - successful TX {}, sending attempt {} of {}",
         strPrefixDetails, txId, idxAttempt, cntAttempts );
@@ -707,7 +707,7 @@ export class TransactionCustomizer {
             strArgumentsDescription += log.fmtDebug( "()" );
         const strContractCallDescription =
             strContractMethodDescription + strArgumentsDescription;
-        const strLogPrefix = strContractMethodDescription + " ";
+        const strLogPrefix = `${strContractMethodDescription} `;
         try {
             const promiseComplete = new Promise( function( resolve, reject ) {
                 const doEstimation = async function() {

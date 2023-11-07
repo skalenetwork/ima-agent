@@ -58,8 +58,8 @@ async function findOutReferenceLogRecord(
     for( let idxLogRecord = 0; idxLogRecord < cntLogRecord; ++ idxLogRecord ) {
         const joEvent = arrLogRecords[idxLogRecord];
         const eventValuesByName = {
-            "currentMessage": imaEventLogScan.extractEventArg( joEvent.args[0] ),
-            "previousOutgoingMessageBlockId": imaEventLogScan.extractEventArg( joEvent.args[1] )
+            "currentMessage": joEvent.args[0],
+            "previousOutgoingMessageBlockId": joEvent.args[1]
         };
         const joReferenceLogRecord = {
             "currentMessage": eventValuesByName.currentMessage,
@@ -164,8 +164,8 @@ async function doQueryOutgoingMessageCounter( optsTransfer ) {
                 optsTransfer.chainNameDst,
                 { from: optsTransfer.joAccountSrc.address() } );
         if( !owaspUtils.validateInteger( nPossibleIntegerValue ) ) {
-            throw new Error( "DST chain " + optsTransfer.chainNameDst + " returned outgoing " +
-                "message counter " + nPossibleIntegerValue + " which is not a valid integer" );
+            throw new Error( `DST chain ${optsTransfer.chainNameDst} returned outgoing ` +
+                `message counter ${nPossibleIntegerValue} which is not a valid integer` );
         }
         optsTransfer.nOutMsgCnt = owaspUtils.toInteger( nPossibleIntegerValue );
         optsTransfer.details.information( "{p}Result of {bright} call: {}",
@@ -188,8 +188,8 @@ async function doQueryOutgoingMessageCounter( optsTransfer ) {
         await optsTransfer.joMessageProxyDst.callStatic.getIncomingMessagesCounter(
             optsTransfer.chainNameSrc, { from: optsTransfer.joAccountDst.address() } );
     if( !owaspUtils.validateInteger( nPossibleIntegerValue ) ) {
-        throw new Error( "SRC chain " + optsTransfer.chainNameSrc + " returned incoming message " +
-            "counter " + nPossibleIntegerValue + " which is not a valid integer" );
+        throw new Error( `SRC chain ${optsTransfer.chainNameSrc} returned incoming message ` +
+            `counter ${nPossibleIntegerValue} which is not a valid integer` );
     }
     optsTransfer.nIncMsgCnt = owaspUtils.toInteger( nPossibleIntegerValue );
     optsTransfer.details.debug( "{p}Result of {bright} call: {}",
@@ -199,9 +199,8 @@ async function doQueryOutgoingMessageCounter( optsTransfer ) {
         await optsTransfer.joMessageProxySrc.callStatic.getIncomingMessagesCounter(
             optsTransfer.chainNameDst, { from: optsTransfer.joAccountSrc.address() } );
     if( !owaspUtils.validateInteger( nPossibleIntegerValue ) ) {
-        throw new Error(
-            "DST chain " + optsTransfer.chainNameDst + " returned incoming message counter " +
-            nPossibleIntegerValue + " which is not a valid integer" );
+        throw new Error( `DST chain ${optsTransfer.chainNameDst} returned incoming ` +
+            `message counter ${nPossibleIntegerValue} + which is not a valid integer` );
     }
     const idxLastToPopNotIncluding = owaspUtils.toInteger( nPossibleIntegerValue );
     optsTransfer.details.debug( "{p}Result of {bright} call: {}",
@@ -249,7 +248,7 @@ async function doQueryOutgoingMessageCounter( optsTransfer ) {
         ++ nWalkMsgNumber
     ) {
         const joFilter = optsTransfer.joMessageProxySrc.filters[strEventName](
-            owaspUtils.ethersMod.ethers.utils.id( optsTransfer.chainNameDst ), // dstChainHash
+            owaspUtils.ethersMod.ethers.utils.id( optsTransfer.chainNameDst ),
             owaspUtils.toBN( nWalkMsgNumber ) );
         const arrLogRecordReferencesWalk =
             await imaEventLogScan.safeGetPastEventsProgressive( optsTransfer.details,
@@ -275,11 +274,11 @@ async function analyzeGatheredRecords( optsTransfer, r ) {
         optsTransfer.details.debug( "{p}Will review found event record {} with data {}",
             optsTransfer.strLogPrefix, i, joEvent );
         const eventValuesByName = {
-            "dstChainHash": imaEventLogScan.extractEventArg( joEvent.args[0] ),
-            "msgCounter": imaEventLogScan.extractEventArg( joEvent.args[1] ),
-            "srcContract": imaEventLogScan.extractEventArg( joEvent.args[2] ),
-            "dstContract": imaEventLogScan.extractEventArg( joEvent.args[3] ),
-            "data": imaEventLogScan.extractEventArg( joEvent.args[4] )
+            "dstChainHash": joEvent.args[0],
+            "msgCounter": joEvent.args[1],
+            "srcContract": joEvent.args[2],
+            "dstContract": joEvent.args[3],
+            "data": joEvent.args[4]
         };
         if( eventValuesByName.dstChainHash == strChainHashWeAreLookingFor ) {
             joValues = eventValuesByName;
@@ -339,7 +338,7 @@ async function gatherMessages( optsTransfer ) {
             optsTransfer.strLogPrefixShort, optsTransfer.ethersProviderSrc, 10,
             optsTransfer.joMessageProxySrc, strEventName, nBlockFrom, nBlockTo,
             optsTransfer.joMessageProxySrc.filters[strEventName](
-                owaspUtils.ethersMod.ethers.utils.id( optsTransfer.chainNameDst ), // dstChainHash
+                owaspUtils.ethersMod.ethers.utils.id( optsTransfer.chainNameDst ),
                 owaspUtils.toBN( optsTransfer.nIdxCurrentMsg )
             ), optsTransfer.optsChainPair );
         const joValues = await analyzeGatheredRecords( optsTransfer, r );
@@ -410,8 +409,8 @@ async function gatherMessages( optsTransfer ) {
                     optsTransfer.strLogPrefix, blockNumber );
                 const joBlock = await optsTransfer.ethersProviderSrc.getBlock( blockNumber );
                 if( !owaspUtils.validateInteger( joBlock.timestamp ) ) {
-                    throw new Error( "Block \"timestamp\" is not a valid integer value: " +
-                        joBlock.timestamp );
+                    throw new Error( "Block timestamp is not a valid " +
+                        `integer value: ${joBlock.timestamp}` );
                 }
                 const timestampBlock = owaspUtils.toInteger( joBlock.timestamp );
                 optsTransfer.details.debug( "{p}Block   TS is {}",
@@ -628,22 +627,22 @@ async function callbackAllMessagesSign( optsTransfer, err, jarrMessages, joGlueR
                         "MessageProxy/{} contract, no events found", optsTransfer.strLogPrefix,
                     strEventName, optsTransfer.joMessageProxyDst.address );
                 } else {
-                    optsTransfer.details.critical( "{p}Failed verification of the {} event of " +
-                        "the {}/{} contract, found event(s): {}", optsTransfer.strLogPrefix,
-                    "PostMessageError", "MessageProxy", optsTransfer.joMessageProxyDst.address,
-                    joEvents );
+                    optsTransfer.details.critical( "{p}Failed verification of the " +
+                        "PostMessageError event of the MessageProxy/{} contract, " +
+                        "found event(s): {}", optsTransfer.strLogPrefix,
+                    optsTransfer.joMessageProxyDst.address, joEvents );
                     if( log.id != optsTransfer.details.id ) {
-                        log.critical( "{p}Failed verification of the {} event of " +
-                            "the {}/{} contract, found event(s): {}", optsTransfer.strLogPrefix,
-                        "PostMessageError", "MessageProxy",
-                        optsTransfer.joMessageProxyDst.address, joEvents );
+                        log.critical( "{p}Failed verification of the PostMessageError event of " +
+                            "the MessageProxy/{} contract, found event(s): {}",
+                        optsTransfer.strLogPrefix, optsTransfer.joMessageProxyDst.address,
+                        joEvents );
                     }
                     imaTransferErrorHandling.saveTransferError(
                         optsTransfer.strTransferErrorCategoryName,
                         optsTransfer.details.toString() );
-                    throw new Error( "Verification failed for the \"PostMessageError\" " +
-                        "event of the \"MessageProxy\"/" + optsTransfer.joMessageProxyDst.address +
-                        " contract, error events found" );
+                    throw new Error( "Verification failed for the PostMessageError event " +
+                            `of the MessageProxy ${optsTransfer.joMessageProxyDst.address}  ` +
+                            "contract, error events found" );
                 }
                 optsTransfer.details.success( "{p}Done, validated transfer to Main Net via " +
                     "MessageProxy error absence on Main Net", optsTransfer.strLogPrefix );
@@ -749,10 +748,10 @@ async function checkOutgoingMessageEvent( optsTransfer, joSChain ) {
                     for( let idxEvent = 0; idxEvent < cntEvents; ++ idxEvent ) {
                         const joEvent = node_r[idxEvent];
                         const eventValuesByName = {
-                            "dstChainHash": imaEventLogScan.extractEventArg( joEvent.args[0] ),
-                            "srcContract": imaEventLogScan.extractEventArg( joEvent.args[2] ),
-                            "dstContract": imaEventLogScan.extractEventArg( joEvent.args[3] ),
-                            "data": imaEventLogScan.extractEventArg( joEvent.args[4] )
+                            "dstChainHash": joEvent.args[0],
+                            "srcContract": joEvent.args[2],
+                            "dstContract": joEvent.args[3],
+                            "data": joEvent.args[4]
                         };
                         if( owaspUtils.ensureStartsWith0x(
                             joMessage.sender ).toLowerCase() ==
@@ -935,10 +934,10 @@ async function doMainTransferLoopActions( optsTransfer ) {
                 optsTransfer.joExtraSignOpts.skaleObserver.findSChainIndexInArrayByName(
                     arrSChainsCached, optsTransfer.chainNameSrc );
             if( idxSChain < 0 ) {
-                throw new Error( "Could not validate S2S messages, source S-Chain \"" +
-                    optsTransfer.chainNameSrc + "\" is not in SKALE NETWORK observer " +
-                    "cache yet or it's not connected to this \"" + optsTransfer.chainNameDst +
-                    "\" S-Chain yet, try again later" );
+                throw new Error( "Could not validate S2S messages, source " +
+                    `S-Chain ${optsTransfer.chainNameSrc} is not in SKALE NETWORK observer ` +
+                        `cache yet or it's not connected to this ${optsTransfer.chainNameDst} ` +
+                        "S-Chain yet, try again later" );
             }
             const cntMessages = optsTransfer.jarrMessages.length;
             const joSChain = arrSChainsCached[idxSChain];
@@ -957,7 +956,7 @@ async function doMainTransferLoopActions( optsTransfer ) {
                     );
             optsTransfer.cntNodesMayFail = cntNodes - optsTransfer.cntNodesShouldPass;
             optsTransfer.details.trace( "{p}{bright} message analysis " +
-                "will be performed o S-Chain {} with {} node(s), {} node(s) " +
+                "will be performed on S-Chain {} with {} node(s), {} node(s) " +
                 "should have same message(s), {} node(s) allowed " +
                 "to fail message(s) comparison, {} message(s) to check...",
             optsTransfer.strLogPrefix, optsTransfer.strDirection, optsTransfer.chainNameSrc,
@@ -1012,8 +1011,8 @@ let gIsOneTransferInProgressInThisThread = false;
 
 export async function doTransfer(
     strDirection, joRuntimeOpts,
-    ethersProviderSrc, joMessageProxySrc, joMessageProxySrcABI, joAccountSrc,
-    ethersProviderDst, joMessageProxyDst, joMessageProxyDstABI, joAccountDst,
+    ethersProviderSrc, joMessageProxySrc, joAccountSrc,
+    ethersProviderDst, joMessageProxyDst, joAccountDst,
     chainNameSrc, chainNameDst, chainIdSrc, chainIdDst,
     joDepositBoxMainNet, // for logs validation on mainnet
     joTokenManagerSChain, // for logs validation on s-chain
@@ -1027,11 +1026,9 @@ export async function doTransfer(
         optsChainPair: optsChainPair,
         ethersProviderSrc: ethersProviderSrc,
         joMessageProxySrc: joMessageProxySrc,
-        joMessageProxySrcABI: joMessageProxySrcABI,
         joAccountSrc: joAccountSrc,
         ethersProviderDst: ethersProviderDst,
         joMessageProxyDst: joMessageProxyDst,
-        joMessageProxyDstABI: joMessageProxyDstABI,
         joAccountDst: joAccountDst,
         chainNameSrc: chainNameSrc,
         chainNameDst: chainNameDst,
@@ -1076,8 +1073,8 @@ export async function doTransfer(
         ? log : log.createMemoryStream( true );
     optsTransfer.strLogPrefixShort = optsTransfer.strDirection + "/#" +
         optsTransfer.nTransferLoopCounter + " ";
-    optsTransfer.strLogPrefix = optsTransfer.strLogPrefixShort + "transfer loop from " +
-        optsTransfer.chainNameSrc + " to " + optsTransfer.chainNameDst + ": ";
+    optsTransfer.strLogPrefix = `${optsTransfer.strLogPrefixShort}transfer loop from ` +
+        `${optsTransfer.chainNameSrc} to ${optsTransfer.chainNameDst}: `;
     if( gIsOneTransferInProgressInThisThread ) {
         optsTransfer.details.warning( "{p}Transfer loop step is skipped because previous one " +
             "is still in progress", optsTransfer.strLogPrefix );
@@ -1183,7 +1180,6 @@ export async function doAllS2S( // s-chain --> s-chain
     skaleObserver,
     ethersProviderDst,
     joMessageProxyDst,
-    joMessageProxyDstABI,
     joAccountDst,
     chainNameDst,
     chainIdDst,
@@ -1227,7 +1223,6 @@ export async function doAllS2S( // s-chain --> s-chain
                         sc.joAbiIMA.message_proxy_chain_address,
                         sc.joAbiIMA.message_proxy_chain_abi,
                         ethersProviderSrc );
-                    const joMessageProxySrcABI = sc.joAbiIMA.message_proxy_chain_abi;
                     const joDepositBoxSrc = new owaspUtils.ethersMod.ethers.Contract(
                         sc.joAbiIMA.message_proxy_chain_address,
                         sc.joAbiIMA.message_proxy_chain_abi,
@@ -1267,11 +1262,9 @@ export async function doAllS2S( // s-chain --> s-chain
                         joRuntimeOpts,
                         ethersProviderSrc,
                         joMessageProxySrc,
-                        joMessageProxySrcABI,
                         joAccountSrc,
                         ethersProviderDst,
                         joMessageProxyDst,
-                        joMessageProxyDstABI,
                         joAccountDst,
                         chainNameSrc,
                         chainNameDst,

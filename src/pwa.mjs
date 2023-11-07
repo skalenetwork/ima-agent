@@ -87,8 +87,8 @@ function getNodeProgressAndTimestamp( joNode, strLoopWorkType, nIndexS2S ) {
         joNode.pwaState = composeEmptyStateForPendingWorkAnalysis();
     strLoopWorkType = strLoopWorkType.toLowerCase();
     if( ! ( strLoopWorkType in joNode.pwaState ) ) {
-        throw new Error( "Specified value \"" + strLoopWorkType +
-            "\" is not a correct loop work type, cannot access info" );
+        throw new Error( `Specified value ${strLoopWorkType} is not a correct loop work type, ` +
+            "cannot access info" );
     }
     if( strLoopWorkType != "s2s" )
         return joNode.pwaState[strLoopWorkType];
@@ -104,11 +104,8 @@ function getNodeProgressAndTimestamp( joNode, strLoopWorkType, nIndexS2S ) {
 export async function checkOnLoopStart( imaState, strLoopWorkType, nIndexS2S ) {
     try {
         nIndexS2S = nIndexS2S || 0; // convert to number if undefined
-        if( ! checkLoopWorkTypeStringIsCorrect( strLoopWorkType ) ) {
-            throw new Error(
-                "Specified value \"" + strLoopWorkType + "\" is not a correct loop work type"
-            );
-        }
+        if( ! checkLoopWorkTypeStringIsCorrect( strLoopWorkType ) )
+            throw new Error( `Specified value ${strLoopWorkType} is not a correct loop work type` );
         if( ! imaState.isPWA )
             return true; // PWA is N/A
         if( imaState.nNodesCount <= 1 )
@@ -175,10 +172,8 @@ export async function handleLoopStateArrived(
     let isSuccess = false;
     let joNode = null;
     try {
-        if( ! checkLoopWorkTypeStringIsCorrect( strLoopWorkType ) ) {
-            throw new Error(
-                "Arrived value \"" + strLoopWorkType + "\" is not a correct loop work type" );
-        }
+        if( ! checkLoopWorkTypeStringIsCorrect( strLoopWorkType ) )
+            throw new Error( `Specified value ${strLoopWorkType} is not a correct loop work type` );
         if( ! imaState.isPWA )
             return true;
         if( imaState.nNodesCount <= 1 )
@@ -226,10 +221,8 @@ async function notifyOnLoopImpl( imaState, strLoopWorkType, nIndexS2S, isStart )
     const se = isStart ? "start" : "end";
     try {
         nIndexS2S = nIndexS2S || 0; // convert to number if undefined
-        if( ! checkLoopWorkTypeStringIsCorrect( strLoopWorkType ) ) {
-            throw new Error(
-                "Specified value \"" + strLoopWorkType + "\" is not a correct loop work type" );
-        }
+        if( ! checkLoopWorkTypeStringIsCorrect( strLoopWorkType ) )
+            throw new Error( `Specified value ${strLoopWorkType} is not a correct loop work type` );
         if( ! imaState.isPWA )
             return true;
         if( imaState.nNodesCount <= 1 )

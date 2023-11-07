@@ -107,8 +107,8 @@ export function oracleGetGasPrice( oracleOpts, details ) {
                         url, err );
                     if( joCall )
                         await joCall.disconnect();
-                    reject( new Error( "CRITICAL ORACLE ERROR: RPC connection problem for url \"" +
-                        url + "\", error description: " + owaspUtils.extractErrorMessage( err ) ) );
+                    reject( new Error( `ORACLE ERROR: RPC connection problem for url ${url}, ` +
+                        `error description: ${owaspUtils.extractErrorMessage( err )}` ) );
                     return;
                 }
                 try {
@@ -130,7 +130,7 @@ export function oracleGetGasPrice( oracleOpts, details ) {
                             }
                             await joCall.disconnect();
                             reject( new Error( "JSON RPC call(oracle_submitRequest) failed, " +
-                                "error: " + owaspUtils.extractErrorMessage( err ) ) );
+                                `error: ${owaspUtils.extractErrorMessage( err )}` ) );
                             return;
                         }
                         if( isVerboseTraceDetails )

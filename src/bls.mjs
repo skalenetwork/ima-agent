@@ -52,7 +52,7 @@ async function withTimeout( strDescription, promise, seconds ) {
     promise.catch( function( err ) {
         isComplete = true;
         resultError =
-            new Error( strDescription + "error: " + owaspUtils.extractErrorMessage( err ) );
+            new Error( `${strDescription}error: ${owaspUtils.extractErrorMessage( err )}` );
     } ).finally( function() {
         isComplete = true;
     } );
@@ -64,7 +64,7 @@ async function withTimeout( strDescription, promise, seconds ) {
     if( resultError )
         throw resultError;
     if( ! isComplete )
-        throw new Error( strDescription + " reached limit of " + seconds + " second(s)" );
+        throw new Error( `${strDescription} reached limit of ${seconds} second(s)` );
 };
 
 function discoverBlsThreshold( joSChainNetworkInfo ) {
@@ -133,10 +133,9 @@ function discoverPublicKeyByIndex( nNodeIndex, joSChainNetworkInfo, details, isT
     }
     details.fatal( "BLS 1/{} public key discovery failed for node #{}, node data is: {}",
         cntNodes, nNodeIndex, joNode );
-    if( isThrowException ) {
-        throw new Error( "BLS 1/" + cntNodes +
-            " public key discovery failed for node #" + nNodeIndex );
-    }
+    if( isThrowException )
+        throw new Error( `BLS 1/${cntNodes} public key discovery failed for node #${nNodeIndex}` );
+
     return null;
 }
 
@@ -297,7 +296,7 @@ function performBlsGlue(
     arrSignResults
 ) {
     const imaState = state.get();
-    const strLogPrefix = strDirection + "/BLS/Glue: ";
+    const strLogPrefix = `${strDirection}/BLS/Glue: `;
     let joGlueResult = null;
     const nThreshold = discoverBlsThreshold( imaState.joSChainNetworkInfo );
     const nParticipants = discoverBlsParticipants( imaState.joSChainNetworkInfo );
@@ -364,12 +363,12 @@ function performBlsGlue(
                 joGlueResult.hint = joResultHashG1.g1.hint;
             } else {
                 joGlueResult = null;
-                throw new Error( "malformed HashG1 result: " + JSON.stringify( joResultHashG1 ) );
+                throw new Error( `malformed HashG1 result: ${JSON.stringify( joResultHashG1 )}` );
             }
         } else {
             const joSavedGlueResult = joGlueResult;
             joGlueResult = null;
-            throw new Error( "malformed BLS glue result: " + JSON.stringify( joSavedGlueResult ) );
+            throw new Error( `malformed BLS glue result: ${JSON.stringify( joSavedGlueResult )}` );
         }
         fnShellRestore();
     } catch ( err ) {
@@ -450,12 +449,12 @@ function performBlsGlueU256( details, u256, arrSignResults ) {
                 joGlueResult.hint = joResultHashG1.g1.hint;
             } else {
                 joGlueResult = null;
-                throw new Error( "malformed HashG1 result: " + JSON.stringify( joResultHashG1 ) );
+                throw new Error( `malformed HashG1 result: ${JSON.stringify( joResultHashG1 )}` );
             }
         } else {
             const joSavedGlueResult = joGlueResult;
             joGlueResult = null;
-            throw new Error( "malformed BLS glue result: " + JSON.stringify( joSavedGlueResult ) );
+            throw new Error( `malformed BLS glue result: ${JSON.stringify( joSavedGlueResult )}` );
         }
         fnShellRestore();
     } catch ( err ) {
@@ -479,7 +478,7 @@ function performBlsVerifyI(
     if( !joResultFromNode )
         return true;
     const imaState = state.get();
-    const strLogPrefix = strDirection + "/BLS/#" + nZeroBasedNodeIndex + ": ";
+    const strLogPrefix = `${strDirection}/BLS/#${nZeroBasedNodeIndex}: `;
     const nThreshold = discoverBlsThreshold( imaState.joSChainNetworkInfo );
     const nParticipants = discoverBlsParticipants( imaState.joSChainNetworkInfo );
     if( ! checkBlsThresholdAndBlsParticipants(
@@ -545,7 +544,7 @@ function performBlsVerifyIU256(
     if( ! joResultFromNode )
         return true;
     const imaState = state.get();
-    const strLogPrefix = "BLS/#" + nZeroBasedNodeIndex + ": ";
+    const strLogPrefix = `BLS/#${nZeroBasedNodeIndex}: `;
     const nThreshold = discoverBlsThreshold( imaState.joSChainNetworkInfo );
     const nParticipants = discoverBlsParticipants( imaState.joSChainNetworkInfo );
     if( ! checkBlsThresholdAndBlsParticipants(
@@ -611,7 +610,7 @@ function performBlsVerify(
         shell.rm( "-rf", strActionDir );
     };
     let strOutput = "";
-    const strLogPrefix = strDirection + "/BLS/Summary: ";
+    const strLogPrefix = `${strDirection}/BLS/Summary: "`;
     try {
         details.trace( "{p}BLS/summary verify message - first message nonce is {}",
             strLogPrefix, nIdxCurrentMsgBlockStart );
@@ -745,15 +744,15 @@ async function checkCorrectnessOfMessagesToSign(
                 ;
         if( ! ethersProvider ) {
             throw new Error( "CRITICAL ERROR: No provider specified in extra signing options " +
-                "for checking messages of direction \"" + strDirection + "\"" );
+                `for checking messages of direction ${strDirection}` );
         }
         joMessageProxy = new owaspUtils.ethersMod.ethers.Contract(
             imaState.chainProperties.sc.joAbiIMA.message_proxy_chain_address,
             imaState.chainProperties.sc.joAbiIMA.message_proxy_chain_abi,
             ethersProvider );
     } else {
-        throw new Error( "CRITICAL ERROR: Failed checkCorrectnessOfMessagesToSign() " +
-            "with unknown direction \"" + strDirection + "\"" );
+        throw new Error( "CRITICAL ERROR: Failed checkCorrectnessOfMessagesToSign() with " +
+            `unknown direction ${strDirection}` );
     }
 
     const strCallerAccountAddress = joAccount.address();
@@ -792,8 +791,8 @@ async function checkCorrectnessOfMessagesToSign(
                     "real message index is: {}, saved msgCounter is: {}", strLogPrefix,
                 strDirection, isValidMessage, + idxMessage, outgoingMessageData.msgCounter );
                 if( !isValidMessage ) {
-                    throw new Error(
-                        "Bad message detected, message is: " + JSON.stringify( joMessage ) );
+                    throw new Error( "Bad message detected, " +
+                        `message is: ${JSON.stringify( joMessage )}` );
                 }
             } catch ( err ) {
                 ++cntBadMessages;
@@ -930,8 +929,8 @@ async function gatherSigningStartImpl( optsSignOperation ) {
                 optsSignOperation.joGatheringTracker.nCountReceived -
                 optsSignOperation.joGatheringTracker.nCountErrors;
             if( optsSignOperation.cntSuccess >= optsSignOperation.nCountOfBlsPartsToCollect ) {
-                optsSignOperation.strLogPrefixB = optsSignOperation.strDirection + "/#" +
-                    optsSignOperation.nTransferLoopCounter + "/BLS/Summary: ";
+                optsSignOperation.strLogPrefixB = `${optsSignOperation.strDirection} /# ` +
+                    `${optsSignOperation.nTransferLoopCounter}/BLS/Summary: `;
                 clearInterval( iv );
                 let strError = null, strSuccessfulResultDescription = null;
                 const joGlueResult = performBlsGlue(
@@ -1180,8 +1179,8 @@ async function doSignConfigureChainAccessParams( optsSignOperation ) {
         optsSignOperation.fromChainID = optsSignOperation.joExtraSignOpts.chainIdSrc;
     } else {
         await joCall.disconnect();
-        throw new Error( "CRITICAL ERROR: Failed doSignMessagesImpl() with unknown direction \"" +
-            optsSignOperation.strDirection + "\"" );
+        throw new Error( "CRITICAL ERROR: Failed doSignMessagesImpl() with " +
+            `unknown direction ${optsSignOperation.strDirection}` );
     }
 }
 
@@ -1238,8 +1237,8 @@ async function doSignProcessHandleCall(
             const nZeroBasedNodeIndex = joNode.imaInfo.thisNodeIndex - 1;
             // partial BLS verification for one participant
             let bNodeSignatureOKay = false; // initially assume signature is wrong
-            optsSignOperation.strLogPrefixA = optsSignOperation.strDirection + "/BLS/#" +
-                nZeroBasedNodeIndex + ": ";
+            optsSignOperation.strLogPrefixA =
+                `${optsSignOperation.strDirection}/BLS/#${nZeroBasedNodeIndex}: `;
             try {
                 optsSignOperation.cntSuccess =
                     optsSignOperation.joGatheringTracker.nCountReceived -
@@ -1423,9 +1422,9 @@ async function doSignMessagesImpl(
         targetChainID: -4,
         fromChainID: -4
     };
-    optsSignOperation.strLogPrefix = optsSignOperation.strDirection + "/#" +
-        optsSignOperation.nTransferLoopCounter + " " + "Sign msgs via " +
-        ( optsSignOperation.imaState.isCrossImaBlsMode ? "IMA agent" : "skaled" ) + ": ";
+    optsSignOperation.strLogPrefix = `${optsSignOperation.strDirection}/#` +
+        `${optsSignOperation.nTransferLoopCounter} Sign msgs via ` +
+        `${optsSignOperation.imaState.isCrossImaBlsMode ? "IMA agent" : "skaled"}: `;
     optsSignOperation.joGatheringTracker = {
         nCountReceivedPrevious: 0,
         nCountReceived: 0,
@@ -1648,7 +1647,7 @@ async function doSignU256OneImpl( i, optsSignU256 ) {
                     const nZeroBasedNodeIndex = joNode.imaInfo.thisNodeIndex - 1;
                     // partial BLS verification for one participant
                     let bNodeSignatureOKay = false; // initially assume signature is wrong
-                    const strLogPrefixA = "BLS/#" + nZeroBasedNodeIndex + ": ";
+                    const strLogPrefixA = `BLS/#${nZeroBasedNodeIndex}: `;
                     try {
                         const cntSuccess = optsSignU256.joGatheringTracker.nCountReceived -
                             optsSignU256.joGatheringTracker.nCountErrors;
@@ -1942,7 +1941,7 @@ export async function doVerifyReadyHash(
 ) {
     const imaState = state.get();
     const strDirection = "RAW";
-    const strLogPrefix = strDirection + "/BLS/#" + nZeroBasedNodeIndex + ": ";
+    const strLogPrefix = `${strDirection}/BLS/#${nZeroBasedNodeIndex}: `;
     const details = log.createMemoryStream();
     let isSuccess = false;
     const arrTmp = signature.signatureShare.split( ":" );
@@ -2063,7 +2062,7 @@ export async function doSignReadyHash( strMessageHash, isExposeOutput ) {
                 if( joCall )
                     await joCall.disconnect();
                 throw new Error( "JSON RPC call to SGX failed, RPC call(doSignReadyHash) was " +
-                    "not created, error is: " + owaspUtils.extractErrorMessage( err ) );
+                    `not created, error is: ${owaspUtils.extractErrorMessage( err )}` );
             }
             const joCallSGX = {
                 "jsonrpc": "2.0",
@@ -2080,10 +2079,9 @@ export async function doSignReadyHash( strMessageHash, isExposeOutput ) {
             details.trace( "{p}Will invoke SGX with call data {}", strLogPrefix, joCallSGX );
             await joCall.call( joCallSGX, async function( joIn, joOut, err ) {
                 if( err ) {
-                    const jsErrorObject = new Error(
-                        "JSON RPC call(doSignReadyHash) to SGX failed, RPC call reported error: " +
-                        owaspUtils.extractErrorMessage( err )
-                    );
+                    const jsErrorObject = new Error( "JSON RPC call(doSignReadyHash) " +
+                        "to SGX failed, RPC call reported " +
+                        `error: ${owaspUtils.extractErrorMessage( err )}` );
                     if( log.id != details.id ) {
                         log.error( "{p}JSON RPC call(doSignReadyHash) to SGX failed, " +
                             "RPC call reported error: {err}, stack is:\n{stack}",
@@ -2107,14 +2105,13 @@ export async function doSignReadyHash( strMessageHash, isExposeOutput ) {
                     typeof joSignResult.errorMessage == "string" &&
                     joSignResult.errorMessage.length > 0
                 ) {
-                    const strError =
-                        "BLS signing finished with error: " + joSignResult.errorMessage;
+                    const strError = `BLS-sign finished with error: ${joSignResult.errorMessage};`;
                     joRetVal.error = strError;
                     if( log.id != details.id ) {
-                        log.error( "{p}BLS signing(1) finished with error: {err}",
+                        log.error( "{p}BLS-sign(1) finished with error: {err}",
                             strLogPrefix, joSignResult.errorMessage );
                     }
-                    details.error( "{p}BLS signing(1) finished with error: {err}",
+                    details.error( "{p}BLS-sign(1) finished with error: {err}",
                         strLogPrefix, joSignResult.errorMessage );
                     await joCall.disconnect();
                     throw new Error( strError );
@@ -2203,9 +2200,9 @@ async function prepareS2sOfSkaleImaVerifyAndSign( optsHandleVerifyAndSign ) {
     strSChainNameSrc, strSChainNameDst );
     const arrSChainsCached = skaleObserver.getLastCachedSChains();
     if( ( !arrSChainsCached ) || arrSChainsCached.length == 0 ) {
-        throw new Error( "Could not handle " + optsHandleVerifyAndSign.strDirection +
-            " skale_imaVerifyAndSign(1), no S-Chains in SKALE NETWORK " +
-            "observer cached yet, try again later" );
+        throw new Error( `Could not handle ${optsHandleVerifyAndSign.strDirection} ` +
+            "skale_imaVerifyAndSign(1), no S-Chains in SKALE NETWORK observer cached yet, " +
+            "try again later" );
     }
 
     let joSChainSrc = null, strUrlSrcSChain = null;
@@ -2218,9 +2215,9 @@ async function prepareS2sOfSkaleImaVerifyAndSign( optsHandleVerifyAndSign ) {
         }
     }
     if( joSChainSrc == null || strUrlSrcSChain == null || strUrlSrcSChain.length == 0 ) {
-        throw new Error( "Could not handle " + optsHandleVerifyAndSign.strDirection +
-            " skale_imaVerifyAndSign(2), failed to discover source " +
-            "chain access parameters, try again later" );
+        throw new Error( `Could not handle ${optsHandleVerifyAndSign.strDirection} ` +
+            "skale_imaVerifyAndSign(2), failed to discover source chain access parameters, " +
+            "try again later" );
     }
     optsHandleVerifyAndSign.details.trace( "{p}{bright} verification algorithm discovered source " +
         "chain URL is {url}, chain name is {}, chain id is {}",
@@ -2306,11 +2303,9 @@ export async function handleSkaleImaVerifyAndSign( joCallData ) {
                     err );
                 if( joCall )
                     await joCall.disconnect();
-                throw new Error(
-                    "JSON RPC call(handleSkaleImaVerifyAndSign) to SGX failed, " +
-                    "RPC call was not created, error is: " +
-                    owaspUtils.extractErrorMessage( err )
-                );
+                throw new Error( "JSON RPC call(handleSkaleImaVerifyAndSign) to SGX failed, " +
+                    "RPC call was not created, " +
+                    `error is: ${owaspUtils.extractErrorMessage( err )}` );
             }
             const joCallSGX = {
                 "jsonrpc": "2.0",
@@ -2364,16 +2359,15 @@ export async function handleSkaleImaVerifyAndSign( joCallData ) {
                     joSignResult.errorMessage.length > 0
                 ) {
                     optsHandleVerifyAndSign.isSuccess = false;
-                    const strError =
-                        "BLS signing finished with error: " + joSignResult.errorMessage;
+                    const strError = `BLS-sign finished with error: ${joSignResult.errorMessage};`;
                     optsHandleVerifyAndSign.joRetVal.error = strError;
                     if( log.id != optsHandleVerifyAndSign.details.id ) {
-                        log.error( "{p}BLS signing(2) finished with error: {err}",
+                        log.error( "{p}BLS-sign(2) finished with error: {err}",
                             optsHandleVerifyAndSign.strLogPrefix,
                             joSignResult.errorMessage );
                     }
                     optsHandleVerifyAndSign.details.error(
-                        "{p}BLS signing(2) finished with error: {err}",
+                        "{p}BLS-sign(2) finished with error: {err}",
                         optsHandleVerifyAndSign.strLogPrefix, joSignResult.errorMessage );
                     await joCall.disconnect();
                     throw new Error( strError );
@@ -2482,8 +2476,8 @@ export async function handleSkaleImaBSU256( joCallData ) {
                     if( joCall )
                         await joCall.disconnect();
                     throw new Error( "JSON RPC call(handleSkaleImaBSU256) to SGX failed, " +
-                        "RPC call was not created, error is: " +
-                        owaspUtils.extractErrorMessage( err ) );
+                        "RPC call was not created, " +
+                        `error is: ${owaspUtils.extractErrorMessage( err )}` );
                 }
                 const joCallSGX = {
                     "jsonrpc": "2.0",
@@ -2501,10 +2495,9 @@ export async function handleSkaleImaBSU256( joCallData ) {
                     optsBSU256.strLogPrefix, joCallSGX );
                 await joCall.call( joCallSGX, async function( joIn, joOut, err ) {
                     if( err ) {
-                        const jsErrorObject = new Error(
-                            "JSON RPC call(handleSkaleImaBSU256) to SGX failed, " +
-                            "RPC call reported error: " +
-                            owaspUtils.extractErrorMessage( err ) );
+                        const jsErrorObject = new Error( "JSON RPC call(handleSkaleImaBSU256) " +
+                            "to SGX failed, RPC call " +
+                            `reported error: ${owaspUtils.extractErrorMessage( err )}` );
                         if( log.id != optsBSU256.details.id ) {
                             log.error( "{p}JSON RPC call(handleSkaleImaBSU256) " +
                                 "to SGX failed, RPC call reported error: {err}, stack is:\n{stack}",
@@ -2529,14 +2522,14 @@ export async function handleSkaleImaBSU256( joCallData ) {
                         typeof joSignResult.errorMessage == "string" &&
                         joSignResult.errorMessage.length > 0 ) {
                         optsBSU256.isSuccess = false;
-                        const strError =
-                            "BLS signing finished with error: " + joSignResult.errorMessage;
+                        const strError = "BLS-sign finished with " +
+                            `error: ${joSignResult.errorMessage}`;
                         optsBSU256.joRetVal.error = strError;
                         if( log.id != optsBSU256.details.id ) {
-                            log.error( "{p}BLS signing(3) finished with error: {err}",
+                            log.error( "{p}BLS-sign(3) finished with error: {err}",
                                 optsBSU256.strLogPrefix, joSignResult.errorMessage );
                         }
-                        optsBSU256.details.error( "{p}BLS signing(3) finished with error: {err}",
+                        optsBSU256.details.error( "{p}BLS-sign(3) finished with error: {err}",
                             optsBSU256.strLogPrefix, joSignResult.errorMessage );
                         await joCall.disconnect();
                         throw new Error( strError );

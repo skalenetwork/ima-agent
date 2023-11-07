@@ -51,8 +51,8 @@ export async function waitWebSocketIsOpen( socket, fnDone, fnStep ) {
             } else {
                 if( ! await fnStep( nStep ) ) {
                     clearInterval( iv );
-                    reject( new Error(
-                        "web socket wait timeout by callback on step " + nStep ) );
+                    reject( new Error( "web socket wait timeout by callback " +
+                        `on step ${nStep}` ) );
                 }
             }
             isInsideAsyncHandler = false;
@@ -73,8 +73,8 @@ export async function doConnect( joCall, opts, fn ) {
     try {
         fn = fn || async function() {};
         if( !validateURL( joCall.url ) ) {
-            throw new Error(
-                "JSON RPC CALLER cannot connect web socket to invalid URL: " + joCall.url );
+            throw new Error( "JSON RPC CALLER cannot connect web socket " +
+                `to invalid URL: ${joCall.url}` );
         }
         if( isUrlWS( joCall.url ) ) {
             let strWsError = null;
@@ -154,8 +154,8 @@ export async function doConnectIfNeeded( joCall, opts, fn ) {
     try {
         fn = fn || async function() {};
         if( !validateURL( joCall.url ) ) {
-            throw new Error(
-                "JSON RPC CALLER cannot connect web socket to invalid URL: " + joCall.url );
+            throw new Error( "JSON RPC CALLER cannot connect web socket " +
+                `to invalid URL: ${joCall.url}` );
         }
         if( isUrlWS( joCall.url ) && ( !joCall.wsConn ) ) {
             await joCall.reconnect( fn );
@@ -330,11 +330,11 @@ export async function doCall( joCall, joIn, fn ) {
 
 export async function rpcCallCreate( strURL, opts, fn ) {
     if( !validateURL( strURL ) )
-        throw new Error( "JSON RPC CALLER cannot create a call object invalid URL: " + strURL );
+        throw new Error( `JSON RPC CALLER cannot create a call object invalid URL: ${strURL}` );
     fn = fn || async function() {};
     if( !( strURL && typeof strURL == "string" && strURL.length > 0 ) ) {
-        throw new Error(
-            "rpcCallCreate() was invoked with bad parameters: " + JSON.stringify( arguments ) );
+        throw new Error( "rpcCallCreate() was invoked with " +
+            `bad parameters: ${JSON.stringify( arguments )}` );
     }
     const joCall = {
         "url": "" + strURL,

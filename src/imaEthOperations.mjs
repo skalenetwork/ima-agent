@@ -136,9 +136,8 @@ export async function doEthPaymentFromMainNet(
                     "contract, found event(s): {}", strLogPrefix, strEventName,
                 joMessageProxyMainNet.address, joEvents );
             } else {
-                throw new Error( "Verification failed for the \"OutgoingMessage\" event of the " +
-                    "\"MessageProxy\"/" + joMessageProxyMainNet.address +
-                    " contract, no events found" );
+                throw new Error( "Verification failed for the OutgoingMessage event of the " +
+                    `MessageProxy ${joMessageProxyMainNet.address} contract, no events found` );
             }
         }
     } catch ( err ) {
@@ -238,9 +237,8 @@ export async function doEthPaymentFromSChain(
                     "contract, found event(s): {}", strLogPrefix, strEventName,
                 joMessageProxySChain.address, joEvents );
             } else {
-                throw new Error( "Verification failed for the \"OutgoingMessage\" " +
-                        "event of the \"MessageProxy\"/" +
-                    joMessageProxySChain.address + " contract, no events found" );
+                throw new Error( "Verification failed for the OutgoingMessage event of the " +
+                        `MessageProxy ${joMessageProxySChain.address} contract, no events found` );
             }
         }
     } catch ( err ) {

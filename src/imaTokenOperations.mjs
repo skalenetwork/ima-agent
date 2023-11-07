@@ -263,9 +263,8 @@ export async function doErc721PaymentFromMainNet(
                     " contract, found event(s): {}", strLogPrefix, strEventName,
                 joMessageProxyMainNet.address, joEvents );
             } else {
-                throw new Error( "Verification failed for the \"OutgoingMessage\" " +
-                        "event of the \"MessageProxy\"/" +
-                    joMessageProxyMainNet.address + " contract, no events found" );
+                throw new Error( "Verification failed for the OutgoingMessage event of the " +
+                    `MessageProxy ${joMessageProxyMainNet.address} contract, no events found` );
             }
         }
     } catch ( err ) {
@@ -422,9 +421,8 @@ export async function doErc20PaymentFromMainNet(
                     " contract, found event(s): {}", strLogPrefix, strEventName,
                 joMessageProxyMainNet.address, joEvents );
             } else {
-                throw new Error( "Verification failed for th\"OutgoingMessage\" event " +
-                        "of the \"MessageProxy\"/" +
-                    joMessageProxyMainNet.address + " contract, no events found" );
+                throw new Error( "Verification failed for the OutgoingMessage event of the " +
+                    `MessageProxy ${joMessageProxyMainNet.address} contract, no events found` );
             }
         }
     } catch ( err ) {
@@ -575,10 +573,8 @@ export async function doErc1155PaymentFromMainNet(
                     " contract, found event(s): ",
                 strLogPrefix, strEventName, joMessageProxyMainNet.address, joEvents );
             } else {
-                throw new Error(
-                    "Verification failed for the \"OutgoingMessage\" event " +
-                        "of the \"MessageProxy\"/" +
-                    joMessageProxyMainNet.address + " contract, no events found" );
+                throw new Error( "Verification failed for theOutgoingMessage event of the " +
+                    `MessageProxy ${joMessageProxyMainNet.address} contract, no events found` );
             }
         }
     } catch ( err ) {
@@ -725,9 +721,8 @@ export async function doErc1155BatchPaymentFromMainNet(
                     " contract, found event(s): {}",
                 strLogPrefix, strEventName, joMessageProxyMainNet.address, joEvents );
             } else {
-                throw new Error( "Verification failed for the \"OutgoingMessage\" event " +
-                        "of the \"MessageProxy\"/" +
-                    joMessageProxyMainNet.address + " contract, no events found" );
+                throw new Error( "Verification failed for the OutgoingMessage event of the " +
+                    `MessageProxy ${joMessageProxyMainNet.address} contract, no events found` );
             }
         }
     } catch ( err ) {
@@ -881,9 +876,8 @@ export async function doErc20PaymentFromSChain(
                     " contract, found event(s): {}",
                 strLogPrefix, strEventName, joMessageProxySChain.address, joEvents );
             } else {
-                throw new Error( "Verification failed for the \"OutgoingMessage\" event " +
-                    "of the \"MessageProxy\"/" + joMessageProxySChain.address +
-                    " contract, no events found" );
+                throw new Error( "Verification failed for the OutgoingMessage event of the " +
+                    `MessageProxy ${joMessageProxySChain.address} contract, no events found` );
             }
         }
     } catch ( err ) {
@@ -1040,10 +1034,10 @@ export async function doErc721PaymentFromSChain(
                     " contract, found event(s): {}",
                 strLogPrefix, strEventName, joMessageProxySChain.address, joEvents );
             } else {
-                throw new Error( "Verification failed for the \"OutgoingMessage\" event " +
-                        "of the \"MessageProxy\"/" +
-                    joMessageProxySChain.address + " contract, no events found" );
+                throw new Error( "Verification failed for the OutgoingMessage event of the " +
+                    `MessageProxy${joMessageProxySChain.address} contract, no events found` );
             }
+
         }
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
@@ -1200,10 +1194,8 @@ export async function doErc1155PaymentFromSChain(
                     " contract, found event(s): {}",
                 strLogPrefix, strEventName, joMessageProxySChain.address, joEvents );
             } else {
-                throw new Error(
-                    "Verification failed for the \"OutgoingMessage\" event " +
-                        "of the \"MessageProxy\"/" +
-                    joMessageProxySChain.address + " contract, no events found" );
+                throw new Error( "Verification failed for the OutgoingMessage event of the " +
+                    `MessageProxy${joMessageProxySChain.address} contract, no events found` );
             }
         }
     } catch ( err ) {
@@ -1364,10 +1356,8 @@ export async function doErc1155BatchPaymentFromSChain(
                     " contract, found event(s): {}",
                 strLogPrefix, strEventName, joMessageProxySChain.address, joEvents );
             } else {
-                throw new Error(
-                    "Verification failed for the \"OutgoingMessage\" event " +
-                        "of the \"MessageProxy\"/" +
-                    joMessageProxySChain.address + " contract, no events found" );
+                throw new Error( "Verification failed for the OutgoingMessage event of the " +
+                    `MessageProxy${joMessageProxySChain.address} contract, no events found` );
             }
         }
     } catch ( err ) {

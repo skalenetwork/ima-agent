@@ -111,8 +111,7 @@ export async function safeGetBlockNumber(
                 return ret;
             details.error( "Cannot call {} via {url} because server is off-line",
                 strFnName + "()", u );
-            throw new Error( "Cannot " + strFnName + "() via " + u.toString() +
-                " because server is off-line" );
+            throw new Error( `Cannot ${strFnName}() via ${u} because server is off-line` );
         }
         details.trace( "Repeat call to {} via {url}, attempt {}", strFnName + "()", u, idxAttempt );
         try {
@@ -128,8 +127,7 @@ export async function safeGetBlockNumber(
     if( ( idxAttempt + 1 ) > cntAttempts && ret === "" ) {
         details.error( "Failed call to {} via {url} after {} attempts ",
             strFnName + "()", u, cntAttempts );
-        throw new Error( "Failed call to " + strFnName + "() via " + u.toString() + " after " +
-            cntAttempts + " attempts" );
+        throw new Error( `Failed call to ${strFnName}() via ${u} after ${cntAttempts} attempts` );
     }
     return ret;
 }

@@ -225,8 +225,7 @@ function initMonitoringServer() {
                         imaTransferErrorHandling.getLastErrorCategories();
                     break;
                 default:
-                    throw new Error(
-                        "Unknown method name \"" + joMessage.method + "\" was specified" );
+                    throw new Error( `Unknown method name ${joMessage.method} was specified` );
                 } // switch( joMessage.method )
             } catch ( err ) {
                 const strError = owaspUtils.extractErrorMessage( err );
@@ -342,7 +341,7 @@ function initJsonRpcServer() {
                 }
                 break;
             default:
-                throw new Error( "Unknown method name \"" + joMessage.method + "\" was specified" );
+                throw new Error( `Unknown method name ${joMessage.method} was specified` );
             } // switch( joMessage.method )
         } catch ( err ) {
             const strError = owaspUtils.extractErrorMessage( err );
@@ -363,7 +362,7 @@ async function doTheJob() {
     let cntFalse = 0;
     let cntTrue = 0;
     for( idxAction = 0; idxAction < cntActions; ++idxAction ) {
-        log.information( "{p}{p}", strLogPrefix, log.fmtDebug( imaHelperAPIs.longSeparator ) );
+        log.information( "{p}{p}", strLogPrefix, imaHelperAPIs.longSeparator );
         const joAction = imaState.arrActions[idxAction];
         log.debug( "{p}Will execute action: {bright} ({} of {})" ,
             strLogPrefix, joAction.name, idxAction + 1, cntActions );

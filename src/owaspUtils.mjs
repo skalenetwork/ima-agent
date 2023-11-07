@@ -329,11 +329,11 @@ export function verifyArgumentIsIntegerIpPortNumber( joArg ) {
     try {
         verifyArgumentIsInteger( joArg );
         if( joArg.value < 0 )
-            throw new Error( "Port number " + joArg.value + " cannot be negative" );
+            throw new Error( `Port number ${joArg.value} cannot be negative` );
         if( joArg.value < 1 )
-            throw new Error( "Port number " + joArg.value + " too small" );
+            throw new Error( `Port number ${joArg.value} too small` );
         if( joArg.value > 65535 )
-            throw new Error( "Port number " + joArg.value + " too big" );
+            throw new Error( `Port number ${joArg.value} too big` );
         return joArg;
     } catch ( err ) {
         console.log( log.fmtFatal( "(OWASP) Value {} of argument {} must be " +
@@ -630,9 +630,8 @@ export function parseMoneySpecToWei( s, isThrowException ) {
         return s;
     } catch ( err ) {
         if( isThrowException ) {
-            throw new Error(
-                "Parse error in parseMoneySpecToWei(\"" + s +
-                "\"), error is: " + err.toString() );
+            throw new Error( `Parse error in parseMoneySpecToWei( ${s} ), ` +
+                `error is: ${err.toString()}` );
         }
     }
     return "0";

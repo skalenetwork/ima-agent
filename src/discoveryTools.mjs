@@ -302,8 +302,8 @@ export async function continueSChainDiscoveryInBackgroundIfNeeded( isSilentReDis
                     const cntDiscoveredNow =
                         getSChainDiscoveredNodesCount( joSChainNetworkInfo );
                     let strMessage =
-                        log.fmtSuccess( "S-Chain network was re-discovered, ", cntDiscoveredNow,
-                            " of ", nCountToWait, " node(s) (", cntDiscoveredNow, " nodes known)" );
+                        log.fmtSuccess( "S-Chain network was re-discovered, {} of {} node(s)" +
+                            "({} nodes known)", cntDiscoveredNow, nCountToWait, cntDiscoveredNow );
                     const cntStillUnknown = cntNodesOnChain - cntDiscoveredNow;
                     if( cntStillUnknown > 0 ) {
                         strMessage += log.fmtSuccess( ", {} of {} still unknown (",
@@ -477,8 +477,8 @@ async function discoverSChainWait( optsDiscover ) {
         ++ nWaitAttempt;
         if( nWaitAttempt >= cntWaitAttempts ) {
             clearInterval( iv );
-            const strErrorDescription =
-                "S-Chain network discovery wait timeout, network will be re-discovered later";
+            const strErrorDescription = "S-Chain network discovery wait timeout, " +
+                "network will be re-discovered later";
             if( ! optsDiscover.isSilentReDiscovery ) {
                 log.warning( "{p}This S-Chain discovery will finish due to: {err}",
                     optsDiscover.strLogPrefix, strErrorDescription );
@@ -611,11 +611,10 @@ export async function discoverSChainNetwork(
                                     optsDiscover.strLogPrefix, optsDiscover.cntNodes,
                                     optsDiscover.nCountAvailable, optsDiscover.nCountToWait );
                                 }
-                                const err = new Error(
-                                    "Not enough nodes available on S-Chain, total " +
-                                    optsDiscover.cntNodes + ", available " +
-                                    optsDiscover.nCountAvailable + ", expected at least " +
-                                    optsDiscover.nCountToWait );
+                                const err = new Error( "Not enough nodes available on S-Chain, " +
+                                    `total ${optsDiscover.cntNodes}, ` +
+                                    `available ${optsDiscover.nCountAvailable}, ` +
+                                    `expected at least ${optsDiscover.nCountToWait}` );
                                 optsDiscover.fnAfter( err, null );
                                 reject( err );
                                 return;
