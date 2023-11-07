@@ -1197,7 +1197,7 @@ export async function doAllS2S( // s-chain --> s-chain
         "S2S transfers in {}.", cntSChains, threadInfo.threadDescription() );
     for( let idxSChain = 0; idxSChain < cntSChains; ++ idxSChain ) {
         const joSChain = arrSChainsCached[idxSChain];
-        const urlSrc = pickRandomSChainUrl( joSChain );
+        const urlSrc = skaleObserver.pickRandomSChainUrl( joSChain );
         const ethersProviderSrc = owaspUtils.getEthersProviderFromURL( urlSrc );
         const joAccountSrc = joAccountDst; // ???
         const chainNameSrc = "" + joSChain.data.name;
