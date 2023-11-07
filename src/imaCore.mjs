@@ -171,13 +171,12 @@ async function doQueryOutgoingMessageCounter( optsTransfer ) {
         optsTransfer.details.information( "{p}Result of {bright} call: {}",
             optsTransfer.strLogPrefix, optsTransfer.strActionName, optsTransfer.nOutMsgCnt );
     } catch ( err ) {
-        optsTransfer.details.critical( "(IMMEDIATE) error caught during {bright}, error " +
-            "optsTransfer.details: {err}, stack is:\n{stack}", optsTransfer.strActionName,
+        optsTransfer.details.critical( "(IMMEDIATE) error caught during {bright}, " +
+            "error details: {err}, stack is:\n{stack}", optsTransfer.strActionName,
         err, err.stack );
         if( log.id != optsTransfer.details.id ) {
-            log.critical( "(IMMEDIATE) error caught during {bright}, " +
-                "error optsTransfer.details: {err}, stack is:\n{stack}",
-            optsTransfer.strActionName, err, err.stack );
+            log.critical( "(IMMEDIATE) error caught during {bright}, error details: {err}, " +
+                "stack is:\n{stack}", optsTransfer.strActionName, err, err.stack );
         }
     }
 

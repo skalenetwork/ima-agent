@@ -942,7 +942,7 @@ async function gatherSigningStartImpl( optsSignOperation ) {
                 );
                 if( joGlueResult ) {
                     optsSignOperation.details.success( "{p}Got BLS glue result: {}",
-                        optsSignOperation.strLogPrefixB,joGlueResult );
+                        optsSignOperation.strLogPrefixB, joGlueResult );
                     if( optsSignOperation.imaState.strPathBlsVerify.length > 0 ) {
                         const joCommonPublicKey = discoverCommonPublicKey(
                             optsSignOperation.imaState.joSChainNetworkInfo, false );
@@ -988,8 +988,8 @@ async function gatherSigningStartImpl( optsSignOperation ) {
                             log.critical( "Problem(2) in BLS sign result handler: {err}", err );
                         optsSignOperation.details.critical(
                             "Problem(2) in BLS sign result handler: {err}", err );
-                        optsSignOperation.errGathering = "Problem(2) in BLS sign result handler: " +
-                            owaspUtils.extractErrorMessage( err );
+                        optsSignOperation.errGathering = "Problem(2) in BLS sign " +
+                            `result handler: ${owaspUtils.extractErrorMessage( err )}`;
                         return;
                     } );
                 optsSignOperation.bHaveResultReportCalled = true;
@@ -1012,19 +1012,18 @@ async function gatherSigningStartImpl( optsSignOperation ) {
                 ).catch( ( err ) => {
                     optsSignOperation.details.error( "Problem(3) in BLS sign result handler, " +
                         "not enough successful BLS signature parts({}) when all attempts done, " +
-                        "error optsSignOperation.details: {err}", optsSignOperation.cntSuccess,
+                        "error details: {err}", optsSignOperation.cntSuccess,
                     err );
                     if( log.id != optsSignOperation.details.id ) {
                         log.error( "Problem(3) in BLS sign result handler, " +
                             "not enough successful BLS signature parts({}) when all attempts " +
-                            "done, error optsSignOperation.details: {err}",
+                            "done, error details: {err}",
                         optsSignOperation.cntSuccess, err );
                     }
-                    optsSignOperation.errGathering = "Problem(3) in BLS sign result handler," +
-                            " not enough successful BLS signature parts(" +
-                        optsSignOperation.cntSuccess +
-                        ") when all attempts done, error optsSignOperation.details: " +
-                        owaspUtils.extractErrorMessage( err );
+                    optsSignOperation.errGathering = "Problem(3) in BLS sign result handler, not " +
+                        `enough successful BLS signature parts(${optsSignOperation.cntSuccess}) ` +
+                        "when all attempts done, " +
+                        `error details: ${owaspUtils.extractErrorMessage( err )}`;
                     reject( new Error( optsSignOperation.errGathering ) );
                 } );
                 optsSignOperation.bHaveResultReportCalled = true;
@@ -1043,19 +1042,18 @@ async function gatherSigningStartImpl( optsSignOperation ) {
                 ).catch( ( err ) => {
                     optsSignOperation.details.critical( "Problem(4) in BLS sign result handler, " +
                         "not enough successful BLS signature parts({}) and timeout reached, " +
-                        "error optsSignOperation.details: {err}", optsSignOperation.cntSuccess,
+                        "error details: {err}", optsSignOperation.cntSuccess,
                     err );
                     if( log.id != optsSignOperation.details.id ) {
                         log.critical( "Problem(4) in BLS sign result handler, not enough " +
-                            "successful BLS signature parts({}) and timeout reached, error " +
-                            "optsSignOperation.details: {err}", optsSignOperation.cntSuccess,
+                            "successful BLS signature parts({}) and timeout reached, " +
+                            "error details: {err}", optsSignOperation.cntSuccess,
                         err );
                     }
-                    optsSignOperation.errGathering = "Problem(4) in BLS sign result handler, " +
-                        "not enough successful BLS signature parts(" +
-                        optsSignOperation.cntSuccess +
-                        ") and timeout reached, error optsSignOperation.details: " +
-                        owaspUtils.extractErrorMessage( err );
+                    optsSignOperation.errGathering = "Problem(4) in BLS sign result handler, not " +
+                        `enough successful BLS signature parts(${optsSignOperation.cntSuccess}) ` +
+                        "and timeout reached, " +
+                        `error details: ${owaspUtils.extractErrorMessage( err )}`;
                     reject( new Error( optsSignOperation.errGathering ) );
                 } );
                 optsSignOperation.bHaveResultReportCalled = true;
@@ -1100,12 +1098,12 @@ async function gatherSigningFinishImpl( optsSignOperation ) {
                 if( log.id != optsSignOperation.details.id ) {
                     log.error( "Problem(5) in BLS sign result handler, " +
                         "not enough successful BLS signature parts({}) and timeout reached, " +
-                        "error optsSignOperation.details: {err}", optsSignOperation.cntSuccess,
+                        "error details: {err}", optsSignOperation.cntSuccess,
                     err );
                 }
                 optsSignOperation.details.error( "Problem(5) in BLS sign result handler, " +
                     "not enough successful BLS signature parts({}) and timeout reached, " +
-                    "error optsSignOperation.details: {err}", optsSignOperation.cntSuccess, err );
+                    "error details: {err}", optsSignOperation.cntSuccess, err );
                 optsSignOperation.details.exposeDetailsTo(
                     log, optsSignOperation.strGatheredDetailsName, false );
                 optsSignOperation.details.close();
@@ -1130,12 +1128,11 @@ async function gatherSigningFinishImpl( optsSignOperation ) {
         ).catch( ( err ) => {
             if( log.id != optsSignOperation.details.id ) {
                 log.error( "Problem(6) in BLS sign result handler, not enough successful BLS " +
-                    "signature parts({}) and timeout reached, error " +
-                    "optsSignOperation.details: {err}", err );
+                    "signature parts({}) and timeout reached, error details: {err}", err );
             }
             optsSignOperation.details.error( "Problem(6) in BLS sign result handler, not enough " +
-                "successful BLS signature parts({}) and timeout reached, error " +
-                "optsSignOperation.details: {err}", optsSignOperation.cntSuccess, err );
+                "successful BLS signature parts({}) and timeout reached, " +
+                "error details: {err}", optsSignOperation.cntSuccess, err );
             optsSignOperation.details.exposeDetailsTo(
                 log, optsSignOperation.strGatheredDetailsName, false );
             optsSignOperation.details.close();
@@ -1797,9 +1794,8 @@ async function doSignU256Gathering( optsSignU256 ) {
                         }
                         optsSignU256.details.critical(
                             "Problem(2) in BLS u256 sign result handler: {err}", err );
-                        optsSignU256.errGathering =
-                            "Problem(2) in BLS u256 sign result handler: " +
-                            owaspUtils.extractErrorMessage( err );
+                        optsSignU256.errGathering = "Problem(2) in BLS u256 sign result " +
+                            `handler: ${owaspUtils.extractErrorMessage( err )}`;
                     } );
                 if( strError ) {
                     optsSignU256.errGathering = strError;
@@ -1821,15 +1817,14 @@ async function doSignU256Gathering( optsSignU256 ) {
                     if( log.id != optsSignU256.details.id ) {
                         log.critical( "Problem(3) in BLS u256 sign result handler, " +
                             "not enough successful BLS signature parts({} when all attempts " +
-                            "done, error optsSignU256.details: {err}", cntSuccess, err );
+                            "done, error details: {err}", cntSuccess, err );
                     }
                     optsSignU256.details.critical( "Problem(3) in BLS u256 sign result handler, " +
                             "not enough successful BLS signature parts({} when all attempts " +
-                            "done, error optsSignU256.details: {err}", cntSuccess, err );
-                    optsSignU256.errGathering = "Problem(3) in BLS u256 sign result handler, " +
-                        "not enough successful BLS signature parts(" + cntSuccess + " when all " +
-                        "attempts done, error optsSignU256.details: " +
-                        owaspUtils.extractErrorMessage( err );
+                            "done, error details: {err}", cntSuccess, err );
+                    optsSignU256.errGathering = "Problem(3) in BLS u256 sign result handler, not " +
+                        `enough successful BLS signature parts(${cntSuccess} when all attempts ` +
+                        `done, error details: ${owaspUtils.extractErrorMessage( err )}`;
                     reject( new Error( optsSignU256.errGathering ) );
                 } );
                 return;
@@ -1848,15 +1843,14 @@ async function doSignU256Gathering( optsSignU256 ) {
                     if( log.id != optsSignU256.details.id ) {
                         log.error( "Problem(4) in BLS u256 sign result handler, not enough " +
                             "successful BLS signature parts({}) and timeout reached, " +
-                            "error optsSignU256.details: {err}", cntSuccess, err );
+                            "error details: {err}", cntSuccess, err );
                     }
                     optsSignU256.details.error( "Problem(4) in BLS u256 sign result handler, " +
                         "not enough successful BLS signature parts({}) and timeout reached, " +
-                        "error optsSignU256.details: {err", cntSuccess, err );
-                    optsSignU256.errGathering = "Problem(4) in BLS u256 sign result handler, " +
-                        "not enough successful BLS signature parts(" + cntSuccess +
-                        ") and timeout reached, error optsSignU256.details: " +
-                        owaspUtils.extractErrorMessage( err );
+                        "error details: {err", cntSuccess, err );
+                    optsSignU256.errGathering = "Problem(4) in BLS u256 sign result handler, not " +
+                        `enough successful BLS signature parts(${cntSuccess}) and timeout ` +
+                        `reached, error details: ${owaspUtils.extractErrorMessage( err )}`;
                     reject( new Error( optsSignU256.errGathering ) );
                 } );
                 return;
