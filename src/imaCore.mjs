@@ -43,13 +43,13 @@ const additionalS2MTransferOverhead = 200000;
 
 async function findOutReferenceLogRecord(
     details, strLogPrefix, ethersProvider, joMessageProxy,
-    bnBlockId, nMessageNumberToFind, isVerbose, optsChainPair
+    bnBlockId, nMessageNumberToFind, isVerbose
 ) {
     const bnMessageNumberToFind = owaspUtils.toBN( nMessageNumberToFind.toString() );
     const strEventName = "PreviousMessageReference";
     const arrLogRecords = await imaEventLogScan.safeGetPastEventsProgressive(
         details, strLogPrefix, ethersProvider, 10, joMessageProxy, strEventName,
-        bnBlockId, bnBlockId, joMessageProxy.filters[strEventName](), optsChainPair );
+        bnBlockId, bnBlockId, joMessageProxy.filters[strEventName]() );
     const cntLogRecord = arrLogRecords.length;
     if( isVerbose ) {
         details.debug( "{p}Got {} log record(s) ({}) with data: {}",
@@ -86,7 +86,7 @@ async function findOutReferenceLogRecord(
 
 async function findOutAllReferenceLogRecords(
     details, strLogPrefix, ethersProvider, joMessageProxy,
-    bnBlockId, nIncMsgCnt, nOutMsgCnt, isVerbose, optsChainPair
+    bnBlockId, nIncMsgCnt, nOutMsgCnt, isVerbose
 ) {
     if( isVerbose ) {
         details.debug( "{p}Optimized IMA message search algorithm will start at block {}" +
@@ -107,8 +107,7 @@ async function findOutAllReferenceLogRecords(
     let nWalkBlockId = bnBlockId;
     for( ; nWalkMsgNumber >= nIncMsgCnt; -- nWalkMsgNumber ) {
         const joReferenceLogRecord = await findOutReferenceLogRecord( details, strLogPrefix,
-            ethersProvider, joMessageProxy, nWalkBlockId, nWalkMsgNumber, isVerbose,
-            optsChainPair );
+            ethersProvider, joMessageProxy, nWalkBlockId, nWalkMsgNumber, isVerbose );
         if( joReferenceLogRecord == null )
             break;
         nWalkBlockId = owaspUtils.toBN( joReferenceLogRecord.previousOutgoingMessageBlockId );
@@ -222,7 +221,7 @@ async function doQueryOutgoingMessageCounter( optsTransfer ) {
                     await findOutAllReferenceLogRecords( optsTransfer.details,
                         optsTransfer.strLogPrefixShort, optsTransfer.ethersProviderSrc,
                         optsTransfer.joMessageProxySrc, bnBlockId, optsTransfer.nIncMsgCnt,
-                        optsTransfer.nOutMsgCnt, true, optsTransfer.optsChainPair );
+                        optsTransfer.nOutMsgCnt, true );
                 return true; // success, finish at this point
             }
         } catch ( err ) {
@@ -252,8 +251,7 @@ async function doQueryOutgoingMessageCounter( optsTransfer ) {
         const arrLogRecordReferencesWalk =
             await imaEventLogScan.safeGetPastEventsProgressive( optsTransfer.details,
                 optsTransfer.strLogPrefixShort, optsTransfer.ethersProviderSrc, attempts,
-                optsTransfer.joMessageProxySrc, strEventName, nBlockFrom, nBlockTo, joFilter,
-                optsTransfer.optsChainPair );
+                optsTransfer.joMessageProxySrc, strEventName, nBlockFrom, nBlockTo, joFilter );
         optsTransfer.arrLogRecordReferences =
             optsTransfer.arrLogRecordReferences.concat( arrLogRecordReferencesWalk );
     }
@@ -338,8 +336,7 @@ async function gatherMessages( optsTransfer ) {
             optsTransfer.joMessageProxySrc, strEventName, nBlockFrom, nBlockTo,
             optsTransfer.joMessageProxySrc.filters[strEventName](
                 owaspUtils.ethersMod.ethers.utils.id( optsTransfer.chainNameDst ),
-                owaspUtils.toBN( optsTransfer.nIdxCurrentMsg )
-            ), optsTransfer.optsChainPair );
+                owaspUtils.toBN( optsTransfer.nIdxCurrentMsg ) ) );
         const joValues = await analyzeGatheredRecords( optsTransfer, r );
         if( joValues == null )
             return false;
@@ -740,7 +737,7 @@ async function checkOutgoingMessageEvent( optsTransfer, joSChain ) {
                         joMessage.savedBlockNumberForOptimizations,
                         joMessageProxyNode.filters[strEventName](
                             owaspUtils.ethersMod.ethers.utils.id( optsTransfer.chainNameDst ),
-                            owaspUtils.toBN( idxImaMessage ) ), optsTransfer.optsChainPair );
+                            owaspUtils.toBN( idxImaMessage ) ) );
                     const cntEvents = node_r.length;
                     optsTransfer.details.trace( "{p}Got {} event(s) ({}) on node {} with data: {}",
                         optsTransfer.strLogPrefix, cntEvents, strEventName, joNode.name, node_r );
@@ -748,6 +745,7 @@ async function checkOutgoingMessageEvent( optsTransfer, joSChain ) {
                         const joEvent = node_r[idxEvent];
                         const eventValuesByName = {
                             "dstChainHash": joEvent.args[0],
+                            "msgCounter": joEvent.args[1],
                             "srcContract": joEvent.args[2],
                             "dstContract": joEvent.args[3],
                             "data": joEvent.args[4]
@@ -1017,12 +1015,11 @@ export async function doTransfer(
     joTokenManagerSChain, // for logs validation on s-chain
     nTransactionsCountInBlock,
     nTransferSteps, nMaxTransactionsCount, nBlockAwaitDepth, nBlockAge,
-    fnSignMessages, joExtraSignOpts, transactionCustomizerDst, optsChainPair
+    fnSignMessages, joExtraSignOpts, transactionCustomizerDst
 ) {
     const optsTransfer = {
         strDirection: strDirection,
         joRuntimeOpts: joRuntimeOpts,
-        optsChainPair: optsChainPair,
         ethersProviderSrc: ethersProviderSrc,
         joMessageProxySrc: joMessageProxySrc,
         joAccountSrc: joAccountSrc,
@@ -1200,8 +1197,7 @@ export async function doAllS2S( // s-chain --> s-chain
         "S2S transfers in {}.", cntSChains, threadInfo.threadDescription() );
     for( let idxSChain = 0; idxSChain < cntSChains; ++ idxSChain ) {
         const joSChain = arrSChainsCached[idxSChain];
-        const joPickResult = skaleObserver.pickRandomSChainIndexAndNodeAndUrl( joSChain );
-        const urlSrc = joPickResult.strURL;
+        const urlSrc = pickRandomSChainUrl( joSChain );
         const ethersProviderSrc = owaspUtils.getEthersProviderFromURL( urlSrc );
         const joAccountSrc = joAccountDst; // ???
         const chainNameSrc = "" + joSChain.data.name;
@@ -1244,18 +1240,6 @@ export async function doAllS2S( // s-chain --> s-chain
                     imaState.loopState.s2s.isInProgress = true;
                     await pwa.notifyOnLoopStart( imaState, "s2s", nIndexS2S );
 
-                    const optsChainPair = {
-                        "strDirection": strDirection,
-                        "chainSrc": null,
-                        "chainDst": sc,
-                        "optsSpecificS2S": {
-                            "joSChain": joSChain,
-                            "idxSChain": idxSChain,
-                            "urlSrc": urlSrc,
-                            "idxNode": joPickResult.idxNode,
-                            "joNode": joPickResult.joNode
-                        }
-                    };
                     bOK = await doTransfer(
                         strDirection,
                         joRuntimeOpts,
@@ -1278,8 +1262,7 @@ export async function doAllS2S( // s-chain --> s-chain
                         nBlockAge,
                         fnSignMessages,
                         joExtraSignOpts,
-                        transactionCustomizerDst,
-                        optsChainPair
+                        transactionCustomizerDst
                     );
                     imaState.loopState.s2s.isInProgress = false;
                     await pwa.notifyOnLoopEnd( imaState, "s2s", nIndexS2S );

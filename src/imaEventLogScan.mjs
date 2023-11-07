@@ -84,30 +84,14 @@ export function createProgressiveEventsScanPlan( details, nLatestBlockNumber ) {
     return arrProgressiveEventsScanPlan;
 }
 
-function generateWhileTransferringLogMessageSuffix( optsChainPair ) {
-    if( ! optsChainPair )
-        return "";
-    if( ! optsChainPair.strDirection )
-        return "";
-    if( optsChainPair.strDirection == "S2S" ) {
-        return log.fmtDebug( "(while performing {bright} transfer with external " +
-            "S-Chain {} / {} node {})", optsChainPair.strDirection,
-        optsChainPair.optsSpecificS2S.joSChain.data.name,
-        optsChainPair.optsSpecificS2S.joSChain.data.computed.chainId,
-        optsChainPair.optsSpecificS2S.idxNode );
-    }
-    return log.fmtDebug( "(while performing {bright} transfer)", optsChainPair.strDirection );
-}
-
 export async function safeGetPastEventsProgressive(
     details, strLogPrefix,
     ethersProvider, attempts, joContract, strEventName,
-    nBlockFrom, nBlockTo, joFilter, optsChainPair
+    nBlockFrom, nBlockTo, joFilter
 ) {
     const strURL = owaspUtils.ethersProviderToUrl( ethersProvider );
-    details.information( "{p}Will run progressive logs search for event {} via URL {url} {}, " +
-        "from block {}, to block...", strLogPrefix, strEventName, strURL,
-    generateWhileTransferringLogMessageSuffix( optsChainPair ), nBlockFrom, nBlockTo );
+    details.information( "{p}Will run progressive logs search for event {} via URL {url}, " +
+        "from block {}, to block...", strLogPrefix, strEventName, strURL, nBlockFrom, nBlockTo );
     if( ! imaTransferErrorHandling.getEnabledProgressiveEventsScan() ) {
         details.warning( "{p}IMPORTANT NOTICE: Will skip progressive events scan " +
                 "in block range from {} to {} because it's {}",
@@ -154,29 +138,25 @@ export async function safeGetPastEventsProgressive(
             continue;
         joLastPlan = joPlan;
         details.trace( "{p}Progressive event log records scan of {} event, from block {}" +
-                ", to block {}, block range is {} via URL {url} {}...", strLogPrefix, strEventName,
-        joPlan.nBlockFrom, joPlan.nBlockTo, joPlan.type, strURL,
-        generateWhileTransferringLogMessageSuffix( optsChainPair ) );
+                ", to block {}, block range is {} via URL {url}...", strLogPrefix, strEventName,
+        joPlan.nBlockFrom, joPlan.nBlockTo, joPlan.type, strURL );
         try {
             const joAllEventsInBlock = await safeGetPastEventsIterative( details, strLogPrefix,
                 ethersProvider, attempts, joContract, strEventName,
                 joPlan.nBlockFrom, joPlan.nBlockTo, joFilter );
             if( joAllEventsInBlock && joAllEventsInBlock.length > 0 ) {
                 details.success( "{p}Progressive event log records scan of log event {}" +
-                        ", from block {}, to block {}, block range is {}, via URL {url} {}" +
+                        ", from block {}, to block {}, block range is {}, via URL {url}" +
                         ", found {} event(s)", strLogPrefix, strEventName, joPlan.nBlockFrom,
-                joPlan.nBlockTo, joPlan.type, strURL,
-                generateWhileTransferringLogMessageSuffix( optsChainPair ),
-                joAllEventsInBlock.length );
+                joPlan.nBlockTo, joPlan.type, strURL, joAllEventsInBlock.length );
                 return joAllEventsInBlock;
             }
         } catch ( err ) {}
     }
     details.error( "{p}Was not found(progressive) event log record for event {}, from block {}" +
-        ", to block {}, block range is {}, via URL {url} {}, using progressive " +
+        ", to block {}, block range is {}, via URL {url}, using progressive " +
         "event log records scan", strLogPrefix, strEventName, joLastPlan.nBlockFrom,
-    joLastPlan.nBlockTo, joLastPlan.type, strURL,
-    generateWhileTransferringLogMessageSuffix( optsChainPair ) );
+    joLastPlan.nBlockTo, joLastPlan.type, strURL );
     return [];
 }
 

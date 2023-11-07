@@ -1301,19 +1301,6 @@ export function pickRandomSChainUrl( joSChain ) {
     return "" + joNode["http_endpoint_ip"];
 }
 
-export function pickRandomSChainIndexAndNodeAndUrl( joSChain ) {
-    const idxNode = pickRandomSChainNodeIndex( joSChain );
-    const joNode = joSChain.data.computed.nodes[idxNode];
-    // eslint-disable-next-line dot-notation
-    const strURL = "" + joNode["http_endpoint_ip"];
-    const joPickResult = {
-        "strURL": strURL,
-        "joNode": joNode,
-        "idxNode": idxNode
-    };
-    return joPickResult;
-}
-
 export async function discoverChainId( strURL ) {
     let ret = null;
     const rpcCallOpts = null;
