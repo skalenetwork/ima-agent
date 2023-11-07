@@ -1203,9 +1203,8 @@ describe( "Agent Utils Module-3", function() {
             const strContentSaved = "Text file content";
             assert.equal( imaUtils.fileSave( strPathTmpFile, strContentSaved ), true );
             assert.equal( imaUtils.fileExists( strPathTmpFile ), true );
-            const strContentLoaded =
-                imaUtils.fileLoad(
-                    strPathTmpFile, "file \"" + strPathTmpFile + "\"was not loaded" );
+            const strContentLoaded = imaUtils.fileLoad(
+                strPathTmpFile, "file \"" + strPathTmpFile + "\"was not loaded" );
             assert.equal( strContentLoaded, strContentSaved );
             try { fs.unlinkSync( strPathTmpFile ); } catch ( err ) { };
         } );

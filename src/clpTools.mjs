@@ -1271,8 +1271,7 @@ export function commandLineTaskTransferM2S() {
                 imaState.nBlockAgeM2S,
                 imaBLS.doSignMessagesM2S,
                 null,
-                imaState.chainProperties.sc.transactionCustomizer,
-                null
+                imaState.chainProperties.sc.transactionCustomizer
             );
         }
     } );
@@ -1312,8 +1311,7 @@ export function commandLineTaskTransferS2M() {
                 imaState.nBlockAgeS2M,
                 imaBLS.doSignMessagesS2M,
                 null,
-                imaState.chainProperties.mn.transactionCustomizer,
-                null
+                imaState.chainProperties.mn.transactionCustomizer
             );
         }
     } );
