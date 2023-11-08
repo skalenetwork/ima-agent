@@ -1534,7 +1534,7 @@ export async function doErc721PaymentS2S(
         }
         const isIgnoreTransferERC721 = true;
         strActionName =
-        `ERC721 payment S2S, transferERC721 ${( isForward ? "forward" : "reverse" )}`;
+            `ERC721 payment S2S, transferERC721 ${( isForward ? "forward" : "reverse" )}`;
         const weiHowMuchTransferERC721 = undefined;
         gasPrice = await tc.computeGasPrice( ethersProviderSrc, 200000000000 );
         details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
