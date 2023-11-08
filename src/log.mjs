@@ -694,8 +694,6 @@ export function fmtArgumentsArray( arrArgs, fnFormatter ) {
         }
         for( let i = idxArgNextPrinted; i < arrArgs.length; ++i ) {
             try {
-                // if( i > 0 && s.length > 0 )
-                //    s += " ";
                 s += fnFormatOneArgument( arrArgs[i], null );
             } catch ( err ) {
             }

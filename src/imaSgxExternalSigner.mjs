@@ -4,7 +4,6 @@ import * as owaspUtils from "./owaspUtils.mjs";
 import * as rpcCall from "./rpcCall.mjs";
 
 const gIsDebugLogging = false; // development option only, must be always false
-//const isColors = owaspUtils.toBoolean( process.argv[2] );
 log.addStdout();
 
 // allow self-signed wss and https

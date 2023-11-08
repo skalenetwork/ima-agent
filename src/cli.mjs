@@ -2645,7 +2645,6 @@ export function commonInit() {
     commonInitPrintSysInfo();
     commonInitCheckAbiPaths();
     commonInitCheckContractPresences();
-    //commonInitPrintFoundContracts();
     commonInitCheckErc20();
     commonInitCheckErc721();
     commonInitCheckErc1155();

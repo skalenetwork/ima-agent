@@ -98,9 +98,9 @@ export async function safeGetBlockNumber(
         return ret;
     } catch ( err ) {
         ret = retValOnFail;
-        details.error( "Failed call attempt {} to {} via {url}, " +
-            "error is: {err}, stack is:\n{stack}",
-        idxAttempt, strFnName + "()", u, err, err.stack );
+        details.error(
+            "Failed call attempt {} to {} via {url}, error is: {err}, stack is:\n{stack}",
+            idxAttempt, strFnName + "()", u, err, err.stack );
     }
     ++ idxAttempt;
     while( ret === "" && idxAttempt <= cntAttempts ) {

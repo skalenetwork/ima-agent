@@ -172,9 +172,9 @@ async function doQueryOutgoingMessageCounter( optsTransfer ) {
         optsTransfer.details.information( "{p}Result of {bright} call: {}",
             optsTransfer.strLogPrefix, optsTransfer.strActionName, optsTransfer.nOutMsgCnt );
     } catch ( err ) {
-        optsTransfer.details.critical( "(IMMEDIATE) error caught during {bright}, " +
-            "error details: {err}, stack is:\n{stack}", optsTransfer.strActionName,
-        err, err.stack );
+        optsTransfer.details.critical(
+            "(IMMEDIATE) error caught during {bright}, error details: {err}, stack is:\n{stack}",
+            optsTransfer.strActionName, err, err.stack );
         if( log.id != optsTransfer.details.id ) {
             log.critical( "(IMMEDIATE) error caught during {bright}, error details: {err}, " +
                 "stack is:\n{stack}", optsTransfer.strActionName, err, err.stack );
@@ -615,9 +615,10 @@ async function callbackAllMessagesSign( optsTransfer, err, jarrMessages, joGlueR
             if( joReceipt && "blockNumber" in joReceipt &&
                 "transactionHash" in joReceipt ) {
                 const strEventName = "PostMessageError";
-                optsTransfer.details.debug( "{p}Verifying the {} event of the MessageProxy/{} " +
-                    "contract...", optsTransfer.strLogPrefix, strEventName,
-                optsTransfer.joMessageProxyDst.address );
+                optsTransfer.details.debug(
+                    "{p}Verifying the {} event of the MessageProxy/{} contract...",
+                    optsTransfer.strLogPrefix, strEventName,
+                    optsTransfer.joMessageProxyDst.address );
                 const joEvents = await imaEventLogScan.getContractCallEvents(
                     optsTransfer.details, optsTransfer.strLogPrefixShort,
                     optsTransfer.ethersProviderDst, optsTransfer.joMessageProxyDst, strEventName,
@@ -716,9 +717,10 @@ async function checkOutgoingMessageEvent( optsTransfer, joSChain ) {
     for( let idxMessage = 0; idxMessage < cntMessages; ++ idxMessage ) {
         const idxImaMessage = optsTransfer.arrMessageCounters[idxMessage];
         const joMessage = optsTransfer.jarrMessages[idxMessage];
-        optsTransfer.details.trace( "{p}{bright} message analysis for message {} of {} " +
-            "with IMA message index {} and message envelope data: {}", optsTransfer.strLogPrefix,
-        optsTransfer.strDirection, idxMessage + 1, cntMessages, idxImaMessage, joMessage );
+        optsTransfer.details.trace(
+            "{p}{bright} message analysis for message {} of {} with IMA message index {} and " +
+            "message envelope data: {}", optsTransfer.strLogPrefix, optsTransfer.strDirection,
+            idxMessage + 1, cntMessages, idxImaMessage, joMessage );
         let cntPassedNodes = 0, cntFailedNodes = 0, joNode = null;
         try {
             for( let idxNode = 0; idxNode < cntNodes; ++ idxNode ) {
@@ -988,16 +990,15 @@ async function doMainTransferLoopActions( optsTransfer ) {
             log.information( strWillInvokeSigningCallbackMessage );
         // will re-open optsTransfer.details B log here for next step,
         // it can be delayed so we will flush accumulated optsTransfer.details A now
-        if( log.exposeDetailsGet() && optsTransfer.details.exposeDetailsTo ) {
-            optsTransfer.details.exposeDetailsTo(
-                log, optsTransfer.strGatheredDetailsName, true );
-        }
+        if( log.exposeDetailsGet() && optsTransfer.details.exposeDetailsTo )
+            optsTransfer.details.exposeDetailsTo( log, optsTransfer.strGatheredDetailsName, true );
+
         optsTransfer.details.close();
         optsTransfer.details = optsTransfer.imaState.isDynamicLogInDoTransfer
             ? log : log.createMemoryStream( true );
-        optsTransfer.strGatheredDetailsName =
-            optsTransfer.strDirection + "/#" + optsTransfer.nTransferLoopCounter + "-" +
-            "doTransfer-B-" + optsTransfer.chainNameSrc + "-->" + optsTransfer.chainNameDst;
+        optsTransfer.strGatheredDetailsName = `${optsTransfer.strDirection}/#` +
+            `${optsTransfer.nTransferLoopCounter}-doTransfer-B-${optsTransfer.chainNameSrc}` +
+            `-->${optsTransfer.chainNameDst}`;
         try {
             if( ! ( await handleAllMessagesSigning( optsTransfer ) ) )
                 return false;
@@ -1076,22 +1077,21 @@ export async function doTransfer(
         arrLogRecordReferences: []
     };
     ++ gTransferLoopCounter;
-    optsTransfer.strGatheredDetailsName = optsTransfer.strDirection + "/#" +
-        optsTransfer.nTransferLoopCounter + "-" + "doTransfer-A" + "-" +
-        optsTransfer.chainNameSrc + "-->" + optsTransfer.chainNameDst;
+    optsTransfer.strGatheredDetailsName =
+        `${optsTransfer.strDirection}/#${optsTransfer.nTransferLoopCounter}-doTransfer-A-` +
+        `${optsTransfer.chainNameSrc}-->${optsTransfer.chainNameDst}`;
     optsTransfer.details = optsTransfer.imaState.isDynamicLogInDoTransfer
         ? log : log.createMemoryStream( true );
-    optsTransfer.strLogPrefixShort = optsTransfer.strDirection + "/#" +
-        optsTransfer.nTransferLoopCounter + " ";
+    optsTransfer.strLogPrefixShort =
+        `${optsTransfer.strDirection}/#${optsTransfer.nTransferLoopCounter} `;
     optsTransfer.strLogPrefix = `${optsTransfer.strLogPrefixShort}transfer loop from ` +
         `${optsTransfer.chainNameSrc} to ${optsTransfer.chainNameDst}: `;
     if( gIsOneTransferInProgressInThisThread ) {
         optsTransfer.details.warning( "{p}Transfer loop step is skipped because previous one " +
             "is still in progress", optsTransfer.strLogPrefix );
-        if( log.exposeDetailsGet() && optsTransfer.details.exposeDetailsTo ) {
-            optsTransfer.details.exposeDetailsTo(
-                log, optsTransfer.strGatheredDetailsName, true );
-        }
+        if( log.exposeDetailsGet() && optsTransfer.details.exposeDetailsTo )
+            optsTransfer.details.exposeDetailsTo( log, optsTransfer.strGatheredDetailsName, true );
+
         optsTransfer.details.close();
         return false;
     }
@@ -1113,7 +1113,7 @@ export async function doTransfer(
                     "index is: {}, have {} message(s) to process {}", optsTransfer.strLogPrefix,
                     nIdxCurrentMsgBlockStart, optsTransfer.jarrMessages.length,
                     optsTransfer.jarrMessages );
-                await fnAfter( null, jarrMessages, null ); // null - no error, null - no signatures
+                await fnAfter( null, jarrMessages ); // null - no error, null - no signatures
             };
         } else {
             optsTransfer.details.debug( "{p}Using externally provided signing function",
@@ -1173,9 +1173,9 @@ export async function doTransfer(
     } catch ( err ) {
         gIsOneTransferInProgressInThisThread = false;
         const strError = owaspUtils.extractErrorMessage( err );
-        optsTransfer.details.error( "{p}Transfer loop step failed with error: {err} in {}, " +
-            "stack is:\n{stack}", optsTransfer.strLogPrefix, strError,
-        threadInfo.threadDescription(), err.stack );
+        optsTransfer.details.error(
+            "{p}Transfer loop step failed with error: {err} in {}, stack is:\n{stack}",
+            optsTransfer.strLogPrefix, strError, threadInfo.threadDescription(), err.stack );
         if( log.exposeDetailsGet() && optsTransfer.details.exposeDetailsTo ) {
             optsTransfer.details.exposeDetailsTo(
                 log, optsTransfer.strGatheredDetailsName, true );

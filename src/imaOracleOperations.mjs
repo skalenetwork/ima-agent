@@ -67,9 +67,10 @@ async function prepareOracleGasPriceSetup( optsGasPriseSetup ) {
         optsGasPriseSetup.bnTimestampOfBlock.toString(),
         owaspUtils.ensureStartsWith0x( optsGasPriseSetup.bnTimestampOfBlock.toHexString() ) );
     const bnValueToSubtractFromTimestamp = owaspUtils.toBN( 60 );
-    optsGasPriseSetup.details.trace( "Value to subtract from timestamp is {}={}" +
-        " (to adjust it to past a bit)", bnValueToSubtractFromTimestamp,
-    owaspUtils.ensureStartsWith0x( bnValueToSubtractFromTimestamp.toHexString() ) );
+    optsGasPriseSetup.details.trace(
+        "Value to subtract from timestamp is {}={}(to adjust it to past a bit)",
+        bnValueToSubtractFromTimestamp,
+        owaspUtils.ensureStartsWith0x( bnValueToSubtractFromTimestamp.toHexString() ) );
     optsGasPriseSetup.bnTimestampOfBlock =
         optsGasPriseSetup.bnTimestampOfBlock.sub( bnValueToSubtractFromTimestamp );
     optsGasPriseSetup.details.trace( "Timestamp on Main Net is {}={} (adjusted to past a bit)",
@@ -113,9 +114,9 @@ async function prepareOracleGasPriceSetup( optsGasPriseSetup ) {
         await optsGasPriseSetup.joCommunityLocker.callStatic.mainnetGasPrice(
             { from: optsGasPriseSetup.joAccountSC.address() } );
     const bnGasPriceOnMainNetOld = owaspUtils.toBN( joGasPriceOnMainNetOld );
-    optsGasPriseSetup.details.trace( "Previous Main Net gas price saved and kept " +
-        "in CommunityLocker={}={}",
-    bnGasPriceOnMainNetOld.toString(), bnGasPriceOnMainNetOld.toHexString() );
+    optsGasPriseSetup.details.trace(
+        "Previous Main Net gas price saved and kept in CommunityLocker={}={}",
+        bnGasPriceOnMainNetOld.toString(), bnGasPriceOnMainNetOld.toHexString() );
     if( bnGasPriceOnMainNetOld.eq( owaspUtils.toBN( optsGasPriseSetup.gasPriceOnMainNet ) ) ) {
         optsGasPriseSetup.details.trace( "Previous Main Net gas price is equal to new one, " +
             " will skip setting it in CommunityLocker" );
@@ -238,7 +239,7 @@ export async function doOracleGasPriceSetup(
                         optsGasPriseSetup.details, optsGasPriseSetup.ethersProviderSChain,
                         "CommunityLocker", optsGasPriseSetup.joCommunityLocker,
                         "setGasPrice", arrArgumentsSetGasPrice, optsGasPriseSetup.joAccountSC,
-                        optsGasPriseSetup.strActionName, gasPrice, 10000000, weiHowMuch, null );
+                        optsGasPriseSetup.strActionName, gasPrice, 10000000, weiHowMuch );
                 optsGasPriseSetup.details.trace( "{p}Using estimated gas={}",
                     optsGasPriseSetup.strLogPrefix, estimatedGasSetGasPrice );
                 const isIgnoreSetGasPrice = false;
@@ -248,7 +249,7 @@ export async function doOracleGasPriceSetup(
                     "setGasPrice", arrArgumentsSetGasPrice,
                     optsGasPriseSetup.joAccountSC, optsGasPriseSetup.strActionName,
                     isIgnoreSetGasPrice, gasPrice,
-                    estimatedGasSetGasPrice, weiHowMuch, null );
+                    estimatedGasSetGasPrice, weiHowMuch );
                 if( strErrorOfDryRun )
                     throw new Error( strErrorOfDryRun );
                 const opts = {

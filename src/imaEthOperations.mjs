@@ -95,14 +95,14 @@ export async function doEthPaymentFromMainNet(
             details, ethersProviderMainNet,
             "DepositBox", joDepositBox, "deposit", arrArguments,
             joAccountSrc, strActionName,
-            gasPrice, 3000000, weiHowMuch, null );
+            gasPrice, 3000000, weiHowMuch );
         details.trace( "{p}Using estimated gas={}", strLogPrefix, estimatedGas );
         const isIgnore = false;
         const strErrorOfDryRun = await imaTx.dryRunCall(
             details, ethersProviderMainNet,
             "DepositBox", joDepositBox, "deposit", arrArguments,
             joAccountSrc, strActionName, isIgnore,
-            gasPrice, estimatedGas, weiHowMuch, null );
+            gasPrice, estimatedGas, weiHowMuch );
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
@@ -110,7 +110,7 @@ export async function doEthPaymentFromMainNet(
             details, ethersProviderMainNet,
             "DepositBox", joDepositBox, "deposit", arrArguments,
             joAccountSrc, strActionName,
-            gasPrice, estimatedGas, weiHowMuch, null );
+            gasPrice, estimatedGas, weiHowMuch );
         if( joReceipt && typeof joReceipt == "object" ) {
             jarrReceipts.push( {
                 "description": "doEthPaymentFromMainNet",
@@ -132,9 +132,10 @@ export async function doEthPaymentFromMainNet(
                 joMessageProxyMainNet.filters[strEventName]()
             );
             if( joEvents.length > 0 ) {
-                details.success( "{p}Success, verified the {} event of the MessageProxy/{} " +
-                    "contract, found event(s): {}", strLogPrefix, strEventName,
-                joMessageProxyMainNet.address, joEvents );
+                details.success(
+                    "{p}Success, verified the {} event of the MessageProxy/{} contract, " +
+                    "found event(s): {}", strLogPrefix, strEventName,
+                    joMessageProxyMainNet.address, joEvents );
             } else {
                 throw new Error( "Verification failed for the OutgoingMessage event of the " +
                     `MessageProxy ${joMessageProxyMainNet.address} contract, no events found` );
@@ -233,12 +234,13 @@ export async function doEthPaymentFromSChain(
                 joMessageProxySChain.filters[strEventName]()
             );
             if( joEvents.length > 0 ) {
-                details.success( "{p}Success, verified the {} event of the MessageProxy/{} " +
-                    "contract, found event(s): {}", strLogPrefix, strEventName,
-                joMessageProxySChain.address, joEvents );
+                details.success(
+                    "{p}Success, verified the {} event of the MessageProxy/{} contract, " +
+                    "found event(s): {}", strLogPrefix, strEventName, joMessageProxySChain.address,
+                    joEvents );
             } else {
                 throw new Error( "Verification failed for the OutgoingMessage event of the " +
-                        `MessageProxy ${joMessageProxySChain.address} contract, no events found` );
+                    `MessageProxy ${joMessageProxySChain.address} contract, no events found` );
             }
         }
     } catch ( err ) {
@@ -282,7 +284,7 @@ export async function receiveEthPaymentFromSchainOnMainNet(
             details, ethersProviderMainNet,
             "DepositBoxETH", joDepositBoxETH, "getMyEth", arrArguments,
             joAccountMN, strActionName,
-            gasPrice, 3000000, weiHowMuch, null );
+            gasPrice, 3000000, weiHowMuch );
         details.trace( "{p}Using estimated gas={}", strLogPrefix, estimatedGas );
         const isIgnore = false;
         const strErrorOfDryRun = await imaTx.dryRunCall(
@@ -290,7 +292,7 @@ export async function receiveEthPaymentFromSchainOnMainNet(
             "DepositBoxETH", joDepositBoxETH,
             "getMyEth", arrArguments,
             joAccountMN, strActionName, isIgnore,
-            gasPrice, estimatedGas, weiHowMuch, null );
+            gasPrice, estimatedGas, weiHowMuch );
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
@@ -299,7 +301,7 @@ export async function receiveEthPaymentFromSchainOnMainNet(
             "DepositBoxETH", joDepositBoxETH,
             "getMyEth", arrArguments,
             joAccountMN, strActionName,
-            gasPrice, estimatedGas, weiHowMuch, null );
+            gasPrice, estimatedGas, weiHowMuch );
         if( joReceipt && typeof joReceipt == "object" ) {
             jarrReceipts.push( {
                 "description": "receiveEthPaymentFromSchainOnMainNet",

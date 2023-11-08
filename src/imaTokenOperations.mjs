@@ -1313,10 +1313,9 @@ export async function doErc20PaymentS2S(
     const details = log.createMemoryStream();
     const jarrReceipts = [];
     let strActionName = "";
-    const strLogPrefix = "S2S ERC20 Payment(" + ( isForward ? "forward" : "reverse" ) + "): ";
+    const strLogPrefix = `S2S ERC20 Payment(${( isForward ? "forward" : "reverse" )}:): `;
     try {
-        strActionName =
-            "validateArgs/doErc20PaymentS2S/" + ( isForward ? "forward" : "reverse" );
+        strActionName = `validateArgs/doErc20PaymentS2S/${( isForward ? "forward" : "reverse" )}`;
         if( ! ethersProviderSrc )
             throw new Error( "No ethers provider specified for source of transfer" );
         if( ! strChainNameDst )
@@ -1349,7 +1348,7 @@ export async function doErc20PaymentS2S(
             strLogPrefix, strChainNameDst );
         details.trace( "{p}Amount of tokens to transfer...................{}",
             strLogPrefix, nAmountOfToken );
-        strActionName = "ERC20 payment S2S, approve, " + ( isForward ? "forward" : "reverse" );
+        strActionName = `ERC20 payment S2S, approve, ${( isForward ? "forward" : "reverse" )}`;
         const contractERC20 = new owaspUtils.ethersMod.ethers.Contract(
             ercSrcAddress20, ercSrcAbi20, ethersProviderSrc );
         const arrArgumentsApprove = [
@@ -1383,12 +1382,11 @@ export async function doErc20PaymentS2S(
             joAccountSrc, strActionName, gasPrice, estimatedGasApprove, weiHowMuchApprove, null );
         if( joReceiptApprove && typeof joReceiptApprove == "object" ) {
             jarrReceipts.push( {
-                "description":
-                    "doErc20PaymentS2S/approve/" + ( isForward ? "forward" : "reverse" ),
+                "description": `doErc20PaymentS2S/approve/${( isForward ? "forward" : "reverse" )}`,
                 "receipt": joReceiptApprove
             } );
         }
-        strActionName = "ERC20 payment S2S, transferERC20 " + ( isForward ? "forward" : "reverse" );
+        strActionName = `ERC20 payment S2S, transferERC20 ${( isForward ? "forward" : "reverse" )}`;
         const weiHowMuchTransferERC20 = undefined;
         gasPrice = await tc.computeGasPrice( ethersProviderSrc, 200000000000 );
         details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
@@ -1428,15 +1426,15 @@ export async function doErc20PaymentS2S(
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
             strLogPrefix, strActionName, strError, err.stack );
         details.exposeDetailsTo(
-            log, "doErc20PaymentS2S/" + ( isForward ? "forward" : "reverse" ), false );
+            log, `doErc20PaymentS2S/${( isForward ? "forward" : "reverse" )}`, false );
         details.close();
         return false;
     }
-    imaGasUsage.printGasUsageReportFromArray( "ERC-20 PAYMENT FROM S2S/" +
-        ( isForward ? "forward" : "reverse" ), jarrReceipts, details );
+    imaGasUsage.printGasUsageReportFromArray(
+        `ERC-20 PAYMENT FROM S2S/${( isForward ? "forward" : "reverse" )}`, jarrReceipts, details );
     if( log.exposeDetailsGet() ) {
         details.exposeDetailsTo(
-            log, "doErc20PaymentS2S/" + ( isForward ? "forward" : "reverse" ), true );
+            log, `doErc20PaymentS2S/${( isForward ? "forward" : "reverse" )}`, true );
     }
     details.close();
     return true;
@@ -1460,10 +1458,9 @@ export async function doErc721PaymentS2S(
     const details = log.createMemoryStream();
     const jarrReceipts = [];
     let strActionName = "";
-    const strLogPrefix = "S2S ERC721 Payment(" + ( isForward ? "forward" : "reverse" ) + "): ";
+    const strLogPrefix = `S2S ERC721 Payment(${( isForward ? "forward" : "reverse" )}: `;
     try {
-        strActionName =
-            "validateArgs/doErc721PaymentS2S/" + ( isForward ? "forward" : "reverse" );
+        strActionName = `validateArgs/doErc721PaymentS2S/${( isForward ? "forward" : "reverse" )}`;
         if( ! ethersProviderSrc )
             throw new Error( "No provider for source of transfer" );
         if( ! strChainNameDst )
@@ -1496,7 +1493,7 @@ export async function doErc721PaymentS2S(
             strLogPrefix, strChainNameDst );
         details.trace( "{p}Token ID to transfer...........................{}",
             strLogPrefix, tokenId );
-        strActionName = "ERC721 payment S2S, approve, " + ( isForward ? "forward" : "reverse" );
+        strActionName = `ERC721 payment S2S, approve, ${( isForward ? "forward" : "reverse" )}`;
         const contractERC721 = new owaspUtils.ethersMod.ethers.Contract(
             ercSrcAddress721, ercSrcAbi721, ethersProviderSrc );
         const arrArgumentsApprove = [
@@ -1531,13 +1528,13 @@ export async function doErc721PaymentS2S(
         if( joReceiptApprove && typeof joReceiptApprove == "object" ) {
             jarrReceipts.push( {
                 "description":
-                    "doErc721PaymentS2S/approve/" + ( isForward ? "forward" : "reverse" ),
+                `doErc721PaymentS2S/approve/${( isForward ? "forward" : "reverse" )}`,
                 "receipt": joReceiptApprove
             } );
         }
         const isIgnoreTransferERC721 = true;
         strActionName =
-            "ERC721 payment S2S, transferERC721 " + ( isForward ? "forward" : "reverse" );
+        `ERC721 payment S2S, transferERC721 ${( isForward ? "forward" : "reverse" )}`;
         const weiHowMuchTransferERC721 = undefined;
         gasPrice = await tc.computeGasPrice( ethersProviderSrc, 200000000000 );
         details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
@@ -1577,15 +1574,16 @@ export async function doErc721PaymentS2S(
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
             strLogPrefix, strActionName, strError, err.stack );
         details.exposeDetailsTo(
-            log, "doErc721PaymentS2S/" + ( isForward ? "forward" : "reverse" ), false );
+            log, `doErc721PaymentS2S/${( isForward ? "forward" : "reverse" )}`, false );
         details.close();
         return false;
     }
-    imaGasUsage.printGasUsageReportFromArray( "ERC-721 PAYMENT FROM S2S/" +
-        ( isForward ? "forward" : "reverse" ), jarrReceipts, details );
+    imaGasUsage.printGasUsageReportFromArray(
+        `ERC-721 PAYMENT FROM S2S/${( isForward ? "forward" : "reverse" )}`,
+        jarrReceipts, details );
     if( log.exposeDetailsGet() ) {
         details.exposeDetailsTo(
-            log, "doErc721PaymentS2S/" + ( isForward ? "forward" : "reverse" ), true );
+            log, `doErc721PaymentS2S/${( isForward ? "forward" : "reverse" )}`, true );
     }
     details.close();
     return true;
@@ -1610,10 +1608,9 @@ export async function doErc1155PaymentS2S(
     const details = log.createMemoryStream();
     const jarrReceipts = [];
     let strActionName = "";
-    const strLogPrefix = "S2S ERC1155 Payment(" + ( isForward ? "forward" : "reverse" ) + "): ";
+    const strLogPrefix = `S2S ERC1155 Payment(${( isForward ? "forward" : "reverse" )}): `;
     try {
-        strActionName =
-            "validateArgs/doErc1155PaymentS2S/" + ( isForward ? "forward" : "reverse" );
+        strActionName = `validateArgs/doErc1155PaymentS2S/${( isForward ? "forward" : "reverse" )}`;
         if( ! ethersProviderSrc )
             throw new Error( "No provider for source of transfer" );
         if( ! strChainNameDst )
@@ -1648,7 +1645,7 @@ export async function doErc1155PaymentS2S(
             strLogPrefix, tokenId );
         details.trace( "{p}Amount of tokens to transfer...................{}",
             strLogPrefix, nAmountOfToken );
-        strActionName = "ERC1155 payment S2S, approve, " + ( isForward ? "forward" : "reverse" );
+        strActionName = `ERC1155 payment S2S, approve, ${( isForward ? "forward" : "reverse" )}`;
         const contractERC1155 = new owaspUtils.ethersMod.ethers.Contract(
             ercSrcAddress1155, ercSrcAbi1155, ethersProviderSrc );
         const arrArgumentsApprove = [ joTokenManagerERC1155Src.address, true ];
@@ -1682,12 +1679,12 @@ export async function doErc1155PaymentS2S(
         if( joReceiptApprove && typeof joReceiptApprove == "object" ) {
             jarrReceipts.push( {
                 "description":
-                    "doErc1155PaymentS2S/approve/" + ( isForward ? "forward" : "reverse" ),
+                    `doErc1155PaymentS2S/approve/${( isForward ? "forward" : "reverse" )}`,
                 "receipt": joReceiptApprove
             } );
         }
         strActionName =
-            "ERC1155 payment S2S, transferERC1155 " + ( isForward ? "forward" : "reverse" );
+            `ERC1155 payment S2S, transferERC1155 ${( isForward ? "forward" : "reverse" )}`;
         const weiHowMuchTransferERC1155 = undefined;
         gasPrice = await tc.computeGasPrice( ethersProviderSrc, 200000000000 );
         details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
@@ -1727,15 +1724,16 @@ export async function doErc1155PaymentS2S(
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
             strLogPrefix, strActionName, strError, err.stack );
         details.exposeDetailsTo(
-            log, "doErc1155PaymentS2S/" + ( isForward ? "forward" : "reverse" ), false );
+            log, `doErc1155PaymentS2S/${( isForward ? "forward" : "reverse" )}`, false );
         details.close();
         return false;
     }
-    imaGasUsage.printGasUsageReportFromArray( "ERC-1155 PAYMENT FROM S2S/" +
-        ( isForward ? "forward" : "reverse" ), jarrReceipts, details );
+    imaGasUsage.printGasUsageReportFromArray(
+        `ERC-1155 PAYMENT FROM S2S/${( isForward ? "forward" : "reverse" )}`,
+        jarrReceipts, details );
     if( log.exposeDetailsGet() ) {
         details.exposeDetailsTo(
-            log, "doErc1155PaymentS2S/" + ( isForward ? "forward" : "reverse" ), true );
+            log, `doErc1155PaymentS2S/${( isForward ? "forward" : "reverse" )}`, true );
     }
     details.close();
     return true;
@@ -1760,11 +1758,10 @@ export async function doErc1155BatchPaymentS2S(
     const details = log.createMemoryStream();
     const jarrReceipts = [];
     let strActionName = "";
-    const strLogPrefix = "S2S Batch ERC1155 Payment(" +
-        ( isForward ? "forward" : "reverse" ) + "): ";
+    const strLogPrefix = `S2S Batch ERC1155 Payment(${( isForward ? "forward" : "reverse" )}: `;
     try {
         strActionName =
-            "validateArgs/doErc1155BatchPaymentS2S/" + ( isForward ? "forward" : "reverse" );
+            `validateArgs/doErc1155BatchPaymentS2S/${( isForward ? "forward" : "reverse" )}`;
         if( ! ethersProviderSrc )
             throw new Error( "No provider for source of transfer" );
         if( ! strChainNameDst )
@@ -1800,7 +1797,7 @@ export async function doErc1155BatchPaymentS2S(
         details.trace( "{p}Amounts of tokens to transfer..................{}",
             strLogPrefix, arrTokenAmounts );
         strActionName =
-            "ERC1155 batch-payment S2S, approve, " + ( isForward ? "forward" : "reverse" );
+            `ERC1155 batch-payment S2S, approve, ${( isForward ? "forward" : "reverse" )}`;
         const contractERC1155 = new owaspUtils.ethersMod.ethers.Contract(
             ercSrcAddress1155, ercSrcAbi1155, ethersProviderSrc );
         const arrArgumentsApprove = [ joTokenManagerERC1155Src.address, true ];
@@ -1833,13 +1830,12 @@ export async function doErc1155BatchPaymentS2S(
         if( joReceiptApprove && typeof joReceiptApprove == "object" ) {
             jarrReceipts.push( {
                 "description":
-                    "doErc1155BatchPaymentS2S/approve/" +
-                        ( isForward ? "forward" : "reverse" ),
+                    `doErc1155BatchPaymentS2S/approve/${( isForward ? "forward" : "reverse" )}`,
                 "receipt": joReceiptApprove
             } );
         }
         strActionName =
-            "ERC1155 batch-payment S2S, transferERC1155 " + ( isForward ? "forward" : "reverse" );
+            `ERC1155 batch-payment S2S, transferERC1155 ${( isForward ? "forward" : "reverse" )}`;
         const weiHowMuchTransferERC1155 = undefined;
         gasPrice = await tc.computeGasPrice( ethersProviderSrc, 200000000000 );
         details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
@@ -1880,15 +1876,16 @@ export async function doErc1155BatchPaymentS2S(
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
             strLogPrefix, strActionName, strError, err.stack );
         details.exposeDetailsTo(
-            log, "doErc1155BatchPaymentS2S/" + ( isForward ? "forward" : "reverse" ), false );
+            log, `doErc1155BatchPaymentS2S/${( isForward ? "forward" : "reverse" )}`, false );
         details.close();
         return false;
     }
-    imaGasUsage.printGasUsageReportFromArray( "ERC-1155-batch PAYMENT FROM S2S/" +
-        ( isForward ? "forward" : "reverse" ), jarrReceipts, details );
+    imaGasUsage.printGasUsageReportFromArray(
+        `ERC-1155-batch PAYMENT FROM S2S/${( isForward ? "forward" : "reverse" )}`,
+        jarrReceipts, details );
     if( log.exposeDetailsGet() ) {
         details.exposeDetailsTo(
-            log, "doErc1155BatchPaymentS2S/" + ( isForward ? "forward" : "reverse" ), true );
+            log, `doErc1155BatchPaymentS2S/${( isForward ? "forward" : "reverse" )}`, true );
     }
     details.close();
     return true;

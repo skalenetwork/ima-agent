@@ -259,14 +259,14 @@ export async function reimbursementWalletWithdraw(
         const estimatedGas = await transactionCustomizerMainNet.computeGas(
             details, ethersProviderMainNet,
             "CommunityPool", joCommunityPool, "withdrawFunds", arrArguments,
-            joAccountMN, strActionName, gasPrice, 3000000, weiHowMuch, null );
+            joAccountMN, strActionName, gasPrice, 3000000, weiHowMuch );
         details.trace( "{p}Using estimated gas={}", strLogPrefix, estimatedGas );
         const isIgnore = false;
         const strErrorOfDryRun = await imaTx.dryRunCall(
             details, ethersProviderMainNet,
             "CommunityPool", joCommunityPool, "withdrawFunds", arrArguments,
             joAccountMN, strActionName, isIgnore,
-            gasPrice, estimatedGas, weiHowMuch, null );
+            gasPrice, estimatedGas, weiHowMuch );
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
@@ -274,7 +274,7 @@ export async function reimbursementWalletWithdraw(
             details, ethersProviderMainNet,
             "CommunityPool", joCommunityPool, "withdrawFunds", arrArguments,
             joAccountMN, strActionName,
-            gasPrice, estimatedGas, weiHowMuch, null );
+            gasPrice, estimatedGas, weiHowMuch );
         if( joReceipt && typeof joReceipt == "object" ) {
             jarrReceipts.push( {
                 "description": "reimbursementWalletWithdraw",
@@ -330,13 +330,13 @@ export async function reimbursementSetRange(
         const estimatedGas = await transactionCustomizerSChain.computeGas(
             details, ethersProviderSChain,
             "CommunityLocker", joCommunityLocker, "setTimeLimitPerMessage", arrArguments,
-            joAccountSC, strActionName, gasPrice, 3000000, weiHowMuch, null );
+            joAccountSC, strActionName, gasPrice, 3000000, weiHowMuch );
         details.trace( "{p}Using estimated gas={}", strLogPrefix, estimatedGas );
         const isIgnore = false;
         const strErrorOfDryRun = await imaTx.dryRunCall(
             details, ethersProviderSChain,
             "CommunityLocker", joCommunityLocker, "setTimeLimitPerMessage", arrArguments,
-            joAccountSC, strActionName, isIgnore, gasPrice, estimatedGas, weiHowMuch, null );
+            joAccountSC, strActionName, isIgnore, gasPrice, estimatedGas, weiHowMuch );
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
