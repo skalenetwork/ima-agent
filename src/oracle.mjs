@@ -196,9 +196,9 @@ export function oracleGetGasPrice( oracleOpts, details ) {
                                     return;
                                 } );
                             } catch ( err ) {
-                                details.critical( "RPC call {} exception is: {err}, " +
-                                    "stack is:\n{stack}", "oracle_checkResult",
-                                err, err.stack );
+                                details.critical(
+                                    "RPC call {} exception is: {err},stack is:\n{stack}",
+                                    "oracle_checkResult", err, err.stack );
                                 reject( err );
                                 await joCall.disconnect();
                                 return;

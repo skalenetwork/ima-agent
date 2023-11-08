@@ -112,13 +112,13 @@ export async function checkIsRegisteredSChainInDepositBoxes( // step 1
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != details.id ) {
-            log.critical( "{p}Error in checkIsRegisteredSChainInDepositBoxes(reg-step1)() " +
-                "during {bright}: {err}, stack is:\n{stack}", strLogPrefix, strActionName,
-            strError, err.stack );
+            log.critical(
+                "{p}Error in checkIsRegisteredSChainInDepositBoxes(reg-step1)() during {bright}: " +
+                "{err}, stack is:\n{stack}", strLogPrefix, strActionName, strError, err.stack );
         }
-        details.critical( "{p}Error in checkIsRegisteredSChainInDepositBoxes(reg-step1)() " +
-            "during {bright}: {err}, stack is:\n{stack}", strLogPrefix, strActionName,
-        strError, err.stack );
+        details.critical(
+            "{p}Error in checkIsRegisteredSChainInDepositBoxes(reg-step1)() during {bright}: " +
+            "{err}, stack is:\n{stack}", strLogPrefix, strActionName, strError, err.stack );
         details.exposeDetailsTo( log, "checkIsRegisteredSChainInDepositBoxes", false );
         details.close();
     }
@@ -155,8 +155,7 @@ export async function registerSChainInDepositBoxes( // step 1
         strActionName = "Register S-chain in deposit boxes, step 1, connectSchain";
         details.debug( "{p}Will register S-Chain in lock_and_data on Main-net", strLogPrefix );
         const arrArguments = [
-            chainNameSChain,
-            [
+            chainNameSChain, [
                 joTokenManagerLinker.address, // call params
                 joCommunityLocker.address, // call params
                 joTokenManagerETH.address, // call params
@@ -164,8 +163,7 @@ export async function registerSChainInDepositBoxes( // step 1
                 joTokenManagerERC721.address, // call params
                 joTokenManagerERC1155.address, // call params
                 joTokenManagerERC721WithMetadata.address // call params
-            ]
-        ];
+            ] ];
         const weiHowMuch = undefined;
         const gasPrice = await transactionCustomizerMainNet.computeGasPrice(
             ethersProviderMainNet, 200000000000 );

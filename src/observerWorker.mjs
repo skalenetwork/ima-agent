@@ -48,8 +48,7 @@ function doSendMessage( type, endpoint, workerUUID, data ) {
     const jo = networkLayer.socketReceivedDataReverseMarshall( data );
     const joSend = {
         "workerMessageType":
-            ( type && typeof type == "string" && type.length > 0 )
-                ? type : "inWorkerMessage",
+            ( type && typeof type == "string" && type.length > 0 ) ? type : "inWorkerMessage",
         "workerEndPoint": endpoint,
         "workerUUID": workerUUID,
         "data": jo
@@ -114,9 +113,9 @@ class ObserverServer extends SocketServer {
                 self.opts.imaState.chainProperties.mn.ethersProvider =
                     owaspUtils.getEthersProviderFromURL( u );
             } else {
-                self.warning( "WARNING: No Main-net URL specified in command line arguments" +
-                        "(needed for particular operations only) in {}",
-                threadInfo.threadDescription() );
+                self.warning(
+                    "WARNING: No Main-net URL specified in command line arguments(needed for " +
+                    "particular operations only) in {}", threadInfo.threadDescription() );
             }
 
             if( self.opts.imaState.chainProperties.sc.strURL &&
@@ -127,9 +126,9 @@ class ObserverServer extends SocketServer {
                 self.opts.imaState.chainProperties.sc.ethersProvider =
                     owaspUtils.getEthersProviderFromURL( u );
             } else {
-                self.warning( "WARNING: No Main-net URL specified in command line arguments" +
-                        "(needed for particular operations only) in {}",
-                threadInfo.threadDescription() );
+                self.warning(
+                    "WARNING: No Main-net URL specified in command line arguments(needed for " +
+                    "particular operations only) in {}", threadInfo.threadDescription() );
             }
             self.opts.imaState.joNodes = new owaspUtils.ethersMod.ethers.Contract(
                 self.opts.imaState.joAbiSkaleManager.nodes_address,
@@ -253,14 +252,15 @@ class ObserverServer extends SocketServer {
         await self.periodicCachingStop();
         if( secondsToReDiscoverSkaleNetwork <= 0 )
             return false;
-        self.opts.details.debug( "SKALE Observer in {} will do pre-configured periodic " +
-            "SNB refresh each {} second(s)...", threadInfo.threadDescription(),
-        secondsToReDiscoverSkaleNetwork );
+        self.opts.details.debug(
+            "SKALE Observer in {} will do pre-configured periodic SNB refresh each {} " +
+            "second(s)...", threadInfo.threadDescription(), secondsToReDiscoverSkaleNetwork );
         const fnAsyncHandler = async function() {
             try {
-                self.opts.details.debug( "SKALE Observer in {} will do immediate periodic " +
-                    "SNB refresh (one of each {} second(s))...", threadInfo.threadDescription(),
-                secondsToReDiscoverSkaleNetwork );
+                self.opts.details.debug(
+                    "SKALE Observer in {} will do immediate periodic SNB refresh (one of each {} " +
+                    "second(s))...", threadInfo.threadDescription(),
+                    secondsToReDiscoverSkaleNetwork );
                 while( true ) {
                     const strError = await self.periodicCachingDoNow(
                         socket,

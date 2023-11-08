@@ -276,9 +276,10 @@ export async function doOracleGasPriceSetup(
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != optsGasPriseSetup.details.id ) {
-            log.critical( "{p}Error in doOracleGasPriceSetup() during {bright}: {err}" +
+            log.critical(
+                "{p}Error in doOracleGasPriceSetup() during {bright}: {err}" +
                 ", stack is:\n{stack}", optsGasPriseSetup.strLogPrefix,
-            optsGasPriseSetup.strActionName, strError, err.stack );
+                optsGasPriseSetup.strActionName, strError, err.stack );
             optsGasPriseSetup.details.critical(
                 "{p}Error in doOracleGasPriceSetup() during {bright}: {err}, stack is:\n{stack}",
                 optsGasPriseSetup.strLogPrefix, optsGasPriseSetup.strActionName,

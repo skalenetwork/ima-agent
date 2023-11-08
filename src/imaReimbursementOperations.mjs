@@ -103,10 +103,8 @@ export async function reimbursementEstimateAmount(
         if( isForcePrintOut )
             log.information( s );
         details.information( s );
-        const minTransactionGas =
-            owaspUtils.parseIntOrHex(
-                await joCommunityPool.callStatic.minTransactionGas(
-                    { from: addressReceiver } ) );
+        const minTransactionGas = owaspUtils.parseIntOrHex(
+            await joCommunityPool.callStatic.minTransactionGas( { from: addressReceiver } ) );
         s = strLogPrefix + log.fmtSuccess( "MinTransactionGas: {}", minTransactionGas );
         if( isForcePrintOut )
             log.information( s );
@@ -183,19 +181,14 @@ export async function reimbursementWalletRecharge(
             strLogPrefix, strReimbursementChain );
         strActionName = "Recharge reimbursement wallet on Main Net";
         const addressReceiver = joAccountMN.address();
-        const arrArguments = [
-            strReimbursementChain,
-            addressReceiver
-        ];
+        const arrArguments = [ strReimbursementChain, addressReceiver ];
         const gasPrice = await transactionCustomizerMainNet.computeGasPrice(
             ethersProviderMainNet, 200000000000 );
         details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
-        const estimatedGas =
-            await transactionCustomizerMainNet.computeGas(
-                details, ethersProviderMainNet,
-                "CommunityPool", joCommunityPool, "rechargeUserWallet", arrArguments,
-                joAccountMN, strActionName,
-                gasPrice, 3000000, nReimbursementRecharge, null );
+        const estimatedGas = await transactionCustomizerMainNet.computeGas(
+            details, ethersProviderMainNet,
+            "CommunityPool", joCommunityPool, "rechargeUserWallet", arrArguments,
+            joAccountMN, strActionName, gasPrice, 3000000, nReimbursementRecharge, null );
         details.trace( "{p}Using estimated gas={}", strLogPrefix, estimatedGas );
         const isIgnore = false;
         const strErrorOfDryRun = await imaTx.dryRunCall(
@@ -209,8 +202,7 @@ export async function reimbursementWalletRecharge(
         const joReceipt = await imaTx.payedCall(
             details, ethersProviderMainNet,
             "CommunityPool", joCommunityPool, "rechargeUserWallet", arrArguments,
-            joAccountMN, strActionName,
-            gasPrice, estimatedGas, nReimbursementRecharge, null );
+            joAccountMN, strActionName, gasPrice, estimatedGas, nReimbursementRecharge, null );
         if( joReceipt && typeof joReceipt == "object" ) {
             jarrReceipts.push( {
                 "description": "reimbursementWalletRecharge",
@@ -264,12 +256,10 @@ export async function reimbursementWalletWithdraw(
         const gasPrice = await transactionCustomizerMainNet.computeGasPrice(
             ethersProviderMainNet, 200000000000 );
         details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
-        const estimatedGas =
-            await transactionCustomizerMainNet.computeGas(
-                details, ethersProviderMainNet,
-                "CommunityPool", joCommunityPool, "withdrawFunds", arrArguments,
-                joAccountMN, strActionName,
-                gasPrice, 3000000, weiHowMuch, null );
+        const estimatedGas = await transactionCustomizerMainNet.computeGas(
+            details, ethersProviderMainNet,
+            "CommunityPool", joCommunityPool, "withdrawFunds", arrArguments,
+            joAccountMN, strActionName, gasPrice, 3000000, weiHowMuch, null );
         details.trace( "{p}Using estimated gas={}", strLogPrefix, estimatedGas );
         const isIgnore = false;
         const strErrorOfDryRun = await imaTx.dryRunCall(
@@ -337,35 +327,24 @@ export async function reimbursementSetRange(
         const gasPrice = await transactionCustomizerSChain.computeGasPrice(
             ethersProviderSChain, 200000000000 );
         details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
-        const estimatedGas =
-            await transactionCustomizerSChain.computeGas(
-                details, ethersProviderSChain,
-                "CommunityLocker", joCommunityLocker,
-                "setTimeLimitPerMessage", arrArguments,
-                joAccountSC, strActionName,
-                gasPrice, 3000000, weiHowMuch, null );
+        const estimatedGas = await transactionCustomizerSChain.computeGas(
+            details, ethersProviderSChain,
+            "CommunityLocker", joCommunityLocker, "setTimeLimitPerMessage", arrArguments,
+            joAccountSC, strActionName, gasPrice, 3000000, weiHowMuch, null );
         details.trace( "{p}Using estimated gas={}", strLogPrefix, estimatedGas );
         const isIgnore = false;
-        const strErrorOfDryRun =
-            await imaTx.dryRunCall(
-                details, ethersProviderSChain,
-                "CommunityLocker", joCommunityLocker,
-                "setTimeLimitPerMessage", arrArguments,
-                joAccountSC, strActionName, isIgnore,
-                gasPrice, estimatedGas, weiHowMuch, null );
+        const strErrorOfDryRun = await imaTx.dryRunCall(
+            details, ethersProviderSChain,
+            "CommunityLocker", joCommunityLocker, "setTimeLimitPerMessage", arrArguments,
+            joAccountSC, strActionName, isIgnore, gasPrice, estimatedGas, weiHowMuch, null );
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
-        const opts = {
-            isCheckTransactionToSchain: true
-        };
-        const joReceipt =
-            await imaTx.payedCall(
-                details, ethersProviderSChain,
-                "CommunityLocker", joCommunityLocker,
-                "setTimeLimitPerMessage", arrArguments,
-                joAccountSC, strActionName,
-                gasPrice, estimatedGas, weiHowMuch, opts );
+        const opts = { isCheckTransactionToSchain: true };
+        const joReceipt = await imaTx.payedCall(
+            details, ethersProviderSChain,
+            "CommunityLocker", joCommunityLocker, "setTimeLimitPerMessage", arrArguments,
+            joAccountSC, strActionName, gasPrice, estimatedGas, weiHowMuch, opts );
         if( joReceipt && typeof joReceipt == "object" ) {
             jarrReceipts.push( {
                 "description": "reimbursementSetRange",

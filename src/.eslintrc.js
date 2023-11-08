@@ -13,7 +13,11 @@ module.exports = {
         "sourceType": "module"
     },
     "rules": {
-        "indent": [ "error", 4 ],
+        "indent": [ "error", 4, {
+            "CallExpression": {
+                "arguments": 1
+            }
+        } ],
         "linebreak-style": [ "error", "unix" ],
         "quotes": [ "error", "double" ],
         "semi": [ "error", "always" ],

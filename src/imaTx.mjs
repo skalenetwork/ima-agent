@@ -131,18 +131,17 @@ async function payedCallPrepare( optsPayedCall ) {
         optsPayedCall.callOpts.value =
             owaspUtils.toBN( optsPayedCall.weiHowMuch ).toHexString();
     }
-    optsPayedCall.details.trace( "{p}payed-call of action {bright} will do payed-call {p} with " +
-            "call options {} via {sunny}-sign-and-send using from address {}...",
-    optsPayedCall.strLogPrefix, optsPayedCall.strActionName,
-    optsPayedCall.strContractCallDescription, optsPayedCall.callOpts,
-    optsPayedCall.joACI.strType, optsPayedCall.joAccount.address() );
+    optsPayedCall.details.trace(
+        "{p}payed-call of action {bright} will do payed-call {p} with call options {} " +
+        "via {sunny}-sign-and-send using from address {}...", optsPayedCall.strLogPrefix,
+        optsPayedCall.strActionName, optsPayedCall.strContractCallDescription,
+        optsPayedCall.callOpts, optsPayedCall.joACI.strType, optsPayedCall.joAccount.address() );
     optsPayedCall.unsignedTx =
         await optsPayedCall.joContract.populateTransaction[optsPayedCall.strMethodName](
             ...optsPayedCall.arrArguments, optsPayedCall.callOpts );
-    optsPayedCall.unsignedTx.nonce =
-        owaspUtils.toBN( await optsPayedCall.ethersProvider.getTransactionCount(
-            optsPayedCall.joAccount.address() )
-        );
+    optsPayedCall.unsignedTx.nonce = owaspUtils.toBN(
+        await optsPayedCall.ethersProvider.getTransactionCount(
+            optsPayedCall.joAccount.address() ) );
     if( optsPayedCall.opts && optsPayedCall.opts.isCheckTransactionToSchain ) {
         optsPayedCall.unsignedTx = await checkTransactionToSchain(
             optsPayedCall.unsignedTx, optsPayedCall.details,
@@ -356,8 +355,9 @@ export async function payedCall(
             break;
         default: {
             const strErrorPrefix = "Transaction sign and send error(INNER FLOW): ";
-            optsPayedCall.details.critical( "{p}bad credentials information specified, " +
-                "no explicit SGX and no explicit private key found", strErrorPrefix );
+            optsPayedCall.details.critical(
+                "{p}bad credentials information specified, no explicit SGX and no explicit " +
+                "private key found", strErrorPrefix );
             if( log.id != optsPayedCall.details.id ) {
                 log.critical( "{p}bad credentials information specified, no explicit SGX and " +
                     "no explicit private key found", strErrorPrefix );
@@ -411,11 +411,12 @@ export async function checkTransactionToSchain(
         const strFromAddress = joAccount.address(); // unsignedTx.from;
         const requiredBalance = unsignedTx.gasPrice.mul( unsignedTx.gasLimit );
         const balance = owaspUtils.toBN( await ethersProvider.getBalance( strFromAddress ) );
-        details.trace( "{p}Will check whether PoW-mining  is needed for sender {} with balance {}" +
-                " using required balance {}, gas limit is {} gas, checked unsigned transaction " +
-                "is {}", strLogPrefix, strFromAddress, owaspUtils.toHexStringSafe( balance ),
-        owaspUtils.toHexStringSafe( requiredBalance ),
-        owaspUtils.toHexStringSafe( unsignedTx.gasLimit ), unsignedTx
+        details.trace(
+            "{p}Will check whether PoW-mining  is needed for sender {} with balance {} using " +
+            "required balance {}, gas limit is {} gas, checked unsigned transaction is {}",
+            strLogPrefix, strFromAddress, owaspUtils.toHexStringSafe( balance ),
+            owaspUtils.toHexStringSafe( requiredBalance ),
+            owaspUtils.toHexStringSafe( unsignedTx.gasLimit ), unsignedTx
         );
         if( balance.lt( requiredBalance ) ) {
             details.warning( "{p}Insufficient funds for {}, will run PoW-mining to get {} of gas",
@@ -739,9 +740,9 @@ export class TransactionCustomizer {
             await Promise.all( [ promiseComplete ] );
         } catch ( err ) {
             const strError = owaspUtils.extractErrorMessage( err );
-            details.error( "{p}Estimate-gas error: {err}, default recommended gas value " +
-                    "will be used instead of estimated, stack is:\n{stack}",
-            strLogPrefix, strError, err.stack );
+            details.error(
+                "{p}Estimate-gas error: {err}, default recommended gas value will be used " +
+                "instead of estimated, stack is:\n{stack}", strLogPrefix, strError, err.stack );
         }
         estimatedGas = owaspUtils.parseIntOrHex( owaspUtils.toBN( estimatedGas ).toString() );
         if( estimatedGas == 0 ) {

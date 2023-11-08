@@ -452,25 +452,16 @@ function constructChainProperties( opts ) {
     return {
         "mn": {
             "joAccount": {
-                "privateKey":
-                    opts.imaState.chainProperties.mn.joAccount.privateKey,
-                "address_":
-                    opts.imaState.chainProperties.mn.joAccount.address_,
+                "privateKey": opts.imaState.chainProperties.mn.joAccount.privateKey,
+                "address_": opts.imaState.chainProperties.mn.joAccount.address_,
                 "strTransactionManagerURL":
-                    opts.imaState.chainProperties.mn
-                        .joAccount.strTransactionManagerURL,
-                "nTmPriority":
-                    opts.imaState.chainProperties.mn.joAccount.nTmPriority,
-                "strSgxURL":
-                    opts.imaState.chainProperties.mn.joAccount.strSgxURL,
-                "strSgxKeyName":
-                    opts.imaState.chainProperties.mn.joAccount.strSgxKeyName,
-                "strPathSslKey":
-                    opts.imaState.chainProperties.mn.joAccount.strPathSslKey,
-                "strPathSslCert":
-                    opts.imaState.chainProperties.mn.joAccount.strPathSslCert,
-                "strBlsKeyName":
-                    opts.imaState.chainProperties.mn.joAccount.strBlsKeyName
+                    opts.imaState.chainProperties.mn.joAccount.strTransactionManagerURL,
+                "nTmPriority": opts.imaState.chainProperties.mn.joAccount.nTmPriority,
+                "strSgxURL": opts.imaState.chainProperties.mn.joAccount.strSgxURL,
+                "strSgxKeyName": opts.imaState.chainProperties.mn.joAccount.strSgxKeyName,
+                "strPathSslKey": opts.imaState.chainProperties.mn.joAccount.strPathSslKey,
+                "strPathSslCert": opts.imaState.chainProperties.mn.joAccount.strPathSslCert,
+                "strBlsKeyName": opts.imaState.chainProperties.mn.joAccount.strBlsKeyName
             },
             "ethersProvider": null,
             "strURL": opts.imaState.chainProperties.mn.strURL,
@@ -481,25 +472,16 @@ function constructChainProperties( opts ) {
         },
         "sc": {
             "joAccount": {
-                "privateKey":
-                    opts.imaState.chainProperties.sc.joAccount.privateKey,
-                "address_":
-                    opts.imaState.chainProperties.sc.joAccount.address_,
+                "privateKey": opts.imaState.chainProperties.sc.joAccount.privateKey,
+                "address_": opts.imaState.chainProperties.sc.joAccount.address_,
                 "strTransactionManagerURL":
-                    opts.imaState.chainProperties.sc
-                        .joAccount.strTransactionManagerURL,
-                "nTmPriority":
-                    opts.imaState.chainProperties.sc.joAccount.nTmPriority,
-                "strSgxURL":
-                    opts.imaState.chainProperties.sc.joAccount.strSgxURL,
-                "strSgxKeyName":
-                    opts.imaState.chainProperties.sc.joAccount.strSgxKeyName,
-                "strPathSslKey":
-                    opts.imaState.chainProperties.sc.joAccount.strPathSslKey,
-                "strPathSslCert":
-                    opts.imaState.chainProperties.mn.joAccount.strPathSslCert,
-                "strBlsKeyName":
-                    opts.imaState.chainProperties.mn.joAccount.strBlsKeyName
+                    opts.imaState.chainProperties.sc.joAccount.strTransactionManagerURL,
+                "nTmPriority": opts.imaState.chainProperties.sc.joAccount.nTmPriority,
+                "strSgxURL": opts.imaState.chainProperties.sc.joAccount.strSgxURL,
+                "strSgxKeyName": opts.imaState.chainProperties.sc.joAccount.strSgxKeyName,
+                "strPathSslKey": opts.imaState.chainProperties.sc.joAccount.strPathSslKey,
+                "strPathSslCert": opts.imaState.chainProperties.mn.joAccount.strPathSslCert,
+                "strBlsKeyName": opts.imaState.chainProperties.mn.joAccount.strBlsKeyName
             },
             "ethersProvider": null,
             "strURL": opts.imaState.chainProperties.sc.strURL,
@@ -510,25 +492,16 @@ function constructChainProperties( opts ) {
         },
         "tc": {
             "joAccount": {
-                "privateKey":
-                    opts.imaState.chainProperties.tc.joAccount.privateKey,
-                "address_":
-                    opts.imaState.chainProperties.tc.joAccount.address_,
+                "privateKey": opts.imaState.chainProperties.tc.joAccount.privateKey,
+                "address_": opts.imaState.chainProperties.tc.joAccount.address_,
                 "strTransactionManagerURL":
-                    opts.imaState.chainProperties.tc
-                        .joAccount.strTransactionManagerURL,
-                "nTmPriority":
-                    opts.imaState.chainProperties.tc.joAccount.nTmPriority,
-                "strSgxURL":
-                    opts.imaState.chainProperties.tc.joAccount.strSgxURL,
-                "strSgxKeyName":
-                    opts.imaState.chainProperties.tc.joAccount.strSgxKeyName,
-                "strPathSslKey":
-                    opts.imaState.chainProperties.tc.joAccount.strPathSslKey,
-                "strPathSslCert":
-                    opts.imaState.chainProperties.tc.joAccount.strPathSslCert,
-                "strBlsKeyName":
-                    opts.imaState.chainProperties.tc.joAccount.strBlsKeyName
+                    opts.imaState.chainProperties.tc.joAccount.strTransactionManagerURL,
+                "nTmPriority": opts.imaState.chainProperties.tc.joAccount.nTmPriority,
+                "strSgxURL": opts.imaState.chainProperties.tc.joAccount.strSgxURL,
+                "strSgxKeyName": opts.imaState.chainProperties.tc.joAccount.strSgxKeyName,
+                "strPathSslKey": opts.imaState.chainProperties.tc.joAccount.strPathSslKey,
+                "strPathSslCert": opts.imaState.chainProperties.tc.joAccount.strPathSslCert,
+                "strBlsKeyName": opts.imaState.chainProperties.tc.joAccount.strBlsKeyName
             },
             "ethersProvider": null,
             "strURL": opts.imaState.chainProperties.tc.strURL,

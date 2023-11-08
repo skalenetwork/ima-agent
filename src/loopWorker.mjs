@@ -132,9 +132,9 @@ class ObserverServer extends SocketServer {
                 self.opts.imaState.chainProperties.mn.ethersProvider =
                     owaspUtils.getEthersProviderFromURL( u );
             } else {
-                self.warning( "WARNING: No Main-net URL specified in command line arguments" +
-                        "(needed for particular operations only) in {}",
-                threadInfo.threadDescription() );
+                self.warning(
+                    "WARNING: No Main-net URL specified in command line arguments(needed for " +
+                    "particular operations only) in {}", threadInfo.threadDescription() );
             }
 
             if( self.opts.imaState.chainProperties.sc.strURL &&
@@ -145,9 +145,9 @@ class ObserverServer extends SocketServer {
                 self.opts.imaState.chainProperties.sc.ethersProvider =
                     owaspUtils.getEthersProviderFromURL( u );
             } else {
-                self.warning( "WARNING: No Main-net URL specified in command line arguments" +
-                        "(needed for particular operations only) in {}",
-                threadInfo.threadDescription() );
+                self.warning(
+                    "WARNING: No Main-net URL specified in command line arguments(needed for " +
+                    "particular operations only) in {}", threadInfo.threadDescription() );
             }
 
             self.opts.imaState.optsLoop.joRuntimeOpts.isInsideWorker = true;
@@ -181,10 +181,11 @@ class ObserverServer extends SocketServer {
         };
         self.mapApiHandlers.spreadUpdatedSChainNetwork =
             function( joMessage, joAnswer, eventData, socket ) {
-                self.debug( "New own S-Chains network information is arrived to {}" +
-                    " loop worker in {}: {}, this own S-Chain update is {}",
-                workerData.url, threadInfo.threadDescription(), joMessage.joSChainNetworkInfo,
-                log.posNeg( joMessage.isFinal, "final", "partial" ) );
+                self.debug(
+                    "New own S-Chains network information is arrived to {} loop worker " +
+                    "in {}: {}, this own S-Chain update is {}", workerData.url,
+                    threadInfo.threadDescription(), joMessage.joSChainNetworkInfo,
+                    log.posNeg( joMessage.isFinal, "final", "partial" ) );
                 imaState.joSChainNetworkInfo = joMessage.joSChainNetworkInfo;
             };
         self.mapApiHandlers.schainsCached = function( joMessage, joAnswer, eventData, socket ) {

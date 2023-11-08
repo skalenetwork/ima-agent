@@ -1425,7 +1425,7 @@ function commonInitCheckContractPresences() {
         imaUtils.checkKeysExistInABI( "skale-manager",
             imaState.strPathAbiJsonSkaleManager,
             imaState.joAbiSkaleManager, [
-            // partial list of Skale Manager's contracts specified here:
+                // partial list of Skale Manager's contracts specified here:
                 "constants_holder_abi",
                 "constants_holder_address",
                 "nodes_abi",

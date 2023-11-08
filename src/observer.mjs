@@ -222,42 +222,34 @@ export async function loadSChainParts( joSChain, opts ) {
         for( const nodeId of arrNodeIds ) {
             if( opts && opts.bStopNeeded )
                 return;
-            contractCallContext[0].calls.push(
-                {
-                    reference: strRef0,
-                    methodName: "nodes",
-                    methodParameters: [ nodeId ]
-                } );
-            contractCallContext[1].calls.push(
-                {
-                    reference: strRef1,
-                    methodName: "getNodeDomainName",
-                    methodParameters: [ nodeId ]
-                } );
-            contractCallContext[2].calls.push(
-                {
-                    reference: strRef2,
-                    methodName: "isNodeInMaintenance",
-                    methodParameters: [ nodeId ]
-                } );
-            contractCallContext[3].calls.push(
-                {
-                    reference: strRef3,
-                    methodName: "getSchainHashesForNode",
-                    methodParameters: [ nodeId ]
-                } );
+            contractCallContext[0].calls.push( {
+                reference: strRef0,
+                methodName: "nodes",
+                methodParameters: [ nodeId ]
+            } );
+            contractCallContext[1].calls.push( {
+                reference: strRef1,
+                methodName: "getNodeDomainName",
+                methodParameters: [ nodeId ]
+            } );
+            contractCallContext[2].calls.push( {
+                reference: strRef2,
+                methodName: "isNodeInMaintenance",
+                methodParameters: [ nodeId ]
+            } );
+            contractCallContext[3].calls.push( {
+                reference: strRef3,
+                methodName: "getSchainHashesForNode",
+                methodParameters: [ nodeId ]
+            } );
         }
         const rawResults = await multicall.call( contractCallContext );
         let idxResult = 0;
         for( const nodeId of arrNodeIds ) {
-            const values0 =
-                rawResults.results[strRef0].callsReturnContext[idxResult].returnValues;
-            const values1 =
-                rawResults.results[strRef1].callsReturnContext[idxResult].returnValues;
-            const values2 =
-                rawResults.results[strRef2].callsReturnContext[idxResult].returnValues;
-            const values3 =
-                rawResults.results[strRef3].callsReturnContext[idxResult].returnValues;
+            const values0 = rawResults.results[strRef0].callsReturnContext[idxResult].returnValues;
+            const values1 = rawResults.results[strRef1].callsReturnContext[idxResult].returnValues;
+            const values2 = rawResults.results[strRef2].callsReturnContext[idxResult].returnValues;
+            const values3 = rawResults.results[strRef3].callsReturnContext[idxResult].returnValues;
             const nodeDict = {
                 "id": nodeId,
                 "name": values0[0],
@@ -441,12 +433,11 @@ export async function loadSChainsWithEMC( opts ) {
         for( let idxSChain = 0; idxSChain < cntInThisGroup; ++ idxSChain ) {
             if( opts && opts.bStopNeeded )
                 return null;
-            contractCallContext[0].calls.push(
-                {
-                    reference: strRef3,
-                    methodName: "schainsAtSystem",
-                    methodParameters: [ idxFirstChainInGroup + idxSChain ]
-                } );
+            contractCallContext[0].calls.push( {
+                reference: strRef3,
+                methodName: "schainsAtSystem",
+                methodParameters: [ idxFirstChainInGroup + idxSChain ]
+            } );
         }
         const rawResults = await multicall.call( contractCallContext );
         if( opts && opts.bStopNeeded )
@@ -491,12 +482,11 @@ export async function loadSChainsWithEMC( opts ) {
             if( opts && opts.bStopNeeded )
                 return null;
             const hash = arrSChainHashes[idxFirstChainInGroup + idxSChain];
-            contractCallContext[0].calls.push(
-                {
-                    reference: strRef3,
-                    methodName: "schains",
-                    methodParameters: [ hash ]
-                } );
+            contractCallContext[0].calls.push( {
+                reference: strRef3,
+                methodName: "schains",
+                methodParameters: [ hash ]
+            } );
         }
         const rawResults = await multicall.call( contractCallContext );
         if( opts && opts.bStopNeeded )
@@ -505,8 +495,7 @@ export async function loadSChainsWithEMC( opts ) {
             if( opts && opts.bStopNeeded )
                 return null;
             const idxResult = 0 + idxSChain;
-            const values3 =
-                rawResults.results[strRef3].callsReturnContext[idxResult].returnValues;
+            const values3 = rawResults.results[strRef3].callsReturnContext[idxResult].returnValues;
             const joData = process_sc_data( values3 );
             if( opts && opts.details ) {
                 opts.details.trace( "    Data of chain #{} is {}",
@@ -720,9 +709,10 @@ async function checkWhetherSChainIsConnected( strSChainName, joMessageProxySChai
         } catch ( err ) {
             isConnected = false;
             if( opts && opts.details ) {
-                opts.details.error( "Failed attempt {} of {} to query connected state of {} " +
-                    "S-Chain, got error: {err}, stack is:\n{stack}", idxAttempt, cntAttempts,
-                strSChainName, err, err.stack );
+                opts.details.error(
+                    "Failed attempt {} of {} to query connected state of {} S-Chain, " +
+                    "got error: {err}, stack is:\n{stack}", idxAttempt, cntAttempts,
+                    strSChainName, err, err.stack );
             }
         }
     }
@@ -815,9 +805,9 @@ export async function checkConnectedSChains( strChainNameConnectedTo, arrSChains
         try {
             const url = pickRandomSChainUrl( joSChain );
             if( opts && opts.details ) {
-                opts.details.trace( "Querying(2) via URL {url} to S-Chain {} whether " +
-                    "it's connected to S-Chain {}...", url, joSChain.data.name,
-                strChainNameConnectedTo );
+                opts.details.trace(
+                    "Querying(2) via URL {url} to S-Chain {} whether it's connected " +
+                    "to S-Chain {}...", url, joSChain.data.name, strChainNameConnectedTo );
             }
             const ethersProvider = owaspUtils.getEthersProviderFromURL( url );
             const joMessageProxySChain = new owaspUtils.ethersMod.ethers.Contract(
@@ -924,15 +914,8 @@ export async function cacheSChains( strChainNameConnectedTo, opts ) {
             ( typeof strChainNameConnectedTo == "string" ) &&
             strChainNameConnectedTo.length > 0
         ) {
-            await checkConnectedSChains(
-                strChainNameConnectedTo,
-                arrSChains,
-                opts
-            );
-            gArrSChainsCached = await filterSChainsMarkedAsConnected(
-                arrSChains,
-                opts
-            );
+            await checkConnectedSChains( strChainNameConnectedTo, arrSChains, opts );
+            gArrSChainsCached = await filterSChainsMarkedAsConnected( arrSChains, opts );
         } else
             gArrSChainsCached = arrSChains;
         if( opts && opts.details ) {
@@ -1022,11 +1005,10 @@ export async function ensureHaveWorker( opts ) {
     if( gWorker )
         return gWorker;
     const url = "skale_observer_worker_server";
-    gWorker =
-        new threadInfo.Worker(
-            path.join( __dirname, "observerWorker.mjs" ),
-            { "type": "module" }
-        );
+    gWorker = new threadInfo.Worker(
+        path.join( __dirname, "observerWorker.mjs" ),
+        { "type": "module" }
+    );
     gWorker.on( "message", jo => {
         if( networkLayer.outOfWorkerAPIs.onMessage( gWorker, jo ) )
             return;
@@ -1200,9 +1182,10 @@ async function parallelPeriodicCachingStart( strChainNameConnectedTo, opts ) {
             }
             if( gFlagHaveParallelResult )
                 return;
-            log.error( "Failed to start parallel periodic SNB refresh in {}, error is: " +
-                "timeout of {} reached, will restart periodic SNB refresh in non-parallel mode",
-            threadInfo.threadDescription(), nSecondsToWaitParallel );
+            log.error(
+                "Failed to start parallel periodic SNB refresh in {}, error is: timeout of {} " +
+                "reached, will restart periodic SNB refresh in non-parallel mode",
+                threadInfo.threadDescription(), nSecondsToWaitParallel );
             periodicCachingStop();
             inThreadPeriodicCachingStart( strChainNameConnectedTo, opts );
         }, nSecondsToWaitParallel * 1000 );

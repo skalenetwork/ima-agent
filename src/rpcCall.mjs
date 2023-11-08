@@ -60,10 +60,7 @@ export async function waitWebSocketIsOpen( socket, fnDone, fnStep ) {
         const iv = setInterval( function() {
             if( isInsideAsyncHandler )
                 return;
-            fnAsyncHandler()
-                .then( () => {
-                } ).catch( () => {
-                } );
+            fnAsyncHandler().then( () => { } ).catch( () => { } );
         }, 1000 ); // 1 second
     } );
     await Promise.all( [ promiseComplete ] );
@@ -445,15 +442,13 @@ export function checkTcpPromise( strHost, nPort, nTimeoutMilliseconds, isLog ) {
         if( isLog ) {
             console.log(
                 `${gStrTcpConnectionHeader}Will establish " +
-                "TCP connection to ${strHost}:${nPort}...`
-            );
+                "TCP connection to ${strHost}:${nPort}...` );
         }
         const conn = net.createConnection( { host: strHost, port: nPort }, () => {
             if( isLog ) {
                 console.log(
                     `${gStrTcpConnectionHeader}Done, " +
-                    "TCP connection to ${strHost}:${nPort} established`
-                );
+                    "TCP connection to ${strHost}:${nPort} established` );
             }
             conn.end();
             resolve();
@@ -461,8 +456,7 @@ export function checkTcpPromise( strHost, nPort, nTimeoutMilliseconds, isLog ) {
         if( isLog ) {
             console.log(
                 `${gStrTcpConnectionHeader}Did created NET object " +
-                "for TCP connection to ${strHost}:${nPort}...`
-            );
+                "for TCP connection to ${strHost}:${nPort}...` );
         }
         if( nTimeoutMilliseconds )
             nTimeoutMilliseconds = parseInt( nTimeoutMilliseconds.toString(), 10 );
@@ -471,24 +465,21 @@ export function checkTcpPromise( strHost, nPort, nTimeoutMilliseconds, isLog ) {
                 console.log(
                     `${gStrTcpConnectionHeader}Will use " +
                     "TCP connection to ${strHost}:${nPort} " +
-                    "timeout ${nTimeoutMilliseconds} milliseconds...`
-                );
+                    "timeout ${nTimeoutMilliseconds} milliseconds...` );
             }
             conn.setTimeout( nTimeoutMilliseconds );
         } else {
             if( isLog ) {
                 console.log(
                     `${gStrTcpConnectionHeader}Will use " +
-                    "default TCP connection to ${strHost}:${nPort} timeout...`
-                );
+                    "default TCP connection to ${strHost}:${nPort} timeout...` );
             }
         }
         conn.on( "timeout", err => {
             if( isLog ) {
                 console.log(
                     `${gStrTcpConnectionHeader}TCP connection " +
-                    "to ${strHost}:${nPort} timed out`
-                );
+                    "to ${strHost}:${nPort} timed out` );
             }
             conn.destroy();
             reject( err );
@@ -497,16 +488,14 @@ export function checkTcpPromise( strHost, nPort, nTimeoutMilliseconds, isLog ) {
             if( isLog ) {
                 console.log(
                     `${gStrTcpConnectionHeader}TCP connection " +
-                    "to ${strHost}:${nPort} failed`
-                );
+                    "to ${strHost}:${nPort} failed` );
             }
             reject( err );
         } );
         if( isLog ) {
             console.log(
                 `${gStrTcpConnectionHeader}TCP connection " +
-                "to ${strHost}:${nPort} check started...`
-            );
+                "to ${strHost}:${nPort} check started...` );
         }
     } );
 }
@@ -522,22 +511,19 @@ export async function checkTcp( strHost, nPort, nTimeoutMilliseconds, isLog ) {
         if( isLog ) {
             console.log(
                 `${gStrTcpConnectionHeader}Waiting for " + 
-                "TCP connection to ${strHost}:${nPort} check done...`
-            );
+                "TCP connection to ${strHost}:${nPort} check done...` );
         }
         await Promise.all( [ promiseCompleteTcpCheck ] );
         if( isLog ) {
             console.log(
                 `${gStrTcpConnectionHeader}TCP connection " + 
-                "to ${strHost}:${nPort} check finished`
-            );
+                "to ${strHost}:${nPort} check finished` );
         }
     } catch ( err ) {
         isOnline = false;
         console.log(
             `${gStrTcpConnectionHeader}TCP connection " + 
-            "to ${strHost}:${nPort} check failed with error: ` + err.toString()
-        );
+            "to ${strHost}:${nPort} check failed with error: ` + err.toString() );
     }
     return isOnline;
 }
@@ -549,14 +535,12 @@ export async function checkUrl( u, nTimeoutMilliseconds, isLog ) {
     if( isLog ) {
         console.log( gStrTcpConnectionHeader +
             "Extracted from URL \"" + u.toString() + "\" data fields are: " +
-            JSON.stringify( jo )
-        );
+            JSON.stringify( jo ) );
     }
     if( ! ( jo && jo.strHost && "nPort" in jo ) ) {
         console.log( gStrTcpConnectionHeader +
             "Extracted from URL \"" + u.toString() +
-            "\" data fields are bad, returning \"false\" as result of TCP connection check"
-        );
+            "\" data fields are bad, returning \"false\" as result of TCP connection check" );
         return false;
     }
     return await checkTcp( jo.strHost, jo.nPort, nTimeoutMilliseconds, isLog );
