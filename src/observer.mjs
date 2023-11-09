@@ -955,9 +955,17 @@ export function getLastCachedSChains() {
 }
 
 export function setLastCachedSChains( arrSChainsCached ) {
-    log.debug( "Will set arrSChainsCached in {}...", threadInfo.threadDescription() );
-    log.debug( "Value of arrSChainsCached in {} is: {}", threadInfo.threadDescription(),
-        arrSChainsCached );
+    if( threadInfo.joCustomThreadProperties.isSChainsCacheNeeded ) {
+        log.debug( "Value of arrSChainsCached in {} is: {}", threadInfo.threadDescription(),
+            arrSChainsCached );
+    }
+    if( ( !arrSChainsCached ) || arrSChainsCached.length == 0 ) {
+        if( threadInfo.joCustomThreadProperties.isSChainsCacheNeeded ) {
+            self.debug( "Empty S-Chains cache arrived to SkaleObserver will not be renewed in {}",
+                threadInfo.threadDescription() );
+        }
+        return;
+    }
     if( arrSChainsCached && typeof arrSChainsCached == "object" ) {
         gArrSChainsCached = JSON.parse( JSON.stringify( arrSChainsCached ) );
         gArrCacheHistory.push( {
@@ -967,15 +975,19 @@ export function setLastCachedSChains( arrSChainsCached ) {
         const nMaxSize = getLastCachedHistoryMaxSize();
         while( gArrCacheHistory.length > nMaxSize )
             gArrCacheHistory.shift();
-        log.debug( "Will dispatch arrSChainsCached event in {}...",
-            threadInfo.threadDescription() );
+        if( threadInfo.joCustomThreadProperties.isSChainsCacheNeeded ) {
+            log.debug( "Will dispatch arrSChainsCached event in {}...",
+                threadInfo.threadDescription() );
+        }
         events.dispatchEvent(
             new UniversalDispatcherEvent(
                 "chainsCacheChanged",
                 { "detail": { "arrSChainsCached": getLastCachedSChains() } } ) );
     } else {
-        log.error( "Cannot dispatch arrSChainsCached event with bad object {} in {}",
-            arrSChainsCached, threadInfo.threadDescription() );
+        if( threadInfo.joCustomThreadProperties.isSChainsCacheNeeded ) {
+            log.error( "Cannot dispatch arrSChainsCached event with bad object {} in {}",
+                arrSChainsCached, threadInfo.threadDescription() );
+        }
     }
 }
 
