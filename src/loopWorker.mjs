@@ -197,15 +197,6 @@ class ObserverServer extends SocketServer {
                     workerData.url, threadInfo.threadDescription(),
                     joMessage.message.arrSChainsCached );
             }
-            if( ( !joMessage.message.arrSChainsCached ) ||
-                joMessage.message.arrSChainsCached.length == 0
-            ) {
-                if( threadInfo.joCustomThreadProperties.isSChainsCacheNeeded ) {
-                    self.debug( "Empty S-Chains cache arrived to {} will not be renewed in {}",
-                        workerData.url, threadInfo.threadDescription() );
-                }
-                return;
-            }
             skaleObserver.setLastCachedSChains( joMessage.message.arrSChainsCached );
         };
         // eslint-disable-next-line dot-notation

@@ -702,12 +702,10 @@ async function checkWhetherSChainIsConnected( strSChainName, joMessageProxySChai
         ? opts.cntAttemptsCheckConnectedState : 3;
     for( let idxAttempt = 0; idxAttempt < cntAttempts; ++ idxAttempt ) {
         try {
-            isConnected =
-                await joMessageProxySChain.callStatic.isConnectedChain( strSChainName );
+            isConnected = await joMessageProxySChain.callStatic.isConnectedChain( strSChainName );
             isQueryPassed = true;
             break;
         } catch ( err ) {
-            isConnected = false;
             if( opts && opts.details ) {
                 opts.details.error(
                     "Failed attempt {} of {} to query connected state of {} S-Chain, " +
@@ -716,14 +714,13 @@ async function checkWhetherSChainIsConnected( strSChainName, joMessageProxySChai
             }
         }
     }
-    if( opts && opts.details ) {
-        if( ! isQueryPassed ) {
-            opts.details.warning( "Will assume S-Chain {} connected status: {yn}",
-                strSChainName, isConnected );
-        } else {
-            opts.details.trace( "Got S-Chain {} connected status: {yn}",
-                strSChainName, isConnected );
+    if( ! isQueryPassed ) {
+        if( opts && opts.details ) {
+            opts.details.error( "Failed all {} attempt(s) to query connected state of {} S-Chain",
+                cntAttempts, strSChainName );
         }
+        throw new Error( "Failed all " + cntAttempts + " attempt(s) to query connected state of " +
+            strSChainName + " S-Chain" );
     }
     return isConnected;
 }
@@ -752,38 +749,33 @@ export async function loadSChainsConnectedOnly( strChainNameConnectedTo, opts ) 
         );
     const arrSChains = [], arrSChainNames = await getAllSchainNames( arrSChainHashes, opts );
     for( let idxSChain = 0; idxSChain < cntSChains; ++ idxSChain ) {
-        try {
-            if( opts && opts.bStopNeeded )
-                break;
-            const strSChainHash = arrSChainHashes[idxSChain];
-            const strSChainName = arrSChainNames[idxSChain];
-            if( strChainNameConnectedTo == strSChainName ) {
-                if( opts && opts.details ) {
-                    opts.details.trace( "Skip this S-Chain {} connected status check",
-                        strSChainName );
-                }
-                continue;
-            }
+        if( opts && opts.bStopNeeded )
+            break;
+        const strSChainHash = arrSChainHashes[idxSChain];
+        const strSChainName = arrSChainNames[idxSChain];
+        if( strChainNameConnectedTo == strSChainName ) {
             if( opts && opts.details ) {
-                opts.details.trace( "Querying(1) connected status between S-Chain {} and " +
-                    "S-Chain {}...", strSChainName, strChainNameConnectedTo );
+                opts.details.trace( "Skip this S-Chain {} connected status check",
+                    strSChainName );
             }
-            let isConnected = false;
-            if( isLoadConnectedOnly ) {
-                isConnected = await checkWhetherSChainIsConnected(
-                    strSChainName, joMessageProxySChain, opts );
-                if( ! isConnected )
-                    continue;
-            }
-            const joSChain = await loadSChain( idxSChain, strSChainHash, null, cntSChains, opts );
-            if( ! joSChain )
-                continue;
-            joSChain.isConnected = isConnected;
-            arrSChains.push( joSChain );
-        } catch ( err ) {
-            if( opts && opts.details )
-                opts.details.error( "Got error: {err}, stack is:\n{stack}", err, err.stack );
+            continue;
         }
+        if( opts && opts.details ) {
+            opts.details.trace( "Querying(1) connected status between S-Chain {} and " +
+                "S-Chain {}...", strSChainName, strChainNameConnectedTo );
+        }
+        let isConnected = false;
+        if( isLoadConnectedOnly ) {
+            isConnected = await checkWhetherSChainIsConnected(
+                strSChainName, joMessageProxySChain, opts );
+            if( ! isConnected )
+                continue;
+        }
+        const joSChain = await loadSChain( idxSChain, strSChainHash, null, cntSChains, opts );
+        if( ! joSChain )
+            continue;
+        joSChain.isConnected = isConnected;
+        arrSChains.push( joSChain );
     }
     return arrSChains;
 }
@@ -802,24 +794,19 @@ export async function checkConnectedSChains( strChainNameConnectedTo, arrSChains
         joSChain.isConnected = false;
         if( joSChain.data.name == strChainNameConnectedTo )
             continue;
-        try {
-            const url = pickRandomSChainUrl( joSChain );
-            if( opts && opts.details ) {
-                opts.details.trace(
-                    "Querying(2) via URL {url} to S-Chain {} whether it's connected " +
-                    "to S-Chain {}...", url, joSChain.data.name, strChainNameConnectedTo );
-            }
-            const ethersProvider = owaspUtils.getEthersProviderFromURL( url );
-            const joMessageProxySChain = new owaspUtils.ethersMod.ethers.Contract(
-                opts.imaState.chainProperties.sc.joAbiIMA.message_proxy_chain_address,
-                opts.imaState.chainProperties.sc.joAbiIMA.message_proxy_chain_abi,
-                ethersProvider );
-            joSChain.isConnected = await checkWhetherSChainIsConnected(
-                strChainNameConnectedTo, joMessageProxySChain, opts );
-        } catch ( err ) {
-            if( opts && opts.details )
-                opts.details.error( "Got error: {err}, stack is:\n{stack}", err, err.stack );
+        const url = pickRandomSChainUrl( joSChain );
+        if( opts && opts.details ) {
+            opts.details.trace(
+                "Querying(2) via URL {url} to S-Chain {} whether it's connected " +
+                "to S-Chain {}...", url, joSChain.data.name, strChainNameConnectedTo );
         }
+        const ethersProvider = owaspUtils.getEthersProviderFromURL( url );
+        const joMessageProxySChain = new owaspUtils.ethersMod.ethers.Contract(
+            opts.imaState.chainProperties.sc.joAbiIMA.message_proxy_chain_address,
+            opts.imaState.chainProperties.sc.joAbiIMA.message_proxy_chain_abi,
+            ethersProvider );
+        joSChain.isConnected = await checkWhetherSChainIsConnected(
+            strChainNameConnectedTo, joMessageProxySChain, opts );
     }
     return arrSChains;
 }
@@ -926,10 +913,8 @@ export async function cacheSChains( strChainNameConnectedTo, opts ) {
             opts.details.trace( "Will dispatch inThread-arrSChainsCached event in {}",
                 threadInfo.threadDescription() );
         }
-        events.dispatchEvent(
-            new UniversalDispatcherEvent(
-                "inThread-arrSChainsCached",
-                { "detail": { "arrSChainsCached": arrSChains } } ) );
+        events.dispatchEvent( new UniversalDispatcherEvent(
+            "inThread-arrSChainsCached", { "detail": { "arrSChainsCached": arrSChains } } ) );
         if( opts && opts.details ) {
             opts.details.trace( "Did dispatched inThread-arrSChainsCached event in {}",
                 threadInfo.threadDescription() );
@@ -956,15 +941,8 @@ export function getLastCachedSChains() {
 
 export function setLastCachedSChains( arrSChainsCached ) {
     if( threadInfo.joCustomThreadProperties.isSChainsCacheNeeded ) {
-        log.debug( "Value of arrSChainsCached in {} is: {}", threadInfo.threadDescription(),
-            arrSChainsCached );
-    }
-    if( ( !arrSChainsCached ) || arrSChainsCached.length == 0 ) {
-        if( threadInfo.joCustomThreadProperties.isSChainsCacheNeeded ) {
-            self.debug( "Empty S-Chains cache arrived to SkaleObserver will not be renewed in {}",
-                threadInfo.threadDescription() );
-        }
-        return;
+        log.debug( "Will save value of arrSChainsCached in {} is: {}",
+            threadInfo.threadDescription(), arrSChainsCached );
     }
     if( arrSChainsCached && typeof arrSChainsCached == "object" ) {
         gArrSChainsCached = JSON.parse( JSON.stringify( arrSChainsCached ) );
