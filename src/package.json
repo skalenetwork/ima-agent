@@ -24,7 +24,7 @@
         "shelljs": "^0.8.5",
         "connect": "^3.7.0",
         "ethereum-multicall": "^2.16.1",
-        "ioredis": "^4.28.2",
+        "ioredis": "^5.3.2",
         "ethereumjs-util": "^7.1.5",
         "ethereumjs-wallet": "^1.0.2"
     },
