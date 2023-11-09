@@ -607,10 +607,8 @@ class SignalingServer extends EventDispatcher {
                             idRtcParticipant.length <= 0
                         ) {
                             isForceDisconnect = true;
-                            throw new Error(
-                                "Bad impersonate call data, " +
-                                "no valid signaling *somebody* ID provided"
-                            );
+                            throw new Error( "Bad impersonate call data, " +
+                                "no valid signaling *somebody* ID provided" );
                         }
 
                         const strRole = joMessage.role;
@@ -620,10 +618,8 @@ class SignalingServer extends EventDispatcher {
                             ( ! ( strRole == "creator" || strRole == "joiner" ) )
                         ) {
                             isForceDisconnect = true;
-                            throw new Error(
-                                "Bad impersonate call data, " +
-                                "no valid signaling *somebody* role provided"
-                            );
+                            throw new Error( "Bad impersonate call data, " +
+                                "no valid signaling *somebody* role provided" );
                         }
 
                         const idCategory = joMessage.idCategory;
@@ -632,57 +628,42 @@ class SignalingServer extends EventDispatcher {
                             idCategory.length <= 0
                         ) {
                             isForceDisconnect = true;
-                            throw new Error(
-                                "Bad impersonate call data, " +
-                                "no valid signaling space category provided"
-                            );
+                            throw new Error( "Bad impersonate call data, " +
+                                "no valid signaling space category provided" );
                         }
                         signalingCategory = self.signalingManager.categoryGet( idCategory, true );
                         if( ! signalingCategory ) {
                             isForceDisconnect = true;
-                            throw new Error(
-                                "Bad impersonate call data, " +
-                                "cannot get/alloc signaling category with \"" +
-                                idCategory + "\" name"
-                            );
+                            throw new Error( `Bad impersonate call data, ` +
+                                `cannot get/alloc signaling category with ${idCategory} name` );
                         }
 
                         const idSpace = joMessage.idSpace;
                         if( ( !idSpace ) || typeof idSpace != "string" || idSpace.length <= 0 ) {
                             isForceDisconnect = true;
-                            throw new Error(
-                                "Bad impersonate call data, " +
-                                "no valid signaling space name provided"
-                            );
+                            throw new Error( "Bad impersonate call data, " +
+                                "no valid signaling space name provided" );
                         }
                         signalingSpace = signalingCategory.spaceGet( idSpace, true );
                         if( ! signalingSpace ) {
                             isForceDisconnect = true;
-                            throw new Error(
-                                "Bad impersonate call data, " +
-                                "cannot get/alloc signaling space with \"" +
-                                idSpace + "\" name"
-                            );
+                            throw new Error( `Bad impersonate call data, ` +
+                                `cannot get/alloc signaling space with ${idSpace} name` );
                         }
 
                         if( signalingSpace.clientGet( idRtcParticipant ) != null ) {
                             isForceDisconnect = true;
-                            throw new Error(
-                                "*Somebody* \"" + idRtcParticipant + "\" is already in \"" +
-                                idSpace + "\" signaling space"
-                            );
+                            throw new Error( `*Somebody* ${idRtcParticipant} is already ` +
+                                `in ${idSpace} signaling space` );
                         }
 
                         if( strRole == "creator" &&
                             signalingSpace.idSomebodyCreator != "" &&
                             signalingSpace.idSomebodyCreator != idRtcParticipant
                         ) {
-                            throw new Error(
-                                "*Somebody* \"" + idRtcParticipant +
-                                "\" is already in \"" + idSpace +
-                                "\" attempted to impersonate as creator " +
-                                "while other creator already exist"
-                            );
+                            throw new Error( `*Somebody* ${idRtcParticipant} is already ` +
+                                `in ${idSpace} attempted to impersonate as creator while ` +
+                                `other creator already exist` );
                         }
 
                         signalingClient =
@@ -711,8 +692,8 @@ class SignalingServer extends EventDispatcher {
                     } break;
                     case "signalingPublishOffer": {
                         if( ! ( signalingClient && signalingSpace && signalingCategory ) ) {
-                            throw new Error(
-                                "only connected signaling clients can publish offers" );
+                            throw new Error( "only connected signaling clients " +
+                                "can publish offers" );
                         }
                         if( ! ( signalingClient.isCreator ) )
                             throw new Error( "only creator can publish offers" );
@@ -734,22 +715,21 @@ class SignalingServer extends EventDispatcher {
                     } break;
                     case "signalingFetchOffer": {
                         if( ! ( signalingClient && signalingSpace && signalingCategory ) ) {
-                            throw new Error(
-                                "only connected signaling clients can fetch published offers" );
+                            throw new Error( "only connected signaling clients " +
+                                "can fetch published offers" );
                         }
                         signalingClient.offerDiscoveryStart( joMessage );
                     } break;
                     case "signalingPublishAnswer": {
                         if( ! ( signalingClient && signalingSpace && signalingCategory ) ) {
-                            throw new Error(
-                                "only connected signaling clients can publish offer answers" );
+                            throw new Error( "only connected signaling clients " +
+                                "can publish offer answers" );
                         }
                         const connectedServerCreator =
                             signalingSpace.clientGet( joMessage.idSomebodyCreator );
                         if( ! connectedServerCreator ) {
-                            throw new Error(
-                                "answer published with invalid server holder reference: " +
-                                joMessage.idSomebodyCreator );
+                            throw new Error( `answer published with invalid server ` +
+                                `holder reference: ${joMessage.idSomebodyCreator}` );
                         }
                         const joForwardMessage = JSON.parse( JSON.stringify( joMessage ) );
                         joForwardMessage.idSomebody_joiner = "" + signalingClient.idRtcParticipant;

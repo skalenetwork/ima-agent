@@ -24,7 +24,7 @@
  */
 
 import * as worker_threads from "worker_threads";
-import * as cc from "./cc.mjs";
+import * as log from "./log.mjs";
 
 const Worker = worker_threads.Worker;
 export { Worker };
@@ -47,6 +47,7 @@ export function threadDescription( isColorized ) {
     const tid = getCurrentThreadID();
     const st = isMainThread() ? "main" : "worker";
     return isColorized
-        ? ( cc.sunny( st ) + cc.bright( " thread " ) + cc.info( tid ) )
+        ? ( log.fmtAttention( st ) + log.fmtDebug( " thread " ) +
+                log.fmtInformation( tid ) )
         : ( st + " thread " + tid );
 }

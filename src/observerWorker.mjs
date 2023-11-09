@@ -28,7 +28,6 @@ import {
 } from "worker_threads";
 import * as networkLayer from "./socket.mjs";
 import { SocketServer } from "./socketServer.mjs";
-import * as cc from "./cc.mjs";
 import * as owaspUtils from "./owaspUtils.mjs";
 import * as skaleObserver from "./observer.mjs";
 import * as log from "./log.mjs";
@@ -49,8 +48,7 @@ function doSendMessage( type, endpoint, workerUUID, data ) {
     const jo = networkLayer.socketReceivedDataReverseMarshall( data );
     const joSend = {
         "workerMessageType":
-            ( type && typeof type == "string" && type.length > 0 )
-                ? type : "inWorkerMessage",
+            ( type && typeof type == "string" && type.length > 0 ) ? type : "inWorkerMessage",
         "workerEndPoint": endpoint,
         "workerUUID": workerUUID,
         "data": jo
@@ -83,11 +81,24 @@ class ObserverServer extends SocketServer {
                 const isFlush = true;
                 socket.send( jo, isFlush );
             };
+            self.initLogMethods();
             self.opts = JSON.parse( JSON.stringify( joMessage.message.opts ) );
             self.opts.details = {
-                write: self.log
+                "write": self.log,
+                "fatal": self.fatal,
+                "critical": self.critical,
+                "error": self.error,
+                "warning": self.warning,
+                "attention": self.attention,
+                "information": self.information,
+                "info": self.info,
+                "notice": self.notice,
+                "note": self.note,
+                "debug": self.debug,
+                "trace": self.trace,
+                "success": self.success
             };
-            cc.enable( joMessage.message.cc.isEnabled );
+            log.enableColorization( joMessage.message.colorization.isEnabled );
             log.verboseSet( self.opts.imaState.verbose_ );
             log.exposeDetailsSet( self.opts.imaState.expose_details_ );
             self.opts.imaState.chainProperties.mn.joAccount.address =
@@ -102,13 +113,9 @@ class ObserverServer extends SocketServer {
                 self.opts.imaState.chainProperties.mn.ethersProvider =
                     owaspUtils.getEthersProviderFromURL( u );
             } else {
-                if( log.verboseGet() >= log.verboseReversed().warning ) {
-                    self.log( cc.warning( "WARNING:" ) + cc.warning( " No " ) +
-                        cc.note( "Main-net" ) +
-                        cc.warning( " URL specified in command line arguments" ) +
-                        cc.debug( "(needed for particular operations only) in " ) +
-                        threadInfo.threadDescription() + "\n" );
-                }
+                self.warning(
+                    "WARNING: No Main-net URL specified in command line arguments(needed for " +
+                    "particular operations only) in {}", threadInfo.threadDescription() );
             }
 
             if( self.opts.imaState.chainProperties.sc.strURL &&
@@ -119,59 +126,40 @@ class ObserverServer extends SocketServer {
                 self.opts.imaState.chainProperties.sc.ethersProvider =
                     owaspUtils.getEthersProviderFromURL( u );
             } else {
-                if( log.verboseGet() >= log.verboseReversed().warning ) {
-                    self.log( cc.warning( "WARNING:" ) + cc.warning( " No " ) +
-                        cc.note( "Main-net" ) +
-                        cc.warning( " URL specified in command line arguments" ) +
-                        cc.debug( "(needed for particular operations only) in " ) +
-                        threadInfo.threadDescription() + "\n" );
-                }
+                self.warning(
+                    "WARNING: No Main-net URL specified in command line arguments(needed for " +
+                    "particular operations only) in {}", threadInfo.threadDescription() );
             }
-            self.opts.imaState.joNodes =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    self.opts.imaState.joAbiSkaleManager.nodes_address,
-                    self.opts.imaState.joAbiSkaleManager.nodes_abi,
-                    self.opts.imaState.chainProperties.mn.ethersProvider
-                );
-            self.opts.imaState.joSChains =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    self.opts.imaState.joAbiSkaleManager.schains_address,
-                    self.opts.imaState.joAbiSkaleManager.schains_abi,
-                    self.opts.imaState.chainProperties.mn.ethersProvider
-                );
-            self.opts.imaState.joSChainsInternal =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    self.opts.imaState.joAbiSkaleManager.schains_internal_address,
-                    self.opts.imaState.joAbiSkaleManager.schains_internal_abi,
-                    self.opts.imaState.chainProperties.mn.ethersProvider
-                );
-
-            self.opts.imaState.joMessageProxySChain =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    self.opts.imaState.chainProperties.sc.joAbiIMA.message_proxy_chain_address,
-                    self.opts.imaState.chainProperties.sc.joAbiIMA.message_proxy_chain_abi,
-                    self.opts.imaState.chainProperties.sc.ethersProvider
-                );
+            self.opts.imaState.joNodes = new owaspUtils.ethersMod.ethers.Contract(
+                self.opts.imaState.joAbiSkaleManager.nodes_address,
+                self.opts.imaState.joAbiSkaleManager.nodes_abi,
+                self.opts.imaState.chainProperties.mn.ethersProvider );
+            self.opts.imaState.joSChains = new owaspUtils.ethersMod.ethers.Contract(
+                self.opts.imaState.joAbiSkaleManager.schains_address,
+                self.opts.imaState.joAbiSkaleManager.schains_abi,
+                self.opts.imaState.chainProperties.mn.ethersProvider );
+            self.opts.imaState.joSChainsInternal = new owaspUtils.ethersMod.ethers.Contract(
+                self.opts.imaState.joAbiSkaleManager.schains_internal_address,
+                self.opts.imaState.joAbiSkaleManager.schains_internal_abi,
+                self.opts.imaState.chainProperties.mn.ethersProvider );
+            self.opts.imaState.joMessageProxySChain = new owaspUtils.ethersMod.ethers.Contract(
+                self.opts.imaState.chainProperties.sc.joAbiIMA.message_proxy_chain_address,
+                self.opts.imaState.chainProperties.sc.joAbiIMA.message_proxy_chain_abi,
+                self.opts.imaState.chainProperties.sc.ethersProvider );
             self.initComplete = true;
-            if( log.verboseGet() >= log.verboseReversed().information ) {
-                self.log( cc.debug( "Full init compete for in-worker SNB server in " ) +
-                    threadInfo.threadDescription() + " " +
-                    cc.notice( gURL ) + "\n" );
-            }
+            self.information( log.fmtInformation(
+                "Full init compete for in-worker SNB server in {}, U={}",
+                threadInfo.threadDescription(), gURL ) );
             return joAnswer;
         };
         self.mapApiHandlers.periodicCachingStart =
             function( joMessage, joAnswer, eventData, socket ) {
-                if( log.verboseGet() >= log.verboseReversed().debug ) {
-                    self.opts.details.write( threadInfo.threadDescription() +
-                        cc.debug( " will start periodic SNB refresh ..." ) + "\n" );
-                }
-                self.periodicCachingStart(
-                    socket,
+                self.opts.details.debug( "{} will start periodic SNB refresh ...",
+                    threadInfo.threadDescription() );
+                self.periodicCachingStart( socket,
                     joMessage.message.secondsToReDiscoverSkaleNetwork,
                     joMessage.message.strChainNameConnectedTo,
-                    joMessage.message.isForceMultiAttemptsUntilSuccess
-                );
+                    joMessage.message.isForceMultiAttemptsUntilSuccess );
                 joAnswer.message = {
                     "method": "" + joMessage.method,
                     "error": null
@@ -187,11 +175,9 @@ class ObserverServer extends SocketServer {
             };
             return joAnswer;
         };
-        if( log.verboseGet() >= log.verboseReversed().information ) {
-            self.log( cc.debug( "Initialized in-worker SNB server in " ) +
-                threadInfo.threadDescription() + cc.debug( " is " ) +
-                cc.notice( gURL ) + "\n" );
-        }
+        console.log( log.fmtInformation(
+            "Initialized in-worker SNB server in {}, U={}",
+            threadInfo.threadDescription(), gURL ) );
     }
     dispose() {
         const self = this;
@@ -213,30 +199,18 @@ class ObserverServer extends SocketServer {
             return null;
         let strError = null;
         self.bIsPeriodicCachingStepInProgress = true;
-        if( log.verboseGet() >= log.verboseReversed().debug ) {
-            self.opts.details.write( threadInfo.threadDescription() +
-                cc.debug( " thread will invoke S-Chains caching in " ) +
-                ( isForceMultiAttemptsUntilSuccess
-                    ? cc.warning( "forced" )
-                    : cc.success( "normal" ) ) +
-                cc.debug( " mode..." ) + "\n" );
-        }
+        self.opts.details.debug( "{} thread will invoke S-Chains caching in {} mode...",
+            threadInfo.threadDescription(), ( isForceMultiAttemptsUntilSuccess
+                ? log.fmtWarning( "forced" ) : log.fmtSuccess( "normal" ) ) );
         for( let idxAttempt = 0;
             // eslint-disable-next-line no-unmodified-loop-condition
             idxAttempt < 10 || isForceMultiAttemptsUntilSuccess;
             ++ idxAttempt
         ) {
             try {
-                if( log.verboseGet() >= log.verboseReversed().debug ) {
-                    self.opts.details.write( threadInfo.threadDescription() +
-                        cc.debug( " thread will invoke S-Chains caching(attempt + " ) +
-                        cc.info( idxAttempt ) + cc.debug( ")..." ) + "\n" );
-                }
-                strError =
-                    await skaleObserver.cacheSChains(
-                        strChainNameConnectedTo,
-                        self.opts
-                    );
+                self.opts.details.debug( "{} thread will invoke S-Chains caching(attempt {})...",
+                    threadInfo.threadDescription(), idxAttempt );
+                strError = await skaleObserver.cacheSChains( strChainNameConnectedTo, self.opts );
                 if( ! strError )
                     break;
             } catch ( err ) {
@@ -250,18 +224,12 @@ class ObserverServer extends SocketServer {
         }
         self.bIsPeriodicCachingStepInProgress = false;
         if( strError ) {
-            if( log.verboseGet() >= log.verboseReversed().error ) {
-                self.log( cc.error( "Parallel periodic SNB caching came across with error: " ) +
-                    cc.warning( strError ) + cc.error( " in " ) + threadInfo.threadDescription() +
-                    "\n" );
-            }
+            self.error( "Parallel periodic SNB caching came across with error: {err} in {}",
+                strError, threadInfo.threadDescription() );
             return strError;
         }
-        if( log.verboseGet() >= log.verboseReversed().debug ) {
-            self.log( cc.debug( "Parallel periodic SNB caching in " ) +
-                threadInfo.threadDescription() + cc.debug( " will notify main thread now" ) +
-                "\n" );
-        }
+        self.debug( "Parallel periodic SNB caching in {} will notify main thread now",
+            threadInfo.threadDescription() );
         const arrSChains = skaleObserver.getLastCachedSChains();
         const jo = {
             "method": "periodicCachingDoNow",
@@ -270,11 +238,8 @@ class ObserverServer extends SocketServer {
         };
         const isFlush = true;
         socket.send( jo, isFlush );
-        if( log.verboseGet() >= log.verboseReversed().debug ) {
-            self.log( cc.debug( "Parallel periodic SNB caching in " ) +
-                threadInfo.threadDescription() + cc.debug( " did notified main thread now" ) +
-                "\n" );
-        }
+        self.debug( "Parallel periodic SNB caching in {} did notified main thread now",
+            threadInfo.threadDescription() );
         return null;
     }
     async periodicCachingStart(
@@ -287,41 +252,29 @@ class ObserverServer extends SocketServer {
         await self.periodicCachingStop();
         if( secondsToReDiscoverSkaleNetwork <= 0 )
             return false;
-        if( log.verboseGet() >= log.verboseReversed().debug ) {
-            self.opts.details.write(
-                cc.debug( "SKALE Observer in " ) + threadInfo.threadDescription() +
-                cc.debug( " will do pre-configured periodic SNB refresh each " ) +
-                cc.info( secondsToReDiscoverSkaleNetwork ) + cc.debug( " second(s)..." ) +
-                "\n" );
-        }
+        self.opts.details.debug(
+            "SKALE Observer in {} will do pre-configured periodic SNB refresh each {} " +
+            "second(s)...", threadInfo.threadDescription(), secondsToReDiscoverSkaleNetwork );
         const fnAsyncHandler = async function() {
             try {
-                if( log.verboseGet() >= log.verboseReversed().debug ) {
-                    self.opts.details.write(
-                        cc.debug( "SKALE Observer in " ) + threadInfo.threadDescription() +
-                        cc.debug( " will do immediate periodic SNB refresh" ) +
-                        cc.normal( "(one of each " ) + cc.info( secondsToReDiscoverSkaleNetwork ) +
-                        cc.normal( " second(s))" ) + cc.debug( "..." ) + "\n" );
-                }
+                self.opts.details.debug(
+                    "SKALE Observer in {} will do immediate periodic SNB refresh (one of each {} " +
+                    "second(s))...", threadInfo.threadDescription(),
+                    secondsToReDiscoverSkaleNetwork );
                 while( true ) {
-                    const strError =
-                        await self.periodicCachingDoNow(
-                            socket,
-                            secondsToReDiscoverSkaleNetwork,
-                            strChainNameConnectedTo,
-                            ( !!isForceMultiAttemptsUntilSuccess )
-                        );
+                    const strError = await self.periodicCachingDoNow(
+                        socket,
+                        secondsToReDiscoverSkaleNetwork,
+                        strChainNameConnectedTo,
+                        ( !!isForceMultiAttemptsUntilSuccess ) );
                     if( strError && isForceMultiAttemptsUntilSuccess )
                         continue;
                     isForceMultiAttemptsUntilSuccess = false;
                     break;
                 }
             } catch ( err ) {
-                if( log.verboseGet() >= log.verboseReversed().error ) {
-                    self.log( cc.error( "Periodic SNB caching(async) error in " ) +
-                        threadInfo.threadDescription() + cc.debug( ": " ) +
-                        cc.warning( strError ) + "\n" );
-                }
+                self.error( "Periodic SNB caching(async) error in {}: {err}",
+                    threadInfo.threadDescription(), strError );
             }
         };
         const fnPeriodicCaching = function() {
@@ -331,26 +284,17 @@ class ObserverServer extends SocketServer {
                 fnAsyncHandler()
                     .then( () => {
                     } ).catch( ( err ) => {
-                        if( log.verboseGet() >= log.verboseReversed().error ) {
-                            self.log( cc.error( "Periodic SNB caching(sync-delayed) in " ) +
-                                threadInfo.threadDescription() + cc.error( " error: " ) +
-                                cc.warning( owaspUtils.extractErrorMessage( err ) ) + "\n" );
-                        }
+                        self.error( "Periodic SNB caching(sync-delayed) in {} error: {err}",
+                            threadInfo.threadDescription(), err );
                     } );
             } catch ( err ) {
-                if( log.verboseGet() >= log.verboseReversed().error ) {
-                    self.log( cc.error( "Periodic SNB caching(sync) in " ) +
-                        threadInfo.threadDescription() + cc.error( " error: " ) +
-                        cc.warning( owaspUtils.extractErrorMessage( err ) ) + "\n" );
-                }
+                self.error( "Periodic SNB caching(sync) in {} error: {err}",
+                    threadInfo.threadDescription(), err );
             }
         };
         await fnPeriodicCaching();
-        if( log.verboseGet() >= log.verboseReversed().debug ) {
-            self.opts.details.write(
-                cc.debug( "SKALE Observer in " ) + threadInfo.threadDescription() +
-                cc.debug( " did invoked periodic SNB refresh" ) + "\n" );
-        }
+        self.opts.details.debug( "SKALE Observer in {} did invoked periodic SNB refresh",
+            threadInfo.threadDescription() );
         self.intervalPeriodicSchainsCaching = owaspUtils.setInterval2(
             fnPeriodicCaching, secondsToReDiscoverSkaleNetwork * 1000 );
         fnAsyncHandler(); // initial async call
@@ -365,15 +309,86 @@ class ObserverServer extends SocketServer {
         self.bIsPeriodicCachingStepInProgress = false;
         return true;
     }
+    initLogMethods() {
+        const self = this;
+        self.fatal = function() {
+            if( log.verboseGet() >= log.verboseReversed().fatal ) {
+                self.log( log.getLogLinePrefixFatal() +
+                log.fmtFatal( ...arguments ) );
+            }
+        };
+        self.critical = function() {
+            if( log.verboseGet() >= log.verboseReversed().critical ) {
+                self.log( log.getLogLinePrefixCritical() +
+                log.fmtCritical( ...arguments ) );
+            }
+        };
+        self.error = function() {
+            if( log.verboseGet() >= log.verboseReversed().error ) {
+                self.log( log.getLogLinePrefixError() +
+                log.fmtError( ...arguments ) );
+            }
+        };
+        self.warning = function() {
+            if( log.verboseGet() >= log.verboseReversed().warning ) {
+                self.log( log.getLogLinePrefixWarning() +
+                log.fmtWarning( ...arguments ) );
+            }
+        };
+        self.attention = function() {
+            if( log.verboseGet() >= log.verboseReversed().attention ) {
+                self.log( log.getLogLinePrefixAttention() +
+                log.fmtAttention( ...arguments ) );
+            }
+        };
+        self.information = function() {
+            if( log.verboseGet() >= log.verboseReversed().information ) {
+                self.log( log.getLogLinePrefixInformation() +
+                log.fmtInformation( ...arguments ) );
+            }
+        };
+        self.info = function() {
+            if( log.verboseGet() >= log.verboseReversed().information ) {
+                self.log( log.getLogLinePrefixInformation() +
+                log.fmtInformation( ...arguments ) );
+            }
+        };
+        self.notice = function() {
+            if( log.verboseGet() >= log.verboseReversed().notice ) {
+                self.log( log.getLogLinePrefixNotice() +
+                log.fmtNotice( ...arguments ) );
+            }
+        };
+        self.note = function() {
+            if( log.verboseGet() >= log.verboseReversed().notice ) {
+                self.log( log.getLogLinePrefixNote() +
+                log.fmtNote( ...arguments ) );
+            }
+        };
+        self.debug = function() {
+            if( log.verboseGet() >= log.verboseReversed().debug ) {
+                self.log( log.getLogLinePrefixDebug() +
+                log.fmtDebug( ...arguments ) );
+            }
+        };
+        self.trace = function() {
+            if( log.verboseGet() >= log.verboseReversed().trace ) {
+                self.log( log.getLogLinePrefixTrace() +
+                log.fmtTrace( ...arguments ) );
+            }
+        };
+        self.success = function() {
+            if( log.verboseGet() >= log.verboseReversed().information ) {
+                self.log( log.getLogLinePrefixSuccess() +
+                log.fmtSuccess( ...arguments ) );
+            }
+        };
+    }
 };
 
 const acceptor = new networkLayer.InWorkerSocketServerAcceptor( gURL, doSendMessage );
 const server = new ObserverServer( acceptor );
 server.on( "dispose", function() {
     const self = server;
-    if( log.verboseGet() >= log.verboseReversed().debug ) {
-        self.log( cc.debug( "Disposed in-worker in " ) +
-            threadInfo.threadDescription() + cc.debug( " SNB server" ) + " " +
-            cc.notice( gURL ) + "\n" );
-    }
+    self.debug( "Disposed in-worker in {} SNB server U=", threadInfo.threadDescription(), gURL );
 } );

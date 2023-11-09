@@ -31,7 +31,6 @@ import Redis from "ioredis";
 import * as ethereumJsUtilModule from "ethereumjs-util";
 
 import * as log from "./log.mjs";
-import * as cc from "./cc.mjs";
 
 import * as owaspUtils from "./owaspUtils.mjs";
 import * as imaUtils from "./utils.mjs";
@@ -77,29 +76,24 @@ export async function dryRunCall(
         return null; // success
     isDryRunResultIgnore = ( isDryRunResultIgnore != null && isDryRunResultIgnore != undefined )
         ? ( !!isDryRunResultIgnore ) : false;
-    const strContractMethodDescription =
-        cc.notice( strContractName ) + cc.debug( "(" ) + cc.info( joContract.address ) +
-        cc.debug( ")." ) + cc.notice( strMethodName );
+    const strContractMethodDescription = log.fmtDebug( "{p}({}).{sunny}",
+        strContractName, joContract.address, strMethodName );
     let strArgumentsDescription = "";
     if( arrArguments.length > 0 ) {
-        strArgumentsDescription += cc.debug( "( " );
+        strArgumentsDescription += log.fmtDebug( "( " );
         for( let i = 0; i < arrArguments.length; ++ i ) {
             if( i > 0 )
-                strArgumentsDescription += cc.debug( ", " );
-            strArgumentsDescription += cc.j( arrArguments[i] );
+                strArgumentsDescription += log.fmtDebug( ", " );
+            strArgumentsDescription += log.fmtInformation( "{}", arrArguments[i] );
         }
-        strArgumentsDescription += cc.debug( " )" );
+        strArgumentsDescription += log.fmtDebug( " )" );
     } else
-        strArgumentsDescription += cc.debug( "()" );
+        strArgumentsDescription += log.fmtDebug( "()" );
     const strContractCallDescription = strContractMethodDescription + strArgumentsDescription;
-    const strLogPrefix = strContractMethodDescription + " ";
+    const strLogPrefix = `${strContractMethodDescription} `;
     try {
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( cc.debug( "Dry-run of action " ) + cc.info( strActionName ) +
-                cc.debug( "..." ) + "\n" );
-            details.write( cc.debug( "Will dry-run " ) + strContractCallDescription +
-                cc.debug( "..." ) + "\n" );
-        }
+        details.trace( "Dry-run of action {bright}...", strActionName );
+        details.trace( "Will dry-run {}...", strContractCallDescription );
         const strAccountWalletAddress = joAccount.address();
         const callOpts = {
             from: strAccountWalletAddress
@@ -112,17 +106,11 @@ export async function dryRunCall(
             callOpts.value = owaspUtils.toBN( weiHowMuch ).toHexString();
         const joDryRunResult =
             await joContract.callStatic[strMethodName]( ...arrArguments, callOpts );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.success( "dry-run success: " ) +
-                cc.j( joDryRunResult ) + "\n" );
-        }
+        details.trace( "{p}dry-run success: {}", strLogPrefix, joDryRunResult );
         return null; // success
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().error ) {
-            const strError = owaspUtils.extractErrorMessage( err );
-            details.write( strLogPrefix + cc.error( "dry-run error: " ) +
-                cc.warning( strError ) + "\n" );
-        }
+        const strError = owaspUtils.extractErrorMessage( err );
+        details.error( "{p}dry-run error: {err}", strLogPrefix, strError );
         if( dryRunIsIgnored() )
             return null;
         return strError;
@@ -143,42 +131,31 @@ async function payedCallPrepare( optsPayedCall ) {
         optsPayedCall.callOpts.value =
             owaspUtils.toBN( optsPayedCall.weiHowMuch ).toHexString();
     }
-    if( log.verboseGet() >= log.verboseReversed().trace ) {
-        optsPayedCall.details.write( optsPayedCall.strLogPrefix +
-            cc.debug( "Payed-call of action " ) + cc.info( optsPayedCall.strActionName ) +
-            cc.debug( " will do payed-call " ) + optsPayedCall.strContractCallDescription +
-            cc.debug( " with call options " ) + cc.j( optsPayedCall.callOpts ) +
-            cc.debug( " via " ) + cc.attention( optsPayedCall.joACI.strType ) +
-            cc.debug( "-sign-and-send using from address " ) +
-            cc.notice( optsPayedCall.joAccount.address() ) + cc.debug( "..." ) + "\n" );
-    }
+    optsPayedCall.details.trace(
+        "{p}payed-call of action {bright} will do payed-call {p} with call options {} " +
+        "via {sunny}-sign-and-send using from address {}...", optsPayedCall.strLogPrefix,
+        optsPayedCall.strActionName, optsPayedCall.strContractCallDescription,
+        optsPayedCall.callOpts, optsPayedCall.joACI.strType, optsPayedCall.joAccount.address() );
     optsPayedCall.unsignedTx =
         await optsPayedCall.joContract.populateTransaction[optsPayedCall.strMethodName](
             ...optsPayedCall.arrArguments, optsPayedCall.callOpts );
-    optsPayedCall.unsignedTx.nonce =
-        owaspUtils.toBN( await optsPayedCall.ethersProvider.getTransactionCount(
-            optsPayedCall.joAccount.address() )
-        );
+    optsPayedCall.unsignedTx.nonce = owaspUtils.toBN(
+        await optsPayedCall.ethersProvider.getTransactionCount(
+            optsPayedCall.joAccount.address() ) );
     if( optsPayedCall.opts && optsPayedCall.opts.isCheckTransactionToSchain ) {
         optsPayedCall.unsignedTx = await checkTransactionToSchain(
             optsPayedCall.unsignedTx, optsPayedCall.details,
             optsPayedCall.ethersProvider, optsPayedCall.joAccount );
     }
-    if( log.verboseGet() >= log.verboseReversed().trace ) {
-        optsPayedCall.details.write( optsPayedCall.strLogPrefix +
-            cc.debug( "populated transaction: " ) + cc.j( optsPayedCall.unsignedTx ) + "\n" );
-    }
+    optsPayedCall.details.trace( "{p}populated transaction: {}", optsPayedCall.strLogPrefix,
+        optsPayedCall.unsignedTx );
     optsPayedCall.rawTx =
         owaspUtils.ethersMod.ethers.utils.serializeTransaction( optsPayedCall.unsignedTx );
-    if( log.verboseGet() >= log.verboseReversed().trace ) {
-        optsPayedCall.details.write( optsPayedCall.strLogPrefix +
-            cc.debug( "Raw transaction: " ) + cc.j( optsPayedCall.rawTx ) + "\n" );
-    }
+    optsPayedCall.details.trace( "{p}taw transaction: {}", optsPayedCall.strLogPrefix,
+        optsPayedCall.rawTx );
     optsPayedCall.txHash = owaspUtils.ethersMod.ethers.utils.keccak256( optsPayedCall.rawTx );
-    if( log.verboseGet() >= log.verboseReversed().trace ) {
-        optsPayedCall.details.write( optsPayedCall.strLogPrefix +
-            cc.debug( "Transaction hash: " ) + cc.j( optsPayedCall.txHash ) + "\n" );
-    }
+    optsPayedCall.details.trace( "{p}transaction hash: {}", optsPayedCall.strLogPrefix,
+        optsPayedCall.txHash );
 }
 
 async function payedCallTM( optsPayedCall ) {
@@ -201,40 +178,31 @@ async function payedCallTM( optsPayedCall ) {
                 delete txAdjusted.chainId;
             const { chainId } = await optsPayedCall.ethersProvider.getNetwork();
             txAdjusted.chainId = chainId;
-            if( log.verboseGet() >= log.verboseReversed().trace ) {
-                optsPayedCall.details.write( optsPayedCall.strLogPrefix +
-                    cc.debug( "Adjusted transaction: " ) + cc.j( txAdjusted ) + "\n" );
-            }
+            optsPayedCall.details.trace( "{p}Adjusted transaction: {}", optsPayedCall.strLogPrefix,
+                txAdjusted );
             if( redis == null )
                 redis = new Redis( optsPayedCall.joAccount.strTransactionManagerURL );
             const priority = optsPayedCall.joAccount.nTmPriority || 5;
-            if( log.verboseGet() >= log.verboseReversed().trace ) {
-                optsPayedCall.details.write( optsPayedCall.strLogPrefix +
-                    cc.debug( "TM priority: " ) + cc.j( priority ) + "\n" );
-            }
+            optsPayedCall.details.trace( "{p}TM priority: {}", optsPayedCall.strLogPrefix,
+                priority );
             try {
-                const [ idTransaction, joReceiptFromTM ] =
-                    await tmEnsureTransaction(
-                        optsPayedCall.details, optsPayedCall.ethersProvider, priority, txAdjusted );
+                const [ idTransaction, joReceiptFromTM ] = await tmEnsureTransaction(
+                    optsPayedCall.details, optsPayedCall.ethersProvider, priority, txAdjusted );
                 optsPayedCall.joReceipt = joReceiptFromTM;
-                if( log.verboseGet() >= log.verboseReversed().trace ) {
-                    optsPayedCall.details.write( optsPayedCall.strLogPrefix +
-                        cc.debug( "ID of TM-transaction : " ) + cc.j( idTransaction ) + "\n" );
-                }
+                optsPayedCall.details.trace( "{p}ID of TM-transaction: {}",
+                    optsPayedCall.strLogPrefix, idTransaction );
                 const txHashSent = "" + optsPayedCall.joReceipt.transactionHash;
-                if( log.verboseGet() >= log.verboseReversed().trace ) {
-                    optsPayedCall.details.write( optsPayedCall.strLogPrefix +
-                        cc.debug( "Hash of sent TM-transaction: " ) + cc.j( txHashSent ) + "\n" );
-                }
+                optsPayedCall.details.trace( "{p}Hash of sent TM-transaction: {}",
+                    optsPayedCall.strLogPrefix, txHashSent );
                 resolve( optsPayedCall.joReceipt );
             } catch ( err ) {
-                if( log.verboseGet() >= log.verboseReversed().critical ) {
-                    const strError = cc.fatal( "BAD ERROR:" ) + " " +
-                        cc.error( "TM-transaction was not sent, underlying error is: " ) +
-                        cc.warning( err.toString() );
-                    optsPayedCall.details.write( optsPayedCall.strLogPrefix + strError + "\n" );
-                    if( log.id != optsPayedCall.details.id )
-                        log.write( optsPayedCall.strLogPrefix + strError + "\n" );
+                optsPayedCall.details.critical(
+                    "{p}TM-transaction was not sent, underlying error is: {err}",
+                    optsPayedCall.strLogPrefix, err.toString() );
+                if( log.id != optsPayedCall.details.id ) {
+                    log.critical(
+                        "{p}TM-transaction was not sent, underlying error is: {err}",
+                        optsPayedCall.strLogPrefix, err.toString() );
                 }
                 reject( err );
             }
@@ -249,12 +217,10 @@ async function payedCallSGX( optsPayedCall ) {
     let { chainId } = await optsPayedCall.ethersProvider.getNetwork();
     if( chainId == "string" )
         chainId = owaspUtils.parseIntOrHex( chainId );
-    if( log.verboseGet() >= log.verboseReversed().trace ) {
-        optsPayedCall.details.write( optsPayedCall.strLogPrefix +
-            cc.debug( "Chain ID is: " ) + cc.info( chainId ) + "\n" );
-    }
+    optsPayedCall.details.trace( "{p}Chain ID is: {}",
+        optsPayedCall.strLogPrefix, chainId );
     const strCmd = "" + process.argv[0] + " --no-warnings ./imaSgxExternalSigner.mjs " +
-        ( cc.isEnabled() ? "true" : "false" ) + " " +
+        ( log.isEnabledColorization() ? "true" : "false" ) + " " +
         "\"" + optsPayedCall.joAccount.strSgxURL + "\" " +
         "\"" + optsPayedCall.joAccount.strSgxKeyName + "\" " +
         "\"" + owaspUtils.ethersProviderToUrl( optsPayedCall.ethersProvider ) + "\" " +
@@ -279,11 +245,8 @@ async function payedCallSGX( optsPayedCall ) {
     const rv = childProcessModule.spawnSync( strCmd, joSpawnOptions );
     const strStdOutFromExternalInvocation = rv.stdout.toString( "utf8" );
     optsPayedCall.joReceipt = JSON.parse( strStdOutFromExternalInvocation.toString( "utf8" ) );
-    if( log.verboseGet() >= log.verboseReversed().trace ) {
-        optsPayedCall.details.write( optsPayedCall.strLogPrefix +
-            cc.debug( "Result from external SGX signer is: " ) +
-                cc.j( optsPayedCall.joReceipt ) + "\n" );
-    }
+    optsPayedCall.details.trace( "{p}Result from external SGX signer is: {}",
+        optsPayedCall.strLogPrefix, optsPayedCall.joReceipt );
     postConvertBN( optsPayedCall.joReceipt, "gasUsed" );
     postConvertBN( optsPayedCall.joReceipt, "cumulativeGasUsed" );
     postConvertBN( optsPayedCall.joReceipt, "effectiveGasPrice" );
@@ -309,38 +272,25 @@ async function payedCallDirect( optsPayedCall ) {
     let { chainId } = await optsPayedCall.ethersProvider.getNetwork();
     if( chainId == "string" )
         chainId = owaspUtils.parseIntOrHex( chainId );
-    if( log.verboseGet() >= log.verboseReversed().trace ) {
-        optsPayedCall.details.write( optsPayedCall.strLogPrefix +
-            cc.debug( "Chain ID is: " ) + cc.info( chainId ) + "\n" );
-    }
+    optsPayedCall.details.trace( "{p}Chain ID is: {}", optsPayedCall.strLogPrefix, chainId );
     if( ( !( chainId in optsPayedCall.unsignedTx ) ) ||
         ( !optsPayedCall.unsignedTx.chainId )
     ) {
         optsPayedCall.unsignedTx.chainId = chainId;
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            optsPayedCall.details.write( optsPayedCall.strLogPrefix +
-                cc.debug( "TX with chainId: " ) +
-                cc.j( optsPayedCall.unsignedTx ) + "\n" );
-        }
+        optsPayedCall.details.trace( "{p}TX with chainId: {}",
+            optsPayedCall.strLogPrefix, optsPayedCall.unsignedTx );
     }
     const joSignedTX = await ethersWallet.signTransaction( optsPayedCall.unsignedTx );
-    if( log.verboseGet() >= log.verboseReversed().trace ) {
-        optsPayedCall.details.write( optsPayedCall.strLogPrefix +
-            cc.debug( "Signed transaction: " ) + cc.j( joSignedTX ) + "\n" );
-    }
+    optsPayedCall.details.trace( "{p}Signed transaction: {}", optsPayedCall.strLogPrefix,
+        joSignedTX );
     const sr = await optsPayedCall.ethersProvider.sendTransaction(
         owaspUtils.ensureStartsWith0x( joSignedTX ) );
-    if( log.verboseGet() >= log.verboseReversed().trace ) {
-        optsPayedCall.details.write( optsPayedCall.strLogPrefix +
-            cc.debug( "Raw-sent transaction result: " ) +
-            cc.j( sr ) + "\n" );
-    }
+    optsPayedCall.details.trace( "{p}Raw-sent transaction result: {}",
+        optsPayedCall.strLogPrefix, sr );
     optsPayedCall.joReceipt =
         await optsPayedCall.ethersProvider.waitForTransaction( sr.hash );
-    if( log.verboseGet() >= log.verboseReversed().trace ) {
-        optsPayedCall.details.write( optsPayedCall.strLogPrefix +
-            cc.debug( "Transaction receipt:" ) + cc.j( optsPayedCall.joReceipt ) + "\n" );
-    }
+    optsPayedCall.details.trace( "{p}Transaction receipt: {}", optsPayedCall.strLogPrefix,
+        optsPayedCall.joReceipt );
 }
 
 export async function payedCall(
@@ -374,23 +324,23 @@ export async function payedCall(
         callOpts: {
         }
     };
-    const strContractMethodDescription = cc.notice( optsPayedCall.strContractName ) +
-        cc.debug( "(" ) + cc.info( optsPayedCall.joContract.address ) +
-        cc.debug( ")." ) + cc.info( optsPayedCall.strMethodName );
+    const strContractMethodDescription = log.fmtDebug( "{p}({}).{sunny}",
+        optsPayedCall.strContractName, optsPayedCall.joContract.address,
+        optsPayedCall.strMethodName );
     let strArgumentsDescription = "";
     if( optsPayedCall.arrArguments.length > 0 ) {
-        strArgumentsDescription += cc.debug( "( " );
+        strArgumentsDescription += log.fmtDebug( "( " );
         for( let i = 0; i < optsPayedCall.arrArguments.length; ++ i ) {
             if( i > 0 )
-                strArgumentsDescription += cc.debug( ", " );
-            strArgumentsDescription += cc.j( optsPayedCall.arrArguments[i] );
+                strArgumentsDescription += log.fmtDebug( ", " );
+            strArgumentsDescription += log.fmtInformation( "{}", optsPayedCall.arrArguments[i] );
         }
-        strArgumentsDescription += cc.debug( " )" );
+        strArgumentsDescription += log.fmtDebug( " )" );
     } else
-        strArgumentsDescription += cc.debug( "()" );
+        strArgumentsDescription += log.fmtDebug( "()" );
     optsPayedCall.strContractCallDescription =
         strContractMethodDescription + strArgumentsDescription;
-    optsPayedCall.strLogPrefix = strContractMethodDescription + " ";
+    optsPayedCall.strLogPrefix = `${strContractMethodDescription} `;
     try {
         await payedCallPrepare( optsPayedCall );
         switch ( optsPayedCall.joACI.strType ) {
@@ -404,67 +354,48 @@ export async function payedCall(
             await payedCallDirect( optsPayedCall );
             break;
         default: {
-            const strErrorPrefix = "CRITICAL TRANSACTION SIGN AND SEND ERROR(INNER FLOW):";
-            if( log.verboseGet() >= log.verboseReversed().critical ) {
-                const s = cc.fatal( strErrorPrefix ) + " " +
-                    cc.error( "bad credentials information specified, " +
-                        "no explicit SGX and no explicit private key found" ) + "\n";
-                optsPayedCall.details.write( s );
-                if( log.id != optsPayedCall.details.id )
-                    log.write( s );
+            const strErrorPrefix = "Transaction sign and send error(INNER FLOW): ";
+            optsPayedCall.details.critical(
+                "{p}bad credentials information specified, no explicit SGX and no explicit " +
+                "private key found", strErrorPrefix );
+            if( log.id != optsPayedCall.details.id ) {
+                log.critical( "{p}bad credentials information specified, no explicit SGX and " +
+                    "no explicit private key found", strErrorPrefix );
             }
-            throw new Error( strErrorPrefix + " bad credentials information specified, " +
+            throw new Error( `${strErrorPrefix} bad credentials information specified, ` +
                 "no explicit SGX and no explicit private key found" );
         } // NOTICE: "break;" is not needed here because of "throw" above
         } // switch( optsPayedCall.joACI.strType )
     } catch ( err ) {
-        const strErrorPrefix = "CRITICAL TRANSACTION SIGN AND SEND ERROR(OUTER FLOW):";
-        if( log.verboseGet() >= log.verboseReversed().critical ) {
-            const s =
-                optsPayedCall.strLogPrefix + cc.error( strErrorPrefix ) + " " +
-                cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) +
-                "\n";
-            optsPayedCall.details.write( s );
-            if( log.id != optsPayedCall.details.id )
-                log.write( s );
+        const strErrorPrefix = "Transaction sign and send error(outer flow):";
+        optsPayedCall.details.critical( "{p}{} {err}, stack is:\n{stack}",
+            optsPayedCall.strLogPrefix, strErrorPrefix, err, err.stack );
+        if( log.id != optsPayedCall.details.id ) {
+            log.critical( "{p}{} {err}, stack is:\n{stack}", optsPayedCall.strLogPrefix,
+                strErrorPrefix, err, err.stack );
         }
-        throw new Error( strErrorPrefix +
-            " invoking the " + optsPayedCall.strContractCallDescription +
-            ", error is: " + owaspUtils.extractErrorMessage( err ) );
+        throw new Error( `${strErrorPrefix} invoking ` +
+            `the ${optsPayedCall.strContractCallDescription}, ` +
+            `error is: ${owaspUtils.extractErrorMessage( err )}` );
     }
-    if( log.verboseGet() >= log.verboseReversed().information ) {
-        optsPayedCall.details.write( optsPayedCall.strLogPrefix + cc.success( "Done, TX was " ) +
-            cc.attention( optsPayedCall.joACI ? optsPayedCall.joACI.strType : "N/A" ) +
-            cc.success( "-signed-and-sent, receipt is " ) + cc.j( optsPayedCall.joReceipt ) +
-            "\n" );
-    }
+    optsPayedCall.details.success( "{p}Done, TX was {sunny}-signed-and-sent, receipt is {}",
+        optsPayedCall.strLogPrefix, optsPayedCall.joACI ? optsPayedCall.joACI.strType : "N/A",
+        optsPayedCall.joReceipt );
     try {
         const bnGasSpent = owaspUtils.toBN( optsPayedCall.joReceipt.cumulativeGasUsed );
         const gasSpent = bnGasSpent.toString();
-        const ethSpent =
-            owaspUtils.ethersMod.ethers.utils.formatEther(
-                optsPayedCall.joReceipt.cumulativeGasUsed.mul(
-                    optsPayedCall.unsignedTx.gasPrice ) );
+        const ethSpent = owaspUtils.ethersMod.ethers.utils.formatEther(
+            optsPayedCall.joReceipt.cumulativeGasUsed.mul( optsPayedCall.unsignedTx.gasPrice ) );
         optsPayedCall.joReceipt.summary = {
             bnGasSpent: bnGasSpent,
             gasSpent: gasSpent,
             ethSpent: ethSpent
         };
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            optsPayedCall.details.write( optsPayedCall.strLogPrefix +
-                cc.debug( "gas spent: " ) + cc.info( gasSpent ) + "\n" );
-            optsPayedCall.details.write( optsPayedCall.strLogPrefix +
-                cc.debug( "ETH spent: " ) + cc.info( ethSpent ) + "\n" );
-        }
+        optsPayedCall.details.trace( "{p}gas spent: {}", optsPayedCall.strLogPrefix, gasSpent );
+        optsPayedCall.details.trace( "{p}ETH spent: {}", optsPayedCall.strLogPrefix, ethSpent );
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().critical ) {
-            optsPayedCall.details.write(
-                optsPayedCall.strLogPrefix + cc.warning( "WARNING: " ) + " " +
-                cc.warning( "TX stats computation error " ) +
-                cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                cc.warning( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
-        }
+        optsPayedCall.details.warning( "{p}TX stats computation error {err}, stack is:\n{stack}",
+            optsPayedCall.strLogPrefix, err, err.stack );
     }
     return optsPayedCall.joReceipt;
 }
@@ -475,82 +406,47 @@ export async function checkTransactionToSchain(
     ethersProvider,
     joAccount
 ) {
-    const strLogPrefix = cc.attention( "PoW-mining:" ) + " ";
+    const strLogPrefix = "PoW-mining: ";
     try {
         const strFromAddress = joAccount.address(); // unsignedTx.from;
         const requiredBalance = unsignedTx.gasPrice.mul( unsignedTx.gasLimit );
         const balance = owaspUtils.toBN( await ethersProvider.getBalance( strFromAddress ) );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Will check whether PoW-mining " +
-                "is needed for sender " ) + cc.notice( strFromAddress ) +
-                cc.debug( " with balance " ) + cc.info( owaspUtils.toHexStringSafe( balance ) ) +
-                cc.debug( " using required balance " ) +
-                cc.info( owaspUtils.toHexStringSafe( requiredBalance ) ) +
-                cc.debug( ", gas limit is " ) +
-                cc.info( owaspUtils.toHexStringSafe( unsignedTx.gasLimit ) ) +
-                cc.debug( " gas, checked unsigned transaction is " ) + cc.j( unsignedTx ) + "\n" );
-        }
+        details.trace(
+            "{p}Will check whether PoW-mining  is needed for sender {} with balance {} using " +
+            "required balance {}, gas limit is {} gas, checked unsigned transaction is {}",
+            strLogPrefix, strFromAddress, owaspUtils.toHexStringSafe( balance ),
+            owaspUtils.toHexStringSafe( requiredBalance ),
+            owaspUtils.toHexStringSafe( unsignedTx.gasLimit ), unsignedTx
+        );
         if( balance.lt( requiredBalance ) ) {
-            if( log.verboseGet() >= log.verboseReversed().trace ) {
-                details.write( strLogPrefix + cc.warning( "Insufficient funds for " ) +
-                    cc.notice( strFromAddress ) + cc.warning( ", will run PoW-mining to get " ) +
-                    cc.info( owaspUtils.toHexStringSafe( unsignedTx.gasLimit ) ) +
-                    cc.warning( " of gas" ) + "\n" );
-            }
-            let powNumber =
-                await calculatePowNumber(
-                    strFromAddress,
-                    owaspUtils.toBN( unsignedTx.nonce ).toHexString(),
-                    owaspUtils.toHexStringSafe( unsignedTx.gasLimit ),
-                    details,
-                    strLogPrefix
-                );
-            if( log.verboseGet() >= log.verboseReversed().debug ) {
-                details.write( strLogPrefix + cc.debug( "Returned PoW-mining number " ) +
-                    cc.sunny( powNumber ) + "\n" );
-            }
+            details.warning( "{p}Insufficient funds for {}, will run PoW-mining to get {} of gas",
+                strLogPrefix, strFromAddress, owaspUtils.toHexStringSafe( unsignedTx.gasLimit ) );
+            let powNumber = await calculatePowNumber(
+                strFromAddress, owaspUtils.toBN( unsignedTx.nonce ).toHexString(),
+                owaspUtils.toHexStringSafe( unsignedTx.gasLimit ), details, strLogPrefix );
+            details.debug( "{p}Returned PoW-mining number {}", strLogPrefix, powNumber );
             powNumber = powNumber.toString().trim();
             powNumber = imaUtils.replaceAll( powNumber, "\r", "" );
             powNumber = imaUtils.replaceAll( powNumber, "\n", "" );
             powNumber = imaUtils.replaceAll( powNumber, "\t", "" );
             powNumber = powNumber.trim();
-            if( log.verboseGet() >= log.verboseReversed().trace ) {
-                details.write( strLogPrefix + cc.debug( "Trimmed PoW-mining number is " ) +
-                    cc.sunny( powNumber ) + "\n" );
-            }
-            if( ! powNumber ) {
-                throw new Error(
-                    "Failed to compute gas price with PoW-mining (1), got empty text" );
-            }
+            details.trace( "{p}Trimmed PoW-mining number is {}", strLogPrefix, powNumber );
+            if( ! powNumber )
+                throw new Error( "Failed to compute gas price with PoW-mining(1), got empty text" );
             powNumber = owaspUtils.toBN( owaspUtils.ensureStartsWith0x( powNumber ) );
-            if( log.verboseGet() >= log.verboseReversed().trace ) {
-                details.write( strLogPrefix + cc.debug( "BN PoW-mining number is " ) +
-                    cc.j( powNumber ) + "\n" );
-            }
-            if( powNumber.eq( owaspUtils.toBN( "0" ) ) ) {
-                throw new Error(
-                    "Failed to compute gas price with PoW-mining (2), got zero value" );
-            }
+            details.trace( "{p}BN PoW-mining number is {}", strLogPrefix, powNumber );
+            if( powNumber.eq( owaspUtils.toBN( "0" ) ) )
+                throw new Error( "Failed to compute gas price with PoW-mining(2), got zero value" );
             unsignedTx.gasPrice = owaspUtils.toBN( powNumber.toHexString() );
-            if( log.verboseGet() >= log.verboseReversed().trace ) {
-                details.write( strLogPrefix + cc.success( "Success, finally (after PoW-mining) " +
-                    "modified unsigned transaction is " ) + cc.j( unsignedTx ) + "\n" );
-            }
+            details.success( "{p}Success, finally (after PoW-mining) modified unsigned " +
+                "transaction is {}", strLogPrefix, unsignedTx );
         } else {
-            if( log.verboseGet() >= log.verboseReversed().trace ) {
-                details.write( strLogPrefix + cc.success( "Have sufficient funds for " ) +
-                    cc.notice( strFromAddress ) + cc.success( ", PoW-mining is not needed " +
-                    "and will be skipped" ) + "\n" );
-            }
+            details.success( "{p}Have sufficient funds for {}, PoW-mining is not needed and " +
+                "will be skipped", strLogPrefix, strFromAddress );
         }
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().critical ) {
-            details.write( strLogPrefix +
-                cc.fatal( "CRITICAL PoW-mining ERROR(checkTransactionToSchain):" ) + " " +
-                cc.error( "exception occur before PoW-mining, error is:" ) + " " +
-                cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
-        }
+        details.critical( "{p}PoW-mining error(checkTransactionToSchain): exception occur before " +
+            "PoW-mining, error is: {err}, stack is:\n{stack}", strLogPrefix, err, err.stack );
     }
     return unsignedTx;
 }
@@ -564,25 +460,13 @@ export async function calculatePowNumber( address, nonce, gas, details, strLogPr
         const _gas = owaspUtils.parseIntOrHex( gas );
         const powScriptPath = path.join( __dirname, "pow" );
         const cmd = `${powScriptPath} ${_address} ${_nonce} ${_gas}`;
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix +
-                cc.debug( "Will run PoW-mining command: " ) + cc.notice( cmd ) + "\n" );
-        }
+        details.trace( "{p}Will run PoW-mining command: {}", strLogPrefix, cmd );
         const res = childProcessModule.execSync( cmd );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix +
-                cc.debug( "Got PoW-mining execution result: " ) + cc.notice( res ) + "\n" );
-        }
+        details.trace( "{p}Got PoW-mining execution result: {}", strLogPrefix, res );
         return res;
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().critical ) {
-            details.write( strLogPrefix +
-                cc.fatal( "CRITICAL PoW-mining ERROR(calculatePowNumber):" ) + " " +
-                cc.error( "exception occur during PoW-mining, error is:" ) + " " +
-                cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) +
-                "\n" );
-        }
+        details.critical( "{p}PoW-mining error(calculatePowNumber): exception occur during " +
+            "PoW-mining, error is: {err}, stack is:\n{stack}", strLogPrefix, err, err.stack );
         throw err;
     }
 }
@@ -631,8 +515,7 @@ function tmMakeId( details ) {
     const prefix = "tx-";
     const unique = tmGenerateRandomHex( 16 );
     const id = prefix + unique + "js";
-    if( log.verboseGet() >= log.verboseReversed().trace )
-        details.write( cc.debug( "TM - Generated id: " ) + cc.debug( id ) + "\n" );
+    details.trace( "TM - Generated id: {}", id );
     return id;
 }
 
@@ -651,17 +534,11 @@ function tmMakeScore( priority ) {
 }
 
 async function tmSend( details, tx, priority = 5 ) {
-    if( log.verboseGet() >= log.verboseReversed().trace ) {
-        details.write( cc.debug( "TM - sending tx " ) + cc.j( tx ) +
-            cc.debug( " ts: " ) + cc.info( imaHelperAPIs.currentTimestamp() ) + "\n" );
-    }
+    details.trace( "TM - sending tx {} ts: {}", tx, imaHelperAPIs.currentTimestamp() );
     const id = tmMakeId( details );
     const score = tmMakeScore( priority );
     const record = tmMakeRecord( tx, score );
-    if( log.verboseGet() >= log.verboseReversed().trace ) {
-        details.write( cc.debug( "TM - Sending score: " ) + cc.info( score ) +
-            cc.debug( ", record: " ) + cc.info( record ) + "\n" );
-    }
+    details.trace( "TM - Sending score: {}, record: {}", score, record );
     const expiration = 24 * 60 * 60; // 1 day;
     await redis.multi()
         .set( id, record, "EX", expiration )
@@ -684,72 +561,50 @@ async function tmGetRecord( txId ) {
 }
 
 async function tmWait( details, txId, ethersProvider, nWaitSeconds = 36000 ) {
-    const strPrefixDetails = cc.debug( "(gathered details)" ) + " ";
-    const strPrefixLog = cc.debug( "(immediate log)" ) + " ";
-    if( log.verboseGet() >= log.verboseReversed().debug ) {
-        const strMsg =
-            cc.debug( "TM - will wait TX " ) + cc.info( txId ) +
-            cc.debug( " to complete for " ) + cc.info( nWaitSeconds ) +
-            cc.debug( " second(s) maximum" );
-        details.write( strPrefixDetails + strMsg + "\n" );
-        if( log.id != details.id )
-            log.write( strPrefixLog + strMsg + "\n" );
+    const strPrefixDetails = log.fmtDebug( "(gathered details)" ) + " ";
+    const strPrefixLog = log.fmtDebug( "(immediate log)" ) + " ";
+    details.debug( "{p}TM - will wait TX {} to complete for {} second(s) maximum",
+        strPrefixDetails, txId, nWaitSeconds );
+    if( log.id != details.id ) {
+        log.debug( "{p}TM - will wait TX {} to complete for {} second(s) maximum",
+            strPrefixDetails, txId, nWaitSeconds );
     }
     const startTs = imaHelperAPIs.currentTimestamp();
     while( ! tmIsFinished( await tmGetRecord( txId ) ) &&
                 ( imaHelperAPIs.currentTimestamp() - startTs ) < nWaitSeconds )
         await imaHelperAPIs.sleep( 500 );
     const r = await tmGetRecord( txId );
-    if( log.verboseGet() >= log.verboseReversed().debug ) {
-        const strMsg = cc.debug( "TM - TX " ) + cc.info( txId ) + cc.debug( " record is " ) +
-            cc.info( JSON.stringify( r ) );
-        details.write( strPrefixDetails + strMsg + "\n" );
-        if( log.id != details.id )
-            log.write( strPrefixLog + strMsg + "\n" );
-    }
+    details.debug( "{p}TM - TX {} record is {}", strPrefixDetails, txId, r );
+    if( log.id != details.id )
+        log.debug( "{p}TM - TX {} record is {}", strPrefixLog, txId, r );
+
     if( ( !r ) ) {
-        if( log.verboseGet() >= log.verboseReversed().error ) {
-            const strMsg = cc.error( "TM - TX " ) + cc.info( txId ) + cc.error( " status is " ) +
-                cc.warning( "NULL RECORD" );
-            details.write( strPrefixDetails + strMsg + "\n" );
-            if( log.id != details.id )
-                log.write( strPrefixLog + strMsg + "\n" );
-        }
+        details.error( "{p}TM - TX {} status is NULL RECORD", strPrefixDetails, txId );
+        if( log.id != details.id )
+            log.error( "{p}TM - TX {} status is NULL RECORD", strPrefixLog, txId );
     } else if( r.status == "SUCCESS" ) {
-        if( log.verboseGet() >= log.verboseReversed().information ) {
-            const strMsg = cc.success( "TM - TX " ) + cc.info( txId ) + cc.success( " success" );
-            details.write( strPrefixDetails + strMsg + "\n" );
-            if( log.id != details.id )
-                log.write( strPrefixLog + strMsg + "\n" );
-        }
+        details.success( "{p}TM - TX {} success", strPrefixDetails, txId );
+        if( log.id != details.id )
+            log.success( "{p}TM - TX {} success", strPrefixDetails, txId );
     } else {
-        if( log.verboseGet() >= log.verboseReversed().error ) {
-            const strMsg = cc.error( "TM - TX " ) + cc.info( txId ) + cc.error( " status is " ) +
-                cc.warning( r.status );
-            details.write( strPrefixDetails + strMsg + "\n" );
-            if( log.id != details.id )
-                log.write( strPrefixLog + strMsg + "\n" );
-        }
+        details.error( "{p}TM - TX {} status is {err}", strPrefixDetails, txId, r.status );
+        if( log.id != details.id )
+            log.error( "{p}TM - TX {} status is {err}", strPrefixDetails, txId, r.status );
     }
     if( ( !tmIsFinished( r ) ) || r.status == "DROPPED" ) {
-        if( log.verboseGet() >= log.verboseReversed().error ) {
-            const strMsg = cc.error( "TM - TX " ) + cc.info( txId ) +
-                cc.error( " was unsuccessful, wait failed" ) + "\n";
-            details.write( strMsg );
-            if( log.id != details.id )
-                log.write( strMsg );
-        }
+        details.error( "{p}TM - TX {} was unsuccessful, wait failed", strPrefixDetails, txId );
+        if( log.id != details.id )
+            log.error( "{p}TM - TX {} was unsuccessful, wait failed", strPrefixDetails, txId );
         return null;
     }
     const joReceipt = await imaEventLogScan.safeGetTransactionReceipt(
         details, 10, ethersProvider, r.tx_hash );
     if( !joReceipt ) {
-        if( log.verboseGet() >= log.verboseReversed().error ) {
-            const strMsg = cc.error( "TM - TX " ) + cc.info( txId ) +
-                cc.error( " was unsuccessful, failed to fetch transaction receipt" );
-            details.write( strPrefixDetails + strMsg + "\n" );
-            if( log.id != details.id )
-                log.write( strPrefixLog + strMsg + "\n" );
+        details.error( "{p}TM - TX {} was unsuccessful, failed to fetch transaction receipt",
+            strPrefixDetails, txId );
+        if( log.id != details.id ) {
+            log.error( "{p}TM - TX {} was unsuccessful, failed to fetch transaction receipt",
+                strPrefixDetails, txId );
         }
         return null;
     }
@@ -764,50 +619,35 @@ async function tmEnsureTransaction(
     let txId = "";
     let joReceipt = null;
     let idxAttempt = 0;
-    const strPrefixDetails = cc.debug( "(gathered details)" ) + " ";
-    const strPrefixLog = cc.debug( "(immediate log)" ) + " ";
+    const strPrefixDetails = log.fmtDebug( "(gathered details)" ) + " ";
+    const strPrefixLog = log.fmtDebug( "(immediate log)" ) + " ";
     for( ; idxAttempt < cntAttempts; ++idxAttempt ) {
         txId = await tmSend( details, txAdjusted, priority );
-        if( log.verboseGet() >= log.verboseReversed().debug ) {
-            const strMsg = cc.debug( "TM - next TX " ) + cc.info( txId );
-            details.write( strPrefixDetails + strMsg + "\n" );
-            if( log.id != details.id )
-                log.write( strPrefixLog + strMsg + "\n" );
-        }
+        details.debug( "{p}TM - next TX {}", strPrefixDetails, txId );
+        if( log.id != details.id )
+            log.debug( "{p}TM - next TX {}", strPrefixLog, txId );
         joReceipt = await tmWait( details, txId, ethersProvider );
         if( joReceipt )
             break;
-        if( log.verboseGet() >= log.verboseReversed().error ) {
-            const strMsg =
-                cc.warning( "TM - unsuccessful TX " ) + cc.info( txId ) +
-                cc.warning( " sending attempt " ) + cc.info( idxAttempt ) +
-                cc.warning( " of " ) + cc.info( cntAttempts ) +
-                cc.debug( " receipt: " ) + cc.info( joReceipt );
-            details.write( strPrefixDetails + strMsg + "\n" );
-            if( log.id != details.id )
-                log.write( strPrefixLog + strMsg + "\n" );
+        details.error( "{p}TM - unsuccessful TX {} sending attempt {} of {} receipt: {}",
+            strPrefixDetails, txId, idxAttempt, cntAttempts, joReceipt );
+        if( log.id != details.id ) {
+            log.error( "{p}TM - unsuccessful TX {} sending attempt {} of {} receipt: {}",
+                strPrefixLog, txId, idxAttempt, cntAttempts, joReceipt );
         }
         await imaHelperAPIs.sleep( sleepMilliseconds );
     }
     if( !joReceipt ) {
-        if( log.verboseGet() >= log.verboseReversed().error ) {
-            const strMsg =
-                cc.fatal( "BAD ERROR:" ) + " " + cc.error( "TM TX " ) + cc.info( txId ) +
-                cc.error( " transaction has been dropped" );
-            details.write( strPrefixDetails + strMsg + "\n" );
-            if( log.id != details.id )
-                log.write( strPrefixLog + strMsg + "\n" );
-        }
-        throw new Error( "TM unsuccessful transaction " + txId );
-    }
-    if( log.verboseGet() >= log.verboseReversed().information ) {
-        const strMsg =
-            cc.success( "TM - successful TX " ) + cc.info( txId ) +
-            cc.success( ", sending attempt " ) + cc.info( idxAttempt ) +
-            cc.success( " of " ) + cc.info( cntAttempts );
-        details.write( strPrefixDetails + strMsg + "\n" );
+        details.error( "{p}TM TX {} transaction has been dropped", strPrefixDetails, txId );
         if( log.id != details.id )
-            log.write( strPrefixLog + strMsg + "\n" );
+            log.error( "{p}TM TX {} transaction has been dropped", strPrefixLog, txId );
+        throw new Error( `TM unsuccessful transaction ${txId}` );
+    }
+    details.information( "{p}TM - successful TX {}, sending attempt {} of {}",
+        strPrefixDetails, txId, idxAttempt, cntAttempts );
+    if( log.id != details.id ) {
+        log.information( "{p}TM - successful TX {}, sending attempt {} of {}",
+            strPrefixLog, txId, idxAttempt, cntAttempts );
     }
     return [ txId, joReceipt ];
 }
@@ -853,58 +693,43 @@ export class TransactionCustomizer {
         opts
     ) {
         let estimatedGas = 0;
-        const strContractMethodDescription =
-            cc.notice( strContractName ) + cc.debug( "(" ) + cc.info( joContract.address ) +
-            cc.debug( ")." ) + cc.notice( strMethodName );
+        const strContractMethodDescription = log.fmtDebug( "{p}({}).{sunny}",
+            strContractName, joContract.address, strMethodName );
         let strArgumentsDescription = "";
         if( arrArguments.length > 0 ) {
-            strArgumentsDescription += cc.debug( "( " );
+            strArgumentsDescription += log.fmtDebug( "( " );
             for( let i = 0; i < arrArguments.length; ++ i ) {
                 if( i > 0 )
-                    strArgumentsDescription += cc.debug( ", " );
-                strArgumentsDescription += cc.j( arrArguments[i] );
+                    strArgumentsDescription += log.fmtDebug( ", " );
+                strArgumentsDescription += log.fmtInformation( "{}", arrArguments[i] );
             }
-            strArgumentsDescription += cc.debug( " )" );
+            strArgumentsDescription += log.fmtDebug( " )" );
         } else
-            strArgumentsDescription += cc.debug( "()" );
+            strArgumentsDescription += log.fmtDebug( "()" );
         const strContractCallDescription =
             strContractMethodDescription + strArgumentsDescription;
-        const strLogPrefix = strContractMethodDescription + " ";
+        const strLogPrefix = `${strContractMethodDescription} `;
         try {
             const promiseComplete = new Promise( function( resolve, reject ) {
                 const doEstimation = async function() {
                     try {
-                        if( log.verboseGet() >= log.verboseReversed().trace ) {
-                            details.write( cc.debug( "Estimate-gas of action " ) +
-                                cc.info( strActionName ) + cc.debug( "..." ) + "\n" );
-                            details.write( cc.debug( "Will estimate-gas " ) +
-                                strContractCallDescription + cc.debug( "..." ) + "\n" );
-                        }
+                        details.trace( "Estimate-gas of action {bright}...", strActionName );
+                        details.trace( "Will estimate-gas {}...", strContractCallDescription );
                         const strAccountWalletAddress = joAccount.address();
-                        const callOpts = {
-                            from: strAccountWalletAddress
-                        };
-                        if( gasPrice ) {
-                            callOpts.gasPrice =
-                                owaspUtils.toBN( gasPrice ).toHexString();
-                        }
+                        const callOpts = { from: strAccountWalletAddress };
+                        if( gasPrice )
+                            callOpts.gasPrice = owaspUtils.toBN( gasPrice ).toHexString();
                         if( gasValueRecommended ) {
                             callOpts.gasLimit =
                                 owaspUtils.toBN( gasValueRecommended ).toHexString();
                         }
                         if( weiHowMuch )
                             callOpts.value = owaspUtils.toBN( weiHowMuch ).toHexString();
-                        if( log.verboseGet() >= log.verboseReversed().trace ) {
-                            details.write( cc.debug( "Call options for estimate-gas " ) +
-                                cc.j( callOpts ) + "\n" );
-                        }
-                        estimatedGas =
-                            await joContract.estimateGas[strMethodName](
-                                ...arrArguments, callOpts );
-                        if( log.verboseGet() >= log.verboseReversed().trace ) {
-                            details.write( strLogPrefix + cc.success( "estimate-gas success: " ) +
-                                cc.j( estimatedGas ) + "\n" );
-                        }
+                        details.trace( "Call options for estimate-gas {}", callOpts );
+                        estimatedGas = await joContract.estimateGas[strMethodName](
+                            ...arrArguments, callOpts );
+                        details.success( "{p}estimate-gas success: {}",
+                            strLogPrefix, estimatedGas );
                         resolve( estimatedGas );
                     } catch ( err ) {
                         reject( err );
@@ -914,31 +739,22 @@ export class TransactionCustomizer {
             } );
             await Promise.all( [ promiseComplete ] );
         } catch ( err ) {
-            if( log.verboseGet() >= log.verboseReversed().error ) {
-                const strError = owaspUtils.extractErrorMessage( err );
-                details.write( strLogPrefix + cc.error( "Estimate-gas error: " ) +
-                    cc.warning( strError ) +
-                    cc.error( ", default recommended gas value " +
-                        "will be used instead of estimated" ) +
-                    cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
-            }
+            const strError = owaspUtils.extractErrorMessage( err );
+            details.error(
+                "{p}Estimate-gas error: {err}, default recommended gas value will be used " +
+                "instead of estimated, stack is:\n{stack}", strLogPrefix, strError, err.stack );
         }
         estimatedGas = owaspUtils.parseIntOrHex( owaspUtils.toBN( estimatedGas ).toString() );
         if( estimatedGas == 0 ) {
             estimatedGas = gasValueRecommended;
-            if( log.verboseGet() >= log.verboseReversed().warning ) {
-                details.write( strLogPrefix + cc.warning( "Will use recommended gas " ) +
-                    cc.j( estimatedGas ) + cc.warning( " instead of estimated" ) + "\n" );
-            }
+            details.warning( "{p}Will use recommended gas {} instead of estimated",
+                strLogPrefix, estimatedGas );
         }
         if( this.gasMultiplier > 0.0 ) {
             estimatedGas =
                 owaspUtils.parseIntOrHex( ( estimatedGas * this.gasMultiplier ).toString() );
         }
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Final amount of gas is " ) +
-                cc.j( estimatedGas ) + "\n" );
-        }
+        details.trace( "{p}Final amount of gas is {}", strLogPrefix, estimatedGas );
         return estimatedGas;
     }
 };

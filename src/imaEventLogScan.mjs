@@ -24,8 +24,6 @@
  */
 
 import * as log from "./log.mjs";
-import * as cc from "./cc.mjs";
-
 import * as owaspUtils from "./owaspUtils.mjs";
 import * as rpcCall from "./rpcCall.mjs";
 import * as imaHelperAPIs from "./imaHelperAPIs.mjs";
@@ -91,18 +89,15 @@ export async function safeGetPastEventsProgressive(
     ethersProvider, attempts, joContract, strEventName,
     nBlockFrom, nBlockTo, joFilter
 ) {
+    const strURL = owaspUtils.ethersProviderToUrl( ethersProvider );
+    details.information( "{p}Will run progressive logs search for event {} via URL {url}, " +
+        "from block {}, to block...", strLogPrefix, strEventName, strURL, nBlockFrom, nBlockTo );
     if( ! imaTransferErrorHandling.getEnabledProgressiveEventsScan() ) {
-        details.write( strLogPrefix +
-            cc.fatal( "IMPORTANT NOTICE:" ) + " " +
-            cc.warning( "Will skip " ) + cc.attention( "progressive" ) +
-            cc.warning( " events scan in block range from " ) +
-            cc.j( nBlockFrom ) + cc.warning( " to " ) + cc.j( nBlockTo ) +
-            cc.warning( " because it's " ) + cc.error( "DISABLED" ) + "\n" );
-        return await safeGetPastEvents(
-            details, strLogPrefix,
-            ethersProvider, attempts, joContract, strEventName,
-            nBlockFrom, nBlockTo, joFilter
-        );
+        details.warning(
+            "{p}IMPORTANT NOTICE: Will skip progressive events scan in block range from {} to {} " +
+            "because it's {}", strLogPrefix, nBlockFrom, nBlockTo, log.fmtError( "DISABLED" ) );
+        return await safeGetPastEvents( details, strLogPrefix, ethersProvider, attempts,
+            joContract, strEventName, nBlockFrom, nBlockTo, joFilter );
     }
     const nLatestBlockNumber = owaspUtils.toBN(
         await imaHelperAPIs.safeGetBlockNumber( details, 10, ethersProvider ) );
@@ -111,11 +106,8 @@ export async function safeGetPastEventsProgressive(
     if( nBlockTo == "latest" ) {
         isLastLatest = true;
         nBlockTo = nLatestBlockNumberPlus1;
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Iterative scan up to latest block " ) +
-                cc.attention( "#" ) + cc.info( nBlockTo.toHexString() ) +
-                cc.debug( " assumed instead of " ) + cc.attention( "latest" ) + "\n" );
-        }
+        details.trace( "{p}Progressive event log records scan up to latest block #{} " +
+            "assumed instead of {}", strLogPrefix, nBlockTo.toHexString(), "latest" );
     } else {
         nBlockTo = owaspUtils.toBN( nBlockTo );
         if( nBlockTo.gte( nLatestBlockNumber ) )
@@ -125,73 +117,49 @@ export async function safeGetPastEventsProgressive(
     const nBlockZero = owaspUtils.toBN( 0 );
     const isFirstZero = ( nBlockFrom.eq( nBlockZero ) ) ? true : false;
     if( ! ( isFirstZero && isLastLatest ) ) {
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Will skip " ) + cc.attention( "progressive" ) +
-                cc.debug( " scan and use scan in block range from " ) +
-                cc.info( nBlockFrom.toHexString() ) + cc.debug( " to " ) +
-                cc.info( nBlockTo.toHexString() ) + "\n" );
-        }
+        details.trace( "{p}Will skip progressive event log records scan and use scan in block " +
+            "range from {} to {}", strLogPrefix, nBlockFrom.toHexString(), nBlockTo.toHexString() );
         return await safeGetPastEvents(
             details, strLogPrefix,
             ethersProvider, attempts, joContract, strEventName,
             nBlockFrom, nBlockTo, joFilter
         );
     }
-    if( log.verboseGet() >= log.verboseReversed().trace ) {
-        details.write( strLogPrefix + cc.debug( "Will run " ) +
-            cc.attention( "progressive" ) + cc.debug( " scan..." ) + "\n" );
-        details.write( strLogPrefix + cc.debug( "Current latest block number is " ) +
-            cc.info( nLatestBlockNumber.toHexString() ) + "\n" );
-    }
+    details.trace( "{p}Current latest block number is {}",
+        strLogPrefix, nLatestBlockNumber.toHexString() );
     const arrProgressiveEventsScanPlan =
         createProgressiveEventsScanPlan( details, nLatestBlockNumberPlus1 );
-    if( log.verboseGet() >= log.verboseReversed().trace ) {
-        details.write( cc.debug( "Composed " ) + cc.attention( "progressive" ) +
-            cc.debug( " scan plan is: " ) + cc.j( arrProgressiveEventsScanPlan ) + "\n" );
-    }
+    details.trace( "Composed progressive event log records scan plan is: {}",
+        arrProgressiveEventsScanPlan );
     let joLastPlan = { "nBlockFrom": 0, "nBlockTo": "latest", "type": "entire block range" };
     for( let idxPlan = 0; idxPlan < arrProgressiveEventsScanPlan.length; ++idxPlan ) {
         const joPlan = arrProgressiveEventsScanPlan[idxPlan];
         if( joPlan.nBlockFrom < 0 )
             continue;
         joLastPlan = joPlan;
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Progressive scan of " ) +
-                cc.attention( "getPastEvents" ) + cc.debug( "/" ) + cc.info( strEventName ) +
-                cc.debug( ", from block " ) + cc.info( joPlan.nBlockFrom ) +
-                cc.debug( ", to block " ) + cc.info( joPlan.nBlockTo ) +
-                cc.debug( ", block range is " ) + cc.info( joPlan.type ) +
-                cc.debug( "..." ) + "\n" );
-        }
+        details.trace(
+            "{p}Progressive event log records scan of {} event, from block {}, to block {}, " +
+            "plan type is {} via URL {url}...",
+            strLogPrefix, strEventName, joPlan.nBlockFrom, joPlan.nBlockTo, joPlan.type, strURL );
         try {
-            const joAllEventsInBlock =
-                await safeGetPastEventsIterative(
-                    details, strLogPrefix,
-                    ethersProvider, attempts, joContract, strEventName,
-                    joPlan.nBlockFrom, joPlan.nBlockTo, joFilter
-                );
+            const joAllEventsInBlock = await safeGetPastEventsIterative( details, strLogPrefix,
+                ethersProvider, attempts, joContract, strEventName,
+                joPlan.nBlockFrom, joPlan.nBlockTo, joFilter );
             if( joAllEventsInBlock && joAllEventsInBlock.length > 0 ) {
-                if( log.verboseGet() >= log.verboseReversed().trace ) {
-                    details.write( strLogPrefix + cc.success( "Progressive scan of " ) +
-                        cc.attention( "getPastEvents" ) + cc.debug( "/" ) +
-                        cc.info( strEventName ) + cc.success( ", from block " ) +
-                        cc.info( joPlan.nBlockFrom ) + cc.success( ", to block " ) +
-                        cc.info( joPlan.nBlockTo ) + cc.success( ", block range is " ) +
-                        cc.info( joPlan.type ) + cc.success( ", found " ) +
-                        cc.info( joAllEventsInBlock.length ) + cc.success( " event(s)" ) + "\n" );
-                }
+                details.success(
+                    "{p}Progressive event log records scan of log event {}, from block {}, " +
+                    "to block {}, block range is {}, via URL {url}, found {} event(s)",
+                    strLogPrefix, strEventName, joPlan.nBlockFrom, joPlan.nBlockTo, joPlan.type,
+                    strURL, joAllEventsInBlock.length );
                 return joAllEventsInBlock;
             }
         } catch ( err ) {}
     }
-    if( log.verboseGet() >= log.verboseReversed().error ) {
-        details.write( strLogPrefix + cc.error( "Could not get Event \"" ) +
-            cc.info( strEventName ) + cc.error( "\", from block " ) +
-            cc.info( joLastPlan.nBlockFrom ) + cc.error( ", to block " ) +
-            cc.info( joLastPlan.nBlockTo ) + cc.debug( ", block range is " ) +
-            cc.info( joLastPlan.type ) + cc.error( ", using " ) + cc.attention( "progressive" ) +
-            cc.error( " event scan" ) + "\n" );
-    }
+    details.error(
+        "{p}Was not found(progressive) event log record for event {}, from block {}" +
+        ", to block {}, block range is {}, via URL {url}, using progressive event log records scan",
+        strLogPrefix, strEventName, joLastPlan.nBlockFrom, joLastPlan.nBlockTo, joLastPlan.type,
+        strURL );
     return [];
 }
 
@@ -246,13 +214,8 @@ export async function safeGetTransactionCount(
         return ret;
     } catch ( err ) {
         ret = retValOnFail;
-        if( log.verboseGet() >= log.verboseReversed().error ) {
-            details.write( cc.error( "Failed call attempt " ) + cc.info( idxAttempt ) +
-                cc.error( " to " ) + cc.note( strFnName + "()" ) + cc.error( " via " ) +
-                cc.u( u ) + cc.error( ", error is: " ) +
-                cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
-        }
+        details.error( "Failed call attempt {} to {} via {url}, error is: {err}, " +
+            "stack is:\n{stack}", idxAttempt, strFnName + "()", u, err, err.stack );
     }
     ++ idxAttempt;
     while( ret === "" && idxAttempt <= cntAttempts ) {
@@ -261,44 +224,25 @@ export async function safeGetTransactionCount(
             ret = retValOnFail;
             if( ! throwIfServerOffline )
                 return ret;
-            if( log.verboseGet() >= log.verboseReversed().error ) {
-                details.write( cc.error( "Cannot call " ) + cc.note( strFnName + "()" ) +
-                    cc.error( " via " ) + cc.u( u ) +
-                    cc.warning( " because server is off-line" ) + "\n" );
-            }
-            throw new Error(
-                "Cannot " + strFnName + "() via " + u.toString() +
-                " because server is off-line" );
+            details.error( "Cannot call {} via {url} because server is off-line",
+                strFnName + "()", u );
+            throw new Error( `Cannot ${strFnName}() via ${u} because server is off-line` );
         }
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( cc.warning( "Repeat call to " ) + cc.note( strFnName + "()" ) +
-                cc.error( " via " ) + cc.u( u ) + cc.warning( ", attempt " ) +
-                cc.info( idxAttempt ) + "\n" );
-        }
+        details.trace( "Repeat call to {} via {url}, attempt {}", strFnName + "()", u, idxAttempt );
         try {
             ret = await ethersProvider[strFnName]( address, param );
             return ret;
         } catch ( err ) {
             ret = retValOnFail;
-            if( log.verboseGet() >= log.verboseReversed().error ) {
-                details.write( cc.error( "Failed call attempt " ) + cc.info( idxAttempt ) +
-                    cc.error( " to " ) + cc.note( strFnName + "()" ) + cc.error( " via " ) +
-                    cc.u( u ) + cc.error( ", error is: " ) +
-                    cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                    cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
-            }
+            details.error( "Failed call attempt {} to {} via {url}, error is: {err}, " +
+                "stack is:\n{stack}", idxAttempt, strFnName + "()", u, err, err.stack );
         }
         ++ idxAttempt;
     }
     if( ( idxAttempt + 1 ) > cntAttempts && ret === "" ) {
-        if( log.verboseGet() >= log.verboseReversed().error ) {
-            details.write( cc.fatal( "ERROR:" ) + cc.error( " Failed call to " ) +
-                cc.note( strFnName + "()" ) + cc.error( " via " ) + cc.u( u ) +
-                cc.error( " after " ) + cc.info( cntAttempts ) + cc.error( " attempts " ) + "\n" );
-        }
-        throw new Error(
-            "Failed call to " + strFnName + "() via " + u.toString() +
-            " after " + cntAttempts + " attempts" );
+        details.error( "Failed call to {} via {url} after {} attempts",
+            strFnName + "()", u, cntAttempts );
+        throw new Error( `Failed call to ${strFnName}() via ${u} after ${cntAttempts} attempts` );
     }
     return ret;
 }
@@ -324,12 +268,8 @@ export async function safeGetTransactionReceipt(
         return ret;
     } catch ( err ) {
         ret = retValOnFail;
-        if( log.verboseGet() >= log.verboseReversed().error ) {
-            details.write( cc.error( "Failed call attempt " ) + cc.info( idxAttempt ) +
-                cc.error( " to " ) + cc.note( strFnName + "()" ) + cc.error( " via " ) + cc.u( u ) +
-                cc.error( ", error is: " ) + cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
-        }
+        details.error( "Failed call attempt {} to {} via {url}, error is: {err}, " +
+            "stack is:\n{stack}", idxAttempt, strFnName + "()", u, err, err.stack );
     }
     ++ idxAttempt;
     while( txReceipt === "" && idxAttempt <= cntAttempts ) {
@@ -338,44 +278,25 @@ export async function safeGetTransactionReceipt(
             ret = retValOnFail;
             if( ! throwIfServerOffline )
                 return ret;
-            if( log.verboseGet() >= log.verboseReversed().error ) {
-                details.write( cc.error( "Cannot call " ) + cc.note( strFnName + "()" ) +
-                    cc.error( " via " ) + cc.u( u ) + cc.warning( " because server is off-line" ) +
-                    "\n" );
-            }
-            throw new Error(
-                "Cannot " + strFnName + "() via " + u.toString() +
-                " because server is off-line" );
+            details.error( "Cannot call {} via {url} because server is off-line",
+                strFnName + "()", u );
+            throw new Error( `Cannot ${strFnName}() via ${u} because server is off-line` );
         }
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( cc.warning( "Repeat call to " ) + cc.note( strFnName + "()" ) +
-                cc.error( " via " ) + cc.u( u ) + cc.warning( ", attempt " ) +
-                cc.info( idxAttempt ) + "\n" );
-        }
+        details.trace( "Repeat call to {} via {url}, attempt {}", strFnName + "()", u, idxAttempt );
         try {
             ret = await ethersProvider[strFnName]( txHash );
             return ret;
         } catch ( err ) {
             ret = retValOnFail;
-            if( log.verboseGet() >= log.verboseReversed().error ) {
-                details.write( cc.error( "Failed call attempt " ) + cc.info( idxAttempt ) +
-                    cc.error( " to " ) + cc.note( strFnName + "()" ) + cc.error( " via " ) +
-                    cc.u( u ) + cc.error( ", error is: " ) +
-                    cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                    cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
-            }
+            details.error( "Failed call attempt {} to {} via {url}, error is: {err}, " +
+                "stack is:\n{stack}", idxAttempt, strFnName + "()", u, err, err.stack );
         }
         ++ idxAttempt;
     }
     if( ( idxAttempt + 1 ) > cntAttempts && ( txReceipt === "" || txReceipt === undefined ) ) {
-        if( log.verboseGet() >= log.verboseReversed().error ) {
-            details.write( cc.fatal( "ERROR:" ) + cc.error( " Failed call to " ) +
-                cc.note( strFnName + "()" ) + cc.error( " via " ) + cc.u( u ) +
-                cc.error( " after " ) + cc.info( cntAttempts ) + cc.error( " attempts " ) + "\n" );
-        }
-        throw new Error(
-            "Failed call to " + strFnName + "() via " + u.toString() +
-            " after " + cntAttempts + " attempts" );
+        details.error( "Failed call to {} via {url} after {} attempts",
+            strFnName + "()", u, cntAttempts );
+        throw new Error( `Failed call to ${strFnName}() via ${u} after ${cntAttempts} attempts` );
     }
     return ret;
 }
@@ -408,40 +329,24 @@ export async function safeGetPastEvents(
         nBlockTo = owaspUtils.toBN( nBlockTo );
     nBlockFrom = owaspUtils.toBN( nBlockFrom );
     try {
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "First time, will query filter " ) +
-                cc.j( joFilter ) + cc.debug( " on contract " ) + cc.info( joContract.address ) +
-                cc.debug( " from block " ) + cc.info( nBlockFrom.toHexString() ) +
-                cc.debug( " to block " ) + cc.info( nBlockTo.toHexString() ) +
-                cc.debug( " while current latest block number on chain is " ) +
-                cc.info( nLatestBlockNumber.toHexString() ) + "\n" );
-        }
-        ret =
-            await joContract.queryFilter(
-                joFilter,
-                nBlockFrom.toHexString(),
-                nBlockTo.toHexString()
-            );
+        details.trace(
+            "{p}First time, will query filter {} on contract {} from block {} to block {} while " +
+            "current latest block number on chain is {}", strLogPrefix, joFilter,
+            joContract.address, nBlockFrom.toHexString(), nBlockTo.toHexString(),
+            nLatestBlockNumber.toHexString() );
+        ret = await joContract.queryFilter(
+            joFilter, nBlockFrom.toHexString(), nBlockTo.toHexString() );
         return ret;
     } catch ( err ) {
         ret = retValOnFail;
-        if( log.verboseGet() >= log.verboseReversed().error ) {
-            details.write( strLogPrefix + cc.error( "Failed filtering attempt " ) +
-                cc.info( idxAttempt ) + cc.error( " for event " ) + cc.note( strEventName ) +
-                cc.error( " via " ) + cc.u( u ) + cc.error( ", from block " ) +
-                cc.warning( nBlockFrom.toHexString() ) +
-                cc.error( ", to block " ) + cc.warning( nBlockTo.toHexString() ) +
-                cc.error( ", error is: " ) + cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
-        }
+        details.error(
+            "{p}Failed filtering attempt {} for event {} via {url}, from block {}, to block {}, " +
+            "error is: {err}, stack is:\n{stack}", strLogPrefix, idxAttempt, strEventName, u,
+            nBlockFrom.toHexString(), nBlockTo.toHexString(), err, err.stack );
         if( owaspUtils.extractErrorMessage( err )
-            .indexOf( strErrorTextAboutNotExistingEvent ) >= 0
-        ) {
-            if( log.verboseGet() >= log.verboseReversed().error ) {
-                details.write( strLogPrefix + cc.error( "Did stopped filtering of " ) +
-                    cc.note( strEventName ) + cc.error( " event because no such event " +
-                    "exist in smart contract " ) + "\n" );
-            }
+            .indexOf( strErrorTextAboutNotExistingEvent ) >= 0 ) {
+            details.error( "{p}Did stopped filtering of {} event because no such event exist " +
+                "in smart contract ", strLogPrefix, strEventName );
             return ret;
         }
     }
@@ -452,76 +357,48 @@ export async function safeGetPastEvents(
             ret = retValOnFail;
             if( ! throwIfServerOffline )
                 return ret;
-            if( log.verboseGet() >= log.verboseReversed().error ) {
-                details.write( strLogPrefix + cc.error( "Cannot do " ) + cc.note( strEventName ) +
-                    cc.error( " event filtering via " ) + cc.u( u ) +
-                    cc.warning( " because server is off-line" ) + "\n" );
-            }
-            throw new Error(
-                "Cannot do " + strEventName + " event filtering, from block " +
-                nBlockFrom.toHexString() + ", to block " + nBlockTo.toHexString() +
-                " via " + u.toString() + " because server is off-line"
-            );
+            details.error( "{p}Cannot do {} event filtering via {url} because server is off-line",
+                strLogPrefix, strEventName, u );
+            throw new Error( `Cannot do ${strEventName} event filtering, ` +
+                `from block ${nBlockFrom.toHexString()} , to block ${nBlockTo.toHexString()} ` +
+                `via ${u} because server is off-line` );
         }
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.warning( "Repeat " ) + cc.note( strEventName ) +
-                cc.error( " event filtering via " ) + cc.u( u ) +
-                cc.warning( ", attempt " ) + cc.info( idxAttempt ) + "\n" );
-        }
+        details.trace( "{p}Repeat {} event filtering via {url}, attempt {}",
+            strLogPrefix, strEventName, u, idxAttempt );
         try {
-            if( log.verboseGet() >= log.verboseReversed().trace ) {
-                details.write( strLogPrefix + cc.debug( "Attempt " ) + cc.info( idxAttempt ) +
-                    cc.debug( ", will query filter " ) + cc.j( joFilter ) +
-                    cc.debug( " on contract " ) + cc.info( joContract.address ) +
-                    cc.debug( " from block " ) + cc.info( nBlockFrom.toHexString() ) +
-                    cc.debug( " to block " ) + cc.info( nBlockTo.toHexString() ) + "\n" );
-            }
-            ret =
-                await joContract.queryFilter(
-                    joFilter,
-                    nBlockFrom.toHexString(),
-                    nBlockTo.toHexString()
-                );
+            details.trace(
+                "{p}Attempt {}, will query filter {} on contract {} from block {} to block {}",
+                strLogPrefix, idxAttempt, joFilter, joContract.address, nBlockFrom.toHexString(),
+                nBlockTo.toHexString() );
+            ret = await joContract.queryFilter( joFilter,
+                nBlockFrom.toHexString(), nBlockTo.toHexString() );
             return ret;
 
         } catch ( err ) {
             ret = retValOnFail;
-            if( log.verboseGet() >= log.verboseReversed().error ) {
-                details.write( strLogPrefix + cc.error( "Failed filtering attempt " ) +
-                    cc.info( idxAttempt ) + cc.error( " for event " ) + cc.note( strEventName ) +
-                    cc.error( " via " ) + cc.u( u ) + cc.error( ", from block " ) +
-                    cc.info( nBlockFrom.toHexString() ) + cc.error( ", to block " ) +
-                    cc.info( nBlockTo.toHexString() ) + cc.error( ", error is: " ) +
-                    cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                    cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
-            }
+            details.error(
+                "{p}Failed filtering attempt {} for event {} via {url}, from block {}" +
+                ", to block{}, error is: {err}, stack is:\n{stack}", strLogPrefix, idxAttempt,
+                strEventName, u, nBlockFrom.toHexString(), nBlockTo.toHexString(),
+                err, err.stack );
             if( owaspUtils.extractErrorMessage( err )
                 .indexOf( strErrorTextAboutNotExistingEvent ) >= 0
             ) {
-                if( log.verboseGet() >= log.verboseReversed().error ) {
-                    details.write( strLogPrefix + cc.error( "Did stopped " ) +
-                        cc.note( strEventName ) + cc.error( " event filtering because " +
-                        "no such event exist in smart contract " ) + "\n" );
-                }
+                details.error( "{p}Did stopped {} event filtering because no such event exist " +
+                    "in smart contract ", strLogPrefix, strEventName );
                 return ret;
             }
         }
         ++ idxAttempt;
     }
     if( ( idxAttempt + 1 ) === cntAttempts && ret === "" ) {
-        if( log.verboseGet() >= log.verboseReversed().error ) {
-            details.write( strLogPrefix + cc.fatal( "ERROR:" ) +
-                cc.error( " Failed filtering attempt for " ) + cc.note( strEventName ) +
-                + cc.error( " event via " ) + cc.u( u ) + cc.error( ", from block " ) +
-                cc.info( nBlockFrom.toHexString() ) + cc.error( ", to block " ) +
-                cc.info( nBlockTo.toHexString() ) + cc.error( " after " ) + cc.info( cntAttempts ) +
-                cc.error( " attempts " ) + "\n" );
-        }
-        throw new Error(
-            "Failed filtering attempt for " + strEventName + " event, from block " +
-            nBlockFrom.toHexString() + ", to block " + nBlockTo.toHexString() +
-            " via " + u.toString() + " after " + cntAttempts + " attempts"
-        );
+        details.error(
+            "{p}Failed filtering attempt for {} event via {url}, from block {}, to block {} " +
+            "after {} attempts", strLogPrefix, strEventName, u, nBlockFrom.toHexString(),
+            nBlockTo.toHexString(), cntAttempts );
+        throw new Error( `Failed filtering attempt for ${strEventName} event, ` +
+            `from block ${nBlockFrom.toHexString()}, to block ${nBlockTo.toHexString()} ` +
+            `via ${u} after ${cntAttempts} attempts` );
     }
     return ret;
 }
@@ -533,18 +410,11 @@ export async function safeGetPastEventsIterative(
 ) {
     if( imaHelperAPIs.getBlocksCountInInIterativeStepOfEventsScan() <= 0 ||
         imaHelperAPIs.getMaxIterationsInAllRangeEventsScan() <= 0 ) {
-        if( log.verboseGet() >= log.verboseReversed().warning ) {
-            details.write( strLogPrefix + cc.fatal( "IMPORTANT NOTICE:" ) + " " +
-                cc.warning( "Will skip " ) + cc.attention( "iterative" ) +
-                cc.warning( " events scan in block range from " ) +
-                cc.j( nBlockFrom ) + cc.warning( " to " ) + cc.j( nBlockTo ) +
-                cc.warning( " because it's " ) + cc.error( "DISABLED" ) + "\n" );
-        }
-        return await safeGetPastEvents(
-            details, strLogPrefix,
-            ethersProvider, attempts, joContract,
-            strEventName, nBlockFrom, nBlockTo, joFilter
-        );
+        details.warning(
+            "{p}IMPORTANT NOTICE: Will skip iterative events scan in block range from {} to {} " +
+            "because it's {}", strLogPrefix, nBlockFrom, nBlockTo, log.fmtError( "DISABLED" ) );
+        return await safeGetPastEvents( details, strLogPrefix, ethersProvider, attempts,
+            joContract, strEventName, nBlockFrom, nBlockTo, joFilter );
     }
     const nLatestBlockNumber = owaspUtils.toBN(
         await imaHelperAPIs.safeGetBlockNumber( details, 10, ethersProvider ) );
@@ -553,11 +423,8 @@ export async function safeGetPastEventsIterative(
     if( nBlockTo == "latest" ) {
         isLastLatest = true;
         nBlockTo = nLatestBlockNumberPlus1;
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Iterative scan up to latest block " ) +
-                cc.info( "#" ) + cc.info( nBlockTo.toHexString() ) +
-                cc.debug( " assumed instead of " ) + cc.attention( "latest" ) + "\n" );
-        }
+        details.trace( "{p}Iterative scan up to latest block #{} assumed instead of {}",
+            strLogPrefix, nBlockTo.toHexString(), "latest" );
     } else {
         nBlockTo = owaspUtils.toBN( nBlockTo );
         if( nBlockTo.gte( nLatestBlockNumber ) )
@@ -571,25 +438,15 @@ export async function safeGetPastEventsIterative(
             owaspUtils.toBN( imaHelperAPIs.getBlocksCountInInIterativeStepOfEventsScan() )
         ).gt( owaspUtils.toBN( imaHelperAPIs.getMaxIterationsInAllRangeEventsScan() ) )
         ) {
-            if( log.verboseGet() >= log.verboseReversed().warning ) {
-                details.write( strLogPrefix + cc.fatal( "IMPORTANT NOTICE:" ) + " " +
-                    cc.warning( "Will skip " ) + cc.attention( "iterative" ) +
-                    cc.warning( " scan and use scan in block range from " ) +
-                    cc.info( nBlockFrom.toHexString() ) + cc.warning( " to " ) +
-                    cc.info( nBlockTo.toHexString() ) + "\n" );
-            }
-            return await safeGetPastEvents(
-                details, strLogPrefix,
-                ethersProvider, attempts, joContract, strEventName,
-                nBlockFrom, nBlockTo, joFilter
-            );
+            details.warning(
+                "{p}IMPORTANT NOTICE: Will skip iterative scan and use scan in block range " +
+                "from {} to {}", strLogPrefix, nBlockFrom.toHexString(), nBlockTo.toHexString() );
+            return await safeGetPastEvents( details, strLogPrefix, ethersProvider, attempts,
+                joContract, strEventName, nBlockFrom, nBlockTo, joFilter );
         }
     }
-    if( log.verboseGet() >= log.verboseReversed().trace ) {
-        details.write( strLogPrefix + cc.debug( "Iterative scan in " ) +
-            cc.info( nBlockFrom.toHexString() ) + cc.debug( "/" ) +
-            cc.info( nBlockTo.toHexString() ) + cc.debug( " block range..." ) + "\n" );
-    }
+    details.trace( "{p}Iterative scan in {}/{} block range...",
+        strLogPrefix, nBlockFrom.toHexString(), nBlockTo.toHexString() );
     let idxBlockSubRangeTo = nBlockTo;
     for( ; true; ) {
         let idxBlockSubRangeFrom = idxBlockSubRangeTo.sub(
@@ -597,51 +454,30 @@ export async function safeGetPastEventsIterative(
         if( idxBlockSubRangeFrom.lt( nBlockFrom ) )
             idxBlockSubRangeFrom = nBlockFrom;
         try {
-            if( log.verboseGet() >= log.verboseReversed().trace ) {
-                details.write( strLogPrefix + cc.debug( "Iterative scan of " ) +
-                    cc.info( idxBlockSubRangeFrom.toHexString() ) + cc.debug( "/" ) +
-                    cc.info( idxBlockSubRangeTo.toHexString() ) +
-                    cc.debug( " block sub-range in " ) +
-                    cc.info( nBlockFrom.toHexString() ) + cc.debug( "/" ) +
-                    cc.info( nBlockTo.toHexString() ) + cc.debug( " block range..." ) + "\n" );
-            }
-            const joAllEventsInBlock = await safeGetPastEvents(
-                details, strLogPrefix,
+            details.trace( "{p}Iterative scan of {}/{} block sub-range in {}/{} block range...",
+                strLogPrefix, idxBlockSubRangeFrom.toHexString(), idxBlockSubRangeTo.toHexString(),
+                nBlockFrom.toHexString(), nBlockTo.toHexString() );
+            const joAllEventsInBlock = await safeGetPastEvents( details, strLogPrefix,
                 ethersProvider, attempts, joContract, strEventName,
-                idxBlockSubRangeFrom, idxBlockSubRangeTo, joFilter
-            );
+                idxBlockSubRangeFrom, idxBlockSubRangeTo, joFilter );
             if( joAllEventsInBlock && joAllEventsInBlock != "" && joAllEventsInBlock.length > 0 ) {
-                if( log.verboseGet() >= log.verboseReversed().trace ) {
-                    details.write( strLogPrefix + cc.success( "Result of " ) +
-                        cc.attention( "iterative" ) + cc.success( " scan in " ) +
-                        cc.info( nBlockFrom.toHexString() ) + cc.success( "/" ) +
-                        cc.info( nBlockTo.toHexString() ) + cc.success( " block range is " ) +
-                        cc.j( joAllEventsInBlock ) + "\n" );
-                }
+                details.success( "{p}Result of iterative scan in {}/{} block range is {}",
+                    strLogPrefix, nBlockFrom.toHexString(), nBlockTo.toHexString(),
+                    joAllEventsInBlock );
                 return joAllEventsInBlock;
             }
         } catch ( err ) {
-            if( log.verboseGet() >= log.verboseReversed().critical ) {
-                details.write( strLogPrefix +
-                    cc.error( "Got scan error during interactive scan of " ) +
-                    cc.info( idxBlockSubRangeFrom.toHexString() ) + cc.error( "/" ) +
-                    cc.info( idxBlockSubRangeTo.toHexString() ) +
-                    cc.error( " block sub-range in " ) + cc.info( nBlockFrom.toHexString() ) +
-                    cc.error( "/" ) + cc.info( nBlockTo.toHexString() ) +
-                    cc.error( " block range, error is: " ) +
-                    cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                    cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
-            }
+            details.critical(
+                "{p}Got scan error during interactive scan of {}/{} block sub-range in {}/{} " +
+                "block range, error is: {err}, stack is:\n{stack}", strLogPrefix,
+                idxBlockSubRangeFrom.toHexString(), idxBlockSubRangeTo.toHexString(),
+                nBlockFrom.toHexString(), nBlockTo.toHexString(), err, err.stack );
         }
         idxBlockSubRangeTo = idxBlockSubRangeFrom;
         if( idxBlockSubRangeTo.lte( nBlockFrom ) )
             break;
     }
-    if( log.verboseGet() >= log.verboseReversed().debug ) {
-        details.write( strLogPrefix + cc.debug( "Result of " ) + cc.attention( "iterative" ) +
-            cc.debug( " scan in " ) + cc.info( nBlockFrom.toHexString() ) + cc.debug( "/" ) +
-            cc.info( nBlockTo.toHexString() ) + cc.debug( " block range is " ) +
-            cc.warning( "empty" ) + "\n" );
-    }
+    details.debug( "{p}Result of iterative scan in {}/{} is {}", strLogPrefix,
+        nBlockFrom.toHexString(), nBlockTo.toHexString(), "empty block range" );
     return "";
 }

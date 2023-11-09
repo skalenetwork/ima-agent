@@ -24,8 +24,6 @@
  */
 
 import * as log from "./log.mjs";
-import * as cc from "./cc.mjs";
-
 import * as owaspUtils from "./owaspUtils.mjs";
 import * as rpcCall from "./rpcCall.mjs";
 
@@ -68,19 +66,13 @@ export const currentTimestamp = () => {
 export async function safeWaitForNextBlockToAppear( details, ethersProvider ) {
     const nBlockNumber =
         owaspUtils.toBN( await safeGetBlockNumber( details, 10, ethersProvider ) );
-    if( log.verboseGet() >= log.verboseReversed().trace ) {
-        details.write( cc.debug( "Waiting for next block to appear..." ) + "\n" );
-        details.write( cc.debug( "    ...have block " ) +
-            cc.info( nBlockNumber.toHexString() ) + "\n" );
-    }
+    details.trace( "Waiting for next block to appear..." );
+    details.trace( "    ...have block {}", nBlockNumber.toHexString() );
     for( ; true; ) {
         await sleep( 1000 );
         const nBlockNumber2 =
             owaspUtils.toBN( await safeGetBlockNumber( details, 10, ethersProvider ) );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( cc.debug( "    ...have block " ) +
-                cc.info( nBlockNumber2.toHexString() ) + "\n" );
-        }
+        details.trace( "    ...have block {}", nBlockNumber2.toHexString() );
         if( nBlockNumber2.gt( nBlockNumber ) )
             break;
     }
@@ -106,13 +98,9 @@ export async function safeGetBlockNumber(
         return ret;
     } catch ( err ) {
         ret = retValOnFail;
-        if( log.verboseGet() >= log.verboseReversed().error ) {
-            details.write( cc.error( "Failed call attempt " ) + cc.info( idxAttempt ) +
-                cc.error( " to " ) + cc.note( strFnName + "()" ) + cc.error( " via " ) +
-                cc.u( u ) + cc.error( ", error is: " ) +
-                cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
-        }
+        details.error(
+            "Failed call attempt {} to {} via {url}, error is: {err}, stack is:\n{stack}",
+            idxAttempt, strFnName + "()", u, err, err.stack );
     }
     ++ idxAttempt;
     while( ret === "" && idxAttempt <= cntAttempts ) {
@@ -121,42 +109,25 @@ export async function safeGetBlockNumber(
             ret = retValOnFail;
             if( ! throwIfServerOffline )
                 return ret;
-            if( log.verboseGet() >= log.verboseReversed().error ) {
-                details.write( cc.error( "Cannot call " ) + cc.note( strFnName + "()" ) +
-                    cc.error( " via " ) + cc.u( u ) + cc.warning( " because server is off-line" ) +
-                    "\n" );
-            }
-            throw new Error( "Cannot " + strFnName + "() via " + u.toString() +
-            " because server is off-line" );
+            details.error( "Cannot call {} via {url} because server is off-line",
+                strFnName + "()", u );
+            throw new Error( `Cannot ${strFnName}() via ${u} because server is off-line` );
         }
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( cc.warning( "Repeat call to " ) + cc.note( strFnName + "()" ) +
-                cc.error( " via " ) + cc.u( u ) + cc.warning( ", attempt " ) +
-                cc.info( idxAttempt ) + "\n" );
-        }
+        details.trace( "Repeat call to {} via {url}, attempt {}", strFnName + "()", u, idxAttempt );
         try {
             ret = await ethersProvider[strFnName]();
             return ret;
         } catch ( err ) {
             ret = retValOnFail;
-            if( log.verboseGet() >= log.verboseReversed().error ) {
-                details.write( cc.error( "Failed call attempt " ) + cc.info( idxAttempt ) +
-                    cc.error( " to " ) + cc.note( strFnName + "()" ) + cc.error( " via " ) +
-                    cc.u( u ) + cc.error( ", error is: " ) +
-                    cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                    cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
-            }
+            details.error( "Failed call attempt {} to  via {url}, error is: {err}, " +
+                "stack is:\n{stack}", idxAttempt, strFnName + "()", u, err, err.stack );
         }
         ++ idxAttempt;
     }
     if( ( idxAttempt + 1 ) > cntAttempts && ret === "" ) {
-        details.write( cc.fatal( "ERROR:" ) +
-            cc.error( " Failed call to " ) + cc.note( strFnName + "()" ) +
-            + cc.error( " via " ) + cc.u( u ) + cc.error( " after " ) +
-            cc.info( cntAttempts ) + cc.error( " attempts " ) +
-            "\n" );
-        throw new Error( "Failed call to " + strFnName + "() via " +
-        u.toString() + " after " + cntAttempts + " attempts" );
+        details.error( "Failed call to {} via {url} after {} attempts ",
+            strFnName + "()", u, cntAttempts );
+        throw new Error( `Failed call to ${strFnName}() via ${u} after ${cntAttempts} attempts` );
     }
     return ret;
 }
@@ -198,7 +169,7 @@ export function getS2STransferModeDescription() {
 }
 
 export function getS2STransferModeDescriptionColorized() {
-    return gFlagIsForwardS2S ? cc.success( "forward" ) : cc.error( "reverse" );
+    return log.posNeg( gFlagIsForwardS2S, "forward", "reverse" );
 }
 
 export function isForwardS2S() {

@@ -29,12 +29,13 @@
         "ethereumjs-wallet": "^1.0.2"
     },
     "devDependencies": {
-        "eslint": "^6.8.0",
-        "eslint-config-standard": "^14.1.1",
-        "eslint-plugin-import": "^2.20.2",
+        "eslint": "^8.53.0",
+        "eslint-config-standard": "^17.1.0",
+        "eslint-plugin-import": "^2.29.0",
         "eslint-plugin-node": "^11.1.0",
-        "eslint-plugin-promise": "^4.2.1",
-        "eslint-plugin-standard": "^4.0.1"
+        "eslint-plugin-promise": "^6.1.1",
+        "eslint-plugin-standard": "^4.0.1",
+        "eslint-plugin-n": "^16.3.0"
     },
     "resolutions": {
     }

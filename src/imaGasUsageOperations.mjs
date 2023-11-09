@@ -24,36 +24,31 @@
  */
 
 import * as log from "./log.mjs";
-import * as cc from "./cc.mjs";
 import * as owaspUtils from "./owaspUtils.mjs";
 
 export function composeGasUsageReportFromArray( strName, jarrReceipts ) {
     if( ! ( strName && typeof strName == "string" && jarrReceipts ) )
         return "";
     let i, sumGasUsed = owaspUtils.toBN( "0" ),
-        s = "\n" + cc.info( "Gas usage report for " ) + cc.attention( strName ) + "\n";
+        s = "\n" + log.fmtInformation( "Gas usage report for " ) +
+            log.fmtInformation( "{p}\n", strName );
     for( i = 0; i < jarrReceipts.length; ++ i ) {
         try {
             sumGasUsed = sumGasUsed.add( owaspUtils.toBN( jarrReceipts[i].receipt.gasUsed ) );
-            s += "    " + cc.notice( jarrReceipts[i].description ) + cc.debug( "....." ) +
-                cc.info( jarrReceipts[i].receipt.gasUsed.toString() ) + "\n";
+            s += log.fmtInformation( "    {p}", jarrReceipts[i].description ) +
+                log.fmtDebug( "....." ) +
+                log.fmtInformation( "{p}\n", jarrReceipts[i].receipt.gasUsed.toString() );
         } catch ( err ) { }
     }
-    s += "    " + cc.attention( "SUM" ) + cc.debug( "....." ) +
-        cc.info( sumGasUsed.toString() ) + "\n";
+    s += "    " + log.fmtAttention( "SUM" ) + log.fmtDebug( "....." ) +
+        log.fmtInformation( "{}", sumGasUsed.toString() );
     return { "sumGasUsed": sumGasUsed, "strReport": s };
 }
 
 export function printGasUsageReportFromArray( strName, jarrReceipts, details ) {
-    if( log.verboseGet() >= log.verboseReversed().notice ) {
-        details = details || log;
-        const jo = composeGasUsageReportFromArray( strName, jarrReceipts );
-        if( jo.strReport &&
-            typeof jo.strReport == "string" &&
-            jo.strReport.length > 0 &&
-            jo.sumGasUsed &&
-            jo.sumGasUsed.gt( owaspUtils.toBN( "0" ) )
-        )
-            log.write( jo.strReport );
-    }
+    details = details || log;
+    const jo = composeGasUsageReportFromArray( strName, jarrReceipts );
+    if( jo.strReport && typeof jo.strReport == "string" && jo.strReport.length > 0 &&
+        jo.sumGasUsed && jo.sumGasUsed.gt( owaspUtils.toBN( "0" ) ) )
+        log.information( jo.strReport );
 }

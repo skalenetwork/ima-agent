@@ -24,8 +24,6 @@
  */
 
 import * as log from "./log.mjs";
-import * as cc from "./cc.mjs";
-
 import * as owaspUtils from "./owaspUtils.mjs";
 import * as imaHelperAPIs from "./imaHelperAPIs.mjs";
 import * as imaTx from "./imaTx.mjs";
@@ -39,7 +37,7 @@ export async function getBalanceEth(
     joAccount,
     contractERC20
 ) {
-    const strLogPrefix = cc.info( "getBalanceEth() call" ) + " ";
+    const strLogPrefix = "getBalanceEth() call ";
     try {
         if( ! ( ethersProvider && joAccount ) )
             return "<no-data>";
@@ -52,12 +50,9 @@ export async function getBalanceEth(
         const balance = await ethersProvider.getBalance( strAddress );
         return balance;
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().error ) {
-            const strError = owaspUtils.extractErrorMessage( err );
-            log.write( strLogPrefix + cc.fatal( "ERROR:" ) + " " +
-                cc.error( strError ) + cc.error( ", stack is: " ) + "\n" +
-                cc.stack( err.stack ) + "\n" );
-        }
+        const strError = owaspUtils.extractErrorMessage( err );
+        log.error( "{p}balance fetching error details: {err}, stack is:\n{stack}",
+            strLogPrefix, strError, err.stack );
     }
     return "<no-data-or-error>";
 }
@@ -85,47 +80,37 @@ export async function doEthPaymentFromMainNet(
     const details = log.createMemoryStream();
     const jarrReceipts = [];
     let strActionName = "";
-    const strLogPrefix = cc.info( "M2S ETH Payment:" ) + " ";
+    const strLogPrefix = "M2S ETH Payment: ";
     try {
-        details.write( strLogPrefix + cc.debug( "Doing payment from mainnet with " ) +
-            cc.notice( "chainIdSChain" ) + cc.debug( "=" ) + cc.notice( chainIdSChain ) +
-            cc.debug( "..." ) + "\n" );
+        details.debug( "{p}Doing payment from mainnet with chainIdSChain={}...",
+            strLogPrefix, chainIdSChain );
         strActionName = "ETH payment from Main Net, deposit";
         const arrArguments = [
             chainIdSChain
         ];
         const gasPrice = await transactionCustomizerMainNet.computeGasPrice(
             ethersProviderMainNet, 200000000000 );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using computed " ) + cc.info( "gasPrice" ) +
-                cc.debug( "=" ) + cc.j( gasPrice ) + "\n" );
-        }
-        const estimatedGas =
-            await transactionCustomizerMainNet.computeGas(
-                details, ethersProviderMainNet,
-                "DepositBox", joDepositBox, "deposit", arrArguments,
-                joAccountSrc, strActionName,
-                gasPrice, 3000000, weiHowMuch, null );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using estimated " ) + cc.info( "gas" ) +
-                cc.debug( "=" ) + cc.notice( estimatedGas ) + "\n" );
-        }
+        details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
+        const estimatedGas = await transactionCustomizerMainNet.computeGas(
+            details, ethersProviderMainNet,
+            "DepositBox", joDepositBox, "deposit", arrArguments,
+            joAccountSrc, strActionName,
+            gasPrice, 3000000, weiHowMuch );
+        details.trace( "{p}Using estimated gas={}", strLogPrefix, estimatedGas );
         const isIgnore = false;
-        const strErrorOfDryRun =
-            await imaTx.dryRunCall(
-                details, ethersProviderMainNet,
-                "DepositBox", joDepositBox, "deposit", arrArguments,
-                joAccountSrc, strActionName, isIgnore,
-                gasPrice, estimatedGas, weiHowMuch, null );
+        const strErrorOfDryRun = await imaTx.dryRunCall(
+            details, ethersProviderMainNet,
+            "DepositBox", joDepositBox, "deposit", arrArguments,
+            joAccountSrc, strActionName, isIgnore,
+            gasPrice, estimatedGas, weiHowMuch );
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
-        const joReceipt =
-            await imaTx.payedCall(
-                details, ethersProviderMainNet,
-                "DepositBox", joDepositBox, "deposit", arrArguments,
-                joAccountSrc, strActionName,
-                gasPrice, estimatedGas, weiHowMuch, null );
+        const joReceipt = await imaTx.payedCall(
+            details, ethersProviderMainNet,
+            "DepositBox", joDepositBox, "deposit", arrArguments,
+            joAccountSrc, strActionName,
+            gasPrice, estimatedGas, weiHowMuch );
         if( joReceipt && typeof joReceipt == "object" ) {
             jarrReceipts.push( {
                 "description": "doEthPaymentFromMainNet",
@@ -136,11 +121,8 @@ export async function doEthPaymentFromMainNet(
         // Must-have event(s) analysis as indicator(s) of success
         const strEventName = "OutgoingMessage";
         if( joMessageProxyMainNet ) {
-            details.write( strLogPrefix +
-                cc.debug( "Verifying the " ) + cc.info( strEventName ) +
-                cc.debug( " event of the " ) + cc.info( "MessageProxy" ) + cc.debug( "/" ) +
-                cc.notice( joMessageProxyMainNet.address ) + cc.debug( " contract ..." ) +
-                "\n" );
+            details.debug( "{p}Verifying the {} event of the ", "MessageProxy/{} contract ...",
+                strLogPrefix, strEventName, joMessageProxyMainNet.address );
             await imaHelperAPIs.sleep(
                 imaHelperAPIs.getMillisecondsSleepBeforeFetchOutgoingMessageEvent() );
             const joEvents = await imaEventLogScan.getContractCallEvents(
@@ -150,29 +132,23 @@ export async function doEthPaymentFromMainNet(
                 joMessageProxyMainNet.filters[strEventName]()
             );
             if( joEvents.length > 0 ) {
-                details.write( strLogPrefix +
-                    cc.success( "Success, verified the " ) + cc.info( strEventName ) +
-                    cc.success( " event of the " ) + cc.info( "MessageProxy" ) +
-                    cc.success( "/" ) + cc.notice( joMessageProxyMainNet.address ) +
-                    cc.success( " contract, found event(s): " ) + cc.j( joEvents ) +
-                    "\n" );
+                details.success(
+                    "{p}Success, verified the {} event of the MessageProxy/{} contract, " +
+                    "found event(s): {}", strLogPrefix, strEventName,
+                    joMessageProxyMainNet.address, joEvents );
             } else {
-                throw new Error(
-                    "Verification failed for the \"OutgoingMessage\" " +
-                        "event of the \"MessageProxy\"/" +
-                    joMessageProxyMainNet.address + " contract, no events found" );
+                throw new Error( "Verification failed for the OutgoingMessage event of the " +
+                    `MessageProxy ${joMessageProxyMainNet.address} contract, no events found` );
             }
         }
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().critical ) {
-            const strError = owaspUtils.extractErrorMessage( err );
-            const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
-                cc.error( " Payment error in " + strActionName + ": " ) + cc.error( strError ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n";
-            if( log.id != details.id )
-                log.write( s );
-            details.write( s );
+        const strError = owaspUtils.extractErrorMessage( err );
+        if( log.id != details.id ) {
+            log.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
+                strLogPrefix, strActionName, strError, err.stack );
         }
+        details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
+            strLogPrefix, strActionName, strError, err.stack );
         details.exposeDetailsTo( log, "doEthPaymentFromMainNet", false );
         details.close();
         return false;
@@ -205,7 +181,7 @@ export async function doEthPaymentFromSChain(
     const details = log.createMemoryStream();
     const jarrReceipts = [];
     let strActionName = "";
-    const strLogPrefix = cc.info( "S2M ETH Payment:" ) + " ";
+    const strLogPrefix = "S2M ETH Payment: ";
     try {
         strActionName = "ETH payment from S-Chain, exitToMain";
         const arrArguments = [
@@ -213,40 +189,30 @@ export async function doEthPaymentFromSChain(
         ];
         const gasPrice = await transactionCustomizerSChain.computeGasPrice(
             ethersProviderSChain, 200000000000 );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using computed " ) + cc.info( "gasPrice" ) +
-                cc.debug( "=" ) + cc.j( gasPrice ) + "\n" );
-        }
-        const estimatedGas =
-            await transactionCustomizerSChain.computeGas(
-                details, ethersProviderSChain,
-                "TokenManagerETH", joTokenManagerETH, "exitToMain", arrArguments,
-                joAccountSrc, strActionName,
-                gasPrice, 6000000, 0, null );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using estimated " ) + cc.info( "gas" ) +
-                cc.debug( "=" ) + cc.notice( estimatedGas ) + "\n" );
-        }
+        details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
+        const estimatedGas = await transactionCustomizerSChain.computeGas(
+            details, ethersProviderSChain,
+            "TokenManagerETH", joTokenManagerETH, "exitToMain", arrArguments,
+            joAccountSrc, strActionName,
+            gasPrice, 6000000, 0, null );
+        details.trace( "{p}Using estimated gas={}", strLogPrefix, estimatedGas );
         const isIgnore = true;
-        const strErrorOfDryRun =
-            await imaTx.dryRunCall(
-                details, ethersProviderSChain,
-                "TokenManagerETH", joTokenManagerETH, "exitToMain", arrArguments,
-                joAccountSrc, strActionName, isIgnore,
-                gasPrice, estimatedGas, 0, null
-            );
+        const strErrorOfDryRun = await imaTx.dryRunCall(
+            details, ethersProviderSChain,
+            "TokenManagerETH", joTokenManagerETH, "exitToMain", arrArguments,
+            joAccountSrc, strActionName, isIgnore,
+            gasPrice, estimatedGas, 0, null );
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
         const opts = {
             isCheckTransactionToSchain: true
         };
-        const joReceipt =
-            await imaTx.payedCall(
-                details, ethersProviderSChain,
-                "TokenManagerETH", joTokenManagerETH, "exitToMain", arrArguments,
-                joAccountSrc, strActionName,
-                gasPrice, estimatedGas, 0, opts );
+        const joReceipt = await imaTx.payedCall(
+            details, ethersProviderSChain,
+            "TokenManagerETH", joTokenManagerETH, "exitToMain", arrArguments,
+            joAccountSrc, strActionName,
+            gasPrice, estimatedGas, 0, opts );
         if( joReceipt && typeof joReceipt == "object" ) {
             jarrReceipts.push( {
                 "description": "doEthPaymentFromSChain",
@@ -257,11 +223,8 @@ export async function doEthPaymentFromSChain(
         // Must-have event(s) analysis as indicator(s) of success
         const strEventName = "OutgoingMessage";
         if( joMessageProxySChain ) {
-            details.write( strLogPrefix +
-                cc.debug( "Verifying the " ) + cc.info( strEventName ) +
-                cc.debug( " event of the " ) + cc.info( "MessageProxy" ) + cc.debug( "/" ) +
-                cc.notice( joMessageProxySChain.address ) + cc.debug( " contract ..." ) +
-                "\n" );
+            details.debug( "{p}Verifying the {} event of the MessageProxy/{} contract ...",
+                strLogPrefix, strEventName, joMessageProxySChain.address );
             await imaHelperAPIs.sleep(
                 imaHelperAPIs.getMillisecondsSleepBeforeFetchOutgoingMessageEvent() );
             const joEvents = await imaEventLogScan.getContractCallEvents(
@@ -271,30 +234,23 @@ export async function doEthPaymentFromSChain(
                 joMessageProxySChain.filters[strEventName]()
             );
             if( joEvents.length > 0 ) {
-                details.write( strLogPrefix +
-                    cc.success( "Success, verified the " ) + cc.info( strEventName ) +
-                    cc.success( " event of the " ) + cc.info( "MessageProxy" ) +
-                    cc.success( "/" ) + cc.notice( joMessageProxySChain.address ) +
-                    cc.success( " contract, found event(s): " ) + cc.j( joEvents ) +
-                    "\n" );
+                details.success(
+                    "{p}Success, verified the {} event of the MessageProxy/{} contract, " +
+                    "found event(s): {}", strLogPrefix, strEventName, joMessageProxySChain.address,
+                    joEvents );
             } else {
-                throw new Error(
-                    "Verification failed for the \"OutgoingMessage\" " +
-                        "event of the \"MessageProxy\"/" +
-                    joMessageProxySChain.address + " contract, no events found" );
+                throw new Error( "Verification failed for the OutgoingMessage event of the " +
+                    `MessageProxy ${joMessageProxySChain.address} contract, no events found` );
             }
         }
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().critical ) {
-            const strError = owaspUtils.extractErrorMessage( err );
-            const s = strLogPrefix +
-                cc.fatal( "CRITICAL ERROR:" ) + cc.error( " Payment error in " +
-                strActionName + ": " ) + cc.error( strError ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n";
-            if( log.id != details.id )
-                log.write( s );
-            details.write( s );
+        const strError = owaspUtils.extractErrorMessage( err );
+        if( log.id != details.id ) {
+            log.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
+                strLogPrefix, strActionName, strError, err.stack );
         }
+        details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
+            strLogPrefix, strActionName, strError, err.stack );
         details.exposeDetailsTo( log, "doEthPaymentFromSChain", false );
         details.close();
         return false;
@@ -316,45 +272,36 @@ export async function receiveEthPaymentFromSchainOnMainNet(
     const details = log.createMemoryStream();
     const jarrReceipts = [];
     let strActionName = "";
-    const strLogPrefix = cc.info( "M2S ETH Receive:" ) + " ";
+    const strLogPrefix = "M2S ETH Receive: ";
     try {
         strActionName = "Receive ETH payment from S-Chain on Main Met, getMyEth";
         const arrArguments = [];
         const weiHowMuch = undefined;
         const gasPrice = await transactionCustomizerMainNet.computeGasPrice(
             ethersProviderMainNet, 200000000000 );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using computed " ) + cc.info( "gasPrice" ) +
-                cc.debug( "=" ) + cc.j( gasPrice ) + "\n" );
-        }
-        const estimatedGas =
-            await transactionCustomizerMainNet.computeGas(
-                details, ethersProviderMainNet,
-                "DepositBoxETH", joDepositBoxETH, "getMyEth", arrArguments,
-                joAccountMN, strActionName,
-                gasPrice, 3000000, weiHowMuch, null );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using estimated " ) + cc.info( "gas" ) +
-                cc.debug( "=" ) + cc.notice( estimatedGas ) + "\n" );
-        }
+        details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
+        const estimatedGas = await transactionCustomizerMainNet.computeGas(
+            details, ethersProviderMainNet,
+            "DepositBoxETH", joDepositBoxETH, "getMyEth", arrArguments,
+            joAccountMN, strActionName,
+            gasPrice, 3000000, weiHowMuch );
+        details.trace( "{p}Using estimated gas={}", strLogPrefix, estimatedGas );
         const isIgnore = false;
-        const strErrorOfDryRun =
-            await imaTx.dryRunCall(
-                details, ethersProviderMainNet,
-                "DepositBoxETH", joDepositBoxETH,
-                "getMyEth", arrArguments,
-                joAccountMN, strActionName, isIgnore,
-                gasPrice, estimatedGas, weiHowMuch, null );
+        const strErrorOfDryRun = await imaTx.dryRunCall(
+            details, ethersProviderMainNet,
+            "DepositBoxETH", joDepositBoxETH,
+            "getMyEth", arrArguments,
+            joAccountMN, strActionName, isIgnore,
+            gasPrice, estimatedGas, weiHowMuch );
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
-        const joReceipt =
-            await imaTx.payedCall(
-                details, ethersProviderMainNet,
-                "DepositBoxETH", joDepositBoxETH,
-                "getMyEth", arrArguments,
-                joAccountMN, strActionName,
-                gasPrice, estimatedGas, weiHowMuch, null );
+        const joReceipt = await imaTx.payedCall(
+            details, ethersProviderMainNet,
+            "DepositBoxETH", joDepositBoxETH,
+            "getMyEth", arrArguments,
+            joAccountMN, strActionName,
+            gasPrice, estimatedGas, weiHowMuch );
         if( joReceipt && typeof joReceipt == "object" ) {
             jarrReceipts.push( {
                 "description": "receiveEthPaymentFromSchainOnMainNet",
@@ -362,16 +309,13 @@ export async function receiveEthPaymentFromSchainOnMainNet(
             } );
         }
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().critical ) {
-            const strError = owaspUtils.extractErrorMessage( err );
-            const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
-                cc.error( " Receive payment error in " + strActionName + ": " ) +
-                cc.error( strError ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n";
-            if( log.id != details.id )
-                log.write( s );
-            details.write( s );
+        const strError = owaspUtils.extractErrorMessage( err );
+        if( log.id != details.id ) {
+            log.critical( "{p}Receive payment error in {bright}: {err}, stack is:\n{stack}",
+                strLogPrefix, strActionName, strError, err.stack );
         }
+        details.critical( "{p}Receive payment error in {bright}: {err}, stack is:\n{stack}",
+            strLogPrefix, strActionName, strError, err.stack );
         details.exposeDetailsTo( log, "receiveEthPaymentFromSchainOnMainNet", false );
         details.close();
         return false;
@@ -390,7 +334,7 @@ export async function viewEthPaymentFromSchainOnMainNet(
 ) {
     const details = log.createMemoryStream();
     const strActionName = "";
-    const strLogPrefix = cc.info( "S ETH View:" ) + " ";
+    const strLogPrefix = "S ETH View: ";
     try {
         if( ! ( ethersProviderMainNet && joAccountMN && joDepositBoxETH ) )
             return null;
@@ -399,29 +343,23 @@ export async function viewEthPaymentFromSchainOnMainNet(
             await joDepositBoxETH.callStatic.approveTransfers(
                 addressFrom,
                 { from: addressFrom } );
-        details.write( strLogPrefix +
-            cc.success( "You can receive(wei): " ) + cc.attention( xWei ) + "\n" );
+        details.success( "{p}You can receive(wei): {}", strLogPrefix, xWei );
         const xEth = owaspUtils.ethersMod.ethers.utils.formatEther( owaspUtils.toBN( xWei ) );
-        const s = strLogPrefix +
-            cc.success( "You can receive(eth): " ) + cc.attention( xEth ) + "\n";
         if( log.id != details.id )
-            log.write( s );
-        details.write( s );
+            log.success( "{p}You can receive(eth): {}", strLogPrefix, xEth );
+        details.success( "{p}You can receive(eth): {}", strLogPrefix, xEth );
         if( log.exposeDetailsGet() )
             details.exposeDetailsTo( log, "viewEthPaymentFromSchainOnMainNet", true );
         details.close();
         return xWei;
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().critical ) {
-            const strError = owaspUtils.extractErrorMessage( err );
-            const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
-                cc.error( " View payment error in " + strActionName + ": " ) +
-                cc.error( strError ) + cc.error( ", stack is: " ) + "\n" +
-                cc.stack( err.stack ) + "\n";
-            if( log.id != details.id )
-                log.write( s );
-            details.write( s );
+        const strError = owaspUtils.extractErrorMessage( err );
+        if( log.id != details.id ) {
+            log.critical( "{p}View payment error in {bright}: {err}, stack is:\n{stack}",
+                strLogPrefix, strActionName, strError, err.stack );
         }
+        details.critical( "{p}View payment error in {bright}: {err}, stack is:\n{stack}",
+            strLogPrefix, strActionName, strError, err.stack );
         details.exposeDetailsTo( log, "viewEthPaymentFromSchainOnMainNet", false );
         details.close();
         return null;

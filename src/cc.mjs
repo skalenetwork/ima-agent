@@ -23,7 +23,7 @@
  * @copyright SKALE Labs 2019-Present
  */
 
-let gFlagIsEnabled = true;
+let gFlagIsEnabled = false;
 
 export function autoEnableFromCommandLineArgs() {
     const b =
@@ -34,6 +34,12 @@ export function autoEnableFromCommandLineArgs() {
 
 export function enable( b ) {
     gFlagIsEnabled = !!b;
+}
+
+export function isStringAlreadyColorized( s ) {
+    if( s && typeof s == "string" && s.length > 0 && s[0] == "\x1b" )
+        return true;
+    return false;
 }
 
 export function isEnabled() {
@@ -336,11 +342,12 @@ export function logArgToString() {
         if( typeof arg === "object" && typeof arg.valueOf() === "boolean" )
             s += "" + tf( arg.valueOf() );
 
-        if( typeof arg === "number" ) {
+        if( typeof arg === "number" || typeof arg === "bigint" ) {
             s += "" + number( arg );
             continue;
         }
-        if( typeof arg === "object" && typeof arg.valueOf() === "number" ) {
+        if( typeof arg === "object" &&
+            ( typeof arg.valueOf() === "number" || typeof arg.valueOf() === "bigint" ) ) {
             s += "" + number( arg.valueOf() );
             continue;
         }
@@ -559,7 +566,8 @@ export function syntaxHighlightJSON( jo, strKeyNamePrefix ) {
                 return "" + nanval( match );
             case "string":
                 return "" + strval( match );
-            // case "number":
+            case "number":
+                return "" + number( match );
             }
             return logArgToString( match );
         } );
@@ -659,6 +667,11 @@ export function trace( s ) {
 }
 
 export function debug( s ) {
+    if( !gFlagIsEnabled )
+        return s;
+    return "" + fgWhite + s + reset;
+}
+export function debugDark( s ) {
     if( !gFlagIsEnabled )
         return s;
     return "" + fgBlack + enlight + s + reset;
@@ -781,7 +794,13 @@ export function yes( s ) {
 export function no( s ) {
     if( !gFlagIsEnabled )
         return s;
-    return "" + fgBlue + s + reset;
+    return "" + fgRed + s + reset;
+}
+
+export function number( s ) {
+    if( !gFlagIsEnabled )
+        return s;
+    return "" + fgBlue + enlight + s + reset;
 }
 
 export function real( s ) {

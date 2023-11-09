@@ -32,6 +32,24 @@ let gFlagLogWithTimeStamps = true;
 
 let gIdentifierAllocatorCounter = 0;
 
+const safeURL = cc.safeURL;
+const replaceAll = cc.replaceAll;
+const timestampHR = cc.timestampHR;
+const capitalizeFirstLetter = cc.capitalizeFirstLetter;
+const getDurationString = cc.getDurationString;
+
+export { safeURL, replaceAll, timestampHR, capitalizeFirstLetter, getDurationString };
+
+export function autoEnableColorizationFromCommandLineArgs() {
+    return cc.autoEnableFromCommandLineArgs();
+}
+export function enableColorization( bIsEnable ) {
+    cc.enable( !!bIsEnable );
+}
+export function isEnabledColorization() {
+    return ( !! ( cc.isEnabled() ) );
+}
+
 export function getPrintTimestamps() {
     return gFlagLogWithTimeStamps;
 }
@@ -113,15 +131,23 @@ export function createStandardOutputStream() {
             "nMaxFilesCount": -1,
             "objStream": null,
             "haveOwnTimestamps": false,
+            "isPausedTimeStamps": false,
             "strOwnIndent": "",
-            "write": function( s ) {
-                const x =
-                    this.strOwnIndent +
-                    ( this.haveOwnTimestamps ? generateTimestampPrefix( null, true ) : "" ) +
-                    s;
+            "write": function() {
+                let s = ( this.strOwnIndent ? this.strOwnIndent : "" ) +
+                    ( ( this.haveOwnTimestamps && ( !this.isPausedTimeStamps ) )
+                        ? generateTimestampPrefix( null, true ) : "" );
+                s += fmtArgumentsArray( arguments );
                 try {
-                    if( this.objStream )
-                        this.objStream.write( x );
+                    if( this.objStream && s.length > 0 )
+                        this.objStream.write( s );
+                } catch ( err ) { }
+            },
+            "writeRaw": function() {
+                const s = fmtArgumentsArray( arguments );
+                try {
+                    if( this.objStream && s.length > 0 )
+                        this.objStream.write( s );
                 } catch ( err ) { }
             },
             "close": function() { this.objStream = null; },
@@ -129,7 +155,64 @@ export function createStandardOutputStream() {
             "size": function() { return 0; },
             "rotate": function( nBytesToWrite ) { },
             "toString": function() { return "" + strFilePath; },
-            "exposeDetailsTo": function( otherStream, strTitle, isSuccess ) { }
+            "exposeDetailsTo": function( otherStream, strTitle, isSuccess ) { },
+            // high-level formatters
+            "fatal": function() {
+                if( verboseGet() >= verboseReversed().fatal )
+                    this.write( getLogLinePrefixFatal() + fmtFatal( ...arguments ) );
+            },
+            "critical": function() {
+                if( verboseGet() >= verboseReversed().critical ) {
+                    this.write(
+                        getLogLinePrefixCritical() + fmtCritical( ...arguments ) );
+                }
+            },
+            "error": function() {
+                if( verboseGet() >= verboseReversed().error )
+                    this.write( getLogLinePrefixError() + fmtError( ...arguments ) );
+            },
+            "warning": function() {
+                if( verboseGet() >= verboseReversed().warning )
+                    this.write( getLogLinePrefixWarning() + fmtWarning( ...arguments ) );
+            },
+            "attention": function() {
+                if( verboseGet() >= verboseReversed().attention ) {
+                    this.write(
+                        getLogLinePrefixAttention() + fmtAttention( ...arguments ) );
+                }
+            },
+            "information": function() {
+                if( verboseGet() >= verboseReversed().information ) {
+                    this.write(
+                        getLogLinePrefixInformation() + fmtInformation( ...arguments ) );
+                }
+            },
+            "info": function() {
+                if( verboseGet() >= verboseReversed().information ) {
+                    this.write(
+                        getLogLinePrefixInformation() + fmtInformation( ...arguments ) );
+                }
+            },
+            "notice": function() {
+                if( verboseGet() >= verboseReversed().notice )
+                    this.write( getLogLinePrefixNotice() + fmtNotice( ...arguments ) );
+            },
+            "note": function() {
+                if( verboseGet() >= verboseReversed().notice )
+                    this.write( getLogLinePrefixNote() + fmtNote( ...arguments ) );
+            },
+            "debug": function() {
+                if( verboseGet() >= verboseReversed().debug )
+                    this.write( getLogLinePrefixDebug() + fmtDebug( ...arguments ) );
+            },
+            "trace": function() {
+                if( verboseGet() >= verboseReversed().trace )
+                    this.write( getLogLinePrefixTrace() + fmtTrace( ...arguments ) );
+            },
+            "success": function() {
+                if( verboseGet() >= verboseReversed().information )
+                    this.write( getLogLinePrefixSuccess() + fmtSuccess( ...arguments ) );
+            }
         };
         objEntry.open();
         return objEntry;
@@ -156,46 +239,153 @@ export function createMemoryOutputStream() {
             "strPath": "memory",
             "nMaxSizeBeforeRotation": -1,
             "nMaxFilesCount": -1,
-            "strAccumulatedLogText": "",
+            "arrAccumulatedLogTextLines": [],
             "haveOwnTimestamps": true,
+            "isPausedTimeStamps": false,
             "strOwnIndent": "    ",
-            "write": function( s ) {
-                if( this.strAccumulatedLogText.length == 0 ||
-                    this.strAccumulatedLogText[this.strAccumulatedLogText.length - 1] == "\n"
-                ) {
-                    this.strAccumulatedLogText += this.strOwnIndent;
-                    if( this.haveOwnTimestamps )
-                        this.strAccumulatedLogText += generateTimestampPrefix( null, true );
-                }
-                this.strAccumulatedLogText += s;
+            "isBeginningOfAccumulatedLog": function() {
+                if( this.arrAccumulatedLogTextLines.length == 0 )
+                    return true;
+                return false;
             },
-            "clear": function() { this.strAccumulatedLogText = ""; },
+            "isLastLineEndsWithCarriageReturn": function() {
+                if( this.arrAccumulatedLogTextLines.length == 0 )
+                    return false;
+                const s = this.arrAccumulatedLogTextLines[
+                    this.arrAccumulatedLogTextLines.length - 1];
+                if( ! s )
+                    return false;
+                if( s[s.length - 1] == "\n" )
+                    return true;
+                return false;
+            },
+            "write": function() {
+                const s = fmtArgumentsArray( arguments );
+                const arr = s.split( "\n" );
+                for( let i = 0; i < arr.length; ++ i ) {
+                    const strLine = arr[i];
+                    let strHeader = "";
+                    if( this.isLastLineEndsWithCarriageReturn() ||
+                        this.isBeginningOfAccumulatedLog() ) {
+                        strHeader = ( this.strOwnIndent ? this.strOwnIndent : "" );
+                        if( this.haveOwnTimestamps && ( !this.isPausedTimeStamps ) )
+                            strHeader += generateTimestampPrefix( null, true );
+                    }
+                    this.arrAccumulatedLogTextLines.push( strHeader + strLine + "\n" );
+                }
+            },
+            "writeRaw": function() {
+                const s = fmtArgumentsArray( arguments );
+                const arr = s.split( "\n" );
+                for( let i = 0; i < arr.length; ++ i ) {
+                    const strLine = arr[i];
+                    this.arrAccumulatedLogTextLines.push( strLine + "\n" );
+                }
+            },
+            "clear": function() { this.arrAccumulatedLogTextLines = []; },
             "close": function() { this.clear(); },
             "open": function() { this.clear(); },
             "size": function() { return 0; },
-            "rotate": function( nBytesToWrite ) { this.strAccumulatedLogText = ""; },
-            "toString": function() { return "" + this.strAccumulatedLogText; },
+            "rotate": function( nBytesToWrite ) { this.this.arrAccumulatedLogTextLines = []; },
+            "toString": function() {
+                let s = "";
+                for( let i = 0; i < this.arrAccumulatedLogTextLines.length; ++ i )
+                    s += this.arrAccumulatedLogTextLines[i];
+                return s;
+            },
             "exposeDetailsTo": function( otherStream, strTitle, isSuccess ) {
-                if( ! ( this.strAccumulatedLogText &&
-                    typeof this.strAccumulatedLogText == "string" &&
-                    this.strAccumulatedLogText.length > 0 ) )
+                if( ! ( this.arrAccumulatedLogTextLines &&
+                    this.arrAccumulatedLogTextLines.length > 0 ) )
                     return;
-                strTitle = strTitle
-                    ? ( cc.bright( " (" ) + cc.attention( strTitle ) + cc.bright( ")" ) ) : "";
-                const strSuccessPrefix = isSuccess
-                    ? cc.success( "SUCCESS" ) : cc.fatal( "ERROR" );
-                otherStream.write(
-                    cc.bright( "\n--- --- --- --- --- GATHERED " ) + strSuccessPrefix +
-                    cc.bright( " DETAILS FOR LATEST(" ) + cc.sunny( strTitle ) +
-                    cc.bright( " action (" ) + cc.sunny( "BEGIN" ) +
-                    cc.bright( ") --- --- ------ --- \n" ) +
-                    this.strAccumulatedLogText +
-                    cc.bright( "--- --- --- --- --- GATHERED " ) + strSuccessPrefix +
-                    cc.bright( " DETAILS FOR LATEST(" ) + cc.sunny( strTitle ) +
-                    cc.bright( " action (" ) + cc.sunny( "END" ) +
-                    cc.bright( ") --- --- --- --- ---\n"
-                    )
-                );
+                let werePausedTimeStamps = false;
+                try {
+                    werePausedTimeStamps = ( !!otherStream.isPausedTimeStamps );
+                    otherStream.isPausedTimeStamps = true;
+                } catch ( err ) {
+                }
+                try {
+                    strTitle = strTitle
+                        ? ( cc.bright( " (" ) + cc.attention( strTitle ) + cc.bright( ")" ) ) : "";
+                    const strSuccessPrefix = isSuccess
+                        ? cc.success( "SUCCESS" ) : cc.error( "ERROR" );
+                    otherStream.write( "\n" );
+                    otherStream.write( cc.bright( "--- --- --- --- --- GATHERED " ) +
+                        strSuccessPrefix + cc.bright( " DETAILS FOR LATEST(" ) +
+                        cc.sunny( strTitle ) + cc.bright( " action (" ) + cc.sunny( "BEGIN" ) +
+                        cc.bright( ") --- --- ------ --- " ) );
+                    otherStream.write( "\n" );
+                    for( let i = 0; i < this.arrAccumulatedLogTextLines.length; ++ i ) {
+                        try {
+                            otherStream.writeRaw( this.arrAccumulatedLogTextLines[i] );
+                        } catch ( err ) {
+                        }
+                    }
+                    otherStream.write( cc.bright( "--- --- --- --- --- GATHERED " ) +
+                        strSuccessPrefix + cc.bright( " DETAILS FOR LATEST(" ) +
+                        cc.sunny( strTitle ) + cc.bright( " action (" ) + cc.sunny( "END" ) +
+                        cc.bright( ") --- --- --- --- ---" ) );
+                    otherStream.write( "\n" );
+                } catch ( err ) {
+                }
+                try {
+                    otherStream.isPausedTimeStamps = werePausedTimeStamps;
+                } catch ( err ) {
+                }
+            },
+            // high-level formatters
+            "fatal": function() {
+                if( verboseGet() >= verboseReversed().fatal )
+                    this.write( getLogLinePrefixFatal() + fmtFatal( ...arguments ) );
+            },
+            "critical": function() {
+                if( verboseGet() >= verboseReversed().critical )
+                    this.write( getLogLinePrefixCritical() + fmtCritical( ...arguments ) );
+            },
+            "error": function() {
+                if( verboseGet() >= verboseReversed().error )
+                    this.write( getLogLinePrefixError() + fmtError( ...arguments ) );
+            },
+            "warning": function() {
+                if( verboseGet() >= verboseReversed().warning )
+                    this.write( getLogLinePrefixWarning() + fmtWarning( ...arguments ) );
+            },
+            "attention": function() {
+                if( verboseGet() >= verboseReversed().attention ) {
+                    this.write(
+                        getLogLinePrefixAttention() + fmtAttention( ...arguments ) );
+                }
+            },
+            "information": function() {
+                if( verboseGet() >= verboseReversed().information ) {
+                    this.write(
+                        getLogLinePrefixInformation() + fmtInformation( ...arguments ) );
+                }
+            },
+            "info": function() {
+                if( verboseGet() >= verboseReversed().information ) {
+                    this.write(
+                        getLogLinePrefixInformation() + fmtInformation( ...arguments ) );
+                }
+            },
+            "notice": function() {
+                if( verboseGet() >= verboseReversed().notice )
+                    this.write( getLogLinePrefixNotice() + fmtNotice( ...arguments ) );
+            },
+            "note": function() {
+                if( verboseGet() >= verboseReversed().notice )
+                    this.write( getLogLinePrefixNote() + fmtNote( ...arguments ) );
+            },
+            "debug": function() {
+                if( verboseGet() >= verboseReversed().debug )
+                    this.write( getLogLinePrefixDebug() + fmtDebug( ...arguments ) );
+            },
+            "trace": function() {
+                if( verboseGet() >= verboseReversed().trace )
+                    this.write( getLogLinePrefixTrace() + fmtTrace( ...arguments ) );
+            },
+            "success": function() {
+                if( verboseGet() >= verboseReversed().information )
+                    this.write( getLogLinePrefixSuccess() + fmtSuccess( ...arguments ) );
             }
         };
         objEntry.open();
@@ -225,15 +415,27 @@ export function createFileOutput( strFilePath, nMaxSizeBeforeRotation, nMaxFiles
             "nMaxFilesCount": 0 + nMaxFilesCount,
             "objStream": null,
             "haveOwnTimestamps": false,
+            "isPausedTimeStamps": false,
             "strOwnIndent": "",
-            "write": function( s ) {
-                const x =
-                    this.strOwnIndent +
-                    ( this.haveOwnTimestamps ? generateTimestampPrefix( null, true ) : "" ) +
-                    s;
+            "write": function() {
+                let s = ( this.strOwnIndent ? this.strOwnIndent : "" ) +
+                    ( ( this.haveOwnTimestamps && ( !this.isPausedTimeStamps ) )
+                        ? generateTimestampPrefix( null, true ) : "" );
+                s += fmtArgumentsArray( arguments );
                 try {
-                    this.rotate( x.length );
-                    fs.appendFileSync( this.objStream, x, "utf8" );
+                    if( s.length > 0 ) {
+                        this.rotate( s.length );
+                        fs.appendFileSync( this.objStream, s, "utf8" );
+                    }
+                } catch ( err ) { }
+            },
+            "writeRaw": function() {
+                const s = fmtArgumentsArray( arguments );
+                try {
+                    if( s.length > 0 ) {
+                        this.rotate( s.length );
+                        fs.appendFileSync( this.objStream, s, "utf8" );
+                    }
                 } catch ( err ) { }
             },
             "close": function() {
@@ -280,7 +482,64 @@ export function createFileOutput( strFilePath, nMaxSizeBeforeRotation, nMaxFiles
                 }
             },
             "toString": function() { return "" + strFilePath; },
-            "exposeDetailsTo": function( otherStream, strTitle, isSuccess ) { }
+            "exposeDetailsTo": function( otherStream, strTitle, isSuccess ) { },
+            // high-level formatters
+            "fatal": function() {
+                if( verboseGet() >= verboseReversed().fatal )
+                    this.write( getLogLinePrefixFatal() + fmtFatal( ...arguments ) );
+            },
+            "critical": function() {
+                if( verboseGet() >= verboseReversed().critical ) {
+                    this.write(
+                        getLogLinePrefixCritical() + fmtCritical( ...arguments ) );
+                }
+            },
+            "error": function() {
+                if( verboseGet() >= verboseReversed().error )
+                    this.write( getLogLinePrefixError() + fmtError( ...arguments ) );
+            },
+            "warning": function() {
+                if( verboseGet() >= verboseReversed().warning )
+                    this.write( getLogLinePrefixWarning() + fmtWarning( ...arguments ) );
+            },
+            "attention": function() {
+                if( verboseGet() >= verboseReversed().attention ) {
+                    this.write(
+                        getLogLinePrefixAttention() + fmtAttention( ...arguments ) );
+                }
+            },
+            "information": function() {
+                if( verboseGet() >= verboseReversed().information ) {
+                    this.write(
+                        getLogLinePrefixInformation() + fmtInformation( ...arguments ) );
+                }
+            },
+            "info": function() {
+                if( verboseGet() >= verboseReversed().information ) {
+                    this.write(
+                        getLogLinePrefixInformation() + fmtInformation( ...arguments ) );
+                }
+            },
+            "notice": function() {
+                if( verboseGet() >= verboseReversed().notice )
+                    this.write( getLogLinePrefixNotice() + fmtNotice( ...arguments ) );
+            },
+            "note": function() {
+                if( verboseGet() >= verboseReversed().notice )
+                    this.write( getLogLinePrefixNote() + fmtNote( ...arguments ) );
+            },
+            "debug": function() {
+                if( verboseGet() >= verboseReversed().debug )
+                    this.write( getLogLinePrefixDebug() + fmtDebug( ...arguments ) );
+            },
+            "trace": function() {
+                if( verboseGet() >= verboseReversed().trace )
+                    this.write( getLogLinePrefixTrace() + fmtTrace( ...arguments ) );
+            },
+            "success": function() {
+                if( verboseGet() >= verboseReversed().information )
+                    this.write( getLogLinePrefixSuccess() + fmtSuccess( ...arguments ) );
+            }
         };
         objEntry.open();
         return objEntry;
@@ -303,30 +562,293 @@ export function insertFileOutput( strFilePath, nMaxSizeBeforeRotation, nMaxFiles
     return true;
 }
 
-export function write() {
-    let s = getPrintTimestamps() ? generateTimestampPrefix( null, true ) : "", i = 0;
+export function extractErrorMessage( jo, strDefaultErrorText ) {
+    strDefaultErrorText = strDefaultErrorText || "unknown error or error without a description";
     try {
-        for( i = 0; i < arguments.length; ++i ) {
+        const isError = function( err ) {
+            return err && err.stack && err.message;
+        };
+        if( ! isError( jo ) ) {
+            if( "error" in jo ) {
+                jo = jo.error;
+                if( typeof jo == "string" )
+                    return jo;
+                if( typeof jo != "object" )
+                    return strDefaultErrorText + "(" + jo.toString() + ")";
+            }
+            if( typeof jo == "string" && jo )
+                return strDefaultErrorText + "(" + jo.toString() + ")";
+            return strDefaultErrorText;
+        }
+        if( typeof jo.message == "string" && jo.message.length > 0 )
+            return jo.message; // + jo.stack;
+        strDefaultErrorText += "(" + jo.toString() + ")"; // + jo.stack;
+    } catch ( err ) {
+    }
+    return strDefaultErrorText;
+}
+
+function tryToSplitFormatString( strFormat, cntArgsMax ) {
+    if( !( strFormat && typeof strFormat == "string" ) )
+        return null;
+    const arrParts = [];
+    let s = strFormat, cntFoundArgs = 0;
+    for( ; true; ) {
+        if( cntFoundArgs >= cntArgsMax )
+            break; // nothing to do split for
+        const nStart = s.indexOf( "{" );
+        if( nStart < 0 )
+            break;
+        const nEnd = s.indexOf( "}", nStart + 1 );
+        if( nEnd < 0 )
+            break;
+        const strPart = s.substring( 0, nStart );
+        const strArgDesc = s.substring( nStart + 1, nEnd ).trim().toLowerCase();
+        s = s.substring( nEnd + 1 );
+        if( strPart.length > 0 )
+            arrParts.push( { "type": "text", "text": strPart } );
+        arrParts.push( { "type": "arg", "text": strArgDesc } );
+        ++ cntFoundArgs;
+        if( s.length == 0 )
+            break;
+    }
+    if( cntFoundArgs == 0 )
+        return null;
+    if( s.length > 0 )
+        arrParts.push( { "type": "text", "text": s } );
+    return arrParts;
+}
+
+export function fmtArgumentsArray( arrArgs, fnFormatter ) {
+    fnFormatter = fnFormatter || function( arg ) { return arg; };
+    const arrParts = ( arrArgs && arrArgs.length > 0 )
+        ? tryToSplitFormatString( arrArgs[0], arrArgs.length - 1 ) : null;
+    let s = "", isValueMode = false;
+    const fnDefaultOneArgumentFormatter = function( arg, fnCustomFormatter ) {
+        if( ! fnCustomFormatter )
+            fnCustomFormatter = fnFormatter;
+        const t = typeof arg;
+        if( t == "string" ) {
+            if( arg.length > 0 ) {
+                if( arg == " " || arg == "\n" ) {
+                    // skip
+                } else if( ! cc.isStringAlreadyColorized( arg ) )
+                    return fnCustomFormatter( arg );
+            }
+        } else
+            return cc.logArgToString( arg );
+        return arg;
+    };
+    const fnFormatOneArgument = function( arg, fmt ) {
+        if( ! arg )
+            return arg;
+        if( arg == " " || arg == "\n" )
+            return arg;
+        if( ! isValueMode )
+            return fnDefaultOneArgumentFormatter( arg, null );
+        if( fmt && typeof "fmt" == "string" ) {
+            if( fmt == "raw" )
+                return arg;
+            if( fmt == "p" )
+                return fnDefaultOneArgumentFormatter( arg, null );
+            if( fmt == "url" )
+                return u( arg );
+            if( fmt == "yn" )
+                return yn( arg );
+            if( fmt == "oo" )
+                return onOff( arg );
+            if( fmt == "stack" )
+                return stack( arg );
+            if( fmt == "em" )
+                return em( arg );
+            if( fmt == "err" )
+                return em( extractErrorMessage( arg ) );
+            if( fmt == "bright" )
+                return fnDefaultOneArgumentFormatter( arg, cc.bright );
+            if( fmt == "sunny" )
+                return fnDefaultOneArgumentFormatter( arg, cc.sunny );
+            if( fmt == "rainbow" )
+                return fnDefaultOneArgumentFormatter( arg, cc.rainbow );
+        }
+        return v( arg );
+    };
+    try {
+        let idxArgNextPrinted = 0;
+        if( arrParts && arrParts.length > 0 ) {
+            idxArgNextPrinted = 1;
+            for( let i = 0; i < arrParts.length; ++i ) {
+                const joPart = arrParts[i];
+                if( joPart.type == "arg" ) {
+                    isValueMode = true;
+                    if( idxArgNextPrinted < arrArgs.length )
+                        s += fnFormatOneArgument( arrArgs[idxArgNextPrinted], joPart.text );
+                    ++ idxArgNextPrinted;
+                    continue;
+                }
+                // assume joPart.type == "text" always here, at this point
+                if( ! cc.isStringAlreadyColorized( joPart.text ) )
+                    s += fnFormatter( joPart.text );
+                else
+                    s += joPart.text;
+            }
+        }
+        for( let i = idxArgNextPrinted; i < arrArgs.length; ++i ) {
             try {
-                s += arguments[i];
+                s += fnFormatOneArgument( arrArgs[i], null );
             } catch ( err ) {
             }
         }
     } catch ( err ) {
     }
+    return s;
+}
+
+export function outputStringToAllStreams( s ) {
     try {
         if( s.length <= 0 )
             return;
-        const cnt = gArrStreams.length;
-        for( i = 0; i < cnt; ++i ) {
+        for( let i = 0; i < gArrStreams.length; ++i ) {
             try {
                 const objEntry = gArrStreams[i];
-                objEntry.write( s );
+                if( objEntry && "write" in objEntry && typeof objEntry.write == "function" )
+                    objEntry.write( s );
             } catch ( err ) {
             }
         }
     } catch ( err ) {
     }
+}
+
+export function write() {
+    let s = getPrintTimestamps() ? generateTimestampPrefix( null, true ) : "";
+    s += fmtArgumentsArray( arguments );
+    outputStringToAllStreams( s );
+}
+export function writeRaw() {
+    const s = fmtArgumentsArray( arguments );
+    outputStringToAllStreams( s );
+}
+
+export function getLogLinePrefixFatal() {
+    return cc.fatal( "FATAL ERROR:" ) + " ";
+}
+export function getLogLinePrefixCritical() {
+    return cc.fatal( "CRITICAL ERROR:" ) + " ";
+}
+export function getLogLinePrefixError() {
+    return cc.fatal( "ERROR:" ) + " ";
+}
+export function getLogLinePrefixWarning() {
+    return cc.error( "WARNING:" ) + " ";
+}
+export function getLogLinePrefixAttention() {
+    return "";
+}
+export function getLogLinePrefixInformation() {
+    return "";
+}
+export function getLogLinePrefixNotice() {
+    return "";
+}
+export function getLogLinePrefixNote() {
+    return "";
+}
+export function getLogLinePrefixDebug() {
+    return "";
+}
+export function getLogLinePrefixTrace() {
+    return "";
+}
+export function getLogLinePrefixSuccess() {
+    return "";
+}
+
+// high-level format to returned string
+export function fmtFatal() {
+    return fmtArgumentsArray( arguments, cc.error );
+}
+export function fmtCritical() {
+    return fmtArgumentsArray( arguments, cc.error );
+}
+export function fmtError() {
+    return fmtArgumentsArray( arguments, cc.error );
+}
+export function fmtWarning() {
+    return fmtArgumentsArray( arguments, cc.warning );
+}
+export function fmtAttention() {
+    return fmtArgumentsArray( arguments, cc.attention );
+}
+export function fmtInformation() {
+    return fmtArgumentsArray( arguments, cc.info );
+}
+export function fmtInfo() {
+    return fmtArgumentsArray( arguments, cc.info );
+}
+export function fmtNotice() {
+    return fmtArgumentsArray( arguments, cc.notice );
+}
+export function fmtNote() {
+    return fmtArgumentsArray( arguments, cc.note );
+}
+export function fmtDebug() {
+    return fmtArgumentsArray( arguments, cc.debug );
+}
+export function fmtTrace() {
+    return fmtArgumentsArray( arguments, cc.trace );
+}
+export function fmtSuccess() {
+    return fmtArgumentsArray( arguments, cc.success );
+}
+
+// high-level formatted output
+export function fatal() {
+    if( verboseGet() >= verboseReversed().fatal )
+        write( getLogLinePrefixFatal() + fmtFatal( ...arguments ) + "\n" );
+}
+export function critical() {
+    if( verboseGet() >= verboseReversed().critical )
+        write( getLogLinePrefixCritical() + fmtCritical( ...arguments ) + "\n" );
+}
+export function error() {
+    if( verboseGet() >= verboseReversed().error )
+        write( getLogLinePrefixError() + fmtError( ...arguments ) + "\n" );
+}
+export function warning() {
+    if( verboseGet() >= verboseReversed().warning )
+        write( getLogLinePrefixWarning() + fmtWarning( ...arguments ) + "\n" );
+}
+export function attention() {
+    if( verboseGet() >= verboseReversed().attention )
+        write( getLogLinePrefixAttention() + fmtAttention( ...arguments ) + "\n" );
+}
+export function information() {
+    if( verboseGet() >= verboseReversed().information )
+        write( getLogLinePrefixInformation() + fmtInformation( ...arguments ) + "\n" );
+}
+export function info() {
+    if( verboseGet() >= verboseReversed().information )
+        write( getLogLinePrefixInformation() + fmtInformation( ...arguments ) + "\n" );
+}
+export function notice() {
+    if( verboseGet() >= verboseReversed().notice )
+        write( getLogLinePrefixNotice() + fmtNotice( ...arguments ) + "\n" );
+}
+export function note() {
+    if( verboseGet() >= verboseReversed().notice )
+        write( getLogLinePrefixNote() + fmtNote( ...arguments ) + "\n" );
+}
+export function debug() {
+    if( verboseGet() >= verboseReversed().debug )
+        write( getLogLinePrefixDebug() + fmtDebug( ...arguments ) + "\n" );
+}
+export function trace() {
+    if( verboseGet() >= verboseReversed().trace )
+        write( getLogLinePrefixTrace() + fmtTrace( ...arguments ) + "\n" );
+}
+export function success() {
+    if( verboseGet() >= verboseReversed().information )
+        write( getLogLinePrefixSuccess() + fmtSuccess( ...arguments ) + "\n" );
 }
 
 export function removeAll() {
@@ -463,6 +985,36 @@ export function verboseList() {
         if( !gMapVerbose.hasOwnProperty( key ) )
             continue; // skip loop if the property is from prototype
         const name = gMapVerbose[key];
-        console.log( "    " + cc.info( key ) + cc.sunny( "=" ) + cc.bright( name ) );
+        console.log( "    " + cc.j( key ) + cc.sunny( "=" ) + cc.bright( name ) );
     }
+}
+
+export function u( x ) {
+    return cc.isStringAlreadyColorized( x ) ? x : cc.u( x );
+}
+
+export function v( x ) {
+    return cc.isStringAlreadyColorized( x ) ? x : cc.j( x );
+}
+
+export function em( x ) {
+    return cc.isStringAlreadyColorized( x ) ? x : cc.warning( x );
+}
+
+export function stack( x ) {
+    return cc.isStringAlreadyColorized( x ) ? x : cc.stack( x );
+}
+
+export function onOff( x ) {
+    return cc.isStringAlreadyColorized( x ) ? x : cc.onOff( x );
+}
+
+export function yn( x ) {
+    return cc.isStringAlreadyColorized( x ) ? x : cc.yn( x );
+}
+
+export function posNeg( condition, strPositive, strNegative ) {
+    return condition
+        ? ( cc.isStringAlreadyColorized( strPositive ) ? strPositive : cc.success( strPositive ) )
+        : ( cc.isStringAlreadyColorized( strNegative ) ? strNegative : cc.error( strNegative ) );
 }

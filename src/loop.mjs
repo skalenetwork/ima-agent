@@ -27,7 +27,6 @@ import * as networkLayer from "./socket.mjs";
 import * as url from "url";
 import * as threadInfo from "./threadInfo.mjs";
 import * as path from "path";
-import * as cc from "./cc.mjs";
 import * as log from "./log.mjs";
 import * as IMA from "./imaCore.mjs";
 import * as imaHelperAPIs from "./imaHelperAPIs.mjs";
@@ -79,64 +78,48 @@ export function checkTimeFraming( d, strDirection, joRuntimeOpts ) {
                 bInsideGap = true;
             }
         }
-        if( log.verboseGet() >= log.verboseReversed().debug ) {
-            log.write( "\n" +
-                cc.info( "Unix UTC time stamp" ) + cc.debug( "........" ) +
-                cc.attention( nUtcUnixTimeStamp ) + "\n" +
-                cc.info( "All Chains Range" ) + cc.debug( "..........." ) +
-                cc.notice( nSecondsRangeForAllSChains ) + "\n" +
-                cc.info( "S-Chain Range Mod" ) + cc.debug( ".........." ) +
-                cc.notice( nMod ) + "\n" +
-                cc.info( "Active Node Frame Index" ) + cc.debug( "...." ) +
-                cc.notice( nActiveNodeFrameIndex ) + "\n" +
-                cc.info( "Testing Frame Index" ) + cc.debug( "........" ) +
-                cc.notice( imaState.nNodeNumber ) + "\n" +
-                cc.info( "Transfer Direction" ) + cc.debug( "........." ) +
-                cc.sunny( strDirection || "NA" ) + "\n" +
-                ( ( nFrameShift > 0 )
-                    ? ( cc.info( "Frame Shift" ) + cc.debug( "................" ) +
-                        cc.note( nFrameShift ) + "\n" +
-                        cc.info( "S2S known chain index" ) + cc.debug( "......" ) +
-                        cc.note( joRuntimeOpts.idxChainKnownForS2S ) + "\n" +
-                        cc.info( "S2S known chains count" ) + cc.debug( "....." ) +
-                        cc.note( joRuntimeOpts.cntChainsKnownForS2S ) +
-                        "\n" +
-                        ( ( "joExtraSignOpts" in joRuntimeOpts &&
-                            typeof joRuntimeOpts.joExtraSignOpts == "object" )
-                            ? cc.info( "S-Chain source" ) + cc.debug( "............." ) +
-                            cc.info( joRuntimeOpts.joExtraSignOpts.chainNameSrc ) +
-                            cc.debug( "/" ) +
-                            cc.attention( joRuntimeOpts.joExtraSignOpts.chainIdSrc ) +
-                            "\n" +
-                            cc.info( "S-Chain destination" ) + cc.debug( "........" ) +
-                            cc.info( joRuntimeOpts.joExtraSignOpts.chainNameDst ) +
-                            cc.debug( "/" ) +
-                            cc.attention( joRuntimeOpts.joExtraSignOpts.chainIdDst ) +
-                            "\n"
-                            : "" )
-                    )
-                    : "" ) +
-                cc.info( "Is skip" ) + cc.debug( "...................." ) +
-                cc.yn( bSkip ) + "\n" +
-                cc.info( "Is inside gap" ) + cc.debug( ".............." ) +
-                cc.yn( bInsideGap ) + "\n" +
-                cc.info( "Range Start" ) + cc.debug( "................" ) +
-                cc.notice( nRangeStart ) + "\n" +
-                cc.info( "Frame Start" ) + cc.debug( "................" ) +
-                cc.notice( nFrameStart ) + "\n" +
-                cc.info( "Gap Start" ) + cc.debug( ".................." ) +
-                cc.notice( nGapStart ) + "\n"
+        log.debug( "\n",
+            "    Unix UTC time stamp", "........",
+            log.fmtInformation( "{}", nUtcUnixTimeStamp ), "\n",
+            "    All Chains Range", "...........", nSecondsRangeForAllSChains, "\n",
+            "    S-Chain Range Mod", "..........", log.fmtInformation( "{}", nMod ), "\n",
+            "    Active Node Frame Index", "....",
+            log.fmtInformation( "{}", nActiveNodeFrameIndex ), "\n",
+            "    Testing Frame Index", "........",
+            log.fmtInformation( "{}", imaState.nNodeNumber ), "\n",
+            "    Transfer Direction", ".........",
+            log.fmtInformation( "{bright}", strDirection || "NA" ) );
+        if( nFrameShift > 0 ) {
+            log.debug(
+                "    Frame Shift", "................",
+                log.fmtInformation( "{}", nFrameShift ), "\n",
+                "    S2S known chain index", "......",
+                log.fmtInformation( "{}", joRuntimeOpts.idxChainKnownForS2S ), "\n",
+                "    S2S known chains count", ".....",
+                log.fmtInformation( "{}", joRuntimeOpts.cntChainsKnownForS2S ), "\n"
             );
+            if( "joExtraSignOpts" in joRuntimeOpts &&
+                typeof joRuntimeOpts.joExtraSignOpts == "object" ) {
+                log.debug( "    S-Chain source", ".............",
+                    log.fmtInformation( "{}", joRuntimeOpts.joExtraSignOpts.chainNameSrc ),
+                    "/", log.fmtInformation( "{}", joRuntimeOpts.joExtraSignOpts.chainIdSrc ) );
+            } else {
+                log.debug( "    S-Chain destination", "........",
+                    log.fmtInformation( "{}", joRuntimeOpts.joExtraSignOpts.chainNameDst ),
+                    "/", log.fmtInformation( "{}", joRuntimeOpts.joExtraSignOpts.chainIdDst ) );
+            }
         }
+        log.debug( "\n",
+            "    Is skip", "....................", log.yn( bSkip ), "\n",
+            "    Is inside gap", "..............", log.yn( bInsideGap ), "\n",
+            "    Range Start", "................", log.fmtInformation( "{}", nRangeStart ), "\n",
+            "    Frame Start", "................", log.fmtInformation( "{}", nFrameStart ), "\n",
+            "    Gap Start", "..................", log.fmtInformation( "{}", nGapStart ) );
         if( bSkip )
             return false;
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().error ) {
-            log.write( cc.error( "Exception in time framing check in " ) +
-                threadInfo.threadDescription() + cc.error( ": " ) +
-                cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
-        }
+        log.error( "Exception in time framing check in {}: {err}, stack is:{}{stack}",
+            threadInfo.threadDescription(), err, "\n", err.stack );
     }
     return true;
 };
@@ -145,18 +128,13 @@ async function singleTransferLoopPartOracle( optsLoop, strLogPrefix ) {
     const imaState = state.get();
     let b0 = true;
     if( optsLoop.enableStepOracle && imaOracleOperations.getEnabledOracle() ) {
-        if( log.verboseGet() >= log.verboseReversed().notice ) {
-            log.write( strLogPrefix + cc.debug( "Will invoke Oracle gas price setup in " ) +
-            threadInfo.threadDescription() + cc.debug( "..." ) + "\n" );
-        }
+        log.notice( "{p}Will invoke Oracle gas price setup in {}...",
+            strLogPrefix, threadInfo.threadDescription() );
         try {
             if( ! await pwa.checkOnLoopStart( imaState, "oracle" ) ) {
                 imaState.loopState.oracle.wasInProgress = false;
-                if( log.verboseGet() >= log.verboseReversed().notice ) {
-                    log.write( strLogPrefix + cc.warning( "Skipped(oracle) in " ) +
-                        threadInfo.threadDescription() +
-                        cc.warning( " due to cancel mode reported from PWA" ) + "\n" );
-                }
+                log.notice( "{p}Skipped(oracle) in {} due to cancel mode reported from PWA",
+                    strLogPrefix, threadInfo.threadDescription() );
             } else {
                 if( checkTimeFraming( null, "oracle", optsLoop.joRuntimeOpts ) ) {
                     imaState.loopState.oracle.isInProgress = true;
@@ -174,28 +152,19 @@ async function singleTransferLoopPartOracle( optsLoop, strLogPrefix ) {
                     imaState.loopState.oracle.isInProgress = false;
                     await pwa.notifyOnLoopEnd( imaState, "oracle" );
                 } else {
-                    if( log.verboseGet() >= log.verboseReversed().notice ) {
-                        log.write( strLogPrefix + cc.warning( "Skipped(oracle) in " ) +
-                            threadInfo.threadDescription() +
-                            cc.warning( " due to time framing check" ) + "\n" );
-                    }
+                    log.notice( "{p}Skipped(oracle) in {} due to time framing check",
+                        strLogPrefix, threadInfo.threadDescription() );
                 }
             }
         } catch ( err ) {
-            if( log.verboseGet() >= log.verboseReversed().error ) {
-                log.write( strLogPrefix + cc.error( "Oracle operation exception: " ) +
-                    cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                    cc.error( " in " ) + threadInfo.threadDescription() +
-                    cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
-            }
+            log.error( "{p}Oracle operation exception: {} in {err}, stack is:{}{stack}",
+                strLogPrefix, err, threadInfo.threadDescription(), "\n", err.stack );
             imaState.loopState.oracle.isInProgress = false;
             await pwa.notifyOnLoopEnd( imaState, "oracle" );
             throw err;
         }
-        if( log.verboseGet() >= log.verboseReversed().information ) {
-            log.write( strLogPrefix + cc.debug( "Oracle gas price setup done in " ) +
-                threadInfo.threadDescription() + cc.debug( ": " ) + cc.tf( b0 ) + "\n" );
-        }
+        log.information( "{p}Oracle gas price setup done in {}: {}",
+            strLogPrefix, threadInfo.threadDescription(), b0 );
     }
     return b0;
 }
@@ -204,18 +173,13 @@ async function singleTransferLoopPartM2S( optsLoop, strLogPrefix ) {
     const imaState = state.get();
     let b1 = true;
     if( optsLoop.enableStepM2S ) {
-        if( log.verboseGet() >= log.verboseReversed().notice ) {
-            log.write( strLogPrefix + cc.debug( "Will invoke M2S transfer in " ) +
-                threadInfo.threadDescription() + cc.debug( "..." ) + "\n" );
-        }
+        log.notice( "{p}Will invoke M2S transfer in {}...",
+            strLogPrefix, threadInfo.threadDescription() );
         try {
             if( ! await pwa.checkOnLoopStart( imaState, "m2s" ) ) {
                 imaState.loopState.m2s.wasInProgress = false;
-                if( log.verboseGet() >= log.verboseReversed().notice ) {
-                    log.write( strLogPrefix + cc.warning( "Skipped(m2s) in " ) +
-                        threadInfo.threadDescription() +
-                        cc.warning( " due to cancel mode reported from PWA" ) + "\n" );
-                }
+                log.notice( "{p}Skipped(m2s) in {} due to cancel mode reported from PWA",
+                    strLogPrefix, threadInfo.threadDescription() );
             } else {
                 if( checkTimeFraming( null, "m2s", optsLoop.joRuntimeOpts ) ) {
                     imaState.loopState.m2s.isInProgress = true;
@@ -223,13 +187,11 @@ async function singleTransferLoopPartM2S( optsLoop, strLogPrefix ) {
                     b1 = await IMA.doTransfer( // main-net --> s-chain
                         "M2S",
                         optsLoop.joRuntimeOpts,
-
                         imaState.chainProperties.mn.ethersProvider,
                         imaState.joMessageProxyMainNet,
                         imaState.chainProperties.mn.joAccount,
                         imaState.chainProperties.sc.ethersProvider,
                         imaState.joMessageProxySChain,
-
                         imaState.chainProperties.sc.joAccount,
                         imaState.chainProperties.mn.strChainName,
                         imaState.chainProperties.sc.strChainName,
@@ -249,34 +211,22 @@ async function singleTransferLoopPartM2S( optsLoop, strLogPrefix ) {
                     imaState.loopState.m2s.isInProgress = false;
                     await pwa.notifyOnLoopEnd( imaState, "m2s" );
                 } else {
-                    if( log.verboseGet() >= log.verboseReversed().notice ) {
-                        log.write( strLogPrefix + cc.warning( "Skipped(m2s) in " ) +
-                            threadInfo.threadDescription() +
-                            cc.warning( " due to time framing check" ) + "\n" );
-                    }
+                    log.notice( "{p}Skipped(m2s) in {} due to time framing check",
+                        strLogPrefix, threadInfo.threadDescription() );
                 }
             }
         } catch ( err ) {
-            if( log.verboseGet() >= log.verboseReversed().error ) {
-                log.write( strLogPrefix + cc.error( "M2S transfer exception in " ) +
-                    threadInfo.threadDescription() + cc.error( ": " ) +
-                    cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                    cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
-            }
+            log.error( "{p}M2S transfer exception in {}: {err}, stack is:{}{stack}",
+                strLogPrefix, threadInfo.threadDescription(), err, "\n", err.stack );
             imaState.loopState.m2s.isInProgress = false;
             await pwa.notifyOnLoopEnd( imaState, "m2s" );
             throw err;
         }
-        if( log.verboseGet() >= log.verboseReversed().information ) {
-            log.write( strLogPrefix + cc.debug( "M2S transfer done in " ) +
-                threadInfo.threadDescription() + cc.debug( ": " ) + cc.tf( b1 ) + "\n" );
-        }
-    } else {
-        if( log.verboseGet() >= log.verboseReversed().debug ) {
-            log.write( strLogPrefix + cc.warning( "Skipped M2S transfer in " ) +
-                threadInfo.threadDescription() + cc.warning( "." ) + "\n" );
-        }
-    }
+        log.information( "{p}M2S transfer done in {}: {}",
+            strLogPrefix, threadInfo.threadDescription(), b1 );
+    } else
+        log.debug( "{p}Skipped M2S transfer in {}.", strLogPrefix, threadInfo.threadDescription() );
+
     return b1;
 }
 
@@ -284,18 +234,13 @@ async function singleTransferLoopPartS2M( optsLoop, strLogPrefix ) {
     const imaState = state.get();
     let b2 = true;
     if( optsLoop.enableStepS2M ) {
-        if( log.verboseGet() >= log.verboseReversed().notice ) {
-            log.write( strLogPrefix + cc.debug( "Will invoke S2M transfer in " ) +
-                threadInfo.threadDescription() + cc.debug( "..." ) + "\n" );
-        }
+        log.notice( "{p}Will invoke S2M transfer in {}...",
+            strLogPrefix, threadInfo.threadDescription() );
         try {
             if( ! await pwa.checkOnLoopStart( imaState, "s2m" ) ) {
                 imaState.loopState.s2m.wasInProgress = false;
-                if( log.verboseGet() >= log.verboseReversed().notice ) {
-                    log.write( strLogPrefix + cc.warning( "Skipped(s2m) in " ) +
-                        threadInfo.threadDescription() +
-                        cc.warning( " due to cancel mode reported from PWA" ) + "\n" );
-                }
+                log.notice( "{p}Skipped(s2m) in {} due to cancel mode reported from PWA",
+                    strLogPrefix, threadInfo.threadDescription() );
             } else {
                 if( checkTimeFraming( null, "s2m", optsLoop.joRuntimeOpts ) ) {
                     imaState.loopState.s2m.isInProgress = true;
@@ -303,13 +248,11 @@ async function singleTransferLoopPartS2M( optsLoop, strLogPrefix ) {
                     b2 = await IMA.doTransfer( // s-chain --> main-net
                         "S2M",
                         optsLoop.joRuntimeOpts,
-
                         imaState.chainProperties.sc.ethersProvider,
                         imaState.joMessageProxySChain,
                         imaState.chainProperties.sc.joAccount,
                         imaState.chainProperties.mn.ethersProvider,
                         imaState.joMessageProxyMainNet,
-
                         imaState.chainProperties.mn.joAccount,
                         imaState.chainProperties.sc.strChainName,
                         imaState.chainProperties.mn.strChainName,
@@ -329,33 +272,22 @@ async function singleTransferLoopPartS2M( optsLoop, strLogPrefix ) {
                     imaState.loopState.s2m.isInProgress = false;
                     await pwa.notifyOnLoopEnd( imaState, "s2m" );
                 } else {
-                    if( log.verboseGet() >= log.verboseReversed().notice ) {
-                        log.write( strLogPrefix + cc.warning( "Skipped(s2m) in " ) +
-                            threadInfo.threadDescription() +
-                            cc.warning( " due to time framing check" ) + "\n" );
-                    }
+                    log.notice( "{p}Skipped(s2m) in {} due to time framing check",
+                        strLogPrefix, threadInfo.threadDescription() );
                 }
             }
         } catch ( err ) {
-            if( log.verboseGet() >= log.verboseReversed().error ) {
-                log.write( strLogPrefix + cc.error( "S2M transfer exception in " ) +
-                    threadInfo.threadDescription() + cc.error( ": " ) +
-                    cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                    cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
-            }
+            log.error( "{p}S2M transfer exception in {err}: , stack is:{}{stack}",
+                strLogPrefix, threadInfo.threadDescription(), err, "\n", err.stack );
             imaState.loopState.s2m.isInProgress = false;
             await pwa.notifyOnLoopEnd( imaState, "s2m" );
             throw err;
         }
-        if( log.verboseGet() >= log.verboseReversed().information ) {
-            log.write( strLogPrefix + cc.debug( "S2M transfer done in " ) +
-                threadInfo.threadDescription() + cc.debug( ": " ) + cc.tf( b2 ) + "\n" );
-        }
+        log.information( "{p}S2M transfer done in {}: {}",
+            strLogPrefix, threadInfo.threadDescription(), b2 );
     } else {
-        if( log.verboseGet() >= log.verboseReversed().debug ) {
-            log.write( strLogPrefix + cc.warning( "Skipped S2M transfer in " ) +
-                threadInfo.threadDescription() + cc.warning( "." ) + "\n" );
-        }
+        log.debug( "{p}Skipped S2M transfer in {}.",
+            strLogPrefix, threadInfo.threadDescription() );
     }
     return b2;
 }
@@ -364,8 +296,7 @@ async function singleTransferLoopPartS2S( optsLoop, strLogPrefix ) {
     const imaState = state.get();
     let b3 = true;
     if( optsLoop.enableStepS2S && imaState.optsS2S.isEnabled ) {
-        if( log.verboseGet() >= log.verboseReversed().notice )
-            log.write( strLogPrefix + cc.debug( "Will invoke all S2S transfers..." ) + "\n" );
+        log.notice( "{p}Will invoke all S2S transfers...", strLogPrefix );
         try {
             b3 = await IMA.doAllS2S( // s-chain --> s-chain
                 optsLoop.joRuntimeOpts,
@@ -386,43 +317,29 @@ async function singleTransferLoopPartS2S( optsLoop, strLogPrefix ) {
                 imaState.chainProperties.sc.transactionCustomizer
             );
         } catch ( err ) {
-            if( log.verboseGet() >= log.verboseReversed().error ) {
-                log.write( strLogPrefix + cc.error( "S2S transfer exception in " ) +
-                    threadInfo.threadDescription() + cc.error( ": " ) +
-                    cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                    cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
-            }
+            log.error( "{p}S2S transfer exception in {}: {err}, stack is:{}{stack}",
+                strLogPrefix, threadInfo.threadDescription(), err, "\n", err.stack );
             throw err;
         }
-        if( log.verboseGet() >= log.verboseReversed().information ) {
-            log.write( strLogPrefix + cc.debug( "All S2S transfers done in " ) +
-                threadInfo.threadDescription() + cc.debug( ": " ) + cc.tf( b3 ) + "\n" );
-        }
+        log.information( "{p}All S2S transfers done in {}: {}",
+            strLogPrefix, threadInfo.threadDescription(), b3 );
 
-    } else {
-        if( log.verboseGet() >= log.verboseReversed().debug ) {
-            log.write( strLogPrefix + cc.warning( "Skipped S2S transfer in " ) +
-                threadInfo.threadDescription() + cc.warning( "." ) + "\n" );
-        }
-    }
+    } else
+        log.debug( "{p}Skipped S2S transfer in {}.", strLogPrefix, threadInfo.threadDescription() );
+
     return b3;
 }
 
 function printLoopPartSkippedWarning( strLoopPartName ) {
-    if( log.verboseGet() >= log.verboseReversed().warning ) {
-        log.write( strLogPrefix + cc.warning( "Skipped " ) + cc.notice( strLoopPartName ) +
-            cc.warning( " transfer loop part due to other single " +
-            "transfer loop is in progress right now" ) + "\n" );
-    }
+    log.warning( "{p}Skipped {} transfer loop part due to other single transfer loop is in " +
+        "progress right now", strLogPrefix, strLoopPartName );
 }
 
 export async function singleTransferLoop( optsLoop ) {
     const imaState = state.get();
-    const strLogPrefix = cc.attention( "Single Loop in " ) +
-        threadInfo.threadDescription() + cc.debug( ":" ) + " ";
+    const strLogPrefix = `Single Loop in ${threadInfo.threadDescription( false )}`;
     try {
-        if( log.verboseGet() >= log.verboseReversed().debug )
-            log.write( strLogPrefix + cc.debug( imaHelperAPIs.longSeparator ) + "\n" );
+        log.debug( "{p}{p}", strLogPrefix, imaHelperAPIs.longSeparator );
         let b0 = false, b1 = false, b2 = false, b3 = false;
         // Oracle loop part:
         if( optsLoop.enableStepOracle ) {
@@ -466,18 +383,12 @@ export async function singleTransferLoop( optsLoop ) {
             b3 = true;
         // Final status check loop part:
         const bResult = b0 && b1 && b2 && b3;
-        if( log.verboseGet() >= log.verboseReversed().notice ) {
-            log.write( strLogPrefix +
-                cc.debug( "Final completion status for all performed transfer loop parts is " ) +
-                cc.tf( bResult ) + "\n" );
-        }
+        log.notice( "{p}Final completion status for all performed transfer loop parts is {}",
+            strLogPrefix, bResult );
         return bResult;
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().error ) {
-            log.write( strLogPrefix + cc.fatal( "Exception in transfer loop: " ) +
-                cc.warning( owaspUtils.extractErrorMessage( err ) ) +
-                cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) + "\n" );
-        }
+        log.error( "{p}Exception in transfer loop: {err}, stack is:{}{stack}", strLogPrefix,
+            err, "\n", err.stack );
     }
     imaState.loopState.oracle.isInProgress = false;
     imaState.loopState.m2s.isInProgress = false;
@@ -512,54 +423,28 @@ const gArrClients = [];
 export function notifyCacheChangedSNB( arrSChainsCached ) {
     const cntWorkers = gArrWorkers.length;
     if( cntWorkers == 0 ) {
-        if( log.verboseGet() >= log.verboseReversed().debug ) {
-            log.write( cc.warning( "Will skip chainsCacheChanged dispatch event with " ) +
-                cc.warning( "no chains arrived in " ) + threadInfo.threadDescription() + "\n" );
-        }
+        log.debug( "Will skip chainsCacheChanged dispatch event with no chains arrived in ",
+            threadInfo.threadDescription() );
         return;
     }
-    if( log.verboseGet() >= log.verboseReversed().debug ) {
-        log.write(
-            cc.debug( "Loop module will broadcast arrSChainsCached event to its " ) +
-            cc.info( cntWorkers ) + cc.debug( " worker(s) in " ) +
-            threadInfo.threadDescription() + cc.debug( "..." ) + "\n" );
-    }
+    log.debug( "Loop module will broadcast arrSChainsCached event to its ",
+        cntWorkers, " worker(s) in ", threadInfo.threadDescription(), "..." );
     for( let idxWorker = 0; idxWorker < cntWorkers; ++ idxWorker ) {
         const jo = {
             "method": "schainsCached",
-            "message": {
-                "arrSChainsCached": arrSChainsCached
-            }
+            "message": { "arrSChainsCached": arrSChainsCached }
         };
-        if( log.verboseGet() >= log.verboseReversed().debug ) {
-            log.write( cc.debug( "S-Chains cache will be sent to " ) +
-                cc.notice( gArrClients[idxWorker].url ) + cc.debug( " loop worker..." ) +
-                "\n" );
-        }
+        log.debug( "S-Chains cache will be sent to {} loop worker...", gArrClients[idxWorker].url );
         gArrClients[idxWorker].send( jo );
-        if( log.verboseGet() >= log.verboseReversed().debug ) {
-            log.write( cc.debug( "S-Chains cache did sent to " ) +
-                cc.notice( gArrClients[idxWorker].url ) + cc.debug( " loop worker" ) +
-                "\n" );
-        }
+        log.debug( "S-Chains cache did sent to {} loop worker", gArrClients[idxWorker].url );
     }
-    if( log.verboseGet() >= log.verboseReversed().debug ) {
-        log.write(
-            cc.debug( "Loop module did finished broadcasting arrSChainsCached event to its " ) +
-            cc.info( cntWorkers ) + cc.debug( " worker(s) in " ) +
-            threadInfo.threadDescription() + cc.debug( "..." ) + "\n" );
-    }
+    log.debug( "Loop module did finished broadcasting arrSChainsCached event " +
+        "to its {} worker(s) in {}...", cntWorkers, threadInfo.threadDescription() );
 }
 
-if( log.verboseGet() >= log.verboseReversed().trace ) {
-    log.write( cc.debug( "Subscribe to chainsCacheChanged event in " ) +
-        threadInfo.threadDescription() + "\n" );
-}
+log.trace( "Subscribe to chainsCacheChanged event in {}", threadInfo.threadDescription() );
 skaleObserver.events.on( "chainsCacheChanged", function( eventData ) {
-    if( log.verboseGet() >= log.verboseReversed().trace ) {
-        log.write( cc.debug( "Did arrived chainsCacheChanged event in " ) +
-            threadInfo.threadDescription() + "\n" );
-    }
+    log.trace( "Did arrived chainsCacheChanged event in {}", threadInfo.threadDescription() );
     notifyCacheChangedSNB( eventData.detail.arrSChainsCached );
 } );
 
@@ -567,25 +452,16 @@ function constructChainProperties( opts ) {
     return {
         "mn": {
             "joAccount": {
-                "privateKey":
-                    opts.imaState.chainProperties.mn.joAccount.privateKey,
-                "address_":
-                    opts.imaState.chainProperties.mn.joAccount.address_,
+                "privateKey": opts.imaState.chainProperties.mn.joAccount.privateKey,
+                "address_": opts.imaState.chainProperties.mn.joAccount.address_,
                 "strTransactionManagerURL":
-                    opts.imaState.chainProperties.mn
-                        .joAccount.strTransactionManagerURL,
-                "nTmPriority":
-                    opts.imaState.chainProperties.mn.joAccount.nTmPriority,
-                "strSgxURL":
-                    opts.imaState.chainProperties.mn.joAccount.strSgxURL,
-                "strSgxKeyName":
-                    opts.imaState.chainProperties.mn.joAccount.strSgxKeyName,
-                "strPathSslKey":
-                    opts.imaState.chainProperties.mn.joAccount.strPathSslKey,
-                "strPathSslCert":
-                    opts.imaState.chainProperties.mn.joAccount.strPathSslCert,
-                "strBlsKeyName":
-                    opts.imaState.chainProperties.mn.joAccount.strBlsKeyName
+                    opts.imaState.chainProperties.mn.joAccount.strTransactionManagerURL,
+                "nTmPriority": opts.imaState.chainProperties.mn.joAccount.nTmPriority,
+                "strSgxURL": opts.imaState.chainProperties.mn.joAccount.strSgxURL,
+                "strSgxKeyName": opts.imaState.chainProperties.mn.joAccount.strSgxKeyName,
+                "strPathSslKey": opts.imaState.chainProperties.mn.joAccount.strPathSslKey,
+                "strPathSslCert": opts.imaState.chainProperties.mn.joAccount.strPathSslCert,
+                "strBlsKeyName": opts.imaState.chainProperties.mn.joAccount.strBlsKeyName
             },
             "ethersProvider": null,
             "strURL": opts.imaState.chainProperties.mn.strURL,
@@ -596,25 +472,16 @@ function constructChainProperties( opts ) {
         },
         "sc": {
             "joAccount": {
-                "privateKey":
-                    opts.imaState.chainProperties.sc.joAccount.privateKey,
-                "address_":
-                    opts.imaState.chainProperties.sc.joAccount.address_,
+                "privateKey": opts.imaState.chainProperties.sc.joAccount.privateKey,
+                "address_": opts.imaState.chainProperties.sc.joAccount.address_,
                 "strTransactionManagerURL":
-                    opts.imaState.chainProperties.sc
-                        .joAccount.strTransactionManagerURL,
-                "nTmPriority":
-                    opts.imaState.chainProperties.sc.joAccount.nTmPriority,
-                "strSgxURL":
-                    opts.imaState.chainProperties.sc.joAccount.strSgxURL,
-                "strSgxKeyName":
-                    opts.imaState.chainProperties.sc.joAccount.strSgxKeyName,
-                "strPathSslKey":
-                    opts.imaState.chainProperties.sc.joAccount.strPathSslKey,
-                "strPathSslCert":
-                    opts.imaState.chainProperties.mn.joAccount.strPathSslCert,
-                "strBlsKeyName":
-                    opts.imaState.chainProperties.mn.joAccount.strBlsKeyName
+                    opts.imaState.chainProperties.sc.joAccount.strTransactionManagerURL,
+                "nTmPriority": opts.imaState.chainProperties.sc.joAccount.nTmPriority,
+                "strSgxURL": opts.imaState.chainProperties.sc.joAccount.strSgxURL,
+                "strSgxKeyName": opts.imaState.chainProperties.sc.joAccount.strSgxKeyName,
+                "strPathSslKey": opts.imaState.chainProperties.sc.joAccount.strPathSslKey,
+                "strPathSslCert": opts.imaState.chainProperties.mn.joAccount.strPathSslCert,
+                "strBlsKeyName": opts.imaState.chainProperties.mn.joAccount.strBlsKeyName
             },
             "ethersProvider": null,
             "strURL": opts.imaState.chainProperties.sc.strURL,
@@ -625,25 +492,16 @@ function constructChainProperties( opts ) {
         },
         "tc": {
             "joAccount": {
-                "privateKey":
-                    opts.imaState.chainProperties.tc.joAccount.privateKey,
-                "address_":
-                    opts.imaState.chainProperties.tc.joAccount.address_,
+                "privateKey": opts.imaState.chainProperties.tc.joAccount.privateKey,
+                "address_": opts.imaState.chainProperties.tc.joAccount.address_,
                 "strTransactionManagerURL":
-                    opts.imaState.chainProperties.tc
-                        .joAccount.strTransactionManagerURL,
-                "nTmPriority":
-                    opts.imaState.chainProperties.tc.joAccount.nTmPriority,
-                "strSgxURL":
-                    opts.imaState.chainProperties.tc.joAccount.strSgxURL,
-                "strSgxKeyName":
-                    opts.imaState.chainProperties.tc.joAccount.strSgxKeyName,
-                "strPathSslKey":
-                    opts.imaState.chainProperties.tc.joAccount.strPathSslKey,
-                "strPathSslCert":
-                    opts.imaState.chainProperties.tc.joAccount.strPathSslCert,
-                "strBlsKeyName":
-                    opts.imaState.chainProperties.tc.joAccount.strBlsKeyName
+                    opts.imaState.chainProperties.tc.joAccount.strTransactionManagerURL,
+                "nTmPriority": opts.imaState.chainProperties.tc.joAccount.nTmPriority,
+                "strSgxURL": opts.imaState.chainProperties.tc.joAccount.strSgxURL,
+                "strSgxKeyName": opts.imaState.chainProperties.tc.joAccount.strSgxKeyName,
+                "strPathSslKey": opts.imaState.chainProperties.tc.joAccount.strPathSslKey,
+                "strPathSslCert": opts.imaState.chainProperties.tc.joAccount.strPathSslCert,
+                "strBlsKeyName": opts.imaState.chainProperties.tc.joAccount.strBlsKeyName
             },
             "ethersProvider": null,
             "strURL": opts.imaState.chainProperties.tc.strURL,
@@ -673,14 +531,12 @@ export async function ensureHaveWorkers( opts ) {
     if( gArrWorkers.length > 0 )
         return gArrWorkers;
     const cntWorkers = 2;
-    if( log.verboseGet() >= log.verboseReversed().debug ) {
-        log.write( cc.debug( "Loop module will create its " ) +
-            cc.info( cntWorkers ) + cc.debug( " worker(s) in " ) +
-            threadInfo.threadDescription() + cc.debug( "..." ) + "\n" );
-    }
+    log.debug( "Loop module will create its ",
+        cntWorkers, " worker(s) in ", threadInfo.threadDescription(), "..." );
     for( let idxWorker = 0; idxWorker < cntWorkers; ++ idxWorker ) {
         const workerData = {
-            url: "ima_loop_server" + idxWorker, cc: { isEnabled: cc.isEnabled() }
+            "url": "ima_loop_server" + idxWorker,
+            "colorization": { isEnabled: log.isEnabledColorization() }
         };
         gArrWorkers.push( new threadInfo.Worker(
             path.join( __dirname, "loopWorker.mjs" ),
@@ -704,16 +560,11 @@ export async function ensureHaveWorkers( opts ) {
                     break;
                 }
                 aClient.errorLogicalInit = joMessage.error;
-                if( log.verboseGet() >= log.verboseReversed().critical ) {
-                    opts.details.write( cc.fatal( "CRITICAL ERROR:" ) + " " +
-                        cc.debug( "Loop worker thread " ) + cc.info( idxWorker ) +
-                        cc.debug( " reported/returned init error:" ) + " " +
-                        cc.warning( owaspUtils.extractErrorMessage( joMessage.error ) ) + "\n" );
-                }
+                opts.details.critical( " Loop worker thread {} reported/returned init error: {err}",
+                    idxWorker, joMessage.error );
                 break;
             case "log":
-                log.write( cc.attention( "LOOP WORKER" ) +
-                    " " + cc.notice( workerData.url ) + " " + joMessage.message + "\n" );
+                log.information( "LOOP WORKER {} {}", workerData.url, joMessage.message );
                 break;
             case "saveTransferError":
                 imaTransferErrorHandling.saveTransferError(
@@ -831,56 +682,37 @@ export async function ensureHaveWorkers( opts ) {
                         "isCrossImaBlsMode": opts.imaState.isCrossImaBlsMode
                     }
                 },
-                "cc": { "isEnabled": cc.isEnabled() }
+                "colorization": { "isEnabled": log.isEnabledColorization() }
             }
         };
         while( ! aClient.logicalInitComplete ) {
-            if( log.verboseGet() >= log.verboseReversed().info )
-                log.write( "LOOP server is not inited yet...\n" );
+            log.information( "LOOP server is not initialized yet..." );
             await threadInfo.sleep( 1000 );
             aClient.send( jo );
         }
     }
-    if( log.verboseGet() >= log.verboseReversed().debug ) {
-        log.write( cc.debug( "Loop module did created its " ) +
-            cc.info( gArrWorkers.length ) + cc.debug( " worker(s) in " ) +
-            threadInfo.threadDescription() + cc.debug( "" ) + "\n" );
-    }
-    if( log.verboseGet() >= log.verboseReversed().trace ) {
-        log.write( cc.debug( "Subscribe to inThread-arrSChainsCached event in " ) +
-            threadInfo.threadDescription() + "\n" );
-    }
+    log.debug( "Loop module did created its ",
+        gArrWorkers.length, " worker(s) in ", threadInfo.threadDescription() );
+    log.trace( "Subscribe to inThread-arrSChainsCached event in {}",
+        threadInfo.threadDescription() );
     skaleObserver.events.on( "inThread-arrSChainsCached", function( eventData ) {
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            log.write( cc.debug( "Did arrived inThread-arrSChainsCached event in " ) +
-                threadInfo.threadDescription() + "\n" );
-        }
+        log.trace( "Did arrived inThread-arrSChainsCached event in {}",
+            threadInfo.threadDescription() );
         if( threadInfo.isMainThread() )
             notifyCacheChangedSNB( eventData.detail.arrSChainsCached );
     } );
     // Force broadcast what we have in SNB right now because works above can start later than SNB
     // is finished download connected chains quickly
-    if( log.verboseGet() >= log.verboseReversed().debug ) {
-        log.write(
-            cc.debug( "Loop module will do first initial broadcast of arrSChainsCached to its " ) +
-            cc.info( cntWorkers ) + cc.debug( " worker(s) in " ) +
-            threadInfo.threadDescription() + cc.debug( "..." ) + "\n" );
-    }
+    log.debug( "Loop module will do first initial broadcast of arrSChainsCached to its {}" +
+        " worker(s) in {}...", cntWorkers, threadInfo.threadDescription() );
     notifyCacheChangedSNB( skaleObserver.getLastCachedSChains() );
 }
 
 export async function runParallelLoops( opts ) {
-    if( log.verboseGet() >= log.verboseReversed().notice ) {
-        log.write( cc.debug( "Will start parallel IMA transfer loops in " ) +
-            threadInfo.threadDescription() + cc.debug( "..." ) + "\n" );
-    }
+    log.notice( "Will start parallel IMA transfer loops in {}...", threadInfo.threadDescription() );
     await ensureHaveWorkers( opts );
-    if( log.verboseGet() >= log.verboseReversed().notice ) {
-        log.write( cc.success( "Done, did started parallel IMA transfer loops in " ) +
-            threadInfo.threadDescription() + cc.debug( ", have " ) +
-            cc.info( gArrWorkers.length ) + cc.success( " worker(s) and " ) +
-            cc.info( gArrClients.length ) + cc.success( " clients(s)." ) + "\n" );
-    }
+    log.success( "Done, did started parallel IMA transfer loops in {}, have {} worker(s) and {} " +
+        "clients(s).", threadInfo.threadDescription(), gArrWorkers.length, gArrClients.length );
     return true;
 }
 

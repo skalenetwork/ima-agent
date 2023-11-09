@@ -24,8 +24,6 @@
  */
 
 import * as log from "./log.mjs";
-import * as cc from "./cc.mjs";
-
 import * as owaspUtils from "./owaspUtils.mjs";
 import * as imaHelperAPIs from "./imaHelperAPIs.mjs";
 import * as imaTx from "./imaTx.mjs";
@@ -37,29 +35,23 @@ export async function invokeHasChain(
     joAccount, // Main-Net or S-Chin
     chainIdSChain
 ) {
-    const strLogPrefix = cc.sunny( "Wait for added chain status:" ) + " ";
+    const strLogPrefix = "Wait for added chain status: ";
     const strActionName = "invokeHasChain(hasSchain): joLinker.hasSchain";
     try {
-        details.write( strLogPrefix + cc.debug( "Will call " ) + cc.notice( strActionName ) +
-            cc.debug( "..." ) + "\n" );
+        details.debug( "{p}Will call {bright}...", strLogPrefix, strActionName );
         const addressFrom = joAccount.address();
         const bHasSchain =
             await joLinker.callStatic.hasSchain( chainIdSChain, { from: addressFrom } );
-        details.write( strLogPrefix +
-            cc.success( "Got joLinker.hasSchain() status is: " ) + cc.attention( bHasSchain ) +
-            "\n" );
+        details.success( "{p}Got joLinker.hasSchain() status is: {}", strLogPrefix, bHasSchain );
         return bHasSchain;
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().critical ) {
-            const strError = owaspUtils.extractErrorMessage( err );
-            const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
-                cc.error( "Error in invokeHasChain() during " + strActionName + ": " ) +
-                cc.error( strError ) + cc.error( ", stack is: " ) + "\n" + cc.stack( err.stack ) +
-                "\n";
-            if( log.id != details.id )
-                log.write( s );
-            details.write( s );
+        const strError = owaspUtils.extractErrorMessage( err );
+        if( log.id != details.id ) {
+            log.critical( "{p}Error in invokeHasChain() during {bright}: {err}, stack is:\n{stack}",
+                strLogPrefix, strActionName, strError, err.stack );
         }
+        details.critical( "{p}Error in invokeHasChain() during {bright}: {err}, stack is:\n{stack}",
+            strLogPrefix, strActionName, strError, err.stack );
     }
     return false;
 }
@@ -82,10 +74,7 @@ export async function waitForHasChain(
             details, ethersProvider, joLinker, joAccount, chainIdSChain
         ) )
             return true;
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( cc.normal( "Sleeping " ) + cc.info( nSleepMilliseconds ) +
-                cc.normal( " milliseconds..." ) + "\n" );
-        }
+        details.trace( "Sleeping {} milliseconds...", nSleepMilliseconds );
         await imaHelperAPIs.sleep( nSleepMilliseconds );
     }
     return false;
@@ -102,41 +91,34 @@ export async function checkIsRegisteredSChainInDepositBoxes( // step 1
     chainIdSChain
 ) {
     const details = log.createMemoryStream();
-    details.write( cc.info( "Main-net " ) + cc.sunny( "Linker" ) +
-        cc.info( "  address is....." ) + cc.bright( joLinker.address ) + "\n" );
-    details.write( cc.info( "S-Chain  " ) + cc.sunny( "ID" ) +
-        cc.info( " is......................." ) + cc.bright( chainIdSChain ) + "\n" );
-    const strLogPrefix = cc.note( "RegChk S in depositBox:" ) + " ";
-    details.write( strLogPrefix + cc.debug( imaHelperAPIs.longSeparator ) + "\n" );
-    details.write( strLogPrefix +
-        cc.bright( "checkIsRegisteredSChainInDepositBoxes(reg-step1)" ) + "\n" );
-    details.write( strLogPrefix + cc.debug( imaHelperAPIs.longSeparator ) + "\n" );
+    details.debug( "Main-net Linker address is...........{}", joLinker.address );
+    details.debug( "S-Chain  ID is.......................{}", chainIdSChain );
+    const strLogPrefix = "RegChk S in depositBox: ";
+    details.debug( "{p}{p}", strLogPrefix, imaHelperAPIs.longSeparator );
+    details.debug( "{p}{p}", strLogPrefix, "checkIsRegisteredSChainInDepositBoxes(reg-step1)" );
+    details.debug( "{p}{p}", strLogPrefix, imaHelperAPIs.longSeparator );
     let strActionName = "";
     try {
         strActionName = "checkIsRegisteredSChainInDepositBoxes(reg-step1)";
         const addressFrom = joAccountMN.address();
         const bIsRegistered =
             await joLinker.callStatic.hasSchain( chainIdSChain, { from: addressFrom } );
-        details.write( strLogPrefix +
-            cc.success( "checkIsRegisteredSChainInDepositBoxes(reg-step1) status is: " ) +
-            cc.attention( bIsRegistered ) +
-            "\n" );
+        details.success( "{p}checkIsRegisteredSChainInDepositBoxes(reg-step1) status is: {}",
+            strLogPrefix, bIsRegistered );
         if( log.exposeDetailsGet() )
             details.exposeDetailsTo( log, "checkIsRegisteredSChainInDepositBoxes", true );
         details.close();
         return bIsRegistered;
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().critical ) {
-            const strError = owaspUtils.extractErrorMessage( err );
-            const s = strLogPrefix + cc.fatal( "CRITICAL ERROR:" ) +
-                cc.error(
-                    " Error in checkIsRegisteredSChainInDepositBoxes(reg-step1)() during " +
-                strActionName + ": " ) + cc.error( strError ) + cc.error( ", stack is: " ) +
-                "\n" + cc.stack( err.stack ) + "\n";
-            if( log.id != details.id )
-                log.write( s );
-            details.write( s );
+        const strError = owaspUtils.extractErrorMessage( err );
+        if( log.id != details.id ) {
+            log.critical(
+                "{p}Error in checkIsRegisteredSChainInDepositBoxes(reg-step1)() during {bright}: " +
+                "{err}, stack is:\n{stack}", strLogPrefix, strActionName, strError, err.stack );
         }
+        details.critical(
+            "{p}Error in checkIsRegisteredSChainInDepositBoxes(reg-step1)() during {bright}: " +
+            "{err}, stack is:\n{stack}", strLogPrefix, strActionName, strError, err.stack );
         details.exposeDetailsTo( log, "checkIsRegisteredSChainInDepositBoxes", false );
         details.close();
     }
@@ -162,23 +144,18 @@ export async function registerSChainInDepositBoxes( // step 1
 ) {
     const details = log.createMemoryStream();
     const jarrReceipts = [];
-    details.write( cc.info( "Main-net " ) + cc.sunny( "Linker" ) +
-        cc.info( "  address is......." ) + cc.bright( joLinker.address ) + "\n" );
-    details.write( cc.info( "S-Chain  " ) + cc.sunny( "ID" ) +
-        cc.info( " is......................." ) + cc.bright( chainNameSChain ) + "\n" );
-    const strLogPrefix = cc.sunny( "Reg S in depositBoxes:" ) + " ";
-    details.write( strLogPrefix + cc.debug( imaHelperAPIs.longSeparator ) + "\n" );
-    details.write( strLogPrefix +
-        cc.bright( "reg-step1:registerSChainInDepositBoxes" ) + "\n" );
-    details.write( strLogPrefix + cc.debug( imaHelperAPIs.longSeparator ) + "\n" );
+    details.debug( "Main-net Linker address is..........{}", joLinker.address );
+    details.debug( "S-Chain ID is.......................{}", chainNameSChain );
+    const strLogPrefix = "Reg S in depositBoxes: ";
+    details.debug( "{p}{}", strLogPrefix, imaHelperAPIs.longSeparator );
+    details.debug( "{p}reg-step1:registerSChainInDepositBoxes", strLogPrefix );
+    details.debug( "{p}{}", strLogPrefix, imaHelperAPIs.longSeparator );
     let strActionName = "";
     try {
         strActionName = "Register S-chain in deposit boxes, step 1, connectSchain";
-        details.write( strLogPrefix +
-            cc.debug( "Will register S-Chain in lock_and_data on Main-net" ) + "\n" );
+        details.debug( "{p}Will register S-Chain in lock_and_data on Main-net", strLogPrefix );
         const arrArguments = [
-            chainNameSChain,
-            [
+            chainNameSChain, [
                 joTokenManagerLinker.address, // call params
                 joCommunityLocker.address, // call params
                 joTokenManagerETH.address, // call params
@@ -186,44 +163,28 @@ export async function registerSChainInDepositBoxes( // step 1
                 joTokenManagerERC721.address, // call params
                 joTokenManagerERC1155.address, // call params
                 joTokenManagerERC721WithMetadata.address // call params
-            ]
-        ];
+            ] ];
         const weiHowMuch = undefined;
         const gasPrice = await transactionCustomizerMainNet.computeGasPrice(
             ethersProviderMainNet, 200000000000 );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using computed " ) + cc.info( "gasPrice" ) +
-                cc.debug( "=" ) + cc.j( gasPrice ) + "\n" );
-        }
-        const estimatedGas =
-            await transactionCustomizerMainNet.computeGas(
-                details,
-                ethersProviderMainNet,
-                "Linker", joLinker, "connectSchain", arrArguments,
-                joAccountMN, strActionName,
-                gasPrice, 3000000, weiHowMuch,
-                null
-            );
-        if( log.verboseGet() >= log.verboseReversed().trace ) {
-            details.write( strLogPrefix + cc.debug( "Using estimated " ) + cc.info( "gas" ) +
-                cc.debug( "=" ) + cc.notice( estimatedGas ) + "\n" );
-        }
+        details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
+        const estimatedGas = await transactionCustomizerMainNet.computeGas( details,
+            ethersProviderMainNet, "Linker", joLinker, "connectSchain", arrArguments,
+            joAccountMN, strActionName, gasPrice, 3000000, weiHowMuch );
+        details.trace( "{p}Using estimated gas={}", strLogPrefix, estimatedGas );
         const isIgnore = false;
-        const strErrorOfDryRun =
-            await imaTx.dryRunCall(
-                details, ethersProviderMainNet,
-                "Linker", joLinker, "connectSchain", arrArguments,
-                joAccountMN, strActionName, isIgnore,
-                gasPrice, estimatedGas, weiHowMuch, null );
+        const strErrorOfDryRun = await imaTx.dryRunCall( details, ethersProviderMainNet,
+            "Linker", joLinker, "connectSchain", arrArguments,
+            joAccountMN, strActionName, isIgnore,
+            gasPrice, estimatedGas, weiHowMuch );
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
-        const joReceipt =
-            await imaTx.payedCall(
-                details, ethersProviderMainNet,
-                "Linker", joLinker, "connectSchain", arrArguments,
-                joAccountMN, strActionName,
-                gasPrice, estimatedGas, weiHowMuch, null );
+        const joReceipt = await imaTx.payedCall(
+            details, ethersProviderMainNet,
+            "Linker", joLinker, "connectSchain", arrArguments,
+            joAccountMN, strActionName,
+            gasPrice, estimatedGas, weiHowMuch );
         if( joReceipt && typeof joReceipt == "object" ) {
             jarrReceipts.push( {
                 "description": "registerSChainInDepositBoxes",
@@ -237,18 +198,13 @@ export async function registerSChainInDepositBoxes( // step 1
         if( ! isSChainStatusOKay )
             throw new Error( "S-Chain ownership status check timeout" );
     } catch ( err ) {
-        if( log.verboseGet() >= log.verboseReversed().critical ) {
-            const strError = owaspUtils.extractErrorMessage( err );
-            const s = strLogPrefix +
-                cc.fatal( "CRITICAL ERROR:" ) +
-                cc.error( " Error in registerSChainInDepositBoxes() during " +
-                strActionName + ": " ) +
-                cc.error( strError ) + cc.error( ", stack is: " ) +
-                "\n" + cc.stack( err.stack ) + "\n";
-            if( log.id != details.id )
-                log.write( s );
-            details.write( s );
+        const strError = owaspUtils.extractErrorMessage( err );
+        if( log.id != details.id ) {
+            log.critical( "{p}Error in registerSChainInDepositBoxes() during {bright}: {err}" +
+                ", stack is:\n{stack}", strLogPrefix, strActionName, strError, err.stack );
         }
+        details.critical( "{p}Error in registerSChainInDepositBoxes() during {bright}: {err}" +
+            ", stack is:\n{stack}", strLogPrefix, strActionName, strError, err.stack );
         details.exposeDetailsTo( log, "registerSChainInDepositBoxes", false );
         details.close();
         return null;

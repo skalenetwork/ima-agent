@@ -29,7 +29,6 @@ import * as https from "https";
 import * as net from "net";
 import { validateURL, isUrlWS } from "./owaspUtils.mjs";
 import * as log from "./log.mjs";
-import * as cc from "./cc.mjs";
 
 const gSecondsConnectionTimeout = 60;
 
@@ -52,8 +51,8 @@ export async function waitWebSocketIsOpen( socket, fnDone, fnStep ) {
             } else {
                 if( ! await fnStep( nStep ) ) {
                     clearInterval( iv );
-                    reject( new Error(
-                        "web socket wait timeout by callback on step " + nStep ) );
+                    reject( new Error( "web socket wait timeout by callback " +
+                        `on step ${nStep}` ) );
                 }
             }
             isInsideAsyncHandler = false;
@@ -61,10 +60,7 @@ export async function waitWebSocketIsOpen( socket, fnDone, fnStep ) {
         const iv = setInterval( function() {
             if( isInsideAsyncHandler )
                 return;
-            fnAsyncHandler()
-                .then( () => {
-                } ).catch( () => {
-                } );
+            fnAsyncHandler().then( () => { } ).catch( () => { } );
         }, 1000 ); // 1 second
     } );
     await Promise.all( [ promiseComplete ] );
@@ -74,8 +70,8 @@ export async function doConnect( joCall, opts, fn ) {
     try {
         fn = fn || async function() {};
         if( !validateURL( joCall.url ) ) {
-            throw new Error(
-                "JSON RPC CALLER cannot connect web socket to invalid URL: " + joCall.url );
+            throw new Error( "JSON RPC CALLER cannot connect web socket " +
+                `to invalid URL: ${joCall.url}` );
         }
         if( isUrlWS( joCall.url ) ) {
             let strWsError = null;
@@ -90,10 +86,7 @@ export async function doConnect( joCall, opts, fn ) {
             } );
             joCall.wsConn.on( "error", async function( err ) {
                 strWsError = err.toString() || "internal web socket error";
-                if( log.verboseGet() >= log.verboseReversed().error ) {
-                    log.write( cc.u( joCall.url ) + cc.error( " web socket error: " ) +
-                        cc.warning( err.toString() ) + "\n" );
-                }
+                log.error( "{url} web socket error: {err", joCall.url, err.toString() );
                 const wsConn = joCall.wsConn;
                 joCall.wsConn = null;
                 wsConn.close();
@@ -101,10 +94,7 @@ export async function doConnect( joCall, opts, fn ) {
             } );
             joCall.wsConn.on( "fail", async function( err ) {
                 strWsError = err.toString() || "internal web socket failure";
-                if( log.verboseGet() >= log.verboseReversed().error ) {
-                    log.write( cc.u( joCall.url ) + cc.error( " web socket fail: " ) +
-                        cc.warning( err.toString() ) + "\n" );
-                }
+                log.error( "{url} web socket fail: {err}", joCall.url, err.toString() );
                 const wsConn = joCall.wsConn;
                 joCall.wsConn = null;
                 wsConn.close();
@@ -128,19 +118,13 @@ export async function doConnect( joCall, opts, fn ) {
                 },
                 async function( nStep ) { // step handler
                     if( strWsError && typeof strWsError == "string" && strWsError.length > 0 ) {
-                        if( log.verboseGet() >= log.verboseReversed().error ) {
-                            log.write( cc.u( joCall.url ) +
-                            cc.error( " web socket wait error detected: " ) +
-                            cc.warning( strWsError ) + "\n" );
-                        }
+                        log.error( "{url} web socket wait error detected: {err}",
+                            joCall.url, strWsError );
                         return false;
                     }
                     if( nStep >= gSecondsConnectionTimeout ) {
                         strWsError = "wait timeout, web socket is connecting too long";
-                        if( log.verboseGet() >= log.verboseReversed().error ) {
-                            log.write( cc.u( joCall.url ) +
-                                cc.error( " web socket wait timeout detected" ) + "\n" );
-                        }
+                        log.error( "{url} web socket wait timeout detected", joCall.url );
                         const wsConn = joCall.wsConn;
                         joCall.wsConn = null;
                         wsConn.close();
@@ -167,8 +151,8 @@ export async function doConnectIfNeeded( joCall, opts, fn ) {
     try {
         fn = fn || async function() {};
         if( !validateURL( joCall.url ) ) {
-            throw new Error(
-                "JSON RPC CALLER cannot connect web socket to invalid URL: " + joCall.url );
+            throw new Error( "JSON RPC CALLER cannot connect web socket " +
+                `to invalid URL: ${joCall.url}` );
         }
         if( isUrlWS( joCall.url ) && ( !joCall.wsConn ) ) {
             await joCall.reconnect( fn );
@@ -274,8 +258,7 @@ export async function doCall( joCall, joIn, fn ) {
                     res.on( "end", function() {
                         if( res.statusCode !== 200 ) {
                             joOut = null;
-                            errCall =
-                                "Response ends with bad status code: " +
+                            errCall = "Response ends with bad status code: " +
                                 res.statusCode.toString();
                             reject( errCall );
                         }
@@ -291,10 +274,7 @@ export async function doCall( joCall, joIn, fn ) {
                     } );
                 } );
                 req.on( "error", err => {
-                    if( log.verboseGet() >= log.verboseReversed().error ) {
-                        log.write( cc.u( joCall.url ) + cc.error( " REST error " ) +
-                            cc.warning( err.toString() ) + "\n" );
-                    }
+                    log.error( "{url} REST error {err}", joCall.url, err.toString() );
                     joOut = null;
                     errCall = "RPC call error: " + err.toString();
                     reject( errCall );
@@ -327,20 +307,13 @@ export async function doCall( joCall, joIn, fn ) {
                         ? joCall.joRpcOptions.key : null
                 } );
                 const body = response.data.toString( "utf8" );
-                if( response && response.statusCode && response.statusCode !== 200 ) {
-                    if( log.verboseGet() >= log.verboseReversed().warning ) {
-                        log.write( cc.warning( "WARNING:" ) +
-                            cc.warning( " REST call status code is " ) +
-                            cc.info( response.statusCode ) + "\n" );
-                    }
-                }
+                if( response && response.statusCode && response.statusCode !== 200 )
+                    log.warning( "REST call status code is {}", response.statusCode );
+
                 joOut = JSON.parse( body );
                 errCall = null;
             } catch ( err ) {
-                if( log.verboseGet() >= log.verboseReversed().error ) {
-                    log.write( cc.u( joCall.url ) + cc.error( " request error " ) +
-                        cc.warning( err.toString() ) + "\n" );
-                }
+                log.error( "{url} request error {err}", joCall.url, err.toString() );
                 joOut = null;
                 errCall = "request error: " + err.toString();
             }
@@ -354,11 +327,11 @@ export async function doCall( joCall, joIn, fn ) {
 
 export async function rpcCallCreate( strURL, opts, fn ) {
     if( !validateURL( strURL ) )
-        throw new Error( "JSON RPC CALLER cannot create a call object invalid URL: " + strURL );
+        throw new Error( `JSON RPC CALLER cannot create a call object invalid URL: ${strURL}` );
     fn = fn || async function() {};
     if( !( strURL && typeof strURL == "string" && strURL.length > 0 ) ) {
-        throw new Error(
-            "rpcCallCreate() was invoked with bad parameters: " + JSON.stringify( arguments ) );
+        throw new Error( "rpcCallCreate() was invoked with " +
+            `bad parameters: ${JSON.stringify( arguments )}` );
     }
     const joCall = {
         "url": "" + strURL,
@@ -468,51 +441,45 @@ export function checkTcpPromise( strHost, nPort, nTimeoutMilliseconds, isLog ) {
     return new Promise( ( resolve, reject ) => {
         if( isLog ) {
             console.log(
-                `${gStrTcpConnectionHeader}Will establish " +
-                "TCP connection to ${strHost}:${nPort}...`
-            );
+                `${gStrTcpConnectionHeader}Will establish ` +
+                `TCP connection to ${strHost}:${nPort}...` );
         }
         const conn = net.createConnection( { host: strHost, port: nPort }, () => {
             if( isLog ) {
                 console.log(
-                    `${gStrTcpConnectionHeader}Done, " +
-                    "TCP connection to ${strHost}:${nPort} established`
-                );
+                    `${gStrTcpConnectionHeader}Done, ` +
+                    `TCP connection to ${strHost}:${nPort} established` );
             }
             conn.end();
             resolve();
         } );
         if( isLog ) {
             console.log(
-                `${gStrTcpConnectionHeader}Did created NET object " +
-                "for TCP connection to ${strHost}:${nPort}...`
-            );
+                `${gStrTcpConnectionHeader}Did created NET object ` +
+                `for TCP connection to ${strHost}:${nPort}...` );
         }
         if( nTimeoutMilliseconds )
             nTimeoutMilliseconds = parseInt( nTimeoutMilliseconds.toString(), 10 );
         if( nTimeoutMilliseconds > 0 ) {
             if( isLog ) {
                 console.log(
-                    `${gStrTcpConnectionHeader}Will use " +
-                    "TCP connection to ${strHost}:${nPort} " +
-                    "timeout ${nTimeoutMilliseconds} milliseconds...`
-                );
+                    `${gStrTcpConnectionHeader}Will use ` +
+                    `TCP connection to ${strHost}:${nPort} ` +
+                    `timeout ${nTimeoutMilliseconds} milliseconds...` );
             }
             conn.setTimeout( nTimeoutMilliseconds );
         } else {
             if( isLog ) {
                 console.log(
-                    `${gStrTcpConnectionHeader}Will use " +
-                    "default TCP connection to ${strHost}:${nPort} timeout...`
-                );
+                    `${gStrTcpConnectionHeader}Will use ` +
+                    `default TCP connection to ${strHost}:${nPort} timeout...` );
             }
         }
         conn.on( "timeout", err => {
             if( isLog ) {
                 console.log(
-                    `${gStrTcpConnectionHeader}TCP connection " +
-                    "to ${strHost}:${nPort} timed out`
-                );
+                    `${gStrTcpConnectionHeader}TCP connection ` +
+                    `to ${strHost}:${nPort} timed out` );
             }
             conn.destroy();
             reject( err );
@@ -520,17 +487,15 @@ export function checkTcpPromise( strHost, nPort, nTimeoutMilliseconds, isLog ) {
         conn.on( "error", err => {
             if( isLog ) {
                 console.log(
-                    `${gStrTcpConnectionHeader}TCP connection " +
-                    "to ${strHost}:${nPort} failed`
-                );
+                    `${gStrTcpConnectionHeader}TCP connection ` +
+                    `to ${strHost}:${nPort} failed` );
             }
             reject( err );
         } );
         if( isLog ) {
             console.log(
-                `${gStrTcpConnectionHeader}TCP connection " +
-                "to ${strHost}:${nPort} check started...`
-            );
+                `${gStrTcpConnectionHeader}TCP connection ` +
+                `to ${strHost}:${nPort} check started...` );
         }
     } );
 }
@@ -545,23 +510,20 @@ export async function checkTcp( strHost, nPort, nTimeoutMilliseconds, isLog ) {
             ;
         if( isLog ) {
             console.log(
-                `${gStrTcpConnectionHeader}Waiting for " + 
-                "TCP connection to ${strHost}:${nPort} check done...`
-            );
+                `${gStrTcpConnectionHeader}Waiting for ` +
+                `TCP connection to ${strHost}:${nPort} check done...` );
         }
         await Promise.all( [ promiseCompleteTcpCheck ] );
         if( isLog ) {
             console.log(
-                `${gStrTcpConnectionHeader}TCP connection " + 
-                "to ${strHost}:${nPort} check finished`
-            );
+                `${gStrTcpConnectionHeader}TCP connection ` +
+                `to ${strHost}:${nPort} check finished` );
         }
     } catch ( err ) {
         isOnline = false;
         console.log(
-            `${gStrTcpConnectionHeader}TCP connection " + 
-            "to ${strHost}:${nPort} check failed with error: ` + err.toString()
-        );
+            `${gStrTcpConnectionHeader}TCP connection ` +
+            `to ${strHost}:${nPort} check failed with error: ${err.toString()}` );
     }
     return isOnline;
 }
@@ -571,16 +533,12 @@ export async function checkUrl( u, nTimeoutMilliseconds, isLog ) {
         return false;
     const jo = getValidHostAndPort( u );
     if( isLog ) {
-        console.log( gStrTcpConnectionHeader +
-            "Extracted from URL \"" + u.toString() + "\" data fields are: " +
-            JSON.stringify( jo )
-        );
+        console.log( `${gStrTcpConnectionHeader}Extracted from URL ${u.toString()} data ` +
+            `fields are: ${JSON.stringify( jo )}` );
     }
     if( ! ( jo && jo.strHost && "nPort" in jo ) ) {
-        console.log( gStrTcpConnectionHeader +
-            "Extracted from URL \"" + u.toString() +
-            "\" data fields are bad, returning \"false\" as result of TCP connection check"
-        );
+        console.log( `${gStrTcpConnectionHeader}Extracted from URL ${u.toString()} data ` +
+            "fields are bad, returning \"false\" as result of TCP connection check" );
         return false;
     }
     return await checkTcp( jo.strHost, jo.nPort, nTimeoutMilliseconds, isLog );

@@ -200,6 +200,7 @@ const joMessageProxySrc = {
     "methods": { getOutgoingMessagesCounter: getOutgoingMessagesCounter },
     getPastEvents: getPastEvents
 };
+
 function getOutgoingMessagesCounter( string ) {
     return { "call": callNum };
 }

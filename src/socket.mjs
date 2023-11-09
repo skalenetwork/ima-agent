@@ -669,12 +669,12 @@ export class OutOfWorkerRelay extends EventDispatcher {
             ( isAutoFlushOutgoing == null || isAutoFlushOutgoing == undefined )
                 ? true : ( !!( isAutoFlushOutgoing ) );
         if( ! acceptor ) {
-            throw new Error( "OutOfWorkerRelay \"" + self.strRelayName +
-                "\" needs acceptor for normal functionality" );
+            throw new Error( `OutOfWorkerRelay ${self.strRelayName} needs acceptor ` +
+                "for normal functionality" );
         }
         if( typeof fnCreateClient != "function" ) {
-            throw new Error( "OutOfWorkerRelay \"" + self.strRelayName +
-                "\" needs callback to create connections to target server" );
+            throw new Error( `OutOfWorkerRelay ${self.strRelayName} needs callback ` +
+                "to create connections to target server" );
         }
         self.acceptor = acceptor;
         self.fnCreateClient = fnCreateClient;
@@ -783,8 +783,8 @@ export class OutOfWorkerRelay extends EventDispatcher {
                         pipeIncoming.strSavedRemoteAddress + "\" message ", joMessage );
                 }
                 if( ! pipeOutgoing ) {
-                    throw new Error( "Relay \"" + self.strRelayName +
-                        "\" is not completely initialized and cannot transfer messages" );
+                    throw new Error( `Relay ${self.strRelayName} is not completely initialized ` +
+                        "and cannot transfer messages" );
                 }
                 self.dispatchEvent( new UniversalDispatcherEvent(
                     "message", {
@@ -809,8 +809,8 @@ export class OutOfWorkerRelay extends EventDispatcher {
                         pipeIncoming.strSavedRemoteAddress + "\" message ", joMessage );
                 }
                 if( ! pipeOutgoing ) {
-                    throw new Error( "Relay \"" + self.strRelayName +
-                        "\" is not completely initialized and cannot transfer messages" );
+                    throw new Error( `Relay ${self.strRelayName} is not completely initialized ` +
+                        "and cannot transfer messages" );
                 }
                 self.dispatchEvent( new UniversalDispatcherEvent(
                     "message", {
@@ -863,8 +863,8 @@ export class OutOfWorkerRelay extends EventDispatcher {
             pipeOutgoing = pipeIncoming.relayClientSocket = self.fnCreateClient();
             if( ! pipeOutgoing ) {
                 pipeIncoming.dispose();
-                throw new Error( "Relay \"" + self.strRelayName +
-                    "\" failed to initialize relay-client socket to target server" );
+                throw new Error( `Relay ${self.strRelayName} failed to initialize ` +
+                    "relay-client socket to target server" );
             }
             pipeOutgoing.on( "close", _onRelayPipeClose );
             pipeOutgoing.on( "error", _onRelayPipeError );
@@ -1018,10 +1018,8 @@ export class OneToOneRelay extends EventDispatcher {
                 );
             }
             if( ! pipeOutgoing ) {
-                throw new Error(
-                    "Relay \"" + self.strRelayName +
-                    "\" is not completely initialized and cannot transfer messages"
-                );
+                throw new Error( `Relay  ${self.strRelayName} is not completely initialized ` +
+                    "and cannot transfer messages" );
             }
             self.dispatchEvent(
                 new UniversalDispatcherEvent(
@@ -1041,22 +1039,20 @@ export class OneToOneRelay extends EventDispatcher {
         let _onOutgoingPipeMessage = function( eventData ) {
             if( settings.logging.net.relay.rawMessage ) {
                 console.log(
-                    "Relay \"" + self.strRelayName + "\" outgoing-client socket \"" +
+                    `Relay  ${self.strRelayName}` + "\" outgoing-client socket \"" +
                     eventData.strSavedRemoteAddress + "\" raw message", eventData
                 );
             }
             const joMessage = eventData.message;
             if( settings.logging.net.relay.message ) {
                 console.log(
-                    "Relay \"" + self.strRelayName + "\" outgoing-client socket \"" +
+                    `Relay  ${self.strRelayName}` + "\" outgoing-client socket \"" +
                     pipeIncoming.strSavedRemoteAddress + "\" message ", joMessage
                 );
             }
             if( ! pipeOutgoing ) {
-                throw new Error(
-                    "Relay \"" + self.strRelayName +
-                    "\" is not completely initialized and cannot transfer messages"
-                );
+                throw new Error( `Relay  ${self.strRelayName} is not completely initialized ` +
+                    "and cannot transfer messages" );
             }
             self.dispatchEvent(
                 new UniversalDispatcherEvent(
