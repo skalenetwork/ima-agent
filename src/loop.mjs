@@ -423,20 +423,31 @@ const gArrClients = [];
 export function notifyCacheChangedSNB( arrSChainsCached ) {
     const cntWorkers = gArrWorkers.length;
     if( cntWorkers == 0 ) {
-        log.debug( "Will skip chainsCacheChanged dispatch event with no chains arrived in ",
-            threadInfo.threadDescription() );
+        if( threadInfo.joCustomThreadProperties.isSChainsCacheNeeded ) {
+            log.debug(
+                "Will skip chainsCacheChanged dispatch event with in {} " +
+                "because of no workers present yet",
+                threadInfo.threadDescription() );
+        }
         return;
     }
-    log.debug( "Loop module will broadcast arrSChainsCached event to its ",
-        cntWorkers, " worker(s) in ", threadInfo.threadDescription(), "..." );
+    if( threadInfo.joCustomThreadProperties.isSChainsCacheNeeded ) {
+        log.debug( "Loop module will broadcast arrSChainsCached event to its ",
+            cntWorkers, " worker(s) in ", threadInfo.threadDescription(), "..." );
+    }
     for( let idxWorker = 0; idxWorker < cntWorkers; ++ idxWorker ) {
         const jo = {
             "method": "schainsCached",
             "message": { "arrSChainsCached": arrSChainsCached }
         };
-        log.debug( "S-Chains cache will be sent to {} loop worker...", gArrClients[idxWorker].url );
+        if( threadInfo.joCustomThreadProperties.isSChainsCacheNeeded ) {
+            log.debug( "S-Chains cache will be sent to {} loop worker...",
+                gArrClients[idxWorker].url );
+        }
         gArrClients[idxWorker].send( jo );
-        log.debug( "S-Chains cache did sent to {} loop worker", gArrClients[idxWorker].url );
+        if( threadInfo.joCustomThreadProperties.isSChainsCacheNeeded )
+            log.debug( "S-Chains cache did sent to {} loop worker", gArrClients[idxWorker].url );
+
     }
     log.debug( "Loop module did finished broadcasting arrSChainsCached event " +
         "to its {} worker(s) in {}...", cntWorkers, threadInfo.threadDescription() );
@@ -444,7 +455,8 @@ export function notifyCacheChangedSNB( arrSChainsCached ) {
 
 log.trace( "Subscribe to chainsCacheChanged event in {}", threadInfo.threadDescription() );
 skaleObserver.events.on( "chainsCacheChanged", function( eventData ) {
-    log.trace( "Did arrived chainsCacheChanged event in {}", threadInfo.threadDescription() );
+    if( threadInfo.joCustomThreadProperties.isSChainsCacheNeeded )
+        log.trace( "Did arrived chainsCacheChanged event in {}", threadInfo.threadDescription() );
     notifyCacheChangedSNB( eventData.detail.arrSChainsCached );
 } );
 
