@@ -1209,8 +1209,8 @@ async function doSignProcessHandleCall(
         optsSignOperation.strLogPrefix, log.generateTimestampString( null, true ),
         "skale_imaVerifyAndSign", i, strNodeURL, optsSignOperation.fromChainName,
         optsSignOperation.targetChainName, joParams, joOut, optsSignOperation.sequenceId );
-    if( joOut.result == null || joOut.result == undefined ||
-        ( !typeof joOut.result == "object" ) ) {
+    if( ( !joOut ) || typeof joOut != "object" || ( !( "result" in joOut ) ) || ( !joOut.result ) ||
+        typeof joOut.result != "object" ) {
         ++optsSignOperation.joGatheringTracker.nCountErrors;
         if( log.id != optsSignOperation.details.id ) {
             log.critical( "{p}S-Chain node {} reported wallet error: {err}, sequence ID is ",

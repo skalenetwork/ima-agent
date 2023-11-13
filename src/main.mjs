@@ -341,8 +341,12 @@ function initJsonRpcServer() {
                 }
                 break;
             default:
-                throw new Error( `Unknown method name ${joMessage.method} was specified` );
+                joAnswer.error = `Unknown method name ${joMessage.method} was specified`;
             } // switch( joMessage.method )
+            if( ( !joAnswer ) || typeof joAnswer != "object" ) {
+                joAnswer = {};
+                joAnswer.error = "internal error, null data returned";
+            }
         } catch ( err ) {
             const strError = owaspUtils.extractErrorMessage( err );
             log.error( "{p}Bad message from {}: {}, error is: {err}, stack is:\n{stack}",
