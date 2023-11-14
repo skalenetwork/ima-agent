@@ -86,25 +86,14 @@ export async function safeGetBlockNumber(
     const nWaitStepMilliseconds = 10 * 1000;
     if( throwIfServerOffline == null || throwIfServerOffline == undefined )
         throwIfServerOffline = true;
-    cntAttempts =
-        owaspUtils.parseIntOrHex( cntAttempts ) < 1
-            ? 1 : owaspUtils.parseIntOrHex( cntAttempts );
+    cntAttempts = owaspUtils.parseIntOrHex( cntAttempts ) < 1
+        ? 1 : owaspUtils.parseIntOrHex( cntAttempts );
     if( retValOnFail == null || retValOnFail == undefined )
         retValOnFail = "";
     let idxAttempt = 1;
     let ret = retValOnFail;
-    try {
-        ret = await ethersProvider[strFnName]();
-        return ret;
-    } catch ( err ) {
-        ret = retValOnFail;
-        details.error(
-            "Failed call attempt {} to {} via {url}, error is: {err}, stack is:\n{stack}",
-            idxAttempt, strFnName + "()", u, err, err.stack );
-    }
-    ++ idxAttempt;
-    while( ret === "" && idxAttempt <= cntAttempts ) {
-        const isOnLine = rpcCall.checkUrl( u, nWaitStepMilliseconds );
+    while( ( idxAttempt == 1 || ret === "" ) && idxAttempt <= cntAttempts ) {
+        const isOnLine = await rpcCall.checkUrl( u, nWaitStepMilliseconds );
         if( ! isOnLine ) {
             ret = retValOnFail;
             if( ! throwIfServerOffline )
@@ -124,12 +113,9 @@ export async function safeGetBlockNumber(
         }
         ++ idxAttempt;
     }
-    if( ( idxAttempt + 1 ) > cntAttempts && ret === "" ) {
-        details.error( "Failed call to {} via {url} after {} attempts ",
-            strFnName + "()", u, cntAttempts );
-        throw new Error( `Failed call to ${strFnName}() via ${u} after ${cntAttempts} attempts` );
-    }
-    return ret;
+    details.error( "Failed call to {} via {url} after {} attempts ",
+        strFnName + "()", u, cntAttempts );
+    throw new Error( `Failed call to ${strFnName}() via ${u} after ${cntAttempts} attempts` );
 }
 
 let gCountOfBlocksInIterativeStep = 1000;
