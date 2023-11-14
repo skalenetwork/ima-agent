@@ -1210,7 +1210,7 @@ async function doSignProcessHandleCall(
         "skale_imaVerifyAndSign", i, strNodeURL, optsSignOperation.fromChainName,
         optsSignOperation.targetChainName, joParams, joOut, optsSignOperation.sequenceId );
     if( ( !joOut ) || typeof joOut != "object" || ( !( "result" in joOut ) ) || ( !joOut.result ) ||
-        typeof joOut.result != "object" ) {
+        typeof joOut.result != "object" || "error" in joOut || joOut.error ) {
         ++optsSignOperation.joGatheringTracker.nCountErrors;
         if( log.id != optsSignOperation.details.id ) {
             log.critical( "{p}S-Chain node {} reported wallet error: {err}, sequence ID is ",
@@ -1616,6 +1616,7 @@ async function doSignU256OneImpl( i, optsSignU256 ) {
             optsSignU256.details.trace( "{p}Did invoked {} for to sign value {}, answer is: {}",
                 optsSignU256.strLogPrefix, "skale_imaBSU256", optsSignU256.u256.toString(), joOut );
             if( ( !joOut ) || typeof joOut != "object" || ( !( "result" in joOut ) ) ||
+                "error" in joOut || joOut.error ||
                 ( !joOut.result ) || typeof joOut.result != "object" ||
                 ( !( "signature" in joOut.result ) ) || joOut.result.signature != "object"
             ) {
