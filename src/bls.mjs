@@ -1616,7 +1616,7 @@ async function doSignU256OneImpl( i, optsSignU256 ) {
             optsSignU256.details.trace( "{p}Did invoked {} for to sign value {}, answer is: {}",
                 optsSignU256.strLogPrefix, "skale_imaBSU256", optsSignU256.u256.toString(), joOut );
             if( ( !joOut ) || typeof joOut != "object" || ( !( "result" in joOut ) ) ||
-                "error" in joOut || joOut.error ||
+                ( "error" in joOut && joOut.error ) ||
                 ( !joOut.result ) || typeof joOut.result != "object" ||
                 ( !( "signature" in joOut.result ) ) || joOut.result.signature != "object"
             ) {
