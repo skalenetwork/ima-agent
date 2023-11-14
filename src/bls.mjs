@@ -916,7 +916,7 @@ async function gatherSigningStartImpl( optsSignOperation ) {
     optsSignOperation.errGathering = null;
     optsSignOperation.promiseCompleteGathering = new Promise( ( resolve, reject ) => {
         const iv = setInterval( function() {
-            const cntSuccess = 0 + optsSignOperation.arrSignResults.length;
+            const cntSuccess = optsSignOperation.arrSignResults.length;
             if( optsSignOperation.joGatheringTracker.nCountReceivedPrevious !=
                 optsSignOperation.joGatheringTracker.nCountReceived ) {
                 optsSignOperation.details.debug(
@@ -1007,7 +1007,7 @@ async function gatherSigningStartImpl( optsSignOperation ) {
                     ` errors(s) for ${optsSignOperation.jarrNodes.length} node(s)`,
                     optsSignOperation.jarrMessages
                 ).catch( ( err ) => {
-                    const cntSuccess = 0 + optsSignOperation.arrSignResults.length;
+                    const cntSuccess = optsSignOperation.arrSignResults.length;
                     optsSignOperation.details.error(
                         "Problem(3) in BLS sign result handler, not enough successful BLS " +
                         "signature parts({}) when all attempts done, error details: {err}",
@@ -1036,7 +1036,7 @@ async function gatherSigningStartImpl( optsSignOperation ) {
                     ` errors(s) for ${optsSignOperation.jarrNodes.length} node(s)`,
                     optsSignOperation.jarrMessages
                 ).catch( ( err ) => {
-                    const cntSuccess = 0 + optsSignOperation.arrSignResults.length;
+                    const cntSuccess = optsSignOperation.arrSignResults.length;
                     optsSignOperation.details.critical( "Problem(4) in BLS sign result handler, " +
                         "not enough successful BLS signature parts({}) and timeout reached, " +
                         "error details: {err}", cntSuccess,
@@ -1091,7 +1091,7 @@ async function gatherSigningFinishImpl( optsSignOperation ) {
                 `error is: ${optsSignOperation.errGathering.toString()}`,
                 optsSignOperation.jarrMessages
             ).catch( ( err ) => {
-                const cntSuccess = 0 + optsSignOperation.arrSignResults.length;
+                const cntSuccess = optsSignOperation.arrSignResults.length;
                 if( log.id != optsSignOperation.details.id ) {
                     log.error(
                         "Problem(5) in BLS sign result handler, not enough successful BLS " +
@@ -1238,7 +1238,7 @@ async function doSignProcessHandleCall(
             optsSignOperation.strLogPrefixA =
                 `${optsSignOperation.strDirection}/BLS/#${nZeroBasedNodeIndex}: `;
             try {
-                const cntSuccess = 0 + optsSignOperation.arrSignResults.length;
+                const cntSuccess = optsSignOperation.arrSignResults.length;
                 if( cntSuccess > optsSignOperation.nCountOfBlsPartsToCollect ) {
                     ++optsSignOperation.joGatheringTracker.nCountSkipped;
                     optsSignOperation.details.notice(
@@ -1438,7 +1438,7 @@ async function doSignMessagesImpl(
         if( ! ( await prepareSignMessagesImpl( optsSignOperation ) ) )
             return;
         for( let i = 0; i < optsSignOperation.jarrNodes.length; ++i ) {
-            const cntSuccess = 0 + optsSignOperation.arrSignResults.length;
+            const cntSuccess = optsSignOperation.arrSignResults.length;
             if( cntSuccess >= optsSignOperation.nCountOfBlsPartsToCollect ) {
                 optsSignOperation.details.trace(
                     "{p}{} Stop invoking {bright} for transfer from chain {} at #{} because " +
@@ -1642,7 +1642,7 @@ async function doSignU256OneImpl( i, optsSignU256 ) {
                     let bNodeSignatureOKay = false; // initially assume signature is wrong
                     const strLogPrefixA = `BLS/#${nZeroBasedNodeIndex}: `;
                     try {
-                        const cntSuccess = 0 + optsSignU256.arrSignResults.length;
+                        const cntSuccess = optsSignU256.arrSignResults.length;
                         if( cntSuccess > optsSignU256.nCountOfBlsPartsToCollect ) {
                             ++optsSignU256.joGatheringTracker.nCountSkipped;
                             optsSignU256.details.notice(
@@ -1722,7 +1722,7 @@ async function doSignU256Gathering( optsSignU256 ) {
     optsSignU256.errGathering = null;
     optsSignU256.promiseCompleteGathering = new Promise( ( resolve, reject ) => {
         const iv = setInterval( function() {
-            const cntSuccess = 0 + optsSignU256.arrSignResults.length;
+            const cntSuccess = optsSignU256.arrSignResults.length;
             if( optsSignU256.joGatheringTracker.nCountReceivedPrevious !=
                 optsSignU256.joGatheringTracker.nCountReceived ) {
                 optsSignU256.details.debug(
