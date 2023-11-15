@@ -270,11 +270,8 @@ export function keccak256ForPendingWorkAnalysis( nNodeNumber, strLoopWorkType, i
 function splitSignatureShare( signatureShare ) {
     const jarr = signatureShare.split( ":" );
     if( jarr.length < 2 )
-        throw new Error( "Failed to split signatureShare=" + signatureShare.toString() );
-    return {
-        X: jarr[0],
-        Y: jarr[1]
-    };
+        throw new Error( `Failed to split signatureShare=${signatureShare.toString()}` );
+    return { X: jarr[0], Y: jarr[1] };
 }
 
 function getBlsGlueTmpDir() {
