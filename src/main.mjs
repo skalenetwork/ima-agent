@@ -342,7 +342,7 @@ function initJsonRpcServer() {
                 break;
             default:
                 joAnswer.error = `Unknown method name ${joMessage.method} was specified`;
-            break;
+                break;
             } // switch( joMessage.method )
             if( ( !joAnswer ) || typeof joAnswer != "object" ) {
                 joAnswer = {};
