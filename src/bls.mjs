@@ -1010,10 +1010,10 @@ async function gatherSigningStartImpl( optsSignOperation ) {
                         "signature parts({}) when all attempts done, error details: {err}",
                         cntSuccess, err );
                     if( log.id != optsSignOperation.details.id ) {
-                        log.error( "Problem(3) in BLS sign result handler, " +
-                            "not enough successful BLS signature parts({}) when all attempts " +
-                            "done, error details: {err}",
-                        cntSuccess, err );
+                        log.error(
+                            "Problem(3) in BLS sign result handler, not enough successful BLS " +
+                            "signature parts({}) when all attempts done, error details: {err}",
+                            cntSuccess, err );
                     }
                     optsSignOperation.errGathering = "Problem(3) in BLS sign result handler, not " +
                         `enough successful BLS signature parts(${cntSuccess}) ` +
@@ -1034,10 +1034,10 @@ async function gatherSigningStartImpl( optsSignOperation ) {
                     optsSignOperation.jarrMessages
                 ).catch( ( err ) => {
                     const cntSuccess = optsSignOperation.arrSignResults.length;
-                    optsSignOperation.details.critical( "Problem(4) in BLS sign result handler, " +
-                        "not enough successful BLS signature parts({}) and timeout reached, " +
-                        "error details: {err}", cntSuccess,
-                    err );
+                    optsSignOperation.details.critical(
+                        "Problem(4) in BLS sign result handler, not enough successful BLS " +
+                        "signature parts({}) and timeout reached, error details: {err}",
+                        cntSuccess, err );
                     if( log.id != optsSignOperation.details.id ) {
                         log.critical(
                             "Problem(4) in BLS sign result handler, not enough successful BLS " +
@@ -1121,13 +1121,13 @@ async function gatherSigningFinishImpl( optsSignOperation ) {
             optsSignOperation.jarrMessages
         ).catch( ( err ) => {
             if( log.id != optsSignOperation.details.id ) {
-                log.error( "Problem(6) in BLS sign result handler, not enough successful BLS " +
-                    "signature parts({}) and timeout reached, error details: {err}",
-                cntSuccess, err );
+                log.error(
+                    "Problem(6) in BLS sign result handler, not enough successful BLS signature " +
+                    "parts({}) and timeout reached, error details: {err}", cntSuccess, err );
             }
-            optsSignOperation.details.error( "Problem(6) in BLS sign result handler, not enough " +
-                "successful BLS signature parts({}) and timeout reached, " +
-                "error details: {err}", cntSuccess, err );
+            optsSignOperation.details.error(
+                "Problem(6) in BLS sign result handler, not enough successful BLS signature " +
+                "parts({}) and timeout reached, error details: {err}", cntSuccess, err );
             optsSignOperation.details.exposeDetailsTo(
                 log, optsSignOperation.strGatheredDetailsName, false );
             optsSignOperation.details.close();
