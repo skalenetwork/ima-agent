@@ -909,15 +909,17 @@ export async function cacheSChains( strChainNameConnectedTo, opts ) {
             opts.details.trace( "Connected S-Chains cache was updated in {}: {}",
                 threadInfo.threadDescription(), gArrSChainsCached );
         }
-        if( opts && opts.details ) {
-            opts.details.trace( "Will dispatch inThread-arrSChainsCached event in {}",
-                threadInfo.threadDescription() );
-        }
-        events.dispatchEvent( new UniversalDispatcherEvent(
-            "inThread-arrSChainsCached", { "detail": { "arrSChainsCached": arrSChains } } ) );
-        if( opts && opts.details ) {
-            opts.details.trace( "Did dispatched inThread-arrSChainsCached event in {}",
-                threadInfo.threadDescription() );
+        if( threadInfo.joCustomThreadProperties.isSChainsCacheNeeded ) {
+            if( opts && opts.details ) {
+                opts.details.trace( "Will dispatch inThread-arrSChainsCached event in {}",
+                    threadInfo.threadDescription() );
+            }
+            events.dispatchEvent( new UniversalDispatcherEvent(
+                "inThread-arrSChainsCached", { "detail": { "arrSChainsCached": arrSChains } } ) );
+            if( opts && opts.details ) {
+                opts.details.trace( "Did dispatched inThread-arrSChainsCached event in {}",
+                    threadInfo.threadDescription() );
+            }
         }
         if( opts.fnCacheChanged )
             opts.fnCacheChanged( gArrSChainsCached, null ); // null - no error
