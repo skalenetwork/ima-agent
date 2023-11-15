@@ -270,11 +270,8 @@ export function keccak256ForPendingWorkAnalysis( nNodeNumber, strLoopWorkType, i
 function splitSignatureShare( signatureShare ) {
     const jarr = signatureShare.split( ":" );
     if( jarr.length < 2 )
-        throw new Error( "Failed to split signatureShare=" + signatureShare.toString() );
-    return {
-        X: jarr[0],
-        Y: jarr[1]
-    };
+        throw new Error( `Failed to split signatureShare=${signatureShare.toString()}` );
+    return { X: jarr[0], Y: jarr[1] };
 }
 
 function getBlsGlueTmpDir() {
@@ -321,7 +318,7 @@ function performBlsGlue(
         for( let i = 0; i < cnt; ++i ) {
             const jo = arrSignResults[i];
             if( ( !jo ) || typeof jo != "object" )
-                throw new Error( "Failed to save BLS part " + i + "because it's not JSON object" );
+                throw new Error( `Failed to save BLS part ${i} because it's not JSON object` );
             const strPath = strActionDir + "/sign-result" + jo.index + ".json";
             details.trace( "{p}Saving {} file containing {}", strLogPrefix, strPath, jo );
             imaUtils.jsonFileSave( strPath, jo );
@@ -409,7 +406,7 @@ function performBlsGlueU256( details, u256, arrSignResults ) {
         for( let i = 0; i < cnt; ++i ) {
             const jo = arrSignResults[i];
             if( ( !jo ) || typeof jo != "object" )
-                throw new Error( "Failed to save BLS part " + i + "because it's not JSON object" );
+                throw new Error( `Failed to save BLS part ${i} because it's not JSON object` );
             const strPath = strActionDir + "/sign-result" + jo.index + ".json";
             details.trace( "{p}Saving {} file...", strLogPrefix, strPath );
             imaUtils.jsonFileSave( strPath, jo );
