@@ -57,13 +57,13 @@ async function findOutReferenceLogRecord(
     }
     for( let idxLogRecord = 0; idxLogRecord < cntLogRecord; ++ idxLogRecord ) {
         const joEvent = arrLogRecords[idxLogRecord];
-        const eventValuesByName = {
+        const ev = {
             "currentMessage": joEvent.args[0],
             "previousOutgoingMessageBlockId": joEvent.args[1]
         };
         const joReferenceLogRecord = {
-            "currentMessage": eventValuesByName.currentMessage,
-            "previousOutgoingMessageBlockId": eventValuesByName.previousOutgoingMessageBlockId,
+            "currentMessage": ev.currentMessage,
+            "previousOutgoingMessageBlockId": ev.previousOutgoingMessageBlockId,
             "currentBlockId": bnBlockId
         };
         const bnCurrentMessage =
@@ -273,15 +273,15 @@ async function analyzeGatheredRecords( optsTransfer, r ) {
         const joEvent = r[i];
         optsTransfer.details.debug( "{p}Will review found event record {} with data {}",
             optsTransfer.strLogPrefix, i, joEvent );
-        const eventValuesByName = {
+        const ev = {
             "dstChainHash": joEvent.args[0],
             "msgCounter": joEvent.args[1],
             "srcContract": joEvent.args[2],
             "dstContract": joEvent.args[3],
             "data": joEvent.args[4]
         };
-        if( eventValuesByName.dstChainHash == strChainHashWeAreLookingFor ) {
-            joValues = eventValuesByName;
+        if( ev.dstChainHash == strChainHashWeAreLookingFor ) {
+            joValues = ev;
             joValues.savedBlockNumberForOptimizations = r[i].blockNumber;
             optsTransfer.details.success(
                 "{p}Found event record {} reviewed and accepted for processing, found event " +
