@@ -106,17 +106,17 @@ jobs:
     - name: UPDATE - system deps and install libc6, net-tools, btrfs-progs, zip, unzip, bash, procps, curl, jq
       run: |
         sudo apt-get update
-        sudo apt-get install libc6 net-tools btrfs-progs zip unzip
-        sudo apt-get install bash
-        sudo apt-get install procps
-        sudo apt-get install curl
-        sudo apt-get install jq
+        sudo apt-get install -y libc6 net-tools btrfs-progs zip unzip
+        sudo apt-get install -y bash
+        sudo apt-get install -y procps
+        sudo apt-get install -y curl
+        sudo apt-get install -y jq
 
     - name: INIT - uninstall old Node JS if any
       run: |
         sudo npm cache clean -f || true &> /dev/null
-        sudo apt-get remove nodejs npm node -y || true &> /dev/null
-        sudo apt-get purge nodejs -y || true &> /dev/null
+        sudo apt-get remove -y nodejs npm node -y || true &> /dev/null
+        sudo apt-get purge -y nodejs -y || true &> /dev/null
         sudo apt-get autoremove -y || true &> /dev/null
         sudo rm -rf /usr/bin/node || true &> /dev/null
         sudo rm -rf /usr/include/node || true &> /dev/null
@@ -188,7 +188,7 @@ jobs:
     - name: INIT - Install venv for PYTHON
       working-directory: ${{env.working-directory}}
       run: |
-        sudo apt-get install python3.8-venv
+        sudo apt-get install -y python3.8-venv
 
     - name: INIT - Install everything in IMA
       working-directory: ${{env.working-directory}}
