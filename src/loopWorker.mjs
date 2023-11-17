@@ -184,6 +184,7 @@ class ObserverServer extends SocketServer {
         };
         self.mapApiHandlers.spreadUpdatedSChainNetwork =
             function( joMessage, joAnswer, eventData, socket ) {
+                self.initLogMethods();
                 self.debug(
                     "New own S-Chains network information is arrived to {} loop worker " +
                     "in {}: {}, this own S-Chain update is {}", workerData.url,
@@ -192,6 +193,7 @@ class ObserverServer extends SocketServer {
                 imaState.joSChainNetworkInfo = joMessage.joSChainNetworkInfo;
             };
         self.mapApiHandlers.schainsCached = function( joMessage, joAnswer, eventData, socket ) {
+            self.initLogMethods();
             if( threadInfo.joCustomThreadProperties.isSChainsCacheNeeded ) {
                 self.debug( "S-Chains cache did arrived to {} loop worker in {}: {}",
                     workerData.url, threadInfo.threadDescription(),
@@ -202,6 +204,7 @@ class ObserverServer extends SocketServer {
         // eslint-disable-next-line dot-notation
         self.mapApiHandlers["skale_imaNotifyLoopWork"] =
             function( joMessage, joAnswer, eventData, socket ) {
+                self.initLogMethods();
                 pwa.handleLoopStateArrived( // NOTICE: no await here, executed async
                     imaState,
                     owaspUtils.toInteger( joMessage.params.nNodeNumber ),
@@ -226,6 +229,8 @@ class ObserverServer extends SocketServer {
     }
     initLogMethods() {
         const self = this;
+        if( "fatal" in self && self.fatal && typeof self.fatal == "function" )
+            return;
         self.fatal = function() {
             if( log.verboseGet() >= log.verboseReversed().fatal ) {
                 self.log( log.getLogLinePrefixFatal() +

@@ -362,10 +362,9 @@ export async function loadSChain( idxSChain, hash, joData, cntSChains, opts ) {
     if( opts && opts.bStopNeeded )
         return null;
     await loadSChainParts( joSChain, opts );
-    if( opts && opts.details ) {
-        opts.details.trace( "    SNB did loaded parts of S-chain {}", joSChain.data );
-        opts.details.success( "Done" );
-    }
+    if( opts && opts.details )
+        opts.details.success( "    Done, SNB did loaded parts of S-chain {}", joSChain.data );
+
     joSChain.isConnected = false;
     return joSChain;
 }

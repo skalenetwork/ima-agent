@@ -421,8 +421,7 @@ async function main() {
     initMonitoringServer();
     initJsonRpcServer();
     const isSilentReDiscovery = imaState.isPrintSecurityValues
-        ? false
-        : imaState.joSChainDiscovery.isSilentReDiscovery;
+        ? false : imaState.joSChainDiscovery.isSilentReDiscovery;
     const fnOnPeriodicDiscoveryResultAvailable = function( isFinal ) {
         loop.spreadUpdatedSChainNetwork( isFinal );
     };

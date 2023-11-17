@@ -664,7 +664,7 @@ async function callbackAllMessagesSign( optsTransfer, err, jarrMessages, joGlueR
 
 async function handleAllMessagesSigning( optsTransfer ) {
     try {
-        const promiseComplete = new Promise( function( resolve, reject ) {
+        const allMessageSigningDone = new Promise( function( resolve, reject ) {
             const doHandlingWorkForAllMessagesSigning = async function() {
                 await optsTransfer.fnSignMessages(
                     optsTransfer.nTransferLoopCounter,
@@ -693,7 +693,7 @@ async function handleAllMessagesSigning( optsTransfer ) {
             };
             doHandlingWorkForAllMessagesSigning();
         } );
-        await Promise.all( [ promiseComplete ] );
+        await allMessageSigningDone;
         return true;
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );

@@ -159,57 +159,47 @@ async function payedCallPrepare( optsPayedCall ) {
 }
 
 async function payedCallTM( optsPayedCall ) {
-    const promiseComplete = new Promise( function( resolve, reject ) {
-        const doTM = async function() {
-            const txAdjusted =
-                optsPayedCall.unsignedTx; // JSON.parse( JSON.stringify( optsPayedCall.rawTx ) );
-            const arrNamesConvertToHex = [ "gas", "gasLimit", "optsPayedCall.gasPrice", "value" ];
-            for( let idxName = 0; idxName < arrNamesConvertToHex.length; ++ idxName ) {
-                const strName = arrNamesConvertToHex[idxName];
-                if( strName in txAdjusted &&
-                    typeof txAdjusted[strName] == "object" &&
-                    typeof txAdjusted[strName].toHexString == "function"
-                )
-                    txAdjusted[strName] = owaspUtils.toHexStringSafe( txAdjusted[strName] );
-            }
-            if( "gasLimit" in txAdjusted )
-                delete txAdjusted.gasLimit;
-            if( "chainId" in txAdjusted )
-                delete txAdjusted.chainId;
-            const { chainId } = await optsPayedCall.ethersProvider.getNetwork();
-            txAdjusted.chainId = chainId;
-            optsPayedCall.details.trace( "{p}Adjusted transaction: {}", optsPayedCall.strLogPrefix,
-                txAdjusted );
-            if( redis == null )
-                redis = new Redis( optsPayedCall.joAccount.strTransactionManagerURL );
-            const priority = optsPayedCall.joAccount.nTmPriority || 5;
-            optsPayedCall.details.trace( "{p}TM priority: {}", optsPayedCall.strLogPrefix,
-                priority );
-            try {
-                const [ idTransaction, joReceiptFromTM ] = await tmEnsureTransaction(
-                    optsPayedCall.details, optsPayedCall.ethersProvider, priority, txAdjusted );
-                optsPayedCall.joReceipt = joReceiptFromTM;
-                optsPayedCall.details.trace( "{p}ID of TM-transaction: {}",
-                    optsPayedCall.strLogPrefix, idTransaction );
-                const txHashSent = "" + optsPayedCall.joReceipt.transactionHash;
-                optsPayedCall.details.trace( "{p}Hash of sent TM-transaction: {}",
-                    optsPayedCall.strLogPrefix, txHashSent );
-                resolve( optsPayedCall.joReceipt );
-            } catch ( err ) {
-                optsPayedCall.details.critical(
-                    "{p}TM-transaction was not sent, underlying error is: {err}",
-                    optsPayedCall.strLogPrefix, err.toString() );
-                if( log.id != optsPayedCall.details.id ) {
-                    log.critical(
-                        "{p}TM-transaction was not sent, underlying error is: {err}",
-                        optsPayedCall.strLogPrefix, err.toString() );
-                }
-                reject( err );
-            }
-        };
-        doTM();
-    } );
-    await Promise.all( [ promiseComplete ] );
+    const txAdjusted =
+        optsPayedCall.unsignedTx; // JSON.parse( JSON.stringify( optsPayedCall.rawTx ) );
+    const arrNamesConvertToHex = [ "gas", "gasLimit", "optsPayedCall.gasPrice", "value" ];
+    for( let idxName = 0; idxName < arrNamesConvertToHex.length; ++ idxName ) {
+        const strName = arrNamesConvertToHex[idxName];
+        if( strName in txAdjusted && typeof txAdjusted[strName] == "object" &&
+            typeof txAdjusted[strName].toHexString == "function" )
+            txAdjusted[strName] = owaspUtils.toHexStringSafe( txAdjusted[strName] );
+    }
+    if( "gasLimit" in txAdjusted )
+        delete txAdjusted.gasLimit;
+    if( "chainId" in txAdjusted )
+        delete txAdjusted.chainId;
+    const { chainId } = await optsPayedCall.ethersProvider.getNetwork();
+    txAdjusted.chainId = chainId;
+    optsPayedCall.details.trace( "{p}Adjusted transaction: {}", optsPayedCall.strLogPrefix,
+        txAdjusted );
+    if( redis == null )
+        redis = new Redis( optsPayedCall.joAccount.strTransactionManagerURL );
+    const priority = optsPayedCall.joAccount.nTmPriority || 5;
+    optsPayedCall.details.trace( "{p}TM priority: {}", optsPayedCall.strLogPrefix, priority );
+    try {
+        const [ idTransaction, joReceiptFromTM ] = await tmEnsureTransaction(
+            optsPayedCall.details, optsPayedCall.ethersProvider, priority, txAdjusted );
+        optsPayedCall.joReceipt = joReceiptFromTM;
+        optsPayedCall.details.trace( "{p}ID of TM-transaction: {}",
+            optsPayedCall.strLogPrefix, idTransaction );
+        const txHashSent = "" + optsPayedCall.joReceipt.transactionHash;
+        optsPayedCall.details.trace( "{p}Hash of sent TM-transaction: {}",
+            optsPayedCall.strLogPrefix, txHashSent );
+        return optsPayedCall.joReceipt;
+    } catch ( err ) {
+        optsPayedCall.details.critical(
+            "{p}TM-transaction was not sent, underlying error is: {err}",
+            optsPayedCall.strLogPrefix, err.toString() );
+        if( log.id != optsPayedCall.details.id ) {
+            log.critical( "{p}TM-transaction was not sent, underlying error is: {err}",
+                optsPayedCall.strLogPrefix, err.toString() );
+        }
+        throw err;
+    }
 }
 
 async function payedCallSGX( optsPayedCall ) {
@@ -710,34 +700,19 @@ export class TransactionCustomizer {
             strContractMethodDescription + strArgumentsDescription;
         const strLogPrefix = `${strContractMethodDescription} `;
         try {
-            const promiseComplete = new Promise( function( resolve, reject ) {
-                const doEstimation = async function() {
-                    try {
-                        details.trace( "Estimate-gas of action {bright}...", strActionName );
-                        details.trace( "Will estimate-gas {}...", strContractCallDescription );
-                        const strAccountWalletAddress = joAccount.address();
-                        const callOpts = { from: strAccountWalletAddress };
-                        if( gasPrice )
-                            callOpts.gasPrice = owaspUtils.toBN( gasPrice ).toHexString();
-                        if( gasValueRecommended ) {
-                            callOpts.gasLimit =
-                                owaspUtils.toBN( gasValueRecommended ).toHexString();
-                        }
-                        if( weiHowMuch )
-                            callOpts.value = owaspUtils.toBN( weiHowMuch ).toHexString();
-                        details.trace( "Call options for estimate-gas {}", callOpts );
-                        estimatedGas = await joContract.estimateGas[strMethodName](
-                            ...arrArguments, callOpts );
-                        details.success( "{p}estimate-gas success: {}",
-                            strLogPrefix, estimatedGas );
-                        resolve( estimatedGas );
-                    } catch ( err ) {
-                        reject( err );
-                    }
-                };
-                doEstimation();
-            } );
-            await Promise.all( [ promiseComplete ] );
+            details.trace( "Estimate-gas of action {bright}...", strActionName );
+            details.trace( "Will estimate-gas {}...", strContractCallDescription );
+            const strAccountWalletAddress = joAccount.address();
+            const callOpts = { from: strAccountWalletAddress };
+            if( gasPrice )
+                callOpts.gasPrice = owaspUtils.toBN( gasPrice ).toHexString();
+            if( gasValueRecommended )
+                callOpts.gasLimit = owaspUtils.toBN( gasValueRecommended ).toHexString();
+            if( weiHowMuch )
+                callOpts.value = owaspUtils.toBN( weiHowMuch ).toHexString();
+            details.trace( "Call options for estimate-gas {}", callOpts );
+            estimatedGas = await joContract.estimateGas[strMethodName]( ...arrArguments, callOpts );
+            details.success( "{p}estimate-gas success: {}", strLogPrefix, estimatedGas );
         } catch ( err ) {
             const strError = owaspUtils.extractErrorMessage( err );
             details.error(
