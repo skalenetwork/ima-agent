@@ -340,7 +340,7 @@ function printLoopPartSkippedWarning( strLoopPartName ) {
 
 export async function singleTransferLoop( optsLoop ) {
     const imaState = state.get();
-    const strLogPrefix = `Single Loop in ${threadInfo.threadDescription( false )}`;
+    const strLogPrefix = `Single Loop in ${threadInfo.threadDescription( false )} `;
     try {
         log.debug( "{p}{p}", strLogPrefix, imaHelperAPIs.longSeparator );
         let b0 = false, b1 = false, b2 = false, b3 = false;
