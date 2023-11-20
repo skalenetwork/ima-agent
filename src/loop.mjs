@@ -78,7 +78,7 @@ export function checkTimeFraming( d, strDirection, joRuntimeOpts ) {
                 bInsideGap = true;
             }
         }
-        let strFrameInfo = log.fmtDebug(
+        let strFrameInfo = log.fmtDebug( "\n",
             "    Unix UTC time stamp", "........",
             log.fmtInformation( "{}", nUtcUnixTimeStamp ), "\n",
             "    All Chains Range", "...........", nSecondsRangeForAllSChains, "\n",
