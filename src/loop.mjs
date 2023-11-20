@@ -78,7 +78,7 @@ export function checkTimeFraming( d, strDirection, joRuntimeOpts ) {
                 bInsideGap = true;
             }
         }
-        let strFrameInfo = log.fmtDebug( "\n",
+        let strFrameInfo = log.fmtDebug(
             "    Unix UTC time stamp", "........",
             log.fmtInformation( "{}", nUtcUnixTimeStamp ), "\n",
             "    All Chains Range", "...........", nSecondsRangeForAllSChains, "\n",
@@ -110,14 +110,14 @@ export function checkTimeFraming( d, strDirection, joRuntimeOpts ) {
                     "/", log.fmtInformation( "{}", joRuntimeOpts.joExtraSignOpts.chainIdDst ),
                     "\n" );
             }
-            log.write( strFrameInfo );
         }
-        log.debug( "\n",
+        strFrameInfo += log.fmtDebug(
             "    Is skip", "....................", log.yn( bSkip ), "\n",
             "    Is inside gap", "..............", log.yn( bInsideGap ), "\n",
             "    Range Start", "................", log.fmtInformation( "{}", nRangeStart ), "\n",
             "    Frame Start", "................", log.fmtInformation( "{}", nFrameStart ), "\n",
-            "    Gap Start", "..................", log.fmtInformation( "{}", nGapStart ) );
+            "    Gap Start", "..................", log.fmtInformation( "{}", nGapStart ), "\n" );
+        log.write( strFrameInfo );
         if( bSkip )
             return false;
     } catch ( err ) {
