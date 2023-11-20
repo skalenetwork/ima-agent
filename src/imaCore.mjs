@@ -1276,8 +1276,8 @@ export async function doAllS2S( // s-chain --> s-chain
                 } else {
                     bOK = true;
                     const strLogPrefix = "S2S Loop: ";
-                    log.notice( strLogPrefix, "Skipped(s2s) in {} due to time framing check",
-                        threadInfo.threadDescription() );
+                    log.notice( "Skipped(s2s) in {} due to time framing check",
+                        strLogPrefix, threadInfo.threadDescription() );
                 }
             }
         } catch ( err ) {
