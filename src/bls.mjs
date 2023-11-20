@@ -1707,17 +1707,17 @@ async function doSignU256OneImpl( i, optsSignU256 ) {
             ++optsSignU256.joGatheringTracker.nCountErrors;
             if( log.id != optsSignU256.details.id ) {
                 log.error(
-                    "{p}JSON RPC call(doSignU256OneImpl) to S-Chain node {} " +
-                    "failed, RPC call was not created, error is: {err",
+                    "{p}JSON RPC call(doSignU256OneImpl) to S-Chain node {} failed, RPC call was " +
+                    "not created, error is: {err",
                     optsSignU256.strLogPrefix, strNodeDescColorized, err );
             }
             optsSignU256.details.error(
-                "{p}JSON RPC call(doSignU256OneImpl) to S-Chain node {} " +
-                "failed, RPC call was not created, error is: {err}",
+                "{p}JSON RPC call(doSignU256OneImpl) to S-Chain node {} failed, RPC call was " +
+                "not created, error is: {err}",
                 optsSignU256.strLogPrefix, strNodeDescColorized, err );
             if( joCall )
                 await joCall.disconnect();
-            return;
+            return true;
         }
         optsSignU256.details.trace( "{p}Will invoke skale_imaBSU256 for to sign value {}",
             optsSignU256.strLogPrefix, ptsSignU256.u256.toString() );
@@ -1733,141 +1733,148 @@ async function doSignU256OneImpl( i, optsSignU256 ) {
     } ); // rpcCall.create ...
 }
 
+function gatherSigningCheckFinish256( optsSignOperation, iv, resolve, reject ) {
+    const cntSuccess = optsSignU256.arrSignResults.length;
+    if( optsSignU256.joGatheringTracker.nCountReceivedPrevious !=
+        optsSignU256.joGatheringTracker.nCountReceived ) {
+        optsSignU256.details.debug(
+            "BLS u256 - BLS signature gathering progress updated, now have {} BLS parts " +
+            "of needed {} arrived, have {} success(es) and {} error(s)",
+            optsSignU256.joGatheringTracker.nCountReceived,
+            optsSignU256.nCountOfBlsPartsToCollect, cntSuccess,
+            optsSignU256.joGatheringTracker.nCountErrors );
+        optsSignU256.joGatheringTracker.nCountReceivedPrevious =
+            0 + optsSignU256.joGatheringTracker.nCountReceived;
+    }
+    ++ optsSignU256.joGatheringTracker.nWaitIntervalStepsDone;
+    if( cntSuccess < optsSignU256.nCountOfBlsPartsToCollect )
+        return false;
+    const strLogPrefixB = "BLS u256/Summary: ";
+    clearInterval( iv );
+    let strError = null, strSuccessfulResultDescription = null;
+    const joGlueResult = performBlsGlueU256(
+        optsSignU256.details, optsSignU256.u256, optsSignU256.arrSignResults );
+    if( joGlueResult ) {
+        optsSignU256.details.success( "{p}Got BLS glue u256 result: {}",
+            strLogPrefixB, joGlueResult );
+        if( optsSignU256.imaState.strPathBlsVerify.length > 0 ) {
+            const joCommonPublicKey = discoverCommonPublicKey(
+                optsSignU256.imaState.joSChainNetworkInfo, false );
+            if( ! joCommonPublicKey ) {
+                strError = "No BLS common public key";
+                optsSignOperation.details.error( "{p}{}",
+                    optsSignOperation.strLogPrefixB, strError );
+            } else if( performBlsVerifyU256( optsSignU256.details, joGlueResult,
+                optsSignU256.u256, joCommonPublicKey ) ) {
+                strSuccessfulResultDescription =
+                    "Got successful summary BLS u256 verification result";
+                optsSignU256.details.success( "{p}{}", strLogPrefixB,
+                    strSuccessfulResultDescription );
+            } else {
+                strError = "BLS verification failed";
+                if( log.id != optsSignU256.details.id )
+                    log.error( "{p}BLS verification failure:{}", strLogPrefixB, strError );
+                optsSignU256.details.error( "{p}BLS verification failure:{}",
+                    strLogPrefixB, strError );
+            }
+        }
+    } else {
+        strError = "BLS u256 glue failed, no glue result arrived";
+        if( log.id != optsSignU256.details.id ) {
+            log.error( "{p}Problem(1) in BLS u256 sign result handler: {err}",
+                strLogPrefixB, strError );
+        }
+        optsSignU256.details.error(
+            "{p}Problem(1) in BLS u256 sign result handler: {err}",
+            strLogPrefixB, strError );
+    }
+    optsSignU256.details.trace(
+        "Will call signed-256 answer-sending callback {}, u256 is {}, " +
+        "glue result is {}", strError ? ( " with error " + log.fmtError( { em }, strError ) ) : "",
+        optsSignU256.u256, joGlueResult );
+    optsSignU256.fn( strError, optsSignU256.u256, joGlueResult ).catch( ( err ) => {
+        if( log.id != optsSignU256.details.id )
+            log.critical( "Problem(2) in BLS u256 sign result handler: {err}", err );
+        optsSignU256.details.critical(
+            "Problem(2) in BLS u256 sign result handler: {err}", err );
+        optsSignU256.errGathering = "Problem(2) in BLS u256 sign result " +
+                `handler: ${owaspUtils.extractErrorMessage( err )}`;
+    } );
+    if( strError ) {
+        optsSignU256.errGathering = strError;
+        reject( new Error( optsSignU256.errGathering ) );
+    } else
+        resolve();
+    return true;
+}
+
+function gatherSigningCheckOverflow256( optsSignOperation, iv, resolve, reject ) {
+    if( optsSignU256.joGatheringTracker.nCountReceived < optsSignU256.jarrNodes.length )
+        return false;
+    clearInterval( iv );
+    optsSignU256.fn(
+        "signature error(2, u256), got " +
+        `${optsSignU256.joGatheringTracker.nCountErrors} errors(s) for ` +
+        `${optsSignU256.jarrNodes.length}  node(s)`, optsSignU256.u256
+    ).catch( ( err ) => {
+        if( log.id != optsSignU256.details.id ) {
+            log.critical(
+                "Problem(3) in BLS u256 sign result handler, not enough successful " +
+                "BLS signature parts({} when all attempts done, error details: {err}",
+                cntSuccess, err );
+        }
+        optsSignU256.details.critical(
+            "Problem(3) in BLS u256 sign result handler, not enough successful BLS " +
+            "signature parts({} when all attempts done, error details: {err}",
+            cntSuccess, err );
+        optsSignU256.errGathering = "Problem(3) in BLS u256 sign result handler, not " +
+            `enough successful BLS signature parts(${cntSuccess} when all attempts ` +
+            `done, error details: ${owaspUtils.extractErrorMessage( err )}`;
+        reject( new Error( optsSignU256.errGathering ) );
+    } );
+    return true;
+}
+
+function gatherSigningCheckTimeout256( optsSignOperation, iv, resolve, reject ) {
+    if( optsSignU256.joGatheringTracker.nWaitIntervalStepsDone <
+        optsSignU256.joGatheringTracker.nWaitIntervalMaxSteps )
+        return false;
+    clearInterval( iv );
+    optsSignU256.fn(
+        "signature error(3, u256), got " +
+        `${optsSignU256.joGatheringTracker.nCountErrors}  errors(s) for ` +
+        `${optsSignU256.jarrNodes.length} node(s)`,
+        optsSignU256.u256
+    ).catch( ( err ) => {
+        if( log.id != optsSignU256.details.id ) {
+            log.error(
+                "Problem(4) in BLS u256 sign result handler, not enough successful " +
+                "BLS signature parts({}) and timeout reached, error details: {err}",
+                cntSuccess, err );
+        }
+        optsSignU256.details.error(
+            "Problem(4) in BLS u256 sign result handler, not enough successful BLS " +
+            "signature parts({}) and timeout reached, error details: {err",
+            cntSuccess, err );
+        optsSignU256.errGathering = "Problem(4) in BLS u256 sign result handler, not " +
+            `enough successful BLS signature parts(${cntSuccess}) and timeout ` +
+            `reached, error details: ${owaspUtils.extractErrorMessage( err )}`;
+        reject( new Error( optsSignU256.errGathering ) );
+    } );
+    return true;
+}
+
 async function doSignU256Gathering( optsSignU256 ) {
     optsSignU256.details.debug( "{p}Waiting for BLS glue result ", optsSignU256.strLogPrefix );
     optsSignU256.errGathering = null;
     optsSignU256.signaturesGatheringDone = new Promise( ( resolve, reject ) => {
         const iv = setInterval( function() {
-            const cntSuccess = optsSignU256.arrSignResults.length;
-            if( optsSignU256.joGatheringTracker.nCountReceivedPrevious !=
-                optsSignU256.joGatheringTracker.nCountReceived ) {
-                optsSignU256.details.debug(
-                    "BLS u256 - BLS signature gathering progress updated, now have {} BLS parts " +
-                    "of needed {} arrived, have {} success(es) and {} error(s)",
-                    optsSignU256.joGatheringTracker.nCountReceived,
-                    optsSignU256.nCountOfBlsPartsToCollect, cntSuccess,
-                    optsSignU256.joGatheringTracker.nCountErrors );
-                optsSignU256.joGatheringTracker.nCountReceivedPrevious =
-                    0 + optsSignU256.joGatheringTracker.nCountReceived;
-            }
-            ++ optsSignU256.joGatheringTracker.nWaitIntervalStepsDone;
-            if( cntSuccess >= optsSignU256.nCountOfBlsPartsToCollect ) {
-                const strLogPrefixB = "BLS u256/Summary: ";
-                clearInterval( iv );
-                let strError = null, strSuccessfulResultDescription = null;
-                const joGlueResult = performBlsGlueU256(
-                    optsSignU256.details, optsSignU256.u256, optsSignU256.arrSignResults );
-                if( joGlueResult ) {
-                    optsSignU256.details.success( "{p}Got BLS glue u256 result: {}",
-                        strLogPrefixB, joGlueResult );
-                    if( optsSignU256.imaState.strPathBlsVerify.length > 0 ) {
-                        const joCommonPublicKey = discoverCommonPublicKey(
-                            optsSignU256.imaState.joSChainNetworkInfo, false );
-                        if( ! joCommonPublicKey ) {
-                            strError = "No BLS common public key";
-                            optsSignOperation.details.error( "{p}{}",
-                                optsSignOperation.strLogPrefixB, strError );
-                        } else if( performBlsVerifyU256( optsSignU256.details, joGlueResult,
-                            optsSignU256.u256, joCommonPublicKey ) ) {
-                            strSuccessfulResultDescription =
-                                "Got successful summary BLS u256 verification result";
-                            optsSignU256.details.success( "{p}{}", strLogPrefixB,
-                                strSuccessfulResultDescription );
-                        } else {
-                            strError = "BLS verification failed";
-                            if( log.id != optsSignU256.details.id ) {
-                                log.error( "{p}BLS verification failure:{}",
-                                    strLogPrefixB, strError );
-                            }
-                            optsSignU256.details.error( "{p}BLS verification failure:{}",
-                                strLogPrefixB, strError );
-                        }
-                    }
-                } else {
-                    strError = "BLS u256 glue failed, no glue result arrived";
-                    if( log.id != optsSignU256.details.id ) {
-                        log.error( "{p}Problem(1) in BLS u256 sign result handler: {err}",
-                            strLogPrefixB, strError );
-                    }
-                    optsSignU256.details.error(
-                        "{p}Problem(1) in BLS u256 sign result handler: {err}",
-                        strLogPrefixB, strError );
-                }
-                optsSignU256.details.trace(
-                    "Will call signed-256 answer-sending callback {}, u256 is {}, " +
-                    "glue result is {}",
-                    strError ? ( " with error " + log.fmtError( { em }, strError ) ) : "",
-                    optsSignU256.u256, joGlueResult );
-                optsSignU256.fn( strError, optsSignU256.u256, joGlueResult ).catch( ( err ) => {
-                    if( log.id != optsSignU256.details.id ) {
-                        log.critical( "Problem(2) in BLS u256 sign result handler: {err}",
-                            err );
-                    }
-                    optsSignU256.details.critical(
-                        "Problem(2) in BLS u256 sign result handler: {err}", err );
-                    optsSignU256.errGathering = "Problem(2) in BLS u256 sign result " +
-                            `handler: ${owaspUtils.extractErrorMessage( err )}`;
-                } );
-                if( strError ) {
-                    optsSignU256.errGathering = strError;
-                    reject( new Error( optsSignU256.errGathering ) );
-                } else
-                    resolve();
+            if( gatherSigningCheckFinish256( optsSignOperation, iv, resolve, reject ) )
                 return;
-            }
-            if( optsSignU256.joGatheringTracker.nCountReceived >=
-                    optsSignU256.jarrNodes.length ) {
-                clearInterval( iv );
-                optsSignU256.fn(
-                    "signature error(2, u256), got " +
-                    `${optsSignU256.joGatheringTracker.nCountErrors} errors(s) for ` +
-                    `${optsSignU256.jarrNodes.length}  node(s)`,
-                    optsSignU256.u256
-                ).catch( ( err ) => {
-                    if( log.id != optsSignU256.details.id ) {
-                        log.critical(
-                            "Problem(3) in BLS u256 sign result handler, not enough successful " +
-                            "BLS signature parts({} when all attempts done, error details: {err}",
-                            cntSuccess, err );
-                    }
-                    optsSignU256.details.critical(
-                        "Problem(3) in BLS u256 sign result handler, not enough successful BLS " +
-                        "signature parts({} when all attempts done, error details: {err}",
-                        cntSuccess, err );
-                    optsSignU256.errGathering = "Problem(3) in BLS u256 sign result handler, not " +
-                        `enough successful BLS signature parts(${cntSuccess} when all attempts ` +
-                        `done, error details: ${owaspUtils.extractErrorMessage( err )}`;
-                    reject( new Error( optsSignU256.errGathering ) );
-                } );
+            if( gatherSigningCheckOverflow256( optsSignOperation, iv, resolve, reject ) )
                 return;
-            }
-            if( optsSignU256.joGatheringTracker.nWaitIntervalStepsDone >=
-                optsSignU256.joGatheringTracker.nWaitIntervalMaxSteps
-            ) {
-                clearInterval( iv );
-                optsSignU256.fn(
-                    "signature error(3, u256), got " +
-                    `${optsSignU256.joGatheringTracker.nCountErrors}  errors(s) for ` +
-                    `${optsSignU256.jarrNodes.length} node(s)`,
-                    optsSignU256.u256
-                ).catch( ( err ) => {
-                    if( log.id != optsSignU256.details.id ) {
-                        log.error(
-                            "Problem(4) in BLS u256 sign result handler, not enough successful " +
-                            "BLS signature parts({}) and timeout reached, error details: {err}",
-                            cntSuccess, err );
-                    }
-                    optsSignU256.details.error(
-                        "Problem(4) in BLS u256 sign result handler, not enough successful BLS " +
-                        "signature parts({}) and timeout reached, error details: {err",
-                        cntSuccess, err );
-                    optsSignU256.errGathering = "Problem(4) in BLS u256 sign result handler, not " +
-                        `enough successful BLS signature parts(${cntSuccess}) and timeout ` +
-                        `reached, error details: ${owaspUtils.extractErrorMessage( err )}`;
-                    reject( new Error( optsSignU256.errGathering ) );
-                } );
+            if( gatherSigningCheckTimeout256( optsSignOperation, iv, resolve, reject ) )
                 return;
-            }
         }, optsSignU256.joGatheringTracker.nWaitIntervalStepMilliseconds );
     } );
 }

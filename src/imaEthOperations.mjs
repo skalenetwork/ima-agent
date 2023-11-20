@@ -29,6 +29,7 @@ import * as imaHelperAPIs from "./imaHelperAPIs.mjs";
 import * as imaTx from "./imaTx.mjs";
 import * as imaGasUsage from "./imaGasUsageOperations.mjs";
 import * as imaEventLogScan from "./imaEventLogScan.mjs";
+import * as threadInfo from "./threadInfo.mjs";
 
 export async function getBalanceEth(
     isMainNet,
@@ -123,7 +124,7 @@ export async function doEthPaymentFromMainNet(
         if( joMessageProxyMainNet ) {
             details.debug( "{p}Verifying the {} event of the ", "MessageProxy/{} contract ...",
                 strLogPrefix, strEventName, joMessageProxyMainNet.address );
-            await imaHelperAPIs.sleep(
+            await threadInfo.sleep(
                 imaHelperAPIs.getMillisecondsSleepBeforeFetchOutgoingMessageEvent() );
             const joEvents = await imaEventLogScan.getContractCallEvents(
                 details, strLogPrefix,
@@ -225,7 +226,7 @@ export async function doEthPaymentFromSChain(
         if( joMessageProxySChain ) {
             details.debug( "{p}Verifying the {} event of the MessageProxy/{} contract ...",
                 strLogPrefix, strEventName, joMessageProxySChain.address );
-            await imaHelperAPIs.sleep(
+            await threadInfo.sleep(
                 imaHelperAPIs.getMillisecondsSleepBeforeFetchOutgoingMessageEvent() );
             const joEvents = await imaEventLogScan.getContractCallEvents(
                 details, strLogPrefix,

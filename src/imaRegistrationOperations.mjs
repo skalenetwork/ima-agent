@@ -27,6 +27,7 @@ import * as log from "./log.mjs";
 import * as owaspUtils from "./owaspUtils.mjs";
 import * as imaHelperAPIs from "./imaHelperAPIs.mjs";
 import * as imaTx from "./imaTx.mjs";
+import * as threadInfo from "./threadInfo.mjs";
 
 export async function invokeHasChain(
     details,
@@ -75,7 +76,7 @@ export async function waitForHasChain(
         ) )
             return true;
         details.trace( "Sleeping {} milliseconds...", nSleepMilliseconds );
-        await imaHelperAPIs.sleep( nSleepMilliseconds );
+        await threadInfo.sleep( nSleepMilliseconds );
     }
     return false;
 }

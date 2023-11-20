@@ -26,10 +26,10 @@
 import * as owaspUtils from "./owaspUtils.mjs";
 import * as log from "./log.mjs";
 import * as rpcCall from "./rpcCall.mjs";
-import * as imaHelperAPIs from "./imaHelperAPIs.mjs";
 import * as skaleObserver from "./observer.mjs";
 import * as state from "./state.mjs";
 import * as imaUtils from "./utils.mjs";
+import * as threadInfo from "./threadInfo.mjs";
 
 export function initialSkaleNetworkScanForS2S() {
     const imaState = state.get();
@@ -205,7 +205,7 @@ export async function waitUntilSChainStarted() {
                 idxWaitAttempt );
             return;
         }
-        await imaHelperAPIs.sleep( 1000 );
+        await threadInfo.sleep( 1000 );
     }
     log.success( "Done, S-Chain is accessible and sane." );
 }

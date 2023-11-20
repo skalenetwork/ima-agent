@@ -26,6 +26,7 @@
 import * as log from "./log.mjs";
 import * as owaspUtils from "./owaspUtils.mjs";
 import * as rpcCall from "./rpcCall.mjs";
+import * as threadInfo from "./threadInfo.mjs";
 
 export const longSeparator =
     "============================================================" +
@@ -56,9 +57,6 @@ export function setWaitForNextBlockOnSChain( val ) {
     gFlagWaitForNextBlockOnSChain = ( !!val );
 }
 
-export const sleep = ( milliseconds ) => {
-    return new Promise( resolve => setTimeout( resolve, milliseconds ) );
-};
 export const currentTimestamp = () => {
     return parseInt( parseInt( Date.now().valueOf() ) / 1000 );
 };
@@ -69,7 +67,7 @@ export async function safeWaitForNextBlockToAppear( details, ethersProvider ) {
     details.trace( "Waiting for next block to appear..." );
     details.trace( "    ...have block {}", nBlockNumber.toHexString() );
     for( ; true; ) {
-        await sleep( 1000 );
+        await threadInfo.sleep( 1000 );
         const nBlockNumber2 =
             owaspUtils.toBN( await safeGetBlockNumber( details, 10, ethersProvider ) );
         details.trace( "    ...have block {}", nBlockNumber2.toHexString() );

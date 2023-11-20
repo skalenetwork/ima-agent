@@ -40,10 +40,6 @@ parentPort.on( "message", jo => {
         return;
 } );
 
-const sleep = ( milliseconds ) => {
-    return new Promise( resolve => setTimeout( resolve, milliseconds ) );
-};
-
 function doSendMessage( type, endpoint, workerUUID, data ) {
     const jo = networkLayer.socketReceivedDataReverseMarshall( data );
     const joSend = {
@@ -222,7 +218,7 @@ class ObserverServer extends SocketServer {
                         threadInfo.threadDescription( false );
                 }
             }
-            await sleep( 5 * 1000 );
+            await threadInfo.sleep( 5 * 1000 );
         }
         self.bIsPeriodicCachingStepInProgress = false;
         if( strError ) {

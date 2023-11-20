@@ -25,6 +25,7 @@
 
 import * as log from "./log.mjs";
 import * as rpcCall from "./rpcCall.mjs";
+import * as threadInfo from "./threadInfo.mjs";
 import numberToBN from "number-to-bn";
 import * as sha3Module from "sha3";
 const Keccak = sha3Module.Keccak;
@@ -36,10 +37,6 @@ const gBigNum1 = numberToBN( 1 );
 const gBigNum2 = numberToBN( 2 );
 const gBigNum256 = numberToBN( 256 );
 const gBigNumUpperPart = gBigNum2.pow( gBigNum256 ).sub( gBigNum1 );
-
-const sleep = ( milliseconds ) => {
-    return new Promise( resolve => setTimeout( resolve, milliseconds ) );
-};
 
 function getUtcTimestampString( d ) {
     d = d || new Date(); // use now time if d is not specified
@@ -147,7 +144,7 @@ async function handleOracleSubmitRequestResult(
         const nMillisecondsToSleep = ( ! idxAttempt )
             ? nMillisecondsSleepBefore : nMillisecondsSleepPeriod;
         if( nMillisecondsToSleep > 0 )
-            await sleep( nMillisecondsToSleep );
+            await threadInfo.sleep( nMillisecondsToSleep );
         try {
             const joCheck = { "method": "oracle_checkResult", "params": [ joOut.result ] };
             if( isVerboseTraceDetails ) {

@@ -37,6 +37,8 @@ import * as imaUtils from "./utils.mjs";
 import * as imaHelperAPIs from "./imaHelperAPIs.mjs";
 import * as imaEventLogScan from "./imaEventLogScan.mjs";
 
+import * as threadInfo from "./threadInfo.mjs";
+
 const __dirname = path.dirname( url.fileURLToPath( import.meta.url ) );
 
 let redis = null;
@@ -562,7 +564,7 @@ async function tmWait( details, txId, ethersProvider, nWaitSeconds = 36000 ) {
     const startTs = imaHelperAPIs.currentTimestamp();
     while( ! tmIsFinished( await tmGetRecord( txId ) ) &&
                 ( imaHelperAPIs.currentTimestamp() - startTs ) < nWaitSeconds )
-        await imaHelperAPIs.sleep( 500 );
+        await threadInfo.sleep( 500 );
     const r = await tmGetRecord( txId );
     details.debug( "{p}TM - TX {} record is {}", strPrefixDetails, txId, r );
     if( log.id != details.id )
@@ -625,7 +627,7 @@ async function tmEnsureTransaction(
             log.error( "{p}TM - unsuccessful TX {} sending attempt {} of {} receipt: {}",
                 strPrefixLog, txId, idxAttempt, cntAttempts, joReceipt );
         }
-        await imaHelperAPIs.sleep( sleepMilliseconds );
+        await threadInfo.sleep( sleepMilliseconds );
     }
     if( !joReceipt ) {
         details.error( "{p}TM TX {} transaction has been dropped", strPrefixDetails, txId );
