@@ -907,152 +907,158 @@ async function prepareSignMessagesImpl( optsSignOperation ) {
     return true;
 }
 
+function gatherSigningCheckFinish( optsSignOperation, iv, resolve, reject ) {
+    const cntSuccess = optsSignOperation.arrSignResults.length;
+    if( optsSignOperation.joGatheringTracker.nCountReceivedPrevious !=
+        optsSignOperation.joGatheringTracker.nCountReceived ) {
+        optsSignOperation.details.debug(
+            "{bright}/#{} BLS signature gathering progress updated, now have {} BLS " +
+            "parts of needed {} arrived, have {} success(es) and {} error(s)",
+            optsSignOperation.strDirection, optsSignOperation.nTransferLoopCounter,
+            optsSignOperation.joGatheringTracker.nCountReceived,
+            optsSignOperation.nCountOfBlsPartsToCollect, cntSuccess,
+            optsSignOperation.joGatheringTracker.nCountErrors );
+        optsSignOperation.joGatheringTracker.nCountReceivedPrevious =
+            0 + optsSignOperation.joGatheringTracker.nCountReceived;
+    }
+    ++ optsSignOperation.joGatheringTracker.nWaitIntervalStepsDone;
+    if( cntSuccess < optsSignOperation.nCountOfBlsPartsToCollect )
+        return false;
+    optsSignOperation.strLogPrefixB = `${optsSignOperation.strDirection} /# ` +
+        `${optsSignOperation.nTransferLoopCounter}/BLS/Summary: `;
+    clearInterval( iv );
+    let strError = null, strSuccessfulResultDescription = null;
+    const joGlueResult = performBlsGlue( optsSignOperation.details,
+        optsSignOperation.strDirection, optsSignOperation.jarrMessages,
+        optsSignOperation.nIdxCurrentMsgBlockStart, optsSignOperation.strFromChainName,
+        optsSignOperation.arrSignResults );
+    if( joGlueResult ) {
+        optsSignOperation.details.success( "{p}Got BLS glue result: {}",
+            optsSignOperation.strLogPrefixB, joGlueResult );
+        if( optsSignOperation.imaState.strPathBlsVerify.length > 0 ) {
+            const joCommonPublicKey = discoverCommonPublicKey(
+                optsSignOperation.imaState.joSChainNetworkInfo, false );
+            if( ! joCommonPublicKey ) {
+                strError = "No BLS common public key";
+                optsSignOperation.details.error( "{p}{err}",
+                    optsSignOperation.strLogPrefixB, strError );
+            } else if( performBlsVerify(
+                optsSignOperation.details, optsSignOperation.strDirection,
+                joGlueResult, optsSignOperation.jarrMessages,
+                optsSignOperation.nIdxCurrentMsgBlockStart,
+                optsSignOperation.strFromChainName, joCommonPublicKey
+            ) ) {
+                strSuccessfulResultDescription =
+                    "Got successful summary BLS verification result";
+                optsSignOperation.details.success( "{p}{bright}",
+                    optsSignOperation.strLogPrefixB, strSuccessfulResultDescription );
+            } else {
+                strError = "BLS verification failed";
+                optsSignOperation.details.error( "{p}{err}",
+                    optsSignOperation.strLogPrefixB, strError );
+            }
+        }
+    } else {
+        strError = "BLS glue failed, no glue result arrived";
+        optsSignOperation.details.error(
+            "{p}Problem(1) in BLS sign result handler: {err}",
+            optsSignOperation.strLogPrefixB, strError );
+        if( log.id != optsSignOperation.details.id ) {
+            log.error( "{p}Problem(1) in BLS sign result handler: {err}",
+                optsSignOperation.strLogPrefixB, strError );
+        }
+    }
+    optsSignOperation.details.trace(
+        "Will call signed-hash answer-sending callback {}, messages is(are) {}, " +
+        "glue result is {}", strError ? log.fmtError( " with error {}", strError ) : "",
+        optsSignOperation.jarrMessages, joGlueResult );
+    optsSignOperation.fn(
+        strError, optsSignOperation.jarrMessages, joGlueResult )
+        .catch( ( err ) => {
+            if( log.id != optsSignOperation.details.id )
+                log.critical( "Problem(2) in BLS sign result handler: {err}", err );
+            optsSignOperation.details.critical(
+                "Problem(2) in BLS sign result handler: {err}", err );
+            optsSignOperation.errGathering = "Problem(2) in BLS sign " +
+                `result handler: ${owaspUtils.extractErrorMessage( err )}`;
+            return true;
+        } );
+    optsSignOperation.bHaveResultReportCalled = true;
+    if( strError ) {
+        optsSignOperation.errGathering = strError;
+        reject( new Error( optsSignOperation.errGathering ) );
+    } else
+        resolve();
+    return true;
+}
+
+function gatherSigningCheckOverflow( optsSignOperation, iv, resolve, reject ) {
+    if( optsSignOperation.joGatheringTracker.nCountReceived < optsSignOperation.jarrNodes.length )
+        return false;
+    clearInterval( iv );
+    optsSignOperation.fn(
+        `signature error(2), got ${optsSignOperation.joGatheringTracker.nCountErrors}` +
+        ` errors(s) for ${optsSignOperation.jarrNodes.length} node(s)`,
+        optsSignOperation.jarrMessages
+    ).catch( ( err ) => {
+        const cntSuccess = optsSignOperation.arrSignResults.length;
+        optsSignOperation.details.error(
+            "Problem(3) in BLS sign result handler, not enough successful BLS signature " +
+            "parts({}) when all attempts done, error details: {err}", cntSuccess, err );
+        if( log.id != optsSignOperation.details.id ) {
+            log.error(
+                "Problem(3) in BLS sign result handler, not enough successful BLS signature " +
+                "parts({}) when all attempts done, error details: {err}", cntSuccess, err );
+        }
+        optsSignOperation.errGathering = "Problem(3) in BLS sign result handler, not enough " +
+            `successful BLS signature parts(${cntSuccess}) when all attempts done, ` +
+            `error details: ${owaspUtils.extractErrorMessage( err )}`;
+        reject( new Error( optsSignOperation.errGathering ) );
+    } );
+    optsSignOperation.bHaveResultReportCalled = true;
+    return true;
+}
+
+function gatherSigningCheckTimeout( optsSignOperation, iv, resolve, reject ) {
+    if( optsSignOperation.joGatheringTracker.nWaitIntervalStepsDone <
+        optsSignOperation.joGatheringTracker.nWaitIntervalMaxSteps )
+        return false;
+    clearInterval( iv );
+    optsSignOperation.fn(
+        `signature error(3), got ${optsSignOperation.joGatheringTracker.nCountErrors}` +
+        ` errors(s) for ${optsSignOperation.jarrNodes.length} node(s)`,
+        optsSignOperation.jarrMessages
+    ).catch( ( err ) => {
+        const cntSuccess = optsSignOperation.arrSignResults.length;
+        optsSignOperation.details.critical(
+            "Problem(4) in BLS sign result handler, not enough successful BLS signature " +
+            "parts({}) and timeout reached, error details: {err}", cntSuccess, err );
+        if( log.id != optsSignOperation.details.id ) {
+            log.critical(
+                "Problem(4) in BLS sign result handler, not enough successful BLS signature " +
+                "parts({}) and timeout reached, error details: {err}", cntSuccess, err );
+        }
+        optsSignOperation.errGathering = "Problem(4) in BLS sign result handler, not enough " +
+            `successful BLS signature parts(${cntSuccess}) and timeout reached, ` +
+            `error details: ${owaspUtils.extractErrorMessage( err )}`;
+        reject( new Error( optsSignOperation.errGathering ) );
+    } );
+    optsSignOperation.bHaveResultReportCalled = true;
+    return true;
+}
+
 async function gatherSigningStartImpl( optsSignOperation ) {
     optsSignOperation.details.debug( "{p}Waiting for BLS glue result...",
         optsSignOperation.strLogPrefix );
     optsSignOperation.errGathering = null;
     optsSignOperation.signaturesGatheringDone = new Promise( ( resolve, reject ) => {
         const iv = setInterval( function() {
-            const cntSuccess = optsSignOperation.arrSignResults.length;
-            if( optsSignOperation.joGatheringTracker.nCountReceivedPrevious !=
-                optsSignOperation.joGatheringTracker.nCountReceived ) {
-                optsSignOperation.details.debug(
-                    "{bright}/#{} BLS signature gathering progress updated, now have {} BLS " +
-                    "parts of needed {} arrived, have {} success(es) and {} error(s)",
-                    optsSignOperation.strDirection, optsSignOperation.nTransferLoopCounter,
-                    optsSignOperation.joGatheringTracker.nCountReceived,
-                    optsSignOperation.nCountOfBlsPartsToCollect, cntSuccess,
-                    optsSignOperation.joGatheringTracker.nCountErrors );
-                optsSignOperation.joGatheringTracker.nCountReceivedPrevious =
-                    0 + optsSignOperation.joGatheringTracker.nCountReceived;
-            }
-            ++ optsSignOperation.joGatheringTracker.nWaitIntervalStepsDone;
-            if( cntSuccess >= optsSignOperation.nCountOfBlsPartsToCollect ) {
-                optsSignOperation.strLogPrefixB = `${optsSignOperation.strDirection} /# ` +
-                    `${optsSignOperation.nTransferLoopCounter}/BLS/Summary: `;
-                clearInterval( iv );
-                let strError = null, strSuccessfulResultDescription = null;
-                const joGlueResult = performBlsGlue( optsSignOperation.details,
-                    optsSignOperation.strDirection, optsSignOperation.jarrMessages,
-                    optsSignOperation.nIdxCurrentMsgBlockStart, optsSignOperation.strFromChainName,
-                    optsSignOperation.arrSignResults );
-                if( joGlueResult ) {
-                    optsSignOperation.details.success( "{p}Got BLS glue result: {}",
-                        optsSignOperation.strLogPrefixB, joGlueResult );
-                    if( optsSignOperation.imaState.strPathBlsVerify.length > 0 ) {
-                        const joCommonPublicKey = discoverCommonPublicKey(
-                            optsSignOperation.imaState.joSChainNetworkInfo, false );
-                        if( ! joCommonPublicKey ) {
-                            strError = "No BLS common public key";
-                            optsSignOperation.details.error( "{p}{err}",
-                                optsSignOperation.strLogPrefixB, strError );
-                        } else if( performBlsVerify(
-                            optsSignOperation.details, optsSignOperation.strDirection,
-                            joGlueResult, optsSignOperation.jarrMessages,
-                            optsSignOperation.nIdxCurrentMsgBlockStart,
-                            optsSignOperation.strFromChainName,
-                            joCommonPublicKey
-                        ) ) {
-                            strSuccessfulResultDescription =
-                                "Got successful summary BLS verification result";
-                            optsSignOperation.details.success( "{p}{bright}",
-                                optsSignOperation.strLogPrefixB, strSuccessfulResultDescription );
-                        } else {
-                            strError = "BLS verification failed";
-                            optsSignOperation.details.error( "{p}{err}",
-                                optsSignOperation.strLogPrefixB, strError );
-                        }
-                    }
-                } else {
-                    strError = "BLS glue failed, no glue result arrived";
-                    optsSignOperation.details.error(
-                        "{p}Problem(1) in BLS sign result handler: {err}",
-                        optsSignOperation.strLogPrefixB, strError );
-                    if( log.id != optsSignOperation.details.id ) {
-                        log.error( "{p}Problem(1) in BLS sign result handler: {err}",
-                            optsSignOperation.strLogPrefixB, strError );
-                    }
-                }
-                optsSignOperation.details.trace(
-                    "Will call signed-hash answer-sending callback {}, messages is(are) {}, " +
-                    "glue result is {}", strError ? log.fmtError( " with error {}", strError ) : "",
-                    optsSignOperation.jarrMessages, joGlueResult );
-                optsSignOperation.fn(
-                    strError, optsSignOperation.jarrMessages, joGlueResult )
-                    .catch( ( err ) => {
-                        if( log.id != optsSignOperation.details.id )
-                            log.critical( "Problem(2) in BLS sign result handler: {err}", err );
-                        optsSignOperation.details.critical(
-                            "Problem(2) in BLS sign result handler: {err}", err );
-                        optsSignOperation.errGathering = "Problem(2) in BLS sign " +
-                            `result handler: ${owaspUtils.extractErrorMessage( err )}`;
-                        return;
-                    } );
-                optsSignOperation.bHaveResultReportCalled = true;
-                if( strError ) {
-                    optsSignOperation.errGathering = strError;
-                    reject( new Error( optsSignOperation.errGathering ) );
-                } else
-                    resolve();
+            if( gatherSigningCheckFinish( optsSignOperation, iv, resolve, reject ) )
                 return;
-            }
-            if( optsSignOperation.joGatheringTracker.nCountReceived >=
-                    optsSignOperation.jarrNodes.length ) {
-                clearInterval( iv );
-                optsSignOperation.fn(
-                    `signature error(2), got ${optsSignOperation.joGatheringTracker.nCountErrors}` +
-                    ` errors(s) for ${optsSignOperation.jarrNodes.length} node(s)`,
-                    optsSignOperation.jarrMessages
-                ).catch( ( err ) => {
-                    const cntSuccess = optsSignOperation.arrSignResults.length;
-                    optsSignOperation.details.error(
-                        "Problem(3) in BLS sign result handler, not enough successful BLS " +
-                        "signature parts({}) when all attempts done, error details: {err}",
-                        cntSuccess, err );
-                    if( log.id != optsSignOperation.details.id ) {
-                        log.error(
-                            "Problem(3) in BLS sign result handler, not enough successful BLS " +
-                            "signature parts({}) when all attempts done, error details: {err}",
-                            cntSuccess, err );
-                    }
-                    optsSignOperation.errGathering = "Problem(3) in BLS sign result handler, not " +
-                        `enough successful BLS signature parts(${cntSuccess}) ` +
-                        "when all attempts done, " +
-                        `error details: ${owaspUtils.extractErrorMessage( err )}`;
-                    reject( new Error( optsSignOperation.errGathering ) );
-                } );
-                optsSignOperation.bHaveResultReportCalled = true;
+            if( gatherSigningCheckOverflow( optsSignOperation, iv, resolve, reject ) )
                 return;
-            }
-            if( optsSignOperation.joGatheringTracker.nWaitIntervalStepsDone >=
-                    optsSignOperation.joGatheringTracker.nWaitIntervalMaxSteps
-            ) {
-                clearInterval( iv );
-                optsSignOperation.fn(
-                    `signature error(3), got ${optsSignOperation.joGatheringTracker.nCountErrors}` +
-                    ` errors(s) for ${optsSignOperation.jarrNodes.length} node(s)`,
-                    optsSignOperation.jarrMessages
-                ).catch( ( err ) => {
-                    const cntSuccess = optsSignOperation.arrSignResults.length;
-                    optsSignOperation.details.critical(
-                        "Problem(4) in BLS sign result handler, not enough successful BLS " +
-                        "signature parts({}) and timeout reached, error details: {err}",
-                        cntSuccess, err );
-                    if( log.id != optsSignOperation.details.id ) {
-                        log.critical(
-                            "Problem(4) in BLS sign result handler, not enough successful BLS " +
-                            "signature parts({}) and timeout reached, error details: {err}",
-                            cntSuccess, err );
-                    }
-                    optsSignOperation.errGathering = "Problem(4) in BLS sign result handler, not " +
-                        `enough successful BLS signature parts(${cntSuccess}) ` +
-                        "and timeout reached, " +
-                        `error details: ${owaspUtils.extractErrorMessage( err )}`;
-                    reject( new Error( optsSignOperation.errGathering ) );
-                } );
-                optsSignOperation.bHaveResultReportCalled = true;
+            if( gatherSigningCheckTimeout( optsSignOperation, iv, resolve, reject ) )
                 return;
-            }
         }, optsSignOperation.joGatheringTracker.nWaitIntervalStepMilliseconds );
     } );
 }

@@ -664,36 +664,29 @@ async function callbackAllMessagesSign( optsTransfer, err, jarrMessages, joGlueR
 
 async function handleAllMessagesSigning( optsTransfer ) {
     try {
-        const allMessageSigningDone = new Promise( function( resolve, reject ) {
-            const doHandlingWorkForAllMessagesSigning = async function() {
-                await optsTransfer.fnSignMessages(
-                    optsTransfer.nTransferLoopCounter,
-                    optsTransfer.jarrMessages, optsTransfer.nIdxCurrentMsgBlockStart,
-                    optsTransfer.chainNameSrc,
-                    optsTransfer.joExtraSignOpts,
-                    async function( err, jarrMessages, joGlueResult ) {
-                        await callbackAllMessagesSign(
-                            optsTransfer, err, jarrMessages, joGlueResult );
-                        resolve( true );
-                    } ).catch( ( err ) => {
-                    // callback fn as argument of optsTransfer.fnSignMessages
-                    optsTransfer.bErrorInSigningMessages = true;
-                    const strError = owaspUtils.extractErrorMessage( err );
-                    optsTransfer.details.error( "{p}Problem in transfer handler(in signer): {err}",
-                        optsTransfer.strLogPrefix, strError );
-                    if( log.id != optsTransfer.details.id ) {
-                        log.error( "{p}Problem in transfer handler(in signer): {err}",
-                            optsTransfer.strLogPrefix, strError );
-                    }
-                    imaTransferErrorHandling.saveTransferError(
-                        optsTransfer.strTransferErrorCategoryName,
-                        optsTransfer.details.toString() );
-                    reject( err );
-                } );
-            };
-            doHandlingWorkForAllMessagesSigning();
+        let errFinal = null;
+        await optsTransfer.fnSignMessages( optsTransfer.nTransferLoopCounter,
+            optsTransfer.jarrMessages, optsTransfer.nIdxCurrentMsgBlockStart,
+            optsTransfer.chainNameSrc, optsTransfer.joExtraSignOpts,
+            async function( err, jarrMessages, joGlueResult ) {
+                await callbackAllMessagesSign( optsTransfer, err, jarrMessages, joGlueResult );
+                return;
+            } ).catch( ( err ) => {
+            // callback fn as argument of optsTransfer.fnSignMessages
+            optsTransfer.bErrorInSigningMessages = true;
+            const strError = owaspUtils.extractErrorMessage( err );
+            optsTransfer.details.error( "{p}Problem in transfer handler(in signer): {err}",
+                optsTransfer.strLogPrefix, strError );
+            if( log.id != optsTransfer.details.id ) {
+                log.error( "{p}Problem in transfer handler(in signer): {err}",
+                    optsTransfer.strLogPrefix, strError );
+            }
+            imaTransferErrorHandling.saveTransferError(
+                optsTransfer.strTransferErrorCategoryName, optsTransfer.details.toString() );
+            errFinal = err;
         } );
-        await allMessageSigningDone;
+        if( errFinal )
+            throw errFinal;
         return true;
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
