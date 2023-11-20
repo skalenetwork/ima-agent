@@ -502,7 +502,7 @@ async function discoverSChainWait( optsDiscover ) {
 }
 
 async function handleDiscoverSkaleNodesRpcInfoResult(
-    optsDiscover, scURL, joCall, joIn, joOut, err, resolve, reject
+    optsDiscover, scURL, joCall, joIn, joOut, err
 ) {
     if( err ) {
         if( ! optsDiscover.isSilentReDiscovery ) {
@@ -512,8 +512,7 @@ async function handleDiscoverSkaleNodesRpcInfoResult(
         }
         optsDiscover.fnAfter( err, null );
         await joCall.disconnect();
-        reject( err );
-        return;
+        throw err;
     }
     if( ! optsDiscover.isSilentReDiscovery ) {
         log.trace( "{p}OK, got (own) S-Chain network information: {}",
@@ -532,8 +531,7 @@ async function handleDiscoverSkaleNodesRpcInfoResult(
         }
         optsDiscover.fnAfter( err2, null );
         await joCall.disconnect();
-        reject( err2 );
-        return;
+        throw err2;
     }
     optsDiscover.jarrNodes = optsDiscover.joSChainNetworkInfo.network;
     optsDiscover.cntNodes = optsDiscover.jarrNodes.length;
@@ -566,16 +564,16 @@ async function handleDiscoverSkaleNodesRpcInfoResult(
             `total ${optsDiscover.cntNodes}, available ${optsDiscover.nCountAvailable}, ` +
             `expected at least ${optsDiscover.nCountToWait}` );
         optsDiscover.fnAfter( err, null );
-        reject( err );
-        return;
+        throw err;
     }
+    let rv = false;
     await discoverSChainWait( optsDiscover ).then( () => {
         optsDiscover.fnAfter( null, optsDiscover.joSChainNetworkInfo );
-        resolve( true );
+        rv = true;
     } ).catch( ( err ) => {
         optsDiscover.fnAfter( err, null );
-        reject( err );
     } );
+    return rv;
 }
 
 export async function discoverSChainNetwork(
@@ -601,49 +599,48 @@ export async function discoverSChainNetwork(
     optsDiscover.fnAfter = optsDiscover.fnAfter || function() {};
     if( !optsDiscover.isSilentReDiscovery )
         log.information( "{p}This S-Chain discovery will start...", optsDiscover.strLogPrefix );
-    const networkDiscoveryDone = new Promise( function( resolve, reject ) {
-        const doCompoundSChainDiscoveryWork = async function() {
-            try {
-                const scURL = optsDiscover.imaState.chainProperties.sc.strURL;
-                const rpcCallOpts = null;
-                await rpcCall.create( scURL, rpcCallOpts, async function( joCall, err ) {
-                    if( err ) {
-                        const strError = owaspUtils.extractErrorMessage( err );
-                        if( ! optsDiscover.isSilentReDiscovery ) {
-                            log.critical(
-                                "{p}JSON RPC call to (own) S-Chain {url} failed: {err}",
-                                optsDiscover.strLogPrefix, scURL, strError );
-                        }
-                        optsDiscover.fnAfter( err, null );
-                        if( joCall )
-                            await joCall.disconnect();
-                        reject( err );
-                        return;
-                    }
-                    const joDataIn = { "method": "skale_nodesRpcInfo", "params": { } };
-                    if( isSendImaAgentIndex() )
-                        joDataIn.params.fromImaAgentIndex = optsDiscover.imaState.nNodeNumber;
-                    await joCall.call( joDataIn, async function( joIn, joOut, err ) {
-                        await handleDiscoverSkaleNodesRpcInfoResult(
-                            optsDiscover, scURL, joCall, joIn, joOut, err, resolve, reject );
-                    } );
-                } );
-            } catch ( err ) {
+    try {
+        const scURL = optsDiscover.imaState.chainProperties.sc.strURL;
+        const rpcCallOpts = null;
+        await rpcCall.create( scURL, rpcCallOpts, async function( joCall, err ) {
+            if( err ) {
+                const strError = owaspUtils.extractErrorMessage( err );
                 if( ! optsDiscover.isSilentReDiscovery ) {
-                    const strError = owaspUtils.extractErrorMessage( err );
                     log.critical(
-                        "{p}JSON RPC call(discoverSChainNetwork) to S-Chain was not created: " +
-                        "{err}, stack is:\n{stack}", optsDiscover.strLogPrefix,
-                        strError, err.stack );
+                        "{p}JSON RPC call to (own) S-Chain {url} failed: {err}",
+                        optsDiscover.strLogPrefix, scURL, strError );
                 }
-                optsDiscover.joSChainNetworkInfo = null;
                 optsDiscover.fnAfter( err, null );
-                reject( err );
+                if( joCall )
+                    await joCall.disconnect();
+                throw err;
             }
-        };
-        doCompoundSChainDiscoveryWork();
-    } );
-    await networkDiscoveryDone;
+            const joDataIn = { "method": "skale_nodesRpcInfo", "params": { } };
+            if( isSendImaAgentIndex() )
+                joDataIn.params.fromImaAgentIndex = optsDiscover.imaState.nNodeNumber;
+            await joCall.call( joDataIn, async function( joIn, joOut, err ) {
+                await handleDiscoverSkaleNodesRpcInfoResult(
+                    optsDiscover, scURL, joCall, joIn, joOut, err )
+                    .catch( function( err ) {
+                        log.critical(
+                            "{p}JSON RPC call(discoverSChainNetwork) error: " +
+                        "{err}, stack is:\n{stack}", optsDiscover.strLogPrefix,
+                            strError, err.stack );
+                    } );
+            } );
+        } );
+    } catch ( err ) {
+        if( ! optsDiscover.isSilentReDiscovery ) {
+            const strError = owaspUtils.extractErrorMessage( err );
+            log.critical(
+                "{p}JSON RPC call(discoverSChainNetwork) to S-Chain was not created: " +
+                "{err}, stack is:\n{stack}", optsDiscover.strLogPrefix,
+                strError, err.stack );
+        }
+        optsDiscover.joSChainNetworkInfo = null;
+        optsDiscover.fnAfter( err, null );
+        throw err;
+    }
     return optsDiscover.joSChainNetworkInfo;
 }
 

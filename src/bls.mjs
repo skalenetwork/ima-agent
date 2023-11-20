@@ -33,6 +33,7 @@ import * as imaUtils from "./utils.mjs";
 import * as sha3Module from "sha3";
 import * as skaleObserver from "./observer.mjs";
 import * as discoveryTools from "./discoveryTools.mjs";
+import * as threadInfo from "./threadInfo.mjs";
 
 import * as state from "./state.mjs";
 import { randomCallID } from "./socketUtils.mjs";
@@ -40,9 +41,6 @@ import { randomCallID } from "./socketUtils.mjs";
 const shell = shellModule.default;
 
 const Keccak = sha3Module.Keccak;
-
-const sleep =
-    ( milliseconds ) => { return new Promise( resolve => setTimeout( resolve, milliseconds ) ); };
 
 const gSecondsMessageVerifySendTimeout = 2 * 60;
 
@@ -59,7 +57,7 @@ async function withTimeout( strDescription, promise, seconds ) {
     for( let idxWaitStep = 0; idxWaitStep < seconds; ++ idxWaitStep ) {
         if( isComplete )
             break;
-        await sleep( 1000 );
+        await threadInfo.sleep( 1000 );
     }
     if( resultError )
         throw resultError;

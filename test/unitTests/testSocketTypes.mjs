@@ -30,14 +30,11 @@ import { TestSocketServer } from "./testSocketServer.mjs";
 import { Worker } from "worker_threads";
 import { settings } from "../../src/socketSettings.mjs";
 import * as ws from "ws";
+import * as threadInfo from "../../src/threadInfo.mjs";
 
 const __dirname = path.dirname( url.fileURLToPath( import.meta.url ) );
 
 const joTestMessage = { "method": "echo", "message": "Please echo this message!" };
-
-const sleep = ( milliseconds ) => {
-    return new Promise( resolve => setTimeout( resolve, milliseconds ) );
-};
 
 async function testLocal() {
     console.log( "Local test" );
@@ -51,10 +48,10 @@ async function testLocal() {
         client.disconnect();
         console.log( " " );
     } );
-    await sleep( 1 );
+    await threadInfo.sleep( 1 );
     console.log( "CLIENT >>>", JSON.stringify( joTestMessage ) );
     client.send( joTestMessage );
-    await sleep( 100 );
+    await threadInfo.sleep( 100 );
     const joReturnValue = {
         server: server,
         client: client
@@ -83,10 +80,10 @@ async function testWorker() {
         worker.terminate();
         console.log( " " );
     } );
-    await sleep( 100 );
+    await threadInfo.sleep( 100 );
     console.log( "CLIENT >>>", JSON.stringify( joTestMessage ) );
     client.send( joTestMessage );
-    await sleep( 100 );
+    await threadInfo.sleep( 100 );
     const joReturnValue = {
         worker: worker,
         client: client
@@ -114,10 +111,10 @@ async function testWS() {
         client.disconnect();
         console.log( " " );
     } );
-    await sleep( 100 );
+    await threadInfo.sleep( 100 );
     console.log( "CLIENT >>>", JSON.stringify( joTestMessage ) );
     client.send( joTestMessage );
-    await sleep( 100 );
+    await threadInfo.sleep( 100 );
     const joReturnValue = {
         server: server,
         client: client
