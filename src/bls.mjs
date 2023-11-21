@@ -42,29 +42,6 @@ const shell = shellModule.default;
 
 const Keccak = sha3Module.Keccak;
 
-const gSecondsMessageVerifySendTimeout = 2 * 60;
-
-async function withTimeout( strDescription, promise, seconds ) {
-    strDescription = strDescription || "withTimeout()";
-    let resultError = null, isComplete = false;
-    promise.catch( function( err ) {
-        isComplete = true;
-        resultError =
-            new Error( `${strDescription}error: ${owaspUtils.extractErrorMessage( err )}` );
-    } ).finally( function() {
-        isComplete = true;
-    } );
-    for( let idxWaitStep = 0; idxWaitStep < seconds; ++ idxWaitStep ) {
-        if( isComplete )
-            break;
-        await threadInfo.sleep( 1000 );
-    }
-    if( resultError )
-        throw resultError;
-    if( ! isComplete )
-        throw new Error( `${strDescription} reached limit of ${seconds} second(s)` );
-};
-
 function discoverBlsThreshold( joSChainNetworkInfo ) {
     const imaState = state.get();
     joSChainNetworkInfo = joSChainNetworkInfo || imaState.joSChainNetworkInfo;
@@ -905,7 +882,7 @@ async function prepareSignMessagesImpl( optsSignOperation ) {
     return true;
 }
 
-function gatherSigningCheckFinish( optsSignOperation, iv, resolve, reject ) {
+async function gatherSigningCheckFinish( optsSignOperation ) {
     const cntSuccess = optsSignOperation.arrSignResults.length;
     if( optsSignOperation.joGatheringTracker.nCountReceivedPrevious !=
         optsSignOperation.joGatheringTracker.nCountReceived ) {
@@ -919,12 +896,10 @@ function gatherSigningCheckFinish( optsSignOperation, iv, resolve, reject ) {
         optsSignOperation.joGatheringTracker.nCountReceivedPrevious =
             0 + optsSignOperation.joGatheringTracker.nCountReceived;
     }
-    ++ optsSignOperation.joGatheringTracker.nWaitIntervalStepsDone;
     if( cntSuccess < optsSignOperation.nCountOfBlsPartsToCollect )
         return false;
     optsSignOperation.strLogPrefixB = `${optsSignOperation.strDirection} /# ` +
         `${optsSignOperation.nTransferLoopCounter}/BLS/Summary: `;
-    clearInterval( iv );
     let strError = null, strSuccessfulResultDescription = null;
     const joGlueResult = performBlsGlue( optsSignOperation.details,
         optsSignOperation.strDirection, optsSignOperation.jarrMessages,
@@ -979,21 +954,14 @@ function gatherSigningCheckFinish( optsSignOperation, iv, resolve, reject ) {
                 "Problem(2) in BLS sign result handler: {err}", err );
             optsSignOperation.errGathering = "Problem(2) in BLS sign " +
                 `result handler: ${owaspUtils.extractErrorMessage( err )}`;
-            return true;
         } );
     optsSignOperation.bHaveResultReportCalled = true;
-    if( strError ) {
-        optsSignOperation.errGathering = strError;
-        reject( new Error( optsSignOperation.errGathering ) );
-    } else
-        resolve();
     return true;
 }
 
-function gatherSigningCheckOverflow( optsSignOperation, iv, resolve, reject ) {
+async function gatherSigningCheckOverflow( optsSignOperation ) {
     if( optsSignOperation.joGatheringTracker.nCountReceived < optsSignOperation.jarrNodes.length )
         return false;
-    clearInterval( iv );
     optsSignOperation.fn(
         `signature error(2), got ${optsSignOperation.joGatheringTracker.nCountErrors}` +
         ` errors(s) for ${optsSignOperation.jarrNodes.length} node(s)`,
@@ -1011,17 +979,25 @@ function gatherSigningCheckOverflow( optsSignOperation, iv, resolve, reject ) {
         optsSignOperation.errGathering = "Problem(3) in BLS sign result handler, not enough " +
             `successful BLS signature parts(${cntSuccess}) when all attempts done, ` +
             `error details: ${owaspUtils.extractErrorMessage( err )}`;
-        reject( new Error( optsSignOperation.errGathering ) );
     } );
     optsSignOperation.bHaveResultReportCalled = true;
     return true;
 }
 
-function gatherSigningCheckTimeout( optsSignOperation, iv, resolve, reject ) {
-    if( optsSignOperation.joGatheringTracker.nWaitIntervalStepsDone <
-        optsSignOperation.joGatheringTracker.nWaitIntervalMaxSteps )
-        return false;
-    clearInterval( iv );
+async function gatherSigningStartImpl( optsSignOperation ) {
+    optsSignOperation.details.debug( "{p}Waiting for BLS glue result...",
+        optsSignOperation.strLogPrefix );
+    optsSignOperation.errGathering = null;
+    for( let idxStep = 0; idxStep < optsSignOperation.joGatheringTracker.nWaitIntervalMaxSteps;
+        ++ idxStep ) {
+        await threadInfo.sleep(
+            optsSignOperation.joGatheringTracker.nWaitIntervalStepMilliseconds );
+        if( await gatherSigningCheckFinish( optsSignOperation ) )
+            return;
+        if( await gatherSigningCheckOverflow( optsSignOperation ) )
+            return;
+    }
+    // timeout
     optsSignOperation.fn(
         `signature error(3), got ${optsSignOperation.joGatheringTracker.nCountErrors}` +
         ` errors(s) for ${optsSignOperation.jarrNodes.length} node(s)`,
@@ -1039,43 +1015,13 @@ function gatherSigningCheckTimeout( optsSignOperation, iv, resolve, reject ) {
         optsSignOperation.errGathering = "Problem(4) in BLS sign result handler, not enough " +
             `successful BLS signature parts(${cntSuccess}) and timeout reached, ` +
             `error details: ${owaspUtils.extractErrorMessage( err )}`;
-        reject( new Error( optsSignOperation.errGathering ) );
     } );
     optsSignOperation.bHaveResultReportCalled = true;
-    return true;
-}
-
-async function gatherSigningStartImpl( optsSignOperation ) {
-    optsSignOperation.details.debug( "{p}Waiting for BLS glue result...",
-        optsSignOperation.strLogPrefix );
-    optsSignOperation.errGathering = null;
-    optsSignOperation.signaturesGatheringDone = new Promise( ( resolve, reject ) => {
-        const iv = setInterval( function() {
-            if( gatherSigningCheckFinish( optsSignOperation, iv, resolve, reject ) )
-                return;
-            if( gatherSigningCheckOverflow( optsSignOperation, iv, resolve, reject ) )
-                return;
-            if( gatherSigningCheckTimeout( optsSignOperation, iv, resolve, reject ) )
-                return;
-        }, optsSignOperation.joGatheringTracker.nWaitIntervalStepMilliseconds );
-    } );
 }
 
 async function gatherSigningFinishImpl( optsSignOperation ) {
     optsSignOperation.details.trace( "{p}Will await for message BLS verification and sending...",
         optsSignOperation.strLogPrefix );
-    await withTimeout(
-        "BLS verification and sending",
-        optsSignOperation.signaturesGatheringDone,
-        gSecondsMessageVerifySendTimeout )
-        .then( strSuccessfulResultDescription => {
-            optsSignOperation.details.success(
-                "BLS verification and sending promise awaited." );
-        } ).catch( err => {
-            if( log.id != optsSignOperation.details.id )
-                log.error( "Failed to verify BLS/summary message: {err}", err );
-            optsSignOperation.details.error( "Failed to verify BLS/summary message: {err}", err );
-        } );
     if( optsSignOperation.errGathering ) {
         if( log.id != optsSignOperation.details.id ) {
             log.error( "Failed BLS sign result awaiting(1): {err}",
@@ -1409,7 +1355,6 @@ async function doSignMessagesImpl(
         nParticipants: 1,
         nCountOfBlsPartsToCollect: 1,
         errGathering: null,
-        signaturesGatheringDone: null,
         targetChainName: "",
         fromChainName: "",
         targetChainID: -4,
@@ -1424,7 +1369,6 @@ async function doSignMessagesImpl(
         nCountErrors: 0,
         nCountSkipped: 0,
         nWaitIntervalStepMilliseconds: 100,
-        nWaitIntervalStepsDone: 0,
         nWaitIntervalMaxSteps: 10 * 60 * 3 // 10 is 1 second
     };
     optsSignOperation.details =
@@ -1731,7 +1675,7 @@ async function doSignU256OneImpl( i, optsSignU256 ) {
     } ); // rpcCall.create ...
 }
 
-function gatherSigningCheckFinish256( optsSignOperation, iv, resolve, reject ) {
+async function gatherSigningCheckFinish256( optsSignOperation ) {
     const cntSuccess = optsSignU256.arrSignResults.length;
     if( optsSignU256.joGatheringTracker.nCountReceivedPrevious !=
         optsSignU256.joGatheringTracker.nCountReceived ) {
@@ -1744,11 +1688,9 @@ function gatherSigningCheckFinish256( optsSignOperation, iv, resolve, reject ) {
         optsSignU256.joGatheringTracker.nCountReceivedPrevious =
             0 + optsSignU256.joGatheringTracker.nCountReceived;
     }
-    ++ optsSignU256.joGatheringTracker.nWaitIntervalStepsDone;
     if( cntSuccess < optsSignU256.nCountOfBlsPartsToCollect )
         return false;
     const strLogPrefixB = "BLS u256/Summary: ";
-    clearInterval( iv );
     let strError = null, strSuccessfulResultDescription = null;
     const joGlueResult = performBlsGlueU256(
         optsSignU256.details, optsSignU256.u256, optsSignU256.arrSignResults );
@@ -1798,18 +1740,12 @@ function gatherSigningCheckFinish256( optsSignOperation, iv, resolve, reject ) {
         optsSignU256.errGathering = "Problem(2) in BLS u256 sign result " +
                 `handler: ${owaspUtils.extractErrorMessage( err )}`;
     } );
-    if( strError ) {
-        optsSignU256.errGathering = strError;
-        reject( new Error( optsSignU256.errGathering ) );
-    } else
-        resolve();
     return true;
 }
 
-function gatherSigningCheckOverflow256( optsSignOperation, iv, resolve, reject ) {
+async function gatherSigningCheckOverflow256( optsSignOperation ) {
     if( optsSignU256.joGatheringTracker.nCountReceived < optsSignU256.jarrNodes.length )
         return false;
-    clearInterval( iv );
     optsSignU256.fn(
         "signature error(2, u256), got " +
         `${optsSignU256.joGatheringTracker.nCountErrors} errors(s) for ` +
@@ -1828,16 +1764,23 @@ function gatherSigningCheckOverflow256( optsSignOperation, iv, resolve, reject )
         optsSignU256.errGathering = "Problem(3) in BLS u256 sign result handler, not " +
             `enough successful BLS signature parts(${cntSuccess} when all attempts ` +
             `done, error details: ${owaspUtils.extractErrorMessage( err )}`;
-        reject( new Error( optsSignU256.errGathering ) );
     } );
     return true;
 }
 
-function gatherSigningCheckTimeout256( optsSignOperation, iv, resolve, reject ) {
-    if( optsSignU256.joGatheringTracker.nWaitIntervalStepsDone <
-        optsSignU256.joGatheringTracker.nWaitIntervalMaxSteps )
-        return false;
-    clearInterval( iv );
+async function doSignU256Gathering( optsSignU256 ) {
+    optsSignU256.details.debug( "{p}Waiting for BLS glue result ", optsSignU256.strLogPrefix );
+    optsSignU256.errGathering = null;
+    for( let idxStep = 0; idxStep < optsSignOperation.joGatheringTracker.nWaitIntervalMaxSteps;
+        ++ idxStep ) {
+        await threadInfo.sleep(
+            optsSignOperation.joGatheringTracker.nWaitIntervalStepMilliseconds );
+        if( await gatherSigningCheckFinish256( optsSignU256 ) )
+            return;
+        if( await gatherSigningCheckOverflow256( optsSignU256 ) )
+            return;
+    }
+    // timeout
     optsSignU256.fn(
         "signature error(3, u256), got " +
         `${optsSignU256.joGatheringTracker.nCountErrors}  errors(s) for ` +
@@ -1857,23 +1800,6 @@ function gatherSigningCheckTimeout256( optsSignOperation, iv, resolve, reject ) 
         optsSignU256.errGathering = "Problem(4) in BLS u256 sign result handler, not " +
             `enough successful BLS signature parts(${cntSuccess}) and timeout ` +
             `reached, error details: ${owaspUtils.extractErrorMessage( err )}`;
-        reject( new Error( optsSignU256.errGathering ) );
-    } );
-    return true;
-}
-
-async function doSignU256Gathering( optsSignU256 ) {
-    optsSignU256.details.debug( "{p}Waiting for BLS glue result ", optsSignU256.strLogPrefix );
-    optsSignU256.errGathering = null;
-    optsSignU256.signaturesGatheringDone = new Promise( ( resolve, reject ) => {
-        const iv = setInterval( function() {
-            if( gatherSigningCheckFinish256( optsSignOperation, iv, resolve, reject ) )
-                return;
-            if( gatherSigningCheckOverflow256( optsSignOperation, iv, resolve, reject ) )
-                return;
-            if( gatherSigningCheckTimeout256( optsSignOperation, iv, resolve, reject ) )
-                return;
-        }, optsSignU256.joGatheringTracker.nWaitIntervalStepMilliseconds );
     } );
 }
 
@@ -1890,7 +1816,6 @@ export async function doSignU256( u256, details, fn ) {
             nCountErrors: 0,
             nCountSkipped: 0,
             nWaitIntervalStepMilliseconds: 100,
-            nWaitIntervalStepsDone: 0,
             nWaitIntervalMaxSteps: 10 * 60 * 3 // 10 is 1 second
         },
         arrSignResults: [],
@@ -1898,8 +1823,7 @@ export async function doSignU256( u256, details, fn ) {
         nThreshold: 1,
         nParticipants: 1,
         nCountOfBlsPartsToCollect: 1,
-        errGathering: null,
-        signaturesGatheringDone: null
+        errGathering: null
     };
     optsSignU256.jarrNodes = optsSignU256.imaState.joSChainNetworkInfo.network;
     optsSignU256.details.trace( "{p}Invoking signing u256 procedure...",
@@ -1920,18 +1844,6 @@ export async function doSignU256( u256, details, fn ) {
         await doSignU256OneImpl( i, optsSignU256 );
     await doSignU256Gathering( optsSignU256 );
     optsSignU256.details.trace( "Will await BLS u256 sign result..." );
-    await withTimeout(
-        "BLS u256 sign",
-        optsSignU256.signaturesGatheringDone,
-        gSecondsMessageVerifySendTimeout
-    ).then( strSuccessfulResultDescription => {
-        optsSignU256.details.trace( "BLS u256 sign promise awaited." );
-    } ).catch( err => {
-        if( log.id != optsSignU256.details.id )
-            log.critical( "Failed to verify BLS256/summary message : {err}", err );
-
-        optsSignU256.details.critical( "Failed to verify BLS256/summary message : {err}", err );
-    } );
     if( optsSignU256.errGathering ) {
         if( log.id != optsSignU256.details.id ) {
             log.error( "Failed BLS u256 sign result awaiting: {err}",
