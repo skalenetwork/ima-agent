@@ -1073,8 +1073,8 @@ async function gatherSigningFinishImpl( optsSignOperation ) {
                 "BLS verification and sending promise awaited." );
         } ).catch( err => {
             if( log.id != optsSignOperation.details.id )
-                log.error( "Failed to verify BLS and send message: {err}", err );
-            optsSignOperation.details.error( "Failed to verify BLS and send message: {err}", err );
+                log.error( "Failed to verify BLS/summary message: {err}", err );
+            optsSignOperation.details.error( "Failed to verify BLS/summary message: {err}", err );
         } );
     if( optsSignOperation.errGathering ) {
         if( log.id != optsSignOperation.details.id ) {
@@ -1928,9 +1928,9 @@ export async function doSignU256( u256, details, fn ) {
         optsSignU256.details.trace( "BLS u256 sign promise awaited." );
     } ).catch( err => {
         if( log.id != optsSignU256.details.id )
-            log.critical( "Failed to verify BLS and send message : {err}", err );
+            log.critical( "Failed to verify BLS256/summary message : {err}", err );
 
-        optsSignU256.details.critical( "Failed to verify BLS and send message : {err}", err );
+        optsSignU256.details.critical( "Failed to verify BLS256/summary message : {err}", err );
     } );
     if( optsSignU256.errGathering ) {
         if( log.id != optsSignU256.details.id ) {
