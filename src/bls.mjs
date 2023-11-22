@@ -1368,7 +1368,7 @@ async function doSignMessagesImpl(
         nCountReceived: 0,
         nCountErrors: 0,
         nCountSkipped: 0,
-        nWaitIntervalStepMilliseconds: 100,
+        nWaitIntervalStepMilliseconds: 500,
         nWaitIntervalMaxSteps: 10 * 60 * 3 // 10 is 1 second
     };
     optsSignOperation.details =
@@ -1815,7 +1815,7 @@ export async function doSignU256( u256, details, fn ) {
             nCountReceived: 0,
             nCountErrors: 0,
             nCountSkipped: 0,
-            nWaitIntervalStepMilliseconds: 100,
+            nWaitIntervalStepMilliseconds: 500,
             nWaitIntervalMaxSteps: 10 * 60 * 3 // 10 is 1 second
         },
         arrSignResults: [],
