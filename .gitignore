@@ -69,3 +69,7 @@ hash_g1
 verify_bls
 
 venv
+
+# network-browser
+
+network-browser/test*.json
