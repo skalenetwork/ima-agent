@@ -1543,7 +1543,7 @@ export async function doErc721PaymentS2S(
             details, ethersProviderSrc,
             "TokenManagerERC721", joTokenManagerERC721Src,
             "transferToSchainERC721", arrArgumentsTransfer,
-            joAccountSrc, strActionName, isIgnoreTransferERC721,
+            joAccountSrc, strActionName,
             gasPrice, 8000000, weiHowMuchTransferERC721, null );
         details.trace( "{p}Using estimated(transfer) gas={}", strLogPrefix, estimatedGasTransfer );
         const strErrorOfDryRunTransferERC721 = await imaTx.dryRunCall(

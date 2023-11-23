@@ -948,18 +948,7 @@ async function doMainTransferLoopActions( optsTransfer ) {
             const cntMessages = optsTransfer.jarrMessages.length;
             const joSChain = arrSChainsCached[idxSChain];
             const cntNodes = joSChain.data.computed.nodes.length;
-            optsTransfer.cntNodesShouldPass =
-                ( cntNodes == 16 )
-                    ? 11
-                    : (
-                        ( cntNodes == 4 )
-                            ? 3
-                            : (
-                                ( cntNodes == 2 || cntNodes == 1 )
-                                    ? ( 0 + cntNodes )
-                                    : parseInt( ( cntNodes * 2 ) / 3 )
-                            )
-                    );
+            optsTransfer.cntNodesShouldPass = Math.ceil( ( cntNodes * 2 ) / 3 );
             optsTransfer.cntNodesMayFail = cntNodes - optsTransfer.cntNodesShouldPass;
             optsTransfer.details.trace(
                 "{p}{bright} message analysis will be performed on S-Chain {} with {} node(s), " +
