@@ -27,7 +27,7 @@ import { Logger, type ILogObj } from 'tslog'
 import { type SChain, type NetworkBrowserData } from './interfaces'
 import { getSChainHashes, getSChains, filterConnectedOnly, getNodeIdsInGroups } from './schains'
 import { getNodesGroups } from './nodes'
-import { CONNECTED_ONLY, SCHAINS_DATA_PATH } from './constants'
+import { CONNECTED_ONLY, IMA_NETWORK_BROWSER_DATA_PATH } from './constants'
 import { writeJson, currentTimestamp } from './tools'
 
 const log = new Logger<ILogObj>()
@@ -50,7 +50,7 @@ export async function browse(schainsInternal: Contract, nodes: Contract): Promis
         updatedAt: currentTimestamp(),
         schains
     }
-    writeJson(SCHAINS_DATA_PATH, networkBrowserData)
+    writeJson(IMA_NETWORK_BROWSER_DATA_PATH, networkBrowserData)
     const execTime = performance.now() - start
     log.info(
         `Browse execution time: ${execTime} ms (${execTime / 1000} s) for ${schains.length} chains`

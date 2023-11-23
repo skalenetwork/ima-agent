@@ -11,6 +11,8 @@ RUN apt-get update
 RUN apt-get install --no-install-recommends -y libssl1.1
 # NOTICE: to remove extra dep above: sudo rm /etc/apt/sources.list.d/focal-security.list
 
+RUN curl -fsSL https://bun.sh/install | bash -s "bun-v1.0.14"
+
 RUN curl -sL https://deb.nodesource.com/setup_18.x | bash
 RUN apt-get install --no-install-recommends -y nodejs
 RUN npm install npm --global

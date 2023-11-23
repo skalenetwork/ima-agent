@@ -10,7 +10,7 @@ Required env variables:
 
 - `SCHAIN_PROXY_PATH` - IMA ABI from sChain
 - `MANAGER_ABI_PATH` - skale-manager ABI from Mainnet
-- `SCHAINS_DATA_PATH` - path to JSON file where network-browser results will be saved
+- `IMA_NETWORK_BROWSER_DATA_PATH` - path to JSON file where network-browser results will be saved
 
 Optional env variables:
 

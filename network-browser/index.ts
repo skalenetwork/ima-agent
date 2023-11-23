@@ -26,7 +26,7 @@ import {
     getMainnetManagerAbi,
     getMainnetProvider
 } from './src/contracts'
-import { delay, withTimeout } from './src/tools'
+import { delay, pingUrl, withTimeout } from './src/tools'
 import { BrowserTimeoutError } from './src/errors'
 import { browse } from './src/browser'
 import {
@@ -36,7 +36,8 @@ import {
     POST_ERROR_DELAY,
     NETWORK_BROWSER_DELAY,
     MULTICALL,
-    CONNECTED_ONLY
+    CONNECTED_ONLY,
+    SCHAIN_RPC_URL
 } from './src/constants'
 
 import { Logger, type ILogObj } from 'tslog'
@@ -56,7 +57,8 @@ async function safeNetworkBrowserLoop() {
     const managerAbi = getMainnetManagerAbi()
     const schainsInternal = schainsInternalContract(managerAbi, provider)
     const nodes = nodesContract(managerAbi, provider)
-
+    log.info(`Trying to connect to the sChain RPC: ${SCHAIN_RPC_URL}`)
+    await pingUrl(SCHAIN_RPC_URL)
     while (true) {
         try {
             await withTimeout(browse(schainsInternal, nodes), NETWORK_BROWSER_TIMEOUT)

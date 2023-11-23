@@ -25,6 +25,8 @@ import { requiredEnv, booleanEnv, secondsEnv } from './envTools'
 // internal
 
 export const PORTS_PER_SCHAIN = 64
+export const DEFAULT_PING_DELAY = 10000
+export const DEFAULT_PING_ITERATIONS = 50000
 
 // required
 
@@ -34,7 +36,7 @@ export const SCHAIN_NAME = requiredEnv('SCHAIN_NAME')
 
 export const SCHAIN_PROXY_PATH = requiredEnv('SCHAIN_PROXY_PATH')
 export const MANAGER_ABI_PATH = requiredEnv('MANAGER_ABI_PATH')
-export const SCHAINS_DATA_PATH = requiredEnv('SCHAINS_DATA_PATH')
+export const IMA_NETWORK_BROWSER_DATA_PATH = requiredEnv('IMA_NETWORK_BROWSER_DATA_PATH')
 
 // optional
 

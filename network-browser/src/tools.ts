@@ -20,8 +20,13 @@
  * @copyright SKALE Labs 2023-Present
  */
 
+import { Logger, type ILogObj } from 'tslog'
+
 import { readFileSync, writeFileSync } from 'fs'
 import { BrowserTimeoutError } from './errors'
+import { DEFAULT_PING_DELAY, DEFAULT_PING_ITERATIONS } from './constants'
+
+const log = new Logger<ILogObj>()
 
 export function stringifyBigInt(obj: any): string {
     return JSON.stringify(
@@ -66,4 +71,32 @@ export function readJson(filepath: string): any {
 
 export function writeJson(filepath: string, data: any): void {
     writeFileSync(filepath, stringifyBigInt(data), 'utf8')
+}
+
+export async function pingUrl(
+    url: string,
+    maxAttempts: number = DEFAULT_PING_ITERATIONS,
+    delay: number = DEFAULT_PING_DELAY
+): Promise<void> {
+    let attempt = 0
+    while (attempt < maxAttempts) {
+        try {
+            const response = await fetch(url)
+            if (response.ok) {
+                log.info(`URL is available: ${url}`)
+                return
+            } else {
+                log.info(`Attempt ${attempt + 1} failed with status: ${response.status}`)
+            }
+        } catch (error) {
+            log.info(
+                `${url} connection failed - ${attempt + 1}/${maxAttempts}, retrying in ${
+                    delay / 1000
+                } seconds...`
+            )
+        }
+        await new Promise((resolve) => setTimeout(resolve, delay))
+        attempt++
+    }
+    log.info('Max attempts reached, URL is not available.')
 }
