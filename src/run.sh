@@ -110,6 +110,7 @@ BASE_OPTIONS="--gas-price-multiplier=$GAS_PRICE_MULTIPLIER \
 --tm-url-main-net=$TM_URL_MAIN_NET \
 --time-gap=$TIME_GAP \
 --monitoring-port=$MONITORING_PORT \
+--network-browser-path=$IMA_NETWORK_BROWSER_DATA_PATH \
 --pwa \
 --no-expose-pwa \
 --auto-exit=86400"
