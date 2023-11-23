@@ -676,7 +676,8 @@ export async function ensureHaveWorkers( opts ) {
                             "secondsToReDiscoverSkaleNetwork":
                                 opts.imaState.optsS2S.secondsToReDiscoverSkaleNetwork,
                             "secondsToWaitForSkaleNetworkDiscovered":
-                                opts.imaState.optsS2S.secondsToWaitForSkaleNetworkDiscovered
+                                opts.imaState.optsS2S.secondsToWaitForSkaleNetworkDiscovered,
+                            "strNetworkBrowserPath": imaState.optsS2S.strNetworkBrowserPath
                         },
                         "nJsonRpcPort": opts.imaState.nJsonRpcPort,
                         "isCrossImaBlsMode": opts.imaState.isCrossImaBlsMode

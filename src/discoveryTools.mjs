@@ -53,6 +53,7 @@ export function initialSkaleNetworkScanForS2S() {
                     imaState.optsS2S.secondsToReDiscoverSkaleNetwork,
                 "secondsToWaitForSkaleNetworkDiscovered":
                     imaState.optsS2S.secondsToWaitForSkaleNetworkDiscovered,
+                "strNetworkBrowserPath": imaState.optsS2S.strNetworkBrowserPath,
                 "chain": imaState.chainProperties.sc,
                 "bParallelModeRefreshSNB": ( !!( imaState.optsS2S.bParallelModeRefreshSNB ) ),
                 "isForceMultiAttemptsUntilSuccess": true

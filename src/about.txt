@@ -93,6 +93,7 @@ S-CHAIN TO S-CHAIN TRANSFER options:
     --s2s-simple ...........................Sets  simple S2S transfer mode and runs S2S in main thread.
     --net-rediscover=number.................SKALE NETWORK re-discovery interval(in seconds). Default is 3600 seconds or 1 hour, specify 0 to disable SKALE NETWORK re-discovery.
     --net-wait-discovery=number.............SKALE NETWORK wait time(in seconds) for SKALE NETWORK discovery result to arrive. Default is 120.
+    --network-browser-path=path.............Path to SKALE NETWORK browse data.
 PAYMENT TRANSACTION options:
     --gas-price-multiplier-mn ..............Sets Gas Price Multiplier for Main Net transactions, Default value is 1.25. Specify value 0.0 to disable Gas Price Customization for Main Net.
     --gas-price-multiplier-sc ..............Sets Gas Price Multiplier for S-Chain transactions, Default value is 0.0.

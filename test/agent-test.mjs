@@ -267,7 +267,8 @@ const imaState = {
         "isEnabled": false,
         "bParallelModeRefreshSNB": true,
         "secondsToReDiscoverSkaleNetwork": 10 * 60,
-        "secondsToWaitForSkaleNetworkDiscovered": 2 * 60
+        "secondsToWaitForSkaleNetworkDiscovered": 2 * 60,
+        "strNetworkBrowserPath": null
     },
 
     "nJsonRpcPort": 14999, // 0 to disable
