@@ -438,7 +438,7 @@ async function main() {
             ( isSilentReDiscovery
                 ? log.fmtWarning( "silent" ) : log.fmtSuccess( "exposed details" ) ) );
         if( ! imaState.bNoWaitSChainStarted ) {
-            await discoveryTools.waitUntilSChainStarted().then( function() {
+            discoveryTools.waitUntilSChainStarted().then( function() {
                 // uses call to discoveryTools.discoverSChainNetwork()
                 if( ! isSilentReDiscovery ) {
                     log.information(
