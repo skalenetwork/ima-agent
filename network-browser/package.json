@@ -7,6 +7,8 @@
     "dev": "bun _fix && bun --hot index.ts",
     "pre": "bun _lint && bun _prettier",
     "browse": "bun _fix && bun index.ts",
+    "build:js": "bun build index.ts --target=bun --outfile=network-browser.js",
+    "build:exec": "bun build index.ts --compile --outfile=network-browser",
     "_prettier": "prettier --write \"**/*.{ts,tsx,js,mdx}\"",
     "_lint": "eslint -c .eslintrc.cjs --fix ./src/*",
     "_fix": "bash ethers_hotfix.sh"
