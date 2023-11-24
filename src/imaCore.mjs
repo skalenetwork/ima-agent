@@ -664,36 +664,29 @@ async function callbackAllMessagesSign( optsTransfer, err, jarrMessages, joGlueR
 
 async function handleAllMessagesSigning( optsTransfer ) {
     try {
-        const promiseComplete = new Promise( function( resolve, reject ) {
-            const doHandlingWorkForAllMessagesSigning = async function() {
-                await optsTransfer.fnSignMessages(
-                    optsTransfer.nTransferLoopCounter,
-                    optsTransfer.jarrMessages, optsTransfer.nIdxCurrentMsgBlockStart,
-                    optsTransfer.chainNameSrc,
-                    optsTransfer.joExtraSignOpts,
-                    async function( err, jarrMessages, joGlueResult ) {
-                        await callbackAllMessagesSign(
-                            optsTransfer, err, jarrMessages, joGlueResult );
-                        resolve( true );
-                    } ).catch( ( err ) => {
-                    // callback fn as argument of optsTransfer.fnSignMessages
-                    optsTransfer.bErrorInSigningMessages = true;
-                    const strError = owaspUtils.extractErrorMessage( err );
-                    optsTransfer.details.error( "{p}Problem in transfer handler(in signer): {err}",
-                        optsTransfer.strLogPrefix, strError );
-                    if( log.id != optsTransfer.details.id ) {
-                        log.error( "{p}Problem in transfer handler(in signer): {err}",
-                            optsTransfer.strLogPrefix, strError );
-                    }
-                    imaTransferErrorHandling.saveTransferError(
-                        optsTransfer.strTransferErrorCategoryName,
-                        optsTransfer.details.toString() );
-                    reject( err );
-                } );
-            };
-            doHandlingWorkForAllMessagesSigning();
+        let errFinal = null;
+        await optsTransfer.fnSignMessages( optsTransfer.nTransferLoopCounter,
+            optsTransfer.jarrMessages, optsTransfer.nIdxCurrentMsgBlockStart,
+            optsTransfer.chainNameSrc, optsTransfer.joExtraSignOpts,
+            async function( err, jarrMessages, joGlueResult ) {
+                await callbackAllMessagesSign( optsTransfer, err, jarrMessages, joGlueResult );
+                return;
+            } ).catch( ( err ) => {
+            // callback fn as argument of optsTransfer.fnSignMessages
+            optsTransfer.bErrorInSigningMessages = true;
+            const strError = owaspUtils.extractErrorMessage( err );
+            optsTransfer.details.error( "{p}Problem in transfer handler(in signer): {err}",
+                optsTransfer.strLogPrefix, strError );
+            if( log.id != optsTransfer.details.id ) {
+                log.error( "{p}Problem in transfer handler(in signer): {err}",
+                    optsTransfer.strLogPrefix, strError );
+            }
+            imaTransferErrorHandling.saveTransferError(
+                optsTransfer.strTransferErrorCategoryName, optsTransfer.details.toString() );
+            errFinal = err;
         } );
-        await Promise.all( [ promiseComplete ] );
+        if( errFinal )
+            throw errFinal;
         return true;
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
@@ -955,18 +948,7 @@ async function doMainTransferLoopActions( optsTransfer ) {
             const cntMessages = optsTransfer.jarrMessages.length;
             const joSChain = arrSChainsCached[idxSChain];
             const cntNodes = joSChain.data.computed.nodes.length;
-            optsTransfer.cntNodesShouldPass =
-                ( cntNodes == 16 )
-                    ? 11
-                    : (
-                        ( cntNodes == 4 )
-                            ? 3
-                            : (
-                                ( cntNodes == 2 || cntNodes == 1 )
-                                    ? ( 0 + cntNodes )
-                                    : parseInt( ( cntNodes * 2 ) / 3 )
-                            )
-                    );
+            optsTransfer.cntNodesShouldPass = Math.ceil( ( cntNodes * 2 ) / 3 );
             optsTransfer.cntNodesMayFail = cntNodes - optsTransfer.cntNodesShouldPass;
             optsTransfer.details.trace(
                 "{p}{bright} message analysis will be performed on S-Chain {} with {} node(s), " +
@@ -1283,8 +1265,8 @@ export async function doAllS2S( // s-chain --> s-chain
                 } else {
                     bOK = true;
                     const strLogPrefix = "S2S Loop: ";
-                    log.notice( strLogPrefix, "Skipped(s2s) in {} due to time framing check",
-                        threadInfo.threadDescription() );
+                    log.notice( "Skipped(s2s) in {} due to time framing check",
+                        strLogPrefix, threadInfo.threadDescription() );
                 }
             }
         } catch ( err ) {

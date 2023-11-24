@@ -177,12 +177,10 @@ export async function handleLoopStateArrived(
             log.trace( "PWA loop-{} state arrived for node {}, PWA state {}, arrived " +
                 "signature is {}", se, nNodeNumber, joNode.pwaState, signature );
         }
-        const strMessageHash =
-            imaBLS.keccak256ForPendingWorkAnalysis(
-                nNodeNumber, strLoopWorkType, isStart, 0 + ts );
-        const isSignatureOK =
-            await imaBLS.doVerifyReadyHash(
-                strMessageHash, nNodeNumber, signature, imaState.isPrintPWA );
+        const strMessageHash = imaBLS.keccak256ForPendingWorkAnalysis(
+            nNodeNumber, strLoopWorkType, isStart, 0 + ts );
+        const isSignatureOK = await imaBLS.doVerifyReadyHash(
+            strMessageHash, nNodeNumber, signature, imaState.isPrintPWA );
         if( ! isSignatureOK )
             throw new Error( "BLS verification failed" );
         joProps.isInProgress = ( !!isStart );

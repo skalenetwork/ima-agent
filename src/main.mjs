@@ -421,8 +421,7 @@ async function main() {
     initMonitoringServer();
     initJsonRpcServer();
     const isSilentReDiscovery = imaState.isPrintSecurityValues
-        ? false
-        : imaState.joSChainDiscovery.isSilentReDiscovery;
+        ? false : imaState.joSChainDiscovery.isSilentReDiscovery;
     const fnOnPeriodicDiscoveryResultAvailable = function( isFinal ) {
         loop.spreadUpdatedSChainNetwork( isFinal );
     };
@@ -439,34 +438,32 @@ async function main() {
             ( isSilentReDiscovery
                 ? log.fmtWarning( "silent" ) : log.fmtSuccess( "exposed details" ) ) );
         if( ! imaState.bNoWaitSChainStarted ) {
-            discoveryTools.waitUntilSChainStarted().then( function() {
-                // uses call to discoveryTools.discoverSChainNetwork()
-                if( ! isSilentReDiscovery ) {
-                    log.information(
-                        "This S-Chain discovery will be done for command line task handler" );
+            await discoveryTools.waitUntilSChainStarted();
+            if( ! isSilentReDiscovery ) {
+                log.information(
+                    "This S-Chain discovery will be done for command line task handler" );
+            }
+            const nCountToWait = -1;
+            discoveryTools.discoverSChainNetwork( function( err, joSChainNetworkInfo ) {
+                if( err ) {
+                    // error information is printed by discoveryTools.discoverSChainNetwork()
+                    process.exit( 166 );
                 }
-                const nCountToWait = -1;
-                discoveryTools.discoverSChainNetwork( function( err, joSChainNetworkInfo ) {
-                    if( err ) {
-                        // error information is printed by discoveryTools.discoverSChainNetwork()
-                        process.exit( 166 );
-                    }
-                    log.success( "S-Chain network was discovered: {}", joSChainNetworkInfo );
-                    imaState.joSChainNetworkInfo = joSChainNetworkInfo;
-                    discoveryTools.continueSChainDiscoveryInBackgroundIfNeeded(
-                        isSilentReDiscovery, function() {
-                            discoveryTools.doPeriodicSChainNetworkDiscoveryIfNeeded(
-                                isSilentReDiscovery, fnOnPeriodicDiscoveryResultAvailable );
-                        } );
-                    doTheJob();
-                    // Finish of IMA Agent startup,
-                    // everything else is in async calls executed later
-                    return 0;
-                }, isSilentReDiscovery, imaState.joSChainNetworkInfo, nCountToWait
-                ).catch( ( err ) => {
-                    const strError = owaspUtils.extractErrorMessage( err );
-                    log.critical( "S-Chain network discovery failed: {err}", strError );
-                } );
+                log.success( "S-Chain network was discovered: {}", joSChainNetworkInfo );
+                imaState.joSChainNetworkInfo = joSChainNetworkInfo;
+                discoveryTools.continueSChainDiscoveryInBackgroundIfNeeded(
+                    isSilentReDiscovery, function() {
+                        discoveryTools.doPeriodicSChainNetworkDiscoveryIfNeeded(
+                            isSilentReDiscovery, fnOnPeriodicDiscoveryResultAvailable );
+                    } );
+                doTheJob();
+                // Finish of IMA Agent startup,
+                // everything else is in async calls executed later
+                return 0;
+            }, isSilentReDiscovery, imaState.joSChainNetworkInfo, nCountToWait
+            ).catch( ( err ) => {
+                const strError = owaspUtils.extractErrorMessage( err );
+                log.critical( "S-Chain network discovery failed: {err}", strError );
             } );
         }
     } else {

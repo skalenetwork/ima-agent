@@ -28,7 +28,7 @@ import * as owaspUtils from "./owaspUtils.mjs";
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
-import * as imaHelperAPIs from "./imaHelperAPIs.mjs";
+import * as threadInfo from "./threadInfo.mjs";
 
 import { v4 as uuid } from "uuid";
 export { uuid };
@@ -160,7 +160,7 @@ export async function waitForClonedTokenToAppear(
     for( let idxAttempt = 0; idxAttempt < cntAttempts; ++ idxAttempt ) {
         log.information( "Discovering {} step {}...", strTokenSuffixUC, idxAttempt );
         if( gMillisecondsToSleepStepWaitForClonedTokenToAppear > 0 )
-            await imaHelperAPIs.sleep( gMillisecondsToSleepStepWaitForClonedTokenToAppear );
+            await threadInfo.sleep( gMillisecondsToSleepStepWaitForClonedTokenToAppear );
         const addressOnSChain =
             await contractTokenManager.callStatic[
                 "clones" + log.capitalizeFirstLetter( strTokenSuffixLCshort )](

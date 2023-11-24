@@ -78,7 +78,7 @@ export function checkTimeFraming( d, strDirection, joRuntimeOpts ) {
                 bInsideGap = true;
             }
         }
-        log.debug( "\n",
+        let strFrameInfo = log.fmtDebug( "\n",
             "    Unix UTC time stamp", "........",
             log.fmtInformation( "{}", nUtcUnixTimeStamp ), "\n",
             "    All Chains Range", "...........", nSecondsRangeForAllSChains, "\n",
@@ -88,9 +88,9 @@ export function checkTimeFraming( d, strDirection, joRuntimeOpts ) {
             "    Testing Frame Index", "........",
             log.fmtInformation( "{}", imaState.nNodeNumber ), "\n",
             "    Transfer Direction", ".........",
-            log.fmtInformation( "{bright}", strDirection || "NA" ) );
+            log.fmtInformation( "{bright}", strDirection || "NA" ), "\n" );
         if( nFrameShift > 0 ) {
-            log.debug(
+            strFrameInfo += log.fmtDebug(
                 "    Frame Shift", "................",
                 log.fmtInformation( "{}", nFrameShift ), "\n",
                 "    S2S known chain index", "......",
@@ -100,21 +100,24 @@ export function checkTimeFraming( d, strDirection, joRuntimeOpts ) {
             );
             if( "joExtraSignOpts" in joRuntimeOpts &&
                 typeof joRuntimeOpts.joExtraSignOpts == "object" ) {
-                log.debug( "    S-Chain source", ".............",
+                strFrameInfo += log.fmtDebug( "    S-Chain source", ".............",
                     log.fmtInformation( "{}", joRuntimeOpts.joExtraSignOpts.chainNameSrc ),
-                    "/", log.fmtInformation( "{}", joRuntimeOpts.joExtraSignOpts.chainIdSrc ) );
+                    "/", log.fmtInformation( "{}", joRuntimeOpts.joExtraSignOpts.chainIdSrc ),
+                    "\n" );
             } else {
-                log.debug( "    S-Chain destination", "........",
+                strFrameInfo += log.fmtDebug( "    S-Chain destination", "........",
                     log.fmtInformation( "{}", joRuntimeOpts.joExtraSignOpts.chainNameDst ),
-                    "/", log.fmtInformation( "{}", joRuntimeOpts.joExtraSignOpts.chainIdDst ) );
+                    "/", log.fmtInformation( "{}", joRuntimeOpts.joExtraSignOpts.chainIdDst ),
+                    "\n" );
             }
         }
-        log.debug( "\n",
+        strFrameInfo += log.fmtDebug(
             "    Is skip", "....................", log.yn( bSkip ), "\n",
             "    Is inside gap", "..............", log.yn( bInsideGap ), "\n",
             "    Range Start", "................", log.fmtInformation( "{}", nRangeStart ), "\n",
             "    Frame Start", "................", log.fmtInformation( "{}", nFrameStart ), "\n",
-            "    Gap Start", "..................", log.fmtInformation( "{}", nGapStart ) );
+            "    Gap Start", "..................", log.fmtInformation( "{}", nGapStart ), "\n" );
+        log.write( strFrameInfo );
         if( bSkip )
             return false;
     } catch ( err ) {
@@ -337,7 +340,7 @@ function printLoopPartSkippedWarning( strLoopPartName ) {
 
 export async function singleTransferLoop( optsLoop ) {
     const imaState = state.get();
-    const strLogPrefix = `Single Loop in ${threadInfo.threadDescription( false )}`;
+    const strLogPrefix = `Single Loop in ${threadInfo.threadDescription( false )} `;
     try {
         log.debug( "{p}{p}", strLogPrefix, imaHelperAPIs.longSeparator );
         let b0 = false, b1 = false, b2 = false, b3 = false;
