@@ -458,7 +458,7 @@ async function main() {
                 // everything else is in async calls executed later
                 return 0;
             }, isSilentReDiscovery, imaState.joSChainNetworkInfo, nCountToWait
-            ).catch( ( err ) => {
+            ).catch( function( err ) {
                 const strError = owaspUtils.extractErrorMessage( err );
                 log.critical( "S-Chain network discovery failed: {err}", strError );
                 doTheJob();

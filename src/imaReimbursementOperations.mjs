@@ -61,10 +61,6 @@ export async function reimbursementShowBalance(
         details.close();
         return xWei;
     } catch ( err ) {
-        if( log.id != details.id ) {
-            log.critical( "{p}Payment error in reimbursementShowBalance(): {err}, " +
-                "stack is:\n{stack}", strLogPrefix, err, err.stack );
-        }
         details.critical( "{p}Payment error in reimbursementShowBalance(): {err}, " +
             "stack is:\n{stack}", strLogPrefix, err, err.stack );
         details.exposeDetailsTo( log, "reimbursementShowBalance", false );
@@ -148,10 +144,6 @@ export async function reimbursementEstimateAmount(
         details.close();
         return amountToRecharge;
     } catch ( err ) {
-        if( log.id != details.id ) {
-            log.critical( "{p} Payment error in reimbursementEstimateAmount(): {err}, " +
-                "stack is:\n{stack}", strLogPrefix, err, err.stack );
-        }
         details.critical( "{p} Payment error in reimbursementEstimateAmount(): {err}, " +
             "stack is:\n{stack}", strLogPrefix, err, err.stack );
         details.exposeDetailsTo( log, "reimbursementEstimateAmount", false );
@@ -208,10 +200,6 @@ export async function reimbursementWalletRecharge(
             } );
         }
     } catch ( err ) {
-        if( log.id != details.id ) {
-            log.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-                strLogPrefix, strActionName, err, err.stack );
-        }
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
             strLogPrefix, strActionName, err, err.stack );
         details.exposeDetailsTo( log, "reimbursementWalletRecharge", false );
@@ -279,10 +267,6 @@ export async function reimbursementWalletWithdraw(
             } );
         }
     } catch ( err ) {
-        if( log.id != details.id ) {
-            log.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-                strLogPrefix, strActionName, err, err.stack );
-        }
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
             strLogPrefix, strActionName, err, err.stack );
         details.exposeDetailsTo( log, "reimbursementWalletWithdraw", false );
@@ -348,10 +332,6 @@ export async function reimbursementSetRange(
             } );
         }
     } catch ( err ) {
-        if( log.id != details.id ) {
-            log.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-                strLogPrefix, strActionName, err, err.stack );
-        }
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
             strLogPrefix, strActionName, err, err.stack );
         details.exposeDetailsTo( log, "reimbursementSetRange", false );

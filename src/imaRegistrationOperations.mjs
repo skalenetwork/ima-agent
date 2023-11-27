@@ -45,10 +45,6 @@ export async function invokeHasChain(
         details.success( "{p}Got joLinker.hasSchain() status is: {}", strLogPrefix, bHasSchain );
         return bHasSchain;
     } catch ( err ) {
-        if( log.id != details.id ) {
-            log.critical( "{p}Error in invokeHasChain() during {bright}: {err}, stack is:\n{stack}",
-                strLogPrefix, strActionName, err, err.stack );
-        }
         details.critical( "{p}Error in invokeHasChain() during {bright}: {err}, stack is:\n{stack}",
             strLogPrefix, strActionName, err, err.stack );
     }
@@ -109,11 +105,6 @@ export async function checkIsRegisteredSChainInDepositBoxes( // step 1
         details.close();
         return bIsRegistered;
     } catch ( err ) {
-        if( log.id != details.id ) {
-            log.critical(
-                "{p}Error in checkIsRegisteredSChainInDepositBoxes(reg-step1)() during {bright}: " +
-                "{err}, stack is:\n{stack}", strLogPrefix, strActionName, err, err.stack );
-        }
         details.critical(
             "{p}Error in checkIsRegisteredSChainInDepositBoxes(reg-step1)() during {bright}: " +
             "{err}, stack is:\n{stack}", strLogPrefix, strActionName, err, err.stack );
@@ -196,10 +187,6 @@ export async function registerSChainInDepositBoxes( // step 1
         if( ! isSChainStatusOKay )
             throw new Error( "S-Chain ownership status check timeout" );
     } catch ( err ) {
-        if( log.id != details.id ) {
-            log.critical( "{p}Error in registerSChainInDepositBoxes() during {bright}: {err}" +
-                ", stack is:\n{stack}", strLogPrefix, strActionName, err, err.stack );
-        }
         details.critical( "{p}Error in registerSChainInDepositBoxes() during {bright}: {err}" +
             ", stack is:\n{stack}", strLogPrefix, strActionName, err, err.stack );
         details.exposeDetailsTo( log, "registerSChainInDepositBoxes", false );

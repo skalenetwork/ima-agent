@@ -129,10 +129,6 @@ async function prepareOracleGasPriceSetup( optsGasPriseSetup ) {
 
 async function handleOracleSigned( optsGasPriseSetup, strError, u256, joGlueResult ) {
     if( strError ) {
-        if( log.id != optsGasPriseSetup.details.id ) {
-            log.critical( "{p}Error in doOracleGasPriceSetup() during {bright}: {err}",
-                optsGasPriseSetup.strLogPrefix, optsGasPriseSetup.strActionName, strError );
-        }
         optsGasPriseSetup.details.critical(
             "{p}Error in doOracleGasPriceSetup() during {bright}: {err}",
             optsGasPriseSetup.strLogPrefix, optsGasPriseSetup.strActionName, strError );
@@ -269,16 +265,10 @@ export async function doOracleGasPriceSetup(
                 await handleOracleSigned( optsGasPriseSetup, strError, u256, joGlueResult );
             } );
     } catch ( err ) {
-        if( log.id != optsGasPriseSetup.details.id ) {
-            log.critical(
-                "{p}Error in doOracleGasPriceSetup() during {bright}: {err}" +
-                ", stack is:\n{stack}", optsGasPriseSetup.strLogPrefix,
-                optsGasPriseSetup.strActionName, err, err.stack );
-            optsGasPriseSetup.details.critical(
-                "{p}Error in doOracleGasPriceSetup() during {bright}: {err}, stack is:\n{stack}",
-                optsGasPriseSetup.strLogPrefix, optsGasPriseSetup.strActionName,
-                err, err.stack );
-        }
+        optsGasPriseSetup.details.critical(
+            "{p}Error in doOracleGasPriceSetup() during {bright}: {err}, stack is:\n{stack}",
+            optsGasPriseSetup.strLogPrefix, optsGasPriseSetup.strActionName,
+            err, err.stack );
         optsGasPriseSetup.details.exposeDetailsTo( log, "doOracleGasPriceSetup", false );
         imaTransferErrorHandling.saveTransferError(
             "oracle", optsGasPriseSetup.details.toString() );

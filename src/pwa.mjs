@@ -236,35 +236,34 @@ async function notifyOnLoopImpl( imaState, strLoopWorkType, nIndexS2S, isStart )
             const joNode = jarrNodes[i];
             const strNodeURL = imaUtils.composeImaAgentNodeUrl( joNode, isThisNode );
             const rpcCallOpts = null;
-            let joCall = null;
-            rpcCall.create( strNodeURL, rpcCallOpts ) // NOTICE: no await here, executed async
-                .then( async function( joCallCreated ) {
-                    joCall = joCallCreated;
-                    const joIn = {
-                        "method": "skale_imaNotifyLoopWork",
-                        "params": {
-                            "nNodeNumber": 0 + imaState.nNodeNumber,
-                            "strLoopWorkType": "" + strLoopWorkType,
-                            "nIndexS2S": 0 + nIndexS2S,
-                            "isStart": ( !!isStart ),
-                            "ts": nUtcUnixTimeStamp,
-                            "signature": signature
-                        }
-                    };
-                    await joCall.call( joIn ); // no return value needed here
-                    if( imaState.isPrintPWA ) {
-                        log.success( "Was successfully sent PWA loop-{} notification to " +
-                            "node #{} with URL {url}", se, i, strNodeURL );
-                    }
-                    await joCall.disconnect();
-                } ).catch( async function( err ) {
+            let joCall = rpcCall.create( strNodeURL, rpcCallOpts )
+                .catch( async function( err ) {
                     log.error(
                         "PWA failed to perform] loop-{} notification RPC call to node #{} with " +
                         "URL {url}, error is: {err}", se, i, strNodeURL, err );
                     if( joCall )
                         await joCall.disconnect();
-                    return;
+                    joCall = null;
                 } );
+            if( ! joCall )
+                return false;
+            const joIn = {
+                "method": "skale_imaNotifyLoopWork",
+                "params": {
+                    "nNodeNumber": 0 + imaState.nNodeNumber,
+                    "strLoopWorkType": "" + strLoopWorkType,
+                    "nIndexS2S": 0 + nIndexS2S,
+                    "isStart": ( !!isStart ),
+                    "ts": nUtcUnixTimeStamp,
+                    "signature": signature
+                }
+            };
+            await joCall.call( joIn ); // no return value needed here
+            if( imaState.isPrintPWA ) {
+                log.success( "Was successfully sent PWA loop-{} notification to " +
+                    "node #{} with URL {url}", se, i, strNodeURL );
+            }
+            await joCall.disconnect();
         }
     } catch ( err ) {
         log.error( "Exception in PWA notify on loop {}: {err}, stack is:\n{stack}", se,

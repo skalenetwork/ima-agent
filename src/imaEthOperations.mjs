@@ -142,10 +142,6 @@ export async function doEthPaymentFromMainNet(
             }
         }
     } catch ( err ) {
-        if( log.id != details.id ) {
-            log.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-                strLogPrefix, strActionName, err, err.stack );
-        }
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
             strLogPrefix, strActionName, err, err.stack );
         details.exposeDetailsTo( log, "doEthPaymentFromMainNet", false );
@@ -243,10 +239,6 @@ export async function doEthPaymentFromSChain(
             }
         }
     } catch ( err ) {
-        if( log.id != details.id ) {
-            log.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-                strLogPrefix, strActionName, err, err.stack );
-        }
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
             strLogPrefix, strActionName, err, err.stack );
         details.exposeDetailsTo( log, "doEthPaymentFromSChain", false );
@@ -307,10 +299,6 @@ export async function receiveEthPaymentFromSchainOnMainNet(
             } );
         }
     } catch ( err ) {
-        if( log.id != details.id ) {
-            log.critical( "{p}Receive payment error in {bright}: {err}, stack is:\n{stack}",
-                strLogPrefix, strActionName, err, err.stack );
-        }
         details.critical( "{p}Receive payment error in {bright}: {err}, stack is:\n{stack}",
             strLogPrefix, strActionName, err, err.stack );
         details.exposeDetailsTo( log, "receiveEthPaymentFromSchainOnMainNet", false );
@@ -342,18 +330,12 @@ export async function viewEthPaymentFromSchainOnMainNet(
                 { from: addressFrom } );
         details.success( "{p}You can receive(wei): {}", strLogPrefix, xWei );
         const xEth = owaspUtils.ethersMod.ethers.utils.formatEther( owaspUtils.toBN( xWei ) );
-        if( log.id != details.id )
-            log.success( "{p}You can receive(eth): {}", strLogPrefix, xEth );
         details.success( "{p}You can receive(eth): {}", strLogPrefix, xEth );
         if( log.exposeDetailsGet() )
             details.exposeDetailsTo( log, "viewEthPaymentFromSchainOnMainNet", true );
         details.close();
         return xWei;
     } catch ( err ) {
-        if( log.id != details.id ) {
-            log.critical( "{p}View payment error in {bright}: {err}, stack is:\n{stack}",
-                strLogPrefix, strActionName, err, err.stack );
-        }
         details.critical( "{p}View payment error in {bright}: {err}, stack is:\n{stack}",
             strLogPrefix, strActionName, err, err.stack );
         details.exposeDetailsTo( log, "viewEthPaymentFromSchainOnMainNet", false );
