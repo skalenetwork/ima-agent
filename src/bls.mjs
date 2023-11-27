@@ -1264,16 +1264,14 @@ async function doSignProcessOneImpl( i, optsSignOperation ) {
         ++optsSignOperation.joGatheringTracker.nCountErrors;
         if( log.id != optsSignOperation.details.id ) {
             log.error(
-                "{p}JSON RPC call(doSignProcessOneImpl) to S-Chain node {} failed, " +
-                "RPC call was failed, error is: {err}, sequence ID is {}",
-                optsSignOperation.strLogPrefix, strNodeDescColorized, err,
-                optsSignOperation.sequenceId );
+                "{p}JSON RPC call(doSignProcessOneImpl) to S-Chain node {} failed, RPC call was " +
+                "failed, error is: {err}, sequence ID is {}", optsSignOperation.strLogPrefix,
+                strNodeDescColorized, err, optsSignOperation.sequenceId );
         }
         optsSignOperation.details.error(
-            "{p}JSON RPC call(doSignProcessOneImpl) to S-Chain node {} failed, " +
-            "RPC call failed, error is: {err}, sequence ID is {}",
-            optsSignOperation.strLogPrefix, strNodeDescColorized, err,
-            optsSignOperation.sequenceId );
+            "{p}JSON RPC call(doSignProcessOneImpl) to S-Chain node {} failed, RPC call failed, " +
+            "error is: {err}, sequence ID is {}", optsSignOperation.strLogPrefix,
+            strNodeDescColorized, err, optsSignOperation.sequenceId );
         if( joCall )
             joCall.disconnect();
     } );
