@@ -167,6 +167,8 @@ export async function oracleGetGasPrice( oracleOpts, details ) {
             isVerboseTraceDetails = false;
         const callOpts = "callOpts" in oracleOpts ? oracleOpts.callOpts : { };
         joCall = await rpcCall.create( url, callOpts || { } );
+        if( ! joCall )
+            throw new Error( `Failed to create JSON RPC call object to ${url}` );
         const s = findPowNumber(
             "\"cid\":1000,\"uri\":\"geth://\",\"jsps\":[\"/result\"]," +
             "\"post\":\"{\\\"jsonrpc\\\":\\\"2.0\\\"," +

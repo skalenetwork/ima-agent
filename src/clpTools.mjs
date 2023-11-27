@@ -1462,6 +1462,8 @@ async function handleBrowseSkaleModesRpcInfoResult( strLogPrefix, joCall, joIn, 
         let joCall = null;
         try {
             joCall = await rpcCall.create( strNodeURL, rpcCallOpts );
+            if( ! joCall )
+                throw new Error( `Failed to create JSON RPC call object to ${strNodeURL}` );
             const jIn = { "method": "skale_imaInfo", "params": { } };
             if( discoveryTools.isSendImaAgentIndex() )
                 jIn.params.fromImaAgentIndex = imaState.nNodeNumber;
@@ -1502,6 +1504,10 @@ export function commandLineTaskBrowseSChain() {
             let joCall = null;
             try {
                 joCall = await rpcCall.create( imaState.chainProperties.sc.strURL, rpcCallOpts );
+                if( ! joCall ) {
+                    throw new Error( "Failed to create JSON RPC call object " +
+                        `to ${imaState.chainProperties.sc.strURL}` );
+                }
                 const joIn = { "method": "skale_nodesRpcInfo", "params": { } };
                 if( discoveryTools.isSendImaAgentIndex() )
                     joIn.params.fromImaAgentIndex = imaState.nNodeNumber;

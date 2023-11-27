@@ -1259,53 +1259,51 @@ async function doSignProcessOneImpl( i, optsSignOperation ) {
         strNodeURL, i, optsSignOperation.jarrNodes.length, joNode.nodeID,
         optsSignOperation.sequenceId );
     const rpcCallOpts = null;
-    let joCall = null;
-    rpcCall.create( strNodeURL, rpcCallOpts )
-        .then( async function( joCallCreated ) {
-            joCall = joCallCreated;
-            await doSignConfigureChainAccessParams( optsSignOperation );
-            const joParams = {
-                "direction": "" + optsSignOperation.strDirection,
-                "startMessageIdx": optsSignOperation.nIdxCurrentMsgBlockStart,
-                "dstChainName": optsSignOperation.targetChainName,
-                "srcChainName": optsSignOperation.fromChainName,
-                "dstChainID": optsSignOperation.targetChainID,
-                "srcChainID": optsSignOperation.fromChainID,
-                "messages": optsSignOperation.jarrMessages,
-                "qa": {
-                    "skaledNumber": 0 + i,
-                    "optsSignOperation.sequenceId": "" + optsSignOperation.sequenceId,
-                    "ts": "" + log.generateTimestampString( null, false )
-                }
-            };
-            optsSignOperation.details.trace(
-                "{p}{} Will invoke {bright} to node #{} via {url} for transfer from chain {} " +
-                "to chain {} with params {}, sequence ID is {}", optsSignOperation.strLogPrefix,
-                log.generateTimestampString( null, true ), "skale_imaVerifyAndSign", i, strNodeURL,
-                optsSignOperation.fromChainName, optsSignOperation.targetChainName,
-                joParams, optsSignOperation.sequenceId );
-            const joIn = { "method": "skale_imaVerifyAndSign", "params": joParams };
-            const joOut = await joCall.call( joIn );
-            await doSignProcessHandleCall(
-                optsSignOperation, joNode, joParams, joCall, joIn, joOut, strNodeURL, i );
-        } ).catch( function( err ) {
-            ++optsSignOperation.joGatheringTracker.nCountReceived;
-            ++optsSignOperation.joGatheringTracker.nCountErrors;
-            if( log.id != optsSignOperation.details.id ) {
-                log.error(
-                    "{p}JSON RPC call(doSignProcessOneImpl) to S-Chain node {} failed, " +
-                    "RPC call was failed, error is: {err}, sequence ID is {}",
-                    optsSignOperation.strLogPrefix, strNodeDescColorized, err,
-                    optsSignOperation.sequenceId );
-            }
-            optsSignOperation.details.error(
+    const joCall = await rpcCall.create( strNodeURL, rpcCallOpts ).catch( function( err ) {
+        ++optsSignOperation.joGatheringTracker.nCountReceived;
+        ++optsSignOperation.joGatheringTracker.nCountErrors;
+        if( log.id != optsSignOperation.details.id ) {
+            log.error(
                 "{p}JSON RPC call(doSignProcessOneImpl) to S-Chain node {} failed, " +
-                "RPC call failed, error is: {err}, sequence ID is {}",
+                "RPC call was failed, error is: {err}, sequence ID is {}",
                 optsSignOperation.strLogPrefix, strNodeDescColorized, err,
                 optsSignOperation.sequenceId );
-            if( joCall )
-                joCall.disconnect();
-        } );
+        }
+        optsSignOperation.details.error(
+            "{p}JSON RPC call(doSignProcessOneImpl) to S-Chain node {} failed, " +
+            "RPC call failed, error is: {err}, sequence ID is {}",
+            optsSignOperation.strLogPrefix, strNodeDescColorized, err,
+            optsSignOperation.sequenceId );
+        if( joCall )
+            joCall.disconnect();
+    } );
+    if( ! joCall )
+        return;
+    await doSignConfigureChainAccessParams( optsSignOperation );
+    const joParams = {
+        "direction": "" + optsSignOperation.strDirection,
+        "startMessageIdx": optsSignOperation.nIdxCurrentMsgBlockStart,
+        "dstChainName": optsSignOperation.targetChainName,
+        "srcChainName": optsSignOperation.fromChainName,
+        "dstChainID": optsSignOperation.targetChainID,
+        "srcChainID": optsSignOperation.fromChainID,
+        "messages": optsSignOperation.jarrMessages,
+        "qa": {
+            "skaledNumber": 0 + i,
+            "optsSignOperation.sequenceId": "" + optsSignOperation.sequenceId,
+            "ts": "" + log.generateTimestampString( null, false )
+        }
+    };
+    optsSignOperation.details.trace(
+        "{p}{} Will invoke {bright} to node #{} via {url} for transfer from chain {} " +
+        "to chain {} with params {}, sequence ID is {}", optsSignOperation.strLogPrefix,
+        log.generateTimestampString( null, true ), "skale_imaVerifyAndSign", i, strNodeURL,
+        optsSignOperation.fromChainName, optsSignOperation.targetChainName,
+        joParams, optsSignOperation.sequenceId );
+    const joIn = { "method": "skale_imaVerifyAndSign", "params": joParams };
+    const joOut = await joCall.call( joIn );
+    await doSignProcessHandleCall(
+        optsSignOperation, joNode, joParams, joCall, joIn, joOut, strNodeURL, i );
 }
 
 async function doSignMessagesImpl(
@@ -1612,6 +1610,8 @@ async function doSignU256OneImpl( i, optsSignU256 ) {
     let joCall = null;
     try {
         joCall = await rpcCall.create( strNodeURL, rpcCallOpts );
+        if( ! joCall )
+            throw new Error( `Failed to create JSON RPC call object to ${strNodeURL}` );
         optsSignU256.details.trace( "{p}Will invoke skale_imaBSU256 for to sign value {}",
             optsSignU256.strLogPrefix, ptsSignU256.u256.toString() );
         const joIn = {
@@ -1984,6 +1984,8 @@ export async function doSignReadyHash( strMessageHash, isExposeOutput ) {
             details.warning( "Will sign via SGX without SSL options" );
         const signerIndex = imaState.nNodeNumber;
         joCall = await rpcCall.create( joAccount.strSgxURL, rpcCallOpts );
+        if( ! joCall )
+            throw new Error( `Failed to create JSON RPC call object to ${joAccount.strSgxURL}` );
         const joIn = {
             "jsonrpc": "2.0",
             "id": randomCallID(),
@@ -2229,6 +2231,8 @@ export async function handleSkaleImaVerifyAndSign( joCallData ) {
             optsHandleVerifyAndSign.details.warning( "Will sign via SGX without SSL options" );
         const signerIndex = optsHandleVerifyAndSign.imaState.nNodeNumber;
         joCall = await rpcCall.create( joAccount.strSgxURL, rpcCallOpts );
+        if( ! joCall )
+            throw new Error( `Failed to create JSON RPC call object to ${joAccount.strSgxURL}` );
         const joIn = {
             "jsonrpc": "2.0",
             "id": randomCallID(),
@@ -2382,6 +2386,10 @@ export async function handleSkaleImaBSU256( joCallData ) {
             optsBSU256.details.warning( "Will sign via SGX without SSL options" );
         const signerIndex = optsBSU256.imaState.nNodeNumber;
         joCall = await rpcCall.create( optsBSU256.joAccount.strSgxURL, rpcCallOpts );
+        if( ! joCall ) {
+            throw new Error( "Failed to create JSON RPC call object " +
+                `to ${optsBSU256.joAccount.strSgxURL}` );
+        }
         const joIn = {
             "jsonrpc": "2.0",
             "id": randomCallID(),

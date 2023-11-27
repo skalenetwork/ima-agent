@@ -399,6 +399,8 @@ async function discoverSChainWalkNodes( optsDiscover ) {
         let joCall = null;
         try {
             joCall = await rpcCall.create( strNodeURL, rpcCallOpts );
+            if( ! joCall )
+                throw new Error( `Failed to create JSON RPC call object to ${strNodeURL}` );
             const joIn = { "method": "skale_imaInfo", "params": { } };
             if( isSendImaAgentIndex() )
                 joIn.params.fromImaAgentIndex = optsDiscover.imaState.nNodeNumber;
@@ -580,6 +582,8 @@ export async function discoverSChainNetwork(
         const scURL = optsDiscover.imaState.chainProperties.sc.strURL;
         const rpcCallOpts = null;
         joCall = await rpcCall.create( scURL, rpcCallOpts );
+        if( ! joCall )
+            throw new Error( `Failed to create JSON RPC call object to ${scURL}` );
         const joIn = { "method": "skale_nodesRpcInfo", "params": { } };
         if( isSendImaAgentIndex() )
             joIn.params.fromImaAgentIndex = optsDiscover.imaState.nNodeNumber;

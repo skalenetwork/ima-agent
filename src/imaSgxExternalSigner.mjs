@@ -94,6 +94,8 @@ async function run() {
         };
 
         const joCall = await rpcCall.create( strSgxWalletURL, rpcCallOpts );
+        if( ! joCall )
+            throw new Error( `Failed to create JSON RPC call object to ${strSgxWalletURL}` );
         const joIn = {
             "method": "ecdsaSignMessageHash",
             "params": {

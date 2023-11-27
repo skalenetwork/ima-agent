@@ -1280,6 +1280,8 @@ export async function discoverChainId( strURL ) {
     const rpcCallOpts = null;
     try {
         joCall = await rpcCall.create( strURL, rpcCallOpts );
+        if( ! joCall )
+            throw new Error( `Failed to create JSON RPC call object to ${strURL}` );
         const joIn = { "method": "eth_chainId", "params": [] };
         const joOut = await joCall.call( joIn );
         if( ! ( "result" in joOut && joOut.result ) ) {
