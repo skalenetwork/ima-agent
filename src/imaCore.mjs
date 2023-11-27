@@ -775,12 +775,14 @@ async function checkOutgoingMessageEvent( optsTransfer, joSChain ) {
             // eslint-disable-next-line dot-notation
             const strUrlHttp = optsOutgoingMessageAnalysis.joNode
                 ? optsOutgoingMessageAnalysis.joNode.http_endpoint_ip : "";
+            const strNodeName = optsOutgoingMessageAnalysis.joNode
+                ? log.fmtInformation( optsOutgoingMessageAnalysis.joNode.name )
+                : log.fmtError( "<<unknown node name>>" );
             optsTransfer.details.critical(
                 "{p}{bright} message analysis error: Failed to process events for {} message {} " +
                 "on node {} using URL {}, error is: {err}, stack is:\n{stack}",
                 optsTransfer.strLogPrefix, optsTransfer.strDirection, optsTransfer.strDirection,
-                idxMessage + 1, log.posNeg( optsOutgoingMessageAnalysis.joNode,
-                    optsOutgoingMessageAnalysis.joNode.name, "<<unknown node name>>" ),
+                idxMessage + 1, strNodeName,
                 log.posNeg( optsOutgoingMessageAnalysis.joNode,
                     log.u( strUrlHttp ), "<<unknown node endpoint>>" ),
                 err, err.stack );
