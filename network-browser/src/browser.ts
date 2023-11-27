@@ -33,8 +33,9 @@ import { writeJson, currentTimestamp } from './tools'
 const log = new Logger<ILogObj>()
 
 export async function browse(schainsInternal: Contract, nodes: Contract): Promise<void> {
-    const start = performance.now()
+    log.info('Browse iteration started, collecting chains')
 
+    const start = performance.now()
     const schainsHashes = await getSChainHashes(schainsInternal)
     let schains: SChain[] = await getSChains(schainsInternal, schainsHashes)
     if (CONNECTED_ONLY) schains = await filterConnectedOnly(schains)

@@ -23,6 +23,8 @@ Optional env variables:
 
 ## Development 
 
+To use network-browser it's recommended to use [bun.sh](https://bun.sh/), installation script can be found on their website.
+
 Install dependencies:
 
 ```bash

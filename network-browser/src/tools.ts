@@ -22,7 +22,7 @@
 
 import { Logger, type ILogObj } from 'tslog'
 
-import { readFileSync, writeFileSync } from 'fs'
+import { readFileSync, writeFileSync, renameSync } from 'fs'
 import { BrowserTimeoutError } from './errors'
 import { DEFAULT_PING_DELAY, DEFAULT_PING_ITERATIONS } from './constants'
 
@@ -70,7 +70,15 @@ export function readJson(filepath: string): any {
 }
 
 export function writeJson(filepath: string, data: any): void {
-    writeFileSync(filepath, stringifyBigInt(data), 'utf8')
+    log.info(`Going to save data to file: ${filepath}`)
+    const tmpFilepath = `${filepath}.tmp`
+    writeFileSync(tmpFilepath, stringifyBigInt(data), 'utf8')
+    moveFile(tmpFilepath, filepath)
+}
+
+function moveFile(source: string, destination: string): void {
+    renameSync(source, destination)
+    log.info(`Successfully moved the file from ${source} to ${destination}`)
 }
 
 export async function pingUrl(
