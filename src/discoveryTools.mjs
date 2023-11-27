@@ -216,6 +216,30 @@ export function isSendImaAgentIndex() {
 let gTimerSChainDiscovery = null;
 let gFlagIsInSChainDiscovery = false;
 
+function composeStillUnknownNodesMessage( joSChainNetworkInfo, cntStillUnknown, cntNodesOnChain ) {
+    let strMessage = log.fmtSuccess( ", {} of {} still unknown (",
+        cntStillUnknown, cntNodesOnChain );
+    try {
+        const jarrNodes = joSChainNetworkInfo.network;
+        let cntBad = 0;
+        for( let i = 0; i < jarrNodes.length; ++i ) {
+            const joNode = jarrNodes[i];
+            try {
+                if( isSChainNodeFullyDiscovered( joNode ) )
+                    continue;
+                if( cntBad > 0 )
+                    strMessage += log.fmtSuccess( ", " );
+                const strNodeURL = imaUtils.composeSChainNodeUrl( joNode );
+                const strNodeDescColorized = log.fmtAttention( "#{}({url})", i, strNodeURL );
+                strMessage += strNodeDescColorized;
+                ++ cntBad;
+            } catch ( err ) { }
+        }
+    } catch ( err ) { }
+    strMessage += log.fmtSuccess( ")" );
+    return strMessage;
+}
+
 async function handlePeriodicDiscoveryAttemptActions( isSilentReDiscovery, fnAfter ) {
     if( gFlagIsInSChainDiscovery ) {
         isInsideAsyncHandler = false;
@@ -273,28 +297,8 @@ async function handlePeriodicDiscoveryAttemptActions( isSilentReDiscovery, fnAft
                     "({} nodes known)", cntDiscoveredNow, nCountToWait, cntDiscoveredNow );
             const cntStillUnknown = cntNodesOnChain - cntDiscoveredNow;
             if( cntStillUnknown > 0 ) {
-                strMessage += log.fmtSuccess( ", {} of {} still unknown (",
-                    cntStillUnknown, cntNodesOnChain );
-                try {
-                    const jarrNodes = joSChainNetworkInfo.network;
-                    let cntBad = 0;
-                    for( let i = 0; i < jarrNodes.length; ++i ) {
-                        const joNode = jarrNodes[i];
-                        try {
-                            if( ! isSChainNodeFullyDiscovered( joNode ) ) {
-                                if( cntBad > 0 )
-                                    strMessage += log.fmtSuccess( ", " );
-                                const strNodeURL =
-                                    imaUtils.composeSChainNodeUrl( joNode );
-                                const strNodeDescColorized = log.fmtAttention(
-                                    "#{}({url})", i, strNodeURL );
-                                strMessage += strNodeDescColorized;
-                                ++ cntBad;
-                            }
-                        } catch ( err ) { }
-                    }
-                } catch ( err ) { }
-                strMessage += log.fmtSuccess( ")" );
+                strMessage += composeStillUnknownNodesMessage(
+                    joSChainNetworkInfo, cntStillUnknown, cntNodesOnChain );
             }
             if( ! isSilentReDiscovery ) {
                 strMessage += log.fmtSuccess( ", complete re-discovered S-Chain " +

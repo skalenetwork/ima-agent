@@ -392,7 +392,8 @@ async function doTheJob() {
         process.exit( process.exitCode );
 }
 
-function handleFirstSChainDiscoveryAttemptDone( err, joSChainNetworkInfo ) {
+function handleFirstSChainDiscoveryAttemptDone(
+    err, joSChainNetworkInfo, isSilentReDiscovery, fnOnPeriodicDiscoveryResultAvailable ) {
     if( err ) {
         // error information is printed by discoveryTools.discoverSChainNetwork()
         process.exit( 166 );
@@ -457,7 +458,9 @@ async function main() {
             }
             const nCountToWait = -1;
             discoveryTools.discoverSChainNetwork( function( err, joSChainNetworkInfo ) {
-                handleFirstSChainDiscoveryAttemptDone( err, joSChainNetworkInfo );
+                handleFirstSChainDiscoveryAttemptDone(
+                    err, joSChainNetworkInfo, isSilentReDiscovery,
+                    fnOnPeriodicDiscoveryResultAvailable );
                 doTheJob();
                 // Finish of IMA Agent startup,
                 // everything else is in async calls executed later
