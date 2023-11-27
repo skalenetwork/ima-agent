@@ -763,7 +763,6 @@ async function checkOutgoingMessageEvent( optsTransfer, joSChain ) {
                 optsOutgoingMessageAnalysis.idxNode < cntNodes;
                 ++ optsOutgoingMessageAnalysis.idxNode
             ) {
-                optsOutgoingMessageAnalysis.idxNode = idxNode;
                 optsOutgoingMessageAnalysis.joNode = joSChain.data.computed.nodes[
                     optsOutgoingMessageAnalysis.idxNode];
                 const isContinueNodesAnalysis = await checkOutgoingMessageEventInOneNode(
