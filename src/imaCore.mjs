@@ -648,8 +648,97 @@ async function handleAllMessagesSigning( optsTransfer ) {
     }
 }
 
-async function checkOutgoingMessageEvent( optsTransfer, joSChain ) {
+async function checkOutgoingMessageEventInOneNode( optsTransfer, optsOutgoingMessageAnalysis ) {
     const sc = optsTransfer.imaState.chainProperties.sc;
+    // eslint-disable-next-line dot-notation
+    const strUrlHttp = optsOutgoingMessageAnalysis.joNode["http_endpoint_ip"];
+    optsTransfer.details.trace(
+        "{p}Validating {bright} message {} on node {} using URL {url}...",
+        optsTransfer.strLogPrefix, optsTransfer.strDirection,
+        optsOutgoingMessageAnalysis.idxMessage + 1,
+        optsOutgoingMessageAnalysis.joNode.name, strUrlHttp );
+    const joMessage = optsOutgoingMessageAnalysis.joMessage;
+    let bEventIsFound = false;
+    try {
+        // eslint-disable-next-line dot-notation
+        const ethersProviderNode = owaspUtils.getEthersProviderFromURL( strUrlHttp );
+        const joMessageProxyNode = new owaspUtils.ethersMod.ethers.Contract(
+            sc.joAbiIMA.message_proxy_chain_address,
+            sc.joAbiIMA.message_proxy_chain_abi,
+            ethersProviderNode );
+        const strEventName = "OutgoingMessage";
+        const node_r = await imaEventLogScan.safeGetPastEventsProgressive(
+            optsTransfer.details, optsTransfer.strLogPrefixShort, ethersProviderNode,
+            10, joMessageProxyNode, strEventName,
+            joMessage.savedBlockNumberForOptimizations,
+            joMessage.savedBlockNumberForOptimizations,
+            joMessageProxyNode.filters[strEventName](
+                owaspUtils.ethersMod.ethers.utils.id( optsTransfer.chainNameDst ),
+                owaspUtils.toBN( optsOutgoingMessageAnalysis.idxImaMessage ) ) );
+        const cntEvents = node_r.length;
+        optsTransfer.details.trace(
+            "{p}Got {} event(s) ({}) on node {} with data: {}",
+            optsTransfer.strLogPrefix, cntEvents, strEventName,
+            optsOutgoingMessageAnalysis.joNode.name, node_r );
+        for( let idxEvent = 0; idxEvent < cntEvents; ++ idxEvent ) {
+            const joEvent = node_r[idxEvent];
+            const eventValuesByName = {
+                "dstChainHash": joEvent.args[0],
+                "msgCounter": joEvent.args[1],
+                "srcContract": joEvent.args[2],
+                "dstContract": joEvent.args[3],
+                "data": joEvent.args[4]
+            };
+            if( owaspUtils.ensureStartsWith0x( joMessage.sender ).toLowerCase() ==
+                    owaspUtils.ensureStartsWith0x( eventValuesByName.srcContract ).toLowerCase() &&
+                owaspUtils.ensureStartsWith0x( joMessage.destinationContract ).toLowerCase() ==
+                    owaspUtils.ensureStartsWith0x( eventValuesByName.dstContract ).toLowerCase()
+            ) {
+                bEventIsFound = true;
+                break;
+            }
+        }
+    } catch ( err ) {
+        ++ optsOutgoingMessageAnalysis.cntFailedNodes;
+        optsTransfer.details.error(
+            "{p}{bright} message analysis error: Failed to scan events on node {}, " +
+            "error is: {err}, detailed node description is: {}, stack is: ",
+            optsTransfer.strLogPrefix, optsTransfer.strDirection,
+            optsOutgoingMessageAnalysis.joNode.name, err,
+            optsOutgoingMessageAnalysis.joNode, err.stack );
+        return true; // continue nodes analysis
+    }
+    if( bEventIsFound ) {
+        ++ optsOutgoingMessageAnalysis.cntPassedNodes;
+        optsTransfer.details.success(
+            "{p}{bright} message {} validation on node {} using URL {url} is passed",
+            optsTransfer.strLogPrefix, optsTransfer.strDirection,
+            optsOutgoingMessageAnalysis.idxMessage + 1,
+            optsOutgoingMessageAnalysis.joNode.name, strUrlHttp );
+    } else {
+        ++ optsOutgoingMessageAnalysis.cntFailedNodes;
+        // eslint-disable-next-line dot-notation
+        optsTransfer.details.error(
+            "{p}{bright} message {} validation on node {} using URL {url} is failed",
+            optsTransfer.strLogPrefix, optsTransfer.strDirection,
+            optsOutgoingMessageAnalysis.idxMessage + 1,
+            optsOutgoingMessageAnalysis.joNode.name, strUrlHttp );
+    }
+    if( optsOutgoingMessageAnalysis.cntFailedNodes > optsTransfer.cntNodesMayFail )
+        return false;
+    if( optsOutgoingMessageAnalysis.cntPassedNodes >= optsTransfer.cntNodesShouldPass ) {
+        // eslint-disable-next-line dot-notation
+        optsTransfer.details.information(
+            "{p}{bright} message {} validation on node {} using URL {url} is passed",
+            optsTransfer.strLogPrefix, optsTransfer.strDirection,
+            optsOutgoingMessageAnalysis.idxMessage + 1,
+            optsOutgoingMessageAnalysis.joNode.name, strUrlHttp );
+        return false;
+    }
+    return true;
+}
+
+async function checkOutgoingMessageEvent( optsTransfer, joSChain ) {
     const cntNodes = joSChain.data.computed.nodes.length;
     const cntMessages = optsTransfer.jarrMessages.length;
     for( let idxMessage = 0; idxMessage < cntMessages; ++ idxMessage ) {
@@ -659,107 +748,48 @@ async function checkOutgoingMessageEvent( optsTransfer, joSChain ) {
             "{p}{bright} message analysis for message {} of {} with IMA message index {} and " +
             "message envelope data: {}", optsTransfer.strLogPrefix, optsTransfer.strDirection,
             idxMessage + 1, cntMessages, idxImaMessage, joMessage );
-        let cntPassedNodes = 0, cntFailedNodes = 0, joNode = null;
+        const optsOutgoingMessageAnalysis = {
+            idxMessage: idxMessage,
+            idxImaMessage: idxImaMessage,
+            joMessage: joMessage,
+            joNode: null,
+            idxNode: 0,
+            cntNodes: cntNodes,
+            cntPassedNodes: 0,
+            cntFailedNodes: 0
+        };
         try {
-            for( let idxNode = 0; idxNode < cntNodes; ++ idxNode ) {
-                joNode = joSChain.data.computed.nodes[idxNode];
-                // eslint-disable-next-line dot-notation
-                const strUrlHttp = joNode["http_endpoint_ip"];
-                optsTransfer.details.trace( "{p}Validating {bright} message {} on node {} using " +
-                    "URL {url}...", optsTransfer.strLogPrefix, optsTransfer.strDirection,
-                idxMessage + 1, joNode.name, strUrlHttp );
-                let bEventIsFound = false;
-                try {
-                    // eslint-disable-next-line dot-notation
-                    const ethersProviderNode = owaspUtils.getEthersProviderFromURL( strUrlHttp );
-                    const joMessageProxyNode = new owaspUtils.ethersMod.ethers.Contract(
-                        sc.joAbiIMA.message_proxy_chain_address,
-                        sc.joAbiIMA.message_proxy_chain_abi,
-                        ethersProviderNode );
-                    const strEventName = "OutgoingMessage";
-                    const node_r = await imaEventLogScan.safeGetPastEventsProgressive(
-                        optsTransfer.details, optsTransfer.strLogPrefixShort, ethersProviderNode,
-                        10, joMessageProxyNode, strEventName,
-                        joMessage.savedBlockNumberForOptimizations,
-                        joMessage.savedBlockNumberForOptimizations,
-                        joMessageProxyNode.filters[strEventName](
-                            owaspUtils.ethersMod.ethers.utils.id( optsTransfer.chainNameDst ),
-                            owaspUtils.toBN( idxImaMessage ) ) );
-                    const cntEvents = node_r.length;
-                    optsTransfer.details.trace( "{p}Got {} event(s) ({}) on node {} with data: {}",
-                        optsTransfer.strLogPrefix, cntEvents, strEventName, joNode.name, node_r );
-                    for( let idxEvent = 0; idxEvent < cntEvents; ++ idxEvent ) {
-                        const joEvent = node_r[idxEvent];
-                        const eventValuesByName = {
-                            "dstChainHash": joEvent.args[0],
-                            "msgCounter": joEvent.args[1],
-                            "srcContract": joEvent.args[2],
-                            "dstContract": joEvent.args[3],
-                            "data": joEvent.args[4]
-                        };
-                        if( owaspUtils.ensureStartsWith0x(
-                            joMessage.sender ).toLowerCase() ==
-                            owaspUtils.ensureStartsWith0x(
-                                eventValuesByName.srcContract ).toLowerCase() &&
-                            owaspUtils.ensureStartsWith0x(
-                                joMessage.destinationContract ).toLowerCase() ==
-                            owaspUtils.ensureStartsWith0x(
-                                eventValuesByName.dstContract ).toLowerCase()
-                        ) {
-                            bEventIsFound = true;
-                            break;
-                        }
-                    }
-                } catch ( err ) {
-                    ++ cntFailedNodes;
-                    optsTransfer.details.error(
-                        "{p}{bright} message analysis error: Failed to scan events on node {}, " +
-                        "error is: {err}, detailed node description is: {}, stack is: ",
-                        optsTransfer.strLogPrefix, optsTransfer.strDirection,
-                        joNode.name, err, joNode, err.stack );
-                    continue;
-                }
-                if( bEventIsFound ) {
-                    ++ cntPassedNodes;
-                    optsTransfer.details.success(
-                        "{p}{bright} message {} validation on node {} using URL {url} is passed",
-                        optsTransfer.strLogPrefix, optsTransfer.strDirection, idxMessage + 1,
-                        joNode.name, strUrlHttp );
-                } else {
-                    ++ cntFailedNodes;
-                    // eslint-disable-next-line dot-notation
-                    optsTransfer.details.error(
-                        "{p}{bright} message {} validation on node {} using URL {url} is failed",
-                        optsTransfer.strLogPrefix, optsTransfer.strDirection, idxMessage + 1,
-                        joNode.name, strUrlHttp );
-                }
-                if( cntFailedNodes > optsTransfer.cntNodesMayFail )
+            for( optsOutgoingMessageAnalysis.idxNode = 0;
+                optsOutgoingMessageAnalysis.idxNode < cntNodes;
+                ++ optsOutgoingMessageAnalysis.idxNode
+            ) {
+                optsOutgoingMessageAnalysis.idxNode = idxNode;
+                optsOutgoingMessageAnalysis.joNode = joSChain.data.computed.nodes[
+                    optsOutgoingMessageAnalysis.idxNode];
+                const isContinueNodesAnalysis = await checkOutgoingMessageEventInOneNode(
+                    optsTransfer, optsOutgoingMessageAnalysis );
+                if( ! isContinueNodesAnalysis )
                     break;
-                if( cntPassedNodes >= optsTransfer.cntNodesShouldPass ) {
-                    // eslint-disable-next-line dot-notation
-                    optsTransfer.details.information(
-                        "{p}{bright} message {} validation on node {} using URL {url} is passed",
-                        optsTransfer.strLogPrefix, optsTransfer.strDirection, idxMessage + 1,
-                        joNode.name, strUrlHttp );
-                    break;
-                }
             }
         } catch ( err ) {
             // eslint-disable-next-line dot-notation
-            const strUrlHttp = joNode ? joNode["http_endpoint_ip"] : "";
+            const strUrlHttp = optsOutgoingMessageAnalysis.joNode
+                ? optsOutgoingMessageAnalysis.joNode.http_endpoint_ip : "";
             optsTransfer.details.critical(
                 "{p}{bright} message analysis error: Failed to process events for {} message {} " +
                 "on node {} using URL {}, error is: {err}, stack is:\n{stack}",
                 optsTransfer.strLogPrefix, optsTransfer.strDirection, optsTransfer.strDirection,
-                idxMessage + 1, log.posNeg( joNode, joNode.name, "<<unknown node name>>" ),
-                log.posNeg( joNode, log.u( strUrlHttp ), "<<unknown node endpoint>>" ),
+                idxMessage + 1, log.posNeg( optsOutgoingMessageAnalysis.joNode,
+                    optsOutgoingMessageAnalysis.joNode.name, "<<unknown node name>>" ),
+                log.posNeg( optsOutgoingMessageAnalysis.joNode,
+                    log.u( strUrlHttp ), "<<unknown node endpoint>>" ),
                 err, err.stack );
         }
-        if( cntFailedNodes > optsTransfer.cntNodesMayFail ) {
+        if( optsOutgoingMessageAnalysis.cntFailedNodes > optsTransfer.cntNodesMayFail ) {
             optsTransfer.details.critical(
                 "{p}Error validating {bright} messages, failed node count {} is greater then " +
                 "allowed to fail {}", optsTransfer.strLogPrefix, optsTransfer.strDirection,
-                cntFailedNodes, optsTransfer.cntNodesMayFail );
+                optsOutgoingMessageAnalysis.cntFailedNodes, optsTransfer.cntNodesMayFail );
             optsTransfer.details.exposeDetailsTo(
                 log, optsTransfer.strGatheredDetailsName, false );
             imaTransferErrorHandling.saveTransferError(
@@ -768,11 +798,11 @@ async function checkOutgoingMessageEvent( optsTransfer, joSChain ) {
             optsTransfer.details.close();
             return false;
         }
-        if( ! ( cntPassedNodes >= optsTransfer.cntNodesShouldPass ) ) {
+        if( ! ( optsOutgoingMessageAnalysis.cntPassedNodes >= optsTransfer.cntNodesShouldPass ) ) {
             optsTransfer.details.critical(
                 "{p}Error validating {bright} messages, passed node count {} is less then " +
                 "needed count {}", optsTransfer.strLogPrefix, optsTransfer.strDirection,
-                cntFailedNodes, optsTransfer.cntNodesShouldPass );
+                optsOutgoingMessageAnalysis.cntFailedNodes, optsTransfer.cntNodesShouldPass );
             optsTransfer.details.exposeDetailsTo(
                 log, optsTransfer.strGatheredDetailsName, false );
             imaTransferErrorHandling.saveTransferError(

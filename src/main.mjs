@@ -392,6 +392,22 @@ async function doTheJob() {
         process.exit( process.exitCode );
 }
 
+function handleFirstSChainDiscoveryAttemptDone( err, joSChainNetworkInfo ) {
+    if( err ) {
+        // error information is printed by discoveryTools.discoverSChainNetwork()
+        process.exit( 166 );
+    }
+    log.success( "S-Chain network was discovered: {}", joSChainNetworkInfo );
+    const imaState = state.get();
+    imaState.joSChainNetworkInfo = joSChainNetworkInfo;
+    discoveryTools.continueSChainDiscoveryInBackgroundIfNeeded(
+        isSilentReDiscovery, function() {
+            discoveryTools.doPeriodicSChainNetworkDiscoveryIfNeeded(
+                isSilentReDiscovery, fnOnPeriodicDiscoveryResultAvailable );
+        } );
+    imaState.joSChainNetworkInfo = joSChainNetworkInfo;
+}
+
 async function main() {
     log.autoEnableColorizationFromCommandLineArgs();
     const imaState = state.get();
@@ -441,18 +457,7 @@ async function main() {
             }
             const nCountToWait = -1;
             discoveryTools.discoverSChainNetwork( function( err, joSChainNetworkInfo ) {
-                if( err ) {
-                    // error information is printed by discoveryTools.discoverSChainNetwork()
-                    process.exit( 166 );
-                }
-                log.success( "S-Chain network was discovered: {}", joSChainNetworkInfo );
-                imaState.joSChainNetworkInfo = joSChainNetworkInfo;
-                discoveryTools.continueSChainDiscoveryInBackgroundIfNeeded(
-                    isSilentReDiscovery, function() {
-                        discoveryTools.doPeriodicSChainNetworkDiscoveryIfNeeded(
-                            isSilentReDiscovery, fnOnPeriodicDiscoveryResultAvailable );
-                    } );
-                imaState.joSChainNetworkInfo = joSChainNetworkInfo;
+                handleFirstSChainDiscoveryAttemptDone( err, joSChainNetworkInfo );
                 doTheJob();
                 // Finish of IMA Agent startup,
                 // everything else is in async calls executed later
