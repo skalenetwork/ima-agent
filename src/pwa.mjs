@@ -236,7 +236,7 @@ async function notifyOnLoopImpl( imaState, strLoopWorkType, nIndexS2S, isStart )
             const joNode = jarrNodes[i];
             const strNodeURL = imaUtils.composeImaAgentNodeUrl( joNode, isThisNode );
             const rpcCallOpts = null;
-            let joCall = rpcCall.create( strNodeURL, rpcCallOpts )
+            let joCall = await rpcCall.create( strNodeURL, rpcCallOpts )
                 .catch( async function( err ) {
                     log.error(
                         "PWA failed to perform] loop-{} notification RPC call to node #{} with " +
