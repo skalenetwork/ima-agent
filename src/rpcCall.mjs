@@ -63,12 +63,11 @@ export async function waitWebSocketIsOpen( socket, fnDone, fnStep ) {
             fnAsyncHandler().then( () => { } ).catch( () => { } );
         }, 1000 ); // 1 second
     } );
-    await Promise.all( [ promiseComplete ] );
+    await promiseComplete;
 }
 
 export async function doConnect( joCall, opts, fn ) {
     try {
-        fn = fn || async function() {};
         if( !validateURL( joCall.url ) ) {
             throw new Error( "JSON RPC CALLER cannot connect web socket " +
                 `to invalid URL: ${joCall.url}` );
@@ -77,7 +76,8 @@ export async function doConnect( joCall, opts, fn ) {
             let strWsError = null;
             joCall.wsConn = new ws.WebSocket( joCall.url );
             joCall.wsConn.on( "open", async function() {
-                await fn( joCall, null );
+                if( fn )
+                    await fn( joCall, null );
             } );
             joCall.wsConn.on( "close", async function() {
                 strWsError =
@@ -110,7 +110,8 @@ export async function doConnect( joCall, opts, fn ) {
                         entry.iv = null;
                     }
                     clearTimeout( entry.out );
-                    await entry.fn( entry.joIn, joOut, null );
+                    if( entry.fn )
+                        await entry.fn( entry.joIn, joOut, null );
                 }
             } );
             await waitWebSocketIsOpen( joCall.wsConn,
@@ -135,21 +136,23 @@ export async function doConnect( joCall, opts, fn ) {
                 } );
             if( strWsError && typeof strWsError == "string" && strWsError.length > 0 ) {
                 const err = new Error( strWsError );
-                await fn( joCall, err );
+                if( fn )
+                    await fn( joCall, err );
                 return;
             }
         }
-        await fn( joCall, null );
+        if( fn )
+            await fn( joCall, null );
     } catch ( err ) {
         joCall.wsConn = null;
-        await fn( joCall, err );
+        if( fn )
+            await fn( joCall, err );
     }
     return joCall;
 }
 
 export async function doConnectIfNeeded( joCall, opts, fn ) {
     try {
-        fn = fn || async function() {};
         if( !validateURL( joCall.url ) ) {
             throw new Error( "JSON RPC CALLER cannot connect web socket " +
                 `to invalid URL: ${joCall.url}` );
@@ -158,9 +161,11 @@ export async function doConnectIfNeeded( joCall, opts, fn ) {
             await joCall.reconnect( fn );
             return;
         }
-        await fn( joCall, null );
+        if( fn )
+            await fn( joCall, null );
     } catch ( err ) {
-        await fn( joCall, err );
+        if( fn )
+            await fn( joCall, err );
     }
     return joCall;
 }
@@ -170,18 +175,17 @@ async function doReconnectWsStep( joCall, opts, fn ) {
         return;
     if( joCall.isDisconnectMode )
         return;
-    fn = fn || async function() {};
     doConnect( joCall, opts, async function( joCall, err ) {
         if( err ) {
             doReconnectWsStep( joCall, opts );
             return;
         }
-        await fn( joCall, null );
+        if( fn )
+            await fn( joCall, null );
     } );
 }
 
 async function doDisconnect( joCall, fn ) {
-    fn = fn || async function() {};
     try {
         joCall.isDisconnectMode = true;
         const wsConn = joCall.wsConn ? joCall.wsConn : null;
@@ -190,17 +194,18 @@ async function doDisconnect( joCall, fn ) {
             wsConn.close();
         joCall.isDisconnectMode = false;
         try {
-            await fn( joCall, null );
+            if( fn )
+                await fn( joCall, null );
         } catch ( err ) {
         }
     } catch ( err ) {
-        await await fn( joCall, err );
+        if( fn )
+            await await fn( joCall, err );
     }
 }
 
 export async function doCall( joCall, joIn, fn ) {
     joIn = enrichTopLevelFieldsInJSON( joIn );
-    fn = fn || async function() {};
     if( joCall.wsConn ) {
         const entry = {
             joIn: joIn,
@@ -216,11 +221,10 @@ export async function doCall( joCall, joIn, fn ) {
         joCall.wsConn.send( JSON.stringify( joIn ) );
     } else {
         if( !validateURL( joCall.url ) ) {
-            await fn(
-                joIn,
-                null,
-                "JSON RPC CALLER cannot do query post to invalid URL: " + joCall.url
-            );
+            if( fn ) {
+                await fn( joIn, null,
+                    "JSON RPC CALLER cannot do query post to invalid URL: " + joCall.url );
+            }
             return;
         }
         const strBody = JSON.stringify( joIn );
@@ -319,16 +323,16 @@ export async function doCall( joCall, joIn, fn ) {
             }
         }
         try {
-            await fn( joIn, joOut, errCall );
+            if( fn )
+                await fn( joIn, joOut, errCall );
         } catch ( err ) {
         }
     }
 }
 
-export async function rpcCallCreate( strURL, opts, fn ) {
+export async function rpcCallCreate( strURL, opts ) {
     if( !validateURL( strURL ) )
         throw new Error( `JSON RPC CALLER cannot create a call object invalid URL: ${strURL}` );
-    fn = fn || async function() {};
     if( !( strURL && typeof strURL == "string" && strURL.length > 0 ) ) {
         throw new Error( "rpcCallCreate() was invoked with " +
             `bad parameters: ${JSON.stringify( arguments )}` );
@@ -347,21 +351,33 @@ export async function rpcCallCreate( strURL, opts, fn ) {
         "reconnect_if_needed": async function( fnAfter ) {
             await doConnectIfNeeded( joCall, opts, fnAfter );
         },
-        "call": async function( joIn, fnAfter ) {
+        "call": function( joIn, fnAfter ) {
             const self = this;
-            await self.reconnect_if_needed( async function( joCall, err ) {
-                if( err ) {
-                    await fnAfter( joIn, null, err );
-                    return;
-                }
-                await doCall( joCall, joIn, fnAfter );
+            const promiseComplete = new Promise( function( resolve, reject ) {
+                self.reconnect_if_needed( async function( joCall, err ) {
+                    if( err ) {
+                        if( fnAfter )
+                            await fnAfter( joIn, null, err );
+                        reject( err );
+                        return;
+                    }
+                    await doCall( joCall, joIn, async function( joIn, joOut, err ) {
+                        if( fnAfter )
+                            await fnAfter( joIn, joOut, err );
+                        if( err )
+                            reject( err );
+                        else
+                            resolve( joOut );
+                    } );
+                } );
             } );
+            return promiseComplete;
         },
         "disconnect": async function( fnAfter ) {
             await doDisconnect( joCall, fnAfter );
         }
     };
-    await doConnect( joCall, opts, fn );
+    await doConnect( joCall, opts );
     return joCall;
 }
 
@@ -513,7 +529,7 @@ export async function checkTcp( strHost, nPort, nTimeoutMilliseconds, isLog ) {
                 `${gStrTcpConnectionHeader}Waiting for ` +
                 `TCP connection to ${strHost}:${nPort} check done...` );
         }
-        await Promise.all( [ promiseCompleteTcpCheck ] );
+        await promiseCompleteTcpCheck;
         if( isLog ) {
             console.log(
                 `${gStrTcpConnectionHeader}TCP connection ` +

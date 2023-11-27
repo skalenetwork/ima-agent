@@ -23,7 +23,6 @@
  * @copyright SKALE Labs 2019-Present
  */
 
-import * as owaspUtils from "./owaspUtils.mjs";
 import * as log from "./log.mjs";
 import * as rpcCall from "./rpcCall.mjs";
 import * as skaleObserver from "./observer.mjs";
@@ -62,8 +61,7 @@ export function initialSkaleNetworkScanForS2S() {
             ).then( function() {
                 log.success( "{p}Done, did started periodic S-Chains caching.", strLogPrefix );
             } ).catch( function( err ) {
-                const strError = owaspUtils.extractErrorMessage( err );
-                log.error( "Failed to start periodic S-Chains caching {err}", strError );
+                log.error( "Failed to start periodic S-Chains caching {err}", err );
             } );
             return true;
         }
@@ -185,16 +183,17 @@ export async function waitUntilSChainStarted() {
         try {
             log.attention( "This S-Chain discovery will be done for startup pre-requisite" );
             const nCountToWait = -1;
+            let isError = false;
             const joSChainNetworkInfo = await discoverSChainNetwork(
-                function( err, joSChainNetworkInfo ) {
-                    if( ! err )
-                        bSuccess = true;
-                }, isSilentReDiscovery, null, nCountToWait ).catch( ( err ) => {
-                const strError = owaspUtils.extractErrorMessage( err );
-                log.critical( "S-Chain network discovery failed: {err}", strError );
+                null, isSilentReDiscovery, null, nCountToWait
+            ).catch( function( err ) {
+                log.critical( "S-Chain network discovery attempt failed: {err}", err );
+                isError = true;
             } );
-            if( ! joSChainNetworkInfo )
-                bSuccess = false;
+            if( ( !isError ) && joSChainNetworkInfo && typeof joSChainNetworkInfo == "object" ) {
+                imaState.joSChainNetworkInfo = joSChainNetworkInfo;
+                bSuccess = true;
+            }
         } catch ( err ) {
             bSuccess = false;
         }
@@ -297,51 +296,52 @@ export async function continueSChainDiscoveryInBackgroundIfNeeded( isSilentReDis
                 log.information( "Will re-discover {}-nodes S-Chain network, {} node(s) already " +
                     "discovered...", nCountToWait, cntDiscovered );
             }
-            await discoverSChainNetwork( function( err, joSChainNetworkInfo ) {
-                if( ! err ) {
-                    const cntDiscoveredNow =
-                        getSChainDiscoveredNodesCount( joSChainNetworkInfo );
-                    let strMessage =
-                        log.fmtSuccess( "S-Chain network was re-discovered, {} of {} node(s)" +
-                            "({} nodes known)", cntDiscoveredNow, nCountToWait, cntDiscoveredNow );
-                    const cntStillUnknown = cntNodesOnChain - cntDiscoveredNow;
-                    if( cntStillUnknown > 0 ) {
-                        strMessage += log.fmtSuccess( ", {} of {} still unknown (",
-                            cntStillUnknown, cntNodesOnChain );
-                        try {
-                            const jarrNodes = joSChainNetworkInfo.network;
-                            let cntBad = 0;
-                            for( let i = 0; i < jarrNodes.length; ++i ) {
-                                const joNode = jarrNodes[i];
-                                try {
-                                    if( ! isSChainNodeFullyDiscovered( joNode ) ) {
-                                        if( cntBad > 0 )
-                                            strMessage += log.fmtSuccess( ", " );
-                                        const strNodeURL =
-                                            imaUtils.composeSChainNodeUrl( joNode );
-                                        const strNodeDescColorized = log.fmtAttention(
-                                            "#{}({url})", i, strNodeURL );
-                                        strMessage += strNodeDescColorized;
-                                        ++ cntBad;
-                                    }
-                                } catch ( err ) { }
-                            }
-                        } catch ( err ) { }
-                        strMessage += log.fmtSuccess( ")" );
-                    }
-                    if( ! isSilentReDiscovery ) {
-                        strMessage += log.fmtSuccess( ", complete re-discovered S-Chain " +
-                            "network info: {}", joSChainNetworkInfo );
-                    }
-                    log.information( strMessage );
-                    imaState.joSChainNetworkInfo = joSChainNetworkInfo;
-                }
-                fnAfter();
-                continueSChainDiscoveryInBackgroundIfNeeded( isSilentReDiscovery, null );
-            }, isSilentReDiscovery, imaState.joSChainNetworkInfo, nCountToWait ).catch( ( err ) => {
-                const strError = owaspUtils.extractErrorMessage( err );
-                log.critical( "S-Chain network re-discovery failed: {err}", strError );
+            let isError = false;
+            const joSChainNetworkInfo = await discoverSChainNetwork(
+                null, isSilentReDiscovery, imaState.joSChainNetworkInfo, nCountToWait
+            ).catch( function( err ) {
+                isError = true;
+                log.critical( "S-Chain network re-discovery failed: {err}", err );
             } );
+            if( ! isError ) {
+                const cntDiscoveredNow = getSChainDiscoveredNodesCount( joSChainNetworkInfo );
+                let strMessage =
+                    log.fmtSuccess( "S-Chain network was re-discovered, {} of {} node(s)" +
+                        "({} nodes known)", cntDiscoveredNow, nCountToWait, cntDiscoveredNow );
+                const cntStillUnknown = cntNodesOnChain - cntDiscoveredNow;
+                if( cntStillUnknown > 0 ) {
+                    strMessage += log.fmtSuccess( ", {} of {} still unknown (",
+                        cntStillUnknown, cntNodesOnChain );
+                    try {
+                        const jarrNodes = joSChainNetworkInfo.network;
+                        let cntBad = 0;
+                        for( let i = 0; i < jarrNodes.length; ++i ) {
+                            const joNode = jarrNodes[i];
+                            try {
+                                if( ! isSChainNodeFullyDiscovered( joNode ) ) {
+                                    if( cntBad > 0 )
+                                        strMessage += log.fmtSuccess( ", " );
+                                    const strNodeURL =
+                                        imaUtils.composeSChainNodeUrl( joNode );
+                                    const strNodeDescColorized = log.fmtAttention(
+                                        "#{}({url})", i, strNodeURL );
+                                    strMessage += strNodeDescColorized;
+                                    ++ cntBad;
+                                }
+                            } catch ( err ) { }
+                        }
+                    } catch ( err ) { }
+                    strMessage += log.fmtSuccess( ")" );
+                }
+                if( ! isSilentReDiscovery ) {
+                    strMessage += log.fmtSuccess( ", complete re-discovered S-Chain " +
+                        "network info: {}", joSChainNetworkInfo );
+                }
+                log.information( strMessage );
+                imaState.joSChainNetworkInfo = joSChainNetworkInfo;
+            }
+            fnAfter();
+            continueSChainDiscoveryInBackgroundIfNeeded( isSilentReDiscovery, null );
         } catch ( err ) { }
         gFlagIsInSChainDiscovery = false;
         // fnAfter() will be called here inside async call at beginning
@@ -355,17 +355,8 @@ export async function continueSChainDiscoveryInBackgroundIfNeeded( isSilentReDis
 }
 
 function handleDiscoverSkaleImaInfoResult(
-    optsDiscover, strNodeDescColorized, joNode, joCall, joIn, joOut, err
+    optsDiscover, strNodeDescColorized, joNode, joCall, joIn, joOut
 ) {
-    if( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
-        if( ! optsDiscover.isSilentReDiscovery ) {
-            log.critical( "{p}JSON RPC call(network) to S-Chain node {} failed, error: {err}",
-                optsDiscover.strLogPrefix, strNodeDescColorized, strError );
-        }
-        ++ optsDiscover.cntFailed;
-        return;
-    }
     joNode.imaInfo = joOut.result;
     if( isSChainNodeFullyDiscovered( joNode ) )
         ++ optsDiscover.nCountReceivedImaDescriptions;
@@ -405,34 +396,24 @@ async function discoverSChainWalkNodes( optsDiscover ) {
             }
         } catch ( err ) { }
         const rpcCallOpts = null;
+        let joCall = null;
         try {
-            await rpcCall.create( strNodeURL, rpcCallOpts, async function( joCall, err ) {
-                if( err ) {
-                    if( ! optsDiscover.isSilentReDiscovery ) {
-                        log.critical( "{p}JSON RPC call(creation) to S-Chain node {} failed",
-                            optsDiscover.strLogPrefix, strNodeDescColorized );
-                    }
-                    ++ optsDiscover.cntFailed;
-                    if( joCall )
-                        await joCall.disconnect();
-                    return;
-                }
-                const joDataIn = { "method": "skale_imaInfo", "params": { } };
-                if( isSendImaAgentIndex() )
-                    joDataIn.params.fromImaAgentIndex = optsDiscover.imaState.nNodeNumber;
-                joCall.call( joDataIn, function( joIn, joOut, err ) {
-                    handleDiscoverSkaleImaInfoResult(
-                        optsDiscover, strNodeDescColorized, joNode, joCall, joIn, joOut, err );
-                } );
-            } );
+            joCall = await rpcCall.create( strNodeURL, rpcCallOpts );
+            const joIn = { "method": "skale_imaInfo", "params": { } };
+            if( isSendImaAgentIndex() )
+                joIn.params.fromImaAgentIndex = optsDiscover.imaState.nNodeNumber;
+            const joOut = await joCall.call( joIn );
+            await handleDiscoverSkaleImaInfoResult(
+                optsDiscover, strNodeDescColorized, joNode, joCall, joIn, joOut );
         } catch ( err ) {
             if( ! optsDiscover.isSilentReDiscovery ) {
-                const strError = owaspUtils.extractErrorMessage( err );
-                log.critical( "{p}JSON RPC call(err) to S-Chain node {} was not created: {err}" +
-                        ", stack is:\n{stack}", optsDiscover.strLogPrefix, strNodeDescColorized,
-                strError, err.stack );
+                log.critical(
+                    "{p}JSON RPC call(err) to S-Chain node {} failed: {err}, stack is:\n{stack}",
+                    optsDiscover.strLogPrefix, strNodeDescColorized, err, err.stack );
             }
             ++ optsDiscover.cntFailed;
+            if( joCall )
+                await joCall.disconnect();
         }
     }
 }
@@ -475,7 +456,8 @@ async function discoverSChainWait( optsDiscover ) {
                     optsDiscover.cntNodes );
             }
             clearInterval( iv );
-            optsDiscover.fnAfter( null, optsDiscover.joSChainNetworkInfo );
+            if( optsDiscover.fnAfter )
+                optsDiscover.fnAfter( null, optsDiscover.joSChainNetworkInfo );
             return;
         }
         ++ nWaitAttempt;
@@ -487,10 +469,13 @@ async function discoverSChainWait( optsDiscover ) {
                 log.warning( "{p}This S-Chain discovery will finish due to: {err}",
                     optsDiscover.strLogPrefix, strErrorDescription );
             }
-            if( getSChainDiscoveredNodesCount( optsDiscover.joSChainNetworkInfo ) > 0 )
-                optsDiscover.fnAfter( null, optsDiscover.joSChainNetworkInfo );
-            else
-                optsDiscover.fnAfter( new Error( strErrorDescription ), null );
+            if( getSChainDiscoveredNodesCount( optsDiscover.joSChainNetworkInfo ) > 0 ) {
+                if( optsDiscover.fnAfter )
+                    optsDiscover.fnAfter( null, optsDiscover.joSChainNetworkInfo );
+            } else {
+                if( optsDiscover.fnAfter )
+                    optsDiscover.fnAfter( new Error( strErrorDescription ), null );
+            }
             return;
         }
         if( ! optsDiscover.isSilentReDiscovery ) {
@@ -501,19 +486,7 @@ async function discoverSChainWait( optsDiscover ) {
     }, nWaitStepMilliseconds );
 }
 
-async function handleDiscoverSkaleNodesRpcInfoResult(
-    optsDiscover, scURL, joCall, joIn, joOut, err
-) {
-    if( err ) {
-        if( ! optsDiscover.isSilentReDiscovery ) {
-            const strError = owaspUtils.extractErrorMessage( err );
-            log.critical( "{p}JSON RPC call to (own) S-Chain {url} failed, error: {err}",
-                optsDiscover.strLogPrefix, scURL, strError );
-        }
-        optsDiscover.fnAfter( err, null );
-        await joCall.disconnect();
-        throw err;
-    }
+async function handleDiscoverSkaleNodesRpcInfoResult( optsDiscover, scURL, joCall, joIn, joOut ) {
     if( ! optsDiscover.isSilentReDiscovery ) {
         log.trace( "{p}OK, got (own) S-Chain network information: {}",
             optsDiscover.strLogPrefix, joOut.result );
@@ -529,7 +502,8 @@ async function handleDiscoverSkaleNodesRpcInfoResult(
             log.critical( "{p}Network was not detected via call to {url}: {err}",
                 optsDiscover.strLogPrefix, scURL, err2 );
         }
-        optsDiscover.fnAfter( err2, null );
+        if( optsDiscover.fnAfter )
+            optsDiscover.fnAfter( err2, null );
         await joCall.disconnect();
         throw err2;
     }
@@ -563,15 +537,18 @@ async function handleDiscoverSkaleNodesRpcInfoResult(
         const err = new Error( "Not enough nodes available on S-Chain, " +
             `total ${optsDiscover.cntNodes}, available ${optsDiscover.nCountAvailable}, ` +
             `expected at least ${optsDiscover.nCountToWait}` );
-        optsDiscover.fnAfter( err, null );
+        if( optsDiscover.fnAfter )
+            optsDiscover.fnAfter( err, null );
         throw err;
     }
     let rv = false;
-    await discoverSChainWait( optsDiscover ).then( () => {
-        optsDiscover.fnAfter( null, optsDiscover.joSChainNetworkInfo );
+    await discoverSChainWait( optsDiscover ).then( function() {
+        if( optsDiscover.fnAfter )
+            optsDiscover.fnAfter( null, optsDiscover.joSChainNetworkInfo );
         rv = true;
-    } ).catch( ( err ) => {
-        optsDiscover.fnAfter( err, null );
+    } ).catch( function( err ) {
+        if( optsDiscover.fnAfter )
+            optsDiscover.fnAfter( err, null );
     } );
     return rv;
 }
@@ -596,49 +573,36 @@ export async function discoverSChainNetwork(
         optsDiscover.nCountToWait == undefined ||
         optsDiscover.nCountToWait < 0 )
         optsDiscover.nCountToWait = 0;
-    optsDiscover.fnAfter = optsDiscover.fnAfter || function() {};
     if( !optsDiscover.isSilentReDiscovery )
         log.information( "{p}This S-Chain discovery will start...", optsDiscover.strLogPrefix );
+    let joCall = null;
     try {
         const scURL = optsDiscover.imaState.chainProperties.sc.strURL;
         const rpcCallOpts = null;
-        await rpcCall.create( scURL, rpcCallOpts, async function( joCall, err ) {
-            if( err ) {
-                const strError = owaspUtils.extractErrorMessage( err );
-                if( ! optsDiscover.isSilentReDiscovery ) {
-                    log.critical(
-                        "{p}JSON RPC call to (own) S-Chain {url} failed: {err}",
-                        optsDiscover.strLogPrefix, scURL, strError );
-                }
-                optsDiscover.fnAfter( err, null );
-                if( joCall )
-                    await joCall.disconnect();
-                throw err;
-            }
-            const joDataIn = { "method": "skale_nodesRpcInfo", "params": { } };
-            if( isSendImaAgentIndex() )
-                joDataIn.params.fromImaAgentIndex = optsDiscover.imaState.nNodeNumber;
-            await joCall.call( joDataIn, async function( joIn, joOut, err ) {
-                await handleDiscoverSkaleNodesRpcInfoResult(
-                    optsDiscover, scURL, joCall, joIn, joOut, err )
-                    .catch( function( err ) {
-                        log.critical(
-                            "{p}JSON RPC call(discoverSChainNetwork) error: " +
-                        "{err}, stack is:\n{stack}", optsDiscover.strLogPrefix,
-                            strError, err.stack );
-                    } );
-            } );
+        joCall = await rpcCall.create( scURL, rpcCallOpts );
+        const joIn = { "method": "skale_nodesRpcInfo", "params": { } };
+        if( isSendImaAgentIndex() )
+            joIn.params.fromImaAgentIndex = optsDiscover.imaState.nNodeNumber;
+        const joOut = await joCall.call( joIn );
+        await handleDiscoverSkaleNodesRpcInfoResult(
+            optsDiscover, scURL, joCall, joIn, joOut
+        ).catch( function( err ) {
+            log.critical(
+                "{p}JSON RPC call(in discoverSChainNetwork) error: {err}, stack is:\n{stack}",
+                optsDiscover.strLogPrefix, err, err.stack );
         } );
     } catch ( err ) {
         if( ! optsDiscover.isSilentReDiscovery ) {
-            const strError = owaspUtils.extractErrorMessage( err );
             log.critical(
-                "{p}JSON RPC call(discoverSChainNetwork) to S-Chain was not created: " +
+                "{p}JSON RPC call(discoverSChainNetwork) to S-Chain failed: " +
                 "{err}, stack is:\n{stack}", optsDiscover.strLogPrefix,
-                strError, err.stack );
+                err, err.stack );
         }
         optsDiscover.joSChainNetworkInfo = null;
-        optsDiscover.fnAfter( err, null );
+        if( optsDiscover.fnAfter )
+            optsDiscover.fnAfter( err, null );
+        if( joCall )
+            await joCall.disconnect();
         throw err;
     }
     return optsDiscover.joSChainNetworkInfo;
@@ -696,10 +660,10 @@ export async function doPeriodicSChainNetworkDiscoveryIfNeeded(
             nCountToWait = cntNodesOnChain;
         if( !isSilentReDiscovery )
             log.information( "This S-Chain discovery will be done for periodic discovery update" );
-
         await discoverSChainNetwork(
             null, isSilentReDiscovery, joPrevSChainNetworkInfo, nCountToWait );
         joPrevSChainNetworkInfo = imaState.joSChainNetworkInfo;
+        imaState.joSChainNetworkInfo = joSChainNetworkInfo;
         if( checkPeriodicDiscoveryNoLongerNeeded(
             joPrevSChainNetworkInfo, isSilentReDiscovery ) ) {
             if( ! isSilentReDiscovery )

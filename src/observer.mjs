@@ -1276,29 +1276,22 @@ export function pickRandomSChainUrl( joSChain ) {
 }
 
 export async function discoverChainId( strURL ) {
-    let ret = null;
+    let ret = null, joCall = null;
     const rpcCallOpts = null;
-    await rpcCall.create( strURL, rpcCallOpts, async function( joCall, err ) {
-        if( err ) {
-            if( joCall )
-                await joCall.disconnect();
+    try {
+        joCall = await rpcCall.create( strURL, rpcCallOpts );
+        const joIn = { "method": "eth_chainId", "params": [] };
+        const joOut = await joCall.call( joIn );
+        if( ! ( "result" in joOut && joOut.result ) ) {
+            await joCall.disconnect();
             return;
         }
-        await joCall.call( {
-            "method": "eth_chainId",
-            "params": []
-        }, async function( joIn, joOut, err ) {
-            if( err ) {
-                await joCall.disconnect();
-                return;
-            }
-            if( ! ( "result" in joOut && joOut.result ) ) {
-                await joCall.disconnect();
-                return;
-            }
-            ret = joOut.result;
+        ret = joOut.result;
+        await joCall.disconnect();
+    } catch ( err ) {
+        if( joCall )
             await joCall.disconnect();
-        } ); // joCall.call ...
-    } ); // rpcCall.create ...
+        return;
+    }
     return ret;
 }

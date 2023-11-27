@@ -228,18 +228,16 @@ function initMonitoringServer() {
                     throw new Error( `Unknown method name ${joMessage.method} was specified` );
                 } // switch( joMessage.method )
             } catch ( err ) {
-                const strError = owaspUtils.extractErrorMessage( err );
                 log.error( "{p}Bad message from {}: {}, error is: {err}, stack is:\n{stack}",
-                    strLogPrefix, ip, message, strError, err.stack );
+                    strLogPrefix, ip, message, err, err.stack );
             }
             try {
                 if( imaState.bLogMonitoringServer )
                     log.trace( "{p}>>> answer to {}: {}", strLogPrefix, ip, joAnswer );
                 wsPeer.send( JSON.stringify( joAnswer ) );
             } catch ( err ) {
-                const strError = owaspUtils.extractErrorMessage( err );
                 log.error( "{p}Failed to sent answer to {}, error is: {err}, stack is:\n{stack}",
-                    strLogPrefix, ip, strError, err.stack );
+                    strLogPrefix, ip, err, err.stack );
             }
         } );
     } );
@@ -265,9 +263,8 @@ function initJsonRpcServer() {
                 res.status( 200 ).send( JSON.stringify( joAnswer ) );
                 log.trace( "{p}>>> did sent answer to {}: ", strLogPrefix, ip, joAnswer );
             } catch ( err ) {
-                const strError = owaspUtils.extractErrorMessage( err );
                 log.error( "{p}Failed to sent answer {} to {}, error is: {err}, stack is:\n{stack}",
-                    strLogPrefix, joAnswer, ip, strError, err.stack );
+                    strLogPrefix, joAnswer, ip, err, err.stack );
             }
         };
         let joAnswer = {
@@ -349,9 +346,8 @@ function initJsonRpcServer() {
                 joAnswer.error = "internal error, null data returned";
             }
         } catch ( err ) {
-            const strError = owaspUtils.extractErrorMessage( err );
             log.error( "{p}Bad message from {}: {}, error is: {err}, stack is:\n{stack}",
-                strLogPrefix, ip, message, strError, err.stack );
+                strLogPrefix, ip, message, err, err.stack );
         }
         if( ! isSkipMode )
             fnSendAnswer( joAnswer );
@@ -456,6 +452,7 @@ async function main() {
                         discoveryTools.doPeriodicSChainNetworkDiscoveryIfNeeded(
                             isSilentReDiscovery, fnOnPeriodicDiscoveryResultAvailable );
                     } );
+                imaState.joSChainNetworkInfo = joSChainNetworkInfo;
                 doTheJob();
                 // Finish of IMA Agent startup,
                 // everything else is in async calls executed later
@@ -464,6 +461,7 @@ async function main() {
             ).catch( ( err ) => {
                 const strError = owaspUtils.extractErrorMessage( err );
                 log.critical( "S-Chain network discovery failed: {err}", strError );
+                doTheJob();
             } );
         }
     } else {

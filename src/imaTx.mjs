@@ -112,7 +112,7 @@ export async function dryRunCall(
         return null; // success
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
-        details.error( "{p}dry-run error: {err}", strLogPrefix, strError );
+        details.error( "{p}dry-run error: {err}", strLogPrefix, err );
         if( dryRunIsIgnored() )
             return null;
         return strError;
@@ -716,10 +716,9 @@ export class TransactionCustomizer {
             estimatedGas = await joContract.estimateGas[strMethodName]( ...arrArguments, callOpts );
             details.success( "{p}estimate-gas success: {}", strLogPrefix, estimatedGas );
         } catch ( err ) {
-            const strError = owaspUtils.extractErrorMessage( err );
             details.error(
                 "{p}Estimate-gas error: {err}, default recommended gas value will be used " +
-                "instead of estimated, stack is:\n{stack}", strLogPrefix, strError, err.stack );
+                "instead of estimated, stack is:\n{stack}", strLogPrefix, err, err.stack );
         }
         estimatedGas = owaspUtils.parseIntOrHex( owaspUtils.toBN( estimatedGas ).toString() );
         if( estimatedGas == 0 ) {

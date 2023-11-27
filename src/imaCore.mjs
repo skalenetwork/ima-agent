@@ -367,17 +367,16 @@ async function gatherMessages( optsTransfer ) {
                     log.posNeg( bSecurityCheckPassed, "PASSED", "FAILED" ) );
             } catch ( err ) {
                 bSecurityCheckPassed = false;
-                const strError = owaspUtils.extractErrorMessage( err );
                 optsTransfer.details.critical(
                     "{p}Exception(evaluate block depth) while getting transaction hash and " +
                     "block number during {bright}: {err}, stack is:\n{stack}",
-                    optsTransfer.strLogPrefix, optsTransfer.strActionName, strError, err.stack );
+                    optsTransfer.strLogPrefix, optsTransfer.strActionName, err, err.stack );
                 if( log.id != optsTransfer.details.id ) {
                     log.critical(
                         "{p}Exception(evaluate block depth) while getting transaction hash and " +
                         "block number during {bright}: {err}, stack is:\n{stack}",
                         optsTransfer.strLogPrefix, optsTransfer.strActionName,
-                        strError, err.stack );
+                        err, err.stack );
                 }
                 optsTransfer.details.exposeDetailsTo(
                     log, optsTransfer.strGatheredDetailsName, false );
@@ -431,17 +430,15 @@ async function gatherMessages( optsTransfer ) {
                     log.posNeg( bSecurityCheckPassed, "PASSED", "FAILED" ) );
             } catch ( err ) {
                 bSecurityCheckPassed = false;
-                const strError = owaspUtils.extractErrorMessage( err );
                 optsTransfer.details.critical(
                     "{p}Exception(evaluate block age) while getting block number and timestamp " +
                     "during {bright}: {err}, stack is:\n{stack}", optsTransfer.strLogPrefix,
-                    optsTransfer.strActionName, strError, err.stack );
+                    optsTransfer.strActionName, err, err.stack );
                 if( log.id != optsTransfer.details.id ) {
                     log.critical(
                         "{p}Exception(evaluate block age) while getting block number and " +
                         "timestamp during {bright}: {err}, stack is:\n{stack}",
-                        optsTransfer.strLogPrefix, optsTransfer.strActionName, strError,
-                        err.stack );
+                        optsTransfer.strLogPrefix, optsTransfer.strActionName, err, err.stack );
                 }
                 optsTransfer.details.exposeDetailsTo(
                     log, optsTransfer.strGatheredDetailsName, false );
@@ -487,11 +484,10 @@ async function preCheckAllMessagesSign( optsTransfer, err, jarrMessages, joGlueR
         log.debug( strDidInvokedSigningCallbackMessage );
     if( err ) {
         optsTransfer.bErrorInSigningMessages = true;
-        const strError = owaspUtils.extractErrorMessage( err );
         optsTransfer.details.critical( "{p}Error signing messages: {err}",
-            optsTransfer.strLogPrefix, strError );
+            optsTransfer.strLogPrefix, err );
         if( log.id != optsTransfer.details.id )
-            log.critical( "{p}Error signing messages: {err}",optsTransfer.strLogPrefix, strError );
+            log.critical( "{p}Error signing messages: {err}",optsTransfer.strLogPrefix, err );
         imaTransferErrorHandling.saveTransferError(
             optsTransfer.strTransferErrorCategoryName, optsTransfer.details.toString() );
         return false;
@@ -674,12 +670,11 @@ async function handleAllMessagesSigning( optsTransfer ) {
             } ).catch( ( err ) => {
             // callback fn as argument of optsTransfer.fnSignMessages
             optsTransfer.bErrorInSigningMessages = true;
-            const strError = owaspUtils.extractErrorMessage( err );
             optsTransfer.details.error( "{p}Problem in transfer handler(in signer): {err}",
-                optsTransfer.strLogPrefix, strError );
+                optsTransfer.strLogPrefix, err );
             if( log.id != optsTransfer.details.id ) {
                 log.error( "{p}Problem in transfer handler(in signer): {err}",
-                    optsTransfer.strLogPrefix, strError );
+                    optsTransfer.strLogPrefix, err );
             }
             imaTransferErrorHandling.saveTransferError(
                 optsTransfer.strTransferErrorCategoryName, optsTransfer.details.toString() );
@@ -689,12 +684,11 @@ async function handleAllMessagesSigning( optsTransfer ) {
             throw errFinal;
         return true;
     } catch ( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
         optsTransfer.details.error( "{p}Problem in transfer handler(general): {err}",
-            optsTransfer.strLogPrefix, strError );
+            optsTransfer.strLogPrefix, err );
         if( log.id != optsTransfer.details.id ) {
             log.error( "{p}Problem in transfer handler(general): {err}",
-                optsTransfer.strLogPrefix, strError );
+                optsTransfer.strLogPrefix, err );
         }
         imaTransferErrorHandling.saveTransferError( optsTransfer.strTransferErrorCategoryName,
             optsTransfer.details.toString() );
@@ -1153,10 +1147,9 @@ export async function doTransfer(
         return true;
     } catch ( err ) {
         gIsOneTransferInProgressInThisThread = false;
-        const strError = owaspUtils.extractErrorMessage( err );
         optsTransfer.details.error(
             "{p}Transfer loop step failed with error: {err} in {}, stack is:\n{stack}",
-            optsTransfer.strLogPrefix, strError, threadInfo.threadDescription(), err.stack );
+            optsTransfer.strLogPrefix, err, threadInfo.threadDescription(), err.stack );
         if( log.exposeDetailsGet() && optsTransfer.details.exposeDetailsTo ) {
             optsTransfer.details.exposeDetailsTo(
                 log, optsTransfer.strGatheredDetailsName, true );
@@ -1271,9 +1264,8 @@ export async function doAllS2S( // s-chain --> s-chain
             }
         } catch ( err ) {
             bOK = false;
-            const strError = owaspUtils.extractErrorMessage( err );
             log.error( "S2S step error from S-Chain {}, error is: {err} in {}, stack is:\n{stack}",
-                chainNameSrc, strError, threadInfo.threadDescription(), err.stack );
+                chainNameSrc, err, threadInfo.threadDescription(), err.stack );
             imaState.loopState.s2s.isInProgress = false;
             await pwa.notifyOnLoopEnd( imaState, "s2s", nIndexS2S );
         }

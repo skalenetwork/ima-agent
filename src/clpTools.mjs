@@ -1444,16 +1444,8 @@ export function commandLineTaskLoopSimple() {
     } );
 }
 
-async function handleBrowseSkaleModesRpcInfoResult(
-    strLogPrefix, joCall, joIn, joOut, err
-) {
+async function handleBrowseSkaleModesRpcInfoResult( strLogPrefix, joCall, joIn, joOut ) {
     const imaState = state.get();
-    if( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
-        log.fatal( "JSON RPC call to S-Chain failed, error: {err}", strError );
-        await joCall.disconnect();
-        process.exit( 157 );
-    }
     log.information( "{p}S-Chain network information: {}",
         strLogPrefix, joOut.result );
     let nCountReceivedImaDescriptions = 0;
@@ -1467,30 +1459,23 @@ async function handleBrowseSkaleModesRpcInfoResult(
         }
         const strNodeURL = imaUtils.composeSChainNodeUrl( joNode );
         const rpcCallOpts = null;
-        await rpcCall.create(
-            strNodeURL,
-            rpcCallOpts,
-            async function( joCall, err ) {
-                if( err ) {
-                    log.fatal( "JSON RPC call to S-Chain failed" );
-                    await joCall.disconnect();
-                    process.exit( 158 );
-                }
-                const joDataIn = { "method": "skale_imaInfo", "params": { } };
-                if( discoveryTools.isSendImaAgentIndex() )
-                    joDataIn.params.fromImaAgentIndex = imaState.nNodeNumber;
-                await joCall.call( joDataIn, async function( joIn, joOut, err ) {
-                    ++ nCountReceivedImaDescriptions;
-                    if( err ) {
-                        const strError = owaspUtils.extractErrorMessage( err );
-                        log.fatal( "JSON RPC call to S-Chain failed, error: {err}", strError );
-                        process.exit( 159 );
-                    }
-                    log.information( "{p}Node {} IMA information: {}",
-                        strLogPrefix, joNode.nodeID, joOut.result );
-                    await joCall.disconnect();
-                } );
-            } );
+        let joCall = null;
+        try {
+            joCall = await rpcCall.create( strNodeURL, rpcCallOpts );
+            const jIn = { "method": "skale_imaInfo", "params": { } };
+            if( discoveryTools.isSendImaAgentIndex() )
+                jIn.params.fromImaAgentIndex = imaState.nNodeNumber;
+            const joOut = await joCall.call( joIn );
+            ++ nCountReceivedImaDescriptions;
+            log.information( "{p}Node {} IMA information: {}",
+                strLogPrefix, joNode.nodeID, joOut.result );
+            await joCall.disconnect();
+        } catch ( err ) {
+            log.fatal( "JSON RPC call to S-Chain failed, error: {err}", err );
+            if( joCall )
+                await joCall.disconnect();
+            process.exit( 159 );
+        }
     }
     const iv = setInterval( function() {
         if( nCountReceivedImaDescriptions == jarrNodes.length ) {
@@ -1514,22 +1499,20 @@ export function commandLineTaskBrowseSChain() {
             }
             log.information( "{p}Downloading S-Chain network information...", strLogPrefix );
             const rpcCallOpts = null;
-            await rpcCall.create( imaState.chainProperties.sc.strURL, rpcCallOpts,
-                async function( joCall, err ) {
-                    if( err ) {
-                        log.fatal( "JSON RPC call to S-Chain failed" );
-                        if( joCall )
-                            await joCall.disconnect();
-                        process.exit( 156 );
-                    }
-                    const joDataIn = { "method": "skale_nodesRpcInfo", "params": { } };
-                    if( discoveryTools.isSendImaAgentIndex() )
-                        joDataIn.params.fromImaAgentIndex = imaState.nNodeNumber;
-                    await joCall.call( joDataIn, async function( joIn, joOut, err ) {
-                        await handleBrowseSkaleModesRpcInfoResult(
-                            strLogPrefix, joCall, joIn, joOut, err );
-                    } );
-                } );
+            let joCall = null;
+            try {
+                joCall = await rpcCall.create( imaState.chainProperties.sc.strURL, rpcCallOpts );
+                const joIn = { "method": "skale_nodesRpcInfo", "params": { } };
+                if( discoveryTools.isSendImaAgentIndex() )
+                    joIn.params.fromImaAgentIndex = imaState.nNodeNumber;
+                const joOut = await joCall.call( joIn );
+                await handleBrowseSkaleModesRpcInfoResult( strLogPrefix, joCall, joIn, joOut );
+            } catch ( err ) {
+                log.fatal( "JSON RPC call to S-Chain failed, error: {err}", err );
+                if( joCall )
+                    await joCall.disconnect();
+                process.exit( 159 );
+            }
             return true;
         }
     } );

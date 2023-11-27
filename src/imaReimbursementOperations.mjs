@@ -61,13 +61,12 @@ export async function reimbursementShowBalance(
         details.close();
         return xWei;
     } catch ( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != details.id ) {
             log.critical( "{p}Payment error in reimbursementShowBalance(): {err}, " +
-                "stack is:\n{stack}", strLogPrefix, strError, err.stack );
+                "stack is:\n{stack}", strLogPrefix, err, err.stack );
         }
         details.critical( "{p}Payment error in reimbursementShowBalance(): {err}, " +
-            "stack is:\n{stack}", strLogPrefix, strError, err.stack );
+            "stack is:\n{stack}", strLogPrefix, err, err.stack );
         details.exposeDetailsTo( log, "reimbursementShowBalance", false );
         details.close();
         return 0;
@@ -149,13 +148,12 @@ export async function reimbursementEstimateAmount(
         details.close();
         return amountToRecharge;
     } catch ( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != details.id ) {
             log.critical( "{p} Payment error in reimbursementEstimateAmount(): {err}, " +
-                "stack is:\n{stack}", strLogPrefix, strError, err.stack );
+                "stack is:\n{stack}", strLogPrefix, err, err.stack );
         }
         details.critical( "{p} Payment error in reimbursementEstimateAmount(): {err}, " +
-            "stack is:\n{stack}", strLogPrefix, strError, err.stack );
+            "stack is:\n{stack}", strLogPrefix, err, err.stack );
         details.exposeDetailsTo( log, "reimbursementEstimateAmount", false );
         details.close();
         return 0;
@@ -210,13 +208,12 @@ export async function reimbursementWalletRecharge(
             } );
         }
     } catch ( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != details.id ) {
             log.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-                strLogPrefix, strActionName, strError, err.stack );
+                strLogPrefix, strActionName, err, err.stack );
         }
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, strError, err.stack );
+            strLogPrefix, strActionName, err, err.stack );
         details.exposeDetailsTo( log, "reimbursementWalletRecharge", false );
         details.close();
         return false;
@@ -282,13 +279,12 @@ export async function reimbursementWalletWithdraw(
             } );
         }
     } catch ( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != details.id ) {
             log.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-                strLogPrefix, strActionName, strError, err.stack );
+                strLogPrefix, strActionName, err, err.stack );
         }
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, strError, err.stack );
+            strLogPrefix, strActionName, err, err.stack );
         details.exposeDetailsTo( log, "reimbursementWalletWithdraw", false );
         details.close();
         return false;
@@ -352,13 +348,12 @@ export async function reimbursementSetRange(
             } );
         }
     } catch ( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != details.id ) {
             log.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-                strLogPrefix, strActionName, strError, err.stack );
+                strLogPrefix, strActionName, err, err.stack );
         }
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, strError, err.stack );
+            strLogPrefix, strActionName, err, err.stack );
         details.exposeDetailsTo( log, "reimbursementSetRange", false );
         details.close();
         return false;

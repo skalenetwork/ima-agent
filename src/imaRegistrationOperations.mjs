@@ -24,7 +24,6 @@
  */
 
 import * as log from "./log.mjs";
-import * as owaspUtils from "./owaspUtils.mjs";
 import * as imaHelperAPIs from "./imaHelperAPIs.mjs";
 import * as imaTx from "./imaTx.mjs";
 import * as threadInfo from "./threadInfo.mjs";
@@ -46,13 +45,12 @@ export async function invokeHasChain(
         details.success( "{p}Got joLinker.hasSchain() status is: {}", strLogPrefix, bHasSchain );
         return bHasSchain;
     } catch ( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != details.id ) {
             log.critical( "{p}Error in invokeHasChain() during {bright}: {err}, stack is:\n{stack}",
-                strLogPrefix, strActionName, strError, err.stack );
+                strLogPrefix, strActionName, err, err.stack );
         }
         details.critical( "{p}Error in invokeHasChain() during {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, strError, err.stack );
+            strLogPrefix, strActionName, err, err.stack );
     }
     return false;
 }
@@ -111,15 +109,14 @@ export async function checkIsRegisteredSChainInDepositBoxes( // step 1
         details.close();
         return bIsRegistered;
     } catch ( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != details.id ) {
             log.critical(
                 "{p}Error in checkIsRegisteredSChainInDepositBoxes(reg-step1)() during {bright}: " +
-                "{err}, stack is:\n{stack}", strLogPrefix, strActionName, strError, err.stack );
+                "{err}, stack is:\n{stack}", strLogPrefix, strActionName, err, err.stack );
         }
         details.critical(
             "{p}Error in checkIsRegisteredSChainInDepositBoxes(reg-step1)() during {bright}: " +
-            "{err}, stack is:\n{stack}", strLogPrefix, strActionName, strError, err.stack );
+            "{err}, stack is:\n{stack}", strLogPrefix, strActionName, err, err.stack );
         details.exposeDetailsTo( log, "checkIsRegisteredSChainInDepositBoxes", false );
         details.close();
     }
@@ -199,13 +196,12 @@ export async function registerSChainInDepositBoxes( // step 1
         if( ! isSChainStatusOKay )
             throw new Error( "S-Chain ownership status check timeout" );
     } catch ( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
         if( log.id != details.id ) {
             log.critical( "{p}Error in registerSChainInDepositBoxes() during {bright}: {err}" +
-                ", stack is:\n{stack}", strLogPrefix, strActionName, strError, err.stack );
+                ", stack is:\n{stack}", strLogPrefix, strActionName, err, err.stack );
         }
         details.critical( "{p}Error in registerSChainInDepositBoxes() during {bright}: {err}" +
-            ", stack is:\n{stack}", strLogPrefix, strActionName, strError, err.stack );
+            ", stack is:\n{stack}", strLogPrefix, strActionName, err, err.stack );
         details.exposeDetailsTo( log, "registerSChainInDepositBoxes", false );
         details.close();
         return null;
