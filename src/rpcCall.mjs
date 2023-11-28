@@ -280,13 +280,17 @@ export async function doCall( joCall, joIn, fn ) {
                 req.on( "error", err => {
                     log.error( "{url} REST error {err}", joCall.url, err.toString() );
                     joOut = null;
-                    errCall = "RPC call error: " + err.toString();
+                    errCall = `HTTP(S)/RPC call(event) error: ${err.toString()}`;
                     reject( errCall );
                 } );
                 req.write( strBody );
                 req.end();
             } );
-            await promiseComplete;
+            await promiseComplete.catch( function( err ) {
+                log.error( "{url} HTTP call error {err}", joCall.url, err.toString() );
+                if( ! errCall )
+                    errCall = `HTTP(S)/RPC call(catch) error: ${err.toString()}`;
+            } );
         } else {
             try {
                 const response = await urllib.request( joCall.url, {
@@ -521,15 +525,15 @@ export async function checkTcp( strHost, nPort, nTimeoutMilliseconds, isLog ) {
     try {
         const promiseCompleteTcpCheck = checkTcpPromise(
             strHost, nPort, nTimeoutMilliseconds, isLog )
-            .then( () => ( isOnline = true ) )
-            .catch( () => ( isOnline = false ) )
+            .then( function() { isOnline = true; } )
+            .catch( function() { isOnline = false; } )
             ;
         if( isLog ) {
             console.log(
                 `${gStrTcpConnectionHeader}Waiting for ` +
                 `TCP connection to ${strHost}:${nPort} check done...` );
         }
-        await promiseCompleteTcpCheck;
+        await promiseCompleteTcpCheck.catch( function() { isOnline = false; } );
         if( isLog ) {
             console.log(
                 `${gStrTcpConnectionHeader}TCP connection ` +
