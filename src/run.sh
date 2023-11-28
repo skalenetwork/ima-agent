@@ -119,4 +119,4 @@ IMA_LOOP_CMD="node $DIR/main.mjs --loop $BASE_OPTIONS"
 NETWORK_BROWSER_CMD="cd $DIR/../network-browser && bun browse"
 
 echo "$(date) - Running IMA loop and network-browser"
-node $DIR/startup.js "$IMA_LOOP_CMD" "$NETWORK_BROWSER_CMD"
+node "$DIR/startup.js" "$IMA_LOOP_CMD" "$NETWORK_BROWSER_CMD"
