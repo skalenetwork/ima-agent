@@ -4,6 +4,7 @@
     "author": "SKALE Labs and contributors",
     "scripts": {
         "lint-check": "cd src; yarn lint-check; cd ..",
+        "lint-nb": "cd network-browser; yarn lint-check; cd ..",
         "lint-fix": "cd src; yarn lint-fix; cd ..",
         "postinstall": "cd src; yarn install; cd ..; cd IMA; yarn install; cd ..",
         "check-outdated": "yarn outdated; cd src; yarn outdated; cd ..; cd IMA; yarn outdated; cd ..",

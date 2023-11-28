@@ -23,8 +23,8 @@ module.exports = {
     },
     rules: {
         '@typescript-eslint/indent': ['error', 4],
-        '@typescript-eslint/semi': ['error', 'always'],
         '@typescript-eslint/quotes': ['error', 'single'],
+        '@typescript-eslint/space-before-function-paren': 0,
         'no-unused-vars': 2
     }
 }
