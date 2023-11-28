@@ -1081,9 +1081,16 @@ async function doSignConfigureChainAccessParams( optsSignOperation ) {
     }
 }
 
-async function doSignProcessHandleCall(
-    optsSignOperation, joNode, joParams, joCall, joIn, joOut, strNodeURL, i
-) {
+async function doSignProcessHandleCall( optsSignOperation, joParams, joCall, joIn, joOut, i ) {
+    const imaState = state.get();
+    const isThisNode = ( i == imaState.nNodeNumber ) ? true : false;
+    const joNode = optsSignOperation.jarrNodes[i];
+    const strNodeURL = optsSignOperation.imaState.isCrossImaBlsMode
+        ? imaUtils.composeImaAgentNodeUrl( joNode, isThisNode )
+        : imaUtils.composeSChainNodeUrl( joNode );
+    const strNodeDescColorized = log.fmtDebug( "{url} ({}/{}, ID {}), sequence ID is {}",
+        strNodeURL, i, optsSignOperation.jarrNodes.length, joNode.nodeID,
+        optsSignOperation.sequenceId );
     ++optsSignOperation.joGatheringTracker.nCountReceived;
     optsSignOperation.details.trace(
         "{p}{} Got answer from {bright}(node #{} via {url} for transfer from chain {} " +
@@ -1229,8 +1236,7 @@ async function doSignProcessOneImpl( i, optsSignOperation ) {
         joParams, optsSignOperation.sequenceId );
     const joIn = { "method": "skale_imaVerifyAndSign", "params": joParams };
     const joOut = await joCall.call( joIn );
-    await doSignProcessHandleCall(
-        optsSignOperation, joNode, joParams, joCall, joIn, joOut, strNodeURL, i );
+    await doSignProcessHandleCall( optsSignOperation, joParams, joCall, joIn, joOut, i );
 }
 
 async function doSignMessagesImpl(
