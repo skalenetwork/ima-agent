@@ -86,7 +86,7 @@ export async function doConnect( joCall, opts, fn ) {
             } );
             joCall.wsConn.on( "error", async function( err ) {
                 strWsError = err.toString() || "internal web socket error";
-                log.error( "{url} web socket error: {err", joCall.url, err.toString() );
+                log.error( "{url} web socket error: {err}", joCall.url, err );
                 const wsConn = joCall.wsConn;
                 joCall.wsConn = null;
                 wsConn.close();
@@ -94,7 +94,7 @@ export async function doConnect( joCall, opts, fn ) {
             } );
             joCall.wsConn.on( "fail", async function( err ) {
                 strWsError = err.toString() || "internal web socket failure";
-                log.error( "{url} web socket fail: {err}", joCall.url, err.toString() );
+                log.error( "{url} web socket fail: {err}", joCall.url, err );
                 const wsConn = joCall.wsConn;
                 joCall.wsConn = null;
                 wsConn.close();
@@ -254,40 +254,47 @@ export async function doCall( joCall, joIn, fn ) {
             };
             let accumulatedBody = "";
             const promiseComplete = new Promise( ( resolve, reject ) => {
-                const req = https.request( options, res => {
-                    res.setEncoding( "utf8" );
-                    res.on( "data", body => {
-                        accumulatedBody += body;
+                try {
+                    const req = https.request( options, res => {
+                        res.setEncoding( "utf8" );
+                        res.on( "data", body => {
+                            accumulatedBody += body;
+                        } );
+                        res.on( "end", function() {
+                            if( res.statusCode !== 200 ) {
+                                joOut = null;
+                                errCall = "Response ends with bad status code: " +
+                                    res.statusCode.toString();
+                                reject( errCall );
+                            }
+                            try {
+                                joOut = JSON.parse( accumulatedBody );
+                                errCall = null;
+                                resolve( joOut );
+                            } catch ( err ) {
+                                joOut = null;
+                                errCall = "Response body parse error: " + err.toString();
+                                reject( errCall );
+                            }
+                        } );
                     } );
-                    res.on( "end", function() {
-                        if( res.statusCode !== 200 ) {
-                            joOut = null;
-                            errCall = "Response ends with bad status code: " +
-                                res.statusCode.toString();
-                            reject( errCall );
-                        }
-                        try {
-                            joOut = JSON.parse( accumulatedBody );
-                            errCall = null;
-                            resolve( joOut );
-                        } catch ( err ) {
-                            joOut = null;
-                            errCall = "Response body parse error: " + err.toString();
-                            reject( errCall );
-                        }
+                    req.on( "error", err => {
+                        log.error( "{url} REST error {err}", joCall.url, err );
+                        joOut = null;
+                        errCall = `HTTP(S)/RPC call(event) error: ${err.toString()}`;
+                        reject( errCall );
                     } );
-                } );
-                req.on( "error", err => {
-                    log.error( "{url} REST error {err}", joCall.url, err.toString() );
+                    req.write( strBody );
+                    req.end();
+                } catch ( err ) {
+                    log.error( "{url} REST error {err}", joCall.url, err );
                     joOut = null;
-                    errCall = `HTTP(S)/RPC call(event) error: ${err.toString()}`;
+                    errCall = `HTTP(S)/RPC call(processing) error: ${err.toString()}`;
                     reject( errCall );
-                } );
-                req.write( strBody );
-                req.end();
+                }
             } );
             await promiseComplete.catch( function( err ) {
-                log.error( "{url} HTTP call error {err}", joCall.url, err.toString() );
+                log.error( "{url} HTTP call error {err}", joCall.url, err );
                 if( ! errCall )
                     errCall = `HTTP(S)/RPC call(catch) error: ${err.toString()}`;
             } );
@@ -321,7 +328,7 @@ export async function doCall( joCall, joIn, fn ) {
                 joOut = JSON.parse( body );
                 errCall = null;
             } catch ( err ) {
-                log.error( "{url} request error {err}", joCall.url, err.toString() );
+                log.error( "{url} request error {err}", joCall.url, err );
                 joOut = null;
                 errCall = "request error: " + err.toString();
             }
@@ -372,10 +379,16 @@ export async function rpcCallCreate( strURL, opts ) {
                             reject( err );
                         else
                             resolve( joOut );
+                    } ).catch( function( err ) {
+                        log.error(
+                            "{url} JSON RPC call(performer) error: {err}", strURL, err );
                     } );
                 } );
             } );
-            return promiseComplete;
+            return promiseComplete.catch( function( err ) {
+                log.error(
+                    "{url} JSON RPC call(awaiter) error: {err}", strURL, err );
+            } );
         },
         "disconnect": async function( fnAfter ) {
             await doDisconnect( joCall, fnAfter );
