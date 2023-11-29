@@ -1337,6 +1337,7 @@ function commonInitPrintSysInfo() {
     const imaState = state.get();
     const isPrintGathered = ( !!( imaState.isPrintGathered ) );
     if( isPrintGathered ) {
+        log.debug( "This process {sunny} is {}", "versions", process.versions );
         log.debug( "This process {sunny} is {}", "PID", process.pid );
         log.debug( "This process {sunny} is {}", "PPID", process.ppid );
         log.debug( "This process {sunny} is {}", "EGID", process.getegid() );
@@ -1345,6 +1346,8 @@ function commonInitPrintSysInfo() {
         log.debug( "This process {sunny} is {}", "UID", process.getuid() );
         log.debug( "This process {sunny} are {}", "groups", process.getgroups() );
         log.debug( "This process {sunny} is {}", "CWD", process.cwd() );
+        log.debug( "This process {sunny} is {}", "architecture", process.arch );
+        log.debug( "This process {sunny} is {}", "execPath", process.execPath );
         log.debug( "This process {sunny} is {}", "platform", process.platform );
         log.debug( "This process {sunny} is {}", "release",process.release );
         log.debug( "This process {sunny} is {}", "report", process.report );

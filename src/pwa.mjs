@@ -177,12 +177,10 @@ export async function handleLoopStateArrived(
             log.trace( "PWA loop-{} state arrived for node {}, PWA state {}, arrived " +
                 "signature is {}", se, nNodeNumber, joNode.pwaState, signature );
         }
-        const strMessageHash =
-            imaBLS.keccak256ForPendingWorkAnalysis(
-                nNodeNumber, strLoopWorkType, isStart, 0 + ts );
-        const isSignatureOK =
-            await imaBLS.doVerifyReadyHash(
-                strMessageHash, nNodeNumber, signature, imaState.isPrintPWA );
+        const strMessageHash = imaBLS.keccak256ForPendingWorkAnalysis(
+            nNodeNumber, strLoopWorkType, isStart, 0 + ts );
+        const isSignatureOK = await imaBLS.doVerifyReadyHash(
+            strMessageHash, nNodeNumber, signature, imaState.isPrintPWA );
         if( ! isSignatureOK )
             throw new Error( "BLS verification failed" );
         joProps.isInProgress = ( !!isStart );
@@ -238,39 +236,34 @@ async function notifyOnLoopImpl( imaState, strLoopWorkType, nIndexS2S, isStart )
             const joNode = jarrNodes[i];
             const strNodeURL = imaUtils.composeImaAgentNodeUrl( joNode, isThisNode );
             const rpcCallOpts = null;
-            rpcCall.create( // NOTICE: no await here, executed async
-                strNodeURL, rpcCallOpts, async function( joCall, err ) {
-                    if( err ) {
-                        log.error(
-                            "PWA failed to create loop-{} notification RPC call to node #{} with " +
-                            "URL {url}, error is: {err}", se, i, strNodeURL, err );
-                        return;
-                    }
-                    joCall.call( { // NOTICE: no await here, executed async
-                        "method": "skale_imaNotifyLoopWork",
-                        "params": {
-                            "nNodeNumber": 0 + imaState.nNodeNumber,
-                            "strLoopWorkType": "" + strLoopWorkType,
-                            "nIndexS2S": 0 + nIndexS2S,
-                            "isStart": ( !!isStart ),
-                            "ts": nUtcUnixTimeStamp,
-                            "signature": signature
-                        }
-                    }, async function( joIn, joOut, err ) {
-                        if( err ) {
-                            log.error(
-                                "PWA failed to perform loop-{} notification RPC call to node #{} " +
-                                "with URL {url}, error is: {err}", se, i, strNodeURL, err );
-                            await joCall.disconnect();
-                            return;
-                        }
-                        if( imaState.isPrintPWA ) {
-                            log.success( "Was successfully sent PWA loop-{} notification to " +
-                                "node #{} with URL {url}", se, i, strNodeURL );
-                        }
+            let joCall = await rpcCall.create( strNodeURL, rpcCallOpts )
+                .catch( async function( err ) {
+                    log.error(
+                        "PWA failed to perform] loop-{} notification RPC call to node #{} with " +
+                        "URL {url}, error is: {err}", se, i, strNodeURL, err );
+                    if( joCall )
                         await joCall.disconnect();
-                    } ); // joCall.call ...
-                } ); // rpcCall.create ...
+                    joCall = null;
+                } );
+            if( ! joCall )
+                return false;
+            const joIn = {
+                "method": "skale_imaNotifyLoopWork",
+                "params": {
+                    "nNodeNumber": 0 + imaState.nNodeNumber,
+                    "strLoopWorkType": "" + strLoopWorkType,
+                    "nIndexS2S": 0 + nIndexS2S,
+                    "isStart": ( !!isStart ),
+                    "ts": nUtcUnixTimeStamp,
+                    "signature": signature
+                }
+            };
+            await joCall.call( joIn ); // no return value needed here
+            if( imaState.isPrintPWA ) {
+                log.success( "Was successfully sent PWA loop-{} notification to " +
+                    "node #{} with URL {url}", se, i, strNodeURL );
+            }
+            await joCall.disconnect();
         }
     } catch ( err ) {
         log.error( "Exception in PWA notify on loop {}: {err}, stack is:\n{stack}", se,

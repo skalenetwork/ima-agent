@@ -40,10 +40,6 @@ parentPort.on( "message", jo => {
         return;
 } );
 
-const sleep = ( milliseconds ) => {
-    return new Promise( resolve => setTimeout( resolve, milliseconds ) );
-};
-
 function doSendMessage( type, endpoint, workerUUID, data ) {
     const jo = networkLayer.socketReceivedDataReverseMarshall( data );
     const joSend = {
@@ -154,6 +150,7 @@ class ObserverServer extends SocketServer {
         };
         self.mapApiHandlers.periodicCachingStart =
             function( joMessage, joAnswer, eventData, socket ) {
+                self.initLogMethods();
                 self.opts.details.debug( "{} will start periodic SNB refresh ...",
                     threadInfo.threadDescription() );
                 self.periodicCachingStart( socket,
@@ -167,14 +164,15 @@ class ObserverServer extends SocketServer {
                 return joAnswer;
             };
         self.mapApiHandlers.periodicCachingStop =
-        function( joMessage, joAnswer, eventData, socket ) {
-            self.periodicCachingStop();
-            joAnswer.message = {
-                "method": "" + joMessage.method,
-                "error": null
+            function( joMessage, joAnswer, eventData, socket ) {
+                self.initLogMethods();
+                self.periodicCachingStop();
+                joAnswer.message = {
+                    "method": "" + joMessage.method,
+                    "error": null
+                };
+                return joAnswer;
             };
-            return joAnswer;
-        };
         console.log( log.fmtInformation(
             "Initialized in-worker SNB server in {}, U={}",
             threadInfo.threadDescription(), gURL ) );
@@ -220,7 +218,7 @@ class ObserverServer extends SocketServer {
                         threadInfo.threadDescription( false );
                 }
             }
-            await sleep( 5 * 1000 );
+            await threadInfo.sleep( 5 * 1000 );
         }
         self.bIsPeriodicCachingStepInProgress = false;
         if( strError ) {
@@ -283,7 +281,7 @@ class ObserverServer extends SocketServer {
                     return;
                 fnAsyncHandler()
                     .then( () => {
-                    } ).catch( ( err ) => {
+                    } ).catch( function( err ) {
                         self.error( "Periodic SNB caching(sync-delayed) in {} error: {err}",
                             threadInfo.threadDescription(), err );
                     } );
@@ -311,6 +309,8 @@ class ObserverServer extends SocketServer {
     }
     initLogMethods() {
         const self = this;
+        if( "fatal" in self && self.fatal && typeof self.fatal == "function" )
+            return;
         self.fatal = function() {
             if( log.verboseGet() >= log.verboseReversed().fatal ) {
                 self.log( log.getLogLinePrefixFatal() +

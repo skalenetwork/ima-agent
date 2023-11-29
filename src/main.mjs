@@ -43,6 +43,17 @@ import * as state from "./state.mjs";
 // allow self-signed wss and https
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
 
+process.on( "unhandledRejection", function( reason, p ) {
+    log.fatal(
+        "CRITICAL ERROR: unhandled rejection with reason {} and promise {}",
+        reason, p );
+} ).on( "uncaughtException", function( err ) {
+    log.fatal(
+        "CRITICAL ERROR: uncaught exception: {err}, stack is:\n{stack}",
+        err, err.stack );
+    process.exit( 1 );
+} );
+
 function parseCommandLine() {
     const imaState = state.get();
     log.autoEnableColorizationFromCommandLineArgs();
@@ -228,18 +239,16 @@ function initMonitoringServer() {
                     throw new Error( `Unknown method name ${joMessage.method} was specified` );
                 } // switch( joMessage.method )
             } catch ( err ) {
-                const strError = owaspUtils.extractErrorMessage( err );
                 log.error( "{p}Bad message from {}: {}, error is: {err}, stack is:\n{stack}",
-                    strLogPrefix, ip, message, strError, err.stack );
+                    strLogPrefix, ip, message, err, err.stack );
             }
             try {
                 if( imaState.bLogMonitoringServer )
                     log.trace( "{p}>>> answer to {}: {}", strLogPrefix, ip, joAnswer );
                 wsPeer.send( JSON.stringify( joAnswer ) );
             } catch ( err ) {
-                const strError = owaspUtils.extractErrorMessage( err );
                 log.error( "{p}Failed to sent answer to {}, error is: {err}, stack is:\n{stack}",
-                    strLogPrefix, ip, strError, err.stack );
+                    strLogPrefix, ip, err, err.stack );
             }
         } );
     } );
@@ -265,9 +274,8 @@ function initJsonRpcServer() {
                 res.status( 200 ).send( JSON.stringify( joAnswer ) );
                 log.trace( "{p}>>> did sent answer to {}: ", strLogPrefix, ip, joAnswer );
             } catch ( err ) {
-                const strError = owaspUtils.extractErrorMessage( err );
                 log.error( "{p}Failed to sent answer {} to {}, error is: {err}, stack is:\n{stack}",
-                    strLogPrefix, joAnswer, ip, strError, err.stack );
+                    strLogPrefix, joAnswer, ip, err, err.stack );
             }
         };
         let joAnswer = {
@@ -342,12 +350,16 @@ function initJsonRpcServer() {
                 }
                 break;
             default:
-                throw new Error( `Unknown method name ${joMessage.method} was specified` );
+                joAnswer.error = `Unknown method name ${joMessage.method} was specified`;
+                break;
             } // switch( joMessage.method )
+            if( ( !joAnswer ) || typeof joAnswer != "object" ) {
+                joAnswer = {};
+                joAnswer.error = "internal error, null data returned";
+            }
         } catch ( err ) {
-            const strError = owaspUtils.extractErrorMessage( err );
             log.error( "{p}Bad message from {}: {}, error is: {err}, stack is:\n{stack}",
-                strLogPrefix, ip, message, strError, err.stack );
+                strLogPrefix, ip, message, err, err.stack );
         }
         if( ! isSkipMode )
             fnSendAnswer( joAnswer );
@@ -392,6 +404,23 @@ async function doTheJob() {
         process.exit( process.exitCode );
 }
 
+function handleFirstSChainDiscoveryAttemptDone(
+    err, joSChainNetworkInfo, isSilentReDiscovery, fnOnPeriodicDiscoveryResultAvailable ) {
+    if( err ) {
+        // error information is printed by discoveryTools.discoverSChainNetwork()
+        process.exit( 166 );
+    }
+    log.success( "S-Chain network was discovered: {}", joSChainNetworkInfo );
+    const imaState = state.get();
+    imaState.joSChainNetworkInfo = joSChainNetworkInfo;
+    discoveryTools.continueSChainDiscoveryInBackgroundIfNeeded(
+        isSilentReDiscovery, function() {
+            discoveryTools.doPeriodicSChainNetworkDiscoveryIfNeeded(
+                isSilentReDiscovery, fnOnPeriodicDiscoveryResultAvailable );
+        } );
+    imaState.joSChainNetworkInfo = joSChainNetworkInfo;
+}
+
 async function main() {
     log.autoEnableColorizationFromCommandLineArgs();
     const imaState = state.get();
@@ -417,8 +446,7 @@ async function main() {
     initMonitoringServer();
     initJsonRpcServer();
     const isSilentReDiscovery = imaState.isPrintSecurityValues
-        ? false
-        : imaState.joSChainDiscovery.isSilentReDiscovery;
+        ? false : imaState.joSChainDiscovery.isSilentReDiscovery;
     const fnOnPeriodicDiscoveryResultAvailable = function( isFinal ) {
         loop.spreadUpdatedSChainNetwork( isFinal );
     };
@@ -435,34 +463,25 @@ async function main() {
             ( isSilentReDiscovery
                 ? log.fmtWarning( "silent" ) : log.fmtSuccess( "exposed details" ) ) );
         if( ! imaState.bNoWaitSChainStarted ) {
-            discoveryTools.waitUntilSChainStarted().then( function() {
-                // uses call to discoveryTools.discoverSChainNetwork()
-                if( ! isSilentReDiscovery ) {
-                    log.information(
-                        "This S-Chain discovery will be done for command line task handler" );
-                }
-                const nCountToWait = -1;
-                discoveryTools.discoverSChainNetwork( function( err, joSChainNetworkInfo ) {
-                    if( err ) {
-                        // error information is printed by discoveryTools.discoverSChainNetwork()
-                        process.exit( 166 );
-                    }
-                    log.success( "S-Chain network was discovered: {}", joSChainNetworkInfo );
-                    imaState.joSChainNetworkInfo = joSChainNetworkInfo;
-                    discoveryTools.continueSChainDiscoveryInBackgroundIfNeeded(
-                        isSilentReDiscovery, function() {
-                            discoveryTools.doPeriodicSChainNetworkDiscoveryIfNeeded(
-                                isSilentReDiscovery, fnOnPeriodicDiscoveryResultAvailable );
-                        } );
-                    doTheJob();
-                    // Finish of IMA Agent startup,
-                    // everything else is in async calls executed later
-                    return 0;
-                }, isSilentReDiscovery, imaState.joSChainNetworkInfo, nCountToWait
-                ).catch( ( err ) => {
-                    const strError = owaspUtils.extractErrorMessage( err );
-                    log.critical( "S-Chain network discovery failed: {err}", strError );
-                } );
+            await discoveryTools.waitUntilSChainStarted();
+            if( ! isSilentReDiscovery ) {
+                log.information(
+                    "This S-Chain discovery will be done for command line task handler" );
+            }
+            const nCountToWait = -1;
+            discoveryTools.discoverSChainNetwork( function( err, joSChainNetworkInfo ) {
+                handleFirstSChainDiscoveryAttemptDone(
+                    err, joSChainNetworkInfo, isSilentReDiscovery,
+                    fnOnPeriodicDiscoveryResultAvailable );
+                doTheJob();
+                // Finish of IMA Agent startup,
+                // everything else is in async calls executed later
+                return 0;
+            }, isSilentReDiscovery, imaState.joSChainNetworkInfo, nCountToWait
+            ).catch( function( err ) {
+                const strError = owaspUtils.extractErrorMessage( err );
+                log.critical( "S-Chain network discovery failed: {err}", strError );
+                doTheJob();
             } );
         }
     } else {

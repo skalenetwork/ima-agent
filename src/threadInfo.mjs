@@ -29,6 +29,11 @@ import * as log from "./log.mjs";
 const Worker = worker_threads.Worker;
 export { Worker };
 
+const joCustomThreadProperties = {
+    "isSChainsCacheNeeded": true // by default is set to true
+};
+export { joCustomThreadProperties };
+
 export const sleep = ( milliseconds ) => {
     return new Promise( resolve => setTimeout( resolve, milliseconds ) );
 };

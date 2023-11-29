@@ -29,6 +29,7 @@ import * as imaHelperAPIs from "./imaHelperAPIs.mjs";
 import * as imaTx from "./imaTx.mjs";
 import * as imaGasUsage from "./imaGasUsageOperations.mjs";
 import * as imaEventLogScan from "./imaEventLogScan.mjs";
+import * as threadInfo from "./threadInfo.mjs";
 
 export async function getBalanceEth(
     isMainNet,
@@ -50,9 +51,8 @@ export async function getBalanceEth(
         const balance = await ethersProvider.getBalance( strAddress );
         return balance;
     } catch ( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
         log.error( "{p}balance fetching error details: {err}, stack is:\n{stack}",
-            strLogPrefix, strError, err.stack );
+            strLogPrefix, err, err.stack );
     }
     return "<no-data-or-error>";
 }
@@ -123,7 +123,7 @@ export async function doEthPaymentFromMainNet(
         if( joMessageProxyMainNet ) {
             details.debug( "{p}Verifying the {} event of the ", "MessageProxy/{} contract ...",
                 strLogPrefix, strEventName, joMessageProxyMainNet.address );
-            await imaHelperAPIs.sleep(
+            await threadInfo.sleep(
                 imaHelperAPIs.getMillisecondsSleepBeforeFetchOutgoingMessageEvent() );
             const joEvents = await imaEventLogScan.getContractCallEvents(
                 details, strLogPrefix,
@@ -142,13 +142,8 @@ export async function doEthPaymentFromMainNet(
             }
         }
     } catch ( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
-        if( log.id != details.id ) {
-            log.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-                strLogPrefix, strActionName, strError, err.stack );
-        }
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, strError, err.stack );
+            strLogPrefix, strActionName, err, err.stack );
         details.exposeDetailsTo( log, "doEthPaymentFromMainNet", false );
         details.close();
         return false;
@@ -225,7 +220,7 @@ export async function doEthPaymentFromSChain(
         if( joMessageProxySChain ) {
             details.debug( "{p}Verifying the {} event of the MessageProxy/{} contract ...",
                 strLogPrefix, strEventName, joMessageProxySChain.address );
-            await imaHelperAPIs.sleep(
+            await threadInfo.sleep(
                 imaHelperAPIs.getMillisecondsSleepBeforeFetchOutgoingMessageEvent() );
             const joEvents = await imaEventLogScan.getContractCallEvents(
                 details, strLogPrefix,
@@ -244,13 +239,8 @@ export async function doEthPaymentFromSChain(
             }
         }
     } catch ( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
-        if( log.id != details.id ) {
-            log.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-                strLogPrefix, strActionName, strError, err.stack );
-        }
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, strError, err.stack );
+            strLogPrefix, strActionName, err, err.stack );
         details.exposeDetailsTo( log, "doEthPaymentFromSChain", false );
         details.close();
         return false;
@@ -309,13 +299,8 @@ export async function receiveEthPaymentFromSchainOnMainNet(
             } );
         }
     } catch ( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
-        if( log.id != details.id ) {
-            log.critical( "{p}Receive payment error in {bright}: {err}, stack is:\n{stack}",
-                strLogPrefix, strActionName, strError, err.stack );
-        }
         details.critical( "{p}Receive payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, strError, err.stack );
+            strLogPrefix, strActionName, err, err.stack );
         details.exposeDetailsTo( log, "receiveEthPaymentFromSchainOnMainNet", false );
         details.close();
         return false;
@@ -345,21 +330,14 @@ export async function viewEthPaymentFromSchainOnMainNet(
                 { from: addressFrom } );
         details.success( "{p}You can receive(wei): {}", strLogPrefix, xWei );
         const xEth = owaspUtils.ethersMod.ethers.utils.formatEther( owaspUtils.toBN( xWei ) );
-        if( log.id != details.id )
-            log.success( "{p}You can receive(eth): {}", strLogPrefix, xEth );
         details.success( "{p}You can receive(eth): {}", strLogPrefix, xEth );
         if( log.exposeDetailsGet() )
             details.exposeDetailsTo( log, "viewEthPaymentFromSchainOnMainNet", true );
         details.close();
         return xWei;
     } catch ( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
-        if( log.id != details.id ) {
-            log.critical( "{p}View payment error in {bright}: {err}, stack is:\n{stack}",
-                strLogPrefix, strActionName, strError, err.stack );
-        }
         details.critical( "{p}View payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, strError, err.stack );
+            strLogPrefix, strActionName, err, err.stack );
         details.exposeDetailsTo( log, "viewEthPaymentFromSchainOnMainNet", false );
         details.close();
         return null;

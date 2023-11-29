@@ -564,6 +564,8 @@ export function insertFileOutput( strFilePath, nMaxSizeBeforeRotation, nMaxFiles
 
 export function extractErrorMessage( jo, strDefaultErrorText ) {
     strDefaultErrorText = strDefaultErrorText || "unknown error or error without a description";
+    if( ! jo )
+        return strDefaultErrorText;
     try {
         const isError = function( err ) {
             return err && err.stack && err.message;

@@ -28,7 +28,7 @@ import * as owaspUtils from "./owaspUtils.mjs";
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
-import * as imaHelperAPIs from "./imaHelperAPIs.mjs";
+import * as threadInfo from "./threadInfo.mjs";
 
 import { v4 as uuid } from "uuid";
 export { uuid };
@@ -106,9 +106,8 @@ export function jsonFileLoad( strPath, joDefault, bLogOutput ) {
             log.success( "Done, loaded content of JSON file {}.", strPath );
         return jo;
     } catch ( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
         log.error( "Failed to load JSON file {}, error is: {err}, stack is:\n{stack}",
-            strPath, strError, err.stack );
+            strPath, err, err.stack );
     }
     return joDefault;
 }
@@ -125,9 +124,8 @@ export function jsonFileSave( strPath, jo, bLogOutput ) {
             log.success( "Done, saved content of JSON file {}.", strPath );
         return true;
     } catch ( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
         log.error( " failed to save JSON file {}, error is: {err}, stack is:\n{stack}",
-            strPath, strError, err.stack );
+            strPath, err, err.stack );
     }
     return false;
 }
@@ -160,7 +158,7 @@ export async function waitForClonedTokenToAppear(
     for( let idxAttempt = 0; idxAttempt < cntAttempts; ++ idxAttempt ) {
         log.information( "Discovering {} step {}...", strTokenSuffixUC, idxAttempt );
         if( gMillisecondsToSleepStepWaitForClonedTokenToAppear > 0 )
-            await imaHelperAPIs.sleep( gMillisecondsToSleepStepWaitForClonedTokenToAppear );
+            await threadInfo.sleep( gMillisecondsToSleepStepWaitForClonedTokenToAppear );
         const addressOnSChain =
             await contractTokenManager.callStatic[
                 "clones" + log.capitalizeFirstLetter( strTokenSuffixLCshort )](

@@ -29,6 +29,7 @@ import * as imaHelperAPIs from "./imaHelperAPIs.mjs";
 import * as imaTx from "./imaTx.mjs";
 import * as imaGasUsage from "./imaGasUsageOperations.mjs";
 import * as imaEventLogScan from "./imaEventLogScan.mjs";
+import * as threadInfo from "./threadInfo.mjs";
 
 export async function getBalanceErc20(
     isMainNet,
@@ -53,9 +54,8 @@ export async function getBalanceErc20(
             await contractERC20.callStatic.balanceOf( strAddress, { from: strAddress } );
         return balance;
     } catch ( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
         log.error( "{p}ERC20 balance fetching error: {err}, stack is:\n{stack}",
-            strLogPrefix, strError, err.stack );
+            strLogPrefix, err, err.stack );
     }
     return "<no-data-or-error>";
 }
@@ -83,9 +83,8 @@ export async function getOwnerOfErc721(
         const owner = await contractERC721.callStatic.ownerOf( idToken, { from: strAddress } );
         return owner;
     } catch ( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
         log.error( "{p}ERC721 owner fetching error: {err}, stack is:\n{stack}",
-            strLogPrefix, strError, err.stack );
+            strLogPrefix, err, err.stack );
     }
     return "<no-data-or-error>";
 }
@@ -114,9 +113,8 @@ export async function getBalanceErc1155(
             strAddress, idToken, { from: strAddress } );
         return balance;
     } catch ( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
         log.error( "{p}ERC1155 balance fetching error: {err}, stack is:\n{stack}",
-            strLogPrefix, strError, err.stack );
+            strLogPrefix, err, err.stack );
     }
     return "<no-data-or-error>";
 }
@@ -227,7 +225,7 @@ export async function doErc721PaymentFromMainNet(
         if( joMessageProxyMainNet ) {
             details.debug( "{p}Verifying the {} event of the MessageProxy/{} contract...",
                 strLogPrefix, strEventName, joMessageProxyMainNet.address );
-            await imaHelperAPIs.sleep(
+            await threadInfo.sleep(
                 imaHelperAPIs.getMillisecondsSleepBeforeFetchOutgoingMessageEvent() );
             const joEvents = await imaEventLogScan.getContractCallEvents(
                 details, strLogPrefix,
@@ -245,13 +243,8 @@ export async function doErc721PaymentFromMainNet(
             }
         }
     } catch ( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
-        if( log.id != details.id ) {
-            log.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-                strLogPrefix, strActionName, strError, err.stack );
-        }
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, strError, err.stack );
+            strLogPrefix, strActionName, err, err.stack );
         details.exposeDetailsTo( log, "doErc721PaymentFromMainNet", false );
         details.close();
         return false;
@@ -369,7 +362,7 @@ export async function doErc20PaymentFromMainNet(
         if( joMessageProxyMainNet ) {
             details.debug( "{p}Verifying the {} event of the MessageProxy/{} contract...",
                 strLogPrefix, strEventName, joMessageProxyMainNet.address );
-            await imaHelperAPIs.sleep(
+            await threadInfo.sleep(
                 imaHelperAPIs.getMillisecondsSleepBeforeFetchOutgoingMessageEvent() );
             const joEvents = await imaEventLogScan.getContractCallEvents(
                 details, strLogPrefix,
@@ -387,13 +380,8 @@ export async function doErc20PaymentFromMainNet(
             }
         }
     } catch ( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
-        if( log.id != details.id ) {
-            log.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-                strLogPrefix, strActionName, strError, err.stack );
-        }
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, strError, err.stack );
+            strLogPrefix, strActionName, err, err.stack );
         details.exposeDetailsTo( log, "doErc20PaymentFromMainNet", false );
         details.close();
         return false;
@@ -521,7 +509,7 @@ export async function doErc1155PaymentFromMainNet(
         if( joMessageProxyMainNet ) {
             details.trace( "{p}Verifying the {} event of the MessageProxy/{} contract...",
                 strLogPrefix, strEventName, joMessageProxyMainNet.address );
-            await imaHelperAPIs.sleep(
+            await threadInfo.sleep(
                 imaHelperAPIs.getMillisecondsSleepBeforeFetchOutgoingMessageEvent() );
             const joEvents = await imaEventLogScan.getContractCallEvents(
                 details, strLogPrefix,
@@ -539,13 +527,8 @@ export async function doErc1155PaymentFromMainNet(
             }
         }
     } catch ( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
-        if( log.id != details.id ) {
-            log.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-                strLogPrefix, strActionName, strError, err.stack );
-        }
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, strError, err.stack );
+            strLogPrefix, strActionName, err, err.stack );
         details.exposeDetailsTo( log, "doErc1155PaymentFromMainNet", false );
         details.close();
         return false;
@@ -653,7 +636,7 @@ export async function doErc1155BatchPaymentFromMainNet(
         if( joMessageProxyMainNet ) {
             details.debug( "{p}Verifying the {} event of the MessageProxy/{} contract...",
                 strLogPrefix, strEventName, joMessageProxyMainNet.address );
-            await imaHelperAPIs.sleep(
+            await threadInfo.sleep(
                 imaHelperAPIs.getMillisecondsSleepBeforeFetchOutgoingMessageEvent() );
             const joEvents = await imaEventLogScan.getContractCallEvents(
                 details, strLogPrefix,
@@ -671,13 +654,8 @@ export async function doErc1155BatchPaymentFromMainNet(
             }
         }
     } catch ( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
-        if( log.id != details.id ) {
-            log.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-                strLogPrefix, strActionName, strError, err.stack );
-        }
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, strError, err.stack );
+            strLogPrefix, strActionName, err, err.stack );
         details.exposeDetailsTo( log, "doErc1155BatchPaymentFromMainNet", false );
         details.close();
         return false;
@@ -759,7 +737,7 @@ export async function doErc20PaymentFromSChain(
         const nSleep = imaHelperAPIs.getSleepBetweenTransactionsOnSChainMilliseconds();
         if( nSleep > 0 ) {
             details.trace( "Sleeping {} milliseconds between transactions...", nSleep );
-            await imaHelperAPIs.sleep( nSleep );
+            await threadInfo.sleep( nSleep );
         }
         if( imaHelperAPIs.getWaitForNextBlockOnSChain() )
             await imaHelperAPIs.safeWaitForNextBlockToAppear( details, ethersProviderSChain );
@@ -802,7 +780,7 @@ export async function doErc20PaymentFromSChain(
         if( joMessageProxySChain ) {
             details.debug( "{p}Verifying the {} event of the MessageProxy/{} contract...",
                 strLogPrefix, strEventName, joMessageProxySChain.address );
-            await imaHelperAPIs.sleep(
+            await threadInfo.sleep(
                 imaHelperAPIs.getMillisecondsSleepBeforeFetchOutgoingMessageEvent() );
             const joEvents = await imaEventLogScan.getContractCallEvents(
                 details, strLogPrefix,
@@ -820,13 +798,8 @@ export async function doErc20PaymentFromSChain(
             }
         }
     } catch ( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
-        if( log.id != details.id ) {
-            log.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-                strLogPrefix, strActionName, strError, err.stack );
-        }
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, strError, err.stack );
+            strLogPrefix, strActionName, err, err.stack );
         details.exposeDetailsTo( log, "doErc20PaymentFromSChain", false );
         details.close();
         return false;
@@ -910,7 +883,7 @@ export async function doErc721PaymentFromSChain(
         const nSleep = imaHelperAPIs.getSleepBetweenTransactionsOnSChainMilliseconds();
         if( nSleep > 0 ) {
             details.trace( "Sleeping {} milliseconds between transactions...", nSleep );
-            await imaHelperAPIs.sleep( nSleep );
+            await threadInfo.sleep( nSleep );
         }
         if( imaHelperAPIs.getWaitForNextBlockOnSChain() )
             await imaHelperAPIs.safeWaitForNextBlockToAppear( details, ethersProviderSChain );
@@ -953,7 +926,7 @@ export async function doErc721PaymentFromSChain(
         if( joMessageProxySChain ) {
             details.debug( "{p}Verifying the {} event of the MessageProxy/{} contract...",
                 strLogPrefix, strEventName,joMessageProxySChain.address );
-            await imaHelperAPIs.sleep(
+            await threadInfo.sleep(
                 imaHelperAPIs.getMillisecondsSleepBeforeFetchOutgoingMessageEvent() );
             const joEvents = await imaEventLogScan.getContractCallEvents(
                 details, strLogPrefix,
@@ -973,13 +946,8 @@ export async function doErc721PaymentFromSChain(
 
         }
     } catch ( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
-        if( log.id != details.id ) {
-            log.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-                strLogPrefix, strActionName, strError, err.stack );
-        }
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, strError, err.stack );
+            strLogPrefix, strActionName, err, err.stack );
         details.exposeDetailsTo( log, "doErc721PaymentFromSChain", false );
         details.close();
         return false;
@@ -1063,7 +1031,7 @@ export async function doErc1155PaymentFromSChain(
         const nSleep = imaHelperAPIs.getSleepBetweenTransactionsOnSChainMilliseconds();
         if( nSleep > 0 ) {
             details.trace( "Sleeping {} milliseconds between transactions...", nSleep );
-            await imaHelperAPIs.sleep( nSleep );
+            await threadInfo.sleep( nSleep );
         }
         if( imaHelperAPIs.getWaitForNextBlockOnSChain() )
             await imaHelperAPIs.safeWaitForNextBlockToAppear( details, ethersProviderSChain );
@@ -1106,7 +1074,7 @@ export async function doErc1155PaymentFromSChain(
         if( joMessageProxySChain ) {
             details.debug( "{p}Verifying the {} event of the MessageProxy/{} contract...",
                 strLogPrefix, strEventName, joMessageProxySChain.address );
-            await imaHelperAPIs.sleep(
+            await threadInfo.sleep(
                 imaHelperAPIs.getMillisecondsSleepBeforeFetchOutgoingMessageEvent() );
             const joEvents = await imaEventLogScan.getContractCallEvents(
                 details, strLogPrefix,
@@ -1125,13 +1093,8 @@ export async function doErc1155PaymentFromSChain(
             }
         }
     } catch ( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
-        if( log.id != details.id ) {
-            log.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-                strLogPrefix, strActionName, strError, err.stack );
-        }
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, strError, err.stack );
+            strLogPrefix, strActionName, err, err.stack );
         details.exposeDetailsTo( log, "doErc1155PaymentFromSChain", false );
         details.close();
         return false;
@@ -1211,7 +1174,7 @@ export async function doErc1155BatchPaymentFromSChain(
         const nSleep = imaHelperAPIs.getSleepBetweenTransactionsOnSChainMilliseconds();
         if( nSleep > 0 ) {
             details.trace( "Sleeping {} milliseconds between transactions...", nSleep );
-            await imaHelperAPIs.sleep( nSleep );
+            await threadInfo.sleep( nSleep );
         }
         if( imaHelperAPIs.getWaitForNextBlockOnSChain() )
             await imaHelperAPIs.safeWaitForNextBlockToAppear( details, ethersProviderSChain );
@@ -1257,7 +1220,7 @@ export async function doErc1155BatchPaymentFromSChain(
         if( joMessageProxySChain ) {
             details.debug( "{p}Verifying the {} event of the MessageProxy/{} contract...",
                 strLogPrefix, strEventName,joMessageProxySChain.address );
-            await imaHelperAPIs.sleep(
+            await threadInfo.sleep(
                 imaHelperAPIs.getMillisecondsSleepBeforeFetchOutgoingMessageEvent() );
             const joEvents = await imaEventLogScan.getContractCallEvents(
                 details, strLogPrefix,
@@ -1276,13 +1239,8 @@ export async function doErc1155BatchPaymentFromSChain(
             }
         }
     } catch ( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
-        if( log.id != details.id ) {
-            log.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-                strLogPrefix, strActionName, strError, err.stack );
-        }
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, strError, err.stack );
+            strLogPrefix, strActionName, err, err.stack );
         details.exposeDetailsTo( log, "doErc1155BatchPaymentFromSChain", false );
         details.close();
         return false;
@@ -1418,13 +1376,8 @@ export async function doErc20PaymentS2S(
             } );
         }
     } catch ( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
-        if( log.id != details.id ) {
-            log.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-                strLogPrefix, strActionName, strError, err.stack );
-        }
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, strError, err.stack );
+            strLogPrefix, strActionName, err, err.stack );
         details.exposeDetailsTo(
             log, `doErc20PaymentS2S/${( isForward ? "forward" : "reverse" )}`, false );
         details.close();
@@ -1542,7 +1495,7 @@ export async function doErc721PaymentS2S(
             details, ethersProviderSrc,
             "TokenManagerERC721", joTokenManagerERC721Src,
             "transferToSchainERC721", arrArgumentsTransfer,
-            joAccountSrc, strActionName, isIgnoreTransferERC721,
+            joAccountSrc, strActionName,
             gasPrice, 8000000, weiHowMuchTransferERC721, null );
         details.trace( "{p}Using estimated(transfer) gas={}", strLogPrefix, estimatedGasTransfer );
         const strErrorOfDryRunTransferERC721 = await imaTx.dryRunCall(
@@ -1566,13 +1519,8 @@ export async function doErc721PaymentS2S(
             } );
         }
     } catch ( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
-        if( log.id != details.id ) {
-            log.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-                strLogPrefix, strActionName, strError, err.stack );
-        }
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, strError, err.stack );
+            strLogPrefix, strActionName, err, err.stack );
         details.exposeDetailsTo(
             log, `doErc721PaymentS2S/${( isForward ? "forward" : "reverse" )}`, false );
         details.close();
@@ -1716,13 +1664,8 @@ export async function doErc1155PaymentS2S(
             } );
         }
     } catch ( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
-        if( log.id != details.id ) {
-            log.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-                strLogPrefix, strActionName, strError, err.stack );
-        }
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, strError, err.stack );
+            strLogPrefix, strActionName, err, err.stack );
         details.exposeDetailsTo(
             log, `doErc1155PaymentS2S/${( isForward ? "forward" : "reverse" )}`, false );
         details.close();
@@ -1868,13 +1811,8 @@ export async function doErc1155BatchPaymentS2S(
             } );
         }
     } catch ( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
-        if( log.id != details.id ) {
-            log.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-                strLogPrefix, strActionName, strError, err.stack );
-        }
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, strError, err.stack );
+            strLogPrefix, strActionName, err, err.stack );
         details.exposeDetailsTo(
             log, `doErc1155BatchPaymentS2S/${( isForward ? "forward" : "reverse" )}`, false );
         details.close();
@@ -1952,13 +1890,8 @@ export async function mintErc20(
         details.close();
         return joReceipt; // can be used as "true" boolean value
     } catch ( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
-        if( log.id != details.id ) {
-            log.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-                strLogPrefix, strActionName, strError, err.stack );
-        }
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, strError, err.stack );
+            strLogPrefix, strActionName, err, err.stack );
         details.exposeDetailsTo( log, "mintErc20()", false );
         details.close();
         return false;
@@ -2026,13 +1959,8 @@ export async function mintErc721(
         details.close();
         return joReceipt; // can be used as "true" boolean value
     } catch ( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
-        if( log.id != details.id ) {
-            log.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-                strLogPrefix, strActionName, strError, err.stack );
-        }
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, strError, err.stack );
+            strLogPrefix, strActionName, err, err.stack );
         details.exposeDetailsTo( log, "mintErc721()", false );
         details.close();
         return false;
@@ -2104,13 +2032,8 @@ export async function mintErc1155(
         details.close();
         return joReceipt; // can be used as "true" boolean value
     } catch ( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
-        if( log.id != details.id ) {
-            log.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-                strLogPrefix, strActionName, strError, err.stack );
-        }
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, strError, err.stack );
+            strLogPrefix, strActionName, err, err.stack );
         details.exposeDetailsTo( log, "mintErc1155()", false );
         details.close();
         return false;
@@ -2178,13 +2101,8 @@ export async function burnErc20(
         details.close();
         return joReceipt; // can be used as "true" boolean value
     } catch ( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
-        if( log.id != details.id ) {
-            log.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-                strLogPrefix, strActionName, strError, err.stack );
-        }
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, strError, err.stack );
+            strLogPrefix, strActionName, err, err.stack );
         details.exposeDetailsTo( log, "burnErc20()", false );
         details.close();
         return false;
@@ -2249,13 +2167,8 @@ export async function burnErc721(
         details.close();
         return joReceipt; // can be used as "true" boolean value
     } catch ( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
-        if( log.id != details.id ) {
-            log.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-                strLogPrefix, strActionName, strError, err.stack );
-        }
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, strError, err.stack );
+            strLogPrefix, strActionName, err, err.stack );
         details.exposeDetailsTo( log, "burnErc721()", false );
         details.close();
         return false;
@@ -2327,13 +2240,8 @@ export async function burnErc1155(
         details.close();
         return joReceipt; // can be used as "true" boolean value
     } catch ( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
-        if( log.id != details.id ) {
-            log.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-                strLogPrefix, strActionName, strError, err.stack );
-        }
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, strError, err.stack );
+            strLogPrefix, strActionName, err, err.stack );
         details.exposeDetailsTo( log, "burnErc1155()", false );
         details.close();
         return false;
