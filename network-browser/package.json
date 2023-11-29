@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "bun _fix && bun --hot index.ts",
     "browse": "bun _fix && bun index.ts",
-    "build:js": "bun build index.ts --target=bun --outfile=network-browser.js",
+    "build:bun": "bun build index.ts --target=bun --outfile=network-browser.js",
+    "build:node": "bun build index.ts --target=node --outfile=network-browser.js",
     "build:exec": "bun build index.ts --compile --outfile=network-browser",
     "lint-check": "eslint -c .eslintrc.cjs ./src/* && prettier --check \"**/*.{ts,tsx,js,mdx}\"",
     "lint-fix": "bun _lint && bun _prettier",

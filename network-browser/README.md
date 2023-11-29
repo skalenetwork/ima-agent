@@ -48,3 +48,17 @@ bun pre
 ```bash
 bun browse
 ```
+
+## Static build
+
+For node.js tagret:
+
+```bash
+bun build:node
+```
+
+For bun.sh tagret:
+
+```bash
+bun build:bun
+```
