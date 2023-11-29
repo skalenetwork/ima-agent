@@ -106,9 +106,8 @@ export function jsonFileLoad( strPath, joDefault, bLogOutput ) {
             log.success( "Done, loaded content of JSON file {}.", strPath );
         return jo;
     } catch ( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
         log.error( "Failed to load JSON file {}, error is: {err}, stack is:\n{stack}",
-            strPath, strError, err.stack );
+            strPath, err, err.stack );
     }
     return joDefault;
 }
@@ -125,9 +124,8 @@ export function jsonFileSave( strPath, jo, bLogOutput ) {
             log.success( "Done, saved content of JSON file {}.", strPath );
         return true;
     } catch ( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
         log.error( " failed to save JSON file {}, error is: {err}, stack is:\n{stack}",
-            strPath, strError, err.stack );
+            strPath, err, err.stack );
     }
     return false;
 }

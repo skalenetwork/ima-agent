@@ -127,6 +127,90 @@ async function prepareOracleGasPriceSetup( optsGasPriseSetup ) {
     }
 }
 
+async function handleOracleSigned( optsGasPriseSetup, strError, u256, joGlueResult ) {
+    if( strError ) {
+        optsGasPriseSetup.details.critical(
+            "{p}Error in doOracleGasPriceSetup() during {bright}: {err}",
+            optsGasPriseSetup.strLogPrefix, optsGasPriseSetup.strActionName, strError );
+        optsGasPriseSetup.details.exposeDetailsTo( log, "doOracleGasPriceSetup", false );
+        imaTransferErrorHandling.saveTransferError(
+            "oracle", optsGasPriseSetup.details.toString() );
+        optsGasPriseSetup.details.close();
+        return;
+    }
+    optsGasPriseSetup.strActionName = "doOracleGasPriceSetup.formatSignature";
+    let signature = joGlueResult ? joGlueResult.signature : null;
+    if( ! signature )
+        signature = { X: "0", Y: "0" };
+    let hashPoint = joGlueResult ? joGlueResult.hashPoint : null;
+    if( ! hashPoint )
+        hashPoint = { X: "0", Y: "0" };
+    let hint = joGlueResult ? joGlueResult.hint : null;
+    if( ! hint )
+        hint = "0";
+    const sign = {
+        blsSignature: [ signature.X, signature.Y ], // BLS glue of signatures
+        hashA: hashPoint.X, // G1.X from joGlueResult.hashSrc
+        hashB: hashPoint.Y, // G1.Y from joGlueResult.hashSrc
+        counter: hint
+    };
+    optsGasPriseSetup.strActionName =
+        "Oracle gas price setup via CommunityLocker.setGasPrice()";
+    const arrArgumentsSetGasPrice = [
+        u256,
+        owaspUtils.ensureStartsWith0x( optsGasPriseSetup.bnTimestampOfBlock.toHexString() ),
+        sign // bls signature components
+    ];
+    const joDebugArgs = [
+        [ signature.X, signature.Y ], // BLS glue of signatures
+        hashPoint.X, // G1.X from joGlueResult.hashSrc
+        hashPoint.Y, // G1.Y from joGlueResult.hashSrc
+        hint
+    ];
+    optsGasPriseSetup.details.debug( "{p}....debug args for : {}",
+        optsGasPriseSetup.strLogPrefix, joDebugArgs );
+    const weiHowMuch = undefined;
+    const gasPrice = await optsGasPriseSetup.transactionCustomizerSChain.computeGasPrice(
+        optsGasPriseSetup.ethersProviderSChain, 200000000000 );
+    optsGasPriseSetup.details.trace( "{p}Using computed gasPrice={}",
+        optsGasPriseSetup.strLogPrefix, gasPrice );
+    const estimatedGasSetGasPrice = await optsGasPriseSetup.transactionCustomizerSChain.computeGas(
+        optsGasPriseSetup.details, optsGasPriseSetup.ethersProviderSChain,
+        "CommunityLocker", optsGasPriseSetup.joCommunityLocker,
+        "setGasPrice", arrArgumentsSetGasPrice, optsGasPriseSetup.joAccountSC,
+        optsGasPriseSetup.strActionName, gasPrice, 10000000, weiHowMuch );
+    optsGasPriseSetup.details.trace( "{p}Using estimated gas={}",
+        optsGasPriseSetup.strLogPrefix, estimatedGasSetGasPrice );
+    const isIgnoreSetGasPrice = false;
+    const strErrorOfDryRun = await imaTx.dryRunCall( optsGasPriseSetup.details,
+        optsGasPriseSetup.ethersProviderSChain,
+        "CommunityLocker", optsGasPriseSetup.joCommunityLocker,
+        "setGasPrice", arrArgumentsSetGasPrice,
+        optsGasPriseSetup.joAccountSC, optsGasPriseSetup.strActionName,
+        isIgnoreSetGasPrice, gasPrice, estimatedGasSetGasPrice, weiHowMuch );
+    if( strErrorOfDryRun )
+        throw new Error( strErrorOfDryRun );
+    const opts = {
+        isCheckTransactionToSchain: ( optsGasPriseSetup.chainIdSChain !== "Mainnet" ) ? true : false
+    };
+    const joReceipt = await imaTx.payedCall( optsGasPriseSetup.details,
+        optsGasPriseSetup.ethersProviderSChain,
+        "CommunityLocker", optsGasPriseSetup.joCommunityLocker,
+        "setGasPrice", arrArgumentsSetGasPrice,
+        optsGasPriseSetup.joAccountSC, optsGasPriseSetup.strActionName,
+        gasPrice, estimatedGasSetGasPrice, weiHowMuch, opts );
+    if( joReceipt && typeof joReceipt == "object" ) {
+        optsGasPriseSetup.jarrReceipts.push( {
+            "description": "doOracleGasPriceSetup/setGasPrice",
+            "receipt": joReceipt
+        } );
+        imaGasUsage.printGasUsageReportFromArray(
+            "(intermediate result) ORACLE GAS PRICE SETUP ",
+            optsGasPriseSetup.jarrReceipts, optsGasPriseSetup.details );
+    }
+    imaTransferErrorHandling.saveTransferSuccess( "oracle" );
+}
+
 export async function doOracleGasPriceSetup(
     ethersProviderMainNet,
     ethersProviderSChain,
@@ -158,7 +242,6 @@ export async function doOracleGasPriceSetup(
         bnTimeZoneOffset: null,
         gasPriceOnMainNet: null
     };
-
     if( optsGasPriseSetup.fnSignMsgOracle == null ||
         optsGasPriseSetup.fnSignMsgOracle == undefined ) {
         optsGasPriseSetup.details.trace( "{p}Using internal u256 signing stub function",
@@ -179,113 +262,13 @@ export async function doOracleGasPriceSetup(
         await optsGasPriseSetup.fnSignMsgOracle(
             optsGasPriseSetup.gasPriceOnMainNet, optsGasPriseSetup.details,
             async function( strError, u256, joGlueResult ) {
-                if( strError ) {
-                    if( log.id != optsGasPriseSetup.details.id ) {
-                        log.critical( "{p}Error in doOracleGasPriceSetup() during {bright}: {err}",
-                            optsGasPriseSetup.strLogPrefix, optsGasPriseSetup.strActionName,
-                            strError );
-                    }
-                    optsGasPriseSetup.details.critical(
-                        "{p}Error in doOracleGasPriceSetup() during {bright}: {err}",
-                        optsGasPriseSetup.strLogPrefix, optsGasPriseSetup.strActionName,
-                        strError );
-                    optsGasPriseSetup.details.exposeDetailsTo(
-                        log, "doOracleGasPriceSetup", false );
-                    imaTransferErrorHandling.saveTransferError(
-                        "oracle", optsGasPriseSetup.details.toString() );
-                    optsGasPriseSetup.details.close();
-                    return;
-                }
-                optsGasPriseSetup.strActionName = "doOracleGasPriceSetup.formatSignature";
-                let signature = joGlueResult ? joGlueResult.signature : null;
-                if( ! signature )
-                    signature = { X: "0", Y: "0" };
-                let hashPoint = joGlueResult ? joGlueResult.hashPoint : null;
-                if( ! hashPoint )
-                    hashPoint = { X: "0", Y: "0" };
-                let hint = joGlueResult ? joGlueResult.hint : null;
-                if( ! hint )
-                    hint = "0";
-                const sign = {
-                    blsSignature: [ signature.X, signature.Y ], // BLS glue of signatures
-                    hashA: hashPoint.X, // G1.X from joGlueResult.hashSrc
-                    hashB: hashPoint.Y, // G1.Y from joGlueResult.hashSrc
-                    counter: hint
-                };
-                optsGasPriseSetup.strActionName =
-                    "Oracle gas price setup via CommunityLocker.setGasPrice()";
-                const arrArgumentsSetGasPrice = [
-                    u256,
-                    owaspUtils.ensureStartsWith0x(
-                        optsGasPriseSetup.bnTimestampOfBlock.toHexString() ),
-                    sign // bls signature components
-                ];
-                const joDebugArgs = [
-                    [ signature.X, signature.Y ], // BLS glue of signatures
-                    hashPoint.X, // G1.X from joGlueResult.hashSrc
-                    hashPoint.Y, // G1.Y from joGlueResult.hashSrc
-                    hint
-                ];
-                optsGasPriseSetup.details.debug( "{p}....debug args for : {}",
-                    optsGasPriseSetup.strLogPrefix, joDebugArgs );
-                const weiHowMuch = undefined;
-                const gasPrice =
-                    await optsGasPriseSetup.transactionCustomizerSChain.computeGasPrice(
-                        optsGasPriseSetup.ethersProviderSChain, 200000000000 );
-                optsGasPriseSetup.details.trace( "{p}Using computed gasPrice={}",
-                    optsGasPriseSetup.strLogPrefix, gasPrice );
-                const estimatedGasSetGasPrice =
-                    await optsGasPriseSetup.transactionCustomizerSChain.computeGas(
-                        optsGasPriseSetup.details, optsGasPriseSetup.ethersProviderSChain,
-                        "CommunityLocker", optsGasPriseSetup.joCommunityLocker,
-                        "setGasPrice", arrArgumentsSetGasPrice, optsGasPriseSetup.joAccountSC,
-                        optsGasPriseSetup.strActionName, gasPrice, 10000000, weiHowMuch );
-                optsGasPriseSetup.details.trace( "{p}Using estimated gas={}",
-                    optsGasPriseSetup.strLogPrefix, estimatedGasSetGasPrice );
-                const isIgnoreSetGasPrice = false;
-                const strErrorOfDryRun = await imaTx.dryRunCall( optsGasPriseSetup.details,
-                    optsGasPriseSetup.ethersProviderSChain,
-                    "CommunityLocker", optsGasPriseSetup.joCommunityLocker,
-                    "setGasPrice", arrArgumentsSetGasPrice,
-                    optsGasPriseSetup.joAccountSC, optsGasPriseSetup.strActionName,
-                    isIgnoreSetGasPrice, gasPrice,
-                    estimatedGasSetGasPrice, weiHowMuch );
-                if( strErrorOfDryRun )
-                    throw new Error( strErrorOfDryRun );
-                const opts = {
-                    isCheckTransactionToSchain:
-                        ( optsGasPriseSetup.chainIdSChain !== "Mainnet" ) ? true : false
-                };
-                const joReceipt = await imaTx.payedCall( optsGasPriseSetup.details,
-                    optsGasPriseSetup.ethersProviderSChain,
-                    "CommunityLocker", optsGasPriseSetup.joCommunityLocker,
-                    "setGasPrice", arrArgumentsSetGasPrice,
-                    optsGasPriseSetup.joAccountSC, optsGasPriseSetup.strActionName,
-                    gasPrice, estimatedGasSetGasPrice, weiHowMuch,
-                    opts );
-                if( joReceipt && typeof joReceipt == "object" ) {
-                    optsGasPriseSetup.jarrReceipts.push( {
-                        "description": "doOracleGasPriceSetup/setGasPrice",
-                        "receipt": joReceipt
-                    } );
-                    imaGasUsage.printGasUsageReportFromArray(
-                        "(intermediate result) ORACLE GAS PRICE SETUP ",
-                        optsGasPriseSetup.jarrReceipts, optsGasPriseSetup.details );
-                }
-                imaTransferErrorHandling.saveTransferSuccess( "oracle" );
+                await handleOracleSigned( optsGasPriseSetup, strError, u256, joGlueResult );
             } );
     } catch ( err ) {
-        const strError = owaspUtils.extractErrorMessage( err );
-        if( log.id != optsGasPriseSetup.details.id ) {
-            log.critical(
-                "{p}Error in doOracleGasPriceSetup() during {bright}: {err}" +
-                ", stack is:\n{stack}", optsGasPriseSetup.strLogPrefix,
-                optsGasPriseSetup.strActionName, strError, err.stack );
-            optsGasPriseSetup.details.critical(
-                "{p}Error in doOracleGasPriceSetup() during {bright}: {err}, stack is:\n{stack}",
-                optsGasPriseSetup.strLogPrefix, optsGasPriseSetup.strActionName,
-                strError, err.stack );
-        }
+        optsGasPriseSetup.details.critical(
+            "{p}Error in doOracleGasPriceSetup() during {bright}: {err}, stack is:\n{stack}",
+            optsGasPriseSetup.strLogPrefix, optsGasPriseSetup.strActionName,
+            err, err.stack );
         optsGasPriseSetup.details.exposeDetailsTo( log, "doOracleGasPriceSetup", false );
         imaTransferErrorHandling.saveTransferError(
             "oracle", optsGasPriseSetup.details.toString() );

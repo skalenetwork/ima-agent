@@ -112,7 +112,7 @@ export async function dryRunCall(
         return null; // success
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
-        details.error( "{p}dry-run error: {err}", strLogPrefix, strError );
+        details.error( "{p}dry-run error: {err}", strLogPrefix, err );
         if( dryRunIsIgnored() )
             return null;
         return strError;
@@ -196,10 +196,6 @@ async function payedCallTM( optsPayedCall ) {
         optsPayedCall.details.critical(
             "{p}TM-transaction was not sent, underlying error is: {err}",
             optsPayedCall.strLogPrefix, err.toString() );
-        if( log.id != optsPayedCall.details.id ) {
-            log.critical( "{p}TM-transaction was not sent, underlying error is: {err}",
-                optsPayedCall.strLogPrefix, err.toString() );
-        }
         throw err;
     }
 }
@@ -350,10 +346,6 @@ export async function payedCall(
             optsPayedCall.details.critical(
                 "{p}bad credentials information specified, no explicit SGX and no explicit " +
                 "private key found", strErrorPrefix );
-            if( log.id != optsPayedCall.details.id ) {
-                log.critical( "{p}bad credentials information specified, no explicit SGX and " +
-                    "no explicit private key found", strErrorPrefix );
-            }
             throw new Error( `${strErrorPrefix} bad credentials information specified, ` +
                 "no explicit SGX and no explicit private key found" );
         } // NOTICE: "break;" is not needed here because of "throw" above
@@ -362,10 +354,6 @@ export async function payedCall(
         const strErrorPrefix = "Transaction sign and send error(outer flow):";
         optsPayedCall.details.critical( "{p}{} {err}, stack is:\n{stack}",
             optsPayedCall.strLogPrefix, strErrorPrefix, err, err.stack );
-        if( log.id != optsPayedCall.details.id ) {
-            log.critical( "{p}{} {err}, stack is:\n{stack}", optsPayedCall.strLogPrefix,
-                strErrorPrefix, err, err.stack );
-        }
         throw new Error( `${strErrorPrefix} invoking ` +
             `the ${optsPayedCall.strContractCallDescription}, ` +
             `error is: ${owaspUtils.extractErrorMessage( err )}` );
@@ -553,51 +541,31 @@ async function tmGetRecord( txId ) {
 }
 
 async function tmWait( details, txId, ethersProvider, nWaitSeconds = 36000 ) {
-    const strPrefixDetails = log.fmtDebug( "(gathered details)" ) + " ";
-    const strPrefixLog = log.fmtDebug( "(immediate log)" ) + " ";
+    const strLogPrefix = log.fmtDebug( "(gathered details)" ) + " ";
     details.debug( "{p}TM - will wait TX {} to complete for {} second(s) maximum",
-        strPrefixDetails, txId, nWaitSeconds );
-    if( log.id != details.id ) {
-        log.debug( "{p}TM - will wait TX {} to complete for {} second(s) maximum",
-            strPrefixDetails, txId, nWaitSeconds );
-    }
+        strLogPrefix, txId, nWaitSeconds );
     const startTs = imaHelperAPIs.currentTimestamp();
     while( ! tmIsFinished( await tmGetRecord( txId ) ) &&
                 ( imaHelperAPIs.currentTimestamp() - startTs ) < nWaitSeconds )
         await threadInfo.sleep( 500 );
     const r = await tmGetRecord( txId );
-    details.debug( "{p}TM - TX {} record is {}", strPrefixDetails, txId, r );
-    if( log.id != details.id )
-        log.debug( "{p}TM - TX {} record is {}", strPrefixLog, txId, r );
+    details.debug( "{p}TM - TX {} record is {}", strLogPrefix, txId, r );
+    if( ( !r ) )
+        details.error( "{p}TM - TX {} status is NULL RECORD", strLogPrefix, txId );
+    else if( r.status == "SUCCESS" )
+        details.success( "{p}TM - TX {} success", strLogPrefix, txId );
+    else
+        details.error( "{p}TM - TX {} status is {err}", strLogPrefix, txId, r.status );
 
-    if( ( !r ) ) {
-        details.error( "{p}TM - TX {} status is NULL RECORD", strPrefixDetails, txId );
-        if( log.id != details.id )
-            log.error( "{p}TM - TX {} status is NULL RECORD", strPrefixLog, txId );
-    } else if( r.status == "SUCCESS" ) {
-        details.success( "{p}TM - TX {} success", strPrefixDetails, txId );
-        if( log.id != details.id )
-            log.success( "{p}TM - TX {} success", strPrefixDetails, txId );
-    } else {
-        details.error( "{p}TM - TX {} status is {err}", strPrefixDetails, txId, r.status );
-        if( log.id != details.id )
-            log.error( "{p}TM - TX {} status is {err}", strPrefixDetails, txId, r.status );
-    }
     if( ( !tmIsFinished( r ) ) || r.status == "DROPPED" ) {
-        details.error( "{p}TM - TX {} was unsuccessful, wait failed", strPrefixDetails, txId );
-        if( log.id != details.id )
-            log.error( "{p}TM - TX {} was unsuccessful, wait failed", strPrefixDetails, txId );
+        details.error( "{p}TM - TX {} was unsuccessful, wait failed", strLogPrefix, txId );
         return null;
     }
     const joReceipt = await imaEventLogScan.safeGetTransactionReceipt(
         details, 10, ethersProvider, r.tx_hash );
     if( !joReceipt ) {
         details.error( "{p}TM - TX {} was unsuccessful, failed to fetch transaction receipt",
-            strPrefixDetails, txId );
-        if( log.id != details.id ) {
-            log.error( "{p}TM - TX {} was unsuccessful, failed to fetch transaction receipt",
-                strPrefixDetails, txId );
-        }
+            strLogPrefix, txId );
         return null;
     }
     return joReceipt;
@@ -611,36 +579,23 @@ async function tmEnsureTransaction(
     let txId = "";
     let joReceipt = null;
     let idxAttempt = 0;
-    const strPrefixDetails = log.fmtDebug( "(gathered details)" ) + " ";
-    const strPrefixLog = log.fmtDebug( "(immediate log)" ) + " ";
+    const strLogPrefix = log.fmtDebug( "(gathered details)" ) + " ";
     for( ; idxAttempt < cntAttempts; ++idxAttempt ) {
         txId = await tmSend( details, txAdjusted, priority );
-        details.debug( "{p}TM - next TX {}", strPrefixDetails, txId );
-        if( log.id != details.id )
-            log.debug( "{p}TM - next TX {}", strPrefixLog, txId );
+        details.debug( "{p}TM - next TX {}", strLogPrefix, txId );
         joReceipt = await tmWait( details, txId, ethersProvider );
         if( joReceipt )
             break;
         details.error( "{p}TM - unsuccessful TX {} sending attempt {} of {} receipt: {}",
-            strPrefixDetails, txId, idxAttempt, cntAttempts, joReceipt );
-        if( log.id != details.id ) {
-            log.error( "{p}TM - unsuccessful TX {} sending attempt {} of {} receipt: {}",
-                strPrefixLog, txId, idxAttempt, cntAttempts, joReceipt );
-        }
+            strLogPrefix, txId, idxAttempt, cntAttempts, joReceipt );
         await threadInfo.sleep( sleepMilliseconds );
     }
     if( !joReceipt ) {
-        details.error( "{p}TM TX {} transaction has been dropped", strPrefixDetails, txId );
-        if( log.id != details.id )
-            log.error( "{p}TM TX {} transaction has been dropped", strPrefixLog, txId );
+        details.error( "{p}TM TX {} transaction has been dropped", strLogPrefix, txId );
         throw new Error( `TM unsuccessful transaction ${txId}` );
     }
     details.information( "{p}TM - successful TX {}, sending attempt {} of {}",
-        strPrefixDetails, txId, idxAttempt, cntAttempts );
-    if( log.id != details.id ) {
-        log.information( "{p}TM - successful TX {}, sending attempt {} of {}",
-            strPrefixLog, txId, idxAttempt, cntAttempts );
-    }
+        strLogPrefix, txId, idxAttempt, cntAttempts );
     return [ txId, joReceipt ];
 }
 
@@ -716,10 +671,9 @@ export class TransactionCustomizer {
             estimatedGas = await joContract.estimateGas[strMethodName]( ...arrArguments, callOpts );
             details.success( "{p}estimate-gas success: {}", strLogPrefix, estimatedGas );
         } catch ( err ) {
-            const strError = owaspUtils.extractErrorMessage( err );
             details.error(
                 "{p}Estimate-gas error: {err}, default recommended gas value will be used " +
-                "instead of estimated, stack is:\n{stack}", strLogPrefix, strError, err.stack );
+                "instead of estimated, stack is:\n{stack}", strLogPrefix, err, err.stack );
         }
         estimatedGas = owaspUtils.parseIntOrHex( owaspUtils.toBN( estimatedGas ).toString() );
         if( estimatedGas == 0 ) {

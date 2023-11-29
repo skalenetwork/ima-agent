@@ -281,7 +281,7 @@ class ObserverServer extends SocketServer {
                     return;
                 fnAsyncHandler()
                     .then( () => {
-                    } ).catch( ( err ) => {
+                    } ).catch( function( err ) {
                         self.error( "Periodic SNB caching(sync-delayed) in {} error: {err}",
                             threadInfo.threadDescription(), err );
                     } );
