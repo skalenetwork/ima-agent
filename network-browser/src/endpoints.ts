@@ -75,9 +75,9 @@ function composeEndpoints(
     return endpoints as EndpointsSet
 }
 
-export function calcEndpoints(node: Node, scahinHash: string): NodeEndpoints {
+export function calcEndpoints(node: Node, schainHash: string): NodeEndpoints {
     if (node.schainHashes === undefined) throw new Error('schainHashes is not found in node')
-    const sChainIndex = getSChainIndexInNode(scahinHash, node.schainHashes)
+    const sChainIndex = getSChainIndexInNode(schainHash, node.schainHashes)
     const basePort = calcSChainBasePort(node.port, sChainIndex)
     const ports = calcPorts(Number(basePort))
     return {

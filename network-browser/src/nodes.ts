@@ -36,7 +36,7 @@ export async function getNodes(
     nodes: Contract,
     schainsInternal: Contract,
     nodeIds: bigint[] | number[],
-    scahinHash: string
+    schainHash: string
 ): Promise<Node[]> {
     const rawNodes: Array<NodeArray | string> = await getNodesRaw(nodes, schainsInternal, nodeIds)
     const nodesData: Node[] = []
@@ -45,7 +45,7 @@ export async function getNodes(
             nodeStruct(
                 rawNodes[i] as NodeArray,
                 rawNodes[i + 1] as string,
-                scahinHash,
+                schainHash,
                 rawNodes[i + 2] as string[],
                 true
             )
@@ -87,7 +87,7 @@ async function getNodesRaw(
 function nodeStruct(
     nodeArray: NodeArray,
     domainName: string,
-    scahinHash?: string,
+    schainHash?: string,
     schainHashes?: string[],
     endpoints?: boolean
 ): Node {
@@ -104,8 +104,8 @@ function nodeStruct(
         domainName
     }
     if (schainHashes !== undefined) node.schainHashes = schainHashes
-    if (endpoints !== undefined && endpoints && scahinHash !== undefined) {
-        node.endpoints = calcEndpoints(node, scahinHash)
+    if (endpoints !== undefined && endpoints && schainHash !== undefined) {
+        node.endpoints = calcEndpoints(node, schainHash)
     }
     return node
 }
