@@ -24,6 +24,7 @@
  */
 
 import * as fs from "fs";
+import * as path from "path";
 import * as log from "./log.mjs";
 import * as owaspUtils from "./owaspUtils.mjs";
 import * as childProcessModule from "child_process";
@@ -308,7 +309,7 @@ function performBlsGlue(
         details.trace( "{p}Will execute BLS glue command: {}", strLogPrefix, strGlueCommand );
         strOutput = childProcessModule.execSync( strGlueCommand, { cwd: strActionDir } );
         details.trace( "{p}BLS glue output is:\n{raw}", strLogPrefix, strOutput || "<<EMPTY>>" );
-        joGlueResult = imaUtils.jsonFileLoad( strActionDir + "/glue-result.json" );
+        joGlueResult = imaUtils.jsonFileLoad( path.join( strActionDir, "glue-result.json" ) );
         details.trace( "{p}BLS glue result is: {}", strLogPrefix, joGlueResult );
         if( "X" in joGlueResult.signature && "Y" in joGlueResult.signature ) {
             details.success( "{p}BLS glue success", strLogPrefix );
@@ -324,7 +325,7 @@ function performBlsGlue(
             details.trace( "{p}Will execute HashG1 command {}", strLogPrefix, strHasG1Command );
             strOutput = childProcessModule.execSync( strHasG1Command, { cwd: strActionDir } );
             details.trace( "{p}HashG1 output is:\n{raw}", strLogPrefix, strOutput || "<<EMPTY>>" );
-            const joResultHashG1 = imaUtils.jsonFileLoad( strActionDir + "/g1.json" );
+            const joResultHashG1 = imaUtils.jsonFileLoad( path.join( strActionDir, "g1.json" ) );
             details.trace( "{p}HashG1 result is: {}", strLogPrefix, joResultHashG1 );
             if( "g1" in joResultHashG1 &&
                 "hint" in joResultHashG1.g1 &&
@@ -396,7 +397,7 @@ function performBlsGlueU256( details, u256, arrSignResults ) {
         details.trace( "{p}Will execute BLS glue command: {}", strLogPrefix, strGlueCommand );
         strOutput = childProcessModule.execSync( strGlueCommand, { cwd: strActionDir } );
         details.trace( "{p}BLS glue output is:\n{raw}", strLogPrefix, strOutput || "<<EMPTY>>" );
-        joGlueResult = imaUtils.jsonFileLoad( strActionDir + "/glue-result.json" );
+        joGlueResult = imaUtils.jsonFileLoad( path.join( strActionDir, "glue-result.json" ) );
         details.trace( "{p}BLS glue result is:\n{}", strLogPrefix, joGlueResult );
         if( "X" in joGlueResult.signature && "Y" in joGlueResult.signature ) {
             details.success( "{p}BLS glue success", strLogPrefix );
@@ -412,7 +413,7 @@ function performBlsGlueU256( details, u256, arrSignResults ) {
             details.trace( "{p}Will execute HashG1 command: {}", strLogPrefix, strHasG1Command );
             strOutput = childProcessModule.execSync( strHasG1Command, { cwd: strActionDir } );
             details.trace( "{p}HashG1 output is:\n{raw}", strLogPrefix, strOutput || "<<EMPTY>>" );
-            const joResultHashG1 = imaUtils.jsonFileLoad( strActionDir + "/g1.json" );
+            const joResultHashG1 = imaUtils.jsonFileLoad( path.join( strActionDir, "g1.json" ) );
             details.trace( "{p}HashG1 result is: {}", strLogPrefix, joResultHashG1 );
             if( "g1" in joResultHashG1 &&
                 "hint" in joResultHashG1.g1 &&
@@ -1973,9 +1974,8 @@ async function prepareS2sOfSkaleImaVerifyAndSign( optsHandleVerifyAndSign ) {
         "{p}{bright} verification algorithm discovered source chain URL is {url}, chain name " +
         "is {}, chain id is {}", optsHandleVerifyAndSign.strLogPrefix,
         optsHandleVerifyAndSign.strDirection, strUrlSrcSChain,
-        joSChainSrc.data.computed.computedSChainId, joSChainSrc.data.computed.chainId );
+        joSChainSrc.name, skaleObserver.chainNameToChainId( joSChainSrc.name ) );
     optsHandleVerifyAndSign.joExtraSignOpts = {
-        skaleObserver: skaleObserver,
         ethersProviderSrc: owaspUtils.getEthersProviderFromURL( strUrlSrcSChain ),
         chainNameSrc: optsHandleVerifyAndSign.strFromChainName,
         chainNameDst: optsHandleVerifyAndSign.strToChainName,

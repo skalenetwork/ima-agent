@@ -1324,7 +1324,6 @@ export function commandLineTaskTransferS2S() {
         "fn": async function() {
             if( ! imaState.optsS2S.isEnabled )
                 return;
-            discoveryTools.initialSkaleNetworkScanForS2S();
             if( ! imaState.bNoWaitSChainStarted )
                 await discoveryTools.waitUntilSChainStarted(); // s-chain --> main-net transfer
             const joRuntimeOpts = {
@@ -1356,11 +1355,9 @@ export function commandLineTaskTransferS2S() {
 
 export function commandLineTaskTransfer() {
     const imaState = state.get();
-    discoveryTools.initialSkaleNetworkScanForS2S();
     imaState.arrActions.push( {
         "name": "Single M<->S transfer loop iteration",
         "fn": async function() {
-            discoveryTools.initialSkaleNetworkScanForS2S();
             if( ! imaState.bNoWaitSChainStarted )
                 await discoveryTools.waitUntilSChainStarted();
             const joRuntimeOpts = {
@@ -1383,7 +1380,6 @@ export function commandLineTaskTransfer() {
 
 export function commandLineTaskLoop() {
     const imaState = state.get();
-    discoveryTools.initialSkaleNetworkScanForS2S();
     imaState.arrActions.push( {
         "name": "M<->S and S->S transfer loop, startup in parallel mode",
         "fn": async function() {
@@ -1411,7 +1407,6 @@ export function commandLineTaskLoop() {
 
 export function commandLineTaskLoopSimple() {
     const imaState = state.get();
-    discoveryTools.initialSkaleNetworkScanForS2S();
     imaState.arrActions.push( {
         "name": "M<->S and S->S transfer loop, startup simple mode",
         "fn": async function() {
@@ -1524,59 +1519,6 @@ export function commandLineTaskBrowseSChain() {
     } );
 }
 
-export function commandLineTaskBrowseSkaleNetwork() {
-    const imaState = state.get();
-    imaState.arrActions.push( {
-        "name": "Browse S-Chain network",
-        "fn": async function() {
-            const strLogPrefix = "SKALE NETWORK Browse: ";
-            if( imaState.strPathAbiJsonSkaleManager.length === 0 ) {
-                log.fatal( "Missing Skale Manager ABI, please specify {}", "--abi-skale-manager" );
-                process.exit( 160 );
-            }
-            log.information( "{p}Downloading SKALE network information...", strLogPrefix );
-            const opts = {
-                imaState: imaState,
-                "details": log,
-                "bStopNeeded": false,
-                "isLoadConnectedOnly": false
-            };
-            const arrSChains = await skaleObserver.loadSChainsDefault( opts );
-            const cnt = arrSChains.length;
-            log.information( "{p}Got {} S-Chains(s) in SKALE NETWORK information: {}",
-                strLogPrefix, cnt, arrSChains );
-            return true;
-        }
-    } );
-}
-
-export function commandLineTaskBrowseConnectedSChains() {
-    const imaState = state.get();
-    imaState.arrActions.push( {
-        "name": "Browse connected S-Chains",
-        "fn": async function() {
-            const strLogPrefix = "Browse connected S-Chains: ";
-            if( imaState.strPathAbiJsonSkaleManager.length === 0 ) {
-                log.fatal( "Missing Skale Manager ABI, please specify {}", "--abi-skale-manager" );
-                process.exit( 161 );
-            }
-            log.information( "{p}Downloading SKALE network information...", strLogPrefix );
-            const opts = {
-                "imaState": imaState,
-                "details": log,
-                "bStopNeeded": false,
-                "isLoadConnectedOnly": true
-            };
-            const arrSChainsCached = await skaleObserver.loadSChainsConnectedOnly(
-                imaState.chainProperties.sc.strChainName, opts );
-            const cnt = arrSChainsCached.length;
-            log.information( "{p}Got {} connected S-Chain(s): {}",
-                strLogPrefix, cnt, arrSChainsCached );
-            return true;
-        }
-    } );
-}
-
 export function commandLineTaskDiscoverChainId() {
     const imaState = state.get();
     imaState.arrActions.push( {
@@ -1628,7 +1570,7 @@ export function commandLineTaskDiscoverChainId() {
             for( let i = 0; i < arrURLsToDiscover.length; ++ i ) {
                 const joDiscoverEntry = arrURLsToDiscover[i];
                 const chainId = await
-                skaleObserver.discoverChainId( joDiscoverEntry.strURL );
+                imaUtils.discoverChainId( joDiscoverEntry.strURL );
                 if( chainId === null ) {
                     log.error( "{p}Failed to detect {} chain ID",
                         strLogPrefix, joDiscoverEntry.name );

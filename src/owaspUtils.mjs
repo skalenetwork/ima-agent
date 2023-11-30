@@ -692,36 +692,6 @@ export function ethersProviderToUrl( ethersProvider ) {
     return strURL;
 }
 
-export function ensureObserverOptionsInitialized( opts ) {
-    if( ! opts )
-        throw new Error( "IMA observer options is not valid JS object" );
-    if( ! ( "imaState" in opts && opts.imaState && typeof opts.imaState == "object" ) )
-        throw new Error( "IMA observer options does not contain \"imaState\" instance" );
-    if( ! ( "joAbiSkaleManager" in opts.imaState &&
-        opts.imaState.joAbiSkaleManager &&
-        typeof opts.imaState.joAbiSkaleManager == "object" )
-    )
-        throw new Error( "IMA observer options does not contain \"joAbiSkaleManager\" instance" );
-    const arrContractNames = [
-        { abiKey: "schains", nameKey: "SChains" },
-        { abiKey: "schains_internal", nameKey: "SChainsInternal" },
-        { abiKey: "nodes", nameKey: "Nodes" }
-    ];
-    for( let i = 0; i < arrContractNames.length; ++ i ) {
-        const strAbiSuffixName = arrContractNames[i].abiKey;
-        const strPropertySuffixName = arrContractNames[i].nameKey;
-        const strPropertyName = "jo" + strPropertySuffixName;
-        const contractAddress = opts.imaState.joAbiSkaleManager[strAbiSuffixName + "_address"];
-        const joContractABI = opts.imaState.joAbiSkaleManager[strAbiSuffixName + "_abi"];
-        opts[strPropertyName] =
-            new ethersMod.ethers.Contract(
-                contractAddress,
-                joContractABI,
-                opts.imaState.chainProperties.mn.ethersProvider
-            );
-    }
-}
-
 export function toBN( x ) {
     const bn = ethersMod.ethers.BigNumber.from( x );
     return bn;

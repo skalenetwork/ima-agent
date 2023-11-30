@@ -30,7 +30,6 @@ import * as owaspUtils from "./owaspUtils.mjs";
 import * as loop from "./loop.mjs";
 import * as imaTx from "./imaTx.mjs";
 import * as imaTransferErrorHandling from "./imaTransferErrorHandling.mjs";
-import * as skaleObserver from "./observer.mjs";
 import * as imaCLI from "./cli.mjs";
 import * as state from "./state.mjs";
 import * as pwa from "./pwa.mjs";
@@ -120,11 +119,6 @@ class ObserverServer extends SocketServer {
                 const isFlush = true;
                 socket.send( jo, isFlush );
             } );
-            if( ! self.opts.imaState.optsLoop.enableStepS2S )
-                threadInfo.joCustomThreadProperties.isSChainsCacheNeeded = false;
-            if( threadInfo.joCustomThreadProperties.isSChainsCacheNeeded )
-                log.debug( "Loop worker {} will save cached S-Chains...", workerData.url );
-            skaleObserver.setLastCachedSChains( self.opts.imaState.arrSChainsCached );
             self.opts.imaState.chainProperties.mn.joAccount.address = owaspUtils.fnAddressImpl_;
             self.opts.imaState.chainProperties.sc.joAccount.address = owaspUtils.fnAddressImpl_;
             if( self.opts.imaState.chainProperties.mn.strURL &&
@@ -192,15 +186,6 @@ class ObserverServer extends SocketServer {
                     log.posNeg( joMessage.isFinal, "final", "partial" ) );
                 imaState.joSChainNetworkInfo = joMessage.joSChainNetworkInfo;
             };
-        self.mapApiHandlers.schainsCached = function( joMessage, joAnswer, eventData, socket ) {
-            self.initLogMethods();
-            if( threadInfo.joCustomThreadProperties.isSChainsCacheNeeded ) {
-                self.debug( "S-Chains cache did arrived to {} loop worker in {}: {}",
-                    workerData.url, threadInfo.threadDescription(),
-                    joMessage.message.arrSChainsCached );
-            }
-            skaleObserver.setLastCachedSChains( joMessage.message.arrSChainsCached );
-        };
         // eslint-disable-next-line dot-notation
         self.mapApiHandlers["skale_imaNotifyLoopWork"] =
             function( joMessage, joAnswer, eventData, socket ) {
