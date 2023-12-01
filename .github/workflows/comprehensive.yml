@@ -162,6 +162,11 @@ jobs:
         which node-gyp
         node-gyp --version
 
+    - name: INIT - version checks of Bun SH
+      run: |
+        which bun
+        bun --version
+
     - name: INIT - Download comprehensive-test
       working-directory: ${{env.working-directory}}
       run: |
