@@ -55,7 +55,7 @@ export function autoUpdateLastCachedSChains() {
 
     gConnectedChainsData = jo;
     log.debug(
-        // "Connected S-chains cache in thread {} was updated from file {} with data: {}",
+        "Connected S-chains cache in thread {} was updated from file {} with data: {}",
         threadInfo.threadDescription(), imaState.optsS2S.strNetworkBrowserPath,
         gConnectedChainsData );
     return true;
