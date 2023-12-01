@@ -28,7 +28,7 @@ import { type SChain, type NetworkBrowserData } from './interfaces'
 import { getSChainHashes, getSChains, filterConnectedOnly, getNodeIdsInGroups } from './schains'
 import { getNodesGroups } from './nodes'
 import { CONNECTED_ONLY, IMA_NETWORK_BROWSER_DATA_PATH } from './constants'
-import { writeJson, currentTimestamp } from './tools'
+import { writeJson, currentTimestamp, chainIdInt } from './tools'
 
 const log = new Logger<ILogObj>()
 
@@ -44,6 +44,7 @@ export async function browse(schainsInternal: Contract, nodes: Contract): Promis
     const nodesInGroups = await getNodeIdsInGroups(schainsInternal, schainsHashes)
     const nodesInfo = await getNodesGroups(nodes, schainsInternal, nodesInGroups, schainsHashes)
     schains.forEach((schain, index) => {
+        schain.chainId = chainIdInt(schain.name)
         schain.nodes = nodesInfo[index]
     })
 
