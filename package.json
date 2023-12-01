@@ -11,6 +11,7 @@
         "check-outdated": "yarn outdated; cd src; yarn outdated; cd ..; cd IMA; yarn outdated; cd ..",
         "upgrade-to-latest": "yarn upgrade --latest; cd src; yarn upgrade --latest; cd ..; cd IMA; yarn upgrade --latest; cd .."
     },
-    "dependencies": {},
-    "devDependencies": {}
+    "dependencies": {
+        "remark": "^15.0.1"
+    }
 }

@@ -21,7 +21,7 @@ Optional env variables:
 -   `NETWORK_BROWSER_DELAY` - delay between iterations of the network-browser (seconds, default: `10800`)
 -   `NETWORK_BROWSER_TIMEOUT` - maximum amount of time allocated to the browse function (seconds, default: `1200`)
 
-## Development 
+## Development
 
 To use network-browser it's recommended to use [bun.sh](https://bun.sh/), installation script can be found on their website.
 
