@@ -99,7 +99,8 @@ export async function pingUrl(
             }
         } catch (error) {
             log.info(
-                `${url} connection failed - ${attempt + 1}/${maxAttempts}, retrying in ${delay / 1000
+                `${url} connection failed - ${attempt + 1}/${maxAttempts}, retrying in ${
+                    delay / 1000
                 } seconds...`
             )
         }
