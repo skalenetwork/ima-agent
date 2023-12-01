@@ -159,10 +159,37 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-pip-
 
-    - name: Set up Node
-      uses: actions/setup-node@v2
-      with:
-        node-version: '16'
+    - name: INIT - install Node JS
+      run: |
+        curl -sL https://deb.nodesource.com/setup_18.x | sudo bash -
+        sudo apt-get install -y nodejs
+        sudo ln -s /usr/bin/node /usr/local/bin/node
+        sudo npm install --global npm
+        sudo npm install --global color-support
+        sudo npm install --global yarn
+        sudo npm install --global node-gyp
+
+    - name: INIT - version checks of Node JS and its utilities
+      run: |
+        which node
+        node --version
+        which npm
+        npm --version
+        which yarn
+        yarn --version
+        which node-gyp
+        node-gyp --version
+
+    - name: INIT - install Bun SH
+      run: |
+        curl -fsSL https://bun.sh/install | bash
+        export BUN_INSTALL="$HOME/.bun"
+        export PATH=$BUN_INSTALL/bin:$PATH
+
+    - name: INIT - version checks of Bun SH
+      run: |
+        which bun
+        bun --version
 
     - name: Install Python 3.8
       uses: actions/setup-python@v2
