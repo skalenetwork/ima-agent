@@ -20,6 +20,7 @@
  * @copyright SKALE Labs 2023-Present
  */
 
+import { id, toBeHex } from 'ethers'
 import { Logger, type ILogObj } from 'tslog'
 
 import { readFileSync, writeFileSync, renameSync } from 'fs'
@@ -98,8 +99,7 @@ export async function pingUrl(
             }
         } catch (error) {
             log.info(
-                `${url} connection failed - ${attempt + 1}/${maxAttempts}, retrying in ${
-                    delay / 1000
+                `${url} connection failed - ${attempt + 1}/${maxAttempts}, retrying in ${delay / 1000
                 } seconds...`
             )
         }
@@ -107,4 +107,12 @@ export async function pingUrl(
         attempt++
     }
     log.info('Max attempts reached, URL is not available.')
+}
+
+export function chainIdHex(schainName: string): string {
+    return toBeHex(id(schainName).substring(0, 15))
+}
+
+export function chainIdInt(schainName: string): number {
+    return parseInt(chainIdHex(schainName))
 }

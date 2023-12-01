@@ -51,13 +51,13 @@ bun browse
 
 ## Static build
 
-For node.js tagret:
+For node.js target:
 
 ```bash
 bun build:node
 ```
 
-For bun.sh tagret:
+For bun.sh target:
 
 ```bash
 bun build:bun

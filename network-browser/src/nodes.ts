@@ -26,10 +26,18 @@ import { type Node, type NodeArray } from './interfaces'
 import { calcEndpoints } from './endpoints'
 import { hexToIp } from './tools'
 
-export async function getNode(nodesContract: Contract, nodeId: number): Promise<Node> {
-    const node: NodeArray = await nodesContract.nodes(nodeId)
-    const domainName: string = await nodesContract.getNodeDomainName(nodeId)
-    return nodeStruct(node, domainName)
+export async function getNodesGroups(
+    nodes: Contract,
+    schainsInternal: Contract,
+    nodeIdsArrays: bigint[][] | number[][],
+    schainsHashes: string[]
+): Promise<Node[][]> {
+    return await Promise.all(
+        nodeIdsArrays.map(
+            async (nodeIds, index) =>
+                await getNodes(nodes, schainsInternal, nodeIds, schainsHashes[index])
+        )
+    )
 }
 
 export async function getNodes(
@@ -52,20 +60,6 @@ export async function getNodes(
         )
     }
     return nodesData
-}
-
-export async function getNodesGroups(
-    nodes: Contract,
-    schainsInternal: Contract,
-    nodeIdsArrays: bigint[][] | number[][],
-    schainsHashes: string[]
-): Promise<Node[][]> {
-    return await Promise.all(
-        nodeIdsArrays.map(
-            async (nodeIds, index) =>
-                await getNodes(nodes, schainsInternal, nodeIds, schainsHashes[index])
-        )
-    )
 }
 
 async function getNodesRaw(

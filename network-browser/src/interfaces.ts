@@ -79,6 +79,7 @@ export interface SChain {
     generation: bigint
     originator: string
     nodes?: Node[]
+    chainId?: number
 }
 
 export interface SkaleManagerAbi {
