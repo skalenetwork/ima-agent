@@ -23,6 +23,8 @@ jobs:
       with:
           submodules: recursive
 
+    - uses: oven-sh/setup-bun@v1
+
     - name: System Version Checks
       run: |
         echo ------------ GIT_CURRENT_BRANCH
