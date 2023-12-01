@@ -1959,7 +1959,7 @@ async function prepareS2sOfSkaleImaVerifyAndSign( optsHandleVerifyAndSign ) {
     let joSChainSrc = null, strUrlSrcSChain = null;
     for( let idxSChain = 0; idxSChain < arrSChainsCached.length; ++ idxSChain ) {
         const joSChain = arrSChainsCached[idxSChain];
-        if( joSChain.data.name.toString() == strSChainNameSrc.toString() ) {
+        if( joSChain.name.toString() == strSChainNameSrc.toString() ) {
             joSChainSrc = joSChain;
             strUrlSrcSChain = skaleObserver.pickRandomSChainUrl( joSChain );
             break;
