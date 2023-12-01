@@ -1130,7 +1130,7 @@ function parseOracleArgs( imaState, joArg ) {
 
 function parseNetworkDiscoveryArgs( imaState, joArg ) {
     if( joArg.name == "network-browser-path" ) {
-        owaspUtils.verifyArgumentIsPathToExistingFile( joArg );
+        owaspUtils.verifyArgumentWithNonEmptyValue( joArg );
         imaState.optsS2S.strNetworkBrowserPath = "" + joArg.value;
         return true;
     }
