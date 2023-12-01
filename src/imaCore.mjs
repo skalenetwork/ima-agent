@@ -1106,7 +1106,7 @@ export async function doAllS2S( // s-chain --> s-chain
         const ethersProviderSrc = owaspUtils.getEthersProviderFromURL( urlSrc );
         const joAccountSrc = joAccountDst; // ???
         const chainNameSrc = "" + joSChain.name;
-        const chainIdSrc = "" + skaleObserver.chainNameToChainId( joSChain.name );
+        const chainIdSrc = "" + joSChain.chainId;
         log.information( "S2S transfer walk trough {}/{} S-Chain in {}...",
             chainNameSrc, chainIdSrc, threadInfo.threadDescription() );
         let bOK = false;

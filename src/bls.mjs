@@ -1974,7 +1974,7 @@ async function prepareS2sOfSkaleImaVerifyAndSign( optsHandleVerifyAndSign ) {
         "{p}{bright} verification algorithm discovered source chain URL is {url}, chain name " +
         "is {}, chain id is {}", optsHandleVerifyAndSign.strLogPrefix,
         optsHandleVerifyAndSign.strDirection, strUrlSrcSChain,
-        joSChainSrc.name, skaleObserver.chainNameToChainId( joSChainSrc.name ) );
+        joSChainSrc.name, joSChainSrc.chainId );
     optsHandleVerifyAndSign.joExtraSignOpts = {
         ethersProviderSrc: owaspUtils.getEthersProviderFromURL( strUrlSrcSChain ),
         chainNameSrc: optsHandleVerifyAndSign.strFromChainName,

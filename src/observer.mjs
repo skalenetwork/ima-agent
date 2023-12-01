@@ -23,7 +23,6 @@
  * @copyright SKALE Labs 2019-Present
  */
 
-import * as owaspUtils from "./owaspUtils.mjs";
 import * as state from "./state.mjs";
 import * as imaUtils from "./utils.mjs";
 import * as log from "./log.mjs";
@@ -56,7 +55,7 @@ export function autoUpdateLastCachedSChains() {
 
     gConnectedChainsData = jo;
     log.debug(
-        "Connected S-chains cache in thread {} was updated from file {} with data: {}",
+        // "Connected S-chains cache in thread {} was updated from file {} with data: {}",
         threadInfo.threadDescription(), imaState.optsS2S.strNetworkBrowserPath,
         gConnectedChainsData );
     return true;
@@ -67,15 +66,6 @@ export function getLastCachedSChains() {
     if( ! gConnectedChainsData )
         return [];
     return JSON.parse( JSON.stringify( gConnectedChainsData.schains ) );
-}
-
-export function chainNameToChainId( strName ) {
-    let h = owaspUtils.ethersMod.ethers.utils.keccak256( strName );
-    h = owaspUtils.remove_starting_0x( h ).toLowerCase();
-    while( h.length < 64 )
-        h = "0" + h;
-    h = h.tr( 0, 14 );
-    return "0x" + h;
 }
 
 export function pickRandomSChainNodeIndex( joSChain ) {
