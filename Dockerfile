@@ -9,11 +9,11 @@ RUN apt-get install --no-install-recommends -y build-essential zlib1g-dev libncu
 RUN echo "deb http://security.ubuntu.com/ubuntu focal-security main" | tee /etc/apt/sources.list.d/focal-security.list
 RUN apt-get update
 #RUN apt-get install --no-install-recommends -y libssl1.1 unzip
-RUN apt-get install --no-install-recommends -y libssl3 unzip
+RUN apt-get install --no-install-recommends -y libssl3 unzip curl
 # NOTICE: to remove extra dep above: sudo rm /etc/apt/sources.list.d/focal-security.list
 
-RUN curl -fsSL https://bun.sh/install | bash -s "bun-v1.0.14"
-ENV PATH="$HOME/.bun/bin:$PATH"
+RUN curl -fsSL https://bun.sh/install | BUN_INSTALL=/usr bash -s "bun-v1.0.15"
+RUN bun --version
 
 RUN curl -sL https://deb.nodesource.com/setup_18.x | bash
 RUN apt-get install --no-install-recommends -y nodejs
