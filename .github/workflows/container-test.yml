@@ -471,8 +471,8 @@ jobs:
         cd comprehensive-test/engine
         export ALL_SKALE_TEST_CLOUD_RUN=1
         #
-        export VERSION=13.13.13-test.13
-        #export VERSION=13.13.13-develop.13.55
+        #export VERSION=13.13.13-test.13
+        export VERSION=13.13.13-develop.13.55
         echo "Docker image(will run) version is:" $VERSION
         export NAME=ima
         export BRANCH=$GIT_CURRENT_BRANCH
