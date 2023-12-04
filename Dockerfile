@@ -52,8 +52,6 @@ COPY VERSION VERSION
 
 RUN mkdir /ima/bls_binaries
 COPY scripts/bls_binaries /ima/bls_binaries
-RUN ldd /ima/bls_binaries/verify_bls
-RUN /ima/bls_binaries/verify_bls --version
 
 RUN chmod +x /ima/bls_binaries/bls_glue
 RUN chmod +x /ima/bls_binaries/hash_g1
