@@ -1,4 +1,4 @@
-FROM ubuntu:jammy
+FROM ubuntu:focal
 
 RUN apt-get update
 RUN apt-get install --no-install-recommends -yq software-properties-common
@@ -9,7 +9,7 @@ RUN apt-get install --no-install-recommends -y build-essential zlib1g-dev libncu
 RUN echo "deb http://security.ubuntu.com/ubuntu focal-security main" | tee /etc/apt/sources.list.d/focal-security.list
 RUN apt-get update
 #RUN apt-get install --no-install-recommends -y libssl1.1 unzip
-RUN apt-get install --no-install-recommends -y libssl3 unzip curl
+RUN apt-get install --no-install-recommends -y libssl1.1 unzip curl
 # NOTICE: to remove extra dep above: sudo rm /etc/apt/sources.list.d/focal-security.list
 
 RUN curl -fsSL https://bun.sh/install | BUN_INSTALL=/usr bash -s "bun-v1.0.15"

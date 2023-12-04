@@ -24,6 +24,8 @@ jobs:
 
     steps:
 
+    - uses: oven-sh/setup-bun@v1
+
     - name: INIT - force pre-clean
       run: |
         echo "------------------------------------------------------------------------------------"
@@ -162,6 +164,11 @@ jobs:
         yarn --version
         which node-gyp
         node-gyp --version
+
+    - name: INIT - version checks of Bun SH
+      run: |
+        which bun
+        bun --version
 
     - name: INIT - Download comprehensive-test
       working-directory: ${{env.working-directory}}
