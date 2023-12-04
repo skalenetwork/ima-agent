@@ -14,6 +14,7 @@ RUN apt-get install --no-install-recommends -y unzip curl wget
 RUN wget https://www.openssl.org/source/old/1.1.0/openssl-1.1.0l.tar.gz
 RUN tar xfz openssl-1.1.0l.tar.gz 
 RUN cd openssl-1.1.0l && ./config && make && make install && cd ..
+RUN ldconfig
 
 RUN curl -fsSL https://bun.sh/install | BUN_INSTALL=/usr bash -s "bun-v1.0.15"
 RUN bun --version
@@ -51,6 +52,8 @@ COPY VERSION VERSION
 
 RUN mkdir /ima/bls_binaries
 COPY scripts/bls_binaries /ima/bls_binaries
+RUN ldd /ima/bls_binaries/verify_bls
+RUN /ima/bls_binaries/verify_bls --version
 
 RUN chmod +x /ima/bls_binaries/bls_glue
 RUN chmod +x /ima/bls_binaries/hash_g1
