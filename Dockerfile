@@ -1,4 +1,4 @@
-FROM ubuntu:focal
+FROM ubuntu:jammy
 
 RUN apt-get update
 RUN apt-get install --no-install-recommends -yq software-properties-common
@@ -8,9 +8,13 @@ RUN apt-get install --no-install-recommends -y build-essential zlib1g-dev libncu
 # NOTICE: we need to install SSL 1.1 manually here in order to make BLS command line tools working
 RUN echo "deb http://security.ubuntu.com/ubuntu focal-security main" | tee /etc/apt/sources.list.d/focal-security.list
 RUN apt-get update
-#RUN apt-get install --no-install-recommends -y libssl1.1 unzip
-RUN apt-get install --no-install-recommends -y libssl1.1 unzip curl
+RUN apt-get install --no-install-recommends -y unzip curl wget
 # NOTICE: to remove extra dep above: sudo rm /etc/apt/sources.list.d/focal-security.list
+
+RUN wget https://www.openssl.org/source/old/1.1.0/openssl-1.1.0l.tar.gz
+RUN tar xfz openssl-1.1.0l.tar.gz 
+RUN cd openssl-1.1.0l && ./config && make && make install && cd ..
+RUN ldconfig
 
 RUN curl -fsSL https://bun.sh/install | BUN_INSTALL=/usr bash -s "bun-v1.0.15"
 RUN bun --version
@@ -48,6 +52,8 @@ COPY VERSION VERSION
 
 RUN mkdir /ima/bls_binaries
 COPY scripts/bls_binaries /ima/bls_binaries
+RUN ldd /ima/bls_binaries/verify_bls
+RUN /ima/bls_binaries/verify_bls --version
 
 RUN chmod +x /ima/bls_binaries/bls_glue
 RUN chmod +x /ima/bls_binaries/hash_g1
