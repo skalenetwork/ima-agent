@@ -249,6 +249,8 @@ jobs:
     - name: Run test (PY part)
       working-directory: ./test
       run: |
+        export URL_W3_ETHEREUM="http://127.0.0.1:8545"
+        export URL_W3_S_CHAIN="http://127.0.0.1:8545"
         python3 test.py
 
     - name: Prepare test (JS part)
