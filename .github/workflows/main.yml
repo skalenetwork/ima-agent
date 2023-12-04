@@ -243,8 +243,6 @@ jobs:
     - name: Prepare test (PY part)
       working-directory: ./test
       run: |
-        export URL_W3_ETHEREUM="http://127.0.0.1:8545"
-        export URL_W3_S_CHAIN="http://127.0.0.1:8545"
         python3 ../scripts/config_from_accounts.py accounts.json config.json
         pip3 install -r requirements.txt
 
