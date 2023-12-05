@@ -29,7 +29,6 @@ import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
 import * as threadInfo from "./threadInfo.mjs";
-import * as rpcCall from "./rpcCall.mjs";
 
 import { v4 as uuid } from "uuid";
 export { uuid };
@@ -479,27 +478,4 @@ export function composeImaAgentNodeUrl( joNode, isThisNode ) {
         return "http://" + strNodeIP + ":" + nPort;
     }
     return "";
-}
-
-export async function discoverChainId( strURL ) {
-    let ret = null, joCall = null;
-    const rpcCallOpts = null;
-    try {
-        joCall = await rpcCall.create( strURL, rpcCallOpts );
-        if( ! joCall )
-            throw new Error( `Failed to create JSON RPC call object to ${strURL}` );
-        const joIn = { "method": "eth_chainId", "params": [] };
-        const joOut = await joCall.call( joIn );
-        if( ! ( "result" in joOut && joOut.result ) ) {
-            await joCall.disconnect();
-            return;
-        }
-        ret = joOut.result;
-        await joCall.disconnect();
-    } catch ( err ) {
-        if( joCall )
-            await joCall.disconnect();
-        return;
-    }
-    return ret;
 }

@@ -81,8 +81,7 @@ function parseCommandLine() {
         "transfer": clpTools.commandLineTaskTransfer,
         "loop": clpTools.commandLineTaskLoop,
         "simple-loop": clpTools.commandLineTaskLoopSimple,
-        "browse-s-chain": clpTools.commandLineTaskBrowseSChain,
-        "discover-cid": clpTools.commandLineTaskDiscoverChainId
+        "browse-s-chain": clpTools.commandLineTaskBrowseSChain
     } );
     let haveReimbursementCommands = false;
     if( imaState.isShowReimbursementBalance ) {

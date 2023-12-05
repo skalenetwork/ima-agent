@@ -194,7 +194,6 @@ IMA JSON RPC SERVER options:
     --no-cross-ima .........................Disable calls to IMA JSON RPC servers to  compute BLS signature parts and operation state inside time frames. Use calls to skaled. Default mode.
 TEST options:
     --browse-s-chain .......................Download own S-Chain's network information.
-    --discover-cid .........................Discover chains ID(s) from provided URL(s). This command is not executed automatically at startup.
 OPTIMIZATION options:
     --enable-multicall .....................Enable optimizations via multi-call. Default mode.
     --disable-multicall ....................Disable optimizations via multi-call.

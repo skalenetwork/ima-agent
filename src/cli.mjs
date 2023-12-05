@@ -1276,8 +1276,7 @@ export function parse( joExternalHandlers, argv ) {
             joArg.name == "transfer" ||
             joArg.name == "loop" ||
             joArg.name == "simple-loop" ||
-            joArg.name == "browse-s-chain" ||
-            joArg.name == "discover-cid"
+            joArg.name == "browse-s-chain"
         ) {
             joExternalHandlers[joArg.name]();
             continue;
