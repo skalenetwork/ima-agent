@@ -28,6 +28,8 @@ jobs:
       with:
           submodules: recursive
 
+    - uses: oven-sh/setup-bun@v1
+
     - name: INFO - github environment variable checks
       run: |
         echo ------------ GIT_CURRENT_BRANCH
@@ -159,6 +161,11 @@ jobs:
         yarn --version
         which node-gyp
         node-gyp --version
+
+    - name: INIT - version checks of Bun SH
+      run: |
+        which bun
+        bun --version
 
     - name: INIT - Download comprehensive-test
       working-directory: ${{env.working-directory}}

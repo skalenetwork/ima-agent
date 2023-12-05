@@ -8,8 +8,16 @@ RUN apt-get install --no-install-recommends -y build-essential zlib1g-dev libncu
 # NOTICE: we need to install SSL 1.1 manually here in order to make BLS command line tools working
 RUN echo "deb http://security.ubuntu.com/ubuntu focal-security main" | tee /etc/apt/sources.list.d/focal-security.list
 RUN apt-get update
-RUN apt-get install --no-install-recommends -y libssl1.1
+RUN apt-get install --no-install-recommends -y unzip curl wget
 # NOTICE: to remove extra dep above: sudo rm /etc/apt/sources.list.d/focal-security.list
+
+RUN wget https://www.openssl.org/source/old/1.1.0/openssl-1.1.0l.tar.gz
+RUN tar xfz openssl-1.1.0l.tar.gz 
+RUN cd openssl-1.1.0l && ./config && make && make install && cd ..
+RUN ldconfig
+
+RUN curl -fsSL https://bun.sh/install | BUN_INSTALL=/usr bash -s "bun-v1.0.15"
+RUN bun --version
 
 RUN curl -sL https://deb.nodesource.com/setup_18.x | bash
 RUN apt-get install --no-install-recommends -y nodejs
@@ -30,11 +38,14 @@ RUN which python3
 
 RUN mkdir /ima
 WORKDIR /ima
+COPY package.json package.json
 
 COPY src src
+COPY network-browser network-browser
 RUN mkdir IMA
 COPY IMA/proxy IMA/proxy
 COPY IMA/package.json IMA/package.json
+COPY IMA/postinstall.sh IMA/postinstall.sh
 COPY IMA/VERSION IMA/VERSION
 COPY package.json package.json
 COPY VERSION VERSION

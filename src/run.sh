@@ -23,6 +23,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 : "${MONITORING_PORT?Need to set MONITORING_PORT}"
 
 : "${TM_URL_MAIN_NET?Need to set TM_URL_MAIN_NET}"
+: "${IMA_NETWORK_BROWSER_DATA_PATH?Need to set IMA_NETWORK_BROWSER_DATA_PATH}"
 
 # SGX variables
 
@@ -59,7 +60,6 @@ export TIME_GAP=${TIME_GAP:-15}
 export CID_MAIN_NET=${CID_MAIN_NET:--4}
 export CID_SCHAIN=${CID_SCHAIN:--4}
 
-echo "$(date) - Starting IMA agent..."
 
 BASE_OPTIONS="--gas-price-multiplier=$GAS_PRICE_MULTIPLIER \
 --gas-multiplier=$GAS_MULTIPLIER \
@@ -110,9 +110,13 @@ BASE_OPTIONS="--gas-price-multiplier=$GAS_PRICE_MULTIPLIER \
 --tm-url-main-net=$TM_URL_MAIN_NET \
 --time-gap=$TIME_GAP \
 --monitoring-port=$MONITORING_PORT \
+--network-browser-path=$IMA_NETWORK_BROWSER_DATA_PATH \
 --pwa \
 --no-expose-pwa \
 --auto-exit=86400"
 
-echo "Running loop cmd..."
-node "$DIR/main.mjs" --loop $BASE_OPTIONS
+IMA_LOOP_CMD="node $DIR/main.mjs --loop $BASE_OPTIONS"
+NETWORK_BROWSER_CMD="cd $DIR/../network-browser && bun browse"
+
+echo "$(date) - Running IMA loop and network-browser"
+node "$DIR/startup.js" "$IMA_LOOP_CMD" "$NETWORK_BROWSER_CMD"

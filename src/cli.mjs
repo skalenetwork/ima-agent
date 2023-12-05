@@ -1149,6 +1149,11 @@ function parseNetworkDiscoveryArgs( imaState, joArg ) {
             owaspUtils.toInteger( joArg.value );
         return true;
     }
+    if( joArg.name == "network-browser-path" ) {
+        owaspUtils.verifyArgumentIsPathToExistingFile( joArg );
+        imaState.optsS2S.strNetworkBrowserPath = "" + joArg.value;
+        return true;
+    }
     return false;
 }
 
@@ -2588,6 +2593,11 @@ function commonInitGasMultipliersAndTransactionArgs() {
                 ? log.fmtInformation(
                     imaState.optsS2S.secondsToWaitForSkaleNetworkDiscovered.toString() )
                 : log.fmtError( "disabled" ) ) );
+        log.debug( log.fmtInformation( "SKALE network browser file path is" ),
+            "................." +
+            ( imaState.optsS2S.strNetworkBrowserPath
+                ? log.fmtInformation( imaState.optsS2S.strNetworkBrowserPath )
+                : log.fmtError( "N/A" ) ) );
         log.debug( log.fmtInformation( "S<->S transfer mode is" ),
             "..............................." +
             imaHelperAPIs.getS2STransferModeDescriptionColorized() );

@@ -278,7 +278,8 @@ export function get() {
             "bParallelModeRefreshSNB": true,
             // seconds to re-discover SKALE network, 0 to disable
             "secondsToReDiscoverSkaleNetwork": 1 * 60 * 60,
-            "secondsToWaitForSkaleNetworkDiscovered": 5 * 60
+            "secondsToWaitForSkaleNetworkDiscovered": 5 * 60,
+            "strNetworkBrowserPath": null
         },
 
         "nJsonRpcPort": 0, // 0 to disable

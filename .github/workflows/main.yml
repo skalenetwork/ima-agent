@@ -23,6 +23,8 @@ jobs:
       with:
           submodules: recursive
 
+    - uses: oven-sh/setup-bun@v1
+
     - name: System Version Checks
       run: |
         echo ------------ GIT_CURRENT_BRANCH
@@ -92,10 +94,14 @@ jobs:
         yarn install
         ls -1
 
-    - name: JS Lint Check everything
+    - name: JS Lint Check src
       run: |
         yarn run lint-check
         echo "Looks like no JS code formatting errors so far)"
+    
+    - name: JS Lint Check network-browser
+      run: |
+        yarn run lint-nb
 
     - name: Python Version Checks
       run: |
@@ -135,6 +141,8 @@ jobs:
     - uses: actions/checkout@v2
       with:
           submodules: recursive
+    
+    - uses: oven-sh/setup-bun@v1
 
     - name: Get yarn cache directory path
       id: yarn-cache-dir-path
@@ -158,7 +166,7 @@ jobs:
     - name: Set up Node
       uses: actions/setup-node@v2
       with:
-        node-version: '16'
+        node-version: '18'
 
     - name: Install Python 3.8
       uses: actions/setup-python@v2
@@ -184,16 +192,27 @@ jobs:
       working-directory: ./IMA/proxy
       run: |
         npx ganache --miner.blockGasLimit 12000000 --logging.quiet --chain.allowUnlimitedContractSize --wallet.defaultBalance 2000000 --wallet.accountKeysPath ../../test/accounts.json &
+        sleep 3
+        echo "Content of \"accounts.json\" is:"
+        cat ../../test/accounts.json | jq
 
     - name: Prepare test (PY part)
       working-directory: ./test
       run: |
         python3 ../scripts/config_from_accounts.py accounts.json config.json
+        echo "Content of \"config.json\" is:"
+        cat config.json | jq
+        export PRIVATE_KEY_FOR_ETHEREUM=$( cat config.json | jq -M .PRIVATE_KEY_FOR_ETHEREUM | tr -d '"' | sed -e "s/^0x//" )
+        echo "Value of \"PRIVATE_KEY_FOR_ETHEREUM\" is" $PRIVATE_KEY_FOR_ETHEREUM
+        export PRIVATE_KEY_FOR_SCHAIN=$( cat config.json | jq -M .PRIVATE_KEY_FOR_SCHAIN | tr -d '"' | sed -e "s/^0x//" ) 
+        echo "Value of \"PRIVATE_KEY_FOR_SCHAIN\" is" $PRIVATE_KEY_FOR_SCHAIN
         pip3 install -r requirements.txt
 
     - name: Run test (PY part)
       working-directory: ./test
       run: |
+        export URL_W3_ETHEREUM="http://127.0.0.1:8545"
+        export URL_W3_S_CHAIN="http://127.0.0.1:8545"
         python3 test.py
 
     - name: Prepare test (JS part)

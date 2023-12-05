@@ -1,0 +1,30 @@
+{
+  "name": "network-browser",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "bun _fix && bun --hot index.ts",
+    "browse": "bun _fix && bun index.ts",
+    "build:bun": "bun build index.ts --target=bun --outfile=network-browser.js",
+    "build:node": "bun build index.ts --target=node --outfile=network-browser.js",
+    "build:exec": "bun build index.ts --compile --outfile=network-browser",
+    "lint-check": "eslint -c .eslintrc.cjs ./src/* && prettier --check \"**/*.{ts,tsx,js,mdx}\"",
+    "lint-fix": "bun _lint && bun _prettier",
+    "_prettier": "prettier --write \"**/*.{ts,tsx,js,mdx}\"",
+    "_lint": "eslint -c .eslintrc.cjs --fix ./src/*",
+    "_fix": "bash ethers_hotfix.sh"
+  },
+  "dependencies": {
+    "ethers": "6.8.1",
+    "ethers-multicall-provider": "^5.0.0",
+    "tslog": "^4.9.2"
+  },
+  "devDependencies": {
+    "bun-types": "^1.0.11",
+    "eslint": "^8.53.0",
+    "eslint-config-standard-with-typescript": "^39.1.1",
+    "prettier": "^3.1.0",
+    "typescript": "^5.2.2"
+  }
+}

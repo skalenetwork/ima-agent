@@ -1189,6 +1189,7 @@ async function parallelPeriodicCachingStart( strChainNameConnectedTo, opts ) {
                     parseInt( opts.secondsToReDiscoverSkaleNetwork ),
                 "secondsToWaitForSkaleNetworkDiscovered":
                     parseInt( opts.secondsToWaitForSkaleNetworkDiscovered ),
+                "strNetworkBrowserPath": opts.strNetworkBrowserPath,
                 "strChainNameConnectedTo": strChainNameConnectedTo,
                 "isForceMultiAttemptsUntilSuccess":
                     ( "isForceMultiAttemptsUntilSuccess" in opts &&

@@ -3,12 +3,15 @@
     "license": "AGPL-3.0",
     "author": "SKALE Labs and contributors",
     "scripts": {
-        "lint-check": "cd src; yarn lint-check; cd ..",
-        "lint-fix": "cd src; yarn lint-fix; cd ..",
-        "postinstall": "cd src; yarn install; cd ..; cd IMA; yarn install; cd ..",
+        "lint-check": "cd src && yarn lint-check && cd ..",
+        "lint-nb": "cd network-browser && yarn lint-check && cd ..",
+        "install-nb": "cd network-browser && bun install && cd ..",
+        "lint-fix": "cd src && yarn lint-fix && cd ..",
+        "postinstall": "cd src && yarn install && cd .. && cd IMA && yarn install && cd .. && yarn install-nb",
         "check-outdated": "yarn outdated; cd src; yarn outdated; cd ..; cd IMA; yarn outdated; cd ..",
         "upgrade-to-latest": "yarn upgrade --latest; cd src; yarn upgrade --latest; cd ..; cd IMA; yarn upgrade --latest; cd .."
     },
-    "dependencies": {},
-    "devDependencies": {}
+    "dependencies": {
+        "remark": "^15.0.1"
+    }
 }
