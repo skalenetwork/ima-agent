@@ -38,21 +38,25 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-yarn-
 
-    - name: Install NODE JS
-      uses: actions/setup-node@v2
-      with:
-        node-version: '18'
-
+    - name: INIT - install Node JS
+      run: |
+        curl -sL https://deb.nodesource.com/setup_18.x | sudo bash -
+        sudo apt-get install -y nodejs
+        sudo ln -s /usr/bin/node /usr/local/bin/node || true
+        
     - name: INIT - install Node utilities
       run: |
-        npm install --global color-support
-        npm install --global node-gyp
-        npm install --global yarn
+        sudo npm install --global npm
+        sudo npm install --global color-support
+        sudo npm install --global yarn
+        sudo npm install --global node-gyp
 
     - name: INIT - version checks of Node JS and its utilities
       run: |
         which node
         node --version
+        which npx
+        npx --version
         which npm
         npm --version
         which yarn
