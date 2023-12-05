@@ -100,7 +100,6 @@ jobs:
         sudo npm install --global yarn
         sudo npm install --global node-gyp
 
-
     - name: INIT - version checks of Node JS and its utilities
       run: |
         which node
