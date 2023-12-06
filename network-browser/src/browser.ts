@@ -25,7 +25,13 @@ import { type Contract } from 'ethers'
 import { Logger, type ILogObj } from 'tslog'
 
 import { type SChain, type NetworkBrowserData } from './interfaces'
-import { getSChainHashes, getSChains, filterConnectedOnly, getNodeIdsInGroups } from './schains'
+import {
+    getSChainHashes,
+    getSChains,
+    filterConnectedOnly,
+    getNodeIdsInGroups,
+    filterConnectedHashes
+} from './schains'
 import { getNodesGroups } from './nodes'
 import { CONNECTED_ONLY, IMA_NETWORK_BROWSER_DATA_PATH } from './constants'
 import { writeJson, currentTimestamp, chainIdInt } from './tools'
@@ -36,9 +42,12 @@ export async function browse(schainsInternal: Contract, nodes: Contract): Promis
     log.info('Browse iteration started, collecting chains')
 
     const start = performance.now()
-    const schainsHashes = await getSChainHashes(schainsInternal)
+    let schainsHashes = await getSChainHashes(schainsInternal)
     let schains: SChain[] = await getSChains(schainsInternal, schainsHashes)
-    if (CONNECTED_ONLY) schains = await filterConnectedOnly(schains)
+    if (CONNECTED_ONLY) {
+        schains = await filterConnectedOnly(schains)
+        schainsHashes = filterConnectedHashes(schainsHashes, schains)
+    }
     log.info(`Going to gather information about ${schains.length} chains`)
 
     const nodesInGroups = await getNodeIdsInGroups(schainsInternal, schainsHashes)

@@ -58,6 +58,10 @@ export async function filterConnectedOnly(schains: SChain[]): Promise<SChain[]> 
     return results.filter((result) => result.conditionResult).map((result) => result.schain)
 }
 
+export function filterConnectedHashes(schainsHashes: string[], schains: SChain[]): string[] {
+    return schainsHashes.filter((hash) => schains.some((schain) => id(schain.name) === hash))
+}
+
 export async function getNodeIdsInGroups(
     schainsInternal: Contract,
     schainsHashes: string[]
