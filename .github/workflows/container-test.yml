@@ -148,7 +148,10 @@ jobs:
       run: |
         curl -sL https://deb.nodesource.com/setup_18.x | sudo bash -
         sudo apt-get install -y nodejs
-        sudo ln -s /usr/bin/node /usr/local/bin/node
+        sudo ln -s /usr/bin/node /usr/local/bin/node || true
+        
+    - name: INIT - install Node utilities
+      run: |
         sudo npm install --global npm
         sudo npm install --global color-support
         sudo npm install --global yarn
@@ -158,6 +161,8 @@ jobs:
       run: |
         which node
         node --version
+        which npx
+        npx --version
         which npm
         npm --version
         which yarn
@@ -278,42 +283,22 @@ jobs:
         yarn install
         cd ../..
 
-    - name: SELF-TEST 1 A - use IMA to discover chain ID via node 00-00 and test last is alive
-      working-directory: ${{env.working-directory}}
-      run: |
-        node ./src/main.mjs --colors --no-gathered --discover-cid --url-main-net=http://127.0.0.1:2164 || true
-
-    - name: SELF-TEST 1 B - use IMA to discover chain ID via node 00-01 and test last is alive
-      working-directory: ${{env.working-directory}}
-      run: |
-        node ./src/main.mjs --colors --no-gathered --discover-cid --url-main-net=http://127.0.0.2:2264 || true
-
-    - name: SELF-TEST 1 C - use IMA to discover chain ID via node 01-00 and test last is alive
-      working-directory: ${{env.working-directory}}
-      run: |
-        node ./src/main.mjs --colors --no-gathered --discover-cid --url-main-net=http://127.0.0.3:2364 || true
-
-    - name: SELF-TEST 1 D - use IMA to discover chain ID via node 01-01 and test last is alive
-      working-directory: ${{env.working-directory}}
-      run: |
-        node ./src/main.mjs --colors --no-gathered --discover-cid --url-main-net=http://127.0.0.4:2464 || true
-
-    - name: SELF-TEST 2 A - use IMA to browse S-Chain via node 00-00 and test last is alive
+    - name: SELF-TEST A - use IMA to browse S-Chain via node 00-00 and test last is alive
       working-directory: ${{env.working-directory}}
       run: |
         node ./src/main.mjs --colors --no-gathered --browse-s-chain --url-s-chain=http://127.0.0.1:2164 || true
 
-    - name: SELF-TEST 2 B - use IMA to browse S-Chain via node 00-01 and test last is alive
+    - name: SELF-TEST B - use IMA to browse S-Chain via node 00-01 and test last is alive
       working-directory: ${{env.working-directory}}
       run: |
         node ./src/main.mjs --colors --no-gathered --browse-s-chain --url-s-chain=http://127.0.0.2:2264 || true
 
-    - name: SELF-TEST 2 C - use IMA to browse S-Chain via node 01-00 and test last is alive
+    - name: SELF-TEST C - use IMA to browse S-Chain via node 01-00 and test last is alive
       working-directory: ${{env.working-directory}}
       run: |
         node ./src/main.mjs --colors --no-gathered --browse-s-chain --url-s-chain=http://127.0.0.3:2364 || true
 
-    - name: SELF-TEST 2 D - use IMA to browse S-Chain via node 01-01 and test last is alive
+    - name: SELF-TEST D - use IMA to browse S-Chain via node 01-01 and test last is alive
       working-directory: ${{env.working-directory}}
       run: |
         node ./src/main.mjs --colors --no-gathered --browse-s-chain --url-s-chain=http://127.0.0.4:2464 || true

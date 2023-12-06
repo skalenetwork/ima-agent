@@ -81,10 +81,7 @@ function parseCommandLine() {
         "transfer": clpTools.commandLineTaskTransfer,
         "loop": clpTools.commandLineTaskLoop,
         "simple-loop": clpTools.commandLineTaskLoopSimple,
-        "browse-s-chain": clpTools.commandLineTaskBrowseSChain,
-        "browse-skale-network": clpTools.commandLineTaskBrowseSkaleNetwork,
-        "browse-connected-schains": clpTools.commandLineTaskBrowseConnectedSChains,
-        "discover-cid": clpTools.commandLineTaskDiscoverChainId
+        "browse-s-chain": clpTools.commandLineTaskBrowseSChain
     } );
     let haveReimbursementCommands = false;
     if( imaState.isShowReimbursementBalance ) {
@@ -325,29 +322,6 @@ function initJsonRpcServer() {
                 break;
             case "skale_getCachedSNB":
                 joAnswer.arrSChainsCached = skaleObserver.getLastCachedSChains();
-                break;
-            case "skale_historySNB":
-                joAnswer.arrCacheHistory = skaleObserver.getLastCachedHistory();
-                break;
-            case "skale_refreshSNB":
-                {
-                    const opts = {
-                        imaState: imaState,
-                        "details": log,
-                        "bStopNeeded": false,
-                        "secondsToReDiscoverSkaleNetwork":
-                            imaState.optsS2S.secondsToReDiscoverSkaleNetwork,
-                        "secondsToWaitForSkaleNetworkDiscovered":
-                            imaState.optsS2S.secondsToWaitForSkaleNetworkDiscovered,
-                        "strNetworkBrowserPath": imaState.optsS2S.strNetworkBrowserPath,
-                        "chain": imaState.chainProperties.sc,
-                        "bParallelModeRefreshSNB":
-                            ( !!( imaState.optsS2S.bParallelModeRefreshSNB ) ),
-                        "isForceMultiAttemptsUntilSuccess": false
-                    };
-                    skaleObserver.refreshNowSNB( opts ); // async call, no await here
-                    joAnswer.result = "Done";
-                }
                 break;
             default:
                 joAnswer.error = `Unknown method name ${joMessage.method} was specified`;

@@ -423,46 +423,6 @@ export async function runTransferLoop( optsLoop ) {
 const gArrWorkers = [];
 const gArrClients = [];
 
-export function notifyCacheChangedSNB( arrSChainsCached ) {
-    const cntWorkers = gArrWorkers.length;
-    if( cntWorkers == 0 ) {
-        if( threadInfo.joCustomThreadProperties.isSChainsCacheNeeded ) {
-            log.debug(
-                "Will skip chainsCacheChanged dispatch event with in {} " +
-                "because of no workers present yet",
-                threadInfo.threadDescription() );
-        }
-        return;
-    }
-    if( threadInfo.joCustomThreadProperties.isSChainsCacheNeeded ) {
-        log.debug( "Loop module will broadcast arrSChainsCached event to its ",
-            cntWorkers, " worker(s) in ", threadInfo.threadDescription(), "..." );
-    }
-    for( let idxWorker = 0; idxWorker < cntWorkers; ++ idxWorker ) {
-        const jo = {
-            "method": "schainsCached",
-            "message": { "arrSChainsCached": arrSChainsCached }
-        };
-        if( threadInfo.joCustomThreadProperties.isSChainsCacheNeeded ) {
-            log.debug( "S-Chains cache will be sent to {} loop worker...",
-                gArrClients[idxWorker].url );
-        }
-        gArrClients[idxWorker].send( jo );
-        if( threadInfo.joCustomThreadProperties.isSChainsCacheNeeded )
-            log.debug( "S-Chains cache did sent to {} loop worker", gArrClients[idxWorker].url );
-
-    }
-    log.debug( "Loop module did finished broadcasting arrSChainsCached event " +
-        "to its {} worker(s) in {}...", cntWorkers, threadInfo.threadDescription() );
-}
-
-log.trace( "Subscribe to chainsCacheChanged event in {}", threadInfo.threadDescription() );
-skaleObserver.events.on( "chainsCacheChanged", function( eventData ) {
-    if( threadInfo.joCustomThreadProperties.isSChainsCacheNeeded )
-        log.trace( "Did arrived chainsCacheChanged event in {}", threadInfo.threadDescription() );
-    notifyCacheChangedSNB( eventData.detail.arrSChainsCached );
-} );
-
 function constructChainProperties( opts ) {
     return {
         "mn": {
@@ -598,7 +558,6 @@ export async function ensureHaveWorkers( opts ) {
                         "optsLoop": getDefaultOptsLoop( idxWorker ),
                         "verbose_": log.verboseGet(),
                         "expose_details_": log.exposeDetailsGet(),
-                        "arrSChainsCached": skaleObserver.getLastCachedSChains(),
                         "loopState": state.gDefaultValueForLoopState,
                         "isPrintGathered": opts.imaState.isPrintGathered,
                         "isPrintSecurityValues": opts.imaState.isPrintSecurityValues,
@@ -686,12 +645,6 @@ export async function ensureHaveWorkers( opts ) {
                         },
                         "optsS2S": { // S-Chain to S-Chain transfer options
                             "isEnabled": true,
-                            "bParallelModeRefreshSNB":
-                                opts.imaState.optsS2S.bParallelModeRefreshSNB,
-                            "secondsToReDiscoverSkaleNetwork":
-                                opts.imaState.optsS2S.secondsToReDiscoverSkaleNetwork,
-                            "secondsToWaitForSkaleNetworkDiscovered":
-                                opts.imaState.optsS2S.secondsToWaitForSkaleNetworkDiscovered,
                             "strNetworkBrowserPath": opts.imaState.optsS2S.strNetworkBrowserPath
                         },
                         "nJsonRpcPort": opts.imaState.nJsonRpcPort,
@@ -709,19 +662,6 @@ export async function ensureHaveWorkers( opts ) {
     }
     log.debug( "Loop module did created its ",
         gArrWorkers.length, " worker(s) in ", threadInfo.threadDescription() );
-    log.trace( "Subscribe to inThread-arrSChainsCached event in {}",
-        threadInfo.threadDescription() );
-    skaleObserver.events.on( "inThread-arrSChainsCached", function( eventData ) {
-        log.trace( "Did arrived inThread-arrSChainsCached event in {}",
-            threadInfo.threadDescription() );
-        if( threadInfo.isMainThread() )
-            notifyCacheChangedSNB( eventData.detail.arrSChainsCached );
-    } );
-    // Force broadcast what we have in SNB right now because works above can start later than SNB
-    // is finished download connected chains quickly
-    log.debug( "Loop module will do first initial broadcast of arrSChainsCached to its {}" +
-        " worker(s) in {}...", cntWorkers, threadInfo.threadDescription() );
-    notifyCacheChangedSNB( skaleObserver.getLastCachedSChains() );
 }
 
 export async function runParallelLoops( opts ) {

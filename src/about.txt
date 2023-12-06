@@ -89,11 +89,7 @@ GENERAL TRANSFER options:
 S-CHAIN TO S-CHAIN TRANSFER options:
     --s2s-enable ...........................Enables S-Chain to S-Chain transfers. Default mode. The abi-skale-manager path must be provided.
     --s2s-disable ..........................Disables S-Chain to S-Chain transfers.
-    --s2s-parallel .........................Sets  parallel S2S transfer mode and runs S2S in worker thread. This is default mode.
-    --s2s-simple ...........................Sets  simple S2S transfer mode and runs S2S in main thread.
-    --net-rediscover=number.................SKALE NETWORK re-discovery interval(in seconds). Default is 3600 seconds or 1 hour, specify 0 to disable SKALE NETWORK re-discovery.
-    --net-wait-discovery=number.............SKALE NETWORK wait time(in seconds) for SKALE NETWORK discovery result to arrive. Default is 120.
-    --network-browser-path=path.............Path to SKALE NETWORK browse data.
+    --network-browser-path=path.............Path to SKALE NETWORK browse data file in JSON format containing descriptions of S-Chains connected to this S-Chain.
 PAYMENT TRANSACTION options:
     --gas-price-multiplier-mn ..............Sets Gas Price Multiplier for Main Net transactions, Default value is 1.25. Specify value 0.0 to disable Gas Price Customization for Main Net.
     --gas-price-multiplier-sc ..............Sets Gas Price Multiplier for S-Chain transactions, Default value is 0.0.
@@ -198,9 +194,6 @@ IMA JSON RPC SERVER options:
     --no-cross-ima .........................Disable calls to IMA JSON RPC servers to  compute BLS signature parts and operation state inside time frames. Use calls to skaled. Default mode.
 TEST options:
     --browse-s-chain .......................Download own S-Chain's network information.
-    --browse-skale-network .................Download entire SKALE network description.
-    --browse-connected-schains .............Download S-Chains connected to S-Chain with name specified in id-s-chain command line parameter.
-    --discover-cid .........................Discover chains ID(s) from provided URL(s). This command is not executed automatically at startup.
 OPTIMIZATION options:
     --enable-multicall .....................Enable optimizations via multi-call. Default mode.
     --disable-multicall ....................Disable optimizations via multi-call.

@@ -25,49 +25,9 @@
 
 import * as log from "./log.mjs";
 import * as rpcCall from "./rpcCall.mjs";
-import * as skaleObserver from "./observer.mjs";
 import * as state from "./state.mjs";
 import * as imaUtils from "./utils.mjs";
 import * as threadInfo from "./threadInfo.mjs";
-
-export function initialSkaleNetworkScanForS2S() {
-    const imaState = state.get();
-    if( ! imaState.optsS2S.isEnabled )
-        return;
-    imaState.arrActions.push( {
-        "name": "SKALE network scan for S2S",
-        "fn": async function() {
-            const strLogPrefix = "SKALE network scan for S2S: ";
-            if( imaState.strPathAbiJsonSkaleManager.length === 0 ) {
-                log.fatal( "Missing Skale Manager ABI, please specify {}", "--abi-skale-manager" );
-                process.exit( 153 );
-            }
-            log.information( "{p}Downloading SKALE network information...", strLogPrefix );
-            log.information( "{p}Will init periodic S-Chains caching now...", strLogPrefix );
-            const opts = {
-                imaState: imaState,
-                "details": log,
-                "bStopNeeded": false,
-                "secondsToReDiscoverSkaleNetwork":
-                    imaState.optsS2S.secondsToReDiscoverSkaleNetwork,
-                "secondsToWaitForSkaleNetworkDiscovered":
-                    imaState.optsS2S.secondsToWaitForSkaleNetworkDiscovered,
-                "strNetworkBrowserPath": imaState.optsS2S.strNetworkBrowserPath,
-                "chain": imaState.chainProperties.sc,
-                "bParallelModeRefreshSNB": ( !!( imaState.optsS2S.bParallelModeRefreshSNB ) ),
-                "isForceMultiAttemptsUntilSuccess": true
-            };
-            await skaleObserver.periodicCachingStart(
-                imaState.chainProperties.sc.strChainName, opts
-            ).then( function() {
-                log.success( "{p}Done, did started periodic S-Chains caching.", strLogPrefix );
-            } ).catch( function( err ) {
-                log.error( "Failed to start periodic S-Chains caching {err}", err );
-            } );
-            return true;
-        }
-    } );
-};
 
 export function formatBalanceInfo( bi, strAddress ) {
     let s = "";

@@ -806,14 +806,6 @@ function parseTransferArgs( imaState, joArg ) {
         imaState.optsS2S.isEnabled = false;
         return true;
     }
-    if( joArg.name == "s2s-parallel" ) {
-        imaState.optsS2S.bParallelModeRefreshSNB = true;
-        return true;
-    }
-    if( joArg.name == "s2s-simple" ) {
-        imaState.optsS2S.bParallelModeRefreshSNB = false;
-        return true;
-    }
     if( joArg.name == "no-wait-s-chain" ) {
         imaState.bNoWaitSChainStarted = true;
         return true;
@@ -1137,20 +1129,8 @@ function parseOracleArgs( imaState, joArg ) {
 }
 
 function parseNetworkDiscoveryArgs( imaState, joArg ) {
-    if( joArg.name == "net-rediscover" ) {
-        owaspUtils.verifyArgumentIsInteger( joArg );
-        imaState.optsS2S.secondsToReDiscoverSkaleNetwork =
-            owaspUtils.toInteger( joArg.value );
-        return true;
-    }
-    if( joArg.name == "net-wait-discovery" ) {
-        owaspUtils.verifyArgumentIsInteger( joArg );
-        imaState.optsS2S.secondsToWaitForSkaleNetworkDiscovered =
-            owaspUtils.toInteger( joArg.value );
-        return true;
-    }
     if( joArg.name == "network-browser-path" ) {
-        owaspUtils.verifyArgumentIsPathToExistingFile( joArg );
+        owaspUtils.verifyArgumentWithNonEmptyValue( joArg );
         imaState.optsS2S.strNetworkBrowserPath = "" + joArg.value;
         return true;
     }
@@ -1296,10 +1276,7 @@ export function parse( joExternalHandlers, argv ) {
             joArg.name == "transfer" ||
             joArg.name == "loop" ||
             joArg.name == "simple-loop" ||
-            joArg.name == "browse-s-chain" ||
-            joArg.name == "browse-skale-network" ||
-            joArg.name == "browse-connected-schains" ||
-            joArg.name == "discover-cid"
+            joArg.name == "browse-s-chain"
         ) {
             joExternalHandlers[joArg.name]();
             continue;
@@ -2578,21 +2555,10 @@ function commonInitGasMultipliersAndTransactionArgs() {
             "...................." +
             ( imaOracleOperations.getEnabledOracle()
                 ? log.fmtSuccess( "enabled" ) : log.fmtError( "disabled" ) ) );
-        log.debug( log.fmtInformation( "S-Chain to S-Chain transferring is" ) +
-            "..................." +
-        ( imaState.optsS2S.isEnabled
+        log.debug( log.fmtInformation(
+            "S-Chain to S-Chain transferring is" ) +
+            "..................." + ( imaState.optsS2S.isEnabled
             ? log.fmtSuccess( "enabled" ) : log.fmtError( "disabled" ) ) );
-        log.debug( log.fmtInformation( "SKALE network re-discovery interval is" ),
-            "..............." +
-            ( imaState.optsS2S.secondsToReDiscoverSkaleNetwork
-                ? log.fmtInformation( imaState.optsS2S.secondsToReDiscoverSkaleNetwork.toString() )
-                : log.fmtError( "disabled" ) ) );
-        log.debug( log.fmtInformation( "SKALE network max discovery wait time is" ),
-            "............." +
-            ( imaState.optsS2S.secondsToWaitForSkaleNetworkDiscovered
-                ? log.fmtInformation(
-                    imaState.optsS2S.secondsToWaitForSkaleNetworkDiscovered.toString() )
-                : log.fmtError( "disabled" ) ) );
         log.debug( log.fmtInformation( "SKALE network browser file path is" ),
             "................." +
             ( imaState.optsS2S.strNetworkBrowserPath

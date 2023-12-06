@@ -1324,7 +1324,6 @@ export function commandLineTaskTransferS2S() {
         "fn": async function() {
             if( ! imaState.optsS2S.isEnabled )
                 return;
-            discoveryTools.initialSkaleNetworkScanForS2S();
             if( ! imaState.bNoWaitSChainStarted )
                 await discoveryTools.waitUntilSChainStarted(); // s-chain --> main-net transfer
             const joRuntimeOpts = {
@@ -1356,11 +1355,9 @@ export function commandLineTaskTransferS2S() {
 
 export function commandLineTaskTransfer() {
     const imaState = state.get();
-    discoveryTools.initialSkaleNetworkScanForS2S();
     imaState.arrActions.push( {
         "name": "Single M<->S transfer loop iteration",
         "fn": async function() {
-            discoveryTools.initialSkaleNetworkScanForS2S();
             if( ! imaState.bNoWaitSChainStarted )
                 await discoveryTools.waitUntilSChainStarted();
             const joRuntimeOpts = {
@@ -1383,7 +1380,6 @@ export function commandLineTaskTransfer() {
 
 export function commandLineTaskLoop() {
     const imaState = state.get();
-    discoveryTools.initialSkaleNetworkScanForS2S();
     imaState.arrActions.push( {
         "name": "M<->S and S->S transfer loop, startup in parallel mode",
         "fn": async function() {
@@ -1411,7 +1407,6 @@ export function commandLineTaskLoop() {
 
 export function commandLineTaskLoopSimple() {
     const imaState = state.get();
-    discoveryTools.initialSkaleNetworkScanForS2S();
     imaState.arrActions.push( {
         "name": "M<->S and S->S transfer loop, startup simple mode",
         "fn": async function() {
@@ -1518,128 +1513,6 @@ export function commandLineTaskBrowseSChain() {
                 if( joCall )
                     await joCall.disconnect();
                 process.exit( 159 );
-            }
-            return true;
-        }
-    } );
-}
-
-export function commandLineTaskBrowseSkaleNetwork() {
-    const imaState = state.get();
-    imaState.arrActions.push( {
-        "name": "Browse S-Chain network",
-        "fn": async function() {
-            const strLogPrefix = "SKALE NETWORK Browse: ";
-            if( imaState.strPathAbiJsonSkaleManager.length === 0 ) {
-                log.fatal( "Missing Skale Manager ABI, please specify {}", "--abi-skale-manager" );
-                process.exit( 160 );
-            }
-            log.information( "{p}Downloading SKALE network information...", strLogPrefix );
-            const opts = {
-                imaState: imaState,
-                "details": log,
-                "bStopNeeded": false,
-                "isLoadConnectedOnly": false
-            };
-            const arrSChains = await skaleObserver.loadSChainsDefault( opts );
-            const cnt = arrSChains.length;
-            log.information( "{p}Got {} S-Chains(s) in SKALE NETWORK information: {}",
-                strLogPrefix, cnt, arrSChains );
-            return true;
-        }
-    } );
-}
-
-export function commandLineTaskBrowseConnectedSChains() {
-    const imaState = state.get();
-    imaState.arrActions.push( {
-        "name": "Browse connected S-Chains",
-        "fn": async function() {
-            const strLogPrefix = "Browse connected S-Chains: ";
-            if( imaState.strPathAbiJsonSkaleManager.length === 0 ) {
-                log.fatal( "Missing Skale Manager ABI, please specify {}", "--abi-skale-manager" );
-                process.exit( 161 );
-            }
-            log.information( "{p}Downloading SKALE network information...", strLogPrefix );
-            const opts = {
-                "imaState": imaState,
-                "details": log,
-                "bStopNeeded": false,
-                "isLoadConnectedOnly": true
-            };
-            const arrSChainsCached = await skaleObserver.loadSChainsConnectedOnly(
-                imaState.chainProperties.sc.strChainName, opts );
-            const cnt = arrSChainsCached.length;
-            log.information( "{p}Got {} connected S-Chain(s): {}",
-                strLogPrefix, cnt, arrSChainsCached );
-            return true;
-        }
-    } );
-}
-
-export function commandLineTaskDiscoverChainId() {
-    const imaState = state.get();
-    imaState.arrActions.push( {
-        "name": "Discover chains ID(s)",
-        "fn": async function() {
-            const strLogPrefix = "Discover chains ID(s): ";
-            const arrURLsToDiscover = [];
-            if( imaState.chainProperties.mn.strURL &&
-                typeof( imaState.chainProperties.mn.strURL ) == "string" &&
-                imaState.chainProperties.mn.strURL.length > 0
-            ) {
-                arrURLsToDiscover.push( {
-                    "name": "Main Net",
-                    "strURL": "" + imaState.chainProperties.mn.strURL,
-                    "fnSave": function( chainId ) {
-                        imaState.chainProperties.mn.chainId = chainId;
-                    }
-                } );
-            }
-            if( imaState.chainProperties.sc.strURL &&
-                typeof( imaState.chainProperties.sc.strURL ) == "string" &&
-                imaState.chainProperties.sc.strURL.length > 0
-            ) {
-                arrURLsToDiscover.push( {
-                    "name": "S-Chain",
-                    "strURL": "" + "" + imaState.chainProperties.sc.strURL,
-                    "fnSave": function( chainId ) {
-                        imaState.chainProperties.sc.chainId = chainId;
-                    }
-                } );
-            }
-            if( imaState.chainProperties.tc.strURL &&
-                typeof( imaState.chainProperties.tc.strURL ) == "string" &&
-                imaState.chainProperties.tc.strURL.length > 0
-            ) {
-                arrURLsToDiscover.push( {
-                    "name": "S<->S Target S-Chain",
-                    "strURL": "" + "" + imaState.chainProperties.tc.strURL,
-                    "fnSave": function( chainId ) {
-                        imaState.chainProperties.tc.chainId = chainId;
-                    }
-                } );
-            }
-            if( arrURLsToDiscover.length === 0 ) {
-                log.fatal( "No URLs provided to discover chain IDs, please specify {} and/or {} " +
-                    "and/or {}.", "--url-main-net", "--url-s-chain", "--url-t-chain" );
-                process.exit( 162 );
-            }
-            for( let i = 0; i < arrURLsToDiscover.length; ++ i ) {
-                const joDiscoverEntry = arrURLsToDiscover[i];
-                const chainId = await
-                skaleObserver.discoverChainId( joDiscoverEntry.strURL );
-                if( chainId === null ) {
-                    log.error( "{p}Failed to detect {} chain ID",
-                        strLogPrefix, joDiscoverEntry.name );
-                } else {
-                    const cid16 =
-                        owaspUtils.ensureStartsWith0x( owaspUtils.toBN( chainId ).toHexString() );
-                    const cid10 = "" + owaspUtils.toBN( chainId ).toString();
-                    log.information( "{p}Got {} chain ID={}={} from URL {url}", strLogPrefix,
-                        joDiscoverEntry.name, cid16, cid10, joDiscoverEntry.strURL );
-                    joDiscoverEntry.fnSave( chainId );
-                }
             }
             return true;
         }

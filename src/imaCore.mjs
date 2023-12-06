@@ -33,6 +33,7 @@ import * as imaTx from "./imaTx.mjs";
 import * as imaGasUsage from "./imaGasUsageOperations.mjs";
 import * as imaEventLogScan from "./imaEventLogScan.mjs";
 import * as imaTransferErrorHandling from "./imaTransferErrorHandling.mjs";
+import * as skaleObserver from "./observer.mjs";
 import * as threadInfo from "./threadInfo.mjs";
 
 log.enableColorization( false );
@@ -650,8 +651,7 @@ async function handleAllMessagesSigning( optsTransfer ) {
 
 async function checkOutgoingMessageEventInOneNode( optsTransfer, optsOutgoingMessageAnalysis ) {
     const sc = optsTransfer.imaState.chainProperties.sc;
-    // eslint-disable-next-line dot-notation
-    const strUrlHttp = optsOutgoingMessageAnalysis.joNode["http_endpoint_ip"];
+    const strUrlHttp = optsOutgoingMessageAnalysis.joNode.endpoints.ip.http;
     optsTransfer.details.trace(
         "{p}Validating {bright} message {} on node {} using URL {url}...",
         optsTransfer.strLogPrefix, optsTransfer.strDirection,
@@ -660,7 +660,6 @@ async function checkOutgoingMessageEventInOneNode( optsTransfer, optsOutgoingMes
     const joMessage = optsOutgoingMessageAnalysis.joMessage;
     let bEventIsFound = false;
     try {
-        // eslint-disable-next-line dot-notation
         const ethersProviderNode = owaspUtils.getEthersProviderFromURL( strUrlHttp );
         const joMessageProxyNode = new owaspUtils.ethersMod.ethers.Contract(
             sc.joAbiIMA.message_proxy_chain_address,
@@ -702,10 +701,10 @@ async function checkOutgoingMessageEventInOneNode( optsTransfer, optsOutgoingMes
         ++ optsOutgoingMessageAnalysis.cntFailedNodes;
         optsTransfer.details.error(
             "{p}{bright} message analysis error: Failed to scan events on node {}, " +
-            "error is: {err}, detailed node description is: {}, stack is: ",
+            "detailed node description is: {}, error is: {err}, stack is: ",
             optsTransfer.strLogPrefix, optsTransfer.strDirection,
-            optsOutgoingMessageAnalysis.joNode.name, err,
-            optsOutgoingMessageAnalysis.joNode, err.stack );
+            optsOutgoingMessageAnalysis.joNode.name, optsOutgoingMessageAnalysis.joNode,
+            err, err.stack );
         return true; // continue nodes analysis
     }
     if( bEventIsFound ) {
@@ -717,7 +716,6 @@ async function checkOutgoingMessageEventInOneNode( optsTransfer, optsOutgoingMes
             optsOutgoingMessageAnalysis.joNode.name, strUrlHttp );
     } else {
         ++ optsOutgoingMessageAnalysis.cntFailedNodes;
-        // eslint-disable-next-line dot-notation
         optsTransfer.details.error(
             "{p}{bright} message {} validation on node {} using URL {url} is failed",
             optsTransfer.strLogPrefix, optsTransfer.strDirection,
@@ -727,7 +725,6 @@ async function checkOutgoingMessageEventInOneNode( optsTransfer, optsOutgoingMes
     if( optsOutgoingMessageAnalysis.cntFailedNodes > optsTransfer.cntNodesMayFail )
         return false;
     if( optsOutgoingMessageAnalysis.cntPassedNodes >= optsTransfer.cntNodesShouldPass ) {
-        // eslint-disable-next-line dot-notation
         optsTransfer.details.information(
             "{p}{bright} message {} validation on node {} using URL {url} is passed",
             optsTransfer.strLogPrefix, optsTransfer.strDirection,
@@ -739,7 +736,7 @@ async function checkOutgoingMessageEventInOneNode( optsTransfer, optsOutgoingMes
 }
 
 async function checkOutgoingMessageEvent( optsTransfer, joSChain ) {
-    const cntNodes = joSChain.data.computed.nodes.length;
+    const cntNodes = joSChain.nodes.length;
     const cntMessages = optsTransfer.jarrMessages.length;
     for( let idxMessage = 0; idxMessage < cntMessages; ++ idxMessage ) {
         const idxImaMessage = optsTransfer.arrMessageCounters[idxMessage];
@@ -763,7 +760,7 @@ async function checkOutgoingMessageEvent( optsTransfer, joSChain ) {
                 optsOutgoingMessageAnalysis.idxNode < cntNodes;
                 ++ optsOutgoingMessageAnalysis.idxNode
             ) {
-                optsOutgoingMessageAnalysis.joNode = joSChain.data.computed.nodes[
+                optsOutgoingMessageAnalysis.joNode = joSChain.nodes[
                     optsOutgoingMessageAnalysis.idxNode];
                 const isContinueNodesAnalysis = await checkOutgoingMessageEventInOneNode(
                     optsTransfer, optsOutgoingMessageAnalysis );
@@ -771,9 +768,8 @@ async function checkOutgoingMessageEvent( optsTransfer, joSChain ) {
                     break;
             }
         } catch ( err ) {
-            // eslint-disable-next-line dot-notation
             const strUrlHttp = optsOutgoingMessageAnalysis.joNode
-                ? optsOutgoingMessageAnalysis.joNode.http_endpoint_ip : "";
+                ? optsOutgoingMessageAnalysis.joNode.endpoints.ip.http : "";
             const strNodeName = optsOutgoingMessageAnalysis.joNode
                 ? log.fmtInformation( optsOutgoingMessageAnalysis.joNode.name )
                 : log.fmtError( "<<unknown node name>>" );
@@ -858,19 +854,13 @@ async function doMainTransferLoopActions( optsTransfer ) {
                 throw new Error( "Could not validate S2S messages, " +
                     "no extra options provided to transfer algorithm" );
             }
-            if( ! optsTransfer.joExtraSignOpts.skaleObserver ) {
-                throw new Error( "Could not validate S2S messages, " +
-                    "no SKALE NETWORK observer provided to transfer algorithm" );
-            }
-            const arrSChainsCached =
-                optsTransfer.joExtraSignOpts.skaleObserver.getLastCachedSChains();
+            const arrSChainsCached = skaleObserver.getLastCachedSChains();
             if( ( !arrSChainsCached ) || arrSChainsCached.length == 0 ) {
                 throw new Error( "Could not validate S2S messages, " +
                     "no S-Chains in SKALE NETWORK observer cached yet, try again later" );
             }
-            const idxSChain =
-                optsTransfer.joExtraSignOpts.skaleObserver.findSChainIndexInArrayByName(
-                    arrSChainsCached, optsTransfer.chainNameSrc );
+            const idxSChain = skaleObserver.findSChainIndexInArrayByName(
+                arrSChainsCached, optsTransfer.chainNameSrc );
             if( idxSChain < 0 ) {
                 throw new Error( "Could not validate S2S messages, source " +
                     `S-Chain ${optsTransfer.chainNameSrc} is not in SKALE NETWORK observer ` +
@@ -879,7 +869,7 @@ async function doMainTransferLoopActions( optsTransfer ) {
             }
             const cntMessages = optsTransfer.jarrMessages.length;
             const joSChain = arrSChainsCached[idxSChain];
-            const cntNodes = joSChain.data.computed.nodes.length;
+            const cntNodes = joSChain.nodes.length;
             optsTransfer.cntNodesShouldPass = Math.ceil( ( cntNodes * 2 ) / 3 );
             optsTransfer.cntNodesMayFail = cntNodes - optsTransfer.cntNodesShouldPass;
             optsTransfer.details.trace(
@@ -1115,8 +1105,8 @@ export async function doAllS2S( // s-chain --> s-chain
         const urlSrc = skaleObserver.pickRandomSChainUrl( joSChain );
         const ethersProviderSrc = owaspUtils.getEthersProviderFromURL( urlSrc );
         const joAccountSrc = joAccountDst; // ???
-        const chainNameSrc = "" + joSChain.data.name;
-        const chainIdSrc = "" + joSChain.data.computed.chainId;
+        const chainNameSrc = "" + joSChain.name;
+        const chainIdSrc = "" + joSChain.chainId;
         log.information( "S2S transfer walk trough {}/{} S-Chain in {}...",
             chainNameSrc, chainIdSrc, threadInfo.threadDescription() );
         let bOK = false;
@@ -1138,7 +1128,6 @@ export async function doAllS2S( // s-chain --> s-chain
                         sc.joAbiIMA.message_proxy_chain_abi,
                         ethersProviderSrc );
                     const joExtraSignOpts = {
-                        skaleObserver: skaleObserver,
                         chainNameSrc: chainNameSrc,
                         chainIdSrc: chainIdSrc,
                         chainNameDst: chainNameDst,
