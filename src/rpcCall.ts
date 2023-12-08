@@ -32,7 +32,7 @@ import * as log from "./log";
 
 const gSecondsConnectionTimeout = 60;
 
-export async function waitWebSocketIsOpen( socket, fnDone, fnStep ) {
+export async function waitWebSocketIsOpen( socket: any, fnDone: any, fnStep: any ) {
     fnDone = fnDone || async function( nStep ) {};
     fnDone = fnStep || async function( nStep ) { return true; };
     let nStep = 0;
@@ -47,7 +47,7 @@ export async function waitWebSocketIsOpen( socket, fnDone, fnStep ) {
                 // Notice, connection is made if we are here
                 clearInterval( iv );
                 await fnDone( nStep );
-                resolve();
+                resolve( true );
             } else {
                 if( ! await fnStep( nStep ) ) {
                     clearInterval( iv );
@@ -66,14 +66,14 @@ export async function waitWebSocketIsOpen( socket, fnDone, fnStep ) {
     await promiseComplete;
 }
 
-export async function doConnect( joCall, opts, fn ) {
+export async function doConnect( joCall: any, opts: any, fn?: any ) {
     try {
         if( !validateURL( joCall.url ) ) {
             throw new Error( "JSON RPC CALLER cannot connect web socket " +
                 `to invalid URL: ${joCall.url}` );
         }
         if( isUrlWS( joCall.url ) ) {
-            let strWsError = null;
+            let strWsError: string = "";
             joCall.wsConn = new ws.WebSocket( joCall.url );
             joCall.wsConn.on( "open", async function() {
                 if( fn )
@@ -151,7 +151,7 @@ export async function doConnect( joCall, opts, fn ) {
     return joCall;
 }
 
-export async function doConnectIfNeeded( joCall, opts, fn ) {
+export async function doConnectIfNeeded( joCall: any, opts: any, fn: any ) {
     try {
         if( !validateURL( joCall.url ) ) {
             throw new Error( "JSON RPC CALLER cannot connect web socket " +
@@ -170,7 +170,7 @@ export async function doConnectIfNeeded( joCall, opts, fn ) {
     return joCall;
 }
 
-async function doReconnectWsStep( joCall, opts, fn ) {
+async function doReconnectWsStep( joCall: any, opts: any, fn?: any ) {
     if( ! joCall.isAutoReconnect )
         return;
     if( joCall.isDisconnectMode )
@@ -185,7 +185,7 @@ async function doReconnectWsStep( joCall, opts, fn ) {
     } );
 }
 
-async function doDisconnect( joCall, fn ) {
+async function doDisconnect( joCall: any, fn: any ) {
     try {
         joCall.isDisconnectMode = true;
         const wsConn = joCall.wsConn ? joCall.wsConn : null;
@@ -204,10 +204,10 @@ async function doDisconnect( joCall, fn ) {
     }
 }
 
-export async function doCall( joCall, joIn, fn ) {
+export async function doCall( joCall: any, joIn: any, fn: any ) {
     joIn = enrichTopLevelFieldsInJSON( joIn );
     if( joCall.wsConn ) {
-        const entry = {
+        const entry: any = {
             joIn: joIn,
             fn: fn,
             out: null
@@ -228,7 +228,7 @@ export async function doCall( joCall, joIn, fn ) {
             return;
         }
         const strBody = JSON.stringify( joIn );
-        let errCall = null, joOut = null;
+        let errCall: string|null = null, joOut: any = null;
         if( joCall.joRpcOptions &&
             joCall.joRpcOptions.cert && typeof joCall.joRpcOptions.cert == "string" &&
             joCall.joRpcOptions.key && typeof joCall.joRpcOptions.key == "string"
@@ -255,7 +255,7 @@ export async function doCall( joCall, joIn, fn ) {
             let accumulatedBody = "";
             const promiseComplete = new Promise( ( resolve, reject ) => {
                 try {
-                    const req = https.request( options, res => {
+                    const req = https.request( options, ( res: any ) => {
                         res.setEncoding( "utf8" );
                         res.on( "data", body => {
                             accumulatedBody += body;
@@ -341,7 +341,7 @@ export async function doCall( joCall, joIn, fn ) {
     }
 }
 
-export async function rpcCallCreate( strURL, opts ) {
+export async function rpcCallCreate( strURL: string, opts: any ) {
     if( !validateURL( strURL ) )
         throw new Error( `JSON RPC CALLER cannot create a call object invalid URL: ${strURL}` );
     if( !( strURL && typeof strURL == "string" && strURL.length > 0 ) ) {
@@ -400,7 +400,7 @@ export async function rpcCallCreate( strURL, opts ) {
 
 export { rpcCallCreate as create };
 
-export function generateRandomIntegerInRange( min, max ) {
+export function generateRandomIntegerInRange( min: any, max: any ) {
     min = Math.ceil( min );
     max = Math.floor( max );
     return Math.floor( Math.random() * ( max - min + 1 ) ) + min;
@@ -410,7 +410,7 @@ export function generateRandomRpcCallId() {
     return generateRandomIntegerInRange( 1, Number.MAX_SAFE_INTEGER );
 }
 
-export function enrichTopLevelFieldsInJSON( jo ) {
+export function enrichTopLevelFieldsInJSON( jo: any ) {
     if( ( !( "jsonrpc" in jo ) ) ||
         ( typeof jo.jsonrpc !== "string" ) ||
         jo.jsonrpc.length === 0
@@ -421,7 +421,7 @@ export function enrichTopLevelFieldsInJSON( jo ) {
     return jo;
 }
 
-export function isValidUrl( s ) {
+export function isValidUrl( s: any ) {
     if( ! s )
         return false;
     try {
@@ -433,7 +433,7 @@ export function isValidUrl( s ) {
     return false;
 }
 
-export function getValidUrl( s ) {
+export function getValidUrl( s: any ) {
     if( ! s )
         return null;
     try {
@@ -443,7 +443,7 @@ export function getValidUrl( s ) {
     return null;
 }
 
-export function getDefaultPort( strProtocol ) {
+export function getDefaultPort( strProtocol: any ) {
     if( ! strProtocol )
         return 80;
     switch ( strProtocol.toString().toLowerCase() ) {
@@ -457,7 +457,7 @@ export function getDefaultPort( strProtocol ) {
     return 80;
 }
 
-export function getValidHostAndPort( s ) {
+export function getValidHostAndPort( s: any ) {
     const u = getValidUrl( s );
     if( ! u )
         return null;
@@ -468,9 +468,10 @@ export function getValidHostAndPort( s ) {
     return jo;
 }
 
-const gStrTcpConnectionHeader = "TCP connection checker: ";
+const gStrTcpConnectionHeader: string = "TCP connection checker: ";
 
-export function checkTcpPromise( strHost, nPort, nTimeoutMilliseconds, isLog ) {
+export function checkTcpPromise( strHost: string, nPort: number, nTimeoutMilliseconds: number,
+    isLog?: boolean ) {
     return new Promise( ( resolve, reject ) => {
         if( isLog ) {
             console.log(
@@ -484,7 +485,7 @@ export function checkTcpPromise( strHost, nPort, nTimeoutMilliseconds, isLog ) {
                     `TCP connection to ${strHost}:${nPort} established` );
             }
             conn.end();
-            resolve();
+            resolve( true );
         } );
         if( isLog ) {
             console.log(
@@ -533,7 +534,8 @@ export function checkTcpPromise( strHost, nPort, nTimeoutMilliseconds, isLog ) {
     } );
 }
 
-export async function checkTcp( strHost, nPort, nTimeoutMilliseconds, isLog ) {
+export async function checkTcp( strHost: string, nPort: number, nTimeoutMilliseconds: number,
+    isLog?: boolean ) {
     let isOnline = false;
     try {
         const promiseCompleteTcpCheck = checkTcpPromise(
@@ -561,7 +563,7 @@ export async function checkTcp( strHost, nPort, nTimeoutMilliseconds, isLog ) {
     return isOnline;
 }
 
-export async function checkUrl( u, nTimeoutMilliseconds, isLog ) {
+export async function checkUrl( u: string, nTimeoutMilliseconds: number, isLog?: boolean ) {
     if( ! u )
         return false;
     const jo: any = getValidHostAndPort( u );

@@ -7,7 +7,7 @@ const gIsDebugLogging = false; // development option only, must be always false
 log.addStdout();
 
 // allow self-signed wss and https
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 function finalizeOutput( jo ) {
     if( ! jo )

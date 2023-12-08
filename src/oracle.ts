@@ -26,26 +26,27 @@
 import * as log from "./log";
 import * as rpcCall from "./rpcCall";
 import * as threadInfo from "./threadInfo";
+import * as owaspUtils from "./owaspUtils";
 import numberToBN from "number-to-bn";
 import * as sha3Module from "sha3";
-const Keccak = sha3Module.Keccak;
-export const gConstMinPowResultLimit = 10000;
-export const gConstMaxPowResultLimit = 100000;
+const Keccak: any = sha3Module.Keccak;
+export const gConstMinPowResultLimit: number = 10000;
+export const gConstMaxPowResultLimit: any = 100000;
 
-const gBigNumMinPowResult = numberToBN( gConstMinPowResultLimit );
-const gBigNum1 = numberToBN( 1 );
-const gBigNum2 = numberToBN( 2 );
-const gBigNum256 = numberToBN( 256 );
-const gBigNumUpperPart = gBigNum2.pow( gBigNum256 ).sub( gBigNum1 );
+const gBigNumMinPowResult: any = numberToBN( gConstMinPowResultLimit );
+const gBigNum1: any = numberToBN( 1 );
+const gBigNum2: any = numberToBN( 2 );
+const gBigNum256: any = numberToBN( 256 );
+const gBigNumUpperPart: any = gBigNum2.pow( gBigNum256 ).sub( gBigNum1 );
 
-function getUtcTimestampString( d ) {
+function getUtcTimestampString( d?: Date ) : string {
     d = d || new Date(); // use now time if d is not specified
     const nUtcUnixTimeStampWithMilliseconds = d.getTime();
     const t = "" + nUtcUnixTimeStampWithMilliseconds;
     return t;
 }
 
-export function findPowNumber( strRequestPart, details, isVerbose ) {
+export function findPowNumber( strRequestPart: string, details: any, isVerbose?: boolean ) {
     details = details || log;
     if( isVerbose )
         details.debug( "source part of request to find PoW number is {}", strRequestPart );
@@ -55,7 +56,7 @@ export function findPowNumber( strRequestPart, details, isVerbose ) {
     if( isVerbose )
         details.debug( "source t={}, this is UTC timestamp", t );
     for( ; i < gConstMaxPowResultLimit; ++ i ) {
-        n = "" + i;
+        n = 0 + i;
         s = "{" + strRequestPart + ",\"time\":" + t + ",\"pow\":" + n + "}";
 
         const hash = new Keccak( 256 );
@@ -81,7 +82,8 @@ export function findPowNumber( strRequestPart, details, isVerbose ) {
 }
 
 async function handleOracleCheckResultResult(
-    oracleOpts, details, isVerboseTraceDetails, joCall, joIn, joOut
+    oracleOpts: any, details: any, isVerboseTraceDetails: boolean,
+    joCall: any, joIn: any, joOut: any
 ) {
     if( isVerboseTraceDetails )
         details.debug( "RPC call(oracle_checkResult) result is: {}", joOut );
@@ -92,11 +94,11 @@ async function handleOracleCheckResultResult(
         await joCall.disconnect();
         return;
     }
-    const joResult = JSON.parse( joOut.result );
+    const joResult: any = JSON.parse( joOut.result );
     if( isVerboseTraceDetails )
         details.debug( "RPC call(oracle_checkResult) parsed result field is: {}", joResult );
     const gp = numberToBN( joResult.rslts[0] );
-    if( isVerbose ) {
+    if( isVerboseTraceDetails ) {
         details.success( "success, computed Gas Price={}={}",
             gp.toString(), owaspUtils.ensureStartsWith0x( gp.toString( 16 ) ) );
     }
@@ -105,7 +107,8 @@ async function handleOracleCheckResultResult(
 }
 
 async function handleOracleSubmitRequestResult(
-    oracleOpts, details, isVerboseTraceDetails, joCall, joIn, joOut
+    oracleOpts: any, details: any, isVerboseTraceDetails: boolean,
+    joCall: any, joIn: any, joOut: any
 ) {
     const nMillisecondsSleepBefore = "nMillisecondsSleepBefore" in oracleOpts
         ? oracleOpts.nMillisecondsSleepBefore : 1000;
@@ -130,14 +133,14 @@ async function handleOracleSubmitRequestResult(
         if( nMillisecondsToSleep > 0 )
             await threadInfo.sleep( nMillisecondsToSleep );
         try {
-            const joIn = { "method": "oracle_checkResult", "params": [ joOut.result ] };
+            const joIn: any = { "method": "oracle_checkResult", "params": [ joOut.result ] };
             if( isVerboseTraceDetails ) {
                 details.debug( "RPC call oracle_checkResult attempt {} " +
                     "of {}...", idxAttempt, cntAttempts );
                 details.debug( "RPC call(oracle_checkResult) is {}", joIn );
             }
             gp = null;
-            const joOut = await joCall.call( joIn );
+            joOut= await joCall.call( joIn );
             gp = await handleOracleCheckResultResult(
                 oracleOpts, details, isVerboseTraceDetails, joCall, joIn, joOut );
             if( gp )
@@ -155,15 +158,15 @@ async function handleOracleSubmitRequestResult(
     throw new Error( "RPC call(oracle_checkResult) all attempts timed out" );
 }
 
-export async function oracleGetGasPrice( oracleOpts, details ) {
+export async function oracleGetGasPrice( oracleOpts: any, details: any ) {
     details = details || log;
-    let gp = null, joCall = null;
+    const url: string = oracleOpts.url;
+    let gp: any = null, joCall: any = null;
     try {
-        const url = oracleOpts.url;
         const isVerbose = "isVerbose" in oracleOpts ? oracleOpts.isVerbose : false;
         let isVerboseTraceDetails = "isVerboseTraceDetails" in oracleOpts
             ? oracleOpts.isVerboseTraceDetails : false;
-        if( ! ( log.verboseGet() >= log.verboseReversed().trace ) )
+        if( ! ( log.verboseGet() >= log.verboseReversed()["trace"] ) )
             isVerboseTraceDetails = false;
         const callOpts = "callOpts" in oracleOpts ? oracleOpts.callOpts : { };
         joCall = await rpcCall.create( url, callOpts || { } );
@@ -174,10 +177,10 @@ export async function oracleGetGasPrice( oracleOpts, details ) {
             "\"post\":\"{\\\"jsonrpc\\\":\\\"2.0\\\"," +
             "\\\"method\\\":\\\"eth_gasPrice\\\",\\\"params\\\":[],\\\"id\\\":1}\"",
             details, isVerbose );
-        const joIn = { "method": "oracle_submitRequest", "params": [ s ] };
+        const joIn: any = { "method": "oracle_submitRequest", "params": [ s ] };
         if( isVerboseTraceDetails )
             details.debug( "RPC call {} is {}", "oracle_submitRequest", joIn );
-        const joOut = await joCall.call( joIn );
+        const joOut: any = await joCall.call( joIn );
         gp = await handleOracleSubmitRequestResult(
             oracleOpts, details, isVerboseTraceDetails, joCall, joIn, joOut );
         await joCall.disconnect();

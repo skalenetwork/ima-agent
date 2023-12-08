@@ -28,7 +28,7 @@ import * as rpcCall from "./rpcCall";
 import * as imaBLS from "./bls";
 import * as imaUtils from "./utils";
 
-function computeWalkNodeIndices( nNodeNumber, nNodesCount ) {
+function computeWalkNodeIndices( nNodeNumber: number, nNodesCount: number ) : number[] {
     if( nNodesCount <= 1 )
         return []; // PWA is N/A
     if( !( nNodeNumber >= 0 && nNodeNumber < nNodesCount ) )
@@ -36,7 +36,7 @@ function computeWalkNodeIndices( nNodeNumber, nNodesCount ) {
     let i = nNodeNumber - 1;
     if( i < 0 )
         i = nNodesCount - 1;
-    const arrWalkNodeIndices = [];
+    const arrWalkNodeIndices: number[] = [];
     for( ; true; ) {
         if( i == nNodeNumber )
             break;
@@ -48,7 +48,7 @@ function computeWalkNodeIndices( nNodeNumber, nNodesCount ) {
     return arrWalkNodeIndices;
 }
 
-export function checkLoopWorkTypeStringIsCorrect( strLoopWorkType ) {
+export function checkLoopWorkTypeStringIsCorrect( strLoopWorkType: string ) : boolean {
     if( ! strLoopWorkType )
         return false;
     switch ( strLoopWorkType.toString().toLowerCase() ) {
@@ -61,7 +61,7 @@ export function checkLoopWorkTypeStringIsCorrect( strLoopWorkType ) {
     return false;
 }
 
-function composeEmptyStateForPendingWorkAnalysis() {
+function composeEmptyStateForPendingWorkAnalysis() : any {
     return {
         "oracle": { "isInProgress": false, "ts": 0 },
         "m2s": { "isInProgress": false, "ts": 0 },
@@ -70,7 +70,7 @@ function composeEmptyStateForPendingWorkAnalysis() {
     };
 }
 
-function getNodeProgressAndTimestamp( joNode, strLoopWorkType, nIndexS2S ) {
+function getNodeProgressAndTimestamp( joNode: any, strLoopWorkType: string, nIndexS2S: number ) {
     if( ! ( "pwaState" in joNode ) )
         joNode.pwaState = composeEmptyStateForPendingWorkAnalysis();
     strLoopWorkType = strLoopWorkType.toLowerCase();
@@ -86,7 +86,8 @@ function getNodeProgressAndTimestamp( joNode, strLoopWorkType, nIndexS2S ) {
     return joNode.pwaState[strLoopWorkType].mapS2S[nIndexS2S];
 }
 
-export async function checkOnLoopStart( imaState, strLoopWorkType, nIndexS2S ) {
+export async function checkOnLoopStart(
+    imaState: any, strLoopWorkType: string, nIndexS2S: number ) {
     try {
         nIndexS2S = nIndexS2S || 0; // convert to number if undefined
         if( ! checkLoopWorkTypeStringIsCorrect( strLoopWorkType ) )
@@ -102,8 +103,8 @@ export async function checkOnLoopStart( imaState, strLoopWorkType, nIndexS2S ) {
         const jarrNodes = imaState.joSChainNetworkInfo.network;
         if( ! jarrNodes )
             throw new Error( "S-Chain network info is not available yet to PWA" );
-        const arrBusyNodeIndices = [];
-        const arrWalkNodeIndices =
+        const arrBusyNodeIndices: number[] = [];
+        const arrWalkNodeIndices: number[] =
             computeWalkNodeIndices( imaState.nNodeNumber, imaState.nNodesCount );
         if( imaState.isPrintPWA ) {
             log.debug( "PWA will check loop start condition via node(s) sequence {}...",
@@ -112,8 +113,8 @@ export async function checkOnLoopStart( imaState, strLoopWorkType, nIndexS2S ) {
         const nUtcUnixTimeStamp = Math.floor( ( new Date() ).getTime() / 1000 );
         for( let i = 0; i < arrWalkNodeIndices.length; ++i ) {
             const walk_node_index = arrWalkNodeIndices[i];
-            const joNode = jarrNodes[walk_node_index];
-            const joProps = getNodeProgressAndTimestamp( joNode, strLoopWorkType, nIndexS2S );
+            const joNode: any = jarrNodes[walk_node_index];
+            const joProps: any = getNodeProgressAndTimestamp( joNode, strLoopWorkType, nIndexS2S );
             if( joProps && typeof joProps == "object" &&
                 "isInProgress" in joProps && joProps.isInProgress &&
                 joProps.ts != 0 && nUtcUnixTimeStamp >= joProps.ts
@@ -152,11 +153,12 @@ export async function checkOnLoopStart( imaState, strLoopWorkType, nIndexS2S ) {
 }
 
 export async function handleLoopStateArrived(
-    imaState, nNodeNumber, strLoopWorkType, nIndexS2S, isStart, ts, signature
+    imaState: any, nNodeNumber: number, strLoopWorkType: string, nIndexS2S: number,
+    isStart: boolean, ts: any, signature: any
 ) {
     const se = isStart ? "start" : "end";
     let isSuccess = false;
-    let joNode = null;
+    let joNode: any = null;
     try {
         if( ! checkLoopWorkTypeStringIsCorrect( strLoopWorkType ) )
             throw new Error( `Specified value ${strLoopWorkType} is not a correct loop work type` );
@@ -172,7 +174,7 @@ export async function handleLoopStateArrived(
         if( ! jarrNodes )
             throw new Error( "S-Chain network info is not available yet to PWA" );
         joNode = jarrNodes[nNodeNumber];
-        const joProps = getNodeProgressAndTimestamp( joNode, strLoopWorkType, nIndexS2S );
+        const joProps: any = getNodeProgressAndTimestamp( joNode, strLoopWorkType, nIndexS2S );
         if( imaState.isPrintPWA ) {
             log.trace( "PWA loop-{} state arrived for node {}, PWA state {}, arrived " +
                 "signature is {}", se, nNodeNumber, joNode.pwaState, signature );
@@ -202,7 +204,8 @@ export async function handleLoopStateArrived(
     return isSuccess;
 }
 
-async function notifyOnLoopImpl( imaState, strLoopWorkType, nIndexS2S, isStart ) {
+async function notifyOnLoopImpl(
+    imaState: any, strLoopWorkType: string, nIndexS2S: number, isStart: boolean ) {
     const se = isStart ? "start" : "end";
     try {
         nIndexS2S = nIndexS2S || 0; // convert to number if undefined
@@ -233,10 +236,10 @@ async function notifyOnLoopImpl( imaState, strLoopWorkType, nIndexS2S, isStart )
             const isThisNode = ( i == imaState.nNodeNumber ) ? true : false;
             if( isThisNode )
                 continue; // skip this node
-            const joNode = jarrNodes[i];
+            const joNode: any = jarrNodes[i];
             const strNodeURL = imaUtils.composeImaAgentNodeUrl( joNode, isThisNode );
             const rpcCallOpts = null;
-            let joCall = await rpcCall.create( strNodeURL, rpcCallOpts )
+            let joCall: any = await rpcCall.create( strNodeURL, rpcCallOpts )
                 .catch( async function( err ) {
                     log.error(
                         "PWA failed to perform] loop-{} notification RPC call to node #{} with " +
@@ -247,7 +250,7 @@ async function notifyOnLoopImpl( imaState, strLoopWorkType, nIndexS2S, isStart )
                 } );
             if( ! joCall )
                 return false;
-            const joIn = {
+            const joIn: any = {
                 "method": "skale_imaNotifyLoopWork",
                 "params": {
                     "nNodeNumber": 0 + imaState.nNodeNumber,

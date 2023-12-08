@@ -42,7 +42,7 @@ const gStrAppName = "IMA AGENT";
 const gStrVersion =
     imaUtils.fileLoad( path.join( __dirname, "../VERSION" ), "N/A" ).toString().trim();
 
-function att( ...args: any[] ) : string { return log.fmtAttention( ...arguments ); };
+function att( ...args: any[] ) : string { return log.fmtAttention( ...args ); };
 
 export function printAbout( isLog?: boolean ) {
     isLog = isLog || false;
@@ -1198,9 +1198,9 @@ function parseOtherArgs( imaState, joArg ) {
     return false;
 }
 
-export function parse( joExternalHandlers, argv ) {
+export function parse( joExternalHandlers: any ) {
     const imaState = state.get();
-    const cntArgs = argv || process.argv.length;
+    const cntArgs = process.argv.length;
     for( let idxArg = 2; idxArg < cntArgs; ++idxArg ) {
         const joArg = parseCommandLineArgument( process.argv[idxArg] );
         parseHelp( imaState, joArg ); // exits process on "--help"
@@ -1342,7 +1342,7 @@ function commonInitPrintSysInfo() {
         log.debug( "OS {sunny} is {}", "tmp dir", os.tmpdir() );
         log.debug( "OS {sunny} is {}", "uptime", os.uptime() );
         log.debug( "OS {sunny} is {}", "user", os.userInfo() );
-        const joMemory = { total: os.totalmem(), free: os.freemem() };
+        const joMemory: any = { total: os.totalmem(), free: os.freemem() };
         joMemory.freePercent = ( joMemory.free / joMemory.total ) * 100.0;
         log.debug( "OS {sunny} is {}", "memory", joMemory );
         const joLA = os.loadavg();
@@ -2627,7 +2627,7 @@ export function commonInit() {
     commonInitCheckErc20();
     commonInitCheckErc721();
     commonInitCheckErc1155();
-    if( log.verboseGet() > log.verboseReversed().debug || imaState.bShowConfigMode ) {
+    if( log.verboseGet() > log.verboseReversed()["debug"] || imaState.bShowConfigMode ) {
         commonInitCheckGeneralArgs();
         commonInitCheckCredentialsArgs();
         commonInitCheckTransferAmountArgs();

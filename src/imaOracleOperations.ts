@@ -32,7 +32,7 @@ import * as imaTransferErrorHandling from "./imaTransferErrorHandling";
 
 let gFlagIsEnabledOracle = false;
 
-export function getEnabledOracle( isEnabled ) {
+export function getEnabledOracle() : boolean {
     return ( !!gFlagIsEnabledOracle );
 }
 export function setEnabledOracle( isEnabled ) {

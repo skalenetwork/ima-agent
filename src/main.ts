@@ -41,13 +41,13 @@ import * as skaleObserver from "./observer";
 import * as state from "./state";
 
 // allow self-signed wss and https
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
-process.on( "unhandledRejection", function( reason, p ) {
+process.on( "unhandledRejection", function( reason: any, p: any ) {
     log.fatal(
         "CRITICAL ERROR: unhandled rejection with reason {} and promise {}",
         reason, p );
-} ).on( "uncaughtException", function( err ) {
+} ).on( "uncaughtException", function( err: any ) {
     log.fatal(
         "CRITICAL ERROR: uncaught exception: {err}, stack is:\n{stack}",
         err, err.stack );
@@ -137,9 +137,9 @@ function parseCommandLine() {
     }
 }
 
-let gServerMonitoringWS = null;
+let gServerMonitoringWS: any = null;
 
-function initMonitoringServer() {
+function initMonitoringServer() : void {
     const imaState = state.get();
     if( imaState.nMonitoringPort <= 0 )
         return;
@@ -149,7 +149,7 @@ function initMonitoringServer() {
             strLogPrefix, imaState.nMonitoringPort );
     }
     gServerMonitoringWS = new ws.WebSocketServer( { port: 0 + imaState.nMonitoringPort } );
-    gServerMonitoringWS.on( "connection", function( wsPeer, req ) {
+    gServerMonitoringWS.on( "connection", function( wsPeer: any, req: any ) {
         let ip = req.socket.remoteAddress;
         if( "headers" in req && req.headers && typeof req.headers == "object" &&
             "x-forwarded-for" in req.headers && req.headers["x-forwarded-for"] )
@@ -161,13 +161,13 @@ function initMonitoringServer() {
         if( imaState.bLogMonitoringServer )
             log.debug( "{p}New connection from {}", strLogPrefix, ip );
         wsPeer.on( "message", function( message ) {
-            const joAnswer = {
+            const joAnswer: any = {
                 "method": null,
                 "id": null,
                 "error": null
             };
             try {
-                const joMessage = JSON.parse( message );
+                const joMessage: any = JSON.parse( message );
                 if( imaState.bLogMonitoringServer )
                     log.trace( "{p}<<< message from {}: {}", strLogPrefix, ip, joMessage );
 
@@ -251,9 +251,9 @@ function initMonitoringServer() {
     } );
 }
 
-let gExpressJsonRpcAppIMA = null;
+let gExpressJsonRpcAppIMA: any = null;
 
-function initJsonRpcServer() {
+function initJsonRpcServer() : void {
     const imaState = state.get();
     if( imaState.nJsonRpcPort <= 0 )
         return;
@@ -275,13 +275,13 @@ function initJsonRpcServer() {
                     strLogPrefix, joAnswer, ip, err, err.stack );
             }
         };
-        let joAnswer = {
+        let joAnswer: any = {
             "method": null,
             "id": null,
             "error": null
         };
         try {
-            const joMessage = JSON.parse( message );
+            const joMessage: any = JSON.parse( message );
             log.trace( "{p}<<< Peer message from {}: ", strLogPrefix, ip, joMessage );
             if( ! ( "method" in joMessage ) )
                 throw new Error( "\"method\" field was not specified" );
@@ -379,7 +379,8 @@ async function doTheJob() {
 }
 
 function handleFirstSChainDiscoveryAttemptDone(
-    err, joSChainNetworkInfo, isSilentReDiscovery, fnOnPeriodicDiscoveryResultAvailable ) {
+    err: any, joSChainNetworkInfo: any,
+    isSilentReDiscovery: boolean, fnOnPeriodicDiscoveryResultAvailable: any ) : void {
     if( err ) {
         // error information is printed by discoveryTools.discoverSChainNetwork()
         process.exit( 166 );

@@ -36,7 +36,7 @@ import * as pwa from "./pwa";
 import * as log from "./log";
 import * as threadInfo from "./threadInfo";
 
-let imaState = state.get();
+let imaState: any = state.get();
 
 if( parentPort ) {
     parentPort.on( "message", jo => {
@@ -61,9 +61,13 @@ function doSendMessage( type, endpoint, workerUUID, data ) {
 }
 
 class ObserverServer extends SocketServer {
+    initComplete: boolean;
+    opts: any;
+    intervalPeriodicSchainsCaching: number|null;
+    bIsPeriodicCachingStepInProgress: boolean;
     constructor( acceptor ) {
         super( acceptor );
-        const self = this;
+        const self: any = this;
         self.initComplete = false;
         log.enableColorization( workerData.colorization.isEnabled );
         self.opts = null;
@@ -207,7 +211,7 @@ class ObserverServer extends SocketServer {
             workerData.url, threadInfo.threadDescription() );
     }
     dispose() {
-        const self = this;
+        const self:any = this;
         self.isDisposing = true;
         if( self.intervalPeriodicSchainsCaching ) {
             clearInterval( self.intervalPeriodicSchainsCaching );
@@ -216,79 +220,79 @@ class ObserverServer extends SocketServer {
         super.dispose();
     }
     initLogMethods() {
-        const self = this;
+        const self:any = this;
         if( "fatal" in self && self.fatal && typeof self.fatal == "function" )
             return;
-        self.fatal = function() {
-            if( log.verboseGet() >= log.verboseReversed().fatal ) {
+        self.fatal = function( ...args: any[] ) {
+            if( log.verboseGet() >= log.verboseReversed()["fatal"] ) {
                 self.log( log.getLogLinePrefixFatal() +
-                    log.fmtFatal( ...arguments ) );
+                    log.fmtFatal( ...args ) );
             }
         };
-        self.critical = function() {
-            if( log.verboseGet() >= log.verboseReversed().critical ) {
+        self.critical = function( ...args: any[] ) {
+            if( log.verboseGet() >= log.verboseReversed()["critical"] ) {
                 self.log( log.getLogLinePrefixCritical() +
-                log.fmtCritical( ...arguments ) );
+                log.fmtCritical( ...args ) );
             }
         };
-        self.error = function() {
-            if( log.verboseGet() >= log.verboseReversed().error ) {
+        self.error = function( ...args: any[] ) {
+            if( log.verboseGet() >= log.verboseReversed()["error"] ) {
                 self.log( log.getLogLinePrefixError() +
-                log.fmtError( ...arguments ) );
+                log.fmtError( ...args ) );
             }
         };
-        self.warning = function() {
-            if( log.verboseGet() >= log.verboseReversed().warning ) {
+        self.warning = function( ...args: any[] ) {
+            if( log.verboseGet() >= log.verboseReversed()["warning"] ) {
                 self.log( log.getLogLinePrefixWarning() +
-                log.fmtWarning( ...arguments ) );
+                log.fmtWarning( ...args ) );
             }
         };
-        self.attention = function() {
-            if( log.verboseGet() >= log.verboseReversed().attention ) {
+        self.attention = function( ...args: any[] ) {
+            if( log.verboseGet() >= log.verboseReversed()["attention"] ) {
                 self.log( log.getLogLinePrefixAttention() +
-                log.fmtAttention( ...arguments ) );
+                log.fmtAttention( ...args ) );
             }
         };
-        self.information = function() {
-            if( log.verboseGet() >= log.verboseReversed().information ) {
+        self.information = function( ...args: any[] ) {
+            if( log.verboseGet() >= log.verboseReversed()["information"] ) {
                 self.log( log.getLogLinePrefixInformation() +
-                log.fmtInformation( ...arguments ) );
+                log.fmtInformation( ...args ) );
             }
         };
-        self.info = function() {
-            if( log.verboseGet() >= log.verboseReversed().information ) {
+        self.info = function( ...args: any[] ) {
+            if( log.verboseGet() >= log.verboseReversed()["information"] ) {
                 self.log( log.getLogLinePrefixInformation() +
-                log.fmtInformation( ...arguments ) );
+                log.fmtInformation( ...args ) );
             }
         };
-        self.notice = function() {
-            if( log.verboseGet() >= log.verboseReversed().notice ) {
+        self.notice = function( ...args: any[] ) {
+            if( log.verboseGet() >= log.verboseReversed()["notice"] ) {
                 self.log( log.getLogLinePrefixNotice() +
-                log.fmtNotice( ...arguments ) );
+                log.fmtNotice( ...args ) );
             }
         };
-        self.note = function() {
-            if( log.verboseGet() >= log.verboseReversed().notice ) {
+        self.note = function( ...args: any[] ) {
+            if( log.verboseGet() >= log.verboseReversed()["notice"] ) {
                 self.log( log.getLogLinePrefixNote() +
-                log.fmtNote( ...arguments ) );
+                log.fmtNote( ...args ) );
             }
         };
-        self.debug = function() {
-            if( log.verboseGet() >= log.verboseReversed().debug ) {
+        self.debug = function( ...args: any[] ) {
+            if( log.verboseGet() >= log.verboseReversed()["debug"] ) {
                 self.log( log.getLogLinePrefixDebug() +
-                log.fmtDebug( ...arguments ) );
+                log.fmtDebug( ...args ) );
             }
         };
-        self.trace = function() {
-            if( log.verboseGet() >= log.verboseReversed().trace ) {
+        self.trace = function( ...args: any[] ) {
+            if( log.verboseGet() >= log.verboseReversed()["trace"] ) {
                 self.log( log.getLogLinePrefixTrace() +
-                log.fmtTrace( ...arguments ) );
+                log.fmtTrace( ...args ) );
             }
         };
-        self.success = function() {
-            if( log.verboseGet() >= log.verboseReversed().information ) {
+        self.success = function( ...args: any[] ) {
+            if( log.verboseGet() >= log.verboseReversed()["information"] ) {
                 self.log( log.getLogLinePrefixSuccess() +
-                log.fmtSuccess( ...arguments ) );
+                log.fmtSuccess( ...args ) );
             }
         };
     }
@@ -297,7 +301,7 @@ class ObserverServer extends SocketServer {
 const acceptor = new networkLayer.InWorkerSocketServerAcceptor( workerData.url, doSendMessage );
 const server = new ObserverServer( acceptor );
 server.on( "dispose", function() {
-    const self = server;
+    const self:any = server;
     self.debug( "Disposed in-worker in {} IMA loop {}",
         threadInfo.threadDescription(), workerData.url );
 } );

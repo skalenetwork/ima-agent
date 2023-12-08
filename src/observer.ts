@@ -28,7 +28,7 @@ import * as imaUtils from "./utils";
 import * as log from "./log";
 import * as threadInfo from "./threadInfo";
 
-export function findSChainIndexInArrayByName( arrSChains, strSChainName ) {
+export function findSChainIndexInArrayByName( arrSChains: any[], strSChainName: string ) {
     for( let idxSChain = 0; idxSChain < arrSChains.length; ++ idxSChain ) {
         const joSChain = arrSChains[idxSChain];
         if( joSChain.name.toString() == strSChainName.toString() )
@@ -37,9 +37,9 @@ export function findSChainIndexInArrayByName( arrSChains, strSChainName ) {
     return -1;
 }
 
-let gConnectedChainsData = null;
+let gConnectedChainsData: any = null;
 
-export function autoUpdateLastCachedSChains() {
+export function autoUpdateLastCachedSChains() : boolean {
     const imaState = state.get();
     if( ! imaState.optsS2S.strNetworkBrowserPath )
         return false;
@@ -52,7 +52,6 @@ export function autoUpdateLastCachedSChains() {
     }
     if( gConnectedChainsData && gConnectedChainsData.updatedAt == jo.updatedAt )
         return false; // assume data is same
-
     gConnectedChainsData = jo;
     log.debug(
         "Connected S-chains cache in thread {} was updated from file {} with data: {}",
@@ -61,26 +60,26 @@ export function autoUpdateLastCachedSChains() {
     return true;
 }
 
-export function getLastCachedSChains() {
+export function getLastCachedSChains() : any[] {
     autoUpdateLastCachedSChains();
     if( ! gConnectedChainsData )
         return [];
     return JSON.parse( JSON.stringify( gConnectedChainsData.schains ) );
 }
 
-export function pickRandomSChainNodeIndex( joSChain ) {
+export function pickRandomSChainNodeIndex( joSChain: any ) : number {
     let min = 0, max = joSChain.nodes.length - 1;
     min = Math.ceil( min );
     max = Math.floor( max );
     const idxNode = Math.floor( Math.random() * ( max - min + 1 ) ) + min;
     return idxNode;
 }
-export function pickRandomSChainNode( joSChain ) {
+export function pickRandomSChainNode( joSChain: any ) : any {
     const idxNode = pickRandomSChainNodeIndex( joSChain );
     return joSChain.nodes[idxNode];
 }
 
-export function pickRandomSChainUrl( joSChain ) {
+export function pickRandomSChainUrl( joSChain: any ) : string {
     const joNode = pickRandomSChainNode( joSChain );
     return "" + joNode.endpoints.ip.http;
 }
