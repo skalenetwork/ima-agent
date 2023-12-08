@@ -46,7 +46,7 @@ if( parentPort ) {
 }
 
 function doSendMessage( type, endpoint, workerUUID, data ) {
-    const jo = networkLayer.socketReceivedDataReverseMarshall( data );
+    const jo: any = networkLayer.socketReceivedDataReverseMarshall( data );
     const joSend = {
         "workerMessageType":
             ( type && typeof type == "string" && type.length > 0 )
@@ -78,7 +78,7 @@ class ObserverServer extends SocketServer {
                 return joAnswer;
             self.log = function() {
                 const args = Array.prototype.slice.call( arguments );
-                const jo = {
+                const jo: any = {
                     "method": "log",
                     "error": null,
                     "message": args.join( " " )
@@ -107,7 +107,7 @@ class ObserverServer extends SocketServer {
             log.verboseSet( self.opts.imaState.verbose_ );
             log.exposeDetailsSet( self.opts.imaState.expose_details_ );
             imaTransferErrorHandling.saveTransferEvents.on( "error", function( eventData ) {
-                const jo = {
+                const jo: any = {
                     "method": "saveTransferError",
                     "message": eventData.detail
                 };
@@ -115,7 +115,7 @@ class ObserverServer extends SocketServer {
                 socket.send( jo, isFlush );
             } );
             imaTransferErrorHandling.saveTransferEvents.on( "success", function( eventData ) {
-                const jo = {
+                const jo: any = {
                     "method": "saveTransferSuccess",
                     "message": eventData.detail
                 };

@@ -550,7 +550,7 @@ export async function ensureHaveWorkers( opts ) {
                 break;
             } // switch ( joMessage.method )
         } );
-        const jo = {
+        const jo: any = {
             "method": "init",
             "message": {
                 "opts": {

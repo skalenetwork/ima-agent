@@ -265,7 +265,7 @@ function initJsonRpcServer() {
         const isSkipMode = false;
         const message = JSON.stringify( req.body );
         const ip = req.connection.remoteAddress.split( ":" ).pop();
-        const fnSendAnswer = function( joAnswer ) {
+        const fnSendAnswer: any = function( joAnswer ) {
             try {
                 res.header( "Content-Type", "application/json" );
                 res.status( 200 ).send( JSON.stringify( joAnswer ) );

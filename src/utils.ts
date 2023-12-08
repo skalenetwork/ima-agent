@@ -101,7 +101,7 @@ export function jsonFileLoad( strPath: string, joDefault?: any, bLogOutput?: boo
         if( bLogOutput )
             log.debug( "Did loaded content of JSON file {}, will parse it...", strPath );
 
-        const jo = JSON.parse( s );
+        const jo: any = JSON.parse( s );
         if( bLogOutput )
             log.success( "Done, loaded content of JSON file {}.", strPath );
         return jo;

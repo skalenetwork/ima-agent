@@ -291,7 +291,7 @@ function performBlsGlue(
         let strInput = "";
         const cnt = arrSignResults.length;
         for( let i = 0; i < cnt; ++i ) {
-            const jo = arrSignResults[i];
+            const jo: any = arrSignResults[i];
             if( ( !jo ) || typeof jo != "object" )
                 throw new Error( `Failed to save BLS part ${i} because it's not JSON object` );
             const strPath = strActionDir + "/sign-result" + jo.index + ".json";
@@ -379,7 +379,7 @@ function performBlsGlueU256( details, u256, arrSignResults ) {
         let strInput = "";
         const cnt = arrSignResults.length;
         for( let i = 0; i < cnt; ++i ) {
-            const jo = arrSignResults[i];
+            const jo: any = arrSignResults[i];
             if( ( !jo ) || typeof jo != "object" )
                 throw new Error( `Failed to save BLS part ${i} because it's not JSON object` );
             const strPath = strActionDir + "/sign-result" + jo.index + ".json";

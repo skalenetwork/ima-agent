@@ -461,7 +461,7 @@ export function getValidHostAndPort( s ) {
     const u = getValidUrl( s );
     if( ! u )
         return null;
-    const jo = {
+    const jo: any = {
         strHost: u.hostname,
         nPort: u.port ? parseInt( u.port, 10 ) : getDefaultPort( u.protocol )
     };
@@ -564,7 +564,7 @@ export async function checkTcp( strHost, nPort, nTimeoutMilliseconds, isLog ) {
 export async function checkUrl( u, nTimeoutMilliseconds, isLog ) {
     if( ! u )
         return false;
-    const jo = getValidHostAndPort( u );
+    const jo: any = getValidHostAndPort( u );
     if( isLog ) {
         console.log( `${gStrTcpConnectionHeader}Extracted from URL ${u.toString()} data ` +
             `fields are: ${JSON.stringify( jo )}` );

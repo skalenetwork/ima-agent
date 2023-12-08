@@ -29,26 +29,26 @@ import * as log from "./log";
 const Worker = worker_threads.Worker;
 export { Worker };
 
-const joCustomThreadProperties = { };
+const joCustomThreadProperties: any = { };
 export { joCustomThreadProperties };
 
-export const sleep = ( milliseconds ) => {
+export const sleep = ( milliseconds: number ) : Promise<void> => {
     return new Promise( resolve => setTimeout( resolve, milliseconds ) );
 };
 
-export function getCurrentThreadID() {
+export function getCurrentThreadID() : number {
     return worker_threads.threadId;
 }
 
-export function isMainThread() {
+export function isMainThread() : boolean {
     return ( !!( worker_threads.isMainThread ) );
 }
 
-export function threadDescription( isColorized ) {
+export function threadDescription( isColorized?: boolean ) : string {
     if( typeof isColorized == "undefined" )
         isColorized = true;
-    const tid = getCurrentThreadID();
-    const st = isMainThread() ? "main" : "worker";
+    const tid: number = getCurrentThreadID();
+    const st: string = isMainThread() ? "main" : "worker";
     return isColorized
         ? ( log.fmtAttention( st ) + log.fmtDebug( " thread " ) +
                 log.fmtInformation( tid ) )

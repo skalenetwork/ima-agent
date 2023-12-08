@@ -140,7 +140,7 @@ export const prepareAnswerJSON = function( joMessage: any ) : any {
     return joAnswer;
 };
 
-export const makeValidSignalingServerURL = function( strSignalingServerURL: string ) : string {
+export const makeValidSignalingServerURL = function( strSignalingServerURL?: string ) : string {
     const proto = settings.net.secure ? "wss" : "ws";
     return "" +
         ( ( strSignalingServerURL != null &&

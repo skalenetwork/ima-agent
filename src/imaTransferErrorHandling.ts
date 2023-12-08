@@ -74,7 +74,7 @@ export function getLastTransferErrors( isIncludeTextLog ) {
     const jarr = JSON.parse( JSON.stringify( gArrLastTransferErrors ) );
     if( ! isIncludeTextLog ) {
         for( let i = 0; i < jarr.length; ++ i ) {
-            const jo = jarr[i];
+            const jo: any = jarr[i];
             if( "textLog" in jo )
                 delete jo.textLog;
         }

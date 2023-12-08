@@ -43,7 +43,7 @@ export function autoUpdateLastCachedSChains() {
     const imaState = state.get();
     if( ! imaState.optsS2S.strNetworkBrowserPath )
         return false;
-    const jo = imaUtils.jsonFileLoad( imaState.optsS2S.strNetworkBrowserPath, null );
+    const jo: any = imaUtils.jsonFileLoad( imaState.optsS2S.strNetworkBrowserPath, null );
     if( ! ( jo && "schains" in jo && "updatedAt" in jo ) ) {
         log.error(
             "Connected S-chains cache in thread {} was not updated from file {}, bad data format",

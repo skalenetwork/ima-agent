@@ -47,7 +47,7 @@ export function composeGasUsageReportFromArray( strName, jarrReceipts ) {
 
 export function printGasUsageReportFromArray( strName, jarrReceipts, details ) {
     details = details || log;
-    const jo = composeGasUsageReportFromArray( strName, jarrReceipts );
+    const jo: any = composeGasUsageReportFromArray( strName, jarrReceipts );
     if( jo.strReport && typeof jo.strReport == "string" && jo.strReport.length > 0 &&
         jo.sumGasUsed && jo.sumGasUsed.gt( owaspUtils.toBN( "0" ) ) )
         log.information( jo.strReport );
