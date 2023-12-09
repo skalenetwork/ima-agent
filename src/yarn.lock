@@ -3001,10 +3001,10 @@ uri-js@^4.2.2:
   dependencies:
     punycode "^2.1.0"
 
-urllib@^3.10.1:
-  version "3.19.3"
-  resolved "https://registry.yarnpkg.com/urllib/-/urllib-3.19.3.tgz#825084d388c2e442474a1b1e89adaa35e899bde7"
-  integrity sha512-QEEBgRN94uPoVatOmZttfJTVdPKc+U96i/JH1zXgUA+dw3I3k+3d9Dzr1YafI92/r0V/4ypDH75zll93RDrp3w==
+urllib@^3.21.0:
+  version "3.21.0"
+  resolved "https://registry.yarnpkg.com/urllib/-/urllib-3.21.0.tgz#1a81541d00121bf0c4a2c463cf4d8218d01a3a49"
+  integrity sha512-xtgaQ4G2emUssoz3jZjMTL2g32rEL75PggNHg3EUYf1h0sdkLSaRGAFgxe5UtNdFNoxJtjWk9hwNrY5Ja9fGNA==
   dependencies:
     default-user-agent "^1.0.0"
     digest-header "^1.0.0"
