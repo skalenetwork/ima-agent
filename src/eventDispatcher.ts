@@ -25,14 +25,15 @@
 
 export class UniversalDispatcherEvent {
     type: any;
-    constructor( type, jo ) {
+    constructor( type: any, jo: any ) {
         this.type = type;
         for( const [ key, value ] of Object.entries( jo ) ) {
             if( key in this ) {
                 console.warn( "UniversalDispatcherEvent will skip", key, "data field" );
                 continue;
             }
-            this[key] = value;
+            let anyThis: any = this;
+            anyThis[key] = value;
         }
     }
 };

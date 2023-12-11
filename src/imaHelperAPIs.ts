@@ -53,7 +53,7 @@ export function setSleepBetweenTransactionsOnSChainMilliseconds( val?: number ) 
 export function getWaitForNextBlockOnSChain() : boolean {
     return ( !!gFlagWaitForNextBlockOnSChain );
 }
-export function setWaitForNextBlockOnSChain( val ) {
+export function setWaitForNextBlockOnSChain( val: any ) {
     gFlagWaitForNextBlockOnSChain = ( !!val );
 }
 
@@ -99,7 +99,7 @@ export async function safeGetBlockNumber(
         ret = retValOnFail;
         details.error(
             "Failed call attempt {} to {} via {url}, error is: {err}, stack is:\n{stack}",
-            idxAttempt, strFnName + "()", u, err, err.stack );
+            idxAttempt, strFnName + "()", u, err, err );
     }
     ++ idxAttempt;
     while( ret === "" && idxAttempt <= cntAttempts ) {
@@ -119,7 +119,7 @@ export async function safeGetBlockNumber(
         } catch ( err ) {
             ret = retValOnFail;
             details.error( "Failed call attempt {} to  via {url}, error is: {err}, " +
-                "stack is:\n{stack}", idxAttempt, strFnName + "()", u, err, err.stack );
+                "stack is:\n{stack}", idxAttempt, strFnName + "()", u, err, err );
         }
         ++ idxAttempt;
     }

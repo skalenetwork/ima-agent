@@ -62,7 +62,7 @@ export async function reimbursementShowBalance(
         return xWei;
     } catch ( err ) {
         details.critical( "{p}Payment error in reimbursementShowBalance(): {err}, " +
-            "stack is:\n{stack}", strLogPrefix, err, err.stack );
+            "stack is:\n{stack}", strLogPrefix, err, err );
         details.exposeDetailsTo( log, "reimbursementShowBalance", false );
         details.close();
         return 0;
@@ -145,7 +145,7 @@ export async function reimbursementEstimateAmount(
         return amountToRecharge;
     } catch ( err ) {
         details.critical( "{p} Payment error in reimbursementEstimateAmount(): {err}, " +
-            "stack is:\n{stack}", strLogPrefix, err, err.stack );
+            "stack is:\n{stack}", strLogPrefix, err, err );
         details.exposeDetailsTo( log, "reimbursementEstimateAmount", false );
         details.close();
         return 0;
@@ -201,7 +201,7 @@ export async function reimbursementWalletRecharge(
         }
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, err, err.stack );
+            strLogPrefix, strActionName, err, err );
         details.exposeDetailsTo( log, "reimbursementWalletRecharge", false );
         details.close();
         return false;
@@ -268,7 +268,7 @@ export async function reimbursementWalletWithdraw(
         }
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, err, err.stack );
+            strLogPrefix, strActionName, err, err );
         details.exposeDetailsTo( log, "reimbursementWalletWithdraw", false );
         details.close();
         return false;
@@ -333,7 +333,7 @@ export async function reimbursementSetRange(
         }
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, err, err.stack );
+            strLogPrefix, strActionName, err, err );
         details.exposeDetailsTo( log, "reimbursementSetRange", false );
         details.close();
         return false;

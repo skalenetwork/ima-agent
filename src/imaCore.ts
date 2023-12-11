@@ -44,7 +44,7 @@ const additionalS2MTransferOverhead = 200000;
 
 async function findOutReferenceLogRecord(
     details: any, strLogPrefix: string, ethersProvider: any, joMessageProxy: any,
-    bnBlockId: any, nMessageNumberToFind: any, isVerbose: boolean
+    bnBlockId: any, nMessageNumberToFind: any, isVerbose?: boolean
 ) {
     const bnMessageNumberToFind = owaspUtils.toBN( nMessageNumberToFind.toString() );
     const strEventName = "PreviousMessageReference";
@@ -85,8 +85,8 @@ async function findOutReferenceLogRecord(
 }
 
 async function findOutAllReferenceLogRecords(
-    details, strLogPrefix, ethersProvider, joMessageProxy,
-    bnBlockId, nIncMsgCnt, nOutMsgCnt, isVerbose
+    details: any, strLogPrefix: string, ethersProvider: any, joMessageProxy: any,
+    bnBlockId: any, nIncMsgCnt: number, nOutMsgCnt: number, isVerbose?: boolean
 ) {
     if( isVerbose ) {
         details.debug(
@@ -150,7 +150,7 @@ let gTransferLoopCounter = 0;
 //            [to]           // address[] memory to
 //            [amount]       // uint256[] memory amount / *uint256[2] memory blsSignature* /
 //            )
-async function doQueryOutgoingMessageCounter( optsTransfer ) {
+async function doQueryOutgoingMessageCounter( optsTransfer: any ) {
     let nPossibleIntegerValue = 0;
     optsTransfer.details.debug( "{p}SRC MessageProxy address is.....{}",
         optsTransfer.strLogPrefixShort,optsTransfer.joMessageProxySrc.address );
@@ -174,7 +174,7 @@ async function doQueryOutgoingMessageCounter( optsTransfer ) {
     } catch ( err ) {
         optsTransfer.details.critical(
             "(IMMEDIATE) error caught during {bright}, error details: {err}, stack is:\n{stack}",
-            optsTransfer.strActionName, err, err.stack );
+            optsTransfer.strActionName, err, err );
     }
 
     optsTransfer.strActionName = "dst-chain.MessageProxy.getIncomingMessagesCounter()";
@@ -227,7 +227,7 @@ async function doQueryOutgoingMessageCounter( optsTransfer ) {
             optsTransfer.details.error(
                 "{p}Optimized log search is off. Running old IMA smart contracts? " +
                 "Please upgrade, if possible. Error is: {err}, stack is:\n{stack}",
-                optsTransfer.strLogPrefix, err, err.stack );
+                optsTransfer.strLogPrefix, err, err );
         }
     } catch ( err ) {
         optsTransfer.arrLogRecordReferences = [];
@@ -258,7 +258,7 @@ async function doQueryOutgoingMessageCounter( optsTransfer ) {
     return true;
 }
 
-async function analyzeGatheredRecords( optsTransfer, r ) {
+async function analyzeGatheredRecords( optsTransfer: any, r: any ) {
     let joValues: any = null;
     const strChainHashWeAreLookingFor =
         owaspUtils.ethersMod.ethers.utils.id( optsTransfer.chainNameDst );
@@ -303,7 +303,7 @@ async function analyzeGatheredRecords( optsTransfer, r ) {
     return joValues;
 }
 
-async function gatherMessages( optsTransfer ) {
+async function gatherMessages( optsTransfer: any ) {
     optsTransfer.arrMessageCounters = [];
     optsTransfer.jarrMessages = [];
     optsTransfer.nIdxCurrentMsgBlockStart = 0 + optsTransfer.nIdxCurrentMsg;
@@ -365,7 +365,7 @@ async function gatherMessages( optsTransfer ) {
                 optsTransfer.details.critical(
                     "{p}Exception(evaluate block depth) while getting transaction hash and " +
                     "block number during {bright}: {err}, stack is:\n{stack}",
-                    optsTransfer.strLogPrefix, optsTransfer.strActionName, err, err.stack );
+                    optsTransfer.strLogPrefix, optsTransfer.strActionName, err, err );
                 optsTransfer.details.exposeDetailsTo(
                     log, optsTransfer.strGatheredDetailsName, false );
                 imaTransferErrorHandling.saveTransferError(
@@ -417,7 +417,7 @@ async function gatherMessages( optsTransfer ) {
                 optsTransfer.details.critical(
                     "{p}Exception(evaluate block age) while getting block number and timestamp " +
                     "during {bright}: {err}, stack is:\n{stack}", optsTransfer.strLogPrefix,
-                    optsTransfer.strActionName, err, err.stack );
+                    optsTransfer.strActionName, err, err );
                 optsTransfer.details.exposeDetailsTo(
                     log, optsTransfer.strGatheredDetailsName, false );
                 imaTransferErrorHandling.saveTransferError(
@@ -451,7 +451,8 @@ async function gatherMessages( optsTransfer ) {
     }
 }
 
-async function preCheckAllMessagesSign( optsTransfer, err, jarrMessages, joGlueResult ) {
+async function preCheckAllMessagesSign(
+    optsTransfer: any, err: Error|string, jarrMessages: any[], joGlueResult: any ) {
     const strDidInvokedSigningCallbackMessage = log.fmtDebug(
         "{p}Did invoked message signing callback, first real message index is: {}, have {} " +
         "message(s) to process {}", optsTransfer.strLogPrefix,
@@ -475,7 +476,8 @@ async function preCheckAllMessagesSign( optsTransfer, err, jarrMessages, joGlueR
     return true;
 }
 
-async function callbackAllMessagesSign( optsTransfer, err, jarrMessages, joGlueResult ) {
+async function callbackAllMessagesSign(
+    optsTransfer: any, err: Error|string, jarrMessages: any[], joGlueResult: any ) {
     if( ! await preCheckAllMessagesSign( optsTransfer, err, jarrMessages, joGlueResult ) )
         return;
     const nBlockSize = optsTransfer.arrMessageCounters.length;
@@ -619,16 +621,16 @@ async function callbackAllMessagesSign( optsTransfer, err, jarrMessages, joGlueR
     }
 }
 
-async function handleAllMessagesSigning( optsTransfer ) {
+async function handleAllMessagesSigning( optsTransfer: any ) {
     try {
         let errFinal = null;
         await optsTransfer.fnSignMessages( optsTransfer.nTransferLoopCounter,
             optsTransfer.jarrMessages, optsTransfer.nIdxCurrentMsgBlockStart,
             optsTransfer.chainNameSrc, optsTransfer.joExtraSignOpts,
-            async function( err, jarrMessages, joGlueResult ) {
+            async function( err: Error|string, jarrMessages: any[], joGlueResult: any ) {
                 await callbackAllMessagesSign( optsTransfer, err, jarrMessages, joGlueResult );
                 return;
-            } ).catch( function( err ) {
+            } ).catch( function( err: Error|string ) {
             // callback fn as argument of optsTransfer.fnSignMessages
             optsTransfer.bErrorInSigningMessages = true;
             optsTransfer.details.error( "{p}Problem in transfer handler(in signer): {err}",
@@ -649,7 +651,7 @@ async function handleAllMessagesSigning( optsTransfer ) {
     }
 }
 
-async function checkOutgoingMessageEventInOneNode( optsTransfer, optsOutgoingMessageAnalysis ) {
+async function checkOutgoingMessageEventInOneNode( optsTransfer: any, optsOutgoingMessageAnalysis: any ) {
     const sc = optsTransfer.imaState.chainProperties.sc;
     const strUrlHttp = optsOutgoingMessageAnalysis.joNode.endpoints.ip.http;
     optsTransfer.details.trace(
@@ -704,7 +706,7 @@ async function checkOutgoingMessageEventInOneNode( optsTransfer, optsOutgoingMes
             "detailed node description is: {}, error is: {err}, stack is: ",
             optsTransfer.strLogPrefix, optsTransfer.strDirection,
             optsOutgoingMessageAnalysis.joNode.name, optsOutgoingMessageAnalysis.joNode,
-            err, err.stack );
+            err, err );
         return true; // continue nodes analysis
     }
     if( bEventIsFound ) {
@@ -735,7 +737,7 @@ async function checkOutgoingMessageEventInOneNode( optsTransfer, optsOutgoingMes
     return true;
 }
 
-async function checkOutgoingMessageEvent( optsTransfer, joSChain ) {
+async function checkOutgoingMessageEvent( optsTransfer: any, joSChain: any ) {
     const cntNodes = joSChain.nodes.length;
     const cntMessages = optsTransfer.jarrMessages.length;
     for( let idxMessage = 0; idxMessage < cntMessages; ++ idxMessage ) {
@@ -780,7 +782,7 @@ async function checkOutgoingMessageEvent( optsTransfer, joSChain ) {
                 idxMessage + 1, strNodeName,
                 log.posNeg( optsOutgoingMessageAnalysis.joNode,
                     log.u( strUrlHttp ), "<<unknown node endpoint>>" ),
-                err, err.stack );
+                err, err );
         }
         if( optsOutgoingMessageAnalysis.cntFailedNodes > optsTransfer.cntNodesMayFail ) {
             optsTransfer.details.critical(
@@ -811,7 +813,7 @@ async function checkOutgoingMessageEvent( optsTransfer, joSChain ) {
     return true;
 }
 
-async function doMainTransferLoopActions( optsTransfer ) {
+async function doMainTransferLoopActions( optsTransfer: any ) {
     // classic scanner with optional usage of optimized IMA messages search algorithm
     // outer loop is block former/creator, then transfer
     optsTransfer.nIdxCurrentMsg = optsTransfer.nIncMsgCnt;
@@ -906,7 +908,7 @@ async function doMainTransferLoopActions( optsTransfer ) {
         } catch ( err ) {
             optsTransfer.details.critical(
                 "{p}Exception from signing messages function: {err}, stack is:\n{stack}",
-                optsTransfer.strLogPrefix, err, err.stack );
+                optsTransfer.strLogPrefix, err, err );
         }
         if( optsTransfer.bErrorInSigningMessages )
             break;
@@ -918,15 +920,15 @@ async function doMainTransferLoopActions( optsTransfer ) {
 let gIsOneTransferInProgressInThisThread = false;
 
 export async function doTransfer(
-    strDirection, joRuntimeOpts,
-    ethersProviderSrc, joMessageProxySrc, joAccountSrc,
-    ethersProviderDst, joMessageProxyDst, joAccountDst,
-    chainNameSrc, chainNameDst, chainIdSrc, chainIdDst,
-    joDepositBoxMainNet, // for logs validation on mainnet
-    joTokenManagerSChain, // for logs validation on s-chain
-    nTransactionsCountInBlock,
-    nTransferSteps, nMaxTransactionsCount, nBlockAwaitDepth, nBlockAge,
-    fnSignMessages, joExtraSignOpts,
+    strDirection: string, joRuntimeOpts: any,
+    ethersProviderSrc: any, joMessageProxySrc: any, joAccountSrc: any,
+    ethersProviderDst: any, joMessageProxyDst: any, joAccountDst: any,
+    chainNameSrc: string, chainNameDst: string, chainIdSrc: string, chainIdDst: string,
+    joDepositBoxMainNet: any, // for logs validation on mainnet
+    joTokenManagerSChain: any, // for logs validation on s-chain
+    nTransactionsCountInBlock: number,
+    nTransferSteps: number, nMaxTransactionsCount: number, nBlockAwaitDepth: number, nBlockAge: number,
+    fnSignMessages: any, joExtraSignOpts: any,
     transactionCustomizerDst: imaTx.TransactionCustomizer
 ) {
     const optsTransfer: any = {
@@ -1002,8 +1004,9 @@ export async function doTransfer(
             optsTransfer.details.debug( "{p}Using internal signing stub function",
                 optsTransfer.strLogPrefix );
             optsTransfer.fnSignMessages = async function(
-                nTransferLoopCounter, jarrMessages, nIdxCurrentMsgBlockStart, strFromChainName,
-                joExtraSignOpts, fnAfter
+                nTransferLoopCounter: number, jarrMessages: any[],
+                nIdxCurrentMsgBlockStart: number, strFromChainName: string,
+                joExtraSignOpts: any, fnAfter: any
             ) {
                 optsTransfer.details.debug(
                     "{p}Message signing callback was not provided to IMA, first real message " +
@@ -1038,7 +1041,7 @@ export async function doTransfer(
         } catch ( err ) {
             optsTransfer.details.critical( "{p}Error in {} during {bright}: {err}, " +
                 "stack is:\n{stack}", optsTransfer.strLogPrefix,
-            optsTransfer.strGatheredDetailsName, optsTransfer.strActionName,err, err.stack );
+            optsTransfer.strGatheredDetailsName, optsTransfer.strActionName,err, err );
             optsTransfer.details.exposeDetailsTo( log,
                 optsTransfer.strGatheredDetailsName, false );
             imaTransferErrorHandling.saveTransferError(
@@ -1066,7 +1069,7 @@ export async function doTransfer(
         gIsOneTransferInProgressInThisThread = false;
         optsTransfer.details.error(
             "{p}Transfer loop step failed with error: {err} in {}, stack is:\n{stack}",
-            optsTransfer.strLogPrefix, err, threadInfo.threadDescription(), err.stack );
+            optsTransfer.strLogPrefix, err, threadInfo.threadDescription(), err );
         if( log.exposeDetailsGet() && optsTransfer.details.exposeDetailsTo ) {
             optsTransfer.details.exposeDetailsTo(
                 log, optsTransfer.strGatheredDetailsName, true );
@@ -1077,21 +1080,21 @@ export async function doTransfer(
 }
 
 export async function doAllS2S( // s-chain --> s-chain
-    joRuntimeOpts,
-    imaState,
-    skaleObserver,
-    ethersProviderDst,
-    joMessageProxyDst,
-    joAccountDst,
-    chainNameDst,
-    chainIdDst,
-    joTokenManagerSChain, // for logs validation on s-chain
-    nTransactionsCountInBlock,
-    nTransferSteps,
-    nMaxTransactionsCount,
-    nBlockAwaitDepth,
-    nBlockAge,
-    fnSignMessages,
+    joRuntimeOpts: any,
+    imaState: any,
+    skaleObserver: any,
+    ethersProviderDst: any,
+    joMessageProxyDst: any,
+    joAccountDst: any,
+    chainNameDst: string,
+    chainIdDst: string,
+    joTokenManagerSChain: any, // for logs validation on s-chain
+    nTransactionsCountInBlock: number,
+    nTransferSteps: number,
+    nMaxTransactionsCount: number,
+    nBlockAwaitDepth: number,
+    nBlockAge: number,
+    fnSignMessages: any,
     transactionCustomizerDst: imaTx.TransactionCustomizer
 ) {
     let cntOK = 0, cntFail = 0, nIndexS2S = 0;
@@ -1180,7 +1183,7 @@ export async function doAllS2S( // s-chain --> s-chain
         } catch ( err ) {
             bOK = false;
             log.error( "S2S step error from S-Chain {}, error is: {err} in {}, stack is:\n{stack}",
-                chainNameSrc, err, threadInfo.threadDescription(), err.stack );
+                chainNameSrc, err, threadInfo.threadDescription(), err );
             imaState.loopState.s2s.isInProgress = false;
             await pwa.notifyOnLoopEnd( imaState, "s2s", nIndexS2S );
         }

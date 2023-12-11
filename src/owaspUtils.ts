@@ -156,20 +156,23 @@ export function toURL( s: any ) : URL | null {
             const cnt = s.length;
             if( s[cnt - 1] == sc ) {
                 const ss = s.substring( 1, cnt - 1 );
-                const url = toURL( ss );
-                if( url != null && url != undefined )
-                    url["strStrippedStringComma"] = sc;
-                return url;
+                const objURL = toURL( ss );
+                if( objURL != null && objURL != undefined ) {
+                    const anyURL: any = objURL;
+                    anyURL["strStrippedStringComma"] = sc;
+                }
+                return objURL;
             }
             return null;
         }
-        const url = new URL( s );
-        if( !url.hostname )
+        const objURL = new URL( s );
+        if( !objURL.hostname )
             return null;
-        if( url.hostname.length === 0 )
+        if( objURL.hostname.length === 0 )
             return null;
-        url["strStrippedStringComma"] = null;
-        return url;
+        const anyURL: any = objURL;
+        anyURL["strStrippedStringComma"] = null;
+        return objURL;
     } catch ( err ) {
         return null;
     }
@@ -631,7 +634,7 @@ export function parseMoneySpecToWei( s?: any, isThrowException?: boolean ) : str
     } catch ( err ) {
         if( isThrowException ) {
             throw new Error( `Parse error in parseMoneySpecToWei( ${s} ), ` +
-                `error is: ${err.toString()}` );
+                `error is: ${err}` );
         }
     }
     return "0";
@@ -666,11 +669,12 @@ export function publicKeyToAccountAddress( keyPublic : string ) : string {
 }
 
 export function fnAddressImpl_() : string {
-    if( this.address_ == undefined || this.address_ == null || this.address_ == "" ) {
-        if( this.privateKey )
-            this.address_ = "" + privateKeyToAccountAddress( this.privateKey );
+    const anyThis: any = this;
+    if( anyThis.address_ == undefined || anyThis.address_ == null || anyThis.address_ == "" ) {
+        if( anyThis.privateKey )
+            anyThis.address_ = "" + privateKeyToAccountAddress( anyThis.privateKey );
     }
-    return this.address_;
+    return anyThis.address_;
 }
 
 export function getEthersProviderFromURL( strURL: string ) : any {

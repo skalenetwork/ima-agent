@@ -83,10 +83,10 @@ export function ensureHaveValue(
 ) {
     isExitIfEmpty = isExitIfEmpty || false;
     isPrintValue = isPrintValue || false;
-    fnNameColorizer = fnNameColorizer || ( ( x ) => {
+    fnNameColorizer = fnNameColorizer || ( ( x: any ) => {
         return log.fmtInformation( x );
     } );
-    fnValueColorizer = fnValueColorizer || ( ( x ) => {
+    fnValueColorizer = fnValueColorizer || ( ( x: any ) => {
         return log.fmtNotice( x );
     } );
     let retVal = true;
@@ -108,7 +108,7 @@ export function ensureHaveValue(
 }
 
 export function ensureHaveCredentials(
-    strFriendlyChainName, joAccount, isExitIfEmpty, isPrintValue
+    strFriendlyChainName: string, joAccount: any, isExitIfEmpty: boolean, isPrintValue: boolean
 ) {
     strFriendlyChainName = strFriendlyChainName || "<UNKNOWN>";
     if( ! ( typeof joAccount == "object" ) ) {
@@ -196,7 +196,7 @@ export function ensureHaveCredentials(
     return true;
 }
 
-export function findNodeIndex( joSChainNodeConfiguration ) {
+export function findNodeIndex( joSChainNodeConfiguration: any ) {
     try {
         const searchID = joSChainNodeConfiguration.skaleConfig.nodeInfo.nodeID;
         const cnt = joSChainNodeConfiguration.skaleConfig.sChain.nodes.length;
@@ -209,7 +209,7 @@ export function findNodeIndex( joSChainNodeConfiguration ) {
     return 0;
 }
 
-function parseHelp( imaState, joArg ) { // exits process on "--help"
+function parseHelp( imaState: any, joArg: any ) { // exits process on "--help"
     if( joArg.name != "help" )
         return false;
     printAbout();
@@ -218,14 +218,14 @@ function parseHelp( imaState, joArg ) { // exits process on "--help"
     process.exit( 0 );
 }
 
-function parseVersion( imaState, joArg ) { // exits process on "--version"
+function parseVersion( imaState: any, joArg: any ) { // exits process on "--version"
     if( joArg.name != "version" )
         return false;
     printAbout();
     process.exit( 0 );
 }
 
-function parseBasicArgs( imaState, joArg ) {
+function parseBasicArgs( imaState: any, joArg: any ) {
     if( joArg.name == "colors" ) {
         log.enableColorization( true );
         return true;
@@ -253,7 +253,7 @@ function parseBasicArgs( imaState, joArg ) {
     return false;
 }
 
-function parseChainAccessArgs( imaState, joArg ) {
+function parseChainAccessArgs( imaState: any, joArg: any ) {
     if( joArg.name == "url-main-net" ) {
         owaspUtils.verifyArgumentIsURL( joArg );
         imaState.chainProperties.mn.strURL = joArg.value;
@@ -307,7 +307,7 @@ function parseChainAccessArgs( imaState, joArg ) {
     return false;
 }
 
-function parseTransactionManagerArgs( imaState, joArg ) {
+function parseTransactionManagerArgs( imaState: any, joArg: any ) {
     if( joArg.name == "tm-url-main-net" ) {
         owaspUtils.verifyArgumentIsURL( joArg );
         const strURL = "" + joArg.value;
@@ -347,7 +347,7 @@ function parseTransactionManagerArgs( imaState, joArg ) {
     return false;
 }
 
-function parseSgxArgs( imaState, joArg ) {
+function parseSgxArgs( imaState: any, joArg: any ) {
     if( joArg.name == "sgx-url-main-net" ) {
         owaspUtils.verifyArgumentIsURL( joArg );
         imaState.chainProperties.mn.joAccount.strSgxURL = joArg.value;
@@ -472,7 +472,7 @@ function parseSgxArgs( imaState, joArg ) {
     return false;
 }
 
-function parseCredentialsArgs( imaState, joArg ) {
+function parseCredentialsArgs( imaState: any, joArg: any ) {
     if( joArg.name == "address-main-net" ) {
         owaspUtils.verifyArgumentWithNonEmptyValue( joArg );
         imaState.chainProperties.mn.joAccount.address_ = joArg.value;
@@ -511,7 +511,7 @@ function parseCredentialsArgs( imaState, joArg ) {
     return false;
 }
 
-function parseAbiArgs( imaState, joArg ) {
+function parseAbiArgs( imaState: any, joArg: any ) {
     if( joArg.name == "abi-skale-manager" ) {
         owaspUtils.verifyArgumentIsPathToExistingFile( joArg );
         imaState.strPathAbiJsonSkaleManager = imaUtils.normalizePath( joArg.value );
@@ -535,7 +535,7 @@ function parseAbiArgs( imaState, joArg ) {
     return false;
 }
 
-function parseErcArgs( imaState, joArg ) {
+function parseErcArgs( imaState: any, joArg: any ) {
     if( joArg.name == "erc20-main-net" ) {
         owaspUtils.verifyArgumentIsPathToExistingFile( joArg );
         imaState.chainProperties.mn.strPathJsonErc20 = imaUtils.normalizePath( joArg.value );
@@ -620,7 +620,7 @@ function parseErcArgs( imaState, joArg ) {
     return false;
 }
 
-function parseTransactionArgs( imaState, joArg ) {
+function parseTransactionArgs( imaState: any, joArg: any ) {
     if( joArg.name == "sleep-between-tx" ) {
         owaspUtils.verifyArgumentIsInteger( joArg );
         imaHelperAPIs.setSleepBetweenTransactionsOnSChainMilliseconds( joArg.value );
@@ -718,7 +718,7 @@ function parseTransactionArgs( imaState, joArg ) {
     return false;
 }
 
-function parsePaymentAmountArgs( imaState, joArg ) {
+function parsePaymentAmountArgs( imaState: any, joArg: any ) {
     if( joArg.name == "value" ) {
         owaspUtils.verifyArgumentWithNonEmptyValue( joArg );
         imaState.nAmountOfWei = owaspUtils.parseMoneySpecToWei( "" + joArg.value, true );
@@ -789,7 +789,7 @@ function parsePaymentAmountArgs( imaState, joArg ) {
     return false;
 }
 
-function parseTransferArgs( imaState, joArg ) {
+function parseTransferArgs( imaState: any, joArg: any ) {
     if( joArg.name == "s2s-forward" ) {
         imaHelperAPIs.setForwardS2S();
         return true;
@@ -957,7 +957,7 @@ function parseTransferArgs( imaState, joArg ) {
     return false;
 }
 
-function parseMulticallArgs( imaState, joArg ) {
+function parseMulticallArgs( imaState: any, joArg: any ) {
     if( joArg.name == "enable-multicall" ) {
         imaState.isEnabledMultiCall = true;
         return true;
@@ -969,7 +969,7 @@ function parseMulticallArgs( imaState, joArg ) {
     return false;
 }
 
-function parsePendingWorkAnalysisArgs( imaState, joArg ) {
+function parsePendingWorkAnalysisArgs( imaState: any, joArg: any ) {
     if( joArg.name == "pwa" ) {
         imaState.isPWA = true;
         return true;
@@ -994,7 +994,7 @@ function parsePendingWorkAnalysisArgs( imaState, joArg ) {
     return false;
 }
 
-function parseLoggingArgs( imaState, joArg ) {
+function parseLoggingArgs( imaState: any, joArg: any ) {
     if( joArg.name == "gathered" ) {
         imaState.isPrintGathered = true;
         return true;
@@ -1045,7 +1045,7 @@ function parseLoggingArgs( imaState, joArg ) {
     return false;
 }
 
-function parseBlsArgs( imaState, joArg ) {
+function parseBlsArgs( imaState: any, joArg: any ) {
     if( joArg.name == "sign-messages" ) {
         imaState.bSignMessages = true;
         return true;
@@ -1068,7 +1068,7 @@ function parseBlsArgs( imaState, joArg ) {
     return false;
 }
 
-function parseMonitoringArgs( imaState, joArg ) {
+function parseMonitoringArgs( imaState: any, joArg: any ) {
     if( joArg.name == "monitoring-port" ) {
         owaspUtils.verifyArgumentIsIntegerIpPortNumber( joArg );
         imaState.nMonitoringPort = owaspUtils.toInteger( joArg.value );
@@ -1082,7 +1082,7 @@ function parseMonitoringArgs( imaState, joArg ) {
     return false;
 }
 
-function parseReimbursementArgs( imaState, joArg ) {
+function parseReimbursementArgs( imaState: any, joArg: any ) {
     if( joArg.name == "reimbursement-chain" ) {
         owaspUtils.verifyArgumentWithNonEmptyValue( joArg );
         imaState.strReimbursementChain = joArg.value.trim();
@@ -1116,7 +1116,7 @@ function parseReimbursementArgs( imaState, joArg ) {
     return false;
 }
 
-function parseOracleArgs( imaState, joArg ) {
+function parseOracleArgs( imaState: any, joArg: any ) {
     if( joArg.name == "enable-oracle" ) {
         imaOracleOperations.setEnabledOracle( true );
         return true;
@@ -1128,7 +1128,7 @@ function parseOracleArgs( imaState, joArg ) {
     return false;
 }
 
-function parseNetworkDiscoveryArgs( imaState, joArg ) {
+function parseNetworkDiscoveryArgs( imaState: any, joArg: any ) {
     if( joArg.name == "network-browser-path" ) {
         owaspUtils.verifyArgumentWithNonEmptyValue( joArg );
         imaState.optsS2S.strNetworkBrowserPath = "" + joArg.value;
@@ -1137,7 +1137,7 @@ function parseNetworkDiscoveryArgs( imaState, joArg ) {
     return false;
 }
 
-function parseBlockScannerArgs( imaState, joArg ) {
+function parseBlockScannerArgs( imaState: any, joArg: any ) {
     if( joArg.name == "bs-step-size" ) {
         owaspUtils.verifyArgumentIsInteger( joArg );
         imaHelperAPIs.setBlocksCountInInIterativeStepOfEventsScan(
@@ -1160,7 +1160,7 @@ function parseBlockScannerArgs( imaState, joArg ) {
     return false;
 }
 
-function parseJsonRpcServerArgs( imaState, joArg ) {
+function parseJsonRpcServerArgs( imaState: any, joArg: any ) {
     if( joArg.name == "json-rpc-port" ) {
         owaspUtils.verifyArgumentIsIntegerIpPortNumber( joArg );
         imaState.nJsonRpcPort = owaspUtils.toInteger( joArg.value );
@@ -1169,7 +1169,7 @@ function parseJsonRpcServerArgs( imaState, joArg ) {
     return false;
 }
 
-function parseCrossImaCommunicationArgs( imaState, joArg ) {
+function parseCrossImaCommunicationArgs( imaState: any, joArg: any ) {
     if( joArg.name == "cross-ima" ) {
         imaState.isCrossImaBlsMode = true;
         return true;
@@ -1181,7 +1181,7 @@ function parseCrossImaCommunicationArgs( imaState, joArg ) {
     return false;
 }
 
-function parseShowConfigArgs( imaState, joArg ) {
+function parseShowConfigArgs( imaState: any, joArg: any ) {
     if( joArg.name == "show-config" ) {
         imaState.bShowConfigMode = true;
         return true;
@@ -1189,7 +1189,7 @@ function parseShowConfigArgs( imaState, joArg ) {
     return false;
 }
 
-function parseOtherArgs( imaState, joArg ) {
+function parseOtherArgs( imaState: any, joArg: any ) {
     if( joArg.name == "auto-exit" ) {
         owaspUtils.verifyArgumentIsInteger( joArg );
         imaState.nAutoExitAfterSeconds = owaspUtils.toInteger( joArg.value );
@@ -1288,7 +1288,7 @@ export function parse( joExternalHandlers: any ) {
     return 0;
 }
 
-async function asyncCheckUrlAtStartup( u, name ) {
+async function asyncCheckUrlAtStartup( u: URL|string, name: string ) {
     const details = log.createMemoryStream();
     const nTimeoutMilliseconds = 10 * 1000;
     try {
@@ -1305,7 +1305,7 @@ async function asyncCheckUrlAtStartup( u, name ) {
         return isOnLine;
     } catch ( err ) {
         details.error( "Failed to check URL {url} connectivity for {} at start-up, " +
-            "error is: {err}, stack is:\n{stack}", u, name, err, err.stack );
+            "error is: {err}, stack is:\n{stack}", u, name, err, err );
     }
     return false;
 }
@@ -1526,7 +1526,7 @@ function commonInitPrintFoundContracts() {
     // message_proxy_mainnet_address              --> message_proxy_mainnet_abi
     // message_proxy_chain_address                --> message_proxy_chain_abi
 
-    const oct = function( joContract ) { // optional contract address
+    const oct = function( joContract: any ) { // optional contract address
         if( joContract && "address" in joContract && joContract.address )
             return log.fmtInformation( "{}", joContract.address );
         return log.fmtError( "contract is not available" );
@@ -2096,92 +2096,92 @@ function commonInitCheckGeneralArgs() {
     }
     ensureHaveValue(
         "App path",
-        path.join( __dirname, "main.ts" ), false, isPrintGathered, null, ( x ) => {
+        path.join( __dirname, "main.ts" ), false, isPrintGathered, null, ( x: any ) => {
             return att( x );
         } );
     ensureHaveValue(
         "Verbose level",
         log.verboseLevelAsTextForLog( log.verboseGet() ),
-        false, isPrintGathered, null, ( x ) => {
+        false, isPrintGathered, null, ( x: any ) => {
             return att( x );
         } );
     ensureHaveValue(
         "Multi-call optimizations",
-        imaState.isEnabledMultiCall, false, isPrintGathered, null, ( x ) => {
+        imaState.isEnabledMultiCall, false, isPrintGathered, null, ( x: any ) => {
             return log.yn( x );
         } );
     ensureHaveValue(
         "Main-net URL",
         imaState.chainProperties.mn.strURL, false,
-        isPrintGathered && isPrintSecurityValues, null, ( x ) => {
+        isPrintGathered && isPrintSecurityValues, null, ( x: any ) => {
             return log.u( x );
         } );
     ensureHaveValue(
         "S-chain URL",
         imaState.chainProperties.sc.strURL, false,
-        isPrintGathered && isPrintSecurityValues, null, ( x ) => {
+        isPrintGathered && isPrintSecurityValues, null, ( x: any ) => {
             return log.u( x );
         } );
     ensureHaveValue(
         "S<->S Target S-chain URL",
         imaState.chainProperties.tc.strURL, false,
-        isPrintGathered && isPrintSecurityValues, null, ( x ) => {
+        isPrintGathered && isPrintSecurityValues, null, ( x: any ) => {
             return log.u( x );
         } );
     ensureHaveValue(
         "Main-net Ethereum network name",
         imaState.chainProperties.mn.strChainName, false,
-        isPrintGathered && isPrintSecurityValues, null, ( x ) => {
+        isPrintGathered && isPrintSecurityValues, null, ( x: any ) => {
             return log.fmtNote( x );
         } );
     ensureHaveValue(
         "S-Chain Ethereum network name",
         imaState.chainProperties.sc.strChainName, false,
-        isPrintGathered && isPrintSecurityValues, null, ( x ) => {
+        isPrintGathered && isPrintSecurityValues, null, ( x: any ) => {
             return log.fmtNote( x );
         } );
     ensureHaveValue(
         "S<->S Target S-Chain Ethereum network name",
         imaState.chainProperties.tc.strChainName, false,
-        isPrintGathered && isPrintSecurityValues, null, ( x ) => {
+        isPrintGathered && isPrintSecurityValues, null, ( x: any ) => {
             return log.fmtNote( x );
         } );
     ensureHaveValue(
         "Main-net Ethereum chain ID",
         imaState.chainProperties.mn.chainId, false,
-        isPrintGathered && isPrintSecurityValues, null, ( x ) => {
+        isPrintGathered && isPrintSecurityValues, null, ( x: any ) => {
             return log.fmtNote( x );
         } );
     ensureHaveValue(
         "S-Chain Ethereum chain ID",
         imaState.chainProperties.sc.chainId, false,
-        isPrintGathered && isPrintSecurityValues, null, ( x ) => {
+        isPrintGathered && isPrintSecurityValues, null, ( x: any ) => {
             return log.fmtNote( x );
         } );
     ensureHaveValue(
         "S<->S Target S-Chain Ethereum chain ID",
         imaState.chainProperties.tc.chainId, false,
-        isPrintGathered && isPrintSecurityValues, null, ( x ) => {
+        isPrintGathered && isPrintSecurityValues, null, ( x: any ) => {
             return log.fmtNote( x );
         } );
     ensureHaveValue(
         "Skale Manager ABI JSON file path",
-        imaState.strPathAbiJsonSkaleManager, false, isPrintGathered, null, ( x ) => {
+        imaState.strPathAbiJsonSkaleManager, false, isPrintGathered, null, ( x: any ) => {
             return log.fmtWarning( x );
         } );
     ensureHaveValue(
         "Main-net ABI JSON file path",
-        imaState.chainProperties.mn.strPathAbiJson, false, isPrintGathered, null, ( x ) => {
+        imaState.chainProperties.mn.strPathAbiJson, false, isPrintGathered, null, ( x: any ) => {
             return log.fmtWarning( x );
         } );
     ensureHaveValue(
         "S-Chain ABI JSON file path",
-        imaState.chainProperties.sc.strPathAbiJson, false, isPrintGathered, null, ( x ) => {
+        imaState.chainProperties.sc.strPathAbiJson, false, isPrintGathered, null, ( x: any ) => {
             return log.fmtWarning( x );
         } );
     ensureHaveValue(
         "S<->S Target S-Chain ABI JSON file path",
-        imaState.chainProperties.tc.strPathAbiJson, false, isPrintGathered, null, ( x ) => {
+        imaState.chainProperties.tc.strPathAbiJson, false, isPrintGathered, null, ( x: any ) => {
             return log.fmtWarning( x );
         } );
 
@@ -2231,7 +2231,7 @@ function commonInitCheckCredentialsArgs() {
             ensureHaveValue(
                 "BLS/Main Net key name",
                 imaState.chainProperties.mn.joAccount.strBlsKeyName,
-                false, isPrintGathered, null, ( x ) => {
+                false, isPrintGathered, null, ( x: any ) => {
                     return att( x );
                 } );
         }
@@ -2239,7 +2239,7 @@ function commonInitCheckCredentialsArgs() {
             ensureHaveValue(
                 "BLS/S-Chain key name",
                 imaState.chainProperties.sc.joAccount.strBlsKeyName,
-                false, isPrintGathered, null, ( x ) => {
+                false, isPrintGathered, null, ( x: any ) => {
                     return att( x );
                 } );
         }
@@ -2247,7 +2247,7 @@ function commonInitCheckCredentialsArgs() {
             ensureHaveValue(
                 "BLS/Target S-Chain key name",
                 imaState.chainProperties.tc.joAccount.strBlsKeyName,
-                false, isPrintGathered, null, ( x ) => {
+                false, isPrintGathered, null, ( x: any ) => {
                     return att( x );
                 } );
         }
@@ -2259,7 +2259,7 @@ function commonInitCheckTransferAmountArgs() {
     const isPrintGathered = ( !!( imaState.isPrintGathered ) );
     ensureHaveValue(
         "Amount of wei to transfer", imaState.nAmountOfWei,
-        false, isPrintGathered, null, ( x ) => {
+        false, isPrintGathered, null, ( x: any ) => {
             return log.fmtInformation( x );
         } );
 }
@@ -2269,92 +2269,92 @@ function commonInitTransferringArgs() {
     const isPrintGathered = ( !!( imaState.isPrintGathered ) );
     ensureHaveValue(
         "M->S transfer block size", imaState.nTransferBlockSizeM2S,
-        false, isPrintGathered, null, ( x ) => {
+        false, isPrintGathered, null, ( x: any ) => {
             return log.fmtNote( x );
         } );
     ensureHaveValue(
         "S->M transfer block size", imaState.nTransferBlockSizeS2M,
-        false, isPrintGathered, null, ( x ) => {
+        false, isPrintGathered, null, ( x: any ) => {
             return log.fmtNote( x );
         } );
     if( imaState.bHaveSkaleManagerABI ) {
         ensureHaveValue(
             "S->S transfer block size", imaState.nTransferBlockSizeS2S,
-            false, isPrintGathered, null, ( x ) => {
+            false, isPrintGathered, null, ( x: any ) => {
                 return log.fmtNote( x );
             } );
     }
     ensureHaveValue(
         "M->S transfer job steps", imaState.nTransferStepsM2S,
-        false, isPrintGathered, null, ( x ) => {
+        false, isPrintGathered, null, ( x: any ) => {
             return log.fmtNote( x );
         } );
     ensureHaveValue(
         "S->M transfer job steps", imaState.nTransferStepsS2M,
-        false, isPrintGathered, null, ( x ) => {
+        false, isPrintGathered, null, ( x: any ) => {
             return log.fmtNote( x );
         } );
     if( imaState.bHaveSkaleManagerABI ) {
         ensureHaveValue(
             "S->S transfer job steps", imaState.nTransferStepsS2S,
-            false, isPrintGathered, null, ( x ) => {
+            false, isPrintGathered, null, ( x: any ) => {
                 return log.fmtNote( x );
             } );
     }
     ensureHaveValue(
         "M->S transactions limit", imaState.nMaxTransactionsM2S,
-        false, isPrintGathered, null, ( x ) => {
+        false, isPrintGathered, null, ( x: any ) => {
             return log.fmtNote( x );
         } );
     ensureHaveValue(
         "S->M transactions limit", imaState.nMaxTransactionsS2M,
-        false, isPrintGathered, null, ( x ) => {
+        false, isPrintGathered, null, ( x: any ) => {
             return log.fmtNote( x );
         } );
     if( imaState.bHaveSkaleManagerABI ) {
         ensureHaveValue(
             "S->S transactions limit", imaState.nMaxTransactionsS2S,
-            false, isPrintGathered, null, ( x ) => {
+            false, isPrintGathered, null, ( x: any ) => {
                 return log.fmtNote( x );
             } );
     }
     ensureHaveValue(
         "M->S await blocks", imaState.nBlockAwaitDepthM2S, false,
-        isPrintGathered, null, ( x ) => {
+        isPrintGathered, null, ( x: any ) => {
             return log.fmtNote( x );
         } );
     ensureHaveValue(
         "S->M await blocks", imaState.nBlockAwaitDepthS2M, false,
-        isPrintGathered, null, ( x ) => {
+        isPrintGathered, null, ( x: any ) => {
             return log.fmtNote( x );
         } );
     if( imaState.bHaveSkaleManagerABI ) {
         ensureHaveValue(
             "S->S await blocks", imaState.nBlockAwaitDepthS2S, false,
-            isPrintGathered, null, ( x ) => {
+            isPrintGathered, null, ( x: any ) => {
                 return log.fmtNote( x );
             } );
     }
     ensureHaveValue(
         "M->S minimal block age", imaState.nBlockAgeM2S,
-        false, isPrintGathered, null, ( x ) => {
+        false, isPrintGathered, null, ( x: any ) => {
             return log.fmtNote( x );
         } );
     ensureHaveValue(
         "S->M minimal block age", imaState.nBlockAgeS2M,
-        false, isPrintGathered, null, ( x ) => {
+        false, isPrintGathered, null, ( x: any ) => {
             return log.fmtNote( x );
         } );
     if( imaState.bHaveSkaleManagerABI ) {
         ensureHaveValue(
             "S->S minimal block age", imaState.nBlockAgeS2S,
-            false, isPrintGathered, null, ( x ) => {
+            false, isPrintGathered, null, ( x: any ) => {
                 return log.fmtNote( x );
             } );
     }
     ensureHaveValue(
         "Transfer loop period(seconds)", imaState.nLoopPeriodSeconds,
-        false, isPrintGathered, null, ( x ) => {
+        false, isPrintGathered, null, ( x: any ) => {
             return log.fmtSuccess( x );
         } );
     if( imaState.nTimeFrameSeconds > 0 ) {
@@ -2377,12 +2377,12 @@ function commonInitCheckAccessArgs() {
     const isPrintGathered = ( !!( imaState.isPrintGathered ) );
     ensureHaveValue(
         "S-Chain node number(zero based)",
-        imaState.nNodeNumber, false, isPrintGathered, null, ( x ) => {
+        imaState.nNodeNumber, false, isPrintGathered, null, ( x: any ) => {
             return log.fmtInformation( x );
         } );
     ensureHaveValue(
         "S-Chain nodes count",
-        imaState.nNodesCount, false, isPrintGathered, null, ( x ) => {
+        imaState.nNodesCount, false, isPrintGathered, null, ( x: any ) => {
             return log.fmtInformation( x );
         } );
 }
@@ -2394,19 +2394,19 @@ function commonInitErcTokensArgs() {
         ensureHaveValue(
             "Loaded Main-net ERC20 ABI ",
             imaState.chainProperties.tc.strCoinNameErc20,
-            false, isPrintGathered, null, ( x ) => {
+            false, isPrintGathered, null, ( x: any ) => {
                 return att( x );
             } );
         ensureHaveValue(
             "Loaded S-Chain ERC20 ABI ",
             imaState.chainProperties.sc.strCoinNameErc20,
-            false, isPrintGathered, null, ( x ) => {
+            false, isPrintGathered, null, ( x: any ) => {
                 return att( x );
             } );
         ensureHaveValue(
             "Amount of tokens to transfer",
             imaState.nAmountOfToken,
-            false, isPrintGathered, null, ( x ) => {
+            false, isPrintGathered, null, ( x: any ) => {
                 return log.fmtInformation( x );
             } );
         if( isPrintGathered ) {
@@ -2418,7 +2418,7 @@ function commonInitErcTokensArgs() {
         ensureHaveValue(
             "Loaded S<->S Target S-Chain ERC20 ABI ",
             imaState.chainProperties.tc.strCoinNameErc20,
-            false, isPrintGathered, null, ( x ) => {
+            false, isPrintGathered, null, ( x: any ) => {
                 return att( x );
             } );
     }
@@ -2426,19 +2426,19 @@ function commonInitErcTokensArgs() {
         ensureHaveValue(
             "Loaded Main-net ERC721 ABI ",
             imaState.chainProperties.mn.strCoinNameErc721,
-            false, isPrintGathered, null, ( x ) => {
+            false, isPrintGathered, null, ( x: any ) => {
                 return att( x );
             } );
         ensureHaveValue(
             "Loaded S-Chain ERC721 ABI ",
             imaState.chainProperties.sc.strCoinNameErc721,
-            false, isPrintGathered, null, ( x ) => {
+            false, isPrintGathered, null, ( x: any ) => {
                 return att( x );
             } );
         ensureHaveValue(
             "ERC721 token id ",
             imaState.idToken, false,
-            isPrintGathered, null, ( x ) => {
+            isPrintGathered, null, ( x: any ) => {
                 return log.fmtInformation( x );
             } );
         if( isPrintGathered ) {
@@ -2450,28 +2450,28 @@ function commonInitErcTokensArgs() {
         ensureHaveValue(
             "Loaded S<->S Target S-Chain ERC721 ABI ",
             imaState.chainProperties.tc.strCoinNameErc721,
-            false, isPrintGathered, null, ( x ) => {
+            false, isPrintGathered, null, ( x: any ) => {
                 return att( x );
             } );
     }
     if( imaState.chainProperties.mn.strCoinNameErc1155.length > 0 ) {
         ensureHaveValue( "Loaded Main-net ERC1155 ABI ",
             imaState.chainProperties.mn.strCoinNameErc1155,
-            false, isPrintGathered, null, ( x ) => {
+            false, isPrintGathered, null, ( x: any ) => {
                 return att( x );
             } );
         ensureHaveValue( "Loaded S-Chain ERC1155 ABI ",
             imaState.chainProperties.sc.strCoinNameErc1155,
-            false, isPrintGathered, null, ( x ) => {
+            false, isPrintGathered, null, ( x: any ) => {
                 return att( x );
             } );
         try {
             ensureHaveValue( "ERC1155 token id ",
-                imaState.idToken, false, isPrintGathered, null, ( x ) => {
+                imaState.idToken, false, isPrintGathered, null, ( x: any ) => {
                     return log.fmtInformation( x );
                 } );
             ensureHaveValue( "ERC1155 token amount ",
-                imaState.nAmountOfToken, false, isPrintGathered, null, ( x ) => {
+                imaState.nAmountOfToken, false, isPrintGathered, null, ( x: any ) => {
                     return log.fmtInformation( x );
                 } );
         } catch ( e1 ) {
@@ -2479,13 +2479,13 @@ function commonInitErcTokensArgs() {
                 ensureHaveValue(
                     "ERC1155 batch of token ids ",
                     imaState.idTokens, false,
-                    isPrintGathered, null, ( x ) => {
+                    isPrintGathered, null, ( x: any ) => {
                         return log.fmtInformation( x );
                     } );
                 ensureHaveValue(
                     "ERC1155 batch of token amounts ",
                     imaState.arrAmountsOfTokens, false,
-                    isPrintGathered, null, ( x ) => {
+                    isPrintGathered, null, ( x: any ) => {
                         return log.fmtInformation( x );
                     } );
             } catch ( e2 ) {
@@ -2504,7 +2504,7 @@ function commonInitErcTokensArgs() {
         ensureHaveValue(
             "Loaded S<->S Target S-Chain ERC1155 ABI ",
             imaState.chainProperties.tc.strCoinNameErc1155,
-            false, isPrintGathered, null, ( x ) => {
+            false, isPrintGathered, null, ( x: any ) => {
                 return att( x );
             } );
     }
@@ -2596,19 +2596,19 @@ function commonInitLoggingArgs() {
         ensureHaveValue(
             "Log file path",
             imaState.strLogFilePath, false,
-            isPrintGathered, null, ( x ) => {
+            isPrintGathered, null, ( x: any ) => {
                 return log.fmtInformation( x );
             } );
         ensureHaveValue(
             "Max size of log file path",
             imaState.nLogMaxSizeBeforeRotation, false,
-            isPrintGathered, null, ( x ) => {
+            isPrintGathered, null, ( x: any ) => {
                 return ( x <= 0 ) ? log.fmtWarning( "unlimited" ) : log.fmtNote( x );
             } );
         ensureHaveValue(
             "Max rotated count of log files",
             imaState.nLogMaxFilesCount,
-            false, isPrintGathered, null, ( x ) => {
+            false, isPrintGathered, null, ( x: any ) => {
                 return ( x <= 1 ) ? log.fmtWarning( "not set" ) : log.fmtNote( x );
             } );
     }
@@ -2632,7 +2632,7 @@ export function commonInit() {
     commonInitCheckErc20();
     commonInitCheckErc721();
     commonInitCheckErc1155();
-    if( log.verboseGet() > log.verboseReversed()["debug"] || imaState.bShowConfigMode ) {
+    if( log.verboseGet() > log.verboseName2Number( "debug" ) || imaState.bShowConfigMode ) {
         commonInitCheckGeneralArgs();
         commonInitCheckCredentialsArgs();
         commonInitCheckTransferAmountArgs();

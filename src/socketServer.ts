@@ -32,10 +32,10 @@ export class SocketServer extends EventDispatcher {
     acceptor: any;
     mapApiHandlers: any;
     mapAcceptedPipes: any;
-    isLogAcceptedSocket: boolean;
-    isLogSocketErrors: boolean;
-    isLogSocketTraffic: boolean;
-    isLogSocketTrafficRaw: boolean;
+    isLogAcceptedSocket?: boolean;
+    isLogSocketErrors?: boolean;
+    isLogSocketTraffic?: boolean;
+    isLogSocketTrafficRaw?: boolean;
     constructor( acceptor: any ) {
         super();
         if( acceptor == null || acceptor == undefined || typeof acceptor != "object" )
@@ -49,7 +49,7 @@ export class SocketServer extends EventDispatcher {
         self.isLogSocketErrors = true;
         self.isLogSocketTraffic = false;
         self.isLogSocketTrafficRaw = false;
-        acceptor.on( "connection", function( eventData ) {
+        acceptor.on( "connection", function( eventData: any ) {
             const socket = eventData.socket;
             if( ( ! ( "remoteAddress" in eventData ) ) ||
                 eventData.remoteAddress == null ||
@@ -74,7 +74,7 @@ export class SocketServer extends EventDispatcher {
                 }
                 delete self.mapAcceptedPipes[socket];
             };
-            let _onPipeError: any = function( eventData ) {
+            let _onPipeError: any = function( eventData: any ) {
                 if( self.isLogSocketErrors ) {
                     self.log( log.fmtError( "Socket {url} error {err}",
                         socket.strSavedRemoteAddress, eventData ) );
@@ -85,7 +85,7 @@ export class SocketServer extends EventDispatcher {
                 }
                 delete self.mapAcceptedPipes[socket];
             };
-            let _onPipeMessage: any = function( eventData ) {
+            let _onPipeMessage: any = function( eventData: any ) {
                 if( self.isLogSocketTrafficRaw ) {
                     self.log( log.fmtInformation( "Socket {url} did received {sunny} {}",
                         socket.strSavedRemoteAddress, "raw-message", eventData ) );
@@ -118,10 +118,10 @@ export class SocketServer extends EventDispatcher {
                     if( self.isLogSocketErrors ) {
                         self.log( log.fmtError(
                             "Server method {} RPC exception: {err}, stack is: {stack}",
-                            joMessage.method, err, err.stack ) );
+                            joMessage.method, err, err ) );
                     }
                     joAnswer = utils.prepareAnswerJSON( joMessage );
-                    joAnswer.error = "" + err.toString();
+                    joAnswer.error = "" + err;
                 }
 
                 if( joAnswer != null && joAnswer != undefined ) {

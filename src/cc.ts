@@ -269,8 +269,10 @@ export function safeURL( arg?: any ) : URL|null {
             if( arg[cnt - 1] == sc ) {
                 const ss = arg.substring( 1, cnt - 1 );
                 const objURL = safeURL( ss );
-                if( objURL != null && objURL != undefined )
-                    objURL["strStrippedStringComma"] = sc;
+                if( objURL != null && objURL != undefined ) {
+                    const anyURL: any = objURL;
+                    anyURL["strStrippedStringComma"] = sc;
+                }
 
                 return objURL;
             }
@@ -283,7 +285,8 @@ export function safeURL( arg?: any ) : URL|null {
         if( objURL.hostname.length === 0 )
             return null;
 
-        objURL["strStrippedStringComma"] = null;
+        const anyURL: any = objURL;
+        anyURL["strStrippedStringComma"] = null;
         return objURL;
     } catch ( err ) {
         return null;
@@ -354,8 +357,9 @@ export function logArgToString( ...args: any[] ) : string {
             const objURL = safeURL( arg );
             if( objURL != null && objURL != undefined ) {
                 let strURL = "";
-                if( objURL["strStrippedStringComma"] )
-                    strURL += normal( objURL["strStrippedStringComma"] );
+                const anyURL: any = objURL;
+                if( anyURL["strStrippedStringComma"] )
+                    strURL += normal( anyURL["strStrippedStringComma"] );
 
                 if( objURL.protocol )
                     strURL += "" + yellow( objURL.protocol ) + normal( "//" );
@@ -379,8 +383,8 @@ export function logArgToString( ...args: any[] ) : string {
                 if( objURL.search )
                     strURL += "" + magenta( objURL.search );
 
-                if( objURL["strStrippedStringComma"] )
-                    strURL += normal( objURL["strStrippedStringComma"] );
+                if( anyURL["strStrippedStringComma"] )
+                    strURL += normal( anyURL["strStrippedStringComma"] );
 
                 s += strURL;
                 continue;
@@ -429,7 +433,7 @@ export const jsonColorizer: any = { // see http://jsfiddle.net/unLSJ/
     cntCensoredMax: 30000, // zero to disable censoring
     censor: ( censor: any ) : any => {
         let i = 0;
-        return ( key, value ) => {
+        return ( key: any, value: any ) => {
             if( i !== 0 && typeof ( censor ) === "object" &&
                 typeof ( value ) === "object" && censor == value
             )
@@ -528,7 +532,7 @@ export function syntaxHighlightJSON( jo?: any, strKeyNamePrefix?: string ) : str
     return jo.replace(
         // eslint-disable-next-line max-len
         /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g,
-        function( match ) {
+        function( match: any ) {
             if( ! gFlagIsEnabled )
                 return match;
             let cls = "number";

@@ -218,7 +218,7 @@ export async function safeGetTransactionCount(
     } catch ( err ) {
         ret = retValOnFail;
         details.error( "Failed call attempt {} to {} via {url}, error is: {err}, " +
-            "stack is:\n{stack}", idxAttempt, strFnName + "()", u, err, err.stack );
+            "stack is:\n{stack}", idxAttempt, strFnName + "()", u, err, err );
     }
     ++ idxAttempt;
     while( ret === "" && idxAttempt <= cntAttempts ) {
@@ -238,7 +238,7 @@ export async function safeGetTransactionCount(
         } catch ( err ) {
             ret = retValOnFail;
             details.error( "Failed call attempt {} to {} via {url}, error is: {err}, " +
-                "stack is:\n{stack}", idxAttempt, strFnName + "()", u, err, err.stack );
+                "stack is:\n{stack}", idxAttempt, strFnName + "()", u, err, err );
         }
         ++ idxAttempt;
     }
@@ -273,7 +273,7 @@ export async function safeGetTransactionReceipt(
     } catch ( err ) {
         ret = retValOnFail;
         details.error( "Failed call attempt {} to {} via {url}, error is: {err}, " +
-            "stack is:\n{stack}", idxAttempt, strFnName + "()", u, err, err.stack );
+            "stack is:\n{stack}", idxAttempt, strFnName + "()", u, err, err );
     }
     ++ idxAttempt;
     while( idxAttempt <= cntAttempts ) {
@@ -293,7 +293,7 @@ export async function safeGetTransactionReceipt(
         } catch ( err ) {
             ret = retValOnFail;
             details.error( "Failed call attempt {} to {} via {url}, error is: {err}, " +
-                "stack is:\n{stack}", idxAttempt, strFnName + "()", u, err, err.stack );
+                "stack is:\n{stack}", idxAttempt, strFnName + "()", u, err, err );
         }
         ++ idxAttempt;
     }
@@ -347,7 +347,7 @@ export async function safeGetPastEvents(
         details.error(
             "{p}Failed filtering attempt {} for event {} via {url}, from block {}, to block {}, " +
             "error is: {err}, stack is:\n{stack}", strLogPrefix, idxAttempt, strEventName, u,
-            nBlockFrom.toHexString(), nBlockTo.toHexString(), err, err.stack );
+            nBlockFrom.toHexString(), nBlockTo.toHexString(), err, err );
         if( owaspUtils.extractErrorMessage( err )
             .indexOf( strErrorTextAboutNotExistingEvent ) >= 0 ) {
             details.error( "{p}Did stopped filtering of {} event because no such event exist " +
@@ -385,7 +385,7 @@ export async function safeGetPastEvents(
                 "{p}Failed filtering attempt {} for event {} via {url}, from block {}" +
                 ", to block{}, error is: {err}, stack is:\n{stack}", strLogPrefix, idxAttempt,
                 strEventName, u, nBlockFrom.toHexString(), nBlockTo.toHexString(),
-                err, err.stack );
+                err, err );
             if( owaspUtils.extractErrorMessage( err )
                 .indexOf( strErrorTextAboutNotExistingEvent ) >= 0
             ) {
@@ -476,7 +476,7 @@ export async function safeGetPastEventsIterative(
                 "{p}Got scan error during interactive scan of {}/{} block sub-range in {}/{} " +
                 "block range, error is: {err}, stack is:\n{stack}", strLogPrefix,
                 idxBlockSubRangeFrom.toHexString(), idxBlockSubRangeTo.toHexString(),
-                nBlockFrom.toHexString(), nBlockTo.toHexString(), err, err.stack );
+                nBlockFrom.toHexString(), nBlockTo.toHexString(), err, err );
         }
         idxBlockSubRangeTo = idxBlockSubRangeFrom;
         if( idxBlockSubRangeTo.lte( nBlockFrom ) )

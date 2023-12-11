@@ -286,7 +286,7 @@ export function get() {
     return imaState;
 }
 
-export function set( imaStateNew ) {
+export function set( imaStateNew: any ) {
     imaState = imaStateNew;
     return imaState;
 }
@@ -297,6 +297,6 @@ export function isPreventExitAfterLastAction() {
     return gFlagIsPreventExitAfterLastAction;
 }
 
-export function setPreventExitAfterLastAction( isPrevent ) {
-    gFlagIsPreventExitAfterLastAction = isPrevent;
+export function setPreventExitAfterLastAction( isPrevent: any ) {
+    gFlagIsPreventExitAfterLastAction = (!!isPrevent);
 }

@@ -195,7 +195,7 @@ async function payedCallTM( optsPayedCall: any ) {
     } catch ( err ) {
         optsPayedCall.details.critical(
             "{p}TM-transaction was not sent, underlying error is: {err}",
-            optsPayedCall.strLogPrefix, err.toString() );
+            optsPayedCall.strLogPrefix, err );
         throw err;
     }
 }
@@ -284,7 +284,7 @@ async function payedCallDirect( optsPayedCall: any ) {
 export async function payedCall(
     details: any, ethersProvider: any,
     strContractName: string, joContract: any, strMethodName: any, arrArguments: any[],
-    joAccount, strActionName,
+    joAccount: any, strActionName: string,
     gasPrice: any, estimatedGas: any, weiHowMuch: any,
     opts?: any
 ) {
@@ -352,7 +352,7 @@ export async function payedCall(
     } catch ( err ) {
         const strErrorPrefix = "Transaction sign and send error(outer flow):";
         optsPayedCall.details.critical( "{p}{} {err}, stack is:\n{stack}",
-            optsPayedCall.strLogPrefix, strErrorPrefix, err, err.stack );
+            optsPayedCall.strLogPrefix, strErrorPrefix, err, err );
         throw new Error( `${strErrorPrefix} invoking ` +
             `the ${optsPayedCall.strContractCallDescription}, ` +
             `error is: ${owaspUtils.extractErrorMessage( err )}` );
@@ -374,7 +374,7 @@ export async function payedCall(
         optsPayedCall.details.trace( "{p}ETH spent: {}", optsPayedCall.strLogPrefix, ethSpent );
     } catch ( err ) {
         optsPayedCall.details.warning( "{p}TX stats computation error {err}, stack is:\n{stack}",
-            optsPayedCall.strLogPrefix, err, err.stack );
+            optsPayedCall.strLogPrefix, err, err );
     }
     return optsPayedCall.joReceipt;
 }
@@ -426,7 +426,7 @@ export async function checkTransactionToSchain(
         }
     } catch ( err ) {
         details.critical( "{p}PoW-mining error(checkTransactionToSchain): exception occur before " +
-            "PoW-mining, error is: {err}, stack is:\n{stack}", strLogPrefix, err, err.stack );
+            "PoW-mining, error is: {err}, stack is:\n{stack}", strLogPrefix, err, err );
     }
     return unsignedTx;
 }
@@ -447,7 +447,7 @@ export async function calculatePowNumber(
         return res;
     } catch ( err ) {
         details.critical( "{p}PoW-mining error(calculatePowNumber): exception occur during " +
-            "PoW-mining, error is: {err}, stack is:\n{stack}", strLogPrefix, err, err.stack );
+            "PoW-mining, error is: {err}, stack is:\n{stack}", strLogPrefix, err, err );
         throw err;
     }
 }
@@ -489,10 +489,10 @@ export function getAccountConnectivityInfo( joAccount: any ) {
 const gTransactionManagerPool = "transactions";
 
 const tmGenerateRandomHex =
-    size => [ ...Array( size ) ]
-        .map( () => Math.floor( Math.random() * 16 ).toString( 16 ) ).join( "" );
+    function( size: number ) { [ ...Array( size ) ]
+        .map( () => Math.floor( Math.random() * 16 ).toString( 16 ) ).join( "" ) };
 
-function tmMakeId( details ) {
+function tmMakeId( details: any ) {
     const prefix = "tx-";
     const unique = tmGenerateRandomHex( 16 );
     const id = prefix + unique + "js";
@@ -500,7 +500,7 @@ function tmMakeId( details ) {
     return id;
 }
 
-function tmMakeRecord( tx: any = {}, score ) {
+function tmMakeRecord( tx: any = {}, score: any ) {
     const status = "PROPOSED";
     return JSON.stringify( {
         "score": score,
@@ -509,12 +509,12 @@ function tmMakeRecord( tx: any = {}, score ) {
     } );
 }
 
-function tmMakeScore( priority ) {
+function tmMakeScore( priority: number ) {
     const ts = imaHelperAPIs.currentTimestamp();
     return priority * Math.pow( 10, ts.toString().length ) + ts;
 }
 
-async function tmSend( details, tx, priority = 5 ) {
+async function tmSend( details: any, tx: any, priority: number = 5 ) {
     details.trace( "TM - sending tx {} ts: {}", tx, imaHelperAPIs.currentTimestamp() );
     const id = tmMakeId( details );
     const score = tmMakeScore( priority );
@@ -534,7 +534,7 @@ function tmIsFinished( record: any ) {
     return [ "SUCCESS", "FAILED", "DROPPED" ].includes( record.status );
 }
 
-async function tmGetRecord( txId ) {
+async function tmGetRecord( txId: any ) {
     const r = await redis.get( txId );
     if( r != null )
         return JSON.parse( r );
@@ -677,7 +677,7 @@ export class TransactionCustomizer {
         } catch ( err ) {
             details.error(
                 "{p}Estimate-gas error: {err}, default recommended gas value will be used " +
-                "instead of estimated, stack is:\n{stack}", strLogPrefix, err, err.stack );
+                "instead of estimated, stack is:\n{stack}", strLogPrefix, err, err );
         }
         estimatedGas = owaspUtils.parseIntOrHex( owaspUtils.toBN( estimatedGas ).toString() );
         if( estimatedGas == 0 ) {

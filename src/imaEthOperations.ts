@@ -52,7 +52,7 @@ export async function getBalanceEth(
         return balance;
     } catch ( err ) {
         log.error( "{p}balance fetching error details: {err}, stack is:\n{stack}",
-            strLogPrefix, err, err.stack );
+            strLogPrefix, err, err );
     }
     return "<no-data-or-error>";
 }
@@ -143,7 +143,7 @@ export async function doEthPaymentFromMainNet(
         }
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, err, err.stack );
+            strLogPrefix, strActionName, err, err );
         details.exposeDetailsTo( log, "doEthPaymentFromMainNet", false );
         details.close();
         return false;
@@ -240,7 +240,7 @@ export async function doEthPaymentFromSChain(
         }
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, err, err.stack );
+            strLogPrefix, strActionName, err, err );
         details.exposeDetailsTo( log, "doEthPaymentFromSChain", false );
         details.close();
         return false;
@@ -265,7 +265,7 @@ export async function receiveEthPaymentFromSchainOnMainNet(
     const strLogPrefix = "M2S ETH Receive: ";
     try {
         strActionName = "Receive ETH payment from S-Chain on Main Met, getMyEth";
-        const arrArguments = [];
+        const arrArguments: any = [];
         const weiHowMuch = undefined;
         const gasPrice = await transactionCustomizerMainNet.computeGasPrice(
             ethersProviderMainNet, 200000000000 );
@@ -300,7 +300,7 @@ export async function receiveEthPaymentFromSchainOnMainNet(
         }
     } catch ( err ) {
         details.critical( "{p}Receive payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, err, err.stack );
+            strLogPrefix, strActionName, err, err );
         details.exposeDetailsTo( log, "receiveEthPaymentFromSchainOnMainNet", false );
         details.close();
         return false;
@@ -337,7 +337,7 @@ export async function viewEthPaymentFromSchainOnMainNet(
         return xWei;
     } catch ( err ) {
         details.critical( "{p}View payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, err, err.stack );
+            strLogPrefix, strActionName, err, err );
         details.exposeDetailsTo( log, "viewEthPaymentFromSchainOnMainNet", false );
         details.close();
         return null;

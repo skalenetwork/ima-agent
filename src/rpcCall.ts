@@ -33,8 +33,8 @@ import * as log from "./log";
 const gSecondsConnectionTimeout = 60;
 
 export async function waitWebSocketIsOpen( socket: any, fnDone: any, fnStep: any ) {
-    fnDone = fnDone || async function( nStep ) {};
-    fnDone = fnStep || async function( nStep ) { return true; };
+    fnDone = fnDone || async function( nStep: number ) {};
+    fnDone = fnStep || async function( nStep: number ) { return true; };
     let nStep = 0;
     const promiseComplete = new Promise( function( resolve, reject ) {
         let isInsideAsyncHandler = false;
@@ -84,7 +84,7 @@ export async function doConnect( joCall: any, opts: any, fn?: any ) {
                     "web socket was closed, please check provided URL is valid and accessible";
                 joCall.wsConn = null;
             } );
-            joCall.wsConn.on( "error", async function( err ) {
+            joCall.wsConn.on( "error", async function( err: any ) {
                 strWsError = err.toString() || "internal web socket error";
                 log.error( "{url} web socket error: {err}", joCall.url, err );
                 const wsConn = joCall.wsConn;
@@ -92,7 +92,7 @@ export async function doConnect( joCall: any, opts: any, fn?: any ) {
                 wsConn.close();
                 doReconnectWsStep( joCall, opts );
             } );
-            joCall.wsConn.on( "fail", async function( err ) {
+            joCall.wsConn.on( "fail", async function( err: any ) {
                 strWsError = err.toString() || "internal web socket failure";
                 log.error( "{url} web socket fail: {err}", joCall.url, err );
                 const wsConn = joCall.wsConn;
@@ -100,7 +100,7 @@ export async function doConnect( joCall: any, opts: any, fn?: any ) {
                 wsConn.close();
                 doReconnectWsStep( joCall, opts );
             } );
-            joCall.wsConn.on( "message", async function incoming( data ) {
+            joCall.wsConn.on( "message", async function incoming(  data: any ) {
                 const joOut = JSON.parse( data );
                 if( joOut.id in joCall.mapPendingByCallID ) {
                     const entry = joCall.mapPendingByCallID[joOut.id];
@@ -115,9 +115,9 @@ export async function doConnect( joCall: any, opts: any, fn?: any ) {
                 }
             } );
             await waitWebSocketIsOpen( joCall.wsConn,
-                async function( nStep ) { // work done handler
+                async function( nStep: number ) { // work done handler
                 },
-                async function( nStep ) { // step handler
+                async function( nStep: number ) { // step handler
                     if( strWsError && typeof strWsError == "string" && strWsError.length > 0 ) {
                         log.error( "{url} web socket wait error detected: {err}",
                             joCall.url, strWsError );
@@ -175,7 +175,7 @@ async function doReconnectWsStep( joCall: any, opts: any, fn?: any ) {
         return;
     if( joCall.isDisconnectMode )
         return;
-    doConnect( joCall, opts, async function( joCall, err ) {
+    doConnect( joCall, opts, async function( joCall: any, err: any ) {
         if( err ) {
             doReconnectWsStep( joCall, opts );
             return;
@@ -257,7 +257,7 @@ export async function doCall( joCall: any, joIn: any, fn: any ) {
                 try {
                     const req = https.request( options, ( res: any ) => {
                         res.setEncoding( "utf8" );
-                        res.on( "data", body => {
+                        res.on( "data", function( body: any ) {
                             accumulatedBody += body;
                         } );
                         res.on( "end", function() {
@@ -273,15 +273,15 @@ export async function doCall( joCall: any, joIn: any, fn: any ) {
                                 resolve( joOut );
                             } catch ( err ) {
                                 joOut = null;
-                                errCall = "Response body parse error: " + err.toString();
+                                errCall = "Response body parse error: " + err;
                                 reject( errCall );
                             }
                         } );
                     } );
-                    req.on( "error", err => {
+                    req.on( "error", function( err: any ) {
                         log.error( "{url} REST error {err}", joCall.url, err );
                         joOut = null;
-                        errCall = `HTTP(S)/RPC call(event) error: ${err.toString()}`;
+                        errCall = `HTTP(S)/RPC call(event) error: ${err}`;
                         reject( errCall );
                     } );
                     req.write( strBody );
@@ -289,14 +289,14 @@ export async function doCall( joCall: any, joIn: any, fn: any ) {
                 } catch ( err ) {
                     log.error( "{url} REST error {err}", joCall.url, err );
                     joOut = null;
-                    errCall = `HTTP(S)/RPC call(processing) error: ${err.toString()}`;
+                    errCall = `HTTP(S)/RPC call(processing) error: ${err}`;
                     reject( errCall );
                 }
             } );
-            await promiseComplete.catch( function( err ) {
+            await promiseComplete.catch( function( err: Error|string ) {
                 log.error( "{url} HTTP call error {err}", joCall.url, err );
                 if( ! errCall )
-                    errCall = `HTTP(S)/RPC call(catch) error: ${err.toString()}`;
+                    errCall = `HTTP(S)/RPC call(catch) error: ${err}`;
             } );
         } else {
             try {
@@ -330,7 +330,7 @@ export async function doCall( joCall: any, joIn: any, fn: any ) {
             } catch ( err ) {
                 log.error( "{url} request error {err}", joCall.url, err );
                 joOut = null;
-                errCall = "request error: " + err.toString();
+                errCall = "request error: " + err;
             }
         }
         try {
@@ -356,36 +356,36 @@ export async function rpcCallCreate( strURL: string, opts: any ) {
         "isAutoReconnect":
             ( opts && "isAutoReconnect" in opts && opts.isAutoReconnect ) ? true : false,
         "isDisconnectMode": false,
-        "reconnect": async function( fnAfter ) {
+        "reconnect": async function( fnAfter: any ) {
             await doConnect( joCall, fnAfter );
         },
-        "reconnect_if_needed": async function( fnAfter ) {
+        "reconnect_if_needed": async function( fnAfter: any ) {
             await doConnectIfNeeded( joCall, opts, fnAfter );
         },
-        "call": function( joIn, fnAfter ) {
+        "call": function( joIn: any, fnAfter: any ) {
             const self = this;
-            const promiseComplete = new Promise( function( resolve, reject ) {
-                self.reconnect_if_needed( async function( joCall, err ) {
+            const promiseComplete = new Promise( function( resolve: any, reject: any ) {
+                self.reconnect_if_needed( async function( joCall: any, err: any ) {
                     if( err ) {
                         if( fnAfter )
                             await fnAfter( joIn, null, err );
                         reject( err );
                         return;
                     }
-                    await doCall( joCall, joIn, async function( joIn, joOut, err ) {
+                    await doCall( joCall, joIn, async function( joIn: any, joOut: any, err: any ) {
                         if( fnAfter )
                             await fnAfter( joIn, joOut, err );
                         if( err )
                             reject( err );
                         else
                             resolve( joOut );
-                    } ).catch( function( err ) {
+                    } ).catch( function( err: Error|string ) {
                         log.error(
                             "{url} JSON RPC call(performer) error: {err}", strURL, err );
                     } );
                 } );
             } );
-            return promiseComplete.catch( function( err ) {
+            return promiseComplete.catch( function( err: Error|string ) {
                 log.error(
                     "{url} JSON RPC call(awaiter) error: {err}", strURL, err );
             } );
@@ -509,7 +509,7 @@ export function checkTcpPromise( strHost: string, nPort: number, nTimeoutMillise
                     `default TCP connection to ${strHost}:${nPort} timeout...` );
             }
         }
-        conn.on( "timeout", err => {
+        conn.on( "timeout", function( err: any ) {
             if( isLog ) {
                 console.log(
                     `${gStrTcpConnectionHeader}TCP connection ` +
@@ -518,7 +518,7 @@ export function checkTcpPromise( strHost: string, nPort: number, nTimeoutMillise
             conn.destroy();
             reject( err );
         } );
-        conn.on( "error", err => {
+        conn.on( "error", function( err: any ) {
             if( isLog ) {
                 console.log(
                     `${gStrTcpConnectionHeader}TCP connection ` +
@@ -558,12 +558,12 @@ export async function checkTcp( strHost: string, nPort: number, nTimeoutMillisec
         isOnline = false;
         console.log(
             `${gStrTcpConnectionHeader}TCP connection ` +
-            `to ${strHost}:${nPort} check failed with error: ${err.toString()}` );
+            `to ${strHost}:${nPort} check failed with error: ${err}` );
     }
     return isOnline;
 }
 
-export async function checkUrl( u: string, nTimeoutMilliseconds: number, isLog?: boolean ) {
+export async function checkUrl( u: URL|string, nTimeoutMilliseconds: number, isLog?: boolean ) {
     if( ! u )
         return false;
     const jo: any = getValidHostAndPort( u );

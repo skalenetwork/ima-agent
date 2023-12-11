@@ -107,7 +107,7 @@ export function jsonFileLoad( strPath: string, joDefault?: any, bLogOutput?: boo
         return jo;
     } catch ( err ) {
         log.error( "Failed to load JSON file {}, error is: {err}, stack is:\n{stack}",
-            strPath, err, err.stack );
+            strPath, err, err );
     }
     return joDefault;
 }
@@ -125,7 +125,7 @@ export function jsonFileSave( strPath: string, jo?: any, bLogOutput?: boolean ) 
         return true;
     } catch ( err ) {
         log.error( " failed to save JSON file {}, error is: {err}, stack is:\n{stack}",
-            strPath, err, err.stack );
+            strPath, err, err );
     }
     return false;
 }
@@ -375,7 +375,7 @@ export function checkKeyExistInABI(
     } catch ( err ) {
         if( isExitOnError ) {
             log.fatal( "Loaded {} ABI JSON file {} does not contain needed key {}, stack is:\n{stack}",
-                strName, strFile, strKey, err.stack );
+                strName, strFile, strKey, err );
             process.exit( 126 );
         }
     }

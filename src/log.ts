@@ -153,65 +153,65 @@ export function createStandardOutputStream() : any {
             "close": function() { this.objStream = null; },
             "open": function() { try { this.objStream = process.stdout; } catch ( err ) { } },
             "size": function() { return 0; },
-            "rotate": function( nBytesToWrite ) { },
+            "rotate": function( nBytesToWrite: number ) { },
             "toString": function() : string { return "" + this.strFilePath; },
             "exposeDetailsTo":
                 function( otherStream: any, strTitle: string, isSuccess: boolean ) : void { },
             // high-level formatters
             "fatal": function( ...args: any[] ) : void {
-                if( verboseGet() >= verboseReversed()["fatal"] )
+                if( verboseGet() >= verboseName2Number( "fatal" ) )
                     this.write( getLogLinePrefixFatal() + fmtFatal( ...args ) );
             },
             "critical": function( ...args: any[] ) : void {
-                if( verboseGet() >= verboseReversed()["critical"] ) {
+                if( verboseGet() >= verboseName2Number( "critical" ) ) {
                     this.write(
                         getLogLinePrefixCritical() + fmtCritical( ...args ) );
                 }
             },
             "error": function( ...args: any[] ) : void {
-                if( verboseGet() >= verboseReversed()["error"] )
+                if( verboseGet() >= verboseName2Number( "error" ) )
                     this.write( getLogLinePrefixError() + fmtError( ...args ) );
             },
             "warning": function( ...args: any[] ) : void {
-                if( verboseGet() >= verboseReversed()["warning"] )
+                if( verboseGet() >= verboseName2Number( "warning" ) )
                     this.write( getLogLinePrefixWarning() + fmtWarning( ...args ) );
             },
             "attention": function( ...args: any[] ) : void {
-                if( verboseGet() >= verboseReversed()["attention"] ) {
+                if( verboseGet() >= verboseName2Number( "attention" ) ) {
                     this.write(
                         getLogLinePrefixAttention() + fmtAttention( ...args ) );
                 }
             },
             "information": function( ...args: any[] ) : void {
-                if( verboseGet() >= verboseReversed()["information"] ) {
+                if( verboseGet() >= verboseName2Number( "information" ) ) {
                     this.write(
                         getLogLinePrefixInformation() + fmtInformation( ...args ) );
                 }
             },
             "info": function( ...args: any[] ) : void {
-                if( verboseGet() >= verboseReversed()["information"] ) {
+                if( verboseGet() >= verboseName2Number( "information" ) ) {
                     this.write(
                         getLogLinePrefixInformation() + fmtInformation( ...args ) );
                 }
             },
             "notice": function( ...args: any[] ) : void {
-                if( verboseGet() >= verboseReversed()["notice"] )
+                if( verboseGet() >= verboseName2Number( "notice" ) )
                     this.write( getLogLinePrefixNotice() + fmtNotice( ...args ) );
             },
             "note": function( ...args: any[] ) : void {
-                if( verboseGet() >= verboseReversed()["notice"] )
+                if( verboseGet() >= verboseName2Number( "notice" ) )
                     this.write( getLogLinePrefixNote() + fmtNote( ...args ) );
             },
             "debug": function( ...args: any[] ) : void {
-                if( verboseGet() >= verboseReversed()["debug"] )
+                if( verboseGet() >= verboseName2Number( "debug" ) )
                     this.write( getLogLinePrefixDebug() + fmtDebug( ...args ) );
             },
             "trace": function( ...args: any[] ) : void {
-                if( verboseGet() >= verboseReversed()["trace"] )
+                if( verboseGet() >= verboseName2Number( "trace" ) )
                     this.write( getLogLinePrefixTrace() + fmtTrace( ...args ) );
             },
             "success": function( ...args: any[] ) : void {
-                if( verboseGet() >= verboseReversed()["information"] )
+                if( verboseGet() >= verboseName2Number( "information" ) )
                     this.write( getLogLinePrefixSuccess() + fmtSuccess( ...args ) );
             }
         };
@@ -287,7 +287,7 @@ export function createMemoryOutputStream() : any {
             "close": function() { this.clear(); },
             "open": function() { this.clear(); },
             "size": function() { return 0; },
-            "rotate": function( nBytesToWrite ) { this.this.arrAccumulatedLogTextLines = []; },
+            "rotate": function( nBytesToWrite: number ) { this.this.arrAccumulatedLogTextLines = []; },
             "toString": function() : string {
                 let s = "";
                 for( let i = 0; i < this.arrAccumulatedLogTextLines.length; ++ i )
@@ -335,57 +335,57 @@ export function createMemoryOutputStream() : any {
             },
             // high-level formatters
             "fatal": function( ...args: any[] ) : void {
-                if( verboseGet() >= verboseReversed()["fatal"] )
+                if( verboseGet() >= verboseName2Number( "fatal" ) )
                     this.write( getLogLinePrefixFatal() + fmtFatal( ...args ) );
             },
             "critical": function( ...args: any[] ) : void {
-                if( verboseGet() >= verboseReversed()["critical"] )
+                if( verboseGet() >= verboseName2Number( "critical" ) )
                     this.write( getLogLinePrefixCritical() + fmtCritical( ...args ) );
             },
             "error": function( ...args: any[] ) : void {
-                if( verboseGet() >= verboseReversed()["error"] )
+                if( verboseGet() >= verboseName2Number( "error" ) )
                     this.write( getLogLinePrefixError() + fmtError( ...args ) );
             },
             "warning": function( ...args: any[] ) : void {
-                if( verboseGet() >= verboseReversed()["warning"] )
+                if( verboseGet() >= verboseName2Number( "warning" ) )
                     this.write( getLogLinePrefixWarning() + fmtWarning( ...args ) );
             },
             "attention": function( ...args: any[] ) : void {
-                if( verboseGet() >= verboseReversed()["attention"] ) {
+                if( verboseGet() >= verboseName2Number( "attention" ) ) {
                     this.write(
                         getLogLinePrefixAttention() + fmtAttention( ...args ) );
                 }
             },
             "information": function( ...args: any[] ) : void {
-                if( verboseGet() >= verboseReversed()["information"] ) {
+                if( verboseGet() >= verboseName2Number( "information" ) ) {
                     this.write(
                         getLogLinePrefixInformation() + fmtInformation( ...args ) );
                 }
             },
             "info": function( ...args: any[] ) : void {
-                if( verboseGet() >= verboseReversed()["information"] ) {
+                if( verboseGet() >= verboseName2Number( "information" ) ) {
                     this.write(
                         getLogLinePrefixInformation() + fmtInformation( ...args ) );
                 }
             },
             "notice": function( ...args: any[] ) : void {
-                if( verboseGet() >= verboseReversed()["notice"] )
+                if( verboseGet() >= verboseName2Number( "notice" ) )
                     this.write( getLogLinePrefixNotice() + fmtNotice( ...args ) );
             },
             "note": function( ...args: any[] ) : void {
-                if( verboseGet() >= verboseReversed()["notice"] )
+                if( verboseGet() >= verboseName2Number( "notice" ) )
                     this.write( getLogLinePrefixNote() + fmtNote( ...args ) );
             },
             "debug": function( ...args: any[] ) : void {
-                if( verboseGet() >= verboseReversed()["debug"] )
+                if( verboseGet() >= verboseName2Number( "debug" ) )
                     this.write( getLogLinePrefixDebug() + fmtDebug( ...args ) );
             },
             "trace": function( ...args: any[] ) : void {
-                if( verboseGet() >= verboseReversed()["trace"] )
+                if( verboseGet() >= verboseName2Number( "trace" ) )
                     this.write( getLogLinePrefixTrace() + fmtTrace( ...args ) );
             },
             "success": function( ...args: any[] ) : void {
-                if( verboseGet() >= verboseReversed()["information"] )
+                if( verboseGet() >= verboseName2Number( "information" ) )
                     this.write( getLogLinePrefixSuccess() + fmtSuccess( ...args ) );
             }
         };
@@ -453,7 +453,7 @@ export function createFileOutput(
             "size": function() {
                 try { return fs.lstatSync( this.strPath ).size; } catch ( err ) { return 0; }
             },
-            "rotate": function( nBytesToWrite ) {
+            "rotate": function( nBytesToWrite: number ) {
                 try {
                     if( this.nMaxSizeBeforeRotation <= 0 || this.nMaxFilesCount <= 1 )
                         return;
@@ -488,59 +488,59 @@ export function createFileOutput(
                 function( otherStream: any, strTitle: string, isSuccess: boolean ) : void { },
             // high-level formatters
             "fatal": function( ...args: any[] ) : void {
-                if( verboseGet() >= verboseReversed()["fatal"] )
+                if( verboseGet() >= verboseName2Number( "fatal" ) )
                     this.write( getLogLinePrefixFatal() + fmtFatal( ...args ) );
             },
             "critical": function( ...args: any[] ) : void {
-                if( verboseGet() >= verboseReversed()["critical"] ) {
+                if( verboseGet() >= verboseName2Number( "critical" ) ) {
                     this.write(
                         getLogLinePrefixCritical() + fmtCritical( ...args ) );
                 }
             },
             "error": function( ...args: any[] ) : void {
-                if( verboseGet() >= verboseReversed()["error"] )
+                if( verboseGet() >= verboseName2Number( "error" ) )
                     this.write( getLogLinePrefixError() + fmtError( ...args ) );
             },
             "warning": function( ...args: any[] ) : void {
-                if( verboseGet() >= verboseReversed()["warning"] )
+                if( verboseGet() >= verboseName2Number( "warning" ) )
                     this.write( getLogLinePrefixWarning() + fmtWarning( ...args ) );
             },
             "attention": function( ...args: any[] ) : void {
-                if( verboseGet() >= verboseReversed()["attention"] ) {
+                if( verboseGet() >= verboseName2Number( "attention" ) ) {
                     this.write(
                         getLogLinePrefixAttention() + fmtAttention( ...args ) );
                 }
             },
             "information": function( ...args: any[] ) : void {
-                if( verboseGet() >= verboseReversed()["information"] ) {
+                if( verboseGet() >= verboseName2Number( "information" ) ) {
                     this.write(
                         getLogLinePrefixInformation() + fmtInformation( ...args ) );
                 }
             },
             "info": function( ...args: any[] ) : void {
-                if( verboseGet() >= verboseReversed()["information"] ) {
+                if( verboseGet() >= verboseName2Number( "information" ) ) {
                     this.write(
                         getLogLinePrefixInformation() + fmtInformation( ...args ) );
                 }
             },
             "notice": function( ...args: any[] ) : void {
-                if( verboseGet() >= verboseReversed()["notice"] )
+                if( verboseGet() >= verboseName2Number( "notice" ) )
                     this.write( getLogLinePrefixNotice() + fmtNotice( ...args ) );
             },
             "note": function( ...args: any[] ) : void {
-                if( verboseGet() >= verboseReversed()["notice"] )
+                if( verboseGet() >= verboseName2Number( "notice" ) )
                     this.write( getLogLinePrefixNote() + fmtNote( ...args ) );
             },
             "debug": function( ...args: any[] ) : void {
-                if( verboseGet() >= verboseReversed()["debug"] )
+                if( verboseGet() >= verboseName2Number( "debug" ) )
                     this.write( getLogLinePrefixDebug() + fmtDebug( ...args ) );
             },
             "trace": function( ...args: any[] ) : void {
-                if( verboseGet() >= verboseReversed()["trace"] )
+                if( verboseGet() >= verboseName2Number( "trace" ) )
                     this.write( getLogLinePrefixTrace() + fmtTrace( ...args ) );
             },
             "success": function( ...args: any[] ) : void {
-                if( verboseGet() >= verboseReversed()["information"] )
+                if( verboseGet() >= verboseName2Number( "information" ) )
                     this.write( getLogLinePrefixSuccess() + fmtSuccess( ...args ) );
             }
         };
@@ -571,8 +571,8 @@ export function extractErrorMessage( jo?: any, strDefaultErrorText?: string ) : 
     if( ! jo )
         return strDefaultErrorText;
     try {
-        const isError = function( err ) {
-            return err && err.stack && err.message;
+        const isError = function( err: Error|string ) {
+            return err && err instanceof Error && err.stack && err.message;
         };
         if( ! isError( jo ) ) {
             if( "error" in jo ) {
@@ -587,8 +587,8 @@ export function extractErrorMessage( jo?: any, strDefaultErrorText?: string ) : 
             return strDefaultErrorText;
         }
         if( typeof jo.message == "string" && jo.message.length > 0 )
-            return jo.message; // + jo.stack;
-        strDefaultErrorText += "(" + jo.toString() + ")"; // + jo.stack;
+            return jo.message;
+        strDefaultErrorText += "(" + jo.toString() + ")";
     } catch ( err ) {
     }
     return strDefaultErrorText;
@@ -628,7 +628,7 @@ function tryToSplitFormatString( strFormat?: string, cntArgsMax?: number ) : any
 }
 
 export function fmtArgumentsArray( arrArgs: any[], fnFormatter?: any ) : string {
-    fnFormatter = fnFormatter || function( arg ) { return arg; };
+    fnFormatter = fnFormatter || function( arg: any ) { return arg; };
     const arrParts = ( arrArgs && arrArgs.length > 0 )
         ? tryToSplitFormatString( arrArgs[0], arrArgs.length - 1 ) : null;
     let s = "", isValueMode = false;
@@ -811,51 +811,51 @@ export function fmtSuccess( ...args: any[] ) : string {
 
 // high-level formatted output
 export function fatal( ...args: any[] ) : void {
-    if( verboseGet() >= verboseReversed()["fatal"] )
+    if( verboseGet() >= verboseName2Number( "fatal" ) )
         write( getLogLinePrefixFatal() + fmtFatal( ...args ) + "\n" );
 }
 export function critical( ...args: any[] ) : void {
-    if( verboseGet() >= verboseReversed()["critical"] )
+    if( verboseGet() >= verboseName2Number( "critical" ) )
         write( getLogLinePrefixCritical() + fmtCritical( ...args ) + "\n" );
 }
 export function error( ...args: any[] ) : void {
-    if( verboseGet() >= verboseReversed()["error"] )
+    if( verboseGet() >= verboseName2Number( "error" ) )
         write( getLogLinePrefixError() + fmtError( ...args ) + "\n" );
 }
 export function warning( ...args: any[] ) : void {
-    if( verboseGet() >= verboseReversed()["warning"] )
+    if( verboseGet() >= verboseName2Number( "warning" ) )
         write( getLogLinePrefixWarning() + fmtWarning( ...args ) + "\n" );
 }
 export function attention( ...args: any[] ) : void {
-    if( verboseGet() >= verboseReversed()["attention"] )
+    if( verboseGet() >= verboseName2Number( "attention" ) )
         write( getLogLinePrefixAttention() + fmtAttention( ...args ) + "\n" );
 }
 export function information( ...args: any[] ) : void {
-    if( verboseGet() >= verboseReversed()["information"] )
+    if( verboseGet() >= verboseName2Number( "information" ) )
         write( getLogLinePrefixInformation() + fmtInformation( ...args ) + "\n" );
 }
 export function info( ...args: any[] ) : void {
-    if( verboseGet() >= verboseReversed()["information"] )
+    if( verboseGet() >= verboseName2Number( "information" ) )
         write( getLogLinePrefixInformation() + fmtInformation( ...args ) + "\n" );
 }
 export function notice( ...args: any[] ) : void {
-    if( verboseGet() >= verboseReversed()["notice"] )
+    if( verboseGet() >= verboseName2Number( "notice" ) )
         write( getLogLinePrefixNotice() + fmtNotice( ...args ) + "\n" );
 }
 export function note( ...args: any[] ) : void {
-    if( verboseGet() >= verboseReversed()["notice"] )
+    if( verboseGet() >= verboseName2Number( "notice" ) )
         write( getLogLinePrefixNote() + fmtNote( ...args ) + "\n" );
 }
 export function debug( ...args: any[] ) : void {
-    if( verboseGet() >= verboseReversed()["debug"] )
+    if( verboseGet() >= verboseName2Number( "debug" ) )
         write( getLogLinePrefixDebug() + fmtDebug( ...args ) + "\n" );
 }
 export function trace( ...args: any[] ) : void {
-    if( verboseGet() >= verboseReversed()["trace"] )
+    if( verboseGet() >= verboseName2Number( "trace" ) )
         write( getLogLinePrefixTrace() + fmtTrace( ...args ) + "\n" );
 }
 export function success( ...args: any[] ) : void {
-    if( verboseGet() >= verboseReversed()["information"] )
+    if( verboseGet() >= verboseName2Number( "information" ) )
         write( getLogLinePrefixSuccess() + fmtSuccess( ...args ) + "\n" );
 }
 
@@ -943,7 +943,7 @@ export function verboseReversed() : Map < string, number > {
         gMapReversedVerbose = computeVerboseAlias();
     return gMapReversedVerbose;
 }
-export function verboseLevelAsTextForLog( vl ) {
+export function verboseLevelAsTextForLog( vl: any ) {
     if( typeof vl == "undefined" )
         vl = verboseGet();
     if( vl in gMapVerbose ) {
@@ -952,14 +952,21 @@ export function verboseLevelAsTextForLog( vl ) {
     }
     return "unknown(" + JSON.stringify( vl ) + ")";
 }
+export function verboseName2Number( s: string ) : number {
+    const mapReversedVerbose: Map < string, number > = verboseReversed();
+    let n = mapReversedVerbose.get( s );
+    if( typeof n == "undefined" )
+        return 9;
+    return n;
+}
 
 let gFlagIsExposeDetails = false;
-let gVerboseLevel = 0 + verboseReversed()["information"];
+let gVerboseLevel = 0 + verboseName2Number( "information" );
 
 export function exposeDetailsGet() {
     return ( !!gFlagIsExposeDetails );
 }
-export function exposeDetailsSet( isExpose ) {
+export function exposeDetailsSet( isExpose: any ) {
     gFlagIsExposeDetails = ( !!isExpose );
 }
 
@@ -1015,6 +1022,8 @@ export function em( x?: any ) : string {
 }
 
 export function stack( x?: any ) : string {
+    if( x && "stack" in x && x.stack )
+        return stack( x.stack );
     return cc.isStringAlreadyColorized( x ) ? x : cc.stack( x );
 }
 

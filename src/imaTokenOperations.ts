@@ -55,7 +55,7 @@ export async function getBalanceErc20(
         return balance;
     } catch ( err ) {
         log.error( "{p}ERC20 balance fetching error: {err}, stack is:\n{stack}",
-            strLogPrefix, err, err.stack );
+            strLogPrefix, err, err );
     }
     return "<no-data-or-error>";
 }
@@ -84,7 +84,7 @@ export async function getOwnerOfErc721(
         return owner;
     } catch ( err ) {
         log.error( "{p}ERC721 owner fetching error: {err}, stack is:\n{stack}",
-            strLogPrefix, err, err.stack );
+            strLogPrefix, err, err );
     }
     return "<no-data-or-error>";
 }
@@ -114,7 +114,7 @@ export async function getBalanceErc1155(
         return balance;
     } catch ( err ) {
         log.error( "{p}ERC1155 balance fetching error: {err}, stack is:\n{stack}",
-            strLogPrefix, err, err.stack );
+            strLogPrefix, err, err );
     }
     return "<no-data-or-error>";
 }
@@ -244,7 +244,7 @@ export async function doErc721PaymentFromMainNet(
         }
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, err, err.stack );
+            strLogPrefix, strActionName, err, err );
         details.exposeDetailsTo( log, "doErc721PaymentFromMainNet", false );
         details.close();
         return false;
@@ -381,7 +381,7 @@ export async function doErc20PaymentFromMainNet(
         }
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, err, err.stack );
+            strLogPrefix, strActionName, err, err );
         details.exposeDetailsTo( log, "doErc20PaymentFromMainNet", false );
         details.close();
         return false;
@@ -528,7 +528,7 @@ export async function doErc1155PaymentFromMainNet(
         }
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, err, err.stack );
+            strLogPrefix, strActionName, err, err );
         details.exposeDetailsTo( log, "doErc1155PaymentFromMainNet", false );
         details.close();
         return false;
@@ -656,7 +656,7 @@ export async function doErc1155BatchPaymentFromMainNet(
         }
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, err, err.stack );
+            strLogPrefix, strActionName, err, err );
         details.exposeDetailsTo( log, "doErc1155BatchPaymentFromMainNet", false );
         details.close();
         return false;
@@ -800,7 +800,7 @@ export async function doErc20PaymentFromSChain(
         }
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, err, err.stack );
+            strLogPrefix, strActionName, err, err );
         details.exposeDetailsTo( log, "doErc20PaymentFromSChain", false );
         details.close();
         return false;
@@ -948,7 +948,7 @@ export async function doErc721PaymentFromSChain(
         }
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, err, err.stack );
+            strLogPrefix, strActionName, err, err );
         details.exposeDetailsTo( log, "doErc721PaymentFromSChain", false );
         details.close();
         return false;
@@ -1095,7 +1095,7 @@ export async function doErc1155PaymentFromSChain(
         }
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, err, err.stack );
+            strLogPrefix, strActionName, err, err );
         details.exposeDetailsTo( log, "doErc1155PaymentFromSChain", false );
         details.close();
         return false;
@@ -1241,7 +1241,7 @@ export async function doErc1155BatchPaymentFromSChain(
         }
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, err, err.stack );
+            strLogPrefix, strActionName, err, err );
         details.exposeDetailsTo( log, "doErc1155BatchPaymentFromSChain", false );
         details.close();
         return false;
@@ -1378,7 +1378,7 @@ export async function doErc20PaymentS2S(
         }
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, err, err.stack );
+            strLogPrefix, strActionName, err, err );
         details.exposeDetailsTo(
             log, `doErc20PaymentS2S/${( isForward ? "forward" : "reverse" )}`, false );
         details.close();
@@ -1521,7 +1521,7 @@ export async function doErc721PaymentS2S(
         }
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, err, err.stack );
+            strLogPrefix, strActionName, err, err );
         details.exposeDetailsTo(
             log, `doErc721PaymentS2S/${( isForward ? "forward" : "reverse" )}`, false );
         details.close();
@@ -1666,7 +1666,7 @@ export async function doErc1155PaymentS2S(
         }
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, err, err.stack );
+            strLogPrefix, strActionName, err, err );
         details.exposeDetailsTo(
             log, `doErc1155PaymentS2S/${( isForward ? "forward" : "reverse" )}`, false );
         details.close();
@@ -1813,7 +1813,7 @@ export async function doErc1155BatchPaymentS2S(
         }
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, err, err.stack );
+            strLogPrefix, strActionName, err, err );
         details.exposeDetailsTo(
             log, `doErc1155BatchPaymentS2S/${( isForward ? "forward" : "reverse" )}`, false );
         details.close();
@@ -1892,7 +1892,7 @@ export async function mintErc20(
         return joReceipt; // can be used as "true" boolean value
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, err, err.stack );
+            strLogPrefix, strActionName, err, err );
         details.exposeDetailsTo( log, "mintErc20()", false );
         details.close();
         return false;
@@ -1961,7 +1961,7 @@ export async function mintErc721(
         return joReceipt; // can be used as "true" boolean value
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, err, err.stack );
+            strLogPrefix, strActionName, err, err );
         details.exposeDetailsTo( log, "mintErc721()", false );
         details.close();
         return false;
@@ -2034,7 +2034,7 @@ export async function mintErc1155(
         return joReceipt; // can be used as "true" boolean value
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, err, err.stack );
+            strLogPrefix, strActionName, err, err );
         details.exposeDetailsTo( log, "mintErc1155()", false );
         details.close();
         return false;
@@ -2103,7 +2103,7 @@ export async function burnErc20(
         return joReceipt; // can be used as "true" boolean value
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, err, err.stack );
+            strLogPrefix, strActionName, err, err );
         details.exposeDetailsTo( log, "burnErc20()", false );
         details.close();
         return false;
@@ -2169,7 +2169,7 @@ export async function burnErc721(
         return joReceipt; // can be used as "true" boolean value
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, err, err.stack );
+            strLogPrefix, strActionName, err, err );
         details.exposeDetailsTo( log, "burnErc721()", false );
         details.close();
         return false;
@@ -2242,7 +2242,7 @@ export async function burnErc1155(
         return joReceipt; // can be used as "true" boolean value
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, err, err.stack );
+            strLogPrefix, strActionName, err, err );
         details.exposeDetailsTo( log, "burnErc1155()", false );
         details.close();
         return false;

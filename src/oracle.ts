@@ -148,7 +148,7 @@ async function handleOracleSubmitRequestResult(
         } catch ( err ) {
             details.critical(
                 "RPC call {} exception is: {err},stack is:\n{stack}",
-                "oracle_checkResult", err, err.stack );
+                "oracle_checkResult", err, err );
             await joCall.disconnect();
             throw err;
         }
@@ -166,7 +166,7 @@ export async function oracleGetGasPrice( oracleOpts: any, details: any ) {
         const isVerbose = "isVerbose" in oracleOpts ? oracleOpts.isVerbose : false;
         let isVerboseTraceDetails = "isVerboseTraceDetails" in oracleOpts
             ? oracleOpts.isVerboseTraceDetails : false;
-        if( ! ( log.verboseGet() >= log.verboseReversed()["trace"] ) )
+        if( ! ( log.verboseGet() >= log.verboseName2Number( "trace" ) ) )
             isVerboseTraceDetails = false;
         const callOpts = "callOpts" in oracleOpts ? oracleOpts.callOpts : { };
         joCall = await rpcCall.create( url, callOpts || { } );

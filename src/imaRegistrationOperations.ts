@@ -46,7 +46,7 @@ export async function invokeHasChain(
         return bHasSchain;
     } catch ( err ) {
         details.critical( "{p}Error in invokeHasChain() during {bright}: {err}, stack is:\n{stack}",
-            strLogPrefix, strActionName, err, err.stack );
+            strLogPrefix, strActionName, err, err );
     }
     return false;
 }
@@ -105,7 +105,7 @@ export async function checkIsRegisteredSChainInDepositBoxes( // step 1
     } catch ( err ) {
         details.critical(
             "{p}Error in checkIsRegisteredSChainInDepositBoxes(reg-step1)() during {bright}: " +
-            "{err}, stack is:\n{stack}", strLogPrefix, strActionName, err, err.stack );
+            "{err}, stack is:\n{stack}", strLogPrefix, strActionName, err, err );
         details.exposeDetailsTo( log, "checkIsRegisteredSChainInDepositBoxes", false );
         details.close();
     }
@@ -186,7 +186,7 @@ export async function registerSChainInDepositBoxes( // step 1
             throw new Error( "S-Chain ownership status check timeout" );
     } catch ( err ) {
         details.critical( "{p}Error in registerSChainInDepositBoxes() during {bright}: {err}" +
-            ", stack is:\n{stack}", strLogPrefix, strActionName, err, err.stack );
+            ", stack is:\n{stack}", strLogPrefix, strActionName, err, err );
         details.exposeDetailsTo( log, "registerSChainInDepositBoxes", false );
         details.close();
         return null;

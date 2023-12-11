@@ -147,7 +147,7 @@ export async function checkOnLoopStart(
             log.success( "PWA loop start condition check passed" );
     } catch ( err ) {
         log.critical( "Exception in PWA check on loop start: {err}, stack is:\n{stack}",
-            err, err.stack );
+            err, err );
     }
     return true;
 }
@@ -199,7 +199,7 @@ export async function handleLoopStateArrived(
             "Exception in PWA handler for loop-{} for node {}, PWA state {}, arrived signature " +
             "is {}, error is: {err}, stack is:\n{stack}", se, nNodeNumber,
             ( joNode && "pwaState" in joNode ) ? joNode.pwaState : "N/A", signature,
-            err, err.stack );
+            err, err );
     }
     return isSuccess;
 }
@@ -240,7 +240,7 @@ async function notifyOnLoopImpl(
             const strNodeURL = imaUtils.composeImaAgentNodeUrl( joNode, isThisNode );
             const rpcCallOpts: any = null;
             let joCall: any = await rpcCall.create( strNodeURL, rpcCallOpts )
-                .catch( async function( err ) {
+                .catch( async function( err: Error|string ) {
                     log.error(
                         "PWA failed to perform] loop-{} notification RPC call to node #{} with " +
                         "URL {url}, error is: {err}", se, i, strNodeURL, err );
@@ -270,7 +270,7 @@ async function notifyOnLoopImpl(
         }
     } catch ( err ) {
         log.error( "Exception in PWA notify on loop {}: {err}, stack is:\n{stack}", se,
-            err, err.stack );
+            err, err );
     }
     return true;
 }

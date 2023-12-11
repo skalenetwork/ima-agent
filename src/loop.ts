@@ -123,7 +123,7 @@ export function checkTimeFraming(
             return false;
     } catch ( err ) {
         log.error( "Exception in time framing check in {}: {err}, stack is:{}{stack}",
-            threadInfo.threadDescription(), err, "\n", err.stack );
+            threadInfo.threadDescription(), err, "\n", err );
     }
     return true;
 };
@@ -162,7 +162,7 @@ async function singleTransferLoopPartOracle( optsLoop: any, strLogPrefix: string
             }
         } catch ( err ) {
             log.error( "{p}Oracle operation exception: {} in {err}, stack is:{}{stack}",
-                strLogPrefix, err, threadInfo.threadDescription(), "\n", err.stack );
+                strLogPrefix, err, threadInfo.threadDescription(), "\n", err );
             imaState.loopState.oracle.isInProgress = false;
             await pwa.notifyOnLoopEnd( imaState, "oracle" );
             throw err;
@@ -221,7 +221,7 @@ async function singleTransferLoopPartM2S( optsLoop: any, strLogPrefix: string ) 
             }
         } catch ( err ) {
             log.error( "{p}M2S transfer exception in {}: {err}, stack is:{}{stack}",
-                strLogPrefix, threadInfo.threadDescription(), err, "\n", err.stack );
+                strLogPrefix, threadInfo.threadDescription(), err, "\n", err );
             imaState.loopState.m2s.isInProgress = false;
             await pwa.notifyOnLoopEnd( imaState, "m2s" );
             throw err;
@@ -282,7 +282,7 @@ async function singleTransferLoopPartS2M( optsLoop: any, strLogPrefix: string ) 
             }
         } catch ( err ) {
             log.error( "{p}S2M transfer exception in {err}: , stack is:{}{stack}",
-                strLogPrefix, threadInfo.threadDescription(), err, "\n", err.stack );
+                strLogPrefix, threadInfo.threadDescription(), err, "\n", err );
             imaState.loopState.s2m.isInProgress = false;
             await pwa.notifyOnLoopEnd( imaState, "s2m" );
             throw err;
@@ -322,7 +322,7 @@ async function singleTransferLoopPartS2S( optsLoop: any, strLogPrefix: string ) 
             );
         } catch ( err ) {
             log.error( "{p}S2S transfer exception in {}: {err}, stack is:{}{stack}",
-                strLogPrefix, threadInfo.threadDescription(), err, "\n", err.stack );
+                strLogPrefix, threadInfo.threadDescription(), err, "\n", err );
             throw err;
         }
         log.information( "{p}All S2S transfers done in {}: {}",
@@ -392,7 +392,7 @@ export async function singleTransferLoop( optsLoop: any ) {
         return bResult;
     } catch ( err ) {
         log.error( "{p}Exception in transfer loop: {err}, stack is:{}{stack}", strLogPrefix,
-            err, "\n", err.stack );
+            err, "\n", err );
     }
     imaState.loopState.oracle.isInProgress = false;
     imaState.loopState.m2s.isInProgress = false;
@@ -516,9 +516,10 @@ export async function ensureHaveWorkers( opts: any ) {
         };
         gArrWorkers.push( new threadInfo.Worker(
             path.join( __dirname, "loopWorker.ts" ),
-            { "type": "module", "workerData": workerData }
+            { // "type": "module",
+            "workerData": workerData }
         ) );
-        gArrWorkers[idxWorker].on( "message", jo => {
+        gArrWorkers[idxWorker].on( "message", function( jo: any ) {
             if( networkLayer.outOfWorkerAPIs.onMessage( gArrWorkers[idxWorker], jo ) )
                 return;
         } );
@@ -527,7 +528,7 @@ export async function ensureHaveWorkers( opts: any ) {
         gArrClients.push( aClient );
         aClient.logicalInitComplete = false;
         aClient.errorLogicalInit = null;
-        aClient.on( "message", async function( eventData ) {
+        aClient.on( "message", async function( eventData: any ) {
             const joMessage = eventData.message;
             switch ( joMessage.method ) {
             case "init":

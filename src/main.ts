@@ -50,7 +50,7 @@ process.on( "unhandledRejection", function( reason: any, p: any ) {
 } ).on( "uncaughtException", function( err: any ) {
     log.fatal(
         "CRITICAL ERROR: uncaught exception: {err}, stack is:\n{stack}",
-        err, err.stack );
+        err, err );
     process.exit( 1 );
 } );
 
@@ -160,7 +160,7 @@ function initMonitoringServer() : void {
             ip = "N/A";
         if( imaState.bLogMonitoringServer )
             log.debug( "{p}New connection from {}", strLogPrefix, ip );
-        wsPeer.on( "message", function( message ) {
+        wsPeer.on( "message", function( message: any ) {
             const joAnswer: any = {
                 "method": null,
                 "id": null,
@@ -237,7 +237,7 @@ function initMonitoringServer() : void {
                 } // switch( joMessage.method )
             } catch ( err ) {
                 log.error( "{p}Bad message from {}: {}, error is: {err}, stack is:\n{stack}",
-                    strLogPrefix, ip, message, err, err.stack );
+                    strLogPrefix, ip, message, err, err );
             }
             try {
                 if( imaState.bLogMonitoringServer )
@@ -245,7 +245,7 @@ function initMonitoringServer() : void {
                 wsPeer.send( JSON.stringify( joAnswer ) );
             } catch ( err ) {
                 log.error( "{p}Failed to sent answer to {}, error is: {err}, stack is:\n{stack}",
-                    strLogPrefix, ip, err, err.stack );
+                    strLogPrefix, ip, err, err );
             }
         } );
     } );
@@ -261,18 +261,18 @@ function initJsonRpcServer() : void {
     gExpressJsonRpcAppIMA = express();
     gExpressJsonRpcAppIMA.use( bodyParser.urlencoded( { extended: true } ) );
     gExpressJsonRpcAppIMA.use( bodyParser.json() );
-    gExpressJsonRpcAppIMA.post( "/", async function( req, res ) {
+    gExpressJsonRpcAppIMA.post( "/", async function( req: any, res: any ) {
         const isSkipMode = false;
         const message = JSON.stringify( req.body );
         const ip = req.connection.remoteAddress.split( ":" ).pop();
-        const fnSendAnswer: any = function( joAnswer ) {
+        const fnSendAnswer: any = function( joAnswer: any ) {
             try {
                 res.header( "Content-Type", "application/json" );
                 res.status( 200 ).send( JSON.stringify( joAnswer ) );
                 log.trace( "{p}>>> did sent answer to {}: ", strLogPrefix, ip, joAnswer );
             } catch ( err ) {
                 log.error( "{p}Failed to sent answer {} to {}, error is: {err}, stack is:\n{stack}",
-                    strLogPrefix, joAnswer, ip, err, err.stack );
+                    strLogPrefix, joAnswer, ip, err, err );
             }
         };
         let joAnswer: any = {
@@ -333,7 +333,7 @@ function initJsonRpcServer() : void {
             }
         } catch ( err ) {
             log.error( "{p}Bad message from {}: {}, error is: {err}, stack is:\n{stack}",
-                strLogPrefix, ip, message, err, err.stack );
+                strLogPrefix, ip, message, err, err );
         }
         if( ! isSkipMode )
             fnSendAnswer( joAnswer );
@@ -364,7 +364,7 @@ async function doTheJob() {
         } catch ( err ) {
             ++cntFalse;
             log.critical( "{p}Exception occurred while executing action: {err}, stack is:\n{stack}",
-                strLogPrefix, err, err.stack );
+                strLogPrefix, err, err );
         }
     }
     log.information( "{p}{p}", strLogPrefix, imaHelperAPIs.longSeparator );
@@ -422,7 +422,7 @@ async function main() {
     initJsonRpcServer();
     const isSilentReDiscovery = imaState.isPrintSecurityValues
         ? false : imaState.joSChainDiscovery.isSilentReDiscovery;
-    const fnOnPeriodicDiscoveryResultAvailable = function( isFinal ) {
+    const fnOnPeriodicDiscoveryResultAvailable = function( isFinal: boolean ) {
         loop.spreadUpdatedSChainNetwork( isFinal );
     };
     if( imaState.bSignMessages ) {
@@ -444,7 +444,8 @@ async function main() {
                     "This S-Chain discovery will be done for command line task handler" );
             }
             const nCountToWait = -1;
-            discoveryTools.discoverSChainNetwork( function( err, joSChainNetworkInfo ) {
+            discoveryTools.discoverSChainNetwork(
+                function( err: Error|string, joSChainNetworkInfo: any ) {
                 handleFirstSChainDiscoveryAttemptDone(
                     err, joSChainNetworkInfo, isSilentReDiscovery,
                     fnOnPeriodicDiscoveryResultAvailable );
@@ -453,7 +454,7 @@ async function main() {
                 // everything else is in async calls executed later
                 return 0;
             }, isSilentReDiscovery, imaState.joSChainNetworkInfo, nCountToWait
-            ).catch( function( err ) {
+            ).catch( function( err: Error|string ) {
                 const strError = owaspUtils.extractErrorMessage( err );
                 log.critical( "S-Chain network discovery failed: {err}", strError );
                 doTheJob();

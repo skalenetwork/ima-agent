@@ -85,9 +85,9 @@ async function prepareOracleGasPriceSetup( optsGasPriseSetup: any ) {
             nMillisecondsSleepBefore: 1000,
             nMillisecondsSleepPeriod: 3000,
             cntAttempts: 40,
-            isVerbose: ( log.verboseGet() >= log.verboseReversed()["information"] ) ? true : false,
+            isVerbose: ( log.verboseGet() >= log.verboseName2Number( "information" ) ) ? true : false,
             isVerboseTraceDetails:
-                ( log.verboseGet() >= log.verboseReversed()["debug"] ) ? true : false
+                ( log.verboseGet() >= log.verboseName2Number( "debug" ) ) ? true : false
         };
         optsGasPriseSetup.details.debug(
             "Will fetch Main Net gas price via call to Oracle with options {}...", oracleOpts );
@@ -98,7 +98,7 @@ async function prepareOracleGasPriceSetup( optsGasPriseSetup: any ) {
         } catch ( err ) {
             optsGasPriseSetup.gasPriceOnMainNet = null;
             optsGasPriseSetup.details.error( "Failed to fetch Main Net gas price via call " +
-                "to Oracle, error is: {err}, stack is:\n{stack}", err, err.stack );
+                "to Oracle, error is: {err}, stack is:\n{stack}", err, err );
         }
     }
     if( optsGasPriseSetup.gasPriceOnMainNet === null ) {
@@ -247,11 +247,12 @@ export async function doOracleGasPriceSetup(
         optsGasPriseSetup.fnSignMsgOracle == undefined ) {
         optsGasPriseSetup.details.trace( "{p}Using internal u256 signing stub function",
             optsGasPriseSetup.strLogPrefix );
-        optsGasPriseSetup.fnSignMsgOracle = async function( u256, details, fnAfter ) {
-            details.trace( "{p}u256 signing callback was not provided",
-                optsGasPriseSetup.strLogPrefix );
-            await fnAfter( null, u256, null ); // null - no error, null - no signatures
-        };
+        optsGasPriseSetup.fnSignMsgOracle =
+            async function( u256: any, details: any, fnAfter: any ) {
+                details.trace( "{p}u256 signing callback was not provided",
+                    optsGasPriseSetup.strLogPrefix );
+                await fnAfter( null, u256, null ); // null - no error, null - no signatures
+            };
     } else {
         optsGasPriseSetup.details.trace( "{p}Using externally provided u256 signing function",
             optsGasPriseSetup.strLogPrefix );
@@ -262,14 +263,14 @@ export async function doOracleGasPriceSetup(
             "doOracleGasPriceSetup.optsGasPriseSetup.fnSignMsgOracle()";
         await optsGasPriseSetup.fnSignMsgOracle(
             optsGasPriseSetup.gasPriceOnMainNet, optsGasPriseSetup.details,
-            async function( strError, u256, joGlueResult ) {
+            async function( strError: string, u256: any, joGlueResult: any ) {
                 await handleOracleSigned( optsGasPriseSetup, strError, u256, joGlueResult );
             } );
     } catch ( err ) {
         optsGasPriseSetup.details.critical(
             "{p}Error in doOracleGasPriceSetup() during {bright}: {err}, stack is:\n{stack}",
             optsGasPriseSetup.strLogPrefix, optsGasPriseSetup.strActionName,
-            err, err.stack );
+            err, err );
         optsGasPriseSetup.details.exposeDetailsTo( log, "doOracleGasPriceSetup", false );
         imaTransferErrorHandling.saveTransferError(
             "oracle", optsGasPriseSetup.details.toString() );

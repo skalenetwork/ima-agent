@@ -424,7 +424,7 @@ export function commandLineTaskBurnErc1155() {
 }
 
 export async function commandLineTaskShowBalanceEth(
-    arrBalancesMN, arrBalancesSC, arrBalancesTC
+    arrBalancesMN: any[], arrBalancesSC: any[], arrBalancesTC: any[]
 ) {
     const imaState = state.get();
     let assetAddress = null;
@@ -480,7 +480,7 @@ export async function commandLineTaskShowBalanceEth(
 }
 
 export async function commandLineTaskShowBalanceErc20(
-    arrBalancesMN, arrBalancesSC, arrBalancesTC
+    arrBalancesMN: any[], arrBalancesSC: any[], arrBalancesTC: any[]
 ) {
     const imaState = state.get();
     let assetAddress = null;
@@ -538,7 +538,7 @@ export async function commandLineTaskShowBalanceErc20(
 }
 
 export async function commandLineTaskShowBalanceErc721(
-    arrBalancesMN, arrBalancesSC, arrBalancesTC, idTokens
+    arrBalancesMN: any[], arrBalancesSC: any[], arrBalancesTC: any[], idTokens: any[]
 ) {
     const imaState = state.get();
     let assetAddress = null;
@@ -611,7 +611,7 @@ export async function commandLineTaskShowBalanceErc721(
 }
 
 export async function commandLineTaskShowBalanceErc1155(
-    arrBalancesMN, arrBalancesSC, arrBalancesTC, idTokens
+    arrBalancesMN: any[], arrBalancesSC: any[], arrBalancesTC: any[], idTokens: any[]
 ) {
     const imaState = state.get();
     let assetAddress = null;
@@ -688,7 +688,7 @@ export function commandLineTaskShowBalance() {
     imaState.arrActions.push( {
         "name": "show balance",
         "fn": async function() {
-            const arrBalancesMN = [], arrBalancesSC = [], arrBalancesTC = [];
+            const arrBalancesMN: any = [], arrBalancesSC: any = [], arrBalancesTC: any = [];
             await commandLineTaskShowBalanceEth(
                 arrBalancesMN, arrBalancesSC, arrBalancesTC );
             await commandLineTaskShowBalanceErc20(
@@ -1442,7 +1442,8 @@ export function commandLineTaskLoopSimple() {
     } );
 }
 
-async function handleBrowseSkaleModesRpcInfoResult( strLogPrefix, joCall, joIn, joOut ) {
+async function handleBrowseSkaleModesRpcInfoResult(
+    strLogPrefix: string, joCall: any, joIn: any, joOut: any ) {
     const imaState = state.get();
     log.information( "{p}S-Chain network information: {}",
         strLogPrefix, joOut.result );

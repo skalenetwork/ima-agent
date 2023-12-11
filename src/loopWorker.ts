@@ -61,10 +61,10 @@ function doSendMessage( type: any, endpoint: any, workerUUID: any, data: any ) {
 }
 
 class ObserverServer extends SocketServer {
-    initComplete: boolean;
+    initComplete?: boolean;
     opts: any;
-    intervalPeriodicSchainsCaching: number|null;
-    bIsPeriodicCachingStepInProgress: boolean;
+    intervalPeriodicSchainsCaching?: number|null;
+    bIsPeriodicCachingStepInProgress?: boolean;
     constructor( acceptor: any ) {
         super( acceptor );
         const self: any = this;
@@ -73,7 +73,8 @@ class ObserverServer extends SocketServer {
         self.opts = null;
         self.intervalPeriodicSchainsCaching = null;
         self.bIsPeriodicCachingStepInProgress = false;
-        self.mapApiHandlers.init = function( joMessage, joAnswer, eventData, socket ) {
+        self.mapApiHandlers.init =
+        function( joMessage: any, joAnswer: any, eventData: any, socket: any ) {
             joAnswer.message = {
                 "method": "" + joMessage.method,
                 "error": null
@@ -110,7 +111,7 @@ class ObserverServer extends SocketServer {
             log.enableColorization( joMessage.message.colorization.isEnabled );
             log.verboseSet( self.opts.imaState.verbose_ );
             log.exposeDetailsSet( self.opts.imaState.expose_details_ );
-            imaTransferErrorHandling.saveTransferEvents.on( "error", function( eventData ) {
+            imaTransferErrorHandling.saveTransferEvents.on( "error", function( eventData: any ) {
                 const jo: any = {
                     "method": "saveTransferError",
                     "message": eventData.detail
@@ -118,7 +119,7 @@ class ObserverServer extends SocketServer {
                 const isFlush = true;
                 socket.send( jo, isFlush );
             } );
-            imaTransferErrorHandling.saveTransferEvents.on( "success", function( eventData ) {
+            imaTransferErrorHandling.saveTransferEvents.on( "success", function( eventData: any ) {
                 const jo: any = {
                     "method": "saveTransferSuccess",
                     "message": eventData.detail
@@ -184,7 +185,7 @@ class ObserverServer extends SocketServer {
             return joAnswer;
         };
         self.mapApiHandlers.spreadUpdatedSChainNetwork =
-            function( joMessage, joAnswer, eventData, socket ) {
+            function( joMessage: any, joAnswer: any, eventData: any, socket: any ) {
                 self.initLogMethods();
                 self.debug(
                     "New own S-Chains network information is arrived to {} loop worker " +
@@ -195,7 +196,7 @@ class ObserverServer extends SocketServer {
             };
         // eslint-disable-next-line dot-notation
         self.mapApiHandlers["skale_imaNotifyLoopWork"] =
-            function( joMessage, joAnswer, eventData, socket ) {
+            function( joMessage: any, joAnswer: any, eventData: any, socket: any ) {
                 self.initLogMethods();
                 pwa.handleLoopStateArrived( // NOTICE: no await here, executed async
                     imaState,
@@ -224,73 +225,73 @@ class ObserverServer extends SocketServer {
         if( "fatal" in self && self.fatal && typeof self.fatal == "function" )
             return;
         self.fatal = function( ...args: any[] ) {
-            if( log.verboseGet() >= log.verboseReversed()["fatal"] ) {
+            if( log.verboseGet() >= log.verboseName2Number( "fatal" ) ) {
                 self.log( log.getLogLinePrefixFatal() +
                     log.fmtFatal( ...args ) );
             }
         };
         self.critical = function( ...args: any[] ) {
-            if( log.verboseGet() >= log.verboseReversed()["critical"] ) {
+            if( log.verboseGet() >= log.verboseName2Number( "critical" ) ) {
                 self.log( log.getLogLinePrefixCritical() +
                 log.fmtCritical( ...args ) );
             }
         };
         self.error = function( ...args: any[] ) {
-            if( log.verboseGet() >= log.verboseReversed()["error"] ) {
+            if( log.verboseGet() >= log.verboseName2Number( "error" ) ) {
                 self.log( log.getLogLinePrefixError() +
                 log.fmtError( ...args ) );
             }
         };
         self.warning = function( ...args: any[] ) {
-            if( log.verboseGet() >= log.verboseReversed()["warning"] ) {
+            if( log.verboseGet() >= log.verboseName2Number( "warning" ) ) {
                 self.log( log.getLogLinePrefixWarning() +
                 log.fmtWarning( ...args ) );
             }
         };
         self.attention = function( ...args: any[] ) {
-            if( log.verboseGet() >= log.verboseReversed()["attention"] ) {
+            if( log.verboseGet() >= log.verboseName2Number( "attention" ) ) {
                 self.log( log.getLogLinePrefixAttention() +
                 log.fmtAttention( ...args ) );
             }
         };
         self.information = function( ...args: any[] ) {
-            if( log.verboseGet() >= log.verboseReversed()["information"] ) {
+            if( log.verboseGet() >= log.verboseName2Number( "information" ) ) {
                 self.log( log.getLogLinePrefixInformation() +
                 log.fmtInformation( ...args ) );
             }
         };
         self.info = function( ...args: any[] ) {
-            if( log.verboseGet() >= log.verboseReversed()["information"] ) {
+            if( log.verboseGet() >= log.verboseName2Number( "information" ) ) {
                 self.log( log.getLogLinePrefixInformation() +
                 log.fmtInformation( ...args ) );
             }
         };
         self.notice = function( ...args: any[] ) {
-            if( log.verboseGet() >= log.verboseReversed()["notice"] ) {
+            if( log.verboseGet() >= log.verboseName2Number( "notice" ) ) {
                 self.log( log.getLogLinePrefixNotice() +
                 log.fmtNotice( ...args ) );
             }
         };
         self.note = function( ...args: any[] ) {
-            if( log.verboseGet() >= log.verboseReversed()["notice"] ) {
+            if( log.verboseGet() >= log.verboseName2Number( "notice" ) ) {
                 self.log( log.getLogLinePrefixNote() +
                 log.fmtNote( ...args ) );
             }
         };
         self.debug = function( ...args: any[] ) {
-            if( log.verboseGet() >= log.verboseReversed()["debug"] ) {
+            if( log.verboseGet() >= log.verboseName2Number( "debug" ) ) {
                 self.log( log.getLogLinePrefixDebug() +
                 log.fmtDebug( ...args ) );
             }
         };
         self.trace = function( ...args: any[] ) {
-            if( log.verboseGet() >= log.verboseReversed()["trace"] ) {
+            if( log.verboseGet() >= log.verboseName2Number( "trace" ) ) {
                 self.log( log.getLogLinePrefixTrace() +
                 log.fmtTrace( ...args ) );
             }
         };
         self.success = function( ...args: any[] ) {
-            if( log.verboseGet() >= log.verboseReversed()["information"] ) {
+            if( log.verboseGet() >= log.verboseName2Number( "information" ) ) {
                 self.log( log.getLogLinePrefixSuccess() +
                 log.fmtSuccess( ...args ) );
             }
