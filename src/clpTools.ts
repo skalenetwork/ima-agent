@@ -7,7 +7,7 @@
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * (at your option)  any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,7 +19,7 @@
  */
 
 /**
- * @file clpTools.mjs
+ * @file clpTools.ts
  * @copyright SKALE Labs 2019-Present
  */
 
@@ -40,12 +40,13 @@ import * as discoveryTools from "./discoveryTools";
 import * as loop from "./loop";
 import * as imaUtils from "./utils";
 import * as imaBLS from "./bls";
+import * as imaTx from "./imaTx";
 
-export async function registerAll( isPrintSummaryRegistrationCosts ) {
+export async function registerAll( isPrintSummaryRegistrationCosts: boolean ) {
     if( !await registerStep1( false ) )
         return false;
     if( isPrintSummaryRegistrationCosts )
-        printSummaryRegistrationCosts();
+        printSummaryRegistrationCosts( log );
     return true;
 }
 
@@ -54,12 +55,12 @@ export async function checkRegistrationAll() {
     return b1;
 }
 
-const gInfoRegistrationCost = {
+const gInfoRegistrationCost: any = {
     mn: [],
     sc: []
 };
 
-export async function registerStep1( isPrintSummaryRegistrationCosts ) {
+export async function registerStep1( isPrintSummaryRegistrationCosts: boolean ) {
     const imaState = state.get();
     imaCLI.initContracts();
     const strLogPrefix = "Reg 1: ";
@@ -74,7 +75,7 @@ export async function registerStep1( isPrintSummaryRegistrationCosts ) {
         log.posNeg( bSuccess, "already registered", "not registered yet" ) );
     if( bSuccess )
         return true;
-    const jarrReceipts =
+    const jarrReceipts: any =
         await imaReg.registerSChainInDepositBoxes( // step 1
             imaState.chainProperties.mn.ethersProvider,
             imaState.joLinker,
@@ -98,7 +99,7 @@ export async function registerStep1( isPrintSummaryRegistrationCosts ) {
             gInfoRegistrationCost.mn.concat( gInfoRegistrationCost.mn, jarrReceipts );
     }
     if( isPrintSummaryRegistrationCosts )
-        clpTools.printSummaryRegistrationCosts();
+        printSummaryRegistrationCosts();
     if( !bSuccess ) {
         const nRetCode = 163;
         log.fatal( "{p}failed to register S-Chain in deposit box, will return code {}",
@@ -120,7 +121,9 @@ export async function checkRegistrationStep1() {
     return bRetVal;
 }
 
-export function printSummaryRegistrationCosts( details ) {
+export function printSummaryRegistrationCosts( details?: any ) {
+    if( ! details )
+        details = log;
     imaGasUsage.printGasUsageReportFromArray(
         "Main Net REGISTRATION", gInfoRegistrationCost.mn, details );
     imaGasUsage.printGasUsageReportFromArray(
@@ -1086,7 +1089,7 @@ export function commandLineTaskPaymentS2S() {
                 ? strAddrErc721ExplicitTarget : strAddrErc721Explicit;
             const strAddrErc1155Dst = isForward
                 ? strAddrErc1155ExplicitTarget : strAddrErc1155Explicit;
-            const tx_customizer = isForward ? sc.transactionCustomizer : tc.transactionCustomizer;
+            const tx_customizer: imaTx.TransactionCustomizer = isForward ? sc.transactionCustomizer : tc.transactionCustomizer;
             if( strCoinNameErc721Src.length > 0 ) {
                 // ERC721 payment
                 log.information( "one S->S single ERC721 payment: {}", imaState.idToken );
@@ -1193,7 +1196,7 @@ export function commandLineTaskPaymentS2S() {
             }
             // ETH payment
             log.information( "one S->S single ETH payment: {}", imaState.nAmountOfWei );
-            lop.fatal( "S->S ETH payment(s) are neither supported nor allowed" );
+            log.fatal( "S->S ETH payment(s) are neither supported nor allowed" );
             process.exit( 154 );
         }
     } );
@@ -1244,7 +1247,7 @@ export function commandLineTaskTransferM2S() {
         "fn": async function() {
             if( ! imaState.bNoWaitSChainStarted )
                 await discoveryTools.waitUntilSChainStarted(); // main-net --> s-chain transfer
-            const joRuntimeOpts = {
+            const joRuntimeOpts: any = {
                 isInsideWorker: false,
                 idxChainKnownForS2S: 0,
                 cntChainsKnownForS2S: 0
@@ -1284,7 +1287,7 @@ export function commandLineTaskTransferS2M() {
         "fn": async function() {
             if( ! imaState.bNoWaitSChainStarted )
                 await discoveryTools.waitUntilSChainStarted(); // s-chain --> main-net transfer
-            const joRuntimeOpts = {
+            const joRuntimeOpts: any = {
                 isInsideWorker: false,
                 idxChainKnownForS2S: 0,
                 cntChainsKnownForS2S: 0
@@ -1326,7 +1329,7 @@ export function commandLineTaskTransferS2S() {
                 return;
             if( ! imaState.bNoWaitSChainStarted )
                 await discoveryTools.waitUntilSChainStarted(); // s-chain --> main-net transfer
-            const joRuntimeOpts = {
+            const joRuntimeOpts: any = {
                 isInsideWorker: false,
                 idxChainKnownForS2S: 0,
                 cntChainsKnownForS2S: 0
@@ -1360,12 +1363,12 @@ export function commandLineTaskTransfer() {
         "fn": async function() {
             if( ! imaState.bNoWaitSChainStarted )
                 await discoveryTools.waitUntilSChainStarted();
-            const joRuntimeOpts = {
+            const joRuntimeOpts: any = {
                 isInsideWorker: false,
                 idxChainKnownForS2S: 0,
                 cntChainsKnownForS2S: 0
             };
-            const optsLoop = {
+            const optsLoop: any = {
                 joRuntimeOpts: joRuntimeOpts,
                 isDelayFirstRun: false,
                 enableStepOracle: true,
@@ -1373,7 +1376,7 @@ export function commandLineTaskTransfer() {
                 enableStepS2M: true,
                 enableStepS2S: true
             };
-            return await singleTransferLoop( optsLoop );
+            return await loop.singleTransferLoop( optsLoop );
         }
     } );
 }
@@ -1394,7 +1397,7 @@ export function commandLineTaskLoop() {
             }
             if( isPrintSummaryRegistrationCosts )
                 printSummaryRegistrationCosts();
-            const opts = {
+            const opts: any = {
                 imaState: imaState,
                 "details": log
             };
@@ -1421,12 +1424,12 @@ export function commandLineTaskLoopSimple() {
             }
             if( isPrintSummaryRegistrationCosts )
                 printSummaryRegistrationCosts();
-            const joRuntimeOpts = {
+            const joRuntimeOpts: any = {
                 isInsideWorker: false,
                 idxChainKnownForS2S: 0,
                 cntChainsKnownForS2S: 0
             };
-            const optsLoop = {
+            const optsLoop: any = {
                 joRuntimeOpts: joRuntimeOpts,
                 isDelayFirstRun: false,
                 enableStepOracle: true,
@@ -1453,13 +1456,13 @@ async function handleBrowseSkaleModesRpcInfoResult( strLogPrefix, joCall, joIn, 
             continue;
         }
         const strNodeURL = imaUtils.composeSChainNodeUrl( joNode );
-        const rpcCallOpts = null;
-        let joCall = null;
+        const rpcCallOpts: any = null;
+        let joCall: any = null;
         try {
             joCall = await rpcCall.create( strNodeURL, rpcCallOpts );
             if( ! joCall )
                 throw new Error( `Failed to create JSON RPC call object to ${strNodeURL}` );
-            const jIn = { "method": "skale_imaInfo", "params": { } };
+            const jIn: any = { "method": "skale_imaInfo", "params": { } };
             if( discoveryTools.isSendImaAgentIndex() )
                 jIn.params.fromImaAgentIndex = imaState.nNodeNumber;
             const joOut = await joCall.call( joIn );
@@ -1495,15 +1498,15 @@ export function commandLineTaskBrowseSChain() {
                 process.exit( 155 );
             }
             log.information( "{p}Downloading S-Chain network information...", strLogPrefix );
-            const rpcCallOpts = null;
-            let joCall = null;
+            const rpcCallOpts: any = null;
+            let joCall: any = null;
             try {
                 joCall = await rpcCall.create( imaState.chainProperties.sc.strURL, rpcCallOpts );
                 if( ! joCall ) {
                     throw new Error( "Failed to create JSON RPC call object " +
                         `to ${imaState.chainProperties.sc.strURL}` );
                 }
-                const joIn = { "method": "skale_nodesRpcInfo", "params": { } };
+                const joIn: any = { "method": "skale_nodesRpcInfo", "params": { } };
                 if( discoveryTools.isSendImaAgentIndex() )
                     joIn.params.fromImaAgentIndex = imaState.nNodeNumber;
                 const joOut = await joCall.call( joIn );

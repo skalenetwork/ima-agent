@@ -19,7 +19,7 @@
  */
 
 /**
- * @file utils.mjs
+ * @file utils.ts
  * @copyright SKALE Labs 2019-Present
  */
 
@@ -84,7 +84,7 @@ export function fileSave( strPath: string, s: string ) : boolean {
     return false;
 }
 
-export function jsonFileLoad( strPath: string, joDefault?: any, bLogOutput?: boolean ) : boolean {
+export function jsonFileLoad( strPath: string, joDefault?: any, bLogOutput?: boolean ) : any {
     if( bLogOutput == undefined || bLogOutput == null )
         bLogOutput = false;
     joDefault = joDefault || {};
@@ -112,7 +112,7 @@ export function jsonFileLoad( strPath: string, joDefault?: any, bLogOutput?: boo
     return joDefault;
 }
 
-export function jsonFileSave( strPath: string, jo?: any, bLogOutput?: boolean ) : boolean {
+export function jsonFileSave( strPath: string, jo?: any, bLogOutput?: boolean ) : any {
     if( bLogOutput == undefined || bLogOutput == null )
         bLogOutput = false;
     if( bLogOutput )

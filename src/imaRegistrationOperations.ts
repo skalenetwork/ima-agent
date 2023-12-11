@@ -19,7 +19,7 @@
  */
 
 /**
- * @file imaRegistrationOperations.mjs
+ * @file imaRegistrationOperations.ts
  * @copyright SKALE Labs 2019-Present
  */
 
@@ -29,11 +29,11 @@ import * as imaTx from "./imaTx";
 import * as threadInfo from "./threadInfo";
 
 export async function invokeHasChain(
-    details,
-    ethersProvider, // Main-Net or S-Chin
-    joLinker, // Main-Net or S-Chin
-    joAccount, // Main-Net or S-Chin
-    chainIdSChain
+    details: any,
+    ethersProvider: any, // Main-Net or S-Chin
+    joLinker: any, // Main-Net or S-Chin
+    joAccount: any, // Main-Net or S-Chin
+    chainIdSChain: string
 ) {
     const strLogPrefix = "Wait for added chain status: ";
     const strActionName = "invokeHasChain(hasSchain): joLinker.hasSchain";
@@ -52,22 +52,20 @@ export async function invokeHasChain(
 }
 
 export async function waitForHasChain(
-    details,
-    ethersProvider, // Main-Net or S-Chin
-    joLinker, // Main-Net or S-Chin
-    joAccount, // Main-Net or S-Chin
-    chainIdSChain,
-    cntWaitAttempts,
-    nSleepMilliseconds
+    details: any,
+    ethersProvider: any, // Main-Net or S-Chin
+    joLinker: any, // Main-Net or S-Chin
+    joAccount: any, // Main-Net or S-Chin
+    chainIdSChain: string,
+    cntWaitAttempts?: number,
+    nSleepMilliseconds?: number
 ) {
-    if( cntWaitAttempts == null || cntWaitAttempts == undefined )
+    if( ! cntWaitAttempts )
         cntWaitAttempts = 100;
-    if( nSleepMilliseconds == null || nSleepMilliseconds == undefined )
+    if( ! nSleepMilliseconds )
         nSleepMilliseconds = 5;
     for( let idxWaitAttempts = 0; idxWaitAttempts < cntWaitAttempts; ++ idxWaitAttempts ) {
-        if( await invokeHasChain(
-            details, ethersProvider, joLinker, joAccount, chainIdSChain
-        ) )
+        if( await invokeHasChain( details, ethersProvider, joLinker, joAccount, chainIdSChain ) )
             return true;
         details.trace( "Sleeping {} milliseconds...", nSleepMilliseconds );
         await threadInfo.sleep( nSleepMilliseconds );
@@ -80,10 +78,10 @@ export async function waitForHasChain(
 // main-net.DepositBox call: function addSchain(string schainName, address tokenManagerAddress)
 //
 export async function checkIsRegisteredSChainInDepositBoxes( // step 1
-    ethersProviderMainNet,
-    joLinker,
-    joAccountMN,
-    chainIdSChain
+    ethersProviderMainNet: any,
+    joLinker: any,
+    joAccountMN: any,
+    chainIdSChain: string
 ) {
     const details = log.createMemoryStream();
     details.debug( "Main-net Linker address is...........{}", joLinker.address );
@@ -115,24 +113,24 @@ export async function checkIsRegisteredSChainInDepositBoxes( // step 1
 }
 
 export async function registerSChainInDepositBoxes( // step 1
-    ethersProviderMainNet,
-    joLinker,
-    joAccountMN,
-    joTokenManagerETH, // only s-chain
-    joTokenManagerERC20, // only s-chain
-    joTokenManagerERC721, // only s-chain
-    joTokenManagerERC1155, // only s-chain
-    joTokenManagerERC721WithMetadata, // only s-chain
-    joCommunityLocker, // only s-chain
-    joTokenManagerLinker,
-    chainNameSChain,
-    chainNameMainNet,
-    transactionCustomizerMainNet,
-    cntWaitAttempts,
-    nSleepMilliseconds
+    ethersProviderMainNet: any,
+    joLinker: any,
+    joAccountMN: any,
+    joTokenManagerETH: any, // only s-chain
+    joTokenManagerERC20: any, // only s-chain
+    joTokenManagerERC721: any, // only s-chain
+    joTokenManagerERC1155: any, // only s-chain
+    joTokenManagerERC721WithMetadata: any, // only s-chain
+    joCommunityLocker: any, // only s-chain
+    joTokenManagerLinker: any,
+    chainNameSChain: string,
+    chainNameMainNet: string,
+    transactionCustomizerMainNet: imaTx.TransactionCustomizer,
+    cntWaitAttempts?: number,
+    nSleepMilliseconds?: number
 ) {
     const details = log.createMemoryStream();
-    const jarrReceipts = [];
+    const jarrReceipts: any[] = [];
     details.debug( "Main-net Linker address is..........{}", joLinker.address );
     details.debug( "S-Chain ID is.......................{}", chainNameSChain );
     const strLogPrefix = "Reg S in depositBoxes: ";

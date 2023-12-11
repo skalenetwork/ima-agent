@@ -19,7 +19,7 @@
  */
 
 /**
- * @file loop.mjs
+ * @file loop.ts
  * @copyright SKALE Labs 2019-Present
  */
 

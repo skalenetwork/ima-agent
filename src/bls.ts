@@ -7,7 +7,7 @@
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * (at your option)  any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,7 +19,7 @@
  */
 
 /**
- * @file bls.mjs
+ * @file bls.ts
  * @copyright SKALE Labs 2019-Present
  */
 
@@ -42,7 +42,7 @@ const shell = shellModule.default;
 
 const Keccak = sha3Module.Keccak;
 
-function discoverBlsThreshold( joSChainNetworkInfo ) {
+function discoverBlsThreshold( joSChainNetworkInfo: any ) : number {
     const imaState = state.get();
     joSChainNetworkInfo = joSChainNetworkInfo || imaState.joSChainNetworkInfo;
     if( ! joSChainNetworkInfo )
@@ -56,7 +56,7 @@ function discoverBlsThreshold( joSChainNetworkInfo ) {
     return -1;
 }
 
-function discoverBlsParticipants( joSChainNetworkInfo ) {
+function discoverBlsParticipants( joSChainNetworkInfo: any ) : number {
     const imaState = state.get();
     joSChainNetworkInfo = joSChainNetworkInfo || imaState.joSChainNetworkInfo;
     if( ! joSChainNetworkInfo )
@@ -71,7 +71,8 @@ function discoverBlsParticipants( joSChainNetworkInfo ) {
 }
 
 function checkBlsThresholdAndBlsParticipants(
-    nThreshold, nParticipants, strOperation, details ) {
+    nThreshold: number, nParticipants: number, strOperation: string, details: any
+    ) : boolean {
     details = details || log;
     if( nThreshold <= 0 ) {
         details.fatal( "Operation {} will fail because discovered BLS threshold {}" +
@@ -91,7 +92,9 @@ function checkBlsThresholdAndBlsParticipants(
     return true;
 }
 
-function discoverPublicKeyByIndex( nNodeIndex, joSChainNetworkInfo, details, isThrowException ) {
+function discoverPublicKeyByIndex(
+    nNodeIndex: number, joSChainNetworkInfo: any, details: any, isThrowException: boolean
+    ) : any {
     details = details || log;
     const imaState = state.get();
     joSChainNetworkInfo = joSChainNetworkInfo || imaState.joSChainNetworkInfo;
@@ -114,7 +117,8 @@ function discoverPublicKeyByIndex( nNodeIndex, joSChainNetworkInfo, details, isT
     return null;
 }
 
-function discoverCommonPublicKey( joSChainNetworkInfo, isThrowException ) {
+function discoverCommonPublicKey(
+    details: any, joSChainNetworkInfo: any, isThrowException: boolean ) : any {
     const imaState = state.get();
     joSChainNetworkInfo = joSChainNetworkInfo || imaState.joSChainNetworkInfo;
     const jarrNodes = joSChainNetworkInfo.network;
@@ -136,7 +140,9 @@ function discoverCommonPublicKey( joSChainNetworkInfo, isThrowException ) {
     return null;
 }
 
-function hexPrepare( strHex, isInvertBefore, isInvertAfter ) {
+function hexPrepare(
+    strHex: string, isInvertBefore: boolean, isInvertAfter: boolean
+    ) : Uint8Array {
     if( isInvertBefore == undefined )
         isInvertBefore = true;
     if( isInvertAfter == undefined )
@@ -150,27 +156,27 @@ function hexPrepare( strHex, isInvertBefore, isInvertAfter ) {
     return arrBytes;
 }
 
-function stringToKeccak256( s ) {
+function stringToKeccak256( s: string ) : Uint8Array {
     const strU256 = owaspUtils.ethersMod.ethers.utils.id( s );
     return hexPrepare( strU256, true, true );
 }
 
-function arrayToKeccak256( arrBytes ) {
+function arrayToKeccak256( arrBytes: Uint8Array ) : Uint8Array {
     const k = new Keccak( 256 );
     k.update( imaUtils.toBuffer( arrBytes ) );
     const h = k.digest( "hex" );
     return imaUtils.hexToBytes( "0x" + h );
 }
 
-function keccak256Message( jarrMessages, nIdxCurrentMsgBlockStart, strFromChainName ) {
+function keccak256Message(
+    jarrMessages: any[], nIdxCurrentMsgBlockStart: number, strFromChainName: string
+    ) : string {
     let arrBytes = stringToKeccak256( strFromChainName );
     arrBytes = imaUtils.bytesConcat(
         arrBytes,
         hexPrepare(
             owaspUtils.ensureStartsWith0x( nIdxCurrentMsgBlockStart.toString( 16 ) ),
-            false,
-            false
-        )
+            false, false )
     );
     arrBytes = arrayToKeccak256( arrBytes );
     const cnt = jarrMessages.length;
@@ -194,7 +200,7 @@ function keccak256Message( jarrMessages, nIdxCurrentMsgBlockStart, strFromChainN
     return owaspUtils.ensureStartsWith0x( imaUtils.bytesToHex( arrBytes, false ) );
 }
 
-export function keccak256U256( u256, isHash ) {
+export function keccak256U256( u256: any, isHash: boolean ) : string {
     let arrBytes = new Uint8Array();
 
     let bytesU256 = imaUtils.hexToBytes( u256 );
@@ -213,7 +219,9 @@ export function keccak256U256( u256, isHash ) {
     return strMessageHash;
 }
 
-export function keccak256ForPendingWorkAnalysis( nNodeNumber, strLoopWorkType, isStart, ts ) {
+export function keccak256ForPendingWorkAnalysis(
+    nNodeNumber: number, strLoopWorkType: string, isStart: boolean, ts: any
+    ) : string {
     let arrBytes = new Uint8Array();
 
     let bytesU256 = imaUtils.hexToBytes( nNodeNumber );
@@ -242,33 +250,33 @@ export function keccak256ForPendingWorkAnalysis( nNodeNumber, strLoopWorkType, i
     return strMessageHash;
 }
 
-function splitSignatureShare( signatureShare ) {
+function splitSignatureShare( signatureShare: any ) : any {
     const jarr = signatureShare.split( ":" );
     if( jarr.length < 2 )
         throw new Error( `Failed to split signatureShare=${signatureShare.toString()}` );
     return { X: jarr[0], Y: jarr[1] };
 }
 
-function getBlsGlueTmpDir() {
+function getBlsGlueTmpDir() : string {
     const strTmpDir = "/tmp/ima-bls-glue";
     shell.mkdir( "-p", strTmpDir );
     return strTmpDir;
 }
 
-function allocBlsTmpActionDir() {
-    const strActionDir =
-        getBlsGlueTmpDir() + "/" + imaUtils.replaceAll( imaUtils.uuid(), "-", "" );
+function allocBlsTmpActionDir() : string {
+    const strActionDir = getBlsGlueTmpDir() + "/" + imaUtils.replaceAll( imaUtils.uuid(), "-", "" );
     if( ! fs.existsSync( strActionDir ) )
         fs.mkdirSync( strActionDir , { recursive: true } );
     return strActionDir;
 }
 
 function performBlsGlue(
-    details, strDirection, jarrMessages, nIdxCurrentMsgBlockStart, strFromChainName, arrSignResults
-) {
+    details: any, strDirection: string, jarrMessages: any[],
+    nIdxCurrentMsgBlockStart: number, strFromChainName: string, arrSignResults: any[]
+    ) : any {
     const imaState = state.get();
     const strLogPrefix = `${strDirection}/BLS/Glue: `;
-    let joGlueResult = null;
+    let joGlueResult: any = null;
     const nThreshold = discoverBlsThreshold( imaState.joSChainNetworkInfo );
     const nParticipants = discoverBlsParticipants( imaState.joSChainNetworkInfo );
     details.debug( "{p}Discovered BLS threshold is {}.", strLogPrefix, nThreshold );
@@ -306,11 +314,11 @@ function performBlsGlue(
             strInput +
             " --output " + strActionDir + "/glue-result.json";
         details.trace( "{p}Will execute BLS glue command: {}", strLogPrefix, strGlueCommand );
-        strOutput = childProcessModule.execSync( strGlueCommand, { cwd: strActionDir } );
+        let strOutput = childProcessModule.execSync( strGlueCommand, { cwd: strActionDir } );
         details.trace( "{p}BLS glue output is:\n{raw}", strLogPrefix, strOutput || "<<EMPTY>>" );
         joGlueResult = imaUtils.jsonFileLoad( path.join( strActionDir, "glue-result.json" ) );
         details.trace( "{p}BLS glue result is: {}", strLogPrefix, joGlueResult );
-        if( "X" in joGlueResult.signature && "Y" in joGlueResult.signature ) {
+        if( joGlueResult && "X" in joGlueResult.signature && "Y" in joGlueResult.signature ) {
             details.success( "{p}BLS glue success", strLogPrefix );
             joGlueResult.hashSrc = strMessageHash;
             details.trace( "{p}Computing G1 hash point...", strLogPrefix );
@@ -354,10 +362,10 @@ function performBlsGlue(
     return joGlueResult;
 }
 
-function performBlsGlueU256( details, u256, arrSignResults ) {
+function performBlsGlueU256( details: any, u256: any, arrSignResults: any[] ) : any {
     const imaState = state.get();
     const strLogPrefix = "BLS/Glue: ";
-    let joGlueResult = null;
+    let joGlueResult: any = null;
     const nThreshold = discoverBlsThreshold( imaState.joSChainNetworkInfo );
     const nParticipants = discoverBlsParticipants( imaState.joSChainNetworkInfo );
     details.debug( "{p}Discovered BLS threshold is {}.", strLogPrefix, nThreshold );
@@ -394,11 +402,12 @@ function performBlsGlueU256( details, u256, arrSignResults ) {
             strInput +
             " --output " + strActionDir + "/glue-result.json";
         details.trace( "{p}Will execute BLS glue command: {}", strLogPrefix, strGlueCommand );
-        strOutput = childProcessModule.execSync( strGlueCommand, { cwd: strActionDir } );
+        strOutput =
+            childProcessModule.execSync( strGlueCommand, { cwd: strActionDir } ).toString( "utf8" );
         details.trace( "{p}BLS glue output is:\n{raw}", strLogPrefix, strOutput || "<<EMPTY>>" );
         joGlueResult = imaUtils.jsonFileLoad( path.join( strActionDir, "glue-result.json" ) );
         details.trace( "{p}BLS glue result is:\n{}", strLogPrefix, joGlueResult );
-        if( "X" in joGlueResult.signature && "Y" in joGlueResult.signature ) {
+        if( joGlueResult && "X" in joGlueResult.signature && "Y" in joGlueResult.signature ) {
             details.success( "{p}BLS glue success", strLogPrefix );
             joGlueResult.hashSrc = strMessageHash;
             details.trace( "{p}Computing G1 hash point...", strLogPrefix );
@@ -410,7 +419,8 @@ function performBlsGlueU256( details, u256, arrSignResults ) {
                 " --t " + nThreshold +
                 " --n " + nParticipants;
             details.trace( "{p}Will execute HashG1 command: {}", strLogPrefix, strHasG1Command );
-            strOutput = childProcessModule.execSync( strHasG1Command, { cwd: strActionDir } );
+            strOutput =
+                childProcessModule.execSync( strHasG1Command, { cwd: strActionDir } ).toString( "utf8" );
             details.trace( "{p}HashG1 output is:\n{raw}", strLogPrefix, strOutput || "<<EMPTY>>" );
             const joResultHashG1 = imaUtils.jsonFileLoad( path.join( strActionDir, "g1.json" ) );
             details.trace( "{p}HashG1 result is: {}", strLogPrefix, joResultHashG1 );
@@ -443,13 +453,11 @@ function performBlsGlueU256( details, u256, arrSignResults ) {
 }
 
 function performBlsVerifyI(
-    details,
-    strDirection,
-    nZeroBasedNodeIndex,
-    joResultFromNode,
-    jarrMessages, nIdxCurrentMsgBlockStart, strFromChainName,
-    joPublicKey
-) {
+    details: any, strDirection: string, nZeroBasedNodeIndex: number,
+    joResultFromNode: any,
+    jarrMessages: any[], nIdxCurrentMsgBlockStart: number, strFromChainName: string,
+    joPublicKey: any
+) : boolean {
     if( !joResultFromNode )
         return true;
     const imaState = state.get();
@@ -475,7 +483,7 @@ function performBlsVerifyI(
             keccak256Message( jarrMessages, nIdxCurrentMsgBlockStart, strFromChainName ) );
         details.trace( "{p}BLS node #{} - hashed verify message is {}",
             strLogPrefix, nZeroBasedNodeIndex, strMessageHash );
-        const joMsg = { "message": strMessageHash };
+        const joMsg: any = { "message": strMessageHash };
         details.debug(
             "{p}BLS node #{} - composed  {} composed from {} using glue {} and public key {}",
             strLogPrefix, nZeroBasedNodeIndex, joMsg, jarrMessages, joResultFromNode, joPublicKey );
@@ -493,7 +501,8 @@ function performBlsVerifyI(
             ;
         details.trace( "{p}Will execute node #{} BLS verify command: {}", strLogPrefix,
             nZeroBasedNodeIndex, strVerifyCommand );
-        strOutput = childProcessModule.execSync( strVerifyCommand, { cwd: strActionDir } );
+        strOutput =
+            childProcessModule.execSync( strVerifyCommand, { cwd: strActionDir } ).toString( "utf8" );
         details.trace( "{p}BLS node #{} verify output is:\n{raw}", strLogPrefix,
             nZeroBasedNodeIndex, strOutput || "<<EMPTY>>" );
         details.success( "{p}BLS node #{} verify success", strLogPrefix, nZeroBasedNodeIndex );
@@ -510,12 +519,8 @@ function performBlsVerifyI(
 }
 
 function performBlsVerifyIU256(
-    details,
-    nZeroBasedNodeIndex,
-    joResultFromNode,
-    u256,
-    joPublicKey
-) {
+    details: any, nZeroBasedNodeIndex: number, joResultFromNode: any, u256: any, joPublicKey: any
+) : boolean {
     if( ! joResultFromNode )
         return true;
     const imaState = state.get();
@@ -531,7 +536,7 @@ function performBlsVerifyIU256(
     };
     let strOutput = "";
     try {
-        const joMsg = { "message": keccak256U256( u256, true ) };
+        const joMsg: any = { "message": keccak256U256( u256, true ) };
         details.debug( "{p}BLS u256 node #{} verify message {} composed from {} using glue {} " +
             "and public key {}", strLogPrefix, nZeroBasedNodeIndex, joMsg, u256,
         joResultFromNode, joPublicKey );
@@ -549,7 +554,8 @@ function performBlsVerifyIU256(
             ;
         details.trace( "{p}Will execute node #{} BLS u256 verify command: {}",
             strLogPrefix, nZeroBasedNodeIndex, strVerifyCommand );
-        strOutput = childProcessModule.execSync( strVerifyCommand, { cwd: strActionDir } );
+        strOutput =
+            childProcessModule.execSync( strVerifyCommand, { cwd: strActionDir } ).toString( "utf8" );
         details.trace( "{p}BLS u256 node #{} verify output is:\n{raw}", strLogPrefix,
             nZeroBasedNodeIndex, strOutput || "<<EMPTY>>" );
         details.success( "{p}BLS u256 node #{} verify success", strLogPrefix, nZeroBasedNodeIndex );
@@ -566,12 +572,10 @@ function performBlsVerifyIU256(
 }
 
 function performBlsVerify(
-    details,
-    strDirection,
-    joGlueResult,
-    jarrMessages, nIdxCurrentMsgBlockStart, strFromChainName,
-    joCommonPublicKey
-) {
+    details: any, strDirection: string, joGlueResult: any,
+    jarrMessages: any[], nIdxCurrentMsgBlockStart: number, strFromChainName: string,
+    joCommonPublicKey: any
+) : boolean {
     if( !joGlueResult )
         return true;
     const imaState = state.get();
@@ -597,14 +601,14 @@ function performBlsVerify(
             keccak256Message( jarrMessages, nIdxCurrentMsgBlockStart, strFromChainName ) );
         details.trace( "{p}BLS/summary verify message - hashed verify message is {}",
             strLogPrefix, strMessageHash );
-        const joMsg = { "message": strMessageHash };
+        const joMsg: any = { "message": strMessageHash };
         details.debug(
             "{p}BLS/summary verify message - composed JSON {} from messages array {}" +
             " using glue {} and common public key {}",
             strLogPrefix, joMsg, jarrMessages, joGlueResult, joCommonPublicKey );
         imaUtils.jsonFileSave( strActionDir + "/glue-result.json", joGlueResult );
         imaUtils.jsonFileSave( strActionDir + "/hash.json", joMsg );
-        const joCommonPublicKeyToSave = {
+        const joCommonPublicKeyToSave: any = {
             commonBLSPublicKey0: joCommonPublicKey.commonBLSPublicKey0,
             commonBLSPublicKey1: joCommonPublicKey.commonBLSPublicKey1,
             commonBLSPublicKey2: joCommonPublicKey.commonBLSPublicKey2,
@@ -621,7 +625,8 @@ function performBlsVerify(
             ;
         details.trace( "{p}Will execute BLS/summary verify command: {}",
             strLogPrefix, strVerifyCommand );
-        strOutput = childProcessModule.execSync( strVerifyCommand, { cwd: strActionDir } );
+        strOutput =
+            childProcessModule.execSync( strVerifyCommand, { cwd: strActionDir } ).toString( "utf8" );
         details.trace( "{p}BLS/summary verify output is:\n{raw}", strLogPrefix,
             strOutput || "<<EMPTY>>" );
         details.success( "{p}BLS/summary verify success", strLogPrefix );
@@ -636,7 +641,9 @@ function performBlsVerify(
     return false;
 }
 
-function performBlsVerifyU256( details, joGlueResult, u256, joCommonPublicKey ) {
+function performBlsVerifyU256(
+    details: any, joGlueResult: any, u256: any, joCommonPublicKey: any
+    ) : boolean {
     if( !joGlueResult )
         return true;
     const imaState = state.get();
@@ -652,14 +659,14 @@ function performBlsVerifyU256( details, joGlueResult, u256, joCommonPublicKey ) 
     let strOutput = "";
     const strLogPrefix = "BLS u256/Summary: ";
     try {
-        const joMsg = { "message": keccak256U256( u256, true ) };
+        const joMsg: any = { "message": keccak256U256( u256, true ) };
         details.debug(
             "{p}BLS u256/summary verify message {} composed from {} using glue {}" +
             " and common public key {}",
             strLogPrefix, joMsg, u256, joGlueResult, joCommonPublicKey );
         imaUtils.jsonFileSave( strActionDir + "/glue-result.json", joGlueResult );
         imaUtils.jsonFileSave( strActionDir + "/hash.json", joMsg );
-        const joCommonPublicKeyToSave = {
+        const joCommonPublicKeyToSave: any = {
             commonBLSPublicKey0: joCommonPublicKey.commonBLSPublicKey0,
             commonBLSPublicKey1: joCommonPublicKey.commonBLSPublicKey1,
             commonBLSPublicKey2: joCommonPublicKey.commonBLSPublicKey2,
@@ -676,7 +683,8 @@ function performBlsVerifyU256( details, joGlueResult, u256, joCommonPublicKey ) 
             ;
         details.trace( "{p}Will execute BLS u256/summary verify command: {}",
             strLogPrefix, strVerifyCommand );
-        strOutput = childProcessModule.execSync( strVerifyCommand, { cwd: strActionDir } );
+        strOutput =
+            childProcessModule.execSync( strVerifyCommand, { cwd: strActionDir } ).toString( "utf8" );
         details.trace( "{p}BLS u256/summary verify output is:\n{raw}", strLogPrefix,
             strOutput || "<<EMPTY>>" );
         details.success( "{p}BLS u256/summary verify success", strLogPrefix );
@@ -693,15 +701,11 @@ function performBlsVerifyU256( details, joGlueResult, u256, joCommonPublicKey ) 
 }
 
 async function checkCorrectnessOfMessagesToSign(
-    details,
-    strLogPrefix,
-    strDirection,
-    jarrMessages,
-    nIdxCurrentMsgBlockStart,
-    joExtraSignOpts
+    details: any, strLogPrefix: string, strDirection: string,
+    jarrMessages: any[], nIdxCurrentMsgBlockStart: number, joExtraSignOpts: any
 ) {
     const imaState = state.get();
-    let joMessageProxy = null, joAccount = null, joChainName = null;
+    let joMessageProxy: any = null, joAccount: any = null, joChainName: any = null;
     if( strDirection == "M2S" ) {
         joMessageProxy = imaState.joMessageProxyMainNet;
         joAccount = imaState.chainProperties.mn.joAccount;
@@ -753,7 +757,7 @@ async function checkCorrectnessOfMessagesToSign(
                     "source contract is {}, destination contract is {}, message data is {}",
                     strLogPrefix, strDirection, i, cnt, idxMessage, joMessage.sender,
                     joMessage.destinationContract, joMessage.data );
-                const outgoingMessageData = {
+                const outgoingMessageData: any = {
                     "dstChainHash": owaspUtils.ethersMod.ethers.utils.id( joChainName ),
                     "msgCounter": 0 + idxMessage,
                     "srcContract": joMessage.sender,
@@ -789,7 +793,7 @@ async function checkCorrectnessOfMessagesToSign(
 
 }
 
-async function prepareSignMessagesImpl( optsSignOperation ) {
+async function prepareSignMessagesImpl( optsSignOperation: any ) {
     optsSignOperation.fn = optsSignOperation.fn || function() {};
     optsSignOperation.sequenceId =
         owaspUtils.removeStarting0x(
@@ -872,7 +876,7 @@ async function prepareSignMessagesImpl( optsSignOperation ) {
     return true;
 }
 
-async function gatherSigningCheckFinish( optsSignOperation ) {
+async function gatherSigningCheckFinish( optsSignOperation: any ) {
     const cntSuccess = optsSignOperation.arrSignResults.length;
     if( optsSignOperation.joGatheringTracker.nCountReceivedPrevious !=
         optsSignOperation.joGatheringTracker.nCountReceived ) {
@@ -890,7 +894,7 @@ async function gatherSigningCheckFinish( optsSignOperation ) {
         return false;
     optsSignOperation.strLogPrefixB = `${optsSignOperation.strDirection} /# ` +
         `${optsSignOperation.nTransferLoopCounter}/BLS/Summary: `;
-    let strError = null, strSuccessfulResultDescription = null;
+    let strError: string|null = null, strSuccessfulResultDescription: string|null = null;
     const joGlueResult = performBlsGlue( optsSignOperation.details,
         optsSignOperation.strDirection, optsSignOperation.jarrMessages,
         optsSignOperation.nIdxCurrentMsgBlockStart, optsSignOperation.strFromChainName,
@@ -900,7 +904,7 @@ async function gatherSigningCheckFinish( optsSignOperation ) {
             optsSignOperation.strLogPrefixB, joGlueResult );
         if( optsSignOperation.imaState.strPathBlsVerify.length > 0 ) {
             const joCommonPublicKey = discoverCommonPublicKey(
-                optsSignOperation.imaState.joSChainNetworkInfo, false );
+                optsSignOperation.details, optsSignOperation.imaState.joSChainNetworkInfo, false );
             if( ! joCommonPublicKey ) {
                 strError = "No BLS common public key";
                 optsSignOperation.details.error( "{p}{err}",
@@ -943,7 +947,7 @@ async function gatherSigningCheckFinish( optsSignOperation ) {
     return true;
 }
 
-async function gatherSigningCheckOverflow( optsSignOperation ) {
+async function gatherSigningCheckOverflow( optsSignOperation: any ) {
     if( optsSignOperation.joGatheringTracker.nCountReceived < optsSignOperation.jarrNodes.length )
         return false;
     optsSignOperation.fn(
@@ -963,7 +967,7 @@ async function gatherSigningCheckOverflow( optsSignOperation ) {
     return true;
 }
 
-async function gatherSigningStartImpl( optsSignOperation ) {
+async function gatherSigningStartImpl( optsSignOperation: any ) {
     optsSignOperation.details.debug( "{p}Waiting for BLS glue result...",
         optsSignOperation.strLogPrefix );
     optsSignOperation.errGathering = null;
@@ -993,7 +997,7 @@ async function gatherSigningStartImpl( optsSignOperation ) {
     optsSignOperation.bHaveResultReportCalled = true;
 }
 
-async function gatherSigningFinishImpl( optsSignOperation ) {
+async function gatherSigningFinishImpl( optsSignOperation: any ) {
     optsSignOperation.details.trace( "{p}Will await for message BLS verification and sending...",
         optsSignOperation.strLogPrefix );
     if( optsSignOperation.errGathering ) {
@@ -1030,6 +1034,7 @@ async function gatherSigningFinishImpl( optsSignOperation ) {
             `tracker data is: ${JSON.stringify( optsSignOperation.joGatheringTracker )}`,
             optsSignOperation.jarrMessages
         ).catch( function( err ) {
+            const cntSuccess = optsSignOperation.arrSignResults.length;
             optsSignOperation.details.error(
                 "Problem(6) in BLS sign result handler, not enough successful BLS signature " +
                 "parts({}) and timeout reached, error details: {err}", cntSuccess, err );
@@ -1041,7 +1046,7 @@ async function gatherSigningFinishImpl( optsSignOperation ) {
     }
 }
 
-async function doSignConfigureChainAccessParams( optsSignOperation ) {
+async function doSignConfigureChainAccessParams( optsSignOperation: any ) {
     optsSignOperation.targetChainName = "";
     optsSignOperation.fromChainName = "";
     optsSignOperation.targetChainID = -4;
@@ -1075,13 +1080,13 @@ async function doSignConfigureChainAccessParams( optsSignOperation ) {
         optsSignOperation.targetChainID = optsSignOperation.joExtraSignOpts.chainIdDst;
         optsSignOperation.fromChainID = optsSignOperation.joExtraSignOpts.chainIdSrc;
     } else {
-        await joCall.disconnect();
         throw new Error( "CRITICAL ERROR: Failed doSignMessagesImpl() with " +
             `unknown direction ${optsSignOperation.strDirection}` );
     }
 }
 
-async function doSignProcessHandleCall( optsSignOperation, joParams, joCall, joIn, joOut, i ) {
+async function doSignProcessHandleCall(
+    optsSignOperation: any, joParams: any, joCall: any, joIn: any, joOut: any, i: number ) {
     const imaState = state.get();
     const isThisNode = ( i == imaState.nNodeNumber ) ? true : false;
     const joNode = optsSignOperation.jarrNodes[i];
@@ -1133,7 +1138,7 @@ async function doSignProcessHandleCall( optsSignOperation, joParams, joCall, joI
                     return;
                 }
                 const arrTmp = joOut.result.signResult.signatureShare.split( ":" );
-                const joResultFromNode = {
+                const joResultFromNode: any = {
                     index: "" + nZeroBasedNodeIndex,
                     signature: {
                         X: arrTmp[0],
@@ -1189,7 +1194,7 @@ async function doSignProcessHandleCall( optsSignOperation, joParams, joCall, joI
     await joCall.disconnect();
 }
 
-async function doSignProcessOneImpl( i, optsSignOperation ) {
+async function doSignProcessOneImpl( i: number, optsSignOperation: any ) {
     const imaState = state.get();
     const isThisNode = ( i == imaState.nNodeNumber ) ? true : false;
     const joNode = optsSignOperation.jarrNodes[i];
@@ -1199,8 +1204,8 @@ async function doSignProcessOneImpl( i, optsSignOperation ) {
     const strNodeDescColorized = log.fmtDebug( "{url} ({}/{}, ID {}), sequence ID is {}",
         strNodeURL, i, optsSignOperation.jarrNodes.length, joNode.nodeID,
         optsSignOperation.sequenceId );
-    const rpcCallOpts = null;
-    let joCall = await rpcCall.create( strNodeURL, rpcCallOpts ).catch( function( err ) {
+    const rpcCallOpts: any = null;
+    let joCall: any = await rpcCall.create( strNodeURL, rpcCallOpts ).catch( function( err ) {
         ++optsSignOperation.joGatheringTracker.nCountReceived;
         ++optsSignOperation.joGatheringTracker.nCountErrors;
         optsSignOperation.details.error(
@@ -1214,7 +1219,7 @@ async function doSignProcessOneImpl( i, optsSignOperation ) {
     if( ! joCall )
         return;
     await doSignConfigureChainAccessParams( optsSignOperation );
-    const joParams = {
+    const joParams: any = {
         "direction": "" + optsSignOperation.strDirection,
         "startMessageIdx": optsSignOperation.nIdxCurrentMsgBlockStart,
         "dstChainName": optsSignOperation.targetChainName,
@@ -1234,17 +1239,17 @@ async function doSignProcessOneImpl( i, optsSignOperation ) {
         log.generateTimestampString( null, true ), "skale_imaVerifyAndSign", i, strNodeURL,
         optsSignOperation.fromChainName, optsSignOperation.targetChainName,
         joParams, optsSignOperation.sequenceId );
-    const joIn = { "method": "skale_imaVerifyAndSign", "params": joParams };
+    const joIn: any = { "method": "skale_imaVerifyAndSign", "params": joParams };
     const joOut = await joCall.call( joIn );
     await doSignProcessHandleCall( optsSignOperation, joParams, joCall, joIn, joOut, i );
 }
 
 async function doSignMessagesImpl(
-    nTransferLoopCounter, strDirection,
-    jarrMessages, nIdxCurrentMsgBlockStart, strFromChainName,
-    joExtraSignOpts, fn
+    nTransferLoopCounter: number, strDirection: string,
+    jarrMessages: any[], nIdxCurrentMsgBlockStart: number, strFromChainName: string,
+    joExtraSignOpts: any, fn: any
 ) {
-    const optsSignOperation = {
+    const optsSignOperation: any = {
         imaState: state.get(),
         nTransferLoopCounter: nTransferLoopCounter,
         strDirection: strDirection,
@@ -1285,7 +1290,7 @@ async function doSignMessagesImpl(
     };
     optsSignOperation.details =
         optsSignOperation.imaState.isDynamicLogInBlsSigner
-            ? log : log.createMemoryStream( true );
+            ? log : log.createMemoryStream();
     optsSignOperation.strGatheredDetailsName = optsSignOperation.strDirection + "-" +
         "doSignMessagesImpl-#" + optsSignOperation.nTransferLoopCounter +
         "-" + optsSignOperation.strFromChainName + "-msg#" +
@@ -1300,7 +1305,7 @@ async function doSignMessagesImpl(
                     "{p}{} Stop invoking {bright} for transfer from chain {} at #{} because " +
                     "successfully gathered count is reached ", optsSignOperation.strLogPrefix,
                     log.generateTimestampString( null, true ), "skale_imaVerifyAndSign",
-                    fromChainName, i, cntSuccess );
+                    strFromChainName, i, cntSuccess );
                 break;
             }
             doSignProcessOneImpl( i, optsSignOperation );
@@ -1339,51 +1344,36 @@ async function doSignMessagesImpl(
 }
 
 export async function doSignMessagesM2S(
-    nTransferLoopCounter,
-    jarrMessages, nIdxCurrentMsgBlockStart, strFromChainName,
-    joExtraSignOpts,
-    fn
-) {
+    nTransferLoopCounter: number,
+    jarrMessages: any[], nIdxCurrentMsgBlockStart: number, strFromChainName: string,
+    joExtraSignOpts: any, fn: any ) {
     return await doSignMessagesImpl(
-        nTransferLoopCounter,
-        "M2S",
+        nTransferLoopCounter, "M2S",
         jarrMessages, nIdxCurrentMsgBlockStart, strFromChainName,
-        joExtraSignOpts,
-        fn
-    );
+        joExtraSignOpts, fn );
 }
 
 export async function doSignMessagesS2M(
-    nTransferLoopCounter,
-    jarrMessages, nIdxCurrentMsgBlockStart, strFromChainName,
-    joExtraSignOpts,
-    fn
-) {
+    nTransferLoopCounter: number,
+    jarrMessages: any[], nIdxCurrentMsgBlockStart: number, strFromChainName: string,
+    joExtraSignOpts: any, fn: any ) {
     return await doSignMessagesImpl(
-        nTransferLoopCounter,
-        "S2M",
+        nTransferLoopCounter, "S2M",
         jarrMessages, nIdxCurrentMsgBlockStart, strFromChainName,
-        joExtraSignOpts,
-        fn
-    );
+        joExtraSignOpts, fn );
 }
 
 export async function doSignMessagesS2S(
-    nTransferLoopCounter,
-    jarrMessages, nIdxCurrentMsgBlockStart, strFromChainName,
-    joExtraSignOpts,
-    fn
-) {
+    nTransferLoopCounter: number,
+    jarrMessages: any[], nIdxCurrentMsgBlockStart: number, strFromChainName: string,
+    joExtraSignOpts: any, fn: any ) {
     return await doSignMessagesImpl(
-        nTransferLoopCounter,
-        "S2S",
+        nTransferLoopCounter, "S2S",
         jarrMessages, nIdxCurrentMsgBlockStart, strFromChainName,
-        joExtraSignOpts,
-        fn
-    );
+        joExtraSignOpts, fn );
 }
 
-async function prepareSignU256( optsSignU256 ) {
+async function prepareSignU256( optsSignU256: any ) {
     optsSignU256.details.debug( "{p}Will sign {} value...",
         optsSignU256.strLogPrefix, optsSignU256.u256 );
     optsSignU256.details.trace( "{p}Will query to sign {} skaled node(s)...",
@@ -1413,7 +1403,8 @@ async function prepareSignU256( optsSignU256 ) {
     return true;
 }
 
-async function doSignU256OneImplHandleCallResult( i, optsSignU256, joCall, joIn, joOut ) {
+async function doSignU256OneImplHandleCallResult(
+    i: number, optsSignU256: any, joCall: any, joIn: any, joOut: any ) {
     const imaState = state.get();
     const isThisNode = ( i == imaState.nNodeNumber ) ? true : false;
     const joNode = optsSignU256.jarrNodes[i];
@@ -1460,7 +1451,7 @@ async function doSignU256OneImplHandleCallResult( i, optsSignU256, joCall, joIn,
                     return;
                 }
                 const arrTmp = joOut.result.signResult.signatureShare.split( ":" );
-                const joResultFromNode = {
+                const joResultFromNode: any = {
                     index: "" + nZeroBasedNodeIndex,
                     signature: { X: arrTmp[0], Y: arrTmp[1] }
                 };
@@ -1509,7 +1500,7 @@ async function doSignU256OneImplHandleCallResult( i, optsSignU256, joCall, joIn,
     await joCall.disconnect();
 }
 
-async function doSignU256OneImpl( i, optsSignU256 ) {
+async function doSignU256OneImpl( i: number, optsSignU256: any ) {
     const imaState = state.get();
     const isThisNode = ( i == imaState.nNodeNumber ) ? true : false;
     const joNode = optsSignU256.jarrNodes[i];
@@ -1518,15 +1509,15 @@ async function doSignU256OneImpl( i, optsSignU256 ) {
         : imaUtils.composeSChainNodeUrl( joNode );
     const strNodeDescColorized = log.fmtDebug( "{url} ({}/{}, ID {})",
         strNodeURL, i, optsSignU256.jarrNodes.length, joNode.nodeID );
-    const rpcCallOpts = null;
-    let joCall = null;
+    const rpcCallOpts: any = null;
+    let joCall: any = null;
     try {
         joCall = await rpcCall.create( strNodeURL, rpcCallOpts );
         if( ! joCall )
             throw new Error( `Failed to create JSON RPC call object to ${strNodeURL}` );
         optsSignU256.details.trace( "{p}Will invoke skale_imaBSU256 for to sign value {}",
-            optsSignU256.strLogPrefix, ptsSignU256.u256.toString() );
-        const joIn = {
+            optsSignU256.strLogPrefix, optsSignU256.u256.toString() );
+        const joIn: any = {
             "method": "skale_imaBSU256",
             "params": {
                 "valueToSign": optsSignU256.u256 // must be 0x string, came from outside 0x string
@@ -1547,7 +1538,7 @@ async function doSignU256OneImpl( i, optsSignU256 ) {
     }
 }
 
-async function gatherSigningCheckFinish256( optsSignOperation ) {
+async function gatherSigningCheckFinish256( optsSignU256: any ) {
     const cntSuccess = optsSignU256.arrSignResults.length;
     if( optsSignU256.joGatheringTracker.nCountReceivedPrevious !=
         optsSignU256.joGatheringTracker.nCountReceived ) {
@@ -1571,32 +1562,32 @@ async function gatherSigningCheckFinish256( optsSignOperation ) {
             strLogPrefixB, joGlueResult );
         if( optsSignU256.imaState.strPathBlsVerify.length > 0 ) {
             const joCommonPublicKey = discoverCommonPublicKey(
-                optsSignU256.imaState.joSChainNetworkInfo, false );
+                optsSignU256.details, optsSignU256.imaState.joSChainNetworkInfo, false );
             if( ! joCommonPublicKey ) {
-                strError = "No BLS common public key";
-                optsSignOperation.details.error( "{p}{}",
-                    optsSignOperation.strLogPrefixB, strError );
+                const strError = "No BLS common public key";
+                optsSignU256.details.error( "{p}{}",
+                    optsSignU256.strLogPrefixB, strError );
             } else if( performBlsVerifyU256( optsSignU256.details, joGlueResult,
                 optsSignU256.u256, joCommonPublicKey ) ) {
-                strSuccessfulResultDescription =
+                const strSuccessfulResultDescription =
                     "Got successful summary BLS u256 verification result";
                 optsSignU256.details.success( "{p}{}", strLogPrefixB,
                     strSuccessfulResultDescription );
             } else {
-                strError = "BLS verification failed";
+                const strError = "BLS verification failed";
                 optsSignU256.details.error( "{p}BLS verification failure:{}",
                     strLogPrefixB, strError );
             }
         }
     } else {
-        strError = "BLS u256 glue failed, no glue result arrived";
+        const strError = "BLS u256 glue failed, no glue result arrived";
         optsSignU256.details.error(
             "{p}Problem(1) in BLS u256 sign result handler: {err}",
             strLogPrefixB, strError );
     }
     optsSignU256.details.trace(
         "Will call signed-256 answer-sending callback {}, u256 is {}, " +
-        "glue result is {}", strError ? ( " with error " + log.fmtError( { em }, strError ) ) : "",
+        "glue result is {}", strError ? ( " with error " + log.fmtError( "{err}", strError ) ) : "",
         optsSignU256.u256, joGlueResult );
     optsSignU256.fn( strError, optsSignU256.u256, joGlueResult ).catch( function( err ) {
         optsSignU256.details.critical(
@@ -1607,7 +1598,7 @@ async function gatherSigningCheckFinish256( optsSignOperation ) {
     return true;
 }
 
-async function gatherSigningCheckOverflow256( optsSignOperation ) {
+async function gatherSigningCheckOverflow256( optsSignU256: any ) {
     if( optsSignU256.joGatheringTracker.nCountReceived < optsSignU256.jarrNodes.length )
         return false;
     optsSignU256.fn(
@@ -1615,6 +1606,7 @@ async function gatherSigningCheckOverflow256( optsSignOperation ) {
         `${optsSignU256.joGatheringTracker.nCountErrors} errors(s) for ` +
         `${optsSignU256.jarrNodes.length}  node(s)`, optsSignU256.u256
     ).catch( function( err ) {
+        const cntSuccess = optsSignU256.arrSignResults.length;
         optsSignU256.details.critical(
             "Problem(3) in BLS u256 sign result handler, not enough successful BLS " +
             "signature parts({} when all attempts done, error details: {err}",
@@ -1626,13 +1618,13 @@ async function gatherSigningCheckOverflow256( optsSignOperation ) {
     return true;
 }
 
-async function doSignU256Gathering( optsSignU256 ) {
+async function doSignU256Gathering( optsSignU256: any ) {
     optsSignU256.details.debug( "{p}Waiting for BLS glue result ", optsSignU256.strLogPrefix );
     optsSignU256.errGathering = null;
-    for( let idxStep = 0; idxStep < optsSignOperation.joGatheringTracker.nWaitIntervalMaxSteps;
+    for( let idxStep = 0; idxStep < optsSignU256.joGatheringTracker.nWaitIntervalMaxSteps;
         ++ idxStep ) {
         await threadInfo.sleep(
-            optsSignOperation.joGatheringTracker.nWaitIntervalStepMilliseconds );
+            optsSignU256.joGatheringTracker.nWaitIntervalStepMilliseconds );
         if( await gatherSigningCheckFinish256( optsSignU256 ) )
             return;
         if( await gatherSigningCheckOverflow256( optsSignU256 ) )
@@ -1645,6 +1637,7 @@ async function doSignU256Gathering( optsSignU256 ) {
         `${optsSignU256.jarrNodes.length} node(s)`,
         optsSignU256.u256
     ).catch( function( err ) {
+        const cntSuccess = optsSignU256.arrSignResults.length;
         optsSignU256.details.error(
             "Problem(4) in BLS u256 sign result handler, not enough successful BLS " +
             "signature parts({}) and timeout reached, error details: {err",
@@ -1655,8 +1648,8 @@ async function doSignU256Gathering( optsSignU256 ) {
     } );
 }
 
-export async function doSignU256( u256, details, fn ) {
-    const optsSignU256 = {
+export async function doSignU256( u256: any, details: any, fn: any ) {
+    const optsSignU256: any = {
         u256: u256,
         fn: fn,
         details: details,
@@ -1706,10 +1699,8 @@ export async function doSignU256( u256, details, fn ) {
 }
 
 export async function doVerifyReadyHash(
-    strMessageHash,
-    nZeroBasedNodeIndex,
-    signature,
-    isExposeOutput
+    strMessageHash: string, nZeroBasedNodeIndex: number,
+    signature: any, isExposeOutput: boolean
 ) {
     const imaState = state.get();
     const strDirection = "RAW";
@@ -1717,7 +1708,7 @@ export async function doVerifyReadyHash(
     const details = log.createMemoryStream();
     let isSuccess = false;
     const arrTmp = signature.signatureShare.split( ":" );
-    const joResultFromNode = {
+    const joResultFromNode: any = {
         index: "" + nZeroBasedNodeIndex,
         signature: {
             X: arrTmp[0],
@@ -1739,7 +1730,7 @@ export async function doVerifyReadyHash(
             nZeroBasedNodeIndex, imaState.joSChainNetworkInfo, details, true );
         details.trace( "{p}BLS node #{} - hashed verify message is {}",
             strLogPrefix, nZeroBasedNodeIndex, strMessageHash );
-        const joMsg = {
+        const joMsg: any = {
             "message": strMessageHash
         };
         details.debug( "{p}BLS node #{} - composed {} using hash {} and glue {} and public key {}",
@@ -1760,7 +1751,8 @@ export async function doVerifyReadyHash(
             ;
         details.trace( "{p}Will execute node #{} BLS verify command: {}",
             strLogPrefix, nZeroBasedNodeIndex, strVerifyCommand );
-        strOutput = childProcessModule.execSync( strVerifyCommand, { cwd: strActionDir } );
+        strOutput =
+            childProcessModule.execSync( strVerifyCommand, { cwd: strActionDir } ).toString( "utf8" );
         details.trace( "{p}BLS node #{} verify output is:\n{raw}", strLogPrefix,
             nZeroBasedNodeIndex, strOutput || "<<EMPTY>>" );
         details.success( "{p}BLS node #{} verify success", strLogPrefix, nZeroBasedNodeIndex );
@@ -1781,7 +1773,8 @@ export async function doVerifyReadyHash(
 }
 
 async function doSignReadyHashHandleCallResult(
-    strLogPrefix, details, strMessageHash, isExposeOutput, joCall, joIn, joOut
+    strLogPrefix: string, details: any,
+    strMessageHash: string, isExposeOutput: any, joCall: any, joIn: any, joOut: any
 ) {
     details.trace( "{p}Call to ", "SGX done, answer is: {}", strLogPrefix, joOut );
     let joSignResult = joOut;
@@ -1793,7 +1786,6 @@ async function doSignReadyHashHandleCallResult(
         joSignResult = joOut.signResult;
     if( !joSignResult ) {
         const strError = "No signature arrived";
-        joRetVal.error = strError;
         details.error( "{p}BLS-sign(1) finished with error: {err}", strLogPrefix, strError );
         await joCall.disconnect();
         throw new Error( strError );
@@ -1803,7 +1795,6 @@ async function doSignReadyHashHandleCallResult(
         joSignResult.errorMessage.length > 0
     ) {
         const strError = `BLS-sign finished with error: ${joSignResult.errorMessage};`;
-        joRetVal.error = strError;
         details.error( "{p}BLS-sign(2) finished with error: {err}",
             strLogPrefix, joSignResult.errorMessage );
         await joCall.disconnect();
@@ -1814,11 +1805,11 @@ async function doSignReadyHashHandleCallResult(
     return joSignResult;
 }
 
-export async function doSignReadyHash( strMessageHash, isExposeOutput ) {
+export async function doSignReadyHash( strMessageHash: string, isExposeOutput: any ) {
     const imaState = state.get();
     const strLogPrefix = "";
-    const details = log.createMemoryStream();
-    let joSignResult = null, joCall = null;
+    const details: any = log.createMemoryStream();
+    let joSignResult: any = null, joCall: any = null;
     try {
         const nThreshold = discoverBlsThreshold( imaState.joSChainNetworkInfo );
         const nParticipants = discoverBlsParticipants( imaState.joSChainNetworkInfo );
@@ -1838,7 +1829,7 @@ export async function doSignReadyHash( strMessageHash, isExposeOutput ) {
             if( ! joAccount.strBlsKeyName )
                 throw new Error( "BLS keys name is unknown, cannot sign U256" );
         }
-        let rpcCallOpts = null;
+        let rpcCallOpts: any = null;
         if( "strPathSslKey" in joAccount && typeof joAccount.strPathSslKey == "string" &&
             joAccount.strPathSslKey.length > 0 && "strPathSslCert" in joAccount &&
             typeof joAccount.strPathSslCert == "string" && joAccount.strPathSslCert.length > 0
@@ -1853,7 +1844,7 @@ export async function doSignReadyHash( strMessageHash, isExposeOutput ) {
         joCall = await rpcCall.create( joAccount.strSgxURL, rpcCallOpts );
         if( ! joCall )
             throw new Error( `Failed to create JSON RPC call object to ${joAccount.strSgxURL}` );
-        const joIn = {
+        const joIn: any = {
             "jsonrpc": "2.0",
             "id": utils.randomCallID(),
             "method": "blsSignMessageHash",
@@ -1887,7 +1878,7 @@ export async function doSignReadyHash( strMessageHash, isExposeOutput ) {
     return joSignResult;
 }
 
-async function prepareHandlingOfSkaleImaVerifyAndSign( optsHandleVerifyAndSign ) {
+async function prepareHandlingOfSkaleImaVerifyAndSign( optsHandleVerifyAndSign: any ) {
     optsHandleVerifyAndSign.details.debug( "{p}Will verify and sign {}",
         optsHandleVerifyAndSign.strLogPrefix, optsHandleVerifyAndSign.joCallData );
     optsHandleVerifyAndSign.nIdxCurrentMsgBlockStart =
@@ -1941,7 +1932,7 @@ async function prepareHandlingOfSkaleImaVerifyAndSign( optsHandleVerifyAndSign )
     return true;
 }
 
-async function prepareS2sOfSkaleImaVerifyAndSign( optsHandleVerifyAndSign ) {
+async function prepareS2sOfSkaleImaVerifyAndSign( optsHandleVerifyAndSign: any ) {
     const strSChainNameSrc = optsHandleVerifyAndSign.joCallData.params.srcChainName;
     const strSChainNameDst = optsHandleVerifyAndSign.joCallData.params.dstChainName;
     optsHandleVerifyAndSign.details.trace(
@@ -1955,7 +1946,7 @@ async function prepareS2sOfSkaleImaVerifyAndSign( optsHandleVerifyAndSign ) {
             "try again later" );
     }
 
-    let joSChainSrc = null, strUrlSrcSChain = null;
+    let joSChainSrc: any = null, strUrlSrcSChain: string|null = null;
     for( let idxSChain = 0; idxSChain < arrSChainsCached.length; ++ idxSChain ) {
         const joSChain = arrSChainsCached[idxSChain];
         if( joSChain.name.toString() == strSChainNameSrc.toString() ) {
@@ -1984,7 +1975,8 @@ async function prepareS2sOfSkaleImaVerifyAndSign( optsHandleVerifyAndSign ) {
 }
 
 async function handleBlsSignMessageHashResult(
-    optsHandleVerifyAndSign, joCallData, joAccount, joCall, joIn, joOut
+    optsHandleVerifyAndSign: any, joCallData: any, joAccount: any,
+    joCall: any, joIn: any, joOut: any
 ) {
     optsHandleVerifyAndSign.details.trace( "{p}{bright} Call to SGX done, " +
         "answer is: {}", optsHandleVerifyAndSign.strLogPrefix,
@@ -2000,8 +1992,10 @@ async function handleBlsSignMessageHashResult(
         optsHandleVerifyAndSign.joRetVal.qa = optsHandleVerifyAndSign.joCallData.qa;
     if( !joSignResult ) {
         const strError = "No signature arrived";
-        joRetVal.error = strError;
-        details.error( "{p}BLS-sign(1) finished with error: {err}", strLogPrefix, strError );
+        optsHandleVerifyAndSign.joRetVal.error = strError;
+        optsHandleVerifyAndSign.details.error(
+            "{p}BLS-sign(1) finished with error: {err}",
+            optsHandleVerifyAndSign.strLogPrefix, strError );
         await joCall.disconnect();
         throw new Error( strError );
     }
@@ -2026,8 +2020,8 @@ async function handleBlsSignMessageHashResult(
     return joSignResult;
 }
 
-export async function handleSkaleImaVerifyAndSign( joCallData ) {
-    const optsHandleVerifyAndSign = {
+export async function handleSkaleImaVerifyAndSign( joCallData: any ) {
+    const optsHandleVerifyAndSign: any = {
         joCallData: joCallData,
         imaState: state.get(),
         strLogPrefix: "",
@@ -2046,7 +2040,7 @@ export async function handleSkaleImaVerifyAndSign( joCallData ) {
         nThreshold: 1,
         nParticipants: 1
     };
-    let joCall = null;
+    let joCall: any = null;
     try {
         if( ! ( await prepareHandlingOfSkaleImaVerifyAndSign( optsHandleVerifyAndSign ) ) )
             return null;
@@ -2070,7 +2064,7 @@ export async function handleSkaleImaVerifyAndSign( joCallData ) {
             if( ! joAccount.strBlsKeyName )
                 throw new Error( "BLS keys name is unknown, cannot sign IMA message(s)" );
         }
-        let rpcCallOpts = null;
+        let rpcCallOpts: any = null;
         if( "strPathSslKey" in joAccount && typeof joAccount.strPathSslKey == "string" &&
             joAccount.strPathSslKey.length > 0 && "strPathSslCert" in joAccount &&
             typeof joAccount.strPathSslCert == "string" && joAccount.strPathSslCert.length > 0
@@ -2119,7 +2113,7 @@ export async function handleSkaleImaVerifyAndSign( joCallData ) {
     return optsHandleVerifyAndSign.joRetVal;
 }
 
-async function handleSkaleImaBSU256Prepare( optsBSU256 ) {
+async function handleSkaleImaBSU256Prepare( optsBSU256: any ) {
     optsBSU256.details.debug( "{p}Will U256-BLS-sign {}",
         optsBSU256.strLogPrefix, optsBSU256.joCallData );
     optsBSU256.nThreshold = discoverBlsThreshold( optsBSU256.imaState.joSChainNetworkInfo );
@@ -2129,15 +2123,15 @@ async function handleSkaleImaBSU256Prepare( optsBSU256 ) {
     optsBSU256.details.trace( "{p}Discovered number of BLS participants is {}.",
         optsBSU256.strLogPrefix, optsBSU256.nParticipants );
     if( ! checkBlsThresholdAndBlsParticipants(
-        optsHandleVerifyAndSign.nThreshold,
-        optsHandleVerifyAndSign.nParticipants,
+        optsBSU256.nThreshold,
+        optsBSU256.nParticipants,
         "handle BSU256Prepare",
         optsBSU256.details ) )
         return false;
     optsBSU256.u256 = optsBSU256.joCallData.params.valueToSign;
     optsBSU256.details.trace( "{p}U256 original value is {}",
         optsBSU256.strLogPrefix, optsBSU256.u256 );
-    optsBSU256.strMessageHash = keccak256U256.u256( optsBSU256.u256, true );
+    optsBSU256.strMessageHash = keccak256U256( optsBSU256.u256, true );
     optsBSU256.details.trace( "{p}hash of U256 value to sign is {}",
         optsBSU256.strLogPrefix, optsBSU256.strMessageHash );
     optsBSU256.details.trace( "{p}Will BLS-sign U256.", optsBSU256.strLogPrefix );
@@ -2152,7 +2146,9 @@ async function handleSkaleImaBSU256Prepare( optsBSU256 ) {
     return true;
 }
 
-async function handleBlsSignMessageHash256Result( optsBSU256, joCallData, joCall, joIn, joOut ) {
+async function handleBlsSignMessageHash256Result(
+    optsBSU256: any, joCallData: any, joCall: any, joIn: any, joOut: any
+) {
     optsBSU256.details.trace( "{p}Call to SGX done, answer is: {}",
         optsBSU256.strLogPrefix, joOut );
     let joSignResult = joOut;
@@ -2164,8 +2160,9 @@ async function handleBlsSignMessageHash256Result( optsBSU256, joCallData, joCall
         joSignResult = joOut.signResult;
     if( !joSignResult ) {
         const strError = "No signature arrived";
-        joRetVal.error = strError;
-        details.error( "{p}U256/BLS-sign(1) finished with error: {err}", strLogPrefix, strError );
+        optsBSU256.joRetVal.error = strError;
+        optsBSU256.details.error(
+            "{p}U256/BLS-sign(1) finished with error: {err}", optsBSU256.strLogPrefix, strError );
         await joCall.disconnect();
         throw new Error( strError );
     }
@@ -2189,8 +2186,8 @@ async function handleBlsSignMessageHash256Result( optsBSU256, joCallData, joCall
     return joSignResult;
 }
 
-export async function handleSkaleImaBSU256( joCallData ) {
-    const optsBSU256 = {
+export async function handleSkaleImaBSU256( joCallData: any ) {
+    const optsBSU256: any = {
         joCallData: joCallData,
         imaState: state.get(),
         strLogPrefix: "",
@@ -2203,11 +2200,11 @@ export async function handleSkaleImaBSU256( joCallData ) {
         strMessageHash: "",
         joAccount: null
     };
-    let joCall = null;
+    let joCall: any = null;
     try {
         if( ! ( await handleSkaleImaBSU256Prepare( optsBSU256 ) ) )
             return null;
-        let rpcCallOpts = null;
+        let rpcCallOpts: any = null;
         if( "strPathSslKey" in optsBSU256.joAccount &&
             typeof optsBSU256.joAccount.strPathSslKey == "string" &&
             optsBSU256.joAccount.strPathSslKey.length > 0 &&

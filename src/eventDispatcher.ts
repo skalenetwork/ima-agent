@@ -19,11 +19,12 @@
  */
 
 /**
- * @file eventDispatcher.mjs
+ * @file eventDispatcher.ts
  * @copyright SKALE Labs 2019-Present
  */
 
 export class UniversalDispatcherEvent {
+    type: any;
     constructor( type, jo ) {
         this.type = type;
         for( const [ key, value ] of Object.entries( jo ) ) {
@@ -38,6 +39,9 @@ export class UniversalDispatcherEvent {
 
 export class EventDispatcher {
     // see https://stackoverflow.com/questions/36675693/eventtarget-interface-in-safari
+    _listeners: any[];
+    isDisposing: boolean;
+    isDisposed: boolean;
     constructor() {
         this._listeners = [];
         this.isDisposed = false;
@@ -53,10 +57,10 @@ export class EventDispatcher {
         );
         this.removeAllEventListeners();
     }
-    hasEventListener( type, listener ) {
+    hasEventListener( type: any, listener: any ) {
         return this._listeners.some( item => item.type === type && item.listener === listener );
     }
-    addEventListener( type, listener ) {
+    addEventListener( type: any, listener: any ) {
         if( ! this.hasEventListener( type, listener ) ) {
             this._listeners.push( {
                 type,
@@ -66,7 +70,7 @@ export class EventDispatcher {
         }
         return this;
     }
-    removeEventListener( type, listener ) {
+    removeEventListener( type: any, listener: any ) {
         while( true ) {
             const index = ( listener != undefined )
                 ? this._listeners.findIndex(
@@ -85,16 +89,16 @@ export class EventDispatcher {
         this._listeners = [];
         return this;
     }
-    on( type, listener ) {
+    on( type: any, listener: any ) {
         return this.addEventListener( type, listener );
     }
-    off( type, listener ) {
+    off( type: any, listener: any ) {
         return this.removeEventListener( type, listener );
     }
     offAll() {
         return this.removeAllEventListeners();
     }
-    dispatchEvent( evt ) {
+    dispatchEvent( evt: any ) {
         const a = this._listeners.filter( item => item.type === evt.type );
         for( const item of a ) {
             const {

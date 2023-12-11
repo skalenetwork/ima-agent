@@ -7,7 +7,7 @@
  * SKALE IMA is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * (at your option)  any later version.
  *
  * SKALE IMA is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,7 +19,7 @@
  */
 
 /**
- * @file imaTx.mjs
+ * @file imaTx.ts
  * @copyright SKALE Labs 2019-Present
  */
 
@@ -39,16 +39,16 @@ import * as imaEventLogScan from "./imaEventLogScan";
 
 import * as threadInfo from "./threadInfo";
 
-const __dirname = path.dirname( url.fileURLToPath( import.meta.url ) );
+const __dirname: string = path.dirname( url.fileURLToPath( import.meta.url ) );
 
-let redis = null;
+let redis: any = null;
 
-let gFlagDryRunIsEnabled = true;
+let gFlagDryRunIsEnabled: boolean = true;
 
-export function dryRunIsEnabled() {
+export function dryRunIsEnabled() : boolean {
     return ( !!gFlagDryRunIsEnabled );
 }
-export function dryRunEnable( isEnable ) {
+export function dryRunEnable( isEnable: any ) : boolean {
     gFlagDryRunIsEnabled = ( isEnable != null && isEnable != undefined )
         ? ( !!isEnable ) : true;
     return ( !!gFlagDryRunIsEnabled );
@@ -56,23 +56,23 @@ export function dryRunEnable( isEnable ) {
 
 let gFlagDryRunIsIgnored = true;
 
-export function dryRunIsIgnored() {
+export function dryRunIsIgnored() : boolean {
     return ( !!gFlagDryRunIsIgnored );
 }
 
-export function dryRunIgnore( isIgnored ) {
+export function dryRunIgnore( isIgnored: boolean ) : boolean {
     gFlagDryRunIsIgnored = ( isIgnored != null && isIgnored != undefined )
         ? ( !!isIgnored ) : true;
     return ( !!gFlagDryRunIsIgnored );
 }
 
 export async function dryRunCall(
-    details,
-    ethersProvider,
-    strContractName, joContract, strMethodName, arrArguments,
-    joAccount, strActionName, isDryRunResultIgnore,
-    gasPrice, gasValue, weiHowMuch,
-    opts
+    details: any,
+    ethersProvider: any,
+    strContractName: string, joContract: any, strMethodName: string, arrArguments: any[],
+    joAccount: any, strActionName: string, isDryRunResultIgnore: boolean,
+    gasPrice: any, gasValue: any, weiHowMuch: any,
+    opts?: any
 ) {
     if( ! dryRunIsEnabled() )
         return null; // success
@@ -97,7 +97,7 @@ export async function dryRunCall(
         details.trace( "Dry-run of action {bright}...", strActionName );
         details.trace( "Will dry-run {}...", strContractCallDescription );
         const strAccountWalletAddress = joAccount.address();
-        const callOpts = {
+        const callOpts: any = {
             from: strAccountWalletAddress
         };
         if( gasPrice )
@@ -119,7 +119,7 @@ export async function dryRunCall(
     }
 }
 
-async function payedCallPrepare( optsPayedCall ) {
+async function payedCallPrepare( optsPayedCall: any ) {
     optsPayedCall.joACI = getAccountConnectivityInfo( optsPayedCall.joAccount );
     if( optsPayedCall.gasPrice ) {
         optsPayedCall.callOpts.gasPrice =
@@ -160,8 +160,8 @@ async function payedCallPrepare( optsPayedCall ) {
         optsPayedCall.txHash );
 }
 
-async function payedCallTM( optsPayedCall ) {
-    const txAdjusted =
+async function payedCallTM( optsPayedCall: any ) {
+    const txAdjusted: any =
         optsPayedCall.unsignedTx; // JSON.parse( JSON.stringify( optsPayedCall.rawTx ) );
     const arrNamesConvertToHex = [ "gas", "gasLimit", "optsPayedCall.gasPrice", "value" ];
     for( let idxName = 0; idxName < arrNamesConvertToHex.length; ++ idxName ) {
@@ -200,14 +200,14 @@ async function payedCallTM( optsPayedCall ) {
     }
 }
 
-async function payedCallSGX( optsPayedCall ) {
+async function payedCallSGX( optsPayedCall: any ) {
     const tx = optsPayedCall.unsignedTx;
     let { chainId } = await optsPayedCall.ethersProvider.getNetwork();
     if( chainId == "string" )
         chainId = owaspUtils.parseIntOrHex( chainId );
     optsPayedCall.details.trace( "{p}Chain ID is: {}",
         optsPayedCall.strLogPrefix, chainId );
-    const strCmd = "" + process.argv[0] + " --no-warnings ./imaSgxExternalSigner.mjs " +
+    const strCmd = "" + process.argv[0] + " --no-warnings ./imaSgxExternalSigner.ts " +
         ( log.isEnabledColorization() ? "true" : "false" ) + " " +
         "\"" + optsPayedCall.joAccount.strSgxURL + "\" " +
         "\"" + optsPayedCall.joAccount.strSgxKeyName + "\" " +
@@ -224,15 +224,15 @@ async function payedCallSGX( optsPayedCall ) {
         "\"" + ( optsPayedCall.joAccount.strPathSslKey
         ? optsPayedCall.joAccount.strPathSslKey : "" ) + "\" " +
         "";
-    const joSpawnOptions = {
+    const joSpawnOptions: any = {
         shell: true,
         cwd: __dirname,
         env: {},
         encoding: "utf-8"
     };
     const rv = childProcessModule.spawnSync( strCmd, joSpawnOptions );
-    const strStdOutFromExternalInvocation = rv.stdout.toString( "utf8" );
-    optsPayedCall.joReceipt = JSON.parse( strStdOutFromExternalInvocation.toString( "utf8" ) );
+    const strStdOutFromExternalInvocation = rv.stdout.toString();
+    optsPayedCall.joReceipt = JSON.parse( strStdOutFromExternalInvocation.toString() );
     optsPayedCall.details.trace( "{p}Result from external SGX signer is: {}",
         optsPayedCall.strLogPrefix, optsPayedCall.joReceipt );
     postConvertBN( optsPayedCall.joReceipt, "gasUsed" );
@@ -240,7 +240,7 @@ async function payedCallSGX( optsPayedCall ) {
     postConvertBN( optsPayedCall.joReceipt, "effectiveGasPrice" );
 }
 
-function postConvertBN( jo, name ) {
+function postConvertBN( jo: any, name: any ) {
     if( ! jo )
         return;
     if( ! ( name in jo ) )
@@ -250,7 +250,7 @@ function postConvertBN( jo, name ) {
     jo[name] = owaspUtils.toBN( jo[name] );
 }
 
-async function payedCallDirect( optsPayedCall ) {
+async function payedCallDirect( optsPayedCall: any ) {
     const ethersWallet =
         new owaspUtils.ethersMod.ethers.Wallet(
             owaspUtils.ensureStartsWith0x(
@@ -282,14 +282,13 @@ async function payedCallDirect( optsPayedCall ) {
 }
 
 export async function payedCall(
-    details,
-    ethersProvider,
-    strContractName, joContract, strMethodName, arrArguments,
+    details: any, ethersProvider: any,
+    strContractName: string, joContract: any, strMethodName: any, arrArguments: any[],
     joAccount, strActionName,
-    gasPrice, estimatedGas, weiHowMuch,
-    opts
+    gasPrice: any, estimatedGas: any, weiHowMuch: any,
+    opts?: any
 ) {
-    const optsPayedCall = {
+    const optsPayedCall: any = {
         details: details,
         ethersProvider: ethersProvider,
         strContractName: strContractName,
@@ -381,10 +380,10 @@ export async function payedCall(
 }
 
 export async function checkTransactionToSchain(
-    unsignedTx,
-    details,
-    ethersProvider,
-    joAccount
+    unsignedTx: any,
+    details: any,
+    ethersProvider: any,
+    joAccount: any
 ) {
     const strLogPrefix = "PoW-mining: ";
     try {
@@ -401,11 +400,11 @@ export async function checkTransactionToSchain(
         if( balance.lt( requiredBalance ) ) {
             details.warning( "{p}Insufficient funds for {}, will run PoW-mining to get {} of gas",
                 strLogPrefix, strFromAddress, owaspUtils.toHexStringSafe( unsignedTx.gasLimit ) );
-            let powNumber = await calculatePowNumber(
+            let powNumberBuffer = await calculatePowNumber(
                 strFromAddress, owaspUtils.toBN( unsignedTx.nonce ).toHexString(),
                 owaspUtils.toHexStringSafe( unsignedTx.gasLimit ), details, strLogPrefix );
-            details.debug( "{p}Returned PoW-mining number {}", strLogPrefix, powNumber );
-            powNumber = powNumber.toString().trim();
+            details.debug( "{p}Returned PoW-mining number {}", strLogPrefix, powNumberBuffer );
+            let powNumber: string = powNumberBuffer.toString( "utf8" ).trim();
             powNumber = imaUtils.replaceAll( powNumber, "\r", "" );
             powNumber = imaUtils.replaceAll( powNumber, "\n", "" );
             powNumber = imaUtils.replaceAll( powNumber, "\t", "" );
@@ -415,9 +414,10 @@ export async function checkTransactionToSchain(
                 throw new Error( "Failed to compute gas price with PoW-mining(1), got empty text" );
             powNumber = owaspUtils.toBN( owaspUtils.ensureStartsWith0x( powNumber ) );
             details.trace( "{p}BN PoW-mining number is {}", strLogPrefix, powNumber );
-            if( powNumber.eq( owaspUtils.toBN( "0" ) ) )
+            let powNumberBN = owaspUtils.toBN( powNumber);
+            if( powNumberBN.eq( owaspUtils.toBN( "0" ) ) )
                 throw new Error( "Failed to compute gas price with PoW-mining(2), got zero value" );
-            unsignedTx.gasPrice = owaspUtils.toBN( powNumber.toHexString() );
+            unsignedTx.gasPrice = owaspUtils.toBN( powNumberBN.toHexString() );
             details.success( "{p}Success, finally (after PoW-mining) modified unsigned " +
                 "transaction is {}", strLogPrefix, unsignedTx );
         } else {
@@ -431,7 +431,8 @@ export async function checkTransactionToSchain(
     return unsignedTx;
 }
 
-export async function calculatePowNumber( address, nonce, gas, details, strLogPrefix ) {
+export async function calculatePowNumber(
+    address: string, nonce: any, gas: any, details: any, strLogPrefix: string ) {
     try {
         let _address = owaspUtils.ensureStartsWith0x( address );
         _address = ethereumJsUtilModule.toChecksumAddress( _address );
@@ -451,8 +452,8 @@ export async function calculatePowNumber( address, nonce, gas, details, strLogPr
     }
 }
 
-export function getAccountConnectivityInfo( joAccount ) {
-    const joACI = {
+export function getAccountConnectivityInfo( joAccount: any ) {
+    const joACI: any = {
         "isBad": true,
         "strType": "bad",
         "isAutoSend": false
@@ -499,7 +500,7 @@ function tmMakeId( details ) {
     return id;
 }
 
-function tmMakeRecord( tx = {}, score ) {
+function tmMakeRecord( tx: any = {}, score ) {
     const status = "PROPOSED";
     return JSON.stringify( {
         "score": score,
@@ -527,7 +528,7 @@ async function tmSend( details, tx, priority = 5 ) {
     return id;
 }
 
-function tmIsFinished( record ) {
+function tmIsFinished( record: any ) {
     if( record == null )
         return null;
     return [ "SUCCESS", "FAILED", "DROPPED" ].includes( record.status );
@@ -540,7 +541,7 @@ async function tmGetRecord( txId ) {
     return null;
 }
 
-async function tmWait( details, txId, ethersProvider, nWaitSeconds = 36000 ) {
+async function tmWait( details: any, txId: any, ethersProvider: any, nWaitSeconds: number = 36000 ) {
     const strLogPrefix = log.fmtDebug( "(gathered details)" ) + " ";
     details.debug( "{p}TM - will wait TX {} to complete for {} second(s) maximum",
         strLogPrefix, txId, nWaitSeconds );
@@ -561,7 +562,7 @@ async function tmWait( details, txId, ethersProvider, nWaitSeconds = 36000 ) {
         details.error( "{p}TM - TX {} was unsuccessful, wait failed", strLogPrefix, txId );
         return null;
     }
-    const joReceipt = await imaEventLogScan.safeGetTransactionReceipt(
+    const joReceipt: any = await imaEventLogScan.safeGetTransactionReceipt(
         details, 10, ethersProvider, r.tx_hash );
     if( !joReceipt ) {
         details.error( "{p}TM - TX {} was unsuccessful, failed to fetch transaction receipt",
@@ -572,7 +573,8 @@ async function tmWait( details, txId, ethersProvider, nWaitSeconds = 36000 ) {
 }
 
 async function tmEnsureTransaction(
-    details, ethersProvider, priority, txAdjusted, cntAttempts, sleepMilliseconds
+    details: any, ethersProvider: any, priority: any, txAdjusted: any,
+    cntAttempts?: number, sleepMilliseconds?: number
 ) {
     cntAttempts = cntAttempts || 1;
     sleepMilliseconds = sleepMilliseconds || ( 30 * 1000 );
@@ -600,13 +602,15 @@ async function tmEnsureTransaction(
 }
 
 export class TransactionCustomizer {
-    constructor( gasPriceMultiplier, gasMultiplier ) {
+    gasPriceMultiplier: any;
+    gasMultiplier: any;
+    constructor( gasPriceMultiplier: any, gasMultiplier: any ) {
         this.gasPriceMultiplier = gasPriceMultiplier
             ? ( 0.0 + gasPriceMultiplier )
             : null; // null means use current gasPrice or recommendedGasPrice
         this.gasMultiplier = gasMultiplier ? ( 0.0 + gasMultiplier ) : 1.25;
     }
-    async computeGasPrice( ethersProvider, maxGasPrice ) {
+    async computeGasPrice( ethersProvider: any, maxGasPrice: any ) {
         const gasPrice =
             owaspUtils.parseIntOrHex(
                 owaspUtils.toBN(
@@ -632,14 +636,14 @@ export class TransactionCustomizer {
             return gasPrice;
     }
     async computeGas(
-        details,
-        ethersProvider,
-        strContractName, joContract, strMethodName, arrArguments,
-        joAccount, strActionName,
-        gasPrice, gasValueRecommended, weiHowMuch,
-        opts
+        details: any,
+        ethersProvider: any,
+        strContractName: string, joContract: any, strMethodName: string, arrArguments: any[],
+        joAccount: any, strActionName: string,
+        gasPrice: any, gasValueRecommended: any, weiHowMuch: any,
+        opts?: any
     ) {
-        let estimatedGas = 0;
+        let estimatedGas: any = 0;
         const strContractMethodDescription = log.fmtDebug( "{p}({}).{sunny}",
             strContractName, joContract.address, strMethodName );
         let strArgumentsDescription = "";
@@ -660,7 +664,7 @@ export class TransactionCustomizer {
             details.trace( "Estimate-gas of action {bright}...", strActionName );
             details.trace( "Will estimate-gas {}...", strContractCallDescription );
             const strAccountWalletAddress = joAccount.address();
-            const callOpts = { from: strAccountWalletAddress };
+            const callOpts: any = { from: strAccountWalletAddress };
             if( gasPrice )
                 callOpts.gasPrice = owaspUtils.toBN( gasPrice ).toHexString();
             if( gasValueRecommended )
@@ -690,25 +694,25 @@ export class TransactionCustomizer {
     }
 };
 
-let gTransactionCustomizerMainNet = null;
-let gTransactionCustomizerSChain = null;
-let gTransactionCustomizerSChainTarget = null;
+let gTransactionCustomizerMainNet: TransactionCustomizer|null = null;
+let gTransactionCustomizerSChain: TransactionCustomizer|null = null;
+let gTransactionCustomizerSChainTarget: TransactionCustomizer|null = null;
 
-export function getTransactionCustomizerForMainNet() {
+export function getTransactionCustomizerForMainNet() : TransactionCustomizer {
     if( gTransactionCustomizerMainNet )
         return gTransactionCustomizerMainNet;
     gTransactionCustomizerMainNet = new TransactionCustomizer( 1.25, 1.25 );
     return gTransactionCustomizerMainNet;
 }
 
-export function getTransactionCustomizerForSChain() {
+export function getTransactionCustomizerForSChain() : TransactionCustomizer {
     if( gTransactionCustomizerSChain )
         return gTransactionCustomizerSChain;
     gTransactionCustomizerSChain = new TransactionCustomizer( null, 1.25 );
     return gTransactionCustomizerSChain;
 }
 
-export function getTransactionCustomizerForSChainTarget() {
+export function getTransactionCustomizerForSChainTarget() : TransactionCustomizer {
     if( gTransactionCustomizerSChainTarget )
         return gTransactionCustomizerSChainTarget;
     gTransactionCustomizerSChainTarget = new TransactionCustomizer( null, 1.25 );

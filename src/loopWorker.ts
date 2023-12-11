@@ -7,7 +7,7 @@
  * SKALE IMA is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * (at your option)  any later version.
  *
  * SKALE IMA is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,7 +19,7 @@
  */
 
 /**
- * @file loopWorker.mjs
+ * @file loopWorker.ts
  * @copyright SKALE Labs 2019-Present
  */
 
@@ -45,9 +45,9 @@ if( parentPort ) {
     } );
 }
 
-function doSendMessage( type, endpoint, workerUUID, data ) {
+function doSendMessage( type: any, endpoint: any, workerUUID: any, data: any ) {
     const jo: any = networkLayer.socketReceivedDataReverseMarshall( data );
-    const joSend = {
+    const joSend: any = {
         "workerMessageType":
             ( type && typeof type == "string" && type.length > 0 )
                 ? type
@@ -65,7 +65,7 @@ class ObserverServer extends SocketServer {
     opts: any;
     intervalPeriodicSchainsCaching: number|null;
     bIsPeriodicCachingStepInProgress: boolean;
-    constructor( acceptor ) {
+    constructor( acceptor: any ) {
         super( acceptor );
         const self: any = this;
         self.initComplete = false;
@@ -211,7 +211,7 @@ class ObserverServer extends SocketServer {
             workerData.url, threadInfo.threadDescription() );
     }
     dispose() {
-        const self:any = this;
+        const self: any = this;
         self.isDisposing = true;
         if( self.intervalPeriodicSchainsCaching ) {
             clearInterval( self.intervalPeriodicSchainsCaching );
@@ -220,7 +220,7 @@ class ObserverServer extends SocketServer {
         super.dispose();
     }
     initLogMethods() {
-        const self:any = this;
+        const self: any = this;
         if( "fatal" in self && self.fatal && typeof self.fatal == "function" )
             return;
         self.fatal = function( ...args: any[] ) {
@@ -301,7 +301,7 @@ class ObserverServer extends SocketServer {
 const acceptor = new networkLayer.InWorkerSocketServerAcceptor( workerData.url, doSendMessage );
 const server = new ObserverServer( acceptor );
 server.on( "dispose", function() {
-    const self:any = server;
+    const self: any = server;
     self.debug( "Disposed in-worker in {} IMA loop {}",
         threadInfo.threadDescription(), workerData.url );
 } );

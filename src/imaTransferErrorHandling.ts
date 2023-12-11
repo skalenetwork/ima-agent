@@ -7,7 +7,7 @@
  * SKALE IMA is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * (at your option)  any later version.
  *
  * SKALE IMA is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,7 +19,7 @@
  */
 
 /**
- * @file imaTransferErrorHandling.mjs
+ * @file imaTransferErrorHandling.ts
  * @copyright SKALE Labs 2019-Present
  */
 
@@ -30,16 +30,16 @@ export function verifyTransferErrorCategoryName( strCategory ) {
     return "" + ( strCategory ? strCategory : "default" );
 }
 
-const gMaxLastTransferErrors = 20;
-const gArrLastTransferErrors = [];
-let gMapTransferErrorCategories = { };
+const gMaxLastTransferErrors: number = 20;
+const gArrLastTransferErrors: any = [];
+let gMapTransferErrorCategories: any = { };
 
 export const saveTransferEvents = new EventDispatcher();
 
-export function saveTransferError( strCategory, textLog, ts ) {
+export function saveTransferError( strCategory: string, textLog: any, ts?: any ) : void {
     ts = ts || Math.round( ( new Date() ).getTime() / 1000 );
     const c = verifyTransferErrorCategoryName( strCategory );
-    const joTransferEventError = {
+    const joTransferEventError: any = {
         "ts": ts,
         "category": "" + c,
         "textLog": "" + textLog.toString()
@@ -54,7 +54,7 @@ export function saveTransferError( strCategory, textLog, ts ) {
             { "detail": joTransferEventError } ) );
 }
 
-export function saveTransferSuccess( strCategory ) {
+export function saveTransferSuccess( strCategory: string ) : void {
     const c = verifyTransferErrorCategoryName( strCategory );
     try { delete gMapTransferErrorCategories["" + c]; } catch ( err ) { }
     saveTransferEvents.dispatchEvent(
@@ -63,12 +63,12 @@ export function saveTransferSuccess( strCategory ) {
             { "detail": { "category": strCategory } } ) );
 }
 
-export function saveTransferSuccessAll() {
+export function saveTransferSuccessAll() : void {
     // clear all transfer error categories, out of time frame
     gMapTransferErrorCategories = { };
 }
 
-export function getLastTransferErrors( isIncludeTextLog ) {
+export function getLastTransferErrors( isIncludeTextLog: boolean ) : any[] {
     if( typeof isIncludeTextLog == "undefined" )
         isIncludeTextLog = true;
     const jarr = JSON.parse( JSON.stringify( gArrLastTransferErrors ) );
@@ -82,15 +82,15 @@ export function getLastTransferErrors( isIncludeTextLog ) {
     return jarr;
 }
 
-export function getLastErrorCategories() {
+export function getLastErrorCategories() : string[] {
     return Object.keys( gMapTransferErrorCategories );
 }
 
 let gFlagIsEnabledProgressiveEventsScan = true;
 
-export function getEnabledProgressiveEventsScan() {
+export function getEnabledProgressiveEventsScan() : boolean {
     return ( !!gFlagIsEnabledProgressiveEventsScan );
 }
-export function setEnabledProgressiveEventsScan( isEnabled ) {
+export function setEnabledProgressiveEventsScan( isEnabled: boolean ) : void {
     gFlagIsEnabledProgressiveEventsScan = ( !!isEnabled );
 }

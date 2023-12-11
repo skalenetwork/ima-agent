@@ -7,7 +7,7 @@
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * (at your option)  any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,7 +19,7 @@
  */
 
 /**
- * @file rpcCall.mjs
+ * @file rpcCall.ts
  * @copyright SKALE Labs 2019-Present
  */
 
@@ -234,7 +234,7 @@ export async function doCall( joCall: any, joIn: any, fn: any ) {
             joCall.joRpcOptions.key && typeof joCall.joRpcOptions.key == "string"
         ) {
             const u = new URL( joCall.url );
-            const options = {
+            const options: any = {
                 "hostname": u.hostname,
                 "port": u.port,
                 "path": "/",
@@ -348,7 +348,7 @@ export async function rpcCallCreate( strURL: string, opts: any ) {
         throw new Error( "rpcCallCreate() was invoked with " +
             `bad parameters: ${JSON.stringify( arguments )}` );
     }
-    const joCall = {
+    const joCall: any = {
         "url": "" + strURL,
         "joRpcOptions": opts ? opts : null,
         "mapPendingByCallID": { },
@@ -390,7 +390,7 @@ export async function rpcCallCreate( strURL: string, opts: any ) {
                     "{url} JSON RPC call(awaiter) error: {err}", strURL, err );
             } );
         },
-        "disconnect": async function( fnAfter ) {
+        "disconnect": async function( fnAfter?: any ) {
             await doDisconnect( joCall, fnAfter );
         }
     };

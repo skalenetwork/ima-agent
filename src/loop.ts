@@ -7,7 +7,7 @@
  * SKALE IMA is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * (at your option)  any later version.
  *
  * SKALE IMA is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,7 +19,7 @@
  */
 
 /**
- * @file loop.mjs
+ * @file loop.ts
  * @copyright SKALE Labs 2019-Present
  */
 
@@ -38,11 +38,12 @@ import * as skaleObserver from "./observer";
 import * as pwa from "./pwa";
 import * as state from "./state";
 
-const __dirname = path.dirname( url.fileURLToPath( import.meta.url ) );
+const __dirname: string = path.dirname( url.fileURLToPath( import.meta.url ) );
 
 // Run transfer loop
 
-export function checkTimeFraming( d, strDirection, joRuntimeOpts ) {
+export function checkTimeFraming(
+    d: Date|null, strDirection: string, joRuntimeOpts: any ) : boolean {
     try {
         const imaState = state.get();
         if( imaState.nTimeFrameSeconds <= 0 || imaState.nNodesCount <= 1 )
@@ -127,7 +128,7 @@ export function checkTimeFraming( d, strDirection, joRuntimeOpts ) {
     return true;
 };
 
-async function singleTransferLoopPartOracle( optsLoop, strLogPrefix ) {
+async function singleTransferLoopPartOracle( optsLoop: any, strLogPrefix: string ) {
     const imaState = state.get();
     let b0 = true;
     if( optsLoop.enableStepOracle && imaOracleOperations.getEnabledOracle() ) {
@@ -142,7 +143,7 @@ async function singleTransferLoopPartOracle( optsLoop, strLogPrefix ) {
                 if( checkTimeFraming( null, "oracle", optsLoop.joRuntimeOpts ) ) {
                     imaState.loopState.oracle.isInProgress = true;
                     await pwa.notifyOnLoopStart( imaState, "oracle" );
-                    b0 = imaOracleOperations.doOracleGasPriceSetup(
+                    b0 = await imaOracleOperations.doOracleGasPriceSetup(
                         imaState.chainProperties.mn.ethersProvider,
                         imaState.chainProperties.sc.ethersProvider,
                         imaState.chainProperties.sc.transactionCustomizer,
@@ -172,7 +173,7 @@ async function singleTransferLoopPartOracle( optsLoop, strLogPrefix ) {
     return b0;
 }
 
-async function singleTransferLoopPartM2S( optsLoop, strLogPrefix ) {
+async function singleTransferLoopPartM2S( optsLoop: any, strLogPrefix: string ) {
     const imaState = state.get();
     let b1 = true;
     if( optsLoop.enableStepM2S ) {
@@ -233,7 +234,7 @@ async function singleTransferLoopPartM2S( optsLoop, strLogPrefix ) {
     return b1;
 }
 
-async function singleTransferLoopPartS2M( optsLoop, strLogPrefix ) {
+async function singleTransferLoopPartS2M( optsLoop: any, strLogPrefix: string ) {
     const imaState = state.get();
     let b2 = true;
     if( optsLoop.enableStepS2M ) {
@@ -295,7 +296,7 @@ async function singleTransferLoopPartS2M( optsLoop, strLogPrefix ) {
     return b2;
 }
 
-async function singleTransferLoopPartS2S( optsLoop, strLogPrefix ) {
+async function singleTransferLoopPartS2S( optsLoop: any, strLogPrefix: string ) {
     const imaState = state.get();
     let b3 = true;
     if( optsLoop.enableStepS2S && imaState.optsS2S.isEnabled ) {
@@ -333,12 +334,12 @@ async function singleTransferLoopPartS2S( optsLoop, strLogPrefix ) {
     return b3;
 }
 
-function printLoopPartSkippedWarning( strLoopPartName ) {
-    log.warning( "{p}Skipped {} transfer loop part due to other single transfer loop is in " +
-        "progress right now", strLogPrefix, strLoopPartName );
+function printLoopPartSkippedWarning( strLoopPartName: string ) {
+    log.warning( "Skipped {} transfer loop part due to other single transfer loop is in " +
+        "progress right now", strLoopPartName );
 }
 
-export async function singleTransferLoop( optsLoop ) {
+export async function singleTransferLoop( optsLoop: any ) {
     const imaState = state.get();
     const strLogPrefix = `Single Loop in ${threadInfo.threadDescription( false )} `;
     try {
@@ -399,14 +400,14 @@ export async function singleTransferLoop( optsLoop ) {
     imaState.loopState.s2s.isInProgress = false;
     return false;
 }
-export async function singleTransferLoopWithRepeat( optsLoop ) {
+export async function singleTransferLoopWithRepeat( optsLoop: any ) {
     const imaState = state.get();
     await singleTransferLoop( optsLoop );
     setTimeout( async function() {
         await singleTransferLoopWithRepeat( optsLoop );
     }, imaState.nLoopPeriodSeconds * 1000 );
 };
-export async function runTransferLoop( optsLoop ) {
+export async function runTransferLoop( optsLoop: any ) {
     const imaState = state.get();
     const isDelayFirstRun = owaspUtils.toBoolean( optsLoop.isDelayFirstRun );
     if( isDelayFirstRun ) {
@@ -420,10 +421,10 @@ export async function runTransferLoop( optsLoop ) {
 
 // Parallel thread based loop
 
-const gArrWorkers = [];
-const gArrClients = [];
+const gArrWorkers: any[] = [];
+const gArrClients: any[] = [];
 
-function constructChainProperties( opts ) {
+function constructChainProperties( opts: any ) {
     return {
         "mn": {
             "joAccount": {
@@ -488,8 +489,8 @@ function constructChainProperties( opts ) {
     };
 }
 
-function getDefaultOptsLoop( idxWorker ) {
-    const optsLoop = {
+function getDefaultOptsLoop( idxWorker: number ) {
+    const optsLoop: any = {
         joRuntimeOpts: {
             isInsideWorker: true, idxChainKnownForS2S: 0, cntChainsKnownForS2S: 0
         },
@@ -502,19 +503,19 @@ function getDefaultOptsLoop( idxWorker ) {
     return optsLoop;
 }
 
-export async function ensureHaveWorkers( opts ) {
+export async function ensureHaveWorkers( opts: any ) {
     if( gArrWorkers.length > 0 )
         return gArrWorkers;
     const cntWorkers = 2;
     log.debug( "Loop module will create its ",
         cntWorkers, " worker(s) in ", threadInfo.threadDescription(), "..." );
     for( let idxWorker = 0; idxWorker < cntWorkers; ++ idxWorker ) {
-        const workerData = {
+        const workerData: any = {
             "url": "ima_loop_server" + idxWorker,
             "colorization": { isEnabled: log.isEnabledColorization() }
         };
         gArrWorkers.push( new threadInfo.Worker(
-            path.join( __dirname, "loopWorker.mjs" ),
+            path.join( __dirname, "loopWorker.ts" ),
             { "type": "module", "workerData": workerData }
         ) );
         gArrWorkers[idxWorker].on( "message", jo => {
@@ -664,7 +665,7 @@ export async function ensureHaveWorkers( opts ) {
         gArrWorkers.length, " worker(s) in ", threadInfo.threadDescription() );
 }
 
-export async function runParallelLoops( opts ) {
+export async function runParallelLoops( opts: any ) {
     log.notice( "Will start parallel IMA transfer loops in {}...", threadInfo.threadDescription() );
     await ensureHaveWorkers( opts );
     log.success( "Done, did started parallel IMA transfer loops in {}, have {} worker(s) and {} " +
@@ -672,7 +673,7 @@ export async function runParallelLoops( opts ) {
     return true;
 }
 
-export async function spreadArrivedStateOfPendingWorkAnalysis( joMessage ) {
+export async function spreadArrivedStateOfPendingWorkAnalysis( joMessage: any ) {
     if( ! ( joMessage && typeof joMessage == "object" &&
         "method" in joMessage && joMessage.method == "skale_imaNotifyLoopWork" )
     )
@@ -683,9 +684,9 @@ export async function spreadArrivedStateOfPendingWorkAnalysis( joMessage ) {
 
 }
 
-export async function spreadUpdatedSChainNetwork( isFinal ) {
+export async function spreadUpdatedSChainNetwork( isFinal: boolean ) {
     const imaState = state.get();
-    const joMessage = {
+    const joMessage: any = {
         "method": "spreadUpdatedSChainNetwork",
         "isFinal": ( !!isFinal ),
         "joSChainNetworkInfo": imaState.joSChainNetworkInfo

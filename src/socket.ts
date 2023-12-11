@@ -7,7 +7,7 @@
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * (at your option)  any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,7 +19,7 @@
  */
 
 /**
- * @file socket.mjs
+ * @file socket.ts
  * @copyright SKALE Labs 2019-Present
  */
 
@@ -41,7 +41,7 @@ export function setWebRtcModule( mod: any ) : void {
     webRtcModule = mod ? mod : null;
 }
 
-export const gMapLocalServers = { }; // used both for local and in-worker servers
+export const gMapLocalServers: any = { }; // used both for local and in-worker servers
 
 export const socketSentDataMarshall = function( data?: any ) : void {
     const s = data
@@ -83,7 +83,7 @@ export const updateSocketDataStatsForMessage = function( joMessage: any, joStats
         joStats[strMethod] = 1;
 };
 export const generateSocketDataStatsJSON = function( jo: any ) {
-    const joStats = {};
+    const joStats: any = {};
     if( "arrPackedMessages" in jo &&
         jo.arrPackedMessages &&
         typeof jo.arrPackedMessages == "object"
@@ -103,8 +103,6 @@ export class BasicServerAcceptor extends EventDispatcher {
     strEndPoint: string|null;
     nextClientNumber: number;
     mapClients: any;
-    isDisposing: boolean;
-    isDisposed: boolean;
     url: string;
     constructor() {
         super();
@@ -201,10 +199,10 @@ export class BasicSocketPipe extends EventDispatcher {
     maxAccumulatedMessagesCount: number;
     relayClientSocket: any;
     mapImpersonatedEntries: any; // for external in-app usage only
-    isDisposing: boolean;
-    isDisposed: boolean;
     acceptor: any;
     clientPort: any;
+    logicalInitComplete: any; // for external use
+    errorLogicalInit: any; // for external use
     constructor() {
         super();
         this.socketType = "N/A";
@@ -260,7 +258,7 @@ export class BasicSocketPipe extends EventDispatcher {
     socketLoggingTextPrefix( strLogEventName: string ) {
         return "" + strLogEventName + " " + this.socketDescription() + " -";
     }
-    send( data: any, isFlush: boolean ) {
+    send( data: any, isFlush?: boolean ) {
         if( this.isDisposed || ( !this.isConnected ) )
             return;
         if( this.isAutoFlush() ) {
@@ -389,7 +387,7 @@ export const gMapAwaitingInWorkerClients = { };
 // in-worker clients in connecting state
 export const gMapConnectedInWorkerClients = { };
 
-export const outOfWorkerAPIs = {
+export const outOfWorkerAPIs: any = {
     "onMessage": function( worker: any, data: any ) {
         const jo: any = socketReceivedDataReverseMarshall( data );
         if( ! ( "workerMessageType" in jo ) ||
@@ -428,7 +426,7 @@ export const outOfWorkerAPIs = {
     },
     "onSendMessage": function( worker: any, type: any, endpoint: any, workerUUID: any, data: any ) {
         const jo: any = socketReceivedDataReverseMarshall( data );
-        const joSend = {
+        const joSend: any = {
             "workerMessageType":
                 ( type && typeof type == "string" && type.length > 0 )
                     ? type : "inWorkerMessage",
@@ -440,7 +438,7 @@ export const outOfWorkerAPIs = {
         worker.postMessage( socketSentDataMarshall( joSend ) );
     }
 };
-export const inWorkerAPIs = {
+export const inWorkerAPIs: any = {
     "onMessage": function( data: any ) {
         const jo: any = socketReceivedDataReverseMarshall( data );
         if( ! ( "workerMessageType" in jo ) ||
@@ -471,7 +469,7 @@ export const inWorkerAPIs = {
     },
     "onSendMessage": function( type: any, endpoint: any, workerUUID: any, data: any ) {
         const jo: any = socketReceivedDataReverseMarshall( data );
-        const joSend = {
+        const joSend: any = {
             "workerMessageType":
                 ( type && typeof type == "string" && type.length > 0 )
                     ? type : "inWorkerMessage",
@@ -612,7 +610,7 @@ export class OutOfWorkerSocketClientPipe extends BasicSocketPipe {
     worker: any;
     fnSend: any;
     strEndPoint: string;
-    constructor( strEndPoint: string, worker: any, fnSend: any ) {
+    constructor( strEndPoint: string, worker: any, fnSend?: any ) {
         super();
         this.socketType = "InWorker";
         this.socketSubtype = "client";
@@ -688,8 +686,6 @@ export class OutOfWorkerRelay extends EventDispatcher {
     acceptor: any;
     fnCreateClient: any;
     onConnection_: any;
-    isDisposing: any;
-    isDisposed: any;
     // eslint-disable-next-line max-lines-per-function
     constructor(
         strRelayName: string, acceptor: any, fnCreateClient: any,
@@ -928,8 +924,6 @@ export class OneToOneRelay extends EventDispatcher {
     isAutoFlushOutgoing: boolean;
     pipeIncoming: any;
     pipeOutgoing: any;
-    isDisposing: boolean;
-    isDisposed: boolean;
     // eslint-disable-next-line max-lines-per-function
     constructor(
         strRelayName: string, pipeIncoming: any, pipeOutgoing: any,
@@ -1703,8 +1697,6 @@ export class RTCConnection extends EventDispatcher {
     iceComplete: any;
     pc: any;
     dc: any;
-    isDisposing: boolean;
-    isDisposed: boolean;
     constructor( strSignalingServerURL?: string, idRtcParticipant?: string ) {
         super();
         this.strSignalingServerURL = utils.makeValidSignalingServerURL( strSignalingServerURL );

@@ -19,7 +19,7 @@
  */
 
 /**
- * @file imaHelperAPIs.mjs
+ * @file imaHelperAPIs.ts
  * @copyright SKALE Labs 2019-Present
  */
 

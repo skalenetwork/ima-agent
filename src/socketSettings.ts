@@ -19,7 +19,7 @@
  */
 
 /**
- * @file socketSettings.mjs
+ * @file socketSettings.ts
  * @copyright SKALE Labs 2019-Present
  */
 

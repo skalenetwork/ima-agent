@@ -9,13 +9,13 @@ log.addStdout();
 // allow self-signed wss and https
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
-function finalizeOutput( jo ) {
+function finalizeOutput( jo: any ) {
     if( ! jo )
         return;
     process.stdout.write( log.fmtInformation( "{}", jo ) );
 }
 
-function postConvertBN( jo, name ) {
+function postConvertBN( jo: any, name: any ) {
     if( ! jo )
         return;
     if( ! ( name in jo ) )
@@ -70,7 +70,7 @@ async function run() {
 
         const ethersProvider = owaspUtils.getEthersProviderFromURL( strURL );
 
-        const tx = {
+        const tx: any = {
             data: tcData,
             to: txTo,
             value: owaspUtils.toBN( txValue ),
@@ -88,15 +88,15 @@ async function run() {
         if( gIsDebugLogging )
             log.debug( "--- TX hash ---> {}", txHash );
 
-        const rpcCallOpts = {
+        const rpcCallOpts: any = {
             "cert": fs.readFileSync( strPathCert, "utf8" ),
             "key": fs.readFileSync( strPathKey, "utf8" )
         };
 
-        const joCall = await rpcCall.create( strSgxWalletURL, rpcCallOpts );
+        const joCall: any = await rpcCall.create( strSgxWalletURL, rpcCallOpts );
         if( ! joCall )
             throw new Error( `Failed to create JSON RPC call object to ${strSgxWalletURL}` );
-        const joIn = {
+        const joIn: any = {
             "method": "ecdsaSignMessageHash",
             "params": {
                 "keyName": "" + strSgxKeyName,
@@ -104,7 +104,7 @@ async function run() {
                 "base": 16
             }
         };
-        const joOut = await joCall.call( joIn );
+        const joOut: any = await joCall.call( joIn );
         try {
             if( gIsDebugLogging )
                 log.debug( "SGX wallet ECDSA sign result is: {}", joOut );

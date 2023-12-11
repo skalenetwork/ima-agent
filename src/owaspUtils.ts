@@ -7,7 +7,7 @@
  * SKALE IMA is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * (at your option)  any later version.
  *
  * SKALE IMA is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,7 +19,7 @@
  */
 
 /**
- * @file owaspUtils.mjs
+ * @file owaspUtils.ts
  * @copyright SKALE Labs 2019-Present
  */
 
@@ -456,7 +456,7 @@ export function ipFromHex( hex?: any ) : string {
 }
 
 export function cloneObjectByRootKeys( joIn?: any ) : any {
-    const joOut = { }, arrKeys = Object.keys( joIn );
+    const joOut: any = { }, arrKeys = Object.keys( joIn );
     for( let i = 0; i < arrKeys.length; ++ i ) {
         const key = arrKeys[i];
         const value = joIn[key];

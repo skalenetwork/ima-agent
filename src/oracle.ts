@@ -19,7 +19,7 @@
  */
 
 /**
- * @file oracle.mjs
+ * @file oracle.ts
  * @copyright SKALE Labs 2019-Present
  */
 

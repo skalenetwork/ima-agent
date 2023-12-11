@@ -7,7 +7,7 @@
  * SKALE IMA is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * (at your option)  any later version.
  *
  * SKALE IMA is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,7 +19,7 @@
  */
 
 /**
- * @file imaEthOperations.mjs
+ * @file imaEthOperations.ts
  * @copyright SKALE Labs 2019-Present
  */
 
@@ -32,11 +32,11 @@ import * as imaEventLogScan from "./imaEventLogScan";
 import * as threadInfo from "./threadInfo";
 
 export async function getBalanceEth(
-    isMainNet,
-    ethersProvider,
-    chainId,
-    joAccount,
-    contractERC20
+    isMainNet: any,
+    ethersProvider: any,
+    chainId: string,
+    joAccount?: any,
+    contractERC20?: any
 ) {
     const strLogPrefix = "getBalanceEth() call ";
     try {
@@ -67,18 +67,18 @@ export async function getBalanceEth(
 //   money is sent from caller
 //   "value" JSON arg is used to specify amount of money to sent
 export async function doEthPaymentFromMainNet(
-    ethersProviderMainNet,
-    chainIdMainNet,
-    joAccountSrc,
-    joAccountDst,
-    joDepositBox,
-    joMessageProxyMainNet, // for checking logs
-    chainIdSChain,
-    weiHowMuch, // how much WEI money to send
-    transactionCustomizerMainNet
+    ethersProviderMainNet: any,
+    chainIdMainNet: string,
+    joAccountSrc: any,
+    joAccountDst: any,
+    joDepositBox: any,
+    joMessageProxyMainNet: any, // for checking logs
+    chainIdSChain: string,
+    weiHowMuch: any, // how much WEI money to send
+    transactionCustomizerMainNet: imaTx.TransactionCustomizer
 ) {
     const details = log.createMemoryStream();
-    const jarrReceipts = [];
+    const jarrReceipts: any[] = [];
     let strActionName = "";
     const strLogPrefix = "M2S ETH Payment: ";
     try {
@@ -164,17 +164,17 @@ export async function doEthPaymentFromMainNet(
 //   money is sent from caller
 //   "value" JSON arg is used to specify amount of money to sent
 export async function doEthPaymentFromSChain(
-    ethersProviderSChain,
-    chainIdSChain,
-    joAccountSrc,
-    joAccountDst,
-    joTokenManagerETH,
-    joMessageProxySChain, // for checking logs
-    weiHowMuch, // how much WEI money to send
-    transactionCustomizerSChain
+    ethersProviderSChain: any,
+    chainIdSChain: string,
+    joAccountSrc: any,
+    joAccountDst: any,
+    joTokenManagerETH: any,
+    joMessageProxySChain: any, // for checking logs
+    weiHowMuch: any, // how much WEI money to send
+    transactionCustomizerSChain: imaTx.TransactionCustomizer
 ) {
     const details = log.createMemoryStream();
-    const jarrReceipts = [];
+    const jarrReceipts: any = [];
     let strActionName = "";
     const strLogPrefix = "S2M ETH Payment: ";
     try {
@@ -200,7 +200,7 @@ export async function doEthPaymentFromSChain(
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
-        const opts = {
+        const opts: any = {
             isCheckTransactionToSchain: true
         };
         const joReceipt = await imaTx.payedCall(
@@ -253,14 +253,14 @@ export async function doEthPaymentFromSChain(
 }
 
 export async function receiveEthPaymentFromSchainOnMainNet(
-    ethersProviderMainNet,
-    chainIdMainNet,
-    joAccountMN,
-    joDepositBoxETH,
-    transactionCustomizerMainNet
+    ethersProviderMainNet: any,
+    chainIdMainNet: string,
+    joAccountMN: any,
+    joDepositBoxETH: any,
+    transactionCustomizerMainNet: imaTx.TransactionCustomizer
 ) {
     const details = log.createMemoryStream();
-    const jarrReceipts = [];
+    const jarrReceipts: any = [];
     let strActionName = "";
     const strLogPrefix = "M2S ETH Receive: ";
     try {
@@ -313,9 +313,9 @@ export async function receiveEthPaymentFromSchainOnMainNet(
 }
 
 export async function viewEthPaymentFromSchainOnMainNet(
-    ethersProviderMainNet,
-    joAccountMN,
-    joDepositBoxETH
+    ethersProviderMainNet: any,
+    joAccountMN: any,
+    joDepositBoxETH: any
 ) {
     const details = log.createMemoryStream();
     const strActionName = "";

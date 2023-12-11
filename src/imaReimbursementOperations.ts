@@ -7,7 +7,7 @@
  * SKALE IMA is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * (at your option)  any later version.
  *
  * SKALE IMA is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,7 +19,7 @@
  */
 
 /**
- * @file imaReimbursementOperations.mjs
+ * @file imaReimbursementOperations.ts
  * @copyright SKALE Labs 2019-Present
  */
 
@@ -29,14 +29,14 @@ import * as imaTx from "./imaTx";
 import * as imaGasUsage from "./imaGasUsageOperations";
 
 export async function reimbursementShowBalance(
-    ethersProviderMainNet,
-    joCommunityPool,
-    joReceiverMainNet,
-    strChainNameMainNet,
-    chainIdMainNet,
-    transactionCustomizerMainNet,
-    strReimbursementChain,
-    isForcePrintOut
+    ethersProviderMainNet: any,
+    joCommunityPool: any,
+    joReceiverMainNet: any,
+    strChainNameMainNet: any,
+    chainIdMainNet: string,
+    transactionCustomizerMainNet: imaTx.TransactionCustomizer,
+    strReimbursementChain: string,
+    isForcePrintOut: boolean
 ) {
     const details = log.createMemoryStream();
     let s = "";
@@ -70,14 +70,14 @@ export async function reimbursementShowBalance(
 }
 
 export async function reimbursementEstimateAmount(
-    ethersProviderMainNet,
-    joCommunityPool,
-    joReceiverMainNet,
-    strChainNameMainNet,
-    chainIdMainNet,
-    transactionCustomizerMainNet,
-    strReimbursementChain,
-    isForcePrintOut
+    ethersProviderMainNet: any,
+    joCommunityPool: any,
+    joReceiverMainNet: any,
+    strChainNameMainNet: string,
+    chainIdMainNet: string,
+    transactionCustomizerMainNet: imaTx.TransactionCustomizer,
+    strReimbursementChain: string,
+    isForcePrintOut: boolean
 ) {
     const details = log.createMemoryStream();
     let s = "";
@@ -153,17 +153,17 @@ export async function reimbursementEstimateAmount(
 }
 
 export async function reimbursementWalletRecharge(
-    ethersProviderMainNet,
-    joCommunityPool,
-    joAccountMN,
-    strChainNameMainNet,
-    chainIdMainNet,
-    transactionCustomizerMainNet,
-    strReimbursementChain,
-    nReimbursementRecharge
+    ethersProviderMainNet: any,
+    joCommunityPool: any,
+    joAccountMN: any,
+    strChainNameMainNet: string,
+    chainIdMainNet: any,
+    transactionCustomizerMainNet: imaTx.TransactionCustomizer,
+    strReimbursementChain: string,
+    nReimbursementRecharge: any
 ) {
     const details = log.createMemoryStream();
-    const jarrReceipts = [];
+    const jarrReceipts: any = [];
     let strActionName = "";
     const strLogPrefix = "Gas Reimbursement - Wallet Recharge ";
     try {
@@ -215,17 +215,17 @@ export async function reimbursementWalletRecharge(
 }
 
 export async function reimbursementWalletWithdraw(
-    ethersProviderMainNet,
-    joCommunityPool,
-    joAccountMN,
-    strChainNameMainNet,
-    chainIdMainNet,
-    transactionCustomizerMainNet,
-    strReimbursementChain,
-    nReimbursementWithdraw
+    ethersProviderMainNet: any,
+    joCommunityPool: any,
+    joAccountMN: any,
+    strChainNameMainNet: string,
+    chainIdMainNet: string,
+    transactionCustomizerMainNet: imaTx.TransactionCustomizer,
+    strReimbursementChain: string,
+    nReimbursementWithdraw: any
 ) {
     const details = log.createMemoryStream();
-    const jarrReceipts = [];
+    const jarrReceipts: any = [];
     let strActionName = "";
     const strLogPrefix = "Gas Reimbursement - Wallet Withdraw ";
     try {
@@ -282,17 +282,17 @@ export async function reimbursementWalletWithdraw(
 }
 
 export async function reimbursementSetRange(
-    ethersProviderSChain,
-    joCommunityLocker,
-    joAccountSC,
-    strChainNameSChain,
-    chainIdSChain,
-    transactionCustomizerSChain,
-    strChainNameOriginChain,
-    nReimbursementRange
+    ethersProviderSChain: any,
+    joCommunityLocker: any,
+    joAccountSC: any,
+    strChainNameSChain: string,
+    chainIdSChain: string,
+    transactionCustomizerSChain: imaTx.TransactionCustomizer,
+    strChainNameOriginChain: string,
+    nReimbursementRange: any
 ) {
     const details = log.createMemoryStream();
-    const jarrReceipts = [];
+    const jarrReceipts: any = [];
     let strActionName = "";
     const strLogPrefix = "Gas Reimbursement - Set Minimal time interval from S2M transfers ";
     try {
@@ -320,7 +320,7 @@ export async function reimbursementSetRange(
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
-        const opts = { isCheckTransactionToSchain: true };
+        const opts: any = { isCheckTransactionToSchain: true };
         const joReceipt = await imaTx.payedCall(
             details, ethersProviderSChain,
             "CommunityLocker", joCommunityLocker, "setTimeLimitPerMessage", arrArguments,

@@ -7,7 +7,7 @@
  * SKALE IMA is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * (at your option)  any later version.
  *
  * SKALE IMA is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,7 +19,7 @@
  */
 
 /**
- * @file imaOracleOperations.mjs
+ * @file imaOracleOperations.ts
  * @copyright SKALE Labs 2019-Present
  */
 
@@ -30,16 +30,16 @@ import * as imaTx from "./imaTx";
 import * as imaGasUsage from "./imaGasUsageOperations";
 import * as imaTransferErrorHandling from "./imaTransferErrorHandling";
 
-let gFlagIsEnabledOracle = false;
+let gFlagIsEnabledOracle: boolean = false;
 
 export function getEnabledOracle() : boolean {
     return ( !!gFlagIsEnabledOracle );
 }
-export function setEnabledOracle( isEnabled ) {
+export function setEnabledOracle( isEnabled: boolean ) : void {
     gFlagIsEnabledOracle = ( !!isEnabled );
 }
 
-async function prepareOracleGasPriceSetup( optsGasPriseSetup ) {
+async function prepareOracleGasPriceSetup( optsGasPriseSetup: any ) {
     optsGasPriseSetup.strActionName =
         "prepareOracleGasPriceSetup.optsGasPriseSetup.latestBlockNumber()";
     optsGasPriseSetup.latestBlockNumber =
@@ -56,8 +56,8 @@ async function prepareOracleGasPriceSetup( optsGasPriseSetup ) {
     optsGasPriseSetup.details.trace( "Local timestamp on Main Net is {}={} (original)",
         optsGasPriseSetup.bnTimestampOfBlock.toString(),
         owaspUtils.ensureStartsWith0x( optsGasPriseSetup.bnTimestampOfBlock.toHexString() ) );
-    optsGasPriseSetup.bnTimeZoneOffset = owaspUtils.toBN( parseInt( new Date( parseInt(
-        optsGasPriseSetup.bnTimestampOfBlock.toString(), 10 ) ).getTimezoneOffset(), 10 ) );
+    optsGasPriseSetup.bnTimeZoneOffset = owaspUtils.toBN( new Date( parseInt(
+        optsGasPriseSetup.bnTimestampOfBlock.toString(), 10 ) ).getTimezoneOffset() );
     optsGasPriseSetup.details.trace( "Local time zone offset is {}={} (original)",
         optsGasPriseSetup.bnTimeZoneOffset.toString(),
         owaspUtils.ensureStartsWith0x( optsGasPriseSetup.bnTimeZoneOffset.toHexString() ) );
@@ -79,15 +79,15 @@ async function prepareOracleGasPriceSetup( optsGasPriseSetup ) {
     optsGasPriseSetup.strActionName = "prepareOracleGasPriceSetup.getGasPrice()";
     optsGasPriseSetup.gasPriceOnMainNet = null;
     if( getEnabledOracle() ) {
-        const oracleOpts = {
+        const oracleOpts: any = {
             url: owaspUtils.ethersProviderToUrl( optsGasPriseSetup.ethersProviderSChain ),
             callOpts: { },
             nMillisecondsSleepBefore: 1000,
             nMillisecondsSleepPeriod: 3000,
             cntAttempts: 40,
-            isVerbose: ( log.verboseGet() >= log.verboseReversed().information ) ? true : false,
+            isVerbose: ( log.verboseGet() >= log.verboseReversed()["information"] ) ? true : false,
             isVerboseTraceDetails:
-                ( log.verboseGet() >= log.verboseReversed().debug ) ? true : false
+                ( log.verboseGet() >= log.verboseReversed()["debug"] ) ? true : false
         };
         optsGasPriseSetup.details.debug(
             "Will fetch Main Net gas price via call to Oracle with options {}...", oracleOpts );
@@ -127,7 +127,8 @@ async function prepareOracleGasPriceSetup( optsGasPriseSetup ) {
     }
 }
 
-async function handleOracleSigned( optsGasPriseSetup, strError, u256, joGlueResult ) {
+async function handleOracleSigned(
+    optsGasPriseSetup: any, strError: string, u256: any, joGlueResult: any ) {
     if( strError ) {
         optsGasPriseSetup.details.critical(
             "{p}Error in doOracleGasPriceSetup() during {bright}: {err}",
@@ -148,7 +149,7 @@ async function handleOracleSigned( optsGasPriseSetup, strError, u256, joGlueResu
     let hint = joGlueResult ? joGlueResult.hint : null;
     if( ! hint )
         hint = "0";
-    const sign = {
+    const sign: any = {
         blsSignature: [ signature.X, signature.Y ], // BLS glue of signatures
         hashA: hashPoint.X, // G1.X from joGlueResult.hashSrc
         hashB: hashPoint.Y, // G1.Y from joGlueResult.hashSrc
@@ -190,7 +191,7 @@ async function handleOracleSigned( optsGasPriseSetup, strError, u256, joGlueResu
         isIgnoreSetGasPrice, gasPrice, estimatedGasSetGasPrice, weiHowMuch );
     if( strErrorOfDryRun )
         throw new Error( strErrorOfDryRun );
-    const opts = {
+    const opts: any = {
         isCheckTransactionToSchain: ( optsGasPriseSetup.chainIdSChain !== "Mainnet" ) ? true : false
     };
     const joReceipt = await imaTx.payedCall( optsGasPriseSetup.details,
@@ -212,18 +213,18 @@ async function handleOracleSigned( optsGasPriseSetup, strError, u256, joGlueResu
 }
 
 export async function doOracleGasPriceSetup(
-    ethersProviderMainNet,
-    ethersProviderSChain,
-    transactionCustomizerSChain,
-    joCommunityLocker,
-    joAccountSC,
-    chainIdMainNet,
-    chainIdSChain,
-    fnSignMsgOracle
+    ethersProviderMainNet: any,
+    ethersProviderSChain: any,
+    transactionCustomizerSChain: imaTx.TransactionCustomizer,
+    joCommunityLocker: any,
+    joAccountSC: any,
+    chainIdMainNet: string,
+    chainIdSChain: string,
+    fnSignMsgOracle: any
 ) {
     if( ! getEnabledOracle() )
-        return;
-    const optsGasPriseSetup = {
+        return true;
+    const optsGasPriseSetup: any = {
         ethersProviderMainNet: ethersProviderMainNet,
         ethersProviderSChain: ethersProviderSChain,
         transactionCustomizerSChain: transactionCustomizerSChain,

@@ -19,7 +19,7 @@
  */
 
 /**
- * @file pwa.mjs
+ * @file pwa.ts
  * @copyright SKALE Labs 2019-Present
  */
 
@@ -87,7 +87,7 @@ function getNodeProgressAndTimestamp( joNode: any, strLoopWorkType: string, nInd
 }
 
 export async function checkOnLoopStart(
-    imaState: any, strLoopWorkType: string, nIndexS2S: number ) {
+    imaState: any, strLoopWorkType: string, nIndexS2S?: number ) {
     try {
         nIndexS2S = nIndexS2S || 0; // convert to number if undefined
         if( ! checkLoopWorkTypeStringIsCorrect( strLoopWorkType ) )
@@ -205,7 +205,7 @@ export async function handleLoopStateArrived(
 }
 
 async function notifyOnLoopImpl(
-    imaState: any, strLoopWorkType: string, nIndexS2S: number, isStart: boolean ) {
+    imaState: any, strLoopWorkType: string, isStart: boolean, nIndexS2S?: number ) {
     const se = isStart ? "start" : "end";
     try {
         nIndexS2S = nIndexS2S || 0; // convert to number if undefined
@@ -238,7 +238,7 @@ async function notifyOnLoopImpl(
                 continue; // skip this node
             const joNode: any = jarrNodes[i];
             const strNodeURL = imaUtils.composeImaAgentNodeUrl( joNode, isThisNode );
-            const rpcCallOpts = null;
+            const rpcCallOpts: any = null;
             let joCall: any = await rpcCall.create( strNodeURL, rpcCallOpts )
                 .catch( async function( err ) {
                     log.error(
@@ -275,10 +275,10 @@ async function notifyOnLoopImpl(
     return true;
 }
 
-export async function notifyOnLoopStart( imaState, strLoopWorkType, nIndexS2S ) {
-    return await notifyOnLoopImpl( imaState, strLoopWorkType, nIndexS2S, true );
+export async function notifyOnLoopStart( imaState: any, strLoopWorkType: string, nIndexS2S?: number ) {
+    return await notifyOnLoopImpl( imaState, strLoopWorkType, true, nIndexS2S );
 }
 
-export async function notifyOnLoopEnd( imaState, strLoopWorkType, nIndexS2S ) {
-    return await notifyOnLoopImpl( imaState, strLoopWorkType, nIndexS2S, false );
+export async function notifyOnLoopEnd( imaState: any, strLoopWorkType: string, nIndexS2S?: number ) {
+    return await notifyOnLoopImpl( imaState, strLoopWorkType, false, nIndexS2S );
 }

@@ -7,7 +7,7 @@
  * SKALE IMA is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * (at your option)  any later version.
  *
  * SKALE IMA is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,7 +19,7 @@
  */
 
 /**
- * @file imaEventLogScan.mjs
+ * @file imaEventLogScan.ts
  * @copyright SKALE Labs 2019-Present
  */
 
@@ -29,7 +29,7 @@ import * as rpcCall from "./rpcCall";
 import * as imaHelperAPIs from "./imaHelperAPIs";
 import * as imaTransferErrorHandling from "./imaTransferErrorHandling";
 
-export function createProgressiveEventsScanPlan( details, nLatestBlockNumber ) {
+export function createProgressiveEventsScanPlan( details: any, nLatestBlockNumber: any ) {
     // assume Main Net mines 6 blocks per minute
     const blocksInOneMinute = 6;
     const blocksInOneHour = blocksInOneMinute * 60;
@@ -64,7 +64,7 @@ export function createProgressiveEventsScanPlan( details, nLatestBlockNumber ) {
         "nBlockTo": "latest",
         "type": "3 years"
     } ];
-    const arrProgressiveEventsScanPlan = [];
+    const arrProgressiveEventsScanPlan: any[] = [];
     for( let idxPlan = 0; idxPlan < arrProgressiveEventsScanPlanA.length; ++idxPlan ) {
         const joPlan = arrProgressiveEventsScanPlanA[idxPlan];
         if( joPlan.nBlockFrom >= 0 )
@@ -85,9 +85,9 @@ export function createProgressiveEventsScanPlan( details, nLatestBlockNumber ) {
 }
 
 export async function safeGetPastEventsProgressive(
-    details, strLogPrefix,
-    ethersProvider, attempts, joContract, strEventName,
-    nBlockFrom, nBlockTo, joFilter
+    details: any, strLogPrefix: string,
+    ethersProvider: any, attempts: number, joContract: any, strEventName: string,
+    nBlockFrom: any, nBlockTo: any, joFilter: any
 ) {
     const strURL = owaspUtils.ethersProviderToUrl( ethersProvider );
     details.information( "{p}Will run progressive logs search for event {} via URL {url}, " +
@@ -131,7 +131,7 @@ export async function safeGetPastEventsProgressive(
         createProgressiveEventsScanPlan( details, nLatestBlockNumberPlus1 );
     details.trace( "Composed progressive event log records scan plan is: {}",
         arrProgressiveEventsScanPlan );
-    let joLastPlan = { "nBlockFrom": 0, "nBlockTo": "latest", "type": "entire block range" };
+    let joLastPlan: any = { "nBlockFrom": 0, "nBlockTo": "latest", "type": "entire block range" };
     for( let idxPlan = 0; idxPlan < arrProgressiveEventsScanPlan.length; ++idxPlan ) {
         const joPlan = arrProgressiveEventsScanPlan[idxPlan];
         if( joPlan.nBlockFrom < 0 )
@@ -164,9 +164,9 @@ export async function safeGetPastEventsProgressive(
 }
 
 export async function getContractCallEvents(
-    details, strLogPrefix,
-    ethersProvider, joContract, strEventName,
-    nBlockNumber, strTxHash, joFilter
+    details: any, strLogPrefix: string,
+    ethersProvider: any, joContract: any, strEventName: string,
+    nBlockNumber: any, strTxHash: string, joFilter: any
 ) {
     joFilter = joFilter || {};
     nBlockNumber = owaspUtils.toBN( nBlockNumber );
@@ -184,7 +184,8 @@ export async function getContractCallEvents(
         await safeGetPastEventsIterative(
             details, strLogPrefix, ethersProvider, 10, joContract, strEventName,
             nBlockFrom, nBlockTo, joFilter );
-    const joAllTransactionEvents = []; let i;
+    const joAllTransactionEvents: any = [];
+    let i: number;
     for( i = 0; i < joAllEventsInBlock.length; ++i ) {
         const joEvent = joAllEventsInBlock[i];
         if( "transactionHash" in joEvent && joEvent.transactionHash == strTxHash )
@@ -194,7 +195,9 @@ export async function getContractCallEvents(
 }
 
 export async function safeGetTransactionCount(
-    details, cntAttempts, ethersProvider, address, param, retValOnFail, throwIfServerOffline
+    details: any, cntAttempts: number,
+    ethersProvider: any, address: string, param: any,
+    retValOnFail: any, throwIfServerOffline: boolean
 ) {
     const strFnName = "getTransactionCount";
     const u = owaspUtils.ethersProviderToUrl( ethersProvider );
@@ -248,7 +251,8 @@ export async function safeGetTransactionCount(
 }
 
 export async function safeGetTransactionReceipt(
-    details, cntAttempts, ethersProvider, txHash, retValOnFail, throwIfServerOffline
+    details: any, cntAttempts: number,
+    ethersProvider: any, txHash: string, retValOnFail?: any, throwIfServerOffline?: boolean
 ) {
     const strFnName = "getTransactionReceipt";
     const u = owaspUtils.ethersProviderToUrl( ethersProvider );
@@ -272,7 +276,7 @@ export async function safeGetTransactionReceipt(
             "stack is:\n{stack}", idxAttempt, strFnName + "()", u, err, err.stack );
     }
     ++ idxAttempt;
-    while( txReceipt === "" && idxAttempt <= cntAttempts ) {
+    while( idxAttempt <= cntAttempts ) {
         const isOnLine = rpcCall.checkUrl( u, nWaitStepMilliseconds );
         if( ! isOnLine ) {
             ret = retValOnFail;
@@ -293,7 +297,7 @@ export async function safeGetTransactionReceipt(
         }
         ++ idxAttempt;
     }
-    if( ( idxAttempt + 1 ) > cntAttempts && ( txReceipt === "" || txReceipt === undefined ) ) {
+    if( ( idxAttempt + 1 ) > cntAttempts ) {
         details.error( "Failed call to {} via {url} after {} attempts",
             strFnName + "()", u, cntAttempts );
         throw new Error( `Failed call to ${strFnName}() via ${u} after ${cntAttempts} attempts` );
@@ -302,9 +306,10 @@ export async function safeGetTransactionReceipt(
 }
 
 export async function safeGetPastEvents(
-    details, strLogPrefix,
-    ethersProvider, cntAttempts, joContract, strEventName,
-    nBlockFrom, nBlockTo, joFilter, retValOnFail, throwIfServerOffline
+    details: any, strLogPrefix: string,
+    ethersProvider: any, cntAttempts: number, joContract: any, strEventName: string,
+    nBlockFrom: any, nBlockTo: any, joFilter: any,
+    retValOnFail?: any, throwIfServerOffline?: boolean
 ) {
     const u = owaspUtils.ethersProviderToUrl( ethersProvider );
     const nWaitStepMilliseconds = 10 * 1000;
@@ -404,9 +409,9 @@ export async function safeGetPastEvents(
 }
 
 export async function safeGetPastEventsIterative(
-    details, strLogPrefix,
-    ethersProvider, attempts, joContract, strEventName,
-    nBlockFrom, nBlockTo, joFilter
+    details: any, strLogPrefix: string,
+    ethersProvider: any, attempts: number, joContract: any, strEventName: string,
+    nBlockFrom: any, nBlockTo: any, joFilter: any
 ) {
     if( imaHelperAPIs.getBlocksCountInInIterativeStepOfEventsScan() <= 0 ||
         imaHelperAPIs.getMaxIterationsInAllRangeEventsScan() <= 0 ) {

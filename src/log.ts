@@ -7,7 +7,7 @@
  * SKALE IMA is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * (at your option)  any later version.
  *
  * SKALE IMA is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,7 +19,7 @@
  */
 
 /**
- * @file log.mjs
+ * @file log.ts
  * @copyright SKALE Labs 2019-Present
  */
 
@@ -124,7 +124,7 @@ export function getStreamWithFilePath( strFilePath: string ) : any {
 
 export function createStandardOutputStream() : any {
     try {
-        const objEntry = {
+        const objEntry: any = {
             "id": gIdentifierAllocatorCounter ++,
             "strPath": "stdout",
             "nMaxSizeBeforeRotation": -1,
@@ -235,7 +235,7 @@ export function insertStandardOutputStream() : boolean {
 
 export function createMemoryOutputStream() : any {
     try {
-        const objEntry = {
+        const objEntry: any = {
             "id": gIdentifierAllocatorCounter ++,
             "strPath": "memory",
             "nMaxSizeBeforeRotation": -1,
@@ -410,7 +410,7 @@ export function insertMemoryOutputStream() : boolean {
 export function createFileOutput(
     strFilePath: string, nMaxSizeBeforeRotation?: number, nMaxFilesCount?: number ) : any {
     try {
-        const objEntry = {
+        const objEntry: any = {
             "id": gIdentifierAllocatorCounter ++,
             "strPath": "" + strFilePath,
             "nMaxSizeBeforeRotation": 0 + ( nMaxSizeBeforeRotation || 0 ),

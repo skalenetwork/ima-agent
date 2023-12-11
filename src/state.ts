@@ -1,7 +1,7 @@
 import * as owaspUtils from "./owaspUtils";
 import * as imaTx from "./imaTx";
 
-export const gDefaultValueForLoopState = {
+export const gDefaultValueForLoopState: any = {
     "oracle": {
         "isInProgress": false,
         "wasInProgress": false

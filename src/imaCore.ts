@@ -7,7 +7,7 @@
  * SKALE IMA is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * (at your option)  any later version.
  *
  * SKALE IMA is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,7 +19,7 @@
  */
 
 /**
- * @file index.mjs
+ * @file index.ts
  * @copyright SKALE Labs 2019-Present
  */
 
@@ -43,8 +43,8 @@ const perMessageGasForTransfer = 1000000;
 const additionalS2MTransferOverhead = 200000;
 
 async function findOutReferenceLogRecord(
-    details, strLogPrefix, ethersProvider, joMessageProxy,
-    bnBlockId, nMessageNumberToFind, isVerbose
+    details: any, strLogPrefix: string, ethersProvider: any, joMessageProxy: any,
+    bnBlockId: any, nMessageNumberToFind: any, isVerbose: boolean
 ) {
     const bnMessageNumberToFind = owaspUtils.toBN( nMessageNumberToFind.toString() );
     const strEventName = "PreviousMessageReference";
@@ -58,11 +58,11 @@ async function findOutReferenceLogRecord(
     }
     for( let idxLogRecord = 0; idxLogRecord < cntLogRecord; ++ idxLogRecord ) {
         const joEvent = arrLogRecords[idxLogRecord];
-        const ev = {
+        const ev: any = {
             "currentMessage": joEvent.args[0],
             "previousOutgoingMessageBlockId": joEvent.args[1]
         };
-        const joReferenceLogRecord = {
+        const joReferenceLogRecord: any = {
             "currentMessage": ev.currentMessage,
             "previousOutgoingMessageBlockId": ev.previousOutgoingMessageBlockId,
             "currentBlockId": bnBlockId
@@ -95,7 +95,7 @@ async function findOutAllReferenceLogRecords(
             "message counter {}", strLogPrefix, bnBlockId.toString(),
             nOutMsgCnt.toString(), nIncMsgCnt.toString() );
     }
-    const arrLogRecordReferences = [];
+    const arrLogRecordReferences: any = [];
     const cntExpected = nOutMsgCnt - nIncMsgCnt;
     if( cntExpected <= 0 ) {
         if( isVerbose ) {
@@ -259,7 +259,7 @@ async function doQueryOutgoingMessageCounter( optsTransfer ) {
 }
 
 async function analyzeGatheredRecords( optsTransfer, r ) {
-    let joValues = "";
+    let joValues: any = null;
     const strChainHashWeAreLookingFor =
         owaspUtils.ethersMod.ethers.utils.id( optsTransfer.chainNameDst );
     optsTransfer.details.debug(
@@ -270,7 +270,7 @@ async function analyzeGatheredRecords( optsTransfer, r ) {
         const joEvent = r[i];
         optsTransfer.details.debug( "{p}Will review found event record {} with data {}",
             optsTransfer.strLogPrefix, i, joEvent );
-        const ev = {
+        const ev: any = {
             "dstChainHash": joEvent.args[0],
             "msgCounter": joEvent.args[1],
             "srcContract": joEvent.args[2],
@@ -439,7 +439,7 @@ async function gatherMessages( optsTransfer ) {
         optsTransfer.details.debug( "{p}Will process message counter value {}",
             optsTransfer.strLogPrefix, optsTransfer.nIdxCurrentMsg );
         optsTransfer.arrMessageCounters.push( optsTransfer.nIdxCurrentMsg );
-        const joMessage = {
+        const joMessage: any = {
             "sender": joValues.srcContract,
             "destinationContract": joValues.dstContract,
             "to": joValues.to,
@@ -494,7 +494,7 @@ async function callbackAllMessagesSign( optsTransfer, err, jarrMessages, joGlueR
     let hint = joGlueResult ? joGlueResult.hint : null;
     if( !hint )
         hint = "0";
-    const sign = {
+    const sign: any = {
         blsSignature: [ signature.X, signature.Y ], // BLS glue of signatures
         hashA: hashPoint.X, // G1.X from joGlueResult.hashSrc
         hashB: hashPoint.Y, // G1.Y from joGlueResult.hashSrc
@@ -545,7 +545,7 @@ async function callbackAllMessagesSign( optsTransfer, err, jarrMessages, joGlueR
         weiHowMuchPostIncomingMessages, null );
     if( strErrorOfDryRun )
         throw new Error( strErrorOfDryRun );
-    const opts = {
+    const opts: any = {
         isCheckTransactionToSchain:
             ( optsTransfer.chainNameDst !== "Mainnet" ) ? true : false
     };
@@ -681,7 +681,7 @@ async function checkOutgoingMessageEventInOneNode( optsTransfer, optsOutgoingMes
             optsOutgoingMessageAnalysis.joNode.name, node_r );
         for( let idxEvent = 0; idxEvent < cntEvents; ++ idxEvent ) {
             const joEvent = node_r[idxEvent];
-            const eventValuesByName = {
+            const eventValuesByName: any = {
                 "dstChainHash": joEvent.args[0],
                 "msgCounter": joEvent.args[1],
                 "srcContract": joEvent.args[2],
@@ -745,7 +745,7 @@ async function checkOutgoingMessageEvent( optsTransfer, joSChain ) {
             "{p}{bright} message analysis for message {} of {} with IMA message index {} and " +
             "message envelope data: {}", optsTransfer.strLogPrefix, optsTransfer.strDirection,
             idxMessage + 1, cntMessages, idxImaMessage, joMessage );
-        const optsOutgoingMessageAnalysis = {
+        const optsOutgoingMessageAnalysis: any = {
             idxMessage: idxMessage,
             idxImaMessage: idxImaMessage,
             joMessage: joMessage,
@@ -896,7 +896,7 @@ async function doMainTransferLoopActions( optsTransfer ) {
 
         optsTransfer.details.close();
         optsTransfer.details = optsTransfer.imaState.isDynamicLogInDoTransfer
-            ? log : log.createMemoryStream( true );
+            ? log : log.createMemoryStream();
         optsTransfer.strGatheredDetailsName = `${optsTransfer.strDirection}/#` +
             `${optsTransfer.nTransferLoopCounter}-doTransfer-B-${optsTransfer.chainNameSrc}` +
             `-->${optsTransfer.chainNameDst}`;
@@ -926,9 +926,10 @@ export async function doTransfer(
     joTokenManagerSChain, // for logs validation on s-chain
     nTransactionsCountInBlock,
     nTransferSteps, nMaxTransactionsCount, nBlockAwaitDepth, nBlockAge,
-    fnSignMessages, joExtraSignOpts, transactionCustomizerDst
+    fnSignMessages, joExtraSignOpts,
+    transactionCustomizerDst: imaTx.TransactionCustomizer
 ) {
-    const optsTransfer = {
+    const optsTransfer: any = {
         strDirection: strDirection,
         joRuntimeOpts: joRuntimeOpts,
         ethersProviderSrc: ethersProviderSrc,
@@ -977,7 +978,7 @@ export async function doTransfer(
         `${optsTransfer.strDirection}/#${optsTransfer.nTransferLoopCounter}-doTransfer-A-` +
         `${optsTransfer.chainNameSrc}-->${optsTransfer.chainNameDst}`;
     optsTransfer.details = optsTransfer.imaState.isDynamicLogInDoTransfer
-        ? log : log.createMemoryStream( true );
+        ? log : log.createMemoryStream();
     optsTransfer.strLogPrefixShort =
         `${optsTransfer.strDirection}/#${optsTransfer.nTransferLoopCounter} `;
     optsTransfer.strLogPrefix = `${optsTransfer.strLogPrefixShort}transfer loop from ` +
@@ -1091,7 +1092,7 @@ export async function doAllS2S( // s-chain --> s-chain
     nBlockAwaitDepth,
     nBlockAge,
     fnSignMessages,
-    transactionCustomizerDst
+    transactionCustomizerDst: imaTx.TransactionCustomizer
 ) {
     let cntOK = 0, cntFail = 0, nIndexS2S = 0;
     const sc = imaState.chainProperties.sc;
@@ -1127,7 +1128,7 @@ export async function doAllS2S( // s-chain --> s-chain
                         sc.joAbiIMA.message_proxy_chain_address,
                         sc.joAbiIMA.message_proxy_chain_abi,
                         ethersProviderSrc );
-                    const joExtraSignOpts = {
+                    const joExtraSignOpts: any = {
                         chainNameSrc: chainNameSrc,
                         chainIdSrc: chainIdSrc,
                         chainNameDst: chainNameDst,
@@ -1166,8 +1167,7 @@ export async function doAllS2S( // s-chain --> s-chain
                         nBlockAge,
                         fnSignMessages,
                         joExtraSignOpts,
-                        transactionCustomizerDst
-                    );
+                        transactionCustomizerDst );
                     imaState.loopState.s2s.isInProgress = false;
                     await pwa.notifyOnLoopEnd( imaState, "s2s", nIndexS2S );
                 } else {

@@ -19,7 +19,7 @@
  */
 
 /**
- * @file cli.mjs
+ * @file cli.ts
  * @copyright SKALE Labs 2019-Present
  */
 
@@ -36,7 +36,7 @@ import * as imaOracleOperations from "./imaOracleOperations";
 import * as imaTx from "./imaTx";
 import * as state from "./state";
 
-const __dirname = path.dirname( url.fileURLToPath( import.meta.url ) );
+const __dirname: string = path.dirname( url.fileURLToPath( import.meta.url ) );
 
 const gStrAppName = "IMA AGENT";
 const gStrVersion =
@@ -54,7 +54,7 @@ export function printAbout( isLog?: boolean ) {
     return true;
 }
 
-export function parseCommandLineArgument( s ) {
+export function parseCommandLineArgument( s: string ) {
     const joArg = {
         name: "",
         value: ""
@@ -1317,11 +1317,16 @@ function commonInitPrintSysInfo() {
         log.debug( "This process {sunny} is {}", "versions", process.versions );
         log.debug( "This process {sunny} is {}", "PID", process.pid );
         log.debug( "This process {sunny} is {}", "PPID", process.ppid );
-        log.debug( "This process {sunny} is {}", "EGID", process.getegid() );
-        log.debug( "This process {sunny} is {}", "EUID", process.geteuid() );
-        log.debug( "This process {sunny} is {}", "GID", process.getgid() );
-        log.debug( "This process {sunny} is {}", "UID", process.getuid() );
-        log.debug( "This process {sunny} are {}", "groups", process.getgroups() );
+        log.debug( "This process {sunny} is {}", "EGID",
+            process.getegid ? process.getegid() : "N/A" );
+        log.debug( "This process {sunny} is {}", "EUID",
+            process.geteuid ? process.geteuid() : "N/A" );
+        log.debug( "This process {sunny} is {}", "GID",
+            process.getgid ? process.getgid() : "N/A" );
+        log.debug( "This process {sunny} is {}", "UID",
+            process.getuid ? process.getuid() : "N/A" );
+        log.debug( "This process {sunny} are {}", "groups",
+            process.getgroups ? process.getgroups() : "N/A" );
         log.debug( "This process {sunny} is {}", "CWD", process.cwd() );
         log.debug( "This process {sunny} is {}", "architecture", process.arch );
         log.debug( "This process {sunny} is {}", "execPath", process.execPath );
@@ -2091,7 +2096,7 @@ function commonInitCheckGeneralArgs() {
     }
     ensureHaveValue(
         "App path",
-        path.join( __dirname, "main.mjs" ), false, isPrintGathered, null, ( x ) => {
+        path.join( __dirname, "main.ts" ), false, isPrintGathered, null, ( x ) => {
             return att( x );
         } );
     ensureHaveValue(

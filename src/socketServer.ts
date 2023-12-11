@@ -19,7 +19,7 @@
  */
 
 /**
- * @file socketServer.mjs
+ * @file socketServer.ts
  * @copyright SKALE Labs 2019-Present
  */
 
@@ -36,7 +36,6 @@ export class SocketServer extends EventDispatcher {
     isLogSocketErrors: boolean;
     isLogSocketTraffic: boolean;
     isLogSocketTrafficRaw: boolean;
-    isDisposing: boolean;
     constructor( acceptor: any ) {
         super();
         if( acceptor == null || acceptor == undefined || typeof acceptor != "object" )

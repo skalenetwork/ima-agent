@@ -7,7 +7,7 @@
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * (at your option)  any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,7 +19,7 @@
  */
 
 /**
- * @file discoveryTools.mjs
+ * @file discoveryTools.ts
  * @copyright SKALE Labs 2019-Present
  */
 
@@ -29,7 +29,7 @@ import * as state from "./state";
 import * as imaUtils from "./utils";
 import * as threadInfo from "./threadInfo";
 
-export function formatBalanceInfo( bi, strAddress ) {
+export function formatBalanceInfo( bi: any, strAddress: string ) : string {
     let s = "";
     s += log.fmtInformation( "{p}", bi.assetName );
     if( "assetAddress" in bi &&
@@ -53,7 +53,7 @@ export function formatBalanceInfo( bi, strAddress ) {
     return s;
 }
 
-function getSChainNodesCount( joSChainNetworkInfo ) {
+function getSChainNodesCount( joSChainNetworkInfo: any ) : number {
     try {
         if( ! joSChainNetworkInfo )
             return 0;
@@ -65,7 +65,7 @@ function getSChainNodesCount( joSChainNetworkInfo ) {
     }
 }
 
-export function isSChainNodeFullyDiscovered( joNode ) {
+export function isSChainNodeFullyDiscovered( joNode: any ) : boolean {
     if( ! joNode )
         return false;
     if( joNode && "imaInfo" in joNode && typeof joNode.imaInfo == "object" &&
@@ -102,7 +102,7 @@ export function isSChainNodeFullyDiscovered( joNode ) {
     return false;
 }
 
-export function getSChainDiscoveredNodesCount( joSChainNetworkInfo ) {
+export function getSChainDiscoveredNodesCount( joSChainNetworkInfo: any ) : number {
     try {
         if( ! joSChainNetworkInfo )
             return 0;
@@ -170,14 +170,15 @@ export async function waitUntilSChainStarted() {
     log.success( "Done, S-Chain is accessible and sane." );
 }
 
-export function isSendImaAgentIndex() {
+export function isSendImaAgentIndex() : boolean {
     return true;
 }
 
-let gTimerSChainDiscovery = null;
-let gFlagIsInSChainDiscovery = false;
+let gTimerSChainDiscovery: any = null;
+let gFlagIsInSChainDiscovery: boolean = false;
 
-function composeStillUnknownNodesMessage( joSChainNetworkInfo, cntStillUnknown, cntNodesOnChain ) {
+function composeStillUnknownNodesMessage(
+    joSChainNetworkInfo: any, cntStillUnknown: number, cntNodesOnChain: number ) : string {
     let strMessage = log.fmtSuccess( ", {} of {} still unknown (",
         cntStillUnknown, cntNodesOnChain );
     try {
@@ -201,12 +202,12 @@ function composeStillUnknownNodesMessage( joSChainNetworkInfo, cntStillUnknown, 
     return strMessage;
 }
 
-async function handlePeriodicDiscoveryAttemptActions( isSilentReDiscovery, fnAfter ) {
+async function handlePeriodicDiscoveryAttemptActions( isSilentReDiscovery: boolean, fnAfter: any ) {
     if( gFlagIsInSChainDiscovery ) {
-        isInsideAsyncHandler = false;
         log.information( "Notice: long this S-Chain re-discovery is in progress now..." );
         return;
     }
+    const imaState = state.get();
     fnAfter = fnAfter || function() {};
     gFlagIsInSChainDiscovery = true;
     const cntNodesOnChain = getSChainNodesCount( imaState.joSChainNetworkInfo );
@@ -276,7 +277,8 @@ async function handlePeriodicDiscoveryAttemptActions( isSilentReDiscovery, fnAft
     continueSChainDiscoveryInBackgroundIfNeeded( isSilentReDiscovery, fnAfter );
 }
 
-export async function continueSChainDiscoveryInBackgroundIfNeeded( isSilentReDiscovery, fnAfter ) {
+export async function continueSChainDiscoveryInBackgroundIfNeeded(
+    isSilentReDiscovery: boolean, fnAfter: any ) {
     if( gTimerSChainDiscovery != null )
         return;
     fnAfter = fnAfter || function() {};
@@ -321,8 +323,9 @@ export async function continueSChainDiscoveryInBackgroundIfNeeded( isSilentReDis
 }
 
 function handleDiscoverSkaleImaInfoResult(
-    optsDiscover, strNodeDescColorized, joNode, joCall, joIn, joOut
-) {
+    optsDiscover: any, strNodeDescColorized: string,
+    joNode: any, joCall: any, joIn: any, joOut: any
+) : void {
     joNode.imaInfo = joOut.result;
     if( isSChainNodeFullyDiscovered( joNode ) )
         ++ optsDiscover.nCountReceivedImaDescriptions;
@@ -333,7 +336,7 @@ function handleDiscoverSkaleImaInfoResult(
     }
 }
 
-async function discoverSChainWalkNodes( optsDiscover ) {
+async function discoverSChainWalkNodes( optsDiscover: any ) {
     optsDiscover.cntFailed = 0;
     for( let i = 0; i < optsDiscover.cntNodes; ++ i ) {
         const nCurrentNodeIdx = 0 + i;
@@ -361,13 +364,13 @@ async function discoverSChainWalkNodes( optsDiscover ) {
                 }
             }
         } catch ( err ) { }
-        const rpcCallOpts = null;
-        let joCall = null;
+        const rpcCallOpts: any = null;
+        let joCall: any = null;
         try {
             joCall = await rpcCall.create( strNodeURL, rpcCallOpts );
             if( ! joCall )
                 throw new Error( `Failed to create JSON RPC call object to ${strNodeURL}` );
-            const joIn = { "method": "skale_imaInfo", "params": { } };
+            const joIn: any = { "method": "skale_imaInfo", "params": { } };
             if( isSendImaAgentIndex() )
                 joIn.params.fromImaAgentIndex = optsDiscover.imaState.nNodeNumber;
             const joOut = await joCall.call( joIn );
@@ -386,7 +389,7 @@ async function discoverSChainWalkNodes( optsDiscover ) {
     }
 }
 
-async function discoverSChainWait( optsDiscover ) {
+async function discoverSChainWait( optsDiscover: any ) {
     if( ! optsDiscover.isSilentReDiscovery ) {
         log.debug( "{p}Waiting for response from at least {} node(s)...",
             optsDiscover.strLogPrefix, optsDiscover.nCountToWait );
@@ -454,7 +457,8 @@ async function discoverSChainWait( optsDiscover ) {
     }, nWaitStepMilliseconds );
 }
 
-async function handleDiscoverSkaleNodesRpcInfoResult( optsDiscover, scURL, joCall, joIn, joOut ) {
+async function handleDiscoverSkaleNodesRpcInfoResult(
+    optsDiscover: any, scURL: string, joCall: any, joIn: any, joOut: any ) {
     if( ! optsDiscover.isSilentReDiscovery ) {
         log.trace( "{p}OK, got (own) S-Chain network information: {}",
             optsDiscover.strLogPrefix, joOut.result );
@@ -522,8 +526,9 @@ async function handleDiscoverSkaleNodesRpcInfoResult( optsDiscover, scURL, joCal
 }
 
 export async function discoverSChainNetwork(
-    fnAfter, isSilentReDiscovery, joPrevSChainNetworkInfo, nCountToWait ) {
-    const optsDiscover = {
+    fnAfter: any, isSilentReDiscovery: boolean,
+    joPrevSChainNetworkInfo: any, nCountToWait: number ) {
+    const optsDiscover: any = {
         fnAfter: fnAfter,
         isSilentReDiscovery: ( !!isSilentReDiscovery ),
         joPrevSChainNetworkInfo: joPrevSChainNetworkInfo || null,
@@ -543,14 +548,14 @@ export async function discoverSChainNetwork(
         optsDiscover.nCountToWait = 0;
     if( !optsDiscover.isSilentReDiscovery )
         log.information( "{p}This S-Chain discovery will start...", optsDiscover.strLogPrefix );
-    let joCall = null;
+    let joCall: any = null;
     try {
         const scURL = optsDiscover.imaState.chainProperties.sc.strURL;
-        const rpcCallOpts = null;
+        const rpcCallOpts: any = null;
         joCall = await rpcCall.create( scURL, rpcCallOpts );
         if( ! joCall )
             throw new Error( `Failed to create JSON RPC call object to ${scURL}` );
-        const joIn = { "method": "skale_nodesRpcInfo", "params": { } };
+        const joIn: any = { "method": "skale_nodesRpcInfo", "params": { } };
         if( isSendImaAgentIndex() )
             joIn.params.fromImaAgentIndex = optsDiscover.imaState.nNodeNumber;
         const joOut = await joCall.call( joIn );
@@ -578,9 +583,10 @@ export async function discoverSChainNetwork(
     return optsDiscover.joSChainNetworkInfo;
 }
 
-let gIntervalPeriodicDiscovery = null;
+let gIntervalPeriodicDiscovery: any = null;
 
-function checkPeriodicDiscoveryNoLongerNeeded( joSChainNetworkInfo, isSilentReDiscovery ) {
+function checkPeriodicDiscoveryNoLongerNeeded(
+    joSChainNetworkInfo: any, isSilentReDiscovery: boolean ) {
     if( ! joSChainNetworkInfo )
         return false;
     const imaState = state.get();
@@ -601,7 +607,7 @@ function checkPeriodicDiscoveryNoLongerNeeded( joSChainNetworkInfo, isSilentReDi
 }
 
 export async function doPeriodicSChainNetworkDiscoveryIfNeeded(
-    isSilentReDiscovery, fnAfterRediscover
+    isSilentReDiscovery: boolean, fnAfterRediscover: any
 ) {
     if( gIntervalPeriodicDiscovery )
         return; // already started
@@ -633,7 +639,7 @@ export async function doPeriodicSChainNetworkDiscoveryIfNeeded(
         await discoverSChainNetwork(
             null, isSilentReDiscovery, joPrevSChainNetworkInfo, nCountToWait );
         joPrevSChainNetworkInfo = imaState.joSChainNetworkInfo;
-        imaState.joSChainNetworkInfo = joSChainNetworkInfo;
+        imaState.joSChainNetworkInfo = imaState.joSChainNetworkInfo;
         if( checkPeriodicDiscoveryNoLongerNeeded(
             joPrevSChainNetworkInfo, isSilentReDiscovery ) ) {
             if( ! isSilentReDiscovery )

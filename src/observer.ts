@@ -19,7 +19,7 @@
  */
 
 /**
- * @file observer.mjs
+ * @file observer.ts
  * @copyright SKALE Labs 2019-Present
  */
 

@@ -7,7 +7,7 @@
  * SKALE IMA is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * (at your option)  any later version.
  *
  * SKALE IMA is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,7 +19,7 @@
  */
 
 /**
- * @file imaTokenOperations.mjs
+ * @file imaTokenOperations.ts
  * @copyright SKALE Labs 2019-Present
  */
 
@@ -32,12 +32,12 @@ import * as imaEventLogScan from "./imaEventLogScan";
 import * as threadInfo from "./threadInfo";
 
 export async function getBalanceErc20(
-    isMainNet,
-    ethersProvider,
-    chainId,
-    joAccount,
-    strCoinName,
-    joABI
+    isMainNet: boolean,
+    ethersProvider: any,
+    chainId: string,
+    joAccount: any,
+    strCoinName: string,
+    joABI: any
 ) {
     const strLogPrefix = "getBalanceErc20() call ";
     try {
@@ -61,13 +61,13 @@ export async function getBalanceErc20(
 }
 
 export async function getOwnerOfErc721(
-    isMainNet,
-    ethersProvider,
-    chainId,
-    joAccount,
-    strCoinName,
-    joABI,
-    idToken
+    isMainNet: boolean,
+    ethersProvider: any,
+    chainId: string,
+    joAccount: any,
+    strCoinName: string,
+    joABI: any,
+    idToken: any
 ) {
     const strLogPrefix = "getOwnerOfErc721() call ";
     try {
@@ -75,7 +75,7 @@ export async function getOwnerOfErc721(
                 joABI && ( strCoinName + "_address" ) in joABI ) )
             return "<no-data>";
         const strAddress = joAccount.address();
-        const contractERC721 = owaspUtils.ethersMod.ethers.Contract(
+        const contractERC721: any = new owaspUtils.ethersMod.ethers.Contract(
             joABI[strCoinName + "_address"],
             joABI[strCoinName + "_abi"],
             ethersProvider
@@ -90,13 +90,13 @@ export async function getOwnerOfErc721(
 }
 
 export async function getBalanceErc1155(
-    isMainNet,
-    ethersProvider,
-    chainId,
-    joAccount,
-    strCoinName,
-    joABI,
-    idToken
+    isMainNet: boolean,
+    ethersProvider: any,
+    chainId: string,
+    joAccount: any,
+    strCoinName: string,
+    joABI: any,
+    idToken: any
 ) {
     const strLogPrefix = "getBalanceErc1155() call ";
     try {
@@ -120,26 +120,26 @@ export async function getBalanceErc1155(
 }
 
 export async function doErc721PaymentFromMainNet(
-    ethersProviderMainNet,
-    ethersProviderSChain,
-    chainIdMainNet,
-    chainIdSChain,
-    joAccountSrc,
-    joAccountDst,
-    joDepositBoxERC721,
-    joMessageProxyMainNet, // for checking logs
-    chainNameSChain,
-    tokenId, // which ERC721 token id to send
-    weiHowMuch, // how much ETH
-    joTokenManagerERC721, // only s-chain
-    strCoinNameErc721MainNet,
-    erc721PrivateTestnetJsonMainNet,
-    strCoinNameErc721SChain,
-    erc721PrivateTestnetJsonSChain,
-    transactionCustomizerMainNet
+    ethersProviderMainNet: any,
+    ethersProviderSChain: any,
+    chainIdMainNet: string,
+    chainIdSChain: string,
+    joAccountSrc: any,
+    joAccountDst: any,
+    joDepositBoxERC721: any,
+    joMessageProxyMainNet: any, // for checking logs
+    chainNameSChain: string,
+    tokenId: any, // which ERC721 token id to send
+    weiHowMuch: any, // how much ETH
+    joTokenManagerERC721: any, // only s-chain
+    strCoinNameErc721MainNet: string,
+    erc721PrivateTestnetJsonMainNet: any,
+    strCoinNameErc721SChain: string,
+    erc721PrivateTestnetJsonSChain: any,
+    transactionCustomizerMainNet: imaTx.TransactionCustomizer
 ) {
     const details = log.createMemoryStream();
-    const jarrReceipts = [];
+    const jarrReceipts: any = [];
     let strActionName = "";
     const strLogPrefix = "M2S ERC721 Payment: ";
     try {
@@ -258,26 +258,26 @@ export async function doErc721PaymentFromMainNet(
 }
 
 export async function doErc20PaymentFromMainNet(
-    ethersProviderMainNet,
-    ethersProviderSChain,
-    chainIdMainNet,
-    chainIdSChain,
-    joAccountSrc,
-    joAccountDst,
-    joDepositBoxERC20,
-    joMessageProxyMainNet, // for checking logs
-    chainNameSChain,
-    tokenAmount, // how much ERC20 tokens to send
-    weiHowMuch, // how much ETH
-    joTokenManagerERC20, // only s-chain
-    strCoinNameErc20MainNet,
-    erc20MainNet,
-    strCoinNameErc20SChain,
-    erc20SChain,
-    transactionCustomizerMainNet
+    ethersProviderMainNet: any,
+    ethersProviderSChain: any,
+    chainIdMainNet: string,
+    chainIdSChain: string,
+    joAccountSrc: any,
+    joAccountDst: any,
+    joDepositBoxERC20: any,
+    joMessageProxyMainNet: any, // for checking logs
+    chainNameSChain: string,
+    tokenAmount: any, // how much ERC20 tokens to send
+    weiHowMuch: any, // how much ETH
+    joTokenManagerERC20: any, // only s-chain
+    strCoinNameErc20MainNet: string,
+    erc20MainNet: any,
+    strCoinNameErc20SChain: string,
+    erc20SChain: any,
+    transactionCustomizerMainNet: imaTx.TransactionCustomizer
 ) {
     const details = log.createMemoryStream();
-    const jarrReceipts = [];
+    const jarrReceipts: any = [];
     let strActionName = "";
     const strLogPrefix = "M2S ERC20 Payment: ";
     try {
@@ -395,27 +395,27 @@ export async function doErc20PaymentFromMainNet(
 }
 
 export async function doErc1155PaymentFromMainNet(
-    ethersProviderMainNet,
-    ethersProviderSChain,
-    chainIdMainNet,
-    chainIdSChain,
-    joAccountSrc,
-    joAccountDst,
-    joDepositBoxERC1155,
-    joMessageProxyMainNet, // for checking logs
-    chainNameSChain,
-    tokenId, // which ERC1155 token id to send
-    tokenAmount, // which ERC1155 token id to send
-    weiHowMuch, // how much ETH
-    joTokenManagerERC1155, // only s-chain
-    strCoinNameErc1155SMainNet,
-    erc1155PrivateTestnetJsonMainNet,
-    strCoinNameErc1155SChain,
-    erc1155PrivateTestnetJsonSChain,
-    transactionCustomizerMainNet
+    ethersProviderMainNet: any,
+    ethersProviderSChain: any,
+    chainIdMainNet: string,
+    chainIdSChain: string,
+    joAccountSrc: any,
+    joAccountDst: any,
+    joDepositBoxERC1155: any,
+    joMessageProxyMainNet: any, // for checking logs
+    chainNameSChain: string,
+    tokenId: any, // which ERC1155 token id to send
+    tokenAmount: any, // which ERC1155 token id to send
+    weiHowMuch: any, // how much ETH
+    joTokenManagerERC1155: any, // only s-chain
+    strCoinNameErc1155SMainNet: string,
+    erc1155PrivateTestnetJsonMainNet: any,
+    strCoinNameErc1155SChain: string,
+    erc1155PrivateTestnetJsonSChain: any,
+    transactionCustomizerMainNet: imaTx.TransactionCustomizer
 ) {
     const details = log.createMemoryStream();
-    const jarrReceipts = [];
+    const jarrReceipts: any = [];
     let strActionName = "";
     const strLogPrefix = "M2S ERC1155 Payment: ";
     try {
@@ -542,22 +542,23 @@ export async function doErc1155PaymentFromMainNet(
 }
 
 export async function doErc1155BatchPaymentFromMainNet(
-    ethersProviderMainNet, ethersProviderSChain,
-    chainIdMainNet, chainIdSChain,
-    joAccountSrc, joAccountDst,
-    joDepositBoxERC1155,
-    joMessageProxyMainNet, // for checking logs
-    chainNameSChain,
-    arrTokenIds, // which ERC1155 token id to send
-    arrTokenAmounts, // which ERC1155 token id to send
-    weiHowMuch, // how much ETH
-    joTokenManagerERC1155, // only s-chain
-    strCoinNameErc1155SMainNet,
-    erc1155PrivateTestnetJsonMainNet, strCoinNameErc1155SChain,
-    erc1155PrivateTestnetJsonSChain, transactionCustomizerMainNet
+    ethersProviderMainNet: any, ethersProviderSChain: any,
+    chainIdMainNet: string, chainIdSChain: string,
+    joAccountSrc: any, joAccountDst: any,
+    joDepositBoxERC1155: any,
+    joMessageProxyMainNet: any, // for checking logs
+    chainNameSChain: string,
+    arrTokenIds: any[], // which ERC1155 token id to send
+    arrTokenAmounts: any[], // which ERC1155 token id to send
+    weiHowMuch: any, // how much ETH
+    joTokenManagerERC1155: any, // only s-chain
+    strCoinNameErc1155SMainNet: string,
+    erc1155PrivateTestnetJsonMainNet: any, strCoinNameErc1155SChain: string,
+    erc1155PrivateTestnetJsonSChain: any,
+    transactionCustomizerMainNet: imaTx.TransactionCustomizer
 ) {
     const details = log.createMemoryStream();
-    const jarrReceipts = [];
+    const jarrReceipts: any = [];
     let strActionName = "";
     const strLogPrefix = "M2S ERC1155 Batch Payment: ";
     try {
@@ -669,25 +670,25 @@ export async function doErc1155BatchPaymentFromMainNet(
 }
 
 export async function doErc20PaymentFromSChain(
-    ethersProviderMainNet,
-    ethersProviderSChain,
-    chainIdMainNet,
-    chainIdSChain,
-    joAccountSrc,
-    joAccountDst,
-    joTokenManagerERC20, // only s-chain
-    joMessageProxySChain, // for checking logs
-    joDepositBox, // only main net
-    tokenAmount, // how much ERC20 tokens to send
-    weiHowMuch, // how much ETH
-    strCoinNameErc20MainNet,
-    joErc20MainNet,
-    strCoinNameErc20SChain,
-    joErc20SChain,
-    transactionCustomizerSChain
+    ethersProviderMainNet: any,
+    ethersProviderSChain: any,
+    chainIdMainNet: string,
+    chainIdSChain: string,
+    joAccountSrc: any,
+    joAccountDst: any,
+    joTokenManagerERC20: any, // only s-chain
+    joMessageProxySChain: any, // for checking logs
+    joDepositBox: any, // only main net
+    tokenAmount: any, // how much ERC20 tokens to send
+    weiHowMuch: any, // how much ETH
+    strCoinNameErc20MainNet: string,
+    joErc20MainNet: any,
+    strCoinNameErc20SChain: string,
+    joErc20SChain: any,
+    transactionCustomizerSChain: imaTx.TransactionCustomizer
 ) {
     const details = log.createMemoryStream();
-    const jarrReceipts = [];
+    const jarrReceipts: any = [];
     let strActionName = "";
     const strLogPrefix = "S2M ERC20 Payment: ";
     try {
@@ -723,7 +724,7 @@ export async function doErc20PaymentFromSChain(
             weiHowMuchApprove, null );
         if( strErrorOfDryRunApprove )
             throw new Error( strErrorOfDryRunApprove );
-        const opts = { isCheckTransactionToSchain: true };
+        const opts: any = { isCheckTransactionToSchain: true };
         const joReceiptApprove = await imaTx.payedCall(
             details, ethersProviderSChain,
             "ERC20", contractERC20, "approve", arrArgumentsApprove,
@@ -813,25 +814,25 @@ export async function doErc20PaymentFromSChain(
 }
 
 export async function doErc721PaymentFromSChain(
-    ethersProviderMainNet,
-    ethersProviderSChain,
-    chainIdMainNet,
-    chainIdSChain,
-    joAccountSrc,
-    joAccountDst,
-    joTokenManagerERC721, // only s-chain
-    joMessageProxySChain, // for checking logs
-    joDepositBox, // only main net
-    tokenId, // which ERC721 token id to send
-    weiHowMuch, // how much ETH
-    strCoinNameErc721MainNet,
-    joErc721MainNet,
-    strCoinNameErc721SChain,
-    joErc721SChain,
-    transactionCustomizerSChain
+    ethersProviderMainNet: any,
+    ethersProviderSChain: any,
+    chainIdMainNet: string,
+    chainIdSChain: string,
+    joAccountSrc: any,
+    joAccountDst: any,
+    joTokenManagerERC721: any, // only s-chain
+    joMessageProxySChain: any, // for checking logs
+    joDepositBox: any, // only main net
+    tokenId: any, // which ERC721 token id to send
+    weiHowMuch: any, // how much ETH
+    strCoinNameErc721MainNet: string,
+    joErc721MainNet: any,
+    strCoinNameErc721SChain: string,
+    joErc721SChain: any,
+    transactionCustomizerSChain: imaTx.TransactionCustomizer
 ) {
     const details = log.createMemoryStream();
-    const jarrReceipts = [];
+    const jarrReceipts: any = [];
     let strActionName = "";
     const strLogPrefix = "S2M ERC721 Payment: ";
     try {
@@ -869,7 +870,7 @@ export async function doErc721PaymentFromSChain(
             gasPrice, estimatedGasApprove, weiHowMuchApprove, null );
         if( strErrorOfDryRunApprove )
             throw new Error( strErrorOfDryRunApprove );
-        const opts = { isCheckTransactionToSchain: true };
+        const opts: any = { isCheckTransactionToSchain: true };
         const joReceiptApprove = await imaTx.payedCall(
             details, ethersProviderSChain,
             "ERC721", contractERC721, "approve", arrArgumentsApprove,
@@ -961,26 +962,26 @@ export async function doErc721PaymentFromSChain(
 }
 
 export async function doErc1155PaymentFromSChain(
-    ethersProviderMainNet,
-    ethersProviderSChain,
-    chainIdMainNet,
-    chainIdSChain,
-    joAccountSrc,
-    joAccountDst,
-    joTokenManagerERC1155, // only s-chain
-    joMessageProxySChain, // for checking logs
-    joDepositBox, // only main net
-    tokenId, // which ERC1155 token id to send
-    tokenAmount, // which ERC1155 token id to send
-    weiHowMuch, // how much ETH
-    strCoinNameErc1155SMainNet,
-    joErc1155MainNet,
-    strCoinNameErc1155SChain,
-    joErc1155Chain,
-    transactionCustomizerSChain
+    ethersProviderMainNet: any,
+    ethersProviderSChain: any,
+    chainIdMainNet: string,
+    chainIdSChain: string,
+    joAccountSrc: any,
+    joAccountDst: any,
+    joTokenManagerERC1155: any, // only s-chain
+    joMessageProxySChain: any, // for checking logs
+    joDepositBox: any, // only main net
+    tokenId: any, // which ERC1155 token id to send
+    tokenAmount: any, // which ERC1155 token id to send
+    weiHowMuch: any, // how much ETH
+    strCoinNameErc1155SMainNet: string,
+    joErc1155MainNet: any,
+    strCoinNameErc1155SChain: string,
+    joErc1155Chain: any,
+    transactionCustomizerSChain: imaTx.TransactionCustomizer
 ) {
     const details = log.createMemoryStream();
-    const jarrReceipts = [];
+    const jarrReceipts: any = [];
     let strActionName = "";
     const strLogPrefix = "S2M ERC1155 Payment: ";
     try {
@@ -1017,7 +1018,7 @@ export async function doErc1155PaymentFromSChain(
             gasPrice, estimatedGasApprove, weiHowMuchApprove, null );
         if( strErrorOfDryRunApprove )
             throw new Error( strErrorOfDryRunApprove );
-        const opts = { isCheckTransactionToSchain: true };
+        const opts: any = { isCheckTransactionToSchain: true };
         const joReceiptApprove = await imaTx.payedCall(
             details, ethersProviderSChain,
             "ERC1155", contractERC1155, "setApprovalForAll", arrArgumentsApprove,
@@ -1108,26 +1109,26 @@ export async function doErc1155PaymentFromSChain(
 }
 
 export async function doErc1155BatchPaymentFromSChain(
-    ethersProviderMainNet,
-    ethersProviderSChain,
-    chainIdMainNet,
-    chainIdSChain,
-    joAccountSrc,
-    joAccountDst,
-    joTokenManagerERC1155, // only s-chain
-    joMessageProxySChain, // for checking logs
-    joDepositBox, // only main net
-    arrTokenIds, // which ERC1155 token ids to send
-    arrTokenAmounts, // which ERC1155 token amounts to send
-    weiHowMuch, // how much ETH
-    strCoinNameErc1155SMainNet,
-    joErc1155MainNet,
-    strCoinNameErc1155SChain,
-    joErc1155Chain,
-    transactionCustomizerSChain
+    ethersProviderMainNet: any,
+    ethersProviderSChain: any,
+    chainIdMainNet: string,
+    chainIdSChain: string,
+    joAccountSrc: any,
+    joAccountDst: any,
+    joTokenManagerERC1155: any, // only s-chain
+    joMessageProxySChain: any, // for checking logs
+    joDepositBox: any, // only main net
+    arrTokenIds: any[], // which ERC1155 token ids to send
+    arrTokenAmounts: any[], // which ERC1155 token amounts to send
+    weiHowMuch: any, // how much ETH
+    strCoinNameErc1155SMainNet: string,
+    joErc1155MainNet: any,
+    strCoinNameErc1155SChain: string,
+    joErc1155Chain: any,
+    transactionCustomizerSChain: imaTx.TransactionCustomizer
 ) {
     const details = log.createMemoryStream();
-    const jarrReceipts = [];
+    const jarrReceipts: any = [];
     let strActionName = "";
     const strLogPrefix = "S2M ERC1155 Batch Payment: ";
     try {
@@ -1160,7 +1161,7 @@ export async function doErc1155BatchPaymentFromSChain(
             gasPrice, estimatedGasApprove, weiHowMuchApprove, null );
         if( strErrorOfDryRunApprove )
             throw new Error( strErrorOfDryRunApprove );
-        const opts = { isCheckTransactionToSchain: true };
+        const opts: any = { isCheckTransactionToSchain: true };
         const joReceiptApprove = await imaTx.payedCall(
             details, ethersProviderSChain,
             "ERC1155", contractERC1155, "setApprovalForAll", arrArgumentsApprove,
@@ -1254,22 +1255,22 @@ export async function doErc1155BatchPaymentFromSChain(
 }
 
 export async function doErc20PaymentS2S(
-    isForward,
-    ethersProviderSrc,
-    chainIdSrc,
-    strChainNameDst,
-    joAccountSrc,
-    joTokenManagerERC20Src,
-    nAmountOfToken, // how much ERC20 tokens to send
-    nAmountOfWei, // how much to send
-    strCoinNameErc20Src,
-    joSrcErc20,
-    ercDstAddress20, // only reverse payment needs it
-    tc
+    isForward: boolean,
+    ethersProviderSrc: any,
+    chainIdSrc: string,
+    strChainNameDst: string,
+    joAccountSrc: any,
+    joTokenManagerERC20Src: any,
+    nAmountOfToken: any, // how much ERC20 tokens to send
+    nAmountOfWei: any, // how much to send
+    strCoinNameErc20Src: string,
+    joSrcErc20: any,
+    ercDstAddress20: any, // only reverse payment needs it
+    tc: imaTx.TransactionCustomizer
 ) {
     const isReverse = isForward ? false : true;
     const details = log.createMemoryStream();
-    const jarrReceipts = [];
+    const jarrReceipts: any = [];
     let strActionName = "";
     const strLogPrefix = `S2S ERC20 Payment(${( isForward ? "forward" : "reverse" )}:): `;
     try {
@@ -1394,22 +1395,22 @@ export async function doErc20PaymentS2S(
 }
 
 export async function doErc721PaymentS2S(
-    isForward,
-    ethersProviderSrc,
-    chainIdSrc,
-    strChainNameDst,
-    joAccountSrc,
-    joTokenManagerERC721Src,
-    tokenId, // which ERC721 token id to send
-    nAmountOfWei, // how much to send
-    strCoinNameErc721Src,
-    joSrcErc721,
-    ercDstAddress721, // only reverse payment needs it
-    tc
+    isForward: boolean,
+    ethersProviderSrc: any,
+    chainIdSrc: string,
+    strChainNameDst: string,
+    joAccountSrc: any,
+    joTokenManagerERC721Src: any,
+    tokenId: any, // which ERC721 token id to send
+    nAmountOfWei: any, // how much to send
+    strCoinNameErc721Src: string,
+    joSrcErc721: any,
+    ercDstAddress721: any, // only reverse payment needs it
+    tc: imaTx.TransactionCustomizer
 ) {
     const isReverse = isForward ? false : true;
     const details = log.createMemoryStream();
-    const jarrReceipts = [];
+    const jarrReceipts: any = [];
     let strActionName = "";
     const strLogPrefix = `S2S ERC721 Payment(${( isForward ? "forward" : "reverse" )}: `;
     try {
@@ -1538,23 +1539,23 @@ export async function doErc721PaymentS2S(
 }
 
 export async function doErc1155PaymentS2S(
-    isForward,
-    ethersProviderSrc,
-    chainIdSrc,
-    strChainNameDst,
-    joAccountSrc,
-    joTokenManagerERC1155Src,
-    tokenId, // which ERC721 token id to send
-    nAmountOfToken, // how much ERC1155 tokens to send
-    nAmountOfWei, // how much to send
-    strCoinNameErc1155Src,
-    joSrcErc1155,
-    ercDstAddress1155, // only reverse payment needs it
-    tc
+    isForward: boolean,
+    ethersProviderSrc: any,
+    chainIdSrc: string,
+    strChainNameDst: string,
+    joAccountSrc: any,
+    joTokenManagerERC1155Src: any,
+    tokenId: any, // which ERC721 token id to send
+    nAmountOfToken: any, // how much ERC1155 tokens to send
+    nAmountOfWei: any, // how much to send
+    strCoinNameErc1155Src: string,
+    joSrcErc1155: any,
+    ercDstAddress1155: any, // only reverse payment needs it
+    tc: imaTx.TransactionCustomizer
 ) {
     const isReverse = isForward ? false : true;
     const details = log.createMemoryStream();
-    const jarrReceipts = [];
+    const jarrReceipts: any = [];
     let strActionName = "";
     const strLogPrefix = `S2S ERC1155 Payment(${( isForward ? "forward" : "reverse" )}): `;
     try {
@@ -1683,23 +1684,23 @@ export async function doErc1155PaymentS2S(
 }
 
 export async function doErc1155BatchPaymentS2S(
-    isForward,
-    ethersProviderSrc,
-    chainIdSrc,
-    strChainNameDst,
-    joAccountSrc,
-    joTokenManagerERC1155Src,
-    arrTokenIds, // which ERC1155 token id to send
-    arrTokenAmounts, // which ERC1155 token id to send
-    nAmountOfWei, // how much to send
-    strCoinNameErc1155Src,
-    joSrcErc1155,
-    ercDstAddress1155, // only reverse payment needs it
-    tc
+    isForward: boolean,
+    ethersProviderSrc: any,
+    chainIdSrc: string,
+    strChainNameDst: string,
+    joAccountSrc: any,
+    joTokenManagerERC1155Src: any,
+    arrTokenIds: any[], // which ERC1155 token id to send
+    arrTokenAmounts: any[], // which ERC1155 token id to send
+    nAmountOfWei: any, // how much to send
+    strCoinNameErc1155Src: string,
+    joSrcErc1155: any,
+    ercDstAddress1155: any, // only reverse payment needs it
+    tc: imaTx.TransactionCustomizer
 ) {
     const isReverse = isForward ? false : true;
     const details = log.createMemoryStream();
-    const jarrReceipts = [];
+    const jarrReceipts: any = [];
     let strActionName = "";
     const strLogPrefix = `S2S Batch ERC1155 Payment(${( isForward ? "forward" : "reverse" )}: `;
     try {
@@ -1830,15 +1831,15 @@ export async function doErc1155BatchPaymentS2S(
 }
 
 export async function mintErc20(
-    ethersProvider,
-    chainId,
-    chainName,
-    joAccount,
-    strAddressMintTo,
-    nAmount,
-    strTokenContractAddress,
-    joTokenContractABI,
-    tc
+    ethersProvider: any,
+    chainId: string,
+    chainName: string,
+    joAccount: any,
+    strAddressMintTo: string,
+    nAmount: any,
+    strTokenContractAddress: string,
+    joTokenContractABI: any,
+    tc: imaTx.TransactionCustomizer
 ) {
     let strActionName = "mintErc20() init";
     const strLogPrefix = "mintErc20() call ";
@@ -1876,7 +1877,7 @@ export async function mintErc20(
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
-        const opts = { isCheckTransactionToSchain: ( chainNameDst !== "Mainnet" ) ? true : false };
+        const opts: any = { isCheckTransactionToSchain: ( chainName !== "Mainnet" ) ? true : false };
         const joReceipt = await imaTx.payedCall(
             details, ethersProvider,
             "ERC20", contract, "mint", arrArgumentsMint,
@@ -1899,15 +1900,15 @@ export async function mintErc20(
 }
 
 export async function mintErc721(
-    ethersProvider,
-    chainId,
-    chainName,
-    joAccount,
-    strAddressMintTo,
-    idToken,
-    strTokenContractAddress,
-    joTokenContractABI,
-    tc
+    ethersProvider: any,
+    chainId: string,
+    chainName: string,
+    joAccount: any,
+    strAddressMintTo: string,
+    idToken: any,
+    strTokenContractAddress: string,
+    joTokenContractABI: any,
+    tc: imaTx.TransactionCustomizer
 ) {
     let strActionName = "mintErc721() init";
     const strLogPrefix = "mintErc721() call ";
@@ -1945,7 +1946,7 @@ export async function mintErc721(
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
-        const opts = { isCheckTransactionToSchain: ( chainNameDst !== "Mainnet" ) ? true : false };
+        const opts: any = { isCheckTransactionToSchain: ( chainName !== "Mainnet" ) ? true : false };
         const joReceipt = await imaTx.payedCall(
             details, ethersProvider,
             "ERC721", contract, "mint", arrArgumentsMint,
@@ -1968,16 +1969,16 @@ export async function mintErc721(
 }
 
 export async function mintErc1155(
-    ethersProvider,
-    chainId,
-    chainName,
-    joAccount,
-    strAddressMintTo,
-    idToken,
-    nAmount,
-    strTokenContractAddress,
-    joTokenContractABI,
-    tc
+    ethersProvider: any,
+    chainId: string,
+    chainName: any,
+    joAccount: any,
+    strAddressMintTo: string,
+    idToken: any,
+    nAmount: any,
+    strTokenContractAddress: string,
+    joTokenContractABI: any,
+    tc: imaTx.TransactionCustomizer
 ) {
     let strActionName = "mintErc1155() init";
     const strLogPrefix = "mintErc1155() call ";
@@ -2018,7 +2019,7 @@ export async function mintErc1155(
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
-        const opts = { isCheckTransactionToSchain: ( chainNameDst !== "Mainnet" ) ? true : false };
+        const opts: any = { isCheckTransactionToSchain: ( chainName !== "Mainnet" ) ? true : false };
         const joReceipt = await imaTx.payedCall(
             details, ethersProvider,
             "ERC1155", contract, "mint", arrArgumentsMint,
@@ -2041,15 +2042,15 @@ export async function mintErc1155(
 }
 
 export async function burnErc20(
-    ethersProvider,
-    chainId,
-    chainName,
-    joAccount,
-    strAddressBurnFrom,
-    nAmount,
-    strTokenContractAddress,
-    joTokenContractABI,
-    tc
+    ethersProvider: any,
+    chainId: string,
+    chainName: string,
+    joAccount: any,
+    strAddressBurnFrom: string,
+    nAmount: any,
+    strTokenContractAddress: string,
+    joTokenContractABI: any,
+    tc: imaTx.TransactionCustomizer
 ) {
     let strActionName = "burnErc20() init";
     const strLogPrefix = "burnErc20() call ";
@@ -2087,7 +2088,7 @@ export async function burnErc20(
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
-        const opts = { isCheckTransactionToSchain: ( chainNameDst !== "Mainnet" ) ? true : false };
+        const opts: any = { isCheckTransactionToSchain: ( chainName !== "Mainnet" ) ? true : false };
         const joReceipt = await imaTx.payedCall(
             details, ethersProvider,
             "ERC20", contract, "burnFrom", arrArgumentsBurn,
@@ -2110,14 +2111,14 @@ export async function burnErc20(
 }
 
 export async function burnErc721(
-    ethersProvider,
-    chainId,
-    chainName,
-    joAccount,
-    idToken,
-    strTokenContractAddress,
-    joTokenContractABI,
-    tc
+    ethersProvider: any,
+    chainId: string,
+    chainName: string,
+    joAccount: any,
+    idToken: any,
+    strTokenContractAddress: string,
+    joTokenContractABI: any,
+    tc: imaTx.TransactionCustomizer
 ) {
     let strActionName = "burnErc721() init";
     const strLogPrefix = "burnErc721() call ";
@@ -2153,7 +2154,7 @@ export async function burnErc721(
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
-        const opts = { isCheckTransactionToSchain: ( chainNameDst !== "Mainnet" ) ? true : false };
+        const opts: any = { isCheckTransactionToSchain: ( chainName !== "Mainnet" ) ? true : false };
         const joReceipt = await imaTx.payedCall(
             details, ethersProvider,
             "ERC721", contract, "burn", arrArgumentsBurn,
@@ -2176,16 +2177,16 @@ export async function burnErc721(
 }
 
 export async function burnErc1155(
-    ethersProvider,
-    chainId,
-    chainName,
-    joAccount,
-    strAddressBurnFrom,
-    idToken,
-    nAmount,
-    strTokenContractAddress,
-    joTokenContractABI,
-    tc
+    ethersProvider: any,
+    chainId: string,
+    chainName: string,
+    joAccount: any,
+    strAddressBurnFrom: string,
+    idToken: any,
+    nAmount: any,
+    strTokenContractAddress: string,
+    joTokenContractABI: any,
+    tc: imaTx.TransactionCustomizer
 ) {
     let strActionName = "burnErc1155() init";
     const strLogPrefix = "burnErc1155() call ";
@@ -2225,7 +2226,7 @@ export async function burnErc1155(
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
-        const opts = { isCheckTransactionToSchain: ( chainNameDst !== "Mainnet" ) ? true : false };
+        const opts: any = { isCheckTransactionToSchain: ( chainName !== "Mainnet" ) ? true : false };
         const joReceipt = await imaTx.payedCall(
             details, ethersProvider,
             "ERC1155", contract, "burn", arrArgumentsBurn,

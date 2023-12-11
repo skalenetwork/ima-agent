@@ -7,7 +7,7 @@
  * SKALE IMA is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * (at your option)  any later version.
  *
  * SKALE IMA is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,7 +19,7 @@
  */
 
 /**
- * @file cc.mjs
+ * @file cc.ts
  * @copyright SKALE Labs 2019-Present
  */
 
@@ -425,7 +425,7 @@ export const getCircularReplacerForJsonStringify = () : any => {
     };
 };
 
-export const jsonColorizer = { // see http://jsfiddle.net/unLSJ/
+export const jsonColorizer: any = { // see http://jsfiddle.net/unLSJ/
     cntCensoredMax: 30000, // zero to disable censoring
     censor: ( censor: any ) : any => {
         let i = 0;

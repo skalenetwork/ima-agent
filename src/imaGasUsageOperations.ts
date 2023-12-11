@@ -19,16 +19,16 @@
  */
 
 /**
- * @file imaGasUsageOperations.mjs
+ * @file imaGasUsageOperations.ts
  * @copyright SKALE Labs 2019-Present
  */
 
 import * as log from "./log";
 import * as owaspUtils from "./owaspUtils";
 
-export function composeGasUsageReportFromArray( strName, jarrReceipts ) {
+export function composeGasUsageReportFromArray( strName: string, jarrReceipts: any[] ) : any {
     if( ! ( strName && typeof strName == "string" && jarrReceipts ) )
-        return "";
+        return { "sumGasUsed": 0, "strReport": "N/A" };
     let i, sumGasUsed = owaspUtils.toBN( "0" ),
         s = "\n" + log.fmtInformation( "Gas usage report for " ) +
             log.fmtInformation( "{p}\n", strName );
@@ -45,7 +45,8 @@ export function composeGasUsageReportFromArray( strName, jarrReceipts ) {
     return { "sumGasUsed": sumGasUsed, "strReport": s };
 }
 
-export function printGasUsageReportFromArray( strName, jarrReceipts, details ) {
+export function printGasUsageReportFromArray(
+    strName: string, jarrReceipts: any[], details?: any ) {
     details = details || log;
     const jo: any = composeGasUsageReportFromArray( strName, jarrReceipts );
     if( jo.strReport && typeof jo.strReport == "string" && jo.strReport.length > 0 &&
