@@ -757,6 +757,8 @@ export function toBN( arg: any ) : any {
     } else if( typeof arg === "object" && arg.toString && (!arg.pop && !arg.push) ) {
         if( arg.toString().match(/^-?[0-9]+$/) && (arg.mul || arg.dividedToIntegerBy) )
             return toBNbasic(arg.toString(), 10);
+    } else if( arg ) {
+        return toBNbasic( arg ); // try to convert as is
     }
     throw new Error(
         "Error in owaspUtils.toBN() while converting " +
