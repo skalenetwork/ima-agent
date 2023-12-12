@@ -2096,7 +2096,7 @@ function commonInitCheckGeneralArgs() {
     }
     ensureHaveValue(
         "App path",
-        path.join( __dirname, "main.ts" ), false, isPrintGathered, null, ( x: any ) => {
+        path.join( __dirname, "main.js" ), false, isPrintGathered, null, ( x: any ) => {
             return att( x );
         } );
     ensureHaveValue(

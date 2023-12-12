@@ -515,7 +515,7 @@ export async function ensureHaveWorkers( opts: any ) {
             "colorization": { isEnabled: log.isEnabledColorization() }
         };
         gArrWorkers.push( new threadInfo.Worker(
-            path.join( __dirname, "loopWorker.ts" ),
+            path.join( __dirname, "loopWorker.js" ),
             { // "type": "module",
             "workerData": workerData }
         ) );
