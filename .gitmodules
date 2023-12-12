@@ -5,5 +5,5 @@
 	path = hardhat-node
 	url = https://github.com/skalenetwork/hardhat-node.git
 [submodule "network-browser/helper-scripts"]
-	path = network-browser/helper-scripts
+	path = helper-scripts
 	url = https://github.com/skalenetwork/helper-scripts.git
