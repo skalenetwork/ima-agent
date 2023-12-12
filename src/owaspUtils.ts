@@ -727,6 +727,8 @@ export function stripHexPrefix( s: any ) : string {
 
 export function toBNbasic( x?: any, optionalRadix?: number ) : any {
     try {
+        if( optionalRadix && typeof optionalRadix == "number" && optionalRadix == 16 )
+            x = ensureStartsWith0x( x );
         const bn = ethersMod.ethers.BigNumber.from( x );
         return bn;
     } catch( err ) {
@@ -753,8 +755,8 @@ export function toBN( arg: any ) : any {
         if( ( stringArg.match(/^-?[0-9]+$/) || stringArg === "" ) && isHexPrefixed === false )
             return toBNbasic( stringArg, 10).mul( multiplier );
     } else if( typeof arg === "object" && arg.toString && (!arg.pop && !arg.push) ) {
-        if( arg.toString( 10 ).match(/^-?[0-9]+$/) && (arg.mul || arg.dividedToIntegerBy) )
-            return toBNbasic(arg.toString(10), 10);
+        if( arg.toString().match(/^-?[0-9]+$/) && (arg.mul || arg.dividedToIntegerBy) )
+            return toBNbasic(arg.toString(), 10);
     }
     throw new Error(
         "Error in owaspUtils.toBN() while converting " +
