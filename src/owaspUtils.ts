@@ -753,10 +753,10 @@ export function toBN( arg: any ) : any {
             || (isHexPrefixed === true && stringArg.match(/^[0-9A-Fa-f]+$/)) )
             return toBNbasic( stringArg, 16).mul(multiplier);
         if( ( stringArg.match(/^-?[0-9]+$/) || stringArg === "" ) && isHexPrefixed === false )
-            return toBNbasic( stringArg, 10).mul( multiplier );
+            return toBNbasic( stringArg, 10 ).mul( multiplier );
     } else if( typeof arg === "object" && arg.toString && (!arg.pop && !arg.push) ) {
         if( arg.toString().match(/^-?[0-9]+$/) && (arg.mul || arg.dividedToIntegerBy) )
-            return toBNbasic(arg.toString(), 10);
+            return toBNbasic( arg.toString(), 10 );
     } else if( arg ) {
         return toBNbasic( arg ); // try to convert as is
     }
