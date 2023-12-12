@@ -40,6 +40,7 @@ RUN mkdir /ima
 WORKDIR /ima
 COPY package.json package.json
 
+COPY runner runner
 COPY src src
 RUN mkdir IMA
 COPY IMA/proxy IMA/proxy
@@ -66,4 +67,4 @@ RUN node-gyp --version
 WORKDIR /ima
 RUN yarn install
 
-CMD ["bash", "/ima/src/run.sh"]
+CMD ["bash", "/ima/runner/run.sh"]
