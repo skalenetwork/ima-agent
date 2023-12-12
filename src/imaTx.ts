@@ -207,7 +207,7 @@ async function payedCallSGX( optsPayedCall: any ) {
         chainId = owaspUtils.parseIntOrHex( chainId );
     optsPayedCall.details.trace( "{p}Chain ID is: {}",
         optsPayedCall.strLogPrefix, chainId );
-    const strCmd = "" + process.argv[0] + " --no-warnings ./imaSgxExternalSigner.ts " +
+    const strCmd = "" + process.argv[0] + " --no-warnings ./imaSgxExternalSigner.js " +
         ( log.isEnabledColorization() ? "true" : "false" ) + " " +
         "\"" + optsPayedCall.joAccount.strSgxURL + "\" " +
         "\"" + optsPayedCall.joAccount.strSgxKeyName + "\" " +

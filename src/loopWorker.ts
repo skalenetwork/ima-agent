@@ -25,7 +25,7 @@
 
 import { parentPort, workerData } from "worker_threads";
 import * as networkLayer from "./socket.js";
-import { SocketServer } from "./socketServer";
+import { SocketServer } from "./socketServer.js";
 import * as owaspUtils from "./owaspUtils.js";
 import * as loop from "./loop.js";
 import * as imaTx from "./imaTx.js";

@@ -29,7 +29,7 @@ import * as log from "./log.js";
 import * as owaspUtils from "./owaspUtils.js";
 import * as childProcessModule from "child_process";
 import * as rpcCall from "./rpcCall.js";
-import * as shell from "shelljs";
+import * as shellMod from "shelljs";
 import * as imaUtils from "./utils.js";
 import * as sha3Module from "sha3";
 import * as skaleObserver from "./observer.js";
@@ -37,6 +37,9 @@ import * as discoveryTools from "./discoveryTools.js";
 import * as threadInfo from "./threadInfo.js";
 import * as utils from "./socketUtils.js";
 import * as state from "./state.js";
+
+const anyShellMod: any = shellMod as any;
+const shell = anyShellMod[ "default" ];
 
 const Keccak = sha3Module.Keccak;
 
