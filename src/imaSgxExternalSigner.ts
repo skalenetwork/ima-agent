@@ -1,7 +1,7 @@
 import * as fs from "fs";
-import * as log from "./log";
-import * as owaspUtils from "./owaspUtils";
-import * as rpcCall from "./rpcCall";
+import * as log from "./log.js";
+import * as owaspUtils from "./owaspUtils.js";
+import * as rpcCall from "./rpcCall.js";
 
 const gIsDebugLogging = false; // development option only, must be always false
 log.addStdout();

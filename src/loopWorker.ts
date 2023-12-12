@@ -24,17 +24,17 @@
  */
 
 import { parentPort, workerData } from "worker_threads";
-import * as networkLayer from "./socket";
+import * as networkLayer from "./socket.js";
 import { SocketServer } from "./socketServer";
-import * as owaspUtils from "./owaspUtils";
-import * as loop from "./loop";
-import * as imaTx from "./imaTx";
-import * as imaTransferErrorHandling from "./imaTransferErrorHandling";
-import * as imaCLI from "./cli";
-import * as state from "./state";
-import * as pwa from "./pwa";
-import * as log from "./log";
-import * as threadInfo from "./threadInfo";
+import * as owaspUtils from "./owaspUtils.js";
+import * as loop from "./loop.js";
+import * as imaTx from "./imaTx.js";
+import * as imaTransferErrorHandling from "./imaTransferErrorHandling.js";
+import * as imaCLI from "./cli.js";
+import * as state from "./state.js";
+import * as pwa from "./pwa.js";
+import * as log from "./log.js";
+import * as threadInfo from "./threadInfo.js";
 
 let imaState: any = state.get();
 
@@ -127,8 +127,10 @@ class ObserverServer extends SocketServer {
                 const isFlush = true;
                 socket.send( jo, isFlush );
             } );
-            self.opts.imaState.chainProperties.mn.joAccount.address = owaspUtils.fnAddressImpl_;
-            self.opts.imaState.chainProperties.sc.joAccount.address = owaspUtils.fnAddressImpl_;
+            self.opts.imaState.chainProperties.mn.joAccount.address =
+                function() { return owaspUtils.fnAddressImpl_( this ); };
+            self.opts.imaState.chainProperties.sc.joAccount.address =
+                function() { return owaspUtils.fnAddressImpl_( this ); };
             if( self.opts.imaState.chainProperties.mn.strURL &&
                 typeof self.opts.imaState.chainProperties.mn.strURL == "string" &&
                 self.opts.imaState.chainProperties.mn.strURL.length > 0

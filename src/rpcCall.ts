@@ -27,8 +27,8 @@ import * as ws from "ws";
 import * as urllib from "urllib";
 import * as https from "https";
 import * as net from "net";
-import { validateURL, isUrlWS } from "./owaspUtils";
-import * as log from "./log";
+import { validateURL, isUrlWS } from "./owaspUtils.js";
+import * as log from "./log.js";
 
 const gSecondsConnectionTimeout = 60;
 
@@ -300,7 +300,7 @@ export async function doCall( joCall: any, joIn: any, fn: any ) {
             } );
         } else {
             try {
-                const response = await urllib.request( joCall.url, {
+                const requestOpts = {
                     "method": "POST",
                     "timeout": gSecondsConnectionTimeout * 1000, // in milliseconds
                     "headers": {
@@ -320,7 +320,8 @@ export async function doCall( joCall: any, joIn: any, fn: any ) {
                     "key": ( joCall.joRpcOptions && joCall.joRpcOptions.key &&
                         typeof joCall.joRpcOptions.key == "string" )
                         ? joCall.joRpcOptions.key : null
-                } );
+                };
+                const response = await urllib.request( joCall.url, requestOpts as urllib.RequestOptions );
                 const body = response.data.toString( "utf8" );
                 if( response && response.statusCode && response.statusCode !== 200 )
                     log.warning( "REST call status code is {}", response.statusCode );

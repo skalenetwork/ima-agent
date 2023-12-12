@@ -23,11 +23,11 @@
  * @copyright SKALE Labs 2019-Present
  */
 
-import * as log from "./log";
-import * as rpcCall from "./rpcCall";
-import * as state from "./state";
-import * as imaUtils from "./utils";
-import * as threadInfo from "./threadInfo";
+import * as log from "./log.js";
+import * as rpcCall from "./rpcCall.js";
+import * as state from "./state.js";
+import * as imaUtils from "./utils.js";
+import * as threadInfo from "./threadInfo.js";
 
 export function formatBalanceInfo( bi: any, strAddress: string ) : string {
     let s = "";

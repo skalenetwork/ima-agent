@@ -23,10 +23,10 @@
  * @copyright SKALE Labs 2019-Present
  */
 
-import * as log from "./log";
-import * as imaHelperAPIs from "./imaHelperAPIs";
-import * as imaTx from "./imaTx";
-import * as threadInfo from "./threadInfo";
+import * as log from "./log.js";
+import * as imaHelperAPIs from "./imaHelperAPIs.js";
+import * as imaTx from "./imaTx.js";
+import * as threadInfo from "./threadInfo.js";
 
 export async function invokeHasChain(
     details: any,

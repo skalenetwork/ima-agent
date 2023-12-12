@@ -24,7 +24,7 @@
  */
 
 import * as worker_threads from "worker_threads";
-import * as log from "./log";
+import * as log from "./log.js";
 
 const Worker = worker_threads.Worker;
 export { Worker };

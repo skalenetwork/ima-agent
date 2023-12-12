@@ -23,11 +23,11 @@
  * @copyright SKALE Labs 2019-Present
  */
 
-import * as log from "./log";
-import * as owaspUtils from "./owaspUtils";
-import * as rpcCall from "./rpcCall";
-import * as imaHelperAPIs from "./imaHelperAPIs";
-import * as imaTransferErrorHandling from "./imaTransferErrorHandling";
+import * as log from "./log.js";
+import * as owaspUtils from "./owaspUtils.js";
+import * as rpcCall from "./rpcCall.js";
+import * as imaHelperAPIs from "./imaHelperAPIs.js";
+import * as imaTransferErrorHandling from "./imaTransferErrorHandling.js";
 
 export function createProgressiveEventsScanPlan( details: any, nLatestBlockNumber: any ) {
     // assume Main Net mines 6 blocks per minute

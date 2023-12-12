@@ -23,7 +23,7 @@
  * @copyright SKALE Labs 2019-Present
  */
 
-import { settings } from "./socketSettings";
+import { settings } from "./socketSettings.js";
 
 export const UUIDv4 = function() : string {
     return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace( /[xy]/g, function( c ) {

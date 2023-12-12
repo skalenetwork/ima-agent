@@ -23,10 +23,10 @@
  * @copyright SKALE Labs 2019-Present
  */
 
-import * as state from "./state";
-import * as imaUtils from "./utils";
-import * as log from "./log";
-import * as threadInfo from "./threadInfo";
+import * as state from "./state.js";
+import * as imaUtils from "./utils.js";
+import * as log from "./log.js";
+import * as threadInfo from "./threadInfo.js";
 
 export function findSChainIndexInArrayByName( arrSChains: any[], strSChainName: string ) {
     for( let idxSChain = 0; idxSChain < arrSChains.length; ++ idxSChain ) {

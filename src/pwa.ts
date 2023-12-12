@@ -23,10 +23,10 @@
  * @copyright SKALE Labs 2019-Present
  */
 
-import * as log from "./log";
-import * as rpcCall from "./rpcCall";
-import * as imaBLS from "./bls";
-import * as imaUtils from "./utils";
+import * as log from "./log.js";
+import * as rpcCall from "./rpcCall.js";
+import * as imaBLS from "./bls.js";
+import * as imaUtils from "./utils.js";
 
 function computeWalkNodeIndices( nNodeNumber: number, nNodesCount: number ) : number[] {
     if( nNodesCount <= 1 )

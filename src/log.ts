@@ -23,7 +23,7 @@
  * @copyright SKALE Labs 2019-Present
  */
 
-import * as cc from "./cc";
+import * as cc from "./cc.js";
 import * as fs from "fs";
 
 let gArrStreams: any[] = [];
@@ -901,41 +901,40 @@ export function toString() : string {
     return "";
 }
 
-const gMapVerbose : any = {
-    0: "silent",
-    1: "fatal",
-    2: "critical",
-    3: "error",
-    4: "warning",
-    5: "attention",
-    6: "information",
-    7: "notice",
-    8: "debug",
-    9: "trace"
-};
+const gMapVerbose : Map < number, string > = new Map < number, string > ();
+gMapVerbose.set( 0, "silent" );
+gMapVerbose.set( 1, "fatal" );
+gMapVerbose.set( 2, "critical" );
+gMapVerbose.set( 3, "error" );
+gMapVerbose.set( 4, "warning" );
+gMapVerbose.set( 5, "attention" );
+gMapVerbose.set( 6, "information" );
+gMapVerbose.set( 7, "notice" );
+gMapVerbose.set( 8, "debug" );
+gMapVerbose.set( 9, "trace" );
+
 function computeVerboseAlias() {
-    const m: any = {};
-    for( const key in gMapVerbose ) {
-        if( !gMapVerbose.hasOwnProperty( key ) )
-            continue; // skip loop if the property is from prototype
-        const name = gMapVerbose[key];
-        m[name] = parseInt( key );
+    const m: Map < string, number > = new Map < string, number > ();
+    for( const [ key, val ] of gMapVerbose ) {
+        const name = val;
+        if( name )
+            m.set( name, key );
     }
-    m.empty = 0 + parseInt( m.silent ); // alias
-    m.none = 0 + parseInt( m.silent ); // alias
-    m.stop = 0 + parseInt( m.fatal ); // alias
-    m.bad = 0 + parseInt( m.critical ); // alias
-    m.err = 0 + parseInt( m.error ); // alias
-    m.warn = 0 + parseInt( m.warning ); // alias
-    m.attn = 0 + parseInt( m.attention ); // alias
-    m.info = 0 + parseInt( m.information ); // alias
-    m.note = 0 + parseInt( m.notice ); // alias
-    m.dbg = 0 + parseInt( m.debug ); // alias
-    m.crazy = 0 + parseInt( m.trace ); // alias
-    m.detailed = 0 + parseInt( m.trace ); // alias
+    m.set( "empty", m.get( "silent" ) || 0 ); // alias
+    m.set( "none", m.get( "silent" ) || 0 ); // alias
+    m.set( "stop", m.get( "fatal" ) || 0 ); // alias
+    m.set( "bad", m.get( "critical" ) || 0 ); // alias
+    m.set( "err", m.get( "error" ) || 0 ); // alias
+    m.set( "warn", m.get( "warning" ) || 0 ); // alias
+    m.set( "attn", m.get( "attention" ) || 0 ); // alias
+    m.set( "info", m.get( "information" ) || 0 ); // alias
+    m.set( "note", m.get( "notice" ) || 0 ); // alias
+    m.set( "dbg", m.get( "debug" ) || 0 ); // alias
+    m.set( "crazy", m.get( "trace" ) || 0 ); // alias
+    m.set( "detailed", m.get( "trace" ) || 0 ); // alias
     return m;
 }
-let gMapReversedVerbose: any = null;
+let gMapReversedVerbose: Map < string, number > = new Map < string, number > ();
 
 export function verbose() : any { return gMapVerbose; }
 export function verboseReversed() : Map < string, number > {
@@ -943,12 +942,12 @@ export function verboseReversed() : Map < string, number > {
         gMapReversedVerbose = computeVerboseAlias();
     return gMapReversedVerbose;
 }
-export function verboseLevelAsTextForLog( vl: any ) {
+export function verboseLevelAsTextForLog( vl: any ) : string {
     if( typeof vl == "undefined" )
         vl = verboseGet();
     if( vl in gMapVerbose ) {
-        const tl = gMapVerbose[vl];
-        return tl;
+        const tl = gMapVerbose.get( vl ) || 0;
+        return "" + tl;
     }
     return "unknown(" + JSON.stringify( vl ) + ")";
 }
@@ -985,13 +984,11 @@ export function verboseParse( s: string ) : number {
             n = cc.toInteger( s );
         else {
             const ch0 = s[0].toLowerCase();
-            for( const key in gMapVerbose ) {
-                if( !gMapVerbose.hasOwnProperty( key ) )
-                    continue; // skip loop if the property is from prototype
-                const name = gMapVerbose[key];
-                const ch1 = name[0].toLowerCase();
+            for( const [ key, val ] of gMapVerbose ) {
+                const name = val;
+                const ch1:string = name[0].toLowerCase();
                 if( ch0 == ch1 ) {
-                    n = parseInt( key );
+                    n = key;
                     return n;
                 }
             }
@@ -1001,10 +998,8 @@ export function verboseParse( s: string ) : number {
 }
 
 export function verboseList() : void {
-    for( const key in gMapVerbose ) {
-        if( !gMapVerbose.hasOwnProperty( key ) )
-            continue; // skip loop if the property is from prototype
-        const name = gMapVerbose[key];
+    for( const [ key, val ] of gMapVerbose ) {
+        const name = val;
         console.log( "    " + cc.j( key ) + cc.sunny( "=" ) + cc.bright( name ) );
     }
 }

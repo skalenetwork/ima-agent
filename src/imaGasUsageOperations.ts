@@ -23,8 +23,8 @@
  * @copyright SKALE Labs 2019-Present
  */
 
-import * as log from "./log";
-import * as owaspUtils from "./owaspUtils";
+import * as log from "./log.js";
+import * as owaspUtils from "./owaspUtils.js";
 
 export function composeGasUsageReportFromArray( strName: string, jarrReceipts: any[] ) : any {
     if( ! ( strName && typeof strName == "string" && jarrReceipts ) )

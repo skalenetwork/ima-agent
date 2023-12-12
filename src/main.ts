@@ -26,19 +26,19 @@
 import express from "express";
 import bodyParser from "body-parser";
 import * as ws from "ws";
-import * as owaspUtils from "./owaspUtils";
-import * as log from "./log";
-import * as imaCLI from "./cli";
-import * as loop from "./loop";
-import * as imaHelperAPIs from "./imaHelperAPIs";
-import * as imaTransferErrorHandling from "./imaTransferErrorHandling";
-import * as imaBLS from "./bls";
-import * as pwa from "./pwa";
-import * as clpTools from "./clpTools";
-import * as discoveryTools from "./discoveryTools";
-import * as skaleObserver from "./observer";
+import * as owaspUtils from "./owaspUtils.js";
+import * as log from "./log.js";
+import * as imaCLI from "./cli.js";
+import * as loop from "./loop.js";
+import * as imaHelperAPIs from "./imaHelperAPIs.js";
+import * as imaTransferErrorHandling from "./imaTransferErrorHandling.js";
+import * as imaBLS from "./bls.js";
+import * as pwa from "./pwa.js";
+import * as clpTools from "./clpTools.js";
+import * as discoveryTools from "./discoveryTools.js";
+import * as skaleObserver from "./observer.js";
 
-import * as state from "./state";
+import * as state from "./state.js";
 
 // allow self-signed wss and https
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";

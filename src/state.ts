@@ -1,5 +1,5 @@
-import * as owaspUtils from "./owaspUtils";
-import * as imaTx from "./imaTx";
+import * as owaspUtils from "./owaspUtils.js";
+import * as imaTx from "./imaTx.js";
 
 export const gDefaultValueForLoopState: any = {
     "oracle": {
@@ -26,7 +26,8 @@ function constructChainProperties() {
             "joAccount": {
                 "privateKey":
                     owaspUtils.toEthPrivateKey( process.env.PRIVATE_KEY_FOR_ETHEREUM ),
-                "address": owaspUtils.fnAddressImpl_,
+                "address":
+                    function() { return owaspUtils.fnAddressImpl_( this ); },
                 "strTransactionManagerURL":
                     owaspUtils.toStringURL(
                         process.env.TRANSACTION_MANAGER_URL_ETHEREUM ),
@@ -64,7 +65,8 @@ function constructChainProperties() {
             "joAccount": {
                 "privateKey":
                     owaspUtils.toEthPrivateKey( process.env.PRIVATE_KEY_FOR_SCHAIN ),
-                "address": owaspUtils.fnAddressImpl_,
+                "address":
+                    function() { return owaspUtils.fnAddressImpl_( this ); },
                 "strTransactionManagerURL":
                     owaspUtils.toStringURL( process.env.TRANSACTION_MANAGER_URL_S_CHAIN ),
                 "nTmPriority":
@@ -101,7 +103,8 @@ function constructChainProperties() {
             "joAccount": {
                 "privateKey":
                     owaspUtils.toEthPrivateKey( process.env.PRIVATE_KEY_FOR_SCHAIN_TARGET ),
-                "address": owaspUtils.fnAddressImpl_,
+                "address":
+                    function() { return owaspUtils.fnAddressImpl_( this ); },
                 "strTransactionManagerURL":
                     owaspUtils.toStringURL(
                         process.env.TRANSACTION_MANAGER_URL_S_CHAIN_TARGET ),

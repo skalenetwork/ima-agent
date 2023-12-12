@@ -23,10 +23,10 @@
  * @copyright SKALE Labs 2019-Present
  */
 
-import * as log from "./log";
-import * as owaspUtils from "./owaspUtils";
-import * as imaTx from "./imaTx";
-import * as imaGasUsage from "./imaGasUsageOperations";
+import * as log from "./log.js";
+import * as owaspUtils from "./owaspUtils.js";
+import * as imaTx from "./imaTx.js";
+import * as imaGasUsage from "./imaGasUsageOperations.js";
 
 export async function reimbursementShowBalance(
     ethersProviderMainNet: any,

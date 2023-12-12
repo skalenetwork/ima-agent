@@ -2,14 +2,17 @@
     "name": "skale-ima-agent-app",
     "license": "AGPL-3.0",
     "author": "SKALE Labs and contributors",
+    "type": "module",
     "scripts": {
+        "build": "./node_modules/typescript/bin/tsc",
+        "rebuild": "yarn clean-build && yarn build",
+        "clean-build": "rm -rf ./src/build/* || true",
         "lint-check": "eslint ./*.*js",
         "lint-fix": "eslint ./*.*js --fix",
         "check-outdated": "yarn outdated",
         "upgrade-to-latest": "yarn upgrade --latest"
     },
     "dependencies": {
-        "number-to-bn": "^1.7.0",
         "ethers": "^5.7.2",
         "@ethersproject/experimental": "^5.7.0",
         "solc": "0.8.6",        
@@ -41,7 +44,8 @@
         "eslint-plugin-node": "^11.1.0",
         "eslint-plugin-promise": "^6.1.1",
         "eslint-plugin-standard": "^4.0.1",
-        "eslint-plugin-n": "^16.3.0"
+        "eslint-plugin-n": "^16.3.0",
+        "typescript": "^5.3.3"
     },
     "resolutions": {
     }

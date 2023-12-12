@@ -23,12 +23,12 @@
  * @copyright SKALE Labs 2019-Present
  */
 
-import * as log from "./log";
-import * as owaspUtils from "./owaspUtils";
+import * as log from "./log.js";
+import * as owaspUtils from "./owaspUtils.js";
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
-import * as threadInfo from "./threadInfo";
+import * as threadInfo from "./threadInfo.js";
 
 import { v4 as uuid } from "uuid";
 export { uuid };

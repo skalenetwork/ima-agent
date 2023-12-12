@@ -23,10 +23,10 @@
  * @copyright SKALE Labs 2019-Present
  */
 
-import * as log from "./log";
-import * as owaspUtils from "./owaspUtils";
-import * as rpcCall from "./rpcCall";
-import * as threadInfo from "./threadInfo";
+import * as log from "./log.js";
+import * as owaspUtils from "./owaspUtils.js";
+import * as rpcCall from "./rpcCall.js";
+import * as threadInfo from "./threadInfo.js";
 
 export const longSeparator: string =
     "============================================================" +

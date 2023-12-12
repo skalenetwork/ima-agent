@@ -23,24 +23,24 @@
  * @copyright SKALE Labs 2019-Present
  */
 
-import * as owaspUtils from "./owaspUtils";
-import * as log from "./log";
-import * as imaCLI from "./cli";
-import * as rpcCall from "./rpcCall";
-import * as state from "./state";
-import * as IMA from "./imaCore";
-import * as imaHelperAPIs from "./imaHelperAPIs";
-import * as imaGasUsage from "./imaGasUsageOperations";
-import * as imaReimbursement from "./imaReimbursementOperations";
-import * as imaReg from "./imaRegistrationOperations";
-import * as imaEth from "./imaEthOperations";
-import * as imaToken from "./imaTokenOperations";
-import * as skaleObserver from "./observer";
-import * as discoveryTools from "./discoveryTools";
-import * as loop from "./loop";
-import * as imaUtils from "./utils";
-import * as imaBLS from "./bls";
-import * as imaTx from "./imaTx";
+import * as owaspUtils from "./owaspUtils.js";
+import * as log from "./log.js";
+import * as imaCLI from "./cli.js";
+import * as rpcCall from "./rpcCall.js";
+import * as state from "./state.js";
+import * as IMA from "./imaCore.js";
+import * as imaHelperAPIs from "./imaHelperAPIs.js";
+import * as imaGasUsage from "./imaGasUsageOperations.js";
+import * as imaReimbursement from "./imaReimbursementOperations.js";
+import * as imaReg from "./imaRegistrationOperations.js";
+import * as imaEth from "./imaEthOperations.js";
+import * as imaToken from "./imaTokenOperations.js";
+import * as skaleObserver from "./observer.js";
+import * as discoveryTools from "./discoveryTools.js";
+import * as loop from "./loop.js";
+import * as imaUtils from "./utils.js";
+import * as imaBLS from "./bls.js";
+import * as imaTx from "./imaTx.js";
 
 export async function registerAll( isPrintSummaryRegistrationCosts: boolean ) {
     if( !await registerStep1( false ) )

@@ -23,13 +23,13 @@
  * @copyright SKALE Labs 2019-Present
  */
 
-import * as log from "./log";
-import * as owaspUtils from "./owaspUtils";
-import * as imaHelperAPIs from "./imaHelperAPIs";
-import * as imaTx from "./imaTx";
-import * as imaGasUsage from "./imaGasUsageOperations";
-import * as imaEventLogScan from "./imaEventLogScan";
-import * as threadInfo from "./threadInfo";
+import * as log from "./log.js";
+import * as owaspUtils from "./owaspUtils.js";
+import * as imaHelperAPIs from "./imaHelperAPIs.js";
+import * as imaTx from "./imaTx.js";
+import * as imaGasUsage from "./imaGasUsageOperations.js";
+import * as imaEventLogScan from "./imaEventLogScan.js";
+import * as threadInfo from "./threadInfo.js";
 
 export async function getBalanceErc20(
     isMainNet: boolean,

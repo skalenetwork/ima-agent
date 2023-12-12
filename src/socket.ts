@@ -23,9 +23,9 @@
  * @copyright SKALE Labs 2019-Present
  */
 
-import { UniversalDispatcherEvent, EventDispatcher } from "./eventDispatcher";
-import { settings } from "./socketSettings";
-import * as utils from "./socketUtils";
+import { UniversalDispatcherEvent, EventDispatcher } from "./eventDispatcher.js";
+import { settings } from "./socketSettings.js";
+import * as utils from "./socketUtils.js";
 
 export let httpsModule: any = null; // server side only
 export let wsModule: any = null; // server side only

@@ -23,18 +23,18 @@
  * @copyright SKALE Labs 2019-Present
  */
 
-import * as log from "./log";
-import * as owaspUtils from "./owaspUtils";
-import * as loop from "./loop";
-import * as pwa from "./pwa";
-import * as state from "./state";
-import * as imaHelperAPIs from "./imaHelperAPIs";
-import * as imaTx from "./imaTx";
-import * as imaGasUsage from "./imaGasUsageOperations";
-import * as imaEventLogScan from "./imaEventLogScan";
-import * as imaTransferErrorHandling from "./imaTransferErrorHandling";
-import * as skaleObserver from "./observer";
-import * as threadInfo from "./threadInfo";
+import * as log from "./log.js";
+import * as owaspUtils from "./owaspUtils.js";
+import * as loop from "./loop.js";
+import * as pwa from "./pwa.js";
+import * as state from "./state.js";
+import * as imaHelperAPIs from "./imaHelperAPIs.js";
+import * as imaTx from "./imaTx.js";
+import * as imaGasUsage from "./imaGasUsageOperations.js";
+import * as imaEventLogScan from "./imaEventLogScan.js";
+import * as imaTransferErrorHandling from "./imaTransferErrorHandling.js";
+import * as skaleObserver from "./observer.js";
+import * as threadInfo from "./threadInfo.js";
 
 log.enableColorization( false );
 log.addStdout();

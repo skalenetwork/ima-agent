@@ -23,20 +23,19 @@
  * @copyright SKALE Labs 2019-Present
  */
 
-import * as log from "./log";
-import * as rpcCall from "./rpcCall";
-import * as threadInfo from "./threadInfo";
-import * as owaspUtils from "./owaspUtils";
-import numberToBN from "number-to-bn";
+import * as log from "./log.js";
+import * as rpcCall from "./rpcCall.js";
+import * as threadInfo from "./threadInfo.js";
+import * as owaspUtils from "./owaspUtils.js";
 import * as sha3Module from "sha3";
 const Keccak: any = sha3Module.Keccak;
 export const gConstMinPowResultLimit: number = 10000;
 export const gConstMaxPowResultLimit: any = 100000;
 
-const gBigNumMinPowResult: any = numberToBN( gConstMinPowResultLimit );
-const gBigNum1: any = numberToBN( 1 );
-const gBigNum2: any = numberToBN( 2 );
-const gBigNum256: any = numberToBN( 256 );
+const gBigNumMinPowResult: any = owaspUtils.toBN( gConstMinPowResultLimit );
+const gBigNum1: any = owaspUtils.toBN( 1 );
+const gBigNum2: any = owaspUtils.toBN( 2 );
+const gBigNum256: any = owaspUtils.toBN( 256 );
 const gBigNumUpperPart: any = gBigNum2.pow( gBigNum256 ).sub( gBigNum1 );
 
 function getUtcTimestampString( d?: Date ) : string {
@@ -64,7 +63,7 @@ export function findPowNumber( strRequestPart: string, details: any, isVerbose?:
         let strHash = hash.digest( "hex" );
         strHash = owaspUtils.ensureStartsWith0x( strHash );
 
-        const f = numberToBN( strHash );
+        const f = owaspUtils.toBN( strHash );
         const r = gBigNumUpperPart.div( f );
         if( r.gt( gBigNumMinPowResult ) ) {
             if( isVerbose ) {
@@ -97,7 +96,7 @@ async function handleOracleCheckResultResult(
     const joResult: any = JSON.parse( joOut.result );
     if( isVerboseTraceDetails )
         details.debug( "RPC call(oracle_checkResult) parsed result field is: {}", joResult );
-    const gp = numberToBN( joResult.rslts[0] );
+    const gp = owaspUtils.toBN( joResult.rslts[0] );
     if( isVerboseTraceDetails ) {
         details.success( "success, computed Gas Price={}={}",
             gp.toString(), owaspUtils.ensureStartsWith0x( gp.toString( 16 ) ) );

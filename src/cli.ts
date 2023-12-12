@@ -26,15 +26,15 @@
 import * as path from "path";
 import * as url from "url";
 import * as os from "os";
-import * as log from "./log";
-import * as owaspUtils from "./owaspUtils";
-import * as imaUtils from "./utils";
-import * as rpcCall from "./rpcCall";
-import * as imaHelperAPIs from "./imaHelperAPIs";
-import * as imaTransferErrorHandling from "./imaTransferErrorHandling";
-import * as imaOracleOperations from "./imaOracleOperations";
-import * as imaTx from "./imaTx";
-import * as state from "./state";
+import * as log from "./log.js";
+import * as owaspUtils from "./owaspUtils.js";
+import * as imaUtils from "./utils.js";
+import * as rpcCall from "./rpcCall.js";
+import * as imaHelperAPIs from "./imaHelperAPIs.js";
+import * as imaTransferErrorHandling from "./imaTransferErrorHandling.js";
+import * as imaOracleOperations from "./imaOracleOperations.js";
+import * as imaTx from "./imaTx.js";
+import * as state from "./state.js";
 
 const __dirname: string = path.dirname( url.fileURLToPath( import.meta.url ) );
 
@@ -213,7 +213,7 @@ function parseHelp( imaState: any, joArg: any ) { // exits process on "--help"
     if( joArg.name != "help" )
         return false;
     printAbout();
-    const strAboutText = imaUtils.fileLoad( path.join( __dirname, "about.txt" ), "N/A" ).toString();
+    const strAboutText = imaUtils.fileLoad( path.join( __dirname, "../about.txt" ), "N/A" ).toString();
     console.log( strAboutText );
     process.exit( 0 );
 }

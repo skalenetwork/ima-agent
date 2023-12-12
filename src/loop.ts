@@ -23,20 +23,20 @@
  * @copyright SKALE Labs 2019-Present
  */
 
-import * as networkLayer from "./socket";
+import * as networkLayer from "./socket.js";
 import * as url from "url";
-import * as threadInfo from "./threadInfo";
+import * as threadInfo from "./threadInfo.js";
 import * as path from "path";
-import * as log from "./log";
-import * as IMA from "./imaCore";
-import * as imaHelperAPIs from "./imaHelperAPIs";
-import * as imaTransferErrorHandling from "./imaTransferErrorHandling";
-import * as imaOracleOperations from "./imaOracleOperations";
-import * as owaspUtils from "./owaspUtils";
-import * as imaBLS from "./bls";
-import * as skaleObserver from "./observer";
-import * as pwa from "./pwa";
-import * as state from "./state";
+import * as log from "./log.js";
+import * as IMA from "./imaCore.js";
+import * as imaHelperAPIs from "./imaHelperAPIs.js";
+import * as imaTransferErrorHandling from "./imaTransferErrorHandling.js";
+import * as imaOracleOperations from "./imaOracleOperations.js";
+import * as owaspUtils from "./owaspUtils.js";
+import * as imaBLS from "./bls.js";
+import * as skaleObserver from "./observer.js";
+import * as pwa from "./pwa.js";
+import * as state from "./state.js";
 
 const __dirname: string = path.dirname( url.fileURLToPath( import.meta.url ) );
 

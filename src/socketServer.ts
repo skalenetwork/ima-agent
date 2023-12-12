@@ -23,9 +23,9 @@
  * @copyright SKALE Labs 2019-Present
  */
 
-import { EventDispatcher, UniversalDispatcherEvent } from "./eventDispatcher";
-import * as utils from "./socketUtils";
-import * as log from "./log";
+import { EventDispatcher, UniversalDispatcherEvent } from "./eventDispatcher.js";
+import * as utils from "./socketUtils.js";
+import * as log from "./log.js";
 
 export class SocketServer extends EventDispatcher {
     log: any;

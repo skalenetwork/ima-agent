@@ -28,18 +28,20 @@
 //     https://www.gitbook.com/download/pdf/book/checkmarx/JS-SCP
 // top 10 hit parade: https://owasp.org/www-project-top-ten/
 
-import * as log from "./log";
+import * as log from "./log.js";
 import * as ethersMod from "ethers";
 import * as fs from "fs";
 import * as ethereumJsUtilModule from "ethereumjs-util";
 import * as ethereumJsWalletModule from "ethereumjs-wallet";
 const Wallet = ethereumJsWalletModule.default;
+const BN = ethereumJsUtilModule.BN;
+const BigNumber = ethersMod.ethers.BigNumber;
 
 const safeURL = log.safeURL;
 const replaceAll = log.replaceAll;
 const extractErrorMessage = log.extractErrorMessage;
 
-export { ethersMod, safeURL, replaceAll, extractErrorMessage };
+export { ethersMod, safeURL, replaceAll, extractErrorMessage, BigNumber };
 
 export function rxIsInt( val: any ) : boolean {
     try {
@@ -668,8 +670,7 @@ export function publicKeyToAccountAddress( keyPublic : string ) : string {
     return strAddress;
 }
 
-export function fnAddressImpl_() : string {
-    const anyThis: any = this;
+export function fnAddressImpl_( anyThis: any ) : string {
     if( anyThis.address_ == undefined || anyThis.address_ == null || anyThis.address_ == "" ) {
         if( anyThis.privateKey )
             anyThis.address_ = "" + privateKeyToAccountAddress( anyThis.privateKey );
@@ -710,9 +711,56 @@ export function ethersProviderToUrl( ethersProvider: any ) : string {
     return strURL || "N/A-URL";
 }
 
-export function toBN( x?: any ) : any {
-    const bn = ethersMod.ethers.BigNumber.from( x );
-    return bn;
+export function isHexPrefixed( s: any ) : boolean {
+    if( typeof s !== "string" )
+        throw new Error(
+            "Parameter value of owaspUtils.isHexPrefixed() must be type 'string' but it's " +
+            `type ${typeof s}, while checking isHexPrefixed.` );
+    return ( s.slice( 0, 2 ) === "0x" ) ? true : false;
+}
+
+export function stripHexPrefix( s: any ) : string {
+    if( typeof s !== "string" )
+        return s;
+    return isHexPrefixed( s ) ? s.slice( 2 ) : s;
+}
+
+export function toBNbasic( x?: any, optionalRadix?: number ) : any {
+    try {
+        const bn = ethersMod.ethers.BigNumber.from( x );
+        return bn;
+    } catch( err ) {
+        console.log( `CRITICAL ERROR: Failure in owaspUtils.toBNbasic( ${x} ): ${err}` );
+        throw err;
+    }
+}
+
+export function toBN( arg: any ) : any {
+    if( typeof arg === 'string' || typeof arg === "number" ) {
+        let multiplier = toBNbasic( 1 ); // eslint-disable-line
+        let formattedString = String( arg ).toLowerCase().trim();
+        let isHexPrefixed = formattedString.substr(0, 2) === "0x" || formattedString.substr(0, 3) === "-0x";
+        let stringArg = stripHexPrefix(formattedString); // eslint-disable-line
+        if( stringArg.substr(0, 1) === "-" ) {
+            stringArg = stripHexPrefix(stringArg.slice(1));
+            multiplier = toBNbasic( -1, 10 );
+        }
+        stringArg = stringArg === "" ? "0" : stringArg;
+        if( ( ! stringArg.match(/^-?[0-9]+$/) && stringArg.match(/^[0-9A-Fa-f]+$/) )
+            || stringArg.match(/^[a-fA-F]+$/)
+            || (isHexPrefixed === true && stringArg.match(/^[0-9A-Fa-f]+$/)) )
+            return toBNbasic( stringArg, 16).mul(multiplier);
+        if( ( stringArg.match(/^-?[0-9]+$/) || stringArg === "" ) && isHexPrefixed === false )
+            return toBNbasic( stringArg, 10).mul( multiplier );
+    } else if( typeof arg === "object" && arg.toString && (!arg.pop && !arg.push) ) {
+        if( arg.toString( 10 ).match(/^-?[0-9]+$/) && (arg.mul || arg.dividedToIntegerBy) )
+            return toBNbasic(arg.toString(10), 10);
+    }
+    throw new Error(
+        "Error in owaspUtils.toBN() while converting " +
+        `number ${JSON.stringify(arg)}to BN.js instance, error: ` +
+        "invalid number value. Value must be an integer, hex string, BN or BigNumber instance. " +
+        "Note, decimals are not supported." );
 }
 
 export function isNumeric( s?: any ) : boolean {

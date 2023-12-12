@@ -3,6 +3,9 @@
     "license": "AGPL-3.0",
     "author": "SKALE Labs and contributors",
     "scripts": {
+        "build": "cd src && yarn build && cd ..",
+        "rebuild": "cd src && yarn rebuild && cd ..",
+        "clean-build": "cd src && yarn clean-build && cd ..",
         "lint-check": "cd src && yarn lint-check && cd ..",
         "lint-nb": "cd network-browser && yarn lint-check && cd ..",
         "install-nb": "cd network-browser && bun install && cd ..",

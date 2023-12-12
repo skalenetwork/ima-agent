@@ -25,18 +25,18 @@
 
 import * as fs from "fs";
 import * as path from "path";
-import * as log from "./log";
-import * as owaspUtils from "./owaspUtils";
+import * as log from "./log.js";
+import * as owaspUtils from "./owaspUtils.js";
 import * as childProcessModule from "child_process";
-import * as rpcCall from "./rpcCall";
+import * as rpcCall from "./rpcCall.js";
 import * as shell from "shelljs";
-import * as imaUtils from "./utils";
+import * as imaUtils from "./utils.js";
 import * as sha3Module from "sha3";
-import * as skaleObserver from "./observer";
-import * as discoveryTools from "./discoveryTools";
-import * as threadInfo from "./threadInfo";
-import * as utils from "./socketUtils";
-import * as state from "./state";
+import * as skaleObserver from "./observer.js";
+import * as discoveryTools from "./discoveryTools.js";
+import * as threadInfo from "./threadInfo.js";
+import * as utils from "./socketUtils.js";
+import * as state from "./state.js";
 
 const Keccak = sha3Module.Keccak;
 

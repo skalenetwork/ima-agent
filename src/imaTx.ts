@@ -30,14 +30,14 @@ import * as childProcessModule from "child_process";
 import Redis from "ioredis";
 import * as ethereumJsUtilModule from "ethereumjs-util";
 
-import * as log from "./log";
+import * as log from "./log.js";
 
-import * as owaspUtils from "./owaspUtils";
-import * as imaUtils from "./utils";
-import * as imaHelperAPIs from "./imaHelperAPIs";
-import * as imaEventLogScan from "./imaEventLogScan";
+import * as owaspUtils from "./owaspUtils.js";
+import * as imaUtils from "./utils.js";
+import * as imaHelperAPIs from "./imaHelperAPIs.js";
+import * as imaEventLogScan from "./imaEventLogScan.js";
 
-import * as threadInfo from "./threadInfo";
+import * as threadInfo from "./threadInfo.js";
 
 const __dirname: string = path.dirname( url.fileURLToPath( import.meta.url ) );
 

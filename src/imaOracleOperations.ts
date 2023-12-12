@@ -23,12 +23,12 @@
  * @copyright SKALE Labs 2019-Present
  */
 
-import * as log from "./log";
-import * as owaspUtils from "./owaspUtils";
-import * as imaOracle from "./oracle";
-import * as imaTx from "./imaTx";
-import * as imaGasUsage from "./imaGasUsageOperations";
-import * as imaTransferErrorHandling from "./imaTransferErrorHandling";
+import * as log from "./log.js";
+import * as owaspUtils from "./owaspUtils.js";
+import * as imaOracle from "./oracle.js";
+import * as imaTx from "./imaTx.js";
+import * as imaGasUsage from "./imaGasUsageOperations.js";
+import * as imaTransferErrorHandling from "./imaTransferErrorHandling.js";
 
 let gFlagIsEnabledOracle: boolean = false;
 
