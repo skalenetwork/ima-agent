@@ -26,6 +26,8 @@
 import * as cc from "./cc.js";
 import * as fs from "fs";
 
+export { cc };
+
 let gArrStreams: any[] = [];
 
 let gFlagLogWithTimeStamps: boolean = true;
@@ -1016,10 +1018,8 @@ export function em( x?: any ) : string {
     return cc.isStringAlreadyColorized( x ) ? x : cc.warning( x );
 }
 
-export function stack( x?: any ) : string {
-    if( x && "stack" in x && x.stack )
-        return stack( x.stack );
-    return cc.isStringAlreadyColorized( x ) ? x : cc.stack( x );
+export function stack( err?: any ) : string {
+    return cc.stack( err );
 }
 
 export function onOff( x?: any ) : string {

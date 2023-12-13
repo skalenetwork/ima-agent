@@ -964,7 +964,7 @@ function errLocLn( s: string, isWithBraces?: boolean ) : string {
             if( j == 1 )
                 s2 += info( arrCodePoint[j] );
             else
-                s2 += notice( arrCodePoint[j] );
+                s2 += attention( arrCodePoint[j] );
         }
     } else
         s2 += trace( s );
@@ -973,11 +973,16 @@ function errLocLn( s: string, isWithBraces?: boolean ) : string {
     return s2;
 }
 
-export function stack( strIn?: string ) : string {
-    if( ! strIn )
-        return strIn || "";
+export function stack( err?: any ) : string {
+    if( ! err )
+        return "";
+    if( err && "stack" in err )  {
+        const st = err[ "stack" ];
+        if( st && typeof st == "string" )
+            err = st;
+    }
     try {
-        const arr = ( typeof strIn == "string" ) ? strIn.split( "\n" ) : strIn;
+        const arr = ( typeof err == "string" ) ? err.split( "\n" ) : err;
         const cnt = arr.length;
         let i;
         for( i = 0; i < cnt; ++ i ) {
@@ -1008,7 +1013,7 @@ export function stack( strIn?: string ) : string {
             arr[i] = s;
         }
         return arr.join( "\n" );
-    } catch ( err ) {
-        return strIn;
+    } catch ( errCaught ) {
+        return err.toString();
     }
 }
