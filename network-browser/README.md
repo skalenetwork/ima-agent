@@ -43,22 +43,18 @@ Pre-commit hook:
 bun pre
 ```
 
-## Run in production mode
+## Build & run in production mode
 
-```bash
-bun browse
-```
-
-## Static build
-
-For node.js target:
-
-```bash
-bun build:node
-```
-
-For bun.sh target:
+For target bun:
 
 ```bash
 bun build:bun
+bun network-browser.js
+```
+
+For target node:
+
+```bash
+bun build:rollup
+node network-browser.js
 ```

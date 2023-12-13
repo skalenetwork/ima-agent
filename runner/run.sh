@@ -115,8 +115,8 @@ BASE_OPTIONS="--gas-price-multiplier=$GAS_PRICE_MULTIPLIER \
 --no-expose-pwa \
 --auto-exit=86400"
 
-IMA_LOOP_CMD="node $DIR/main.mjs --loop $BASE_OPTIONS"
-NETWORK_BROWSER_CMD="cd $DIR/../network-browser && bun browse"
+IMA_LOOP_CMD="node $DIR/../src/main.mjs --loop $BASE_OPTIONS"
+NETWORK_BROWSER_CMD="node $DIR/../network-browser/network-browser.js"
 
 echo "$(date) - Running IMA loop and network-browser"
 node "$DIR/startup.js" "$IMA_LOOP_CMD" "$NETWORK_BROWSER_CMD"

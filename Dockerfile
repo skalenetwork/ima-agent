@@ -16,7 +16,7 @@ RUN tar xfz openssl-1.1.0l.tar.gz
 RUN cd openssl-1.1.0l && ./config && make && make install && cd ..
 RUN ldconfig
 
-RUN curl -fsSL https://bun.sh/install | BUN_INSTALL=/usr bash -s "bun-v1.0.15"
+RUN curl -fsSL https://bun.sh/install | BUN_INSTALL=/usr bash -s "bun-v1.0.16"
 RUN bun --version
 
 RUN curl -sL https://deb.nodesource.com/setup_18.x | bash
@@ -40,8 +40,8 @@ RUN mkdir /ima
 WORKDIR /ima
 COPY package.json package.json
 
+COPY runner runner
 COPY src src
-COPY network-browser network-browser
 RUN mkdir IMA
 COPY IMA/proxy IMA/proxy
 COPY IMA/package.json IMA/package.json
@@ -49,6 +49,9 @@ COPY IMA/postinstall.sh IMA/postinstall.sh
 COPY IMA/VERSION IMA/VERSION
 COPY package.json package.json
 COPY VERSION VERSION
+
+COPY network-browser network-browser
+RUN cd network-browser && bun install && bun build:rollup
 
 RUN mkdir /ima/bls_binaries
 COPY scripts/bls_binaries /ima/bls_binaries
@@ -64,4 +67,4 @@ RUN node-gyp --version
 WORKDIR /ima
 RUN yarn install
 
-CMD ["bash", "/ima/src/run.sh"]
+CMD ["bash", "/ima/runner/run.sh"]

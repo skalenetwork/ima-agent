@@ -22,7 +22,7 @@
  */
 
 import { JsonRpcProvider, type Provider, Contract } from 'ethers'
-import { MulticallWrapper } from 'ethers-multicall-provider'
+import mc from 'ethers-multicall-provider'
 import { type SkaleManagerAbi, type SChainImaAbi } from './interfaces'
 import { readJson } from './tools'
 
@@ -38,7 +38,7 @@ export function getMainnetManagerAbi(): SkaleManagerAbi {
 
 export function getMainnetProvider(endpoint: string, multicall: boolean): Provider {
     const nativeProvider = new JsonRpcProvider(endpoint)
-    return multicall ? MulticallWrapper.wrap(nativeProvider) : nativeProvider
+    return multicall ? mc.MulticallWrapper.wrap(nativeProvider) : nativeProvider
 }
 
 export function getSChainProvider(endpoint: string): Provider {
