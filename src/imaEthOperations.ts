@@ -32,8 +32,8 @@ import * as imaEventLogScan from "./imaEventLogScan.js";
 import * as threadInfo from "./threadInfo.js";
 
 export async function getBalanceEth(
-    isMainNet: any,
-    ethersProvider: any,
+    isMainNet: boolean,
+    ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider|null,
     chainId: string,
     joAccount?: any,
     contractERC20?: any
@@ -67,12 +67,12 @@ export async function getBalanceEth(
 //   money is sent from caller
 //   "value" JSON arg is used to specify amount of money to sent
 export async function doEthPaymentFromMainNet(
-    ethersProviderMainNet: any,
+    ethersProviderMainNet: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainIdMainNet: string,
     joAccountSrc: any,
     joAccountDst: any,
-    joDepositBox: any,
-    joMessageProxyMainNet: any, // for checking logs
+    joDepositBox: owaspUtils.ethersMod.ethers.Contract,
+    joMessageProxyMainNet: owaspUtils.ethersMod.ethers.Contract, // for checking logs
     chainIdSChain: string,
     weiHowMuch: any, // how much WEI money to send
     transactionCustomizerMainNet: imaTx.TransactionCustomizer
@@ -164,12 +164,12 @@ export async function doEthPaymentFromMainNet(
 //   money is sent from caller
 //   "value" JSON arg is used to specify amount of money to sent
 export async function doEthPaymentFromSChain(
-    ethersProviderSChain: any,
+    ethersProviderSChain: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainIdSChain: string,
     joAccountSrc: any,
     joAccountDst: any,
-    joTokenManagerETH: any,
-    joMessageProxySChain: any, // for checking logs
+    joTokenManagerETH: owaspUtils.ethersMod.ethers.Contract,
+    joMessageProxySChain: owaspUtils.ethersMod.ethers.Contract, // for checking logs
     weiHowMuch: any, // how much WEI money to send
     transactionCustomizerSChain: imaTx.TransactionCustomizer
 ) {
@@ -253,10 +253,10 @@ export async function doEthPaymentFromSChain(
 }
 
 export async function receiveEthPaymentFromSchainOnMainNet(
-    ethersProviderMainNet: any,
+    ethersProviderMainNet: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainIdMainNet: string,
     joAccountMN: any,
-    joDepositBoxETH: any,
+    joDepositBoxETH: owaspUtils.ethersMod.ethers.Contract,
     transactionCustomizerMainNet: imaTx.TransactionCustomizer
 ) {
     const details = log.createMemoryStream();
@@ -313,9 +313,9 @@ export async function receiveEthPaymentFromSchainOnMainNet(
 }
 
 export async function viewEthPaymentFromSchainOnMainNet(
-    ethersProviderMainNet: any,
+    ethersProviderMainNet: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     joAccountMN: any,
-    joDepositBoxETH: any
+    joDepositBoxETH: owaspUtils.ethersMod.ethers.Contract
 ) {
     const details = log.createMemoryStream();
     const strActionName = "";

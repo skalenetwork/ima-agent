@@ -86,7 +86,8 @@ export function createProgressiveEventsScanPlan( details: any, nLatestBlockNumbe
 
 export async function safeGetPastEventsProgressive(
     details: any, strLogPrefix: string,
-    ethersProvider: any, attempts: number, joContract: any, strEventName: string,
+    ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
+    attempts: number, joContract: owaspUtils.ethersMod.ethers.Contract, strEventName: string,
     nBlockFrom: any, nBlockTo: any, joFilter: any
 ) {
     const strURL = owaspUtils.ethersProviderToUrl( ethersProvider );
@@ -165,7 +166,8 @@ export async function safeGetPastEventsProgressive(
 
 export async function getContractCallEvents(
     details: any, strLogPrefix: string,
-    ethersProvider: any, joContract: any, strEventName: string,
+    ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
+    joContract: owaspUtils.ethersMod.ethers.Contract, strEventName: string,
     nBlockNumber: any, strTxHash: string, joFilter: any
 ) {
     joFilter = joFilter || {};
@@ -180,10 +182,9 @@ export async function getContractCallEvents(
         nBlockFrom = nBlockZero;
     if( nBlockTo.gte( nLatestBlockNumber ) )
         nBlockTo = nLatestBlockNumberPlus1;
-    const joAllEventsInBlock =
-        await safeGetPastEventsIterative(
-            details, strLogPrefix, ethersProvider, 10, joContract, strEventName,
-            nBlockFrom, nBlockTo, joFilter );
+    const joAllEventsInBlock = await safeGetPastEventsIterative(
+        details, strLogPrefix, ethersProvider, 10, joContract, strEventName,
+        nBlockFrom, nBlockTo, joFilter );
     const joAllTransactionEvents: any = [];
     let i: number;
     for( i = 0; i < joAllEventsInBlock.length; ++i ) {
@@ -196,7 +197,8 @@ export async function getContractCallEvents(
 
 export async function safeGetTransactionCount(
     details: any, cntAttempts: number,
-    ethersProvider: any, address: string, param: any,
+    ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
+    address: string, param: any,
     retValOnFail: any, throwIfServerOffline: boolean
 ) {
     const strFnName = "getTransactionCount";
@@ -204,43 +206,32 @@ export async function safeGetTransactionCount(
     const nWaitStepMilliseconds = 10 * 1000;
     if( throwIfServerOffline == null || throwIfServerOffline == undefined )
         throwIfServerOffline = true;
-    cntAttempts =
-        owaspUtils.parseIntOrHex( cntAttempts ) < 1
-            ? 1
-            : owaspUtils.parseIntOrHex( cntAttempts );
+    cntAttempts = ( owaspUtils.parseIntOrHex( cntAttempts ) < 1 )
+        ? 1 : owaspUtils.parseIntOrHex( cntAttempts );
     if( retValOnFail == null || retValOnFail == undefined )
         retValOnFail = "";
     let ret = retValOnFail;
     let idxAttempt = 1;
-    try {
-        ret = await ethersProvider[strFnName]( address, param );
-        return ret;
-    } catch ( err ) {
-        ret = retValOnFail;
-        details.error( "Failed call attempt {} to {} via {url}, error is: {err}, " +
-            "stack is:\n{stack}", idxAttempt, strFnName + "()", u, err, err );
-    }
-    ++ idxAttempt;
-    while( ret === "" && idxAttempt <= cntAttempts ) {
-        const isOnLine = rpcCall.checkUrl( u, nWaitStepMilliseconds );
+    for( ; idxAttempt <= cntAttempts; ++ idxAttempt ) {
+        const isOnLine = await rpcCall.checkUrl( u, nWaitStepMilliseconds );
         if( ! isOnLine ) {
             ret = retValOnFail;
             if( ! throwIfServerOffline )
                 return ret;
-            details.error( "Cannot call {} via {url} because server is off-line",
-                strFnName + "()", u );
+            details.error( "Cannot call {} via {url} because server is off-line, attempt {} of {}",
+                strFnName + "()", u, idxAttempt, cntAttempts );
             throw new Error( `Cannot ${strFnName}() via ${u} because server is off-line` );
         }
-        details.trace( "Repeat call to {} via {url}, attempt {}", strFnName + "()", u, idxAttempt );
+        details.trace( "Call to {} via {url}, attempt {} of {}",
+            strFnName + "()", u, idxAttempt, cntAttempts );
         try {
             ret = await ethersProvider[strFnName]( address, param );
             return ret;
         } catch ( err ) {
             ret = retValOnFail;
-            details.error( "Failed call attempt {} to {} via {url}, error is: {err}, " +
-                "stack is:\n{stack}", idxAttempt, strFnName + "()", u, err, err );
+            details.error( "Failed call attempt {} of {} to {} via {url}, error is: {err}, " +
+                "stack is:\n{stack}", idxAttempt, cntAttempts, strFnName + "()", u, err, err );
         }
-        ++ idxAttempt;
     }
     if( ( idxAttempt + 1 ) > cntAttempts && ret === "" ) {
         details.error( "Failed call to {} via {url} after {} attempts",
@@ -252,50 +243,40 @@ export async function safeGetTransactionCount(
 
 export async function safeGetTransactionReceipt(
     details: any, cntAttempts: number,
-    ethersProvider: any, txHash: string, retValOnFail?: any, throwIfServerOffline?: boolean
+    ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
+    txHash: string, retValOnFail?: any, throwIfServerOffline?: boolean
 ) {
     const strFnName = "getTransactionReceipt";
     const u = owaspUtils.ethersProviderToUrl( ethersProvider );
     const nWaitStepMilliseconds = 10 * 1000;
     if( throwIfServerOffline == null || throwIfServerOffline == undefined )
         throwIfServerOffline = true;
-    cntAttempts =
-        owaspUtils.parseIntOrHex( cntAttempts ) < 1
-            ? 1
-            : owaspUtils.parseIntOrHex( cntAttempts );
+    cntAttempts = ( owaspUtils.parseIntOrHex( cntAttempts ) < 1 )
+        ? 1 : owaspUtils.parseIntOrHex( cntAttempts );
     if( retValOnFail == null || retValOnFail == undefined )
         retValOnFail = "";
     let ret = retValOnFail;
     let idxAttempt = 1;
-    try {
-        ret = await ethersProvider[strFnName]( txHash );
-        return ret;
-    } catch ( err ) {
-        ret = retValOnFail;
-        details.error( "Failed call attempt {} to {} via {url}, error is: {err}, " +
-            "stack is:\n{stack}", idxAttempt, strFnName + "()", u, err, err );
-    }
-    ++ idxAttempt;
-    while( idxAttempt <= cntAttempts ) {
-        const isOnLine = rpcCall.checkUrl( u, nWaitStepMilliseconds );
+    for( ; idxAttempt <= cntAttempts; ++ idxAttempt ) {
+        const isOnLine = await rpcCall.checkUrl( u, nWaitStepMilliseconds );
         if( ! isOnLine ) {
             ret = retValOnFail;
             if( ! throwIfServerOffline )
                 return ret;
-            details.error( "Cannot call {} via {url} because server is off-line",
-                strFnName + "()", u );
+            details.error( "Cannot call {} via {url} because server is off-line, attempt {} of {}",
+                strFnName + "()", u, idxAttempt, cntAttempts );
             throw new Error( `Cannot ${strFnName}() via ${u} because server is off-line` );
         }
-        details.trace( "Repeat call to {} via {url}, attempt {}", strFnName + "()", u, idxAttempt );
+        details.trace( "Call to {} via {url}, attempt {} of {}",
+            strFnName + "()", u, idxAttempt, cntAttempts );
         try {
             ret = await ethersProvider[strFnName]( txHash );
             return ret;
         } catch ( err ) {
             ret = retValOnFail;
-            details.error( "Failed call attempt {} to {} via {url}, error is: {err}, " +
-                "stack is:\n{stack}", idxAttempt, strFnName + "()", u, err, err );
+            details.error( "Failed call attempt {} of {} to {} via {url}, error is: {err}, " +
+                "stack is:\n{stack}", idxAttempt, cntAttempts, strFnName + "()", u, err, err );
         }
-        ++ idxAttempt;
     }
     if( ( idxAttempt + 1 ) > cntAttempts ) {
         details.error( "Failed call to {} via {url} after {} attempts",
@@ -307,7 +288,8 @@ export async function safeGetTransactionReceipt(
 
 export async function safeGetPastEvents(
     details: any, strLogPrefix: string,
-    ethersProvider: any, cntAttempts: number, joContract: any, strEventName: string,
+    ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
+    cntAttempts: number, joContract: owaspUtils.ethersMod.ethers.Contract, strEventName: string,
     nBlockFrom: any, nBlockTo: any, joFilter: any,
     retValOnFail?: any, throwIfServerOffline?: boolean
 ) {
@@ -315,10 +297,8 @@ export async function safeGetPastEvents(
     const nWaitStepMilliseconds = 10 * 1000;
     if( throwIfServerOffline == null || throwIfServerOffline == undefined )
         throwIfServerOffline = true;
-    cntAttempts =
-        owaspUtils.parseIntOrHex( cntAttempts ) < 1
-            ? 1
-            : owaspUtils.parseIntOrHex( cntAttempts );
+    cntAttempts = ( owaspUtils.parseIntOrHex( cntAttempts ) < 1 )
+        ? 1 : owaspUtils.parseIntOrHex( cntAttempts );
     if( retValOnFail == null || retValOnFail == undefined )
         retValOnFail = "";
     let ret = retValOnFail;
@@ -333,48 +313,26 @@ export async function safeGetPastEvents(
     } else
         nBlockTo = owaspUtils.toBN( nBlockTo );
     nBlockFrom = owaspUtils.toBN( nBlockFrom );
-    try {
-        details.trace(
-            "{p}First time, will query filter {} on contract {} from block {} to block {} while " +
-            "current latest block number on chain is {}", strLogPrefix, joFilter,
-            joContract.address, nBlockFrom.toHexString(), nBlockTo.toHexString(),
-            nLatestBlockNumber.toHexString() );
-        ret = await joContract.queryFilter(
-            joFilter, nBlockFrom.toHexString(), nBlockTo.toHexString() );
-        return ret;
-    } catch ( err ) {
-        ret = retValOnFail;
-        details.error(
-            "{p}Failed filtering attempt {} for event {} via {url}, from block {}, to block {}, " +
-            "error is: {err}, stack is:\n{stack}", strLogPrefix, idxAttempt, strEventName, u,
-            nBlockFrom.toHexString(), nBlockTo.toHexString(), err, err );
-        if( owaspUtils.extractErrorMessage( err )
-            .indexOf( strErrorTextAboutNotExistingEvent ) >= 0 ) {
-            details.error( "{p}Did stopped filtering of {} event because no such event exist " +
-                "in smart contract ", strLogPrefix, strEventName );
-            return ret;
-        }
-    }
-    ++ idxAttempt;
-    while( ret === "" && idxAttempt <= cntAttempts ) {
-        const isOnLine = rpcCall.checkUrl( u, nWaitStepMilliseconds );
+    for( ; idxAttempt <= cntAttempts; ++ idxAttempt ) {
+        const isOnLine = await rpcCall.checkUrl( u, nWaitStepMilliseconds );
         if( ! isOnLine ) {
             ret = retValOnFail;
             if( ! throwIfServerOffline )
                 return ret;
-            details.error( "{p}Cannot do {} event filtering via {url} because server is off-line",
-                strLogPrefix, strEventName, u );
+            details.error(
+                "{p}Cannot do {} event filtering via {url} because server is off-line, " +
+                "attempt {} of {}", strLogPrefix, strEventName, u, idxAttempt, cntAttempts );
             throw new Error( `Cannot do ${strEventName} event filtering, ` +
                 `from block ${nBlockFrom.toHexString()} , to block ${nBlockTo.toHexString()} ` +
                 `via ${u} because server is off-line` );
         }
-        details.trace( "{p}Repeat {} event filtering via {url}, attempt {}",
-            strLogPrefix, strEventName, u, idxAttempt );
+        details.trace( "{p}Repeat {} event filtering via {url}, attempt {} of {}",
+            strLogPrefix, strEventName, u, idxAttempt, cntAttempts );
         try {
             details.trace(
-                "{p}Attempt {}, will query filter {} on contract {} from block {} to block {}",
-                strLogPrefix, idxAttempt, joFilter, joContract.address, nBlockFrom.toHexString(),
-                nBlockTo.toHexString() );
+                "{p}Attempt {} of, will query filter {} on contract {} from block {} to block {}",
+                strLogPrefix, idxAttempt, cntAttempts, joFilter, joContract.address,
+                nBlockFrom.toHexString(), nBlockTo.toHexString() );
             ret = await joContract.queryFilter( joFilter,
                 nBlockFrom.toHexString(), nBlockTo.toHexString() );
             return ret;
@@ -382,19 +340,18 @@ export async function safeGetPastEvents(
         } catch ( err ) {
             ret = retValOnFail;
             details.error(
-                "{p}Failed filtering attempt {} for event {} via {url}, from block {}" +
-                ", to block{}, error is: {err}, stack is:\n{stack}", strLogPrefix, idxAttempt,
-                strEventName, u, nBlockFrom.toHexString(), nBlockTo.toHexString(),
-                err, err );
+                "{p}Failed filtering attempt {} of {} for event {} via {url}, from block {}" +
+                ", to block{}, error is: {err}, stack is:\n{stack}", strLogPrefix,
+                idxAttempt, cntAttempts, strEventName, u,
+                nBlockFrom.toHexString(), nBlockTo.toHexString(), err, err );
             if( owaspUtils.extractErrorMessage( err )
                 .indexOf( strErrorTextAboutNotExistingEvent ) >= 0
             ) {
                 details.error( "{p}Did stopped {} event filtering because no such event exist " +
-                    "in smart contract ", strLogPrefix, strEventName );
+                    "in smart contract", strLogPrefix, strEventName );
                 return ret;
             }
         }
-        ++ idxAttempt;
     }
     if( ( idxAttempt + 1 ) === cntAttempts && ret === "" ) {
         details.error(
@@ -410,7 +367,8 @@ export async function safeGetPastEvents(
 
 export async function safeGetPastEventsIterative(
     details: any, strLogPrefix: string,
-    ethersProvider: any, attempts: number, joContract: any, strEventName: string,
+    ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
+    attempts: number, joContract: owaspUtils.ethersMod.ethers.Contract, strEventName: string,
     nBlockFrom: any, nBlockTo: any, joFilter: any
 ) {
     if( imaHelperAPIs.getBlocksCountInInIterativeStepOfEventsScan() <= 0 ||

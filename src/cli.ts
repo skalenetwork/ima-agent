@@ -1526,7 +1526,7 @@ function commonInitPrintFoundContracts() {
     // message_proxy_mainnet_address              --> message_proxy_mainnet_abi
     // message_proxy_chain_address                --> message_proxy_chain_abi
 
-    const oct = function( joContract: any ) { // optional contract address
+    const oct = function( joContract: owaspUtils.ethersMod.ethers.Contract ) { // optional contract address
         if( joContract && "address" in joContract && joContract.address )
             return log.fmtInformation( "{}", joContract.address );
         return log.fmtError( "contract is not available" );
@@ -2689,7 +2689,7 @@ function initContractsIMA() {
     const imaState = state.get();
     if( imaState.chainProperties.mn.bHaveAbiIMA ) {
         const cp = imaState.chainProperties.mn;
-        const ep = cp.ethersProvider;
+        const ep: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider = cp.ethersProvider;
         const joABI = cp.joAbiIMA;
         imaState.joDepositBoxETH =
             new owaspUtils.ethersMod.ethers.Contract(
@@ -2736,7 +2736,7 @@ function initContractsIMA() {
     }
     if( imaState.chainProperties.sc.bHaveAbiIMA ) {
         const cp = imaState.chainProperties.sc;
-        const ep = cp.ethersProvider;
+        const ep: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider = cp.ethersProvider;
         const joABI = cp.joAbiIMA;
         imaState.joTokenManagerETH =
             new owaspUtils.ethersMod.ethers.Contract(
@@ -2786,7 +2786,7 @@ function initContractsIMA() {
     }
     if( imaState.chainProperties.tc.bHaveAbiIMA ) {
         const cp = imaState.chainProperties.tc;
-        const ep = cp.ethersProvider;
+        const ep: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider = cp.ethersProvider;
         const joABI = cp.joAbiIMA;
         imaState.joTokenManagerETHTarget =
             new owaspUtils.ethersMod.ethers.Contract(
@@ -2840,7 +2840,7 @@ function initContractsSkaleManager() {
     const imaState = state.get();
     if( imaState.bHaveSkaleManagerABI ) {
         const cp = imaState.chainProperties.mn;
-        const ep = cp.ethersProvider;
+        const ep: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider = cp.ethersProvider;
         const joABI = imaState.joAbiSkaleManager;
         imaState.joConstantsHolder =
             new owaspUtils.ethersMod.ethers.Contract(

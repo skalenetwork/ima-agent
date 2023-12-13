@@ -706,7 +706,8 @@ async function checkCorrectnessOfMessagesToSign(
     jarrMessages: any[], nIdxCurrentMsgBlockStart: number, joExtraSignOpts: any
 ) {
     const imaState = state.get();
-    let joMessageProxy: any = null, joAccount: any = null, joChainName: any = null;
+    let joMessageProxy: owaspUtils.ethersMod.ethers.Contract|null = null;
+    let joAccount: any = null, joChainName: any = null;
     if( strDirection == "M2S" ) {
         joMessageProxy = imaState.joMessageProxyMainNet;
         joAccount = imaState.chainProperties.mn.joAccount;
@@ -718,12 +719,9 @@ async function checkCorrectnessOfMessagesToSign(
     } else if( strDirection == "S2S" ) {
         joAccount = imaState.chainProperties.sc.joAccount;
         joChainName = joExtraSignOpts.chainNameDst;
-        const ethersProvider =
-            ( "ethersProviderSrc" in joExtraSignOpts &&
-                joExtraSignOpts.ethersProviderSrc )
-                ? joExtraSignOpts.ethersProviderSrc
-                : null
-                ;
+        const ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider|null =
+            ( "ethersProviderSrc" in joExtraSignOpts && joExtraSignOpts.ethersProviderSrc )
+                ? joExtraSignOpts.ethersProviderSrc : null;
         if( ! ethersProvider ) {
             throw new Error( "CRITICAL ERROR: No provider specified in extra signing options " +
                 `for checking messages of direction ${strDirection}` );
@@ -743,7 +741,8 @@ async function checkCorrectnessOfMessagesToSign(
         "MessageProxy contract with address {}, caller account address is {}, message(s) " +
         "count is {}, message(s) to process are {}, first real message index is {}, messages " +
         "will be sent to chain name {}",
-        strLogPrefix, strDirection, "verifyOutgoingMessageData", joMessageProxy.address,
+        strLogPrefix, strDirection, "verifyOutgoingMessageData",
+        joMessageProxy ? joMessageProxy.address : "<NullContract>",
         strCallerAccountAddress, jarrMessages.length, jarrMessages,
         nIdxCurrentMsgBlockStart, joChainName );
     let cntBadMessages = 0, i = 0;
@@ -765,6 +764,8 @@ async function checkCorrectnessOfMessagesToSign(
                     "dstContract": joMessage.destinationContract,
                     "data": joMessage.data
                 };
+                if( ! joMessageProxy )
+                    throw new Error( "No message proxy available" );
                 const isValidMessage = await joMessageProxy.callStatic.verifyOutgoingMessageData(
                     outgoingMessageData, { from: strCallerAccountAddress } );
                 details.trace(

@@ -43,7 +43,9 @@ const perMessageGasForTransfer = 1000000;
 const additionalS2MTransferOverhead = 200000;
 
 async function findOutReferenceLogRecord(
-    details: any, strLogPrefix: string, ethersProvider: any, joMessageProxy: any,
+    details: any, strLogPrefix: string,
+    ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
+    joMessageProxy: owaspUtils.ethersMod.ethers.Contract,
     bnBlockId: any, nMessageNumberToFind: any, isVerbose?: boolean
 ) {
     const bnMessageNumberToFind = owaspUtils.toBN( nMessageNumberToFind.toString() );
@@ -85,7 +87,9 @@ async function findOutReferenceLogRecord(
 }
 
 async function findOutAllReferenceLogRecords(
-    details: any, strLogPrefix: string, ethersProvider: any, joMessageProxy: any,
+    details: any, strLogPrefix: string,
+    ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
+    joMessageProxy: owaspUtils.ethersMod.ethers.Contract,
     bnBlockId: any, nIncMsgCnt: number, nOutMsgCnt: number, isVerbose?: boolean
 ) {
     if( isVerbose ) {
@@ -516,9 +520,8 @@ async function callbackAllMessagesSign(
         optsTransfer.strLogPrefix, optsTransfer.nIdxCurrentMsgBlockStart, joDebugArgs );
     optsTransfer.strActionName = optsTransfer.strDirection + " - Post incoming messages";
     const weiHowMuchPostIncomingMessages = undefined;
-    const gasPrice =
-        await optsTransfer.transactionCustomizerDst.computeGasPrice(
-            optsTransfer.ethersProviderDst, 200000000000 );
+    const gasPrice = await optsTransfer.transactionCustomizerDst.computeGasPrice(
+        optsTransfer.ethersProviderDst, 200000000000 );
     optsTransfer.details.debug( "{p}Using computed gasPrice {}={}",
         optsTransfer.strLogPrefix, gasPrice );
     let estimatedGasPostIncomingMessages =
@@ -663,10 +666,11 @@ async function checkOutgoingMessageEventInOneNode( optsTransfer: any, optsOutgoi
     let bEventIsFound = false;
     try {
         const ethersProviderNode = owaspUtils.getEthersProviderFromURL( strUrlHttp );
-        const joMessageProxyNode = new owaspUtils.ethersMod.ethers.Contract(
-            sc.joAbiIMA.message_proxy_chain_address,
-            sc.joAbiIMA.message_proxy_chain_abi,
-            ethersProviderNode );
+        const joMessageProxyNode: owaspUtils.ethersMod.ethers.Contract =
+            new owaspUtils.ethersMod.ethers.Contract(
+                sc.joAbiIMA.message_proxy_chain_address,
+                sc.joAbiIMA.message_proxy_chain_abi,
+                ethersProviderNode );
         const strEventName = "OutgoingMessage";
         const node_r = await imaEventLogScan.safeGetPastEventsProgressive(
             optsTransfer.details, optsTransfer.strLogPrefixShort, ethersProviderNode,
@@ -921,11 +925,13 @@ let gIsOneTransferInProgressInThisThread = false;
 
 export async function doTransfer(
     strDirection: string, joRuntimeOpts: any,
-    ethersProviderSrc: any, joMessageProxySrc: any, joAccountSrc: any,
-    ethersProviderDst: any, joMessageProxyDst: any, joAccountDst: any,
+    ethersProviderSrc: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
+    joMessageProxySrc: owaspUtils.ethersMod.ethers.Contract, joAccountSrc: any,
+    ethersProviderDst: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
+    joMessageProxyDst: owaspUtils.ethersMod.ethers.Contract, joAccountDst: any,
     chainNameSrc: string, chainNameDst: string, chainIdSrc: string, chainIdDst: string,
-    joDepositBoxMainNet: any, // for logs validation on mainnet
-    joTokenManagerSChain: any, // for logs validation on s-chain
+    joDepositBoxMainNet: owaspUtils.ethersMod.ethers.Contract|null, // for logs validation on mainnet
+    joTokenManagerSChain: owaspUtils.ethersMod.ethers.Contract|null, // for logs validation on s-chain
     nTransactionsCountInBlock: number,
     nTransferSteps: number, nMaxTransactionsCount: number, nBlockAwaitDepth: number, nBlockAge: number,
     fnSignMessages: any, joExtraSignOpts: any,
@@ -1083,12 +1089,12 @@ export async function doAllS2S( // s-chain --> s-chain
     joRuntimeOpts: any,
     imaState: any,
     skaleObserver: any,
-    ethersProviderDst: any,
-    joMessageProxyDst: any,
+    ethersProviderDst: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
+    joMessageProxyDst: owaspUtils.ethersMod.ethers.Contract,
     joAccountDst: any,
     chainNameDst: string,
     chainIdDst: string,
-    joTokenManagerSChain: any, // for logs validation on s-chain
+    joTokenManagerSChain: owaspUtils.ethersMod.ethers.Contract, // for logs validation on s-chain
     nTransactionsCountInBlock: number,
     nTransferSteps: number,
     nMaxTransactionsCount: number,
@@ -1107,7 +1113,8 @@ export async function doAllS2S( // s-chain --> s-chain
     for( let idxSChain = 0; idxSChain < cntSChains; ++ idxSChain ) {
         const joSChain = arrSChainsCached[idxSChain];
         const urlSrc = skaleObserver.pickRandomSChainUrl( joSChain );
-        const ethersProviderSrc = owaspUtils.getEthersProviderFromURL( urlSrc );
+        const ethersProviderSrc: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider =
+            owaspUtils.getEthersProviderFromURL( urlSrc );
         const joAccountSrc = joAccountDst; // ???
         const chainNameSrc = "" + joSChain.name;
         const chainIdSrc = "" + joSChain.chainId;
@@ -1123,14 +1130,16 @@ export async function doAllS2S( // s-chain --> s-chain
             } else {
                 if( loop.checkTimeFraming( null, "s2s", joRuntimeOpts ) ) {
                     // ??? assuming all S-Chains have same ABIs here
-                    const joMessageProxySrc = new owaspUtils.ethersMod.ethers.Contract(
-                        sc.joAbiIMA.message_proxy_chain_address,
-                        sc.joAbiIMA.message_proxy_chain_abi,
-                        ethersProviderSrc );
-                    const joDepositBoxSrc = new owaspUtils.ethersMod.ethers.Contract(
-                        sc.joAbiIMA.message_proxy_chain_address,
-                        sc.joAbiIMA.message_proxy_chain_abi,
-                        ethersProviderSrc );
+                    const joMessageProxySrc: owaspUtils.ethersMod.ethers.Contract =
+                        new owaspUtils.ethersMod.ethers.Contract(
+                            sc.joAbiIMA.message_proxy_chain_address,
+                            sc.joAbiIMA.message_proxy_chain_abi,
+                            ethersProviderSrc );
+                    const joDepositBoxSrc: owaspUtils.ethersMod.ethers.Contract =
+                        new owaspUtils.ethersMod.ethers.Contract(
+                            sc.joAbiIMA.message_proxy_chain_address,
+                            sc.joAbiIMA.message_proxy_chain_abi,
+                            ethersProviderSrc );
                     const joExtraSignOpts: any = {
                         chainNameSrc: chainNameSrc,
                         chainIdSrc: chainIdSrc,

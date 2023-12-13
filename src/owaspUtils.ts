@@ -678,8 +678,9 @@ export function fnAddressImpl_( anyThis: any ) : string {
     return anyThis.address_;
 }
 
-export function getEthersProviderFromURL( strURL: string ) : any {
-    const url = new URL( strURL );
+export function getEthersProviderFromURL( strURL: URL|string )
+    :ethersMod.ethers.providers.JsonRpcProvider {
+    const url = new URL( strURL.toString() );
     let userName:string|null = null, userPwd:string|null = null;
     if( url.username ) {
         userName = url.username;
@@ -697,11 +698,14 @@ export function getEthersProviderFromURL( strURL: string ) : any {
         if( userPwd )
             joConnectionInfo.password = userPwd;
     }
-    const ethersProvider = new ethersMod.ethers.providers.JsonRpcProvider( joConnectionInfo );
+    const ethersProvider: ethersMod.ethers.providers.JsonRpcProvider =
+        new ethersMod.ethers.providers.JsonRpcProvider( joConnectionInfo );
     return ethersProvider;
 }
 
-export function ethersProviderToUrl( ethersProvider: any ) : string {
+export function ethersProviderToUrl(
+    ethersProvider: ethersMod.ethers.providers.JsonRpcProvider|null
+    ) : string {
     let strURL: string|null = null;
     if( ethersProvider &&
         "connection" in ethersProvider && typeof ethersProvider.connection == "object" &&

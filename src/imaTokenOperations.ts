@@ -33,7 +33,7 @@ import * as threadInfo from "./threadInfo.js";
 
 export async function getBalanceErc20(
     isMainNet: boolean,
-    ethersProvider: any,
+    ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainId: string,
     joAccount: any,
     strCoinName: string,
@@ -62,7 +62,7 @@ export async function getBalanceErc20(
 
 export async function getOwnerOfErc721(
     isMainNet: boolean,
-    ethersProvider: any,
+    ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainId: string,
     joAccount: any,
     strCoinName: string,
@@ -91,7 +91,7 @@ export async function getOwnerOfErc721(
 
 export async function getBalanceErc1155(
     isMainNet: boolean,
-    ethersProvider: any,
+    ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainId: string,
     joAccount: any,
     strCoinName: string,
@@ -120,18 +120,18 @@ export async function getBalanceErc1155(
 }
 
 export async function doErc721PaymentFromMainNet(
-    ethersProviderMainNet: any,
-    ethersProviderSChain: any,
+    ethersProviderMainNet: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
+    ethersProviderSChain: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainIdMainNet: string,
     chainIdSChain: string,
     joAccountSrc: any,
     joAccountDst: any,
-    joDepositBoxERC721: any,
-    joMessageProxyMainNet: any, // for checking logs
+    joDepositBoxERC721: owaspUtils.ethersMod.ethers.Contract,
+    joMessageProxyMainNet: owaspUtils.ethersMod.ethers.Contract, // for checking logs
     chainNameSChain: string,
     tokenId: any, // which ERC721 token id to send
     weiHowMuch: any, // how much ETH
-    joTokenManagerERC721: any, // only s-chain
+    joTokenManagerERC721: owaspUtils.ethersMod.ethers.Contract, // only s-chain
     strCoinNameErc721MainNet: string,
     erc721PrivateTestnetJsonMainNet: any,
     strCoinNameErc721SChain: string,
@@ -258,18 +258,18 @@ export async function doErc721PaymentFromMainNet(
 }
 
 export async function doErc20PaymentFromMainNet(
-    ethersProviderMainNet: any,
-    ethersProviderSChain: any,
+    ethersProviderMainNet: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
+    ethersProviderSChain: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainIdMainNet: string,
     chainIdSChain: string,
     joAccountSrc: any,
     joAccountDst: any,
-    joDepositBoxERC20: any,
-    joMessageProxyMainNet: any, // for checking logs
+    joDepositBoxERC20: owaspUtils.ethersMod.ethers.Contract,
+    joMessageProxyMainNet: owaspUtils.ethersMod.ethers.Contract, // for checking logs
     chainNameSChain: string,
     tokenAmount: any, // how much ERC20 tokens to send
     weiHowMuch: any, // how much ETH
-    joTokenManagerERC20: any, // only s-chain
+    joTokenManagerERC20: owaspUtils.ethersMod.ethers.Contract, // only s-chain
     strCoinNameErc20MainNet: string,
     erc20MainNet: any,
     strCoinNameErc20SChain: string,
@@ -395,19 +395,19 @@ export async function doErc20PaymentFromMainNet(
 }
 
 export async function doErc1155PaymentFromMainNet(
-    ethersProviderMainNet: any,
-    ethersProviderSChain: any,
+    ethersProviderMainNet: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
+    ethersProviderSChain: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainIdMainNet: string,
     chainIdSChain: string,
     joAccountSrc: any,
     joAccountDst: any,
-    joDepositBoxERC1155: any,
-    joMessageProxyMainNet: any, // for checking logs
+    joDepositBoxERC1155: owaspUtils.ethersMod.ethers.Contract,
+    joMessageProxyMainNet: owaspUtils.ethersMod.ethers.Contract, // for checking logs
     chainNameSChain: string,
     tokenId: any, // which ERC1155 token id to send
     tokenAmount: any, // which ERC1155 token id to send
     weiHowMuch: any, // how much ETH
-    joTokenManagerERC1155: any, // only s-chain
+    joTokenManagerERC1155: owaspUtils.ethersMod.ethers.Contract, // only s-chain
     strCoinNameErc1155SMainNet: string,
     erc1155PrivateTestnetJsonMainNet: any,
     strCoinNameErc1155SChain: string,
@@ -542,16 +542,17 @@ export async function doErc1155PaymentFromMainNet(
 }
 
 export async function doErc1155BatchPaymentFromMainNet(
-    ethersProviderMainNet: any, ethersProviderSChain: any,
+    ethersProviderMainNet: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
+    ethersProviderSChain: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainIdMainNet: string, chainIdSChain: string,
     joAccountSrc: any, joAccountDst: any,
-    joDepositBoxERC1155: any,
-    joMessageProxyMainNet: any, // for checking logs
+    joDepositBoxERC1155: owaspUtils.ethersMod.ethers.Contract,
+    joMessageProxyMainNet: owaspUtils.ethersMod.ethers.Contract, // for checking logs
     chainNameSChain: string,
     arrTokenIds: any[], // which ERC1155 token id to send
     arrTokenAmounts: any[], // which ERC1155 token id to send
     weiHowMuch: any, // how much ETH
-    joTokenManagerERC1155: any, // only s-chain
+    joTokenManagerERC1155: owaspUtils.ethersMod.ethers.Contract, // only s-chain
     strCoinNameErc1155SMainNet: string,
     erc1155PrivateTestnetJsonMainNet: any, strCoinNameErc1155SChain: string,
     erc1155PrivateTestnetJsonSChain: any,
@@ -670,15 +671,15 @@ export async function doErc1155BatchPaymentFromMainNet(
 }
 
 export async function doErc20PaymentFromSChain(
-    ethersProviderMainNet: any,
-    ethersProviderSChain: any,
+    ethersProviderMainNet: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
+    ethersProviderSChain: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainIdMainNet: string,
     chainIdSChain: string,
     joAccountSrc: any,
     joAccountDst: any,
-    joTokenManagerERC20: any, // only s-chain
-    joMessageProxySChain: any, // for checking logs
-    joDepositBox: any, // only main net
+    joTokenManagerERC20: owaspUtils.ethersMod.ethers.Contract, // only s-chain
+    joMessageProxySChain: owaspUtils.ethersMod.ethers.Contract, // for checking logs
+    joDepositBox: owaspUtils.ethersMod.ethers.Contract, // only main net
     tokenAmount: any, // how much ERC20 tokens to send
     weiHowMuch: any, // how much ETH
     strCoinNameErc20MainNet: string,
@@ -814,15 +815,15 @@ export async function doErc20PaymentFromSChain(
 }
 
 export async function doErc721PaymentFromSChain(
-    ethersProviderMainNet: any,
-    ethersProviderSChain: any,
+    ethersProviderMainNet: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
+    ethersProviderSChain: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainIdMainNet: string,
     chainIdSChain: string,
     joAccountSrc: any,
     joAccountDst: any,
-    joTokenManagerERC721: any, // only s-chain
-    joMessageProxySChain: any, // for checking logs
-    joDepositBox: any, // only main net
+    joTokenManagerERC721: owaspUtils.ethersMod.ethers.Contract, // only s-chain
+    joMessageProxySChain: owaspUtils.ethersMod.ethers.Contract, // for checking logs
+    joDepositBox: owaspUtils.ethersMod.ethers.Contract, // only main net
     tokenId: any, // which ERC721 token id to send
     weiHowMuch: any, // how much ETH
     strCoinNameErc721MainNet: string,
@@ -962,15 +963,15 @@ export async function doErc721PaymentFromSChain(
 }
 
 export async function doErc1155PaymentFromSChain(
-    ethersProviderMainNet: any,
-    ethersProviderSChain: any,
+    ethersProviderMainNet: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
+    ethersProviderSChain: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainIdMainNet: string,
     chainIdSChain: string,
     joAccountSrc: any,
     joAccountDst: any,
-    joTokenManagerERC1155: any, // only s-chain
-    joMessageProxySChain: any, // for checking logs
-    joDepositBox: any, // only main net
+    joTokenManagerERC1155: owaspUtils.ethersMod.ethers.Contract, // only s-chain
+    joMessageProxySChain: owaspUtils.ethersMod.ethers.Contract, // for checking logs
+    joDepositBox: owaspUtils.ethersMod.ethers.Contract, // only main net
     tokenId: any, // which ERC1155 token id to send
     tokenAmount: any, // which ERC1155 token id to send
     weiHowMuch: any, // how much ETH
@@ -1109,15 +1110,15 @@ export async function doErc1155PaymentFromSChain(
 }
 
 export async function doErc1155BatchPaymentFromSChain(
-    ethersProviderMainNet: any,
-    ethersProviderSChain: any,
+    ethersProviderMainNet: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
+    ethersProviderSChain: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainIdMainNet: string,
     chainIdSChain: string,
     joAccountSrc: any,
     joAccountDst: any,
-    joTokenManagerERC1155: any, // only s-chain
-    joMessageProxySChain: any, // for checking logs
-    joDepositBox: any, // only main net
+    joTokenManagerERC1155: owaspUtils.ethersMod.ethers.Contract, // only s-chain
+    joMessageProxySChain: owaspUtils.ethersMod.ethers.Contract, // for checking logs
+    joDepositBox: owaspUtils.ethersMod.ethers.Contract, // only main net
     arrTokenIds: any[], // which ERC1155 token ids to send
     arrTokenAmounts: any[], // which ERC1155 token amounts to send
     weiHowMuch: any, // how much ETH
@@ -1256,11 +1257,11 @@ export async function doErc1155BatchPaymentFromSChain(
 
 export async function doErc20PaymentS2S(
     isForward: boolean,
-    ethersProviderSrc: any,
+    ethersProviderSrc: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainIdSrc: string,
     strChainNameDst: string,
     joAccountSrc: any,
-    joTokenManagerERC20Src: any,
+    joTokenManagerERC20Src: owaspUtils.ethersMod.ethers.Contract,
     nAmountOfToken: any, // how much ERC20 tokens to send
     nAmountOfWei: any, // how much to send
     strCoinNameErc20Src: string,
@@ -1396,11 +1397,11 @@ export async function doErc20PaymentS2S(
 
 export async function doErc721PaymentS2S(
     isForward: boolean,
-    ethersProviderSrc: any,
+    ethersProviderSrc: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainIdSrc: string,
     strChainNameDst: string,
     joAccountSrc: any,
-    joTokenManagerERC721Src: any,
+    joTokenManagerERC721Src: owaspUtils.ethersMod.ethers.Contract,
     tokenId: any, // which ERC721 token id to send
     nAmountOfWei: any, // how much to send
     strCoinNameErc721Src: string,
@@ -1540,11 +1541,11 @@ export async function doErc721PaymentS2S(
 
 export async function doErc1155PaymentS2S(
     isForward: boolean,
-    ethersProviderSrc: any,
+    ethersProviderSrc: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainIdSrc: string,
     strChainNameDst: string,
     joAccountSrc: any,
-    joTokenManagerERC1155Src: any,
+    joTokenManagerERC1155Src: owaspUtils.ethersMod.ethers.Contract,
     tokenId: any, // which ERC721 token id to send
     nAmountOfToken: any, // how much ERC1155 tokens to send
     nAmountOfWei: any, // how much to send
@@ -1685,11 +1686,11 @@ export async function doErc1155PaymentS2S(
 
 export async function doErc1155BatchPaymentS2S(
     isForward: boolean,
-    ethersProviderSrc: any,
+    ethersProviderSrc: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainIdSrc: string,
     strChainNameDst: string,
     joAccountSrc: any,
-    joTokenManagerERC1155Src: any,
+    joTokenManagerERC1155Src: owaspUtils.ethersMod.ethers.Contract,
     arrTokenIds: any[], // which ERC1155 token id to send
     arrTokenAmounts: any[], // which ERC1155 token id to send
     nAmountOfWei: any, // how much to send
@@ -1831,7 +1832,7 @@ export async function doErc1155BatchPaymentS2S(
 }
 
 export async function mintErc20(
-    ethersProvider: any,
+    ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainId: string,
     chainName: string,
     joAccount: any,
@@ -1900,7 +1901,7 @@ export async function mintErc20(
 }
 
 export async function mintErc721(
-    ethersProvider: any,
+    ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainId: string,
     chainName: string,
     joAccount: any,
@@ -1969,7 +1970,7 @@ export async function mintErc721(
 }
 
 export async function mintErc1155(
-    ethersProvider: any,
+    ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainId: string,
     chainName: any,
     joAccount: any,
@@ -2042,7 +2043,7 @@ export async function mintErc1155(
 }
 
 export async function burnErc20(
-    ethersProvider: any,
+    ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainId: string,
     chainName: string,
     joAccount: any,
@@ -2111,7 +2112,7 @@ export async function burnErc20(
 }
 
 export async function burnErc721(
-    ethersProvider: any,
+    ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainId: string,
     chainName: string,
     joAccount: any,
@@ -2177,7 +2178,7 @@ export async function burnErc721(
 }
 
 export async function burnErc1155(
-    ethersProvider: any,
+    ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainId: string,
     chainName: string,
     joAccount: any,

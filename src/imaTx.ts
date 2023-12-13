@@ -68,8 +68,9 @@ export function dryRunIgnore( isIgnored: boolean ) : boolean {
 
 export async function dryRunCall(
     details: any,
-    ethersProvider: any,
-    strContractName: string, joContract: any, strMethodName: string, arrArguments: any[],
+    ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
+    strContractName: string, joContract: owaspUtils.ethersMod.ethers.Contract,
+    strMethodName: string, arrArguments: any[],
     joAccount: any, strActionName: string, isDryRunResultIgnore: boolean,
     gasPrice: any, gasValue: any, weiHowMuch: any,
     opts?: any
@@ -251,12 +252,9 @@ function postConvertBN( jo: any, name: any ) {
 }
 
 async function payedCallDirect( optsPayedCall: any ) {
-    const ethersWallet =
-        new owaspUtils.ethersMod.ethers.Wallet(
-            owaspUtils.ensureStartsWith0x(
-                optsPayedCall.joAccount.privateKey ),
-            optsPayedCall.ethersProvider );
-
+    const ethersWallet = new owaspUtils.ethersMod.ethers.Wallet(
+        owaspUtils.ensureStartsWith0x( optsPayedCall.joAccount.privateKey ),
+        optsPayedCall.ethersProvider );
     let { chainId } = await optsPayedCall.ethersProvider.getNetwork();
     if( chainId == "string" )
         chainId = owaspUtils.parseIntOrHex( chainId );
@@ -282,8 +280,9 @@ async function payedCallDirect( optsPayedCall: any ) {
 }
 
 export async function payedCall(
-    details: any, ethersProvider: any,
-    strContractName: string, joContract: any, strMethodName: any, arrArguments: any[],
+    details: any, ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
+    strContractName: string, joContract: owaspUtils.ethersMod.ethers.Contract,
+    strMethodName: any, arrArguments: any[],
     joAccount: any, strActionName: string,
     gasPrice: any, estimatedGas: any, weiHowMuch: any,
     opts?: any
@@ -382,7 +381,7 @@ export async function payedCall(
 export async function checkTransactionToSchain(
     unsignedTx: any,
     details: any,
-    ethersProvider: any,
+    ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     joAccount: any
 ) {
     const strLogPrefix = "PoW-mining: ";
@@ -541,7 +540,11 @@ async function tmGetRecord( txId: any ) {
     return null;
 }
 
-async function tmWait( details: any, txId: any, ethersProvider: any, nWaitSeconds: number = 36000 ) {
+async function tmWait(
+    details: any,
+    txId: any,
+    ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
+    nWaitSeconds: number = 36000 ) {
     const strLogPrefix = log.fmtDebug( "(gathered details)" ) + " ";
     details.debug( "{p}TM - will wait TX {} to complete for {} second(s) maximum",
         strLogPrefix, txId, nWaitSeconds );
@@ -573,7 +576,7 @@ async function tmWait( details: any, txId: any, ethersProvider: any, nWaitSecond
 }
 
 async function tmEnsureTransaction(
-    details: any, ethersProvider: any, priority: any, txAdjusted: any,
+    details: any, ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider, priority: any, txAdjusted: any,
     cntAttempts?: number, sleepMilliseconds?: number
 ) {
     cntAttempts = cntAttempts || 1;
@@ -610,7 +613,9 @@ export class TransactionCustomizer {
             : null; // null means use current gasPrice or recommendedGasPrice
         this.gasMultiplier = gasMultiplier ? ( 0.0 + gasMultiplier ) : 1.25;
     }
-    async computeGasPrice( ethersProvider: any, maxGasPrice: any ) {
+    async computeGasPrice(
+        ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
+        maxGasPrice: any ) {
         const gasPrice =
             owaspUtils.parseIntOrHex(
                 owaspUtils.toBN(
@@ -637,8 +642,9 @@ export class TransactionCustomizer {
     }
     async computeGas(
         details: any,
-        ethersProvider: any,
-        strContractName: string, joContract: any, strMethodName: string, arrArguments: any[],
+        ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
+        strContractName: string, joContract: owaspUtils.ethersMod.ethers.Contract,
+        strMethodName: string, arrArguments: any[],
         joAccount: any, strActionName: string,
         gasPrice: any, gasValueRecommended: any, weiHowMuch: any,
         opts?: any

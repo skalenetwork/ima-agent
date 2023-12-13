@@ -252,16 +252,20 @@ async function singleTransferLoopPartS2M( optsLoop: any, strLogPrefix: string ) 
                     b2 = await IMA.doTransfer( // s-chain --> main-net
                         "S2M",
                         optsLoop.joRuntimeOpts,
+                        
                         imaState.chainProperties.sc.ethersProvider,
                         imaState.joMessageProxySChain,
                         imaState.chainProperties.sc.joAccount,
+                        
                         imaState.chainProperties.mn.ethersProvider,
                         imaState.joMessageProxyMainNet,
                         imaState.chainProperties.mn.joAccount,
+                        
                         imaState.chainProperties.sc.strChainName,
                         imaState.chainProperties.mn.strChainName,
                         imaState.chainProperties.sc.chainId,
                         imaState.chainProperties.mn.chainId,
+                        
                         imaState.joDepositBoxETH, // for logs validation on mainnet
                         null,
                         imaState.nTransferBlockSizeS2M,

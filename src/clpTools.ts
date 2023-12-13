@@ -1042,12 +1042,13 @@ export function commandLineTaskPaymentS2S() {
         "fn": async function() {
             const isForward = imaHelperAPIs.isForwardS2S();
             const sc = imaState.chainProperties.sc, tc = imaState.chainProperties.tc;
-            const ethersProviderSrc = isForward ? sc.ethersProvider : tc.ethersProvider;
+            const ethersProviderSrc: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider =
+                isForward ? sc.ethersProvider : tc.ethersProvider;
             const chainIdSrc = isForward ? sc.chainId : tc.chainId;
             const joAccountSrc = isForward ? sc.joAccount : tc.joAccount;
-            const joTokenManagerERC20Src = isForward
+            const joTokenManagerERC20Src: owaspUtils.ethersMod.ethers.Contract = isForward
                 ? imaState.joTokenManagerERC20 : imaState.joTokenManagerERC20Target;
-            const joTokenManagerERC721Src = isForward
+            const joTokenManagerERC721Src: owaspUtils.ethersMod.ethers.Contract = isForward
                 ? ( imaState.isWithMetadata721
                     ? imaState.joTokenManagerERC721WithMetadata
                     : imaState.joTokenManagerERC721 )
@@ -1055,7 +1056,7 @@ export function commandLineTaskPaymentS2S() {
                     ? imaState.joTokenManagerERC721WithMetadataTarget
                     : imaState.joTokenManagerERC721Target )
             ;
-            const joTokenManagerERC1155Src = isForward
+            const joTokenManagerERC1155Src: owaspUtils.ethersMod.ethers.Contract = isForward
                 ? imaState.joTokenManagerERC1155 : imaState.joTokenManagerERC1155Target;
             const strChainNameDst = isForward ? tc.strChainName : sc.strChainName;
             const strCoinNameErc20Src = isForward ? sc.strCoinNameErc20 : tc.strCoinNameErc20;

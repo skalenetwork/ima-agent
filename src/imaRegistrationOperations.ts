@@ -27,10 +27,11 @@ import * as log from "./log.js";
 import * as imaHelperAPIs from "./imaHelperAPIs.js";
 import * as imaTx from "./imaTx.js";
 import * as threadInfo from "./threadInfo.js";
+import * as owaspUtils from "./owaspUtils.js";
 
 export async function invokeHasChain(
     details: any,
-    ethersProvider: any, // Main-Net or S-Chin
+    ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider, // Main-Net or S-Chin
     joLinker: any, // Main-Net or S-Chin
     joAccount: any, // Main-Net or S-Chin
     chainIdSChain: string
@@ -53,7 +54,7 @@ export async function invokeHasChain(
 
 export async function waitForHasChain(
     details: any,
-    ethersProvider: any, // Main-Net or S-Chin
+    ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider, // Main-Net or S-Chin
     joLinker: any, // Main-Net or S-Chin
     joAccount: any, // Main-Net or S-Chin
     chainIdSChain: string,
@@ -78,7 +79,7 @@ export async function waitForHasChain(
 // main-net.DepositBox call: function addSchain(string schainName, address tokenManagerAddress)
 //
 export async function checkIsRegisteredSChainInDepositBoxes( // step 1
-    ethersProviderMainNet: any,
+    ethersProviderMainNet: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     joLinker: any,
     joAccountMN: any,
     chainIdSChain: string
@@ -113,16 +114,16 @@ export async function checkIsRegisteredSChainInDepositBoxes( // step 1
 }
 
 export async function registerSChainInDepositBoxes( // step 1
-    ethersProviderMainNet: any,
-    joLinker: any,
+    ethersProviderMainNet: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
+    joLinker: owaspUtils.ethersMod.ethers.Contract,
     joAccountMN: any,
-    joTokenManagerETH: any, // only s-chain
-    joTokenManagerERC20: any, // only s-chain
-    joTokenManagerERC721: any, // only s-chain
-    joTokenManagerERC1155: any, // only s-chain
-    joTokenManagerERC721WithMetadata: any, // only s-chain
-    joCommunityLocker: any, // only s-chain
-    joTokenManagerLinker: any,
+    joTokenManagerETH: owaspUtils.ethersMod.ethers.Contract, // only s-chain
+    joTokenManagerERC20: owaspUtils.ethersMod.ethers.Contract, // only s-chain
+    joTokenManagerERC721: owaspUtils.ethersMod.ethers.Contract, // only s-chain
+    joTokenManagerERC1155: owaspUtils.ethersMod.ethers.Contract, // only s-chain
+    joTokenManagerERC721WithMetadata: owaspUtils.ethersMod.ethers.Contract, // only s-chain
+    joCommunityLocker: owaspUtils.ethersMod.ethers.Contract, // only s-chain
+    joTokenManagerLinker: owaspUtils.ethersMod.ethers.Contract,
     chainNameSChain: string,
     chainNameMainNet: string,
     transactionCustomizerMainNet: imaTx.TransactionCustomizer,

@@ -213,8 +213,8 @@ async function handleOracleSigned(
 }
 
 export async function doOracleGasPriceSetup(
-    ethersProviderMainNet: any,
-    ethersProviderSChain: any,
+    ethersProviderMainNet: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
+    ethersProviderSChain: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     transactionCustomizerSChain: imaTx.TransactionCustomizer,
     joCommunityLocker: any,
     joAccountSC: any,

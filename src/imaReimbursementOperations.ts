@@ -29,7 +29,7 @@ import * as imaTx from "./imaTx.js";
 import * as imaGasUsage from "./imaGasUsageOperations.js";
 
 export async function reimbursementShowBalance(
-    ethersProviderMainNet: any,
+    ethersProviderMainNet: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     joCommunityPool: any,
     joReceiverMainNet: any,
     strChainNameMainNet: any,
@@ -70,7 +70,7 @@ export async function reimbursementShowBalance(
 }
 
 export async function reimbursementEstimateAmount(
-    ethersProviderMainNet: any,
+    ethersProviderMainNet: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     joCommunityPool: any,
     joReceiverMainNet: any,
     strChainNameMainNet: string,
@@ -153,7 +153,7 @@ export async function reimbursementEstimateAmount(
 }
 
 export async function reimbursementWalletRecharge(
-    ethersProviderMainNet: any,
+    ethersProviderMainNet: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     joCommunityPool: any,
     joAccountMN: any,
     strChainNameMainNet: string,
@@ -215,7 +215,7 @@ export async function reimbursementWalletRecharge(
 }
 
 export async function reimbursementWalletWithdraw(
-    ethersProviderMainNet: any,
+    ethersProviderMainNet: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     joCommunityPool: any,
     joAccountMN: any,
     strChainNameMainNet: string,
@@ -282,7 +282,7 @@ export async function reimbursementWalletWithdraw(
 }
 
 export async function reimbursementSetRange(
-    ethersProviderSChain: any,
+    ethersProviderSChain: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     joCommunityLocker: any,
     joAccountSC: any,
     strChainNameSChain: string,

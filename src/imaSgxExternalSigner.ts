@@ -67,9 +67,8 @@ async function run() {
         const strPathKey = process.argv[14];
         if( gIsDebugLogging )
             log.debug( "Path to SGX key file is {}", strPathKey );
-
-        const ethersProvider = owaspUtils.getEthersProviderFromURL( strURL );
-
+        const ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider =
+            owaspUtils.getEthersProviderFromURL( strURL );
         const tx: any = {
             data: tcData,
             to: txTo,
@@ -128,7 +127,7 @@ async function run() {
             if( gIsDebugLogging )
                 log.debug( "--- Raw-sent transaction result ---> {}", sr );
 
-            const joReceipt = await ethersProvider.waitForTransaction( sr.hash );
+            const joReceipt: any = await ethersProvider.waitForTransaction( sr.hash );
             if( gIsDebugLogging )
                 log.debug( "--- Transaction receipt ---> {}", joReceipt );
             joReceipt.chainId = tx.chainId;
