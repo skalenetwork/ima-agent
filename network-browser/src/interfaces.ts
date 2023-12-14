@@ -89,6 +89,10 @@ export interface SkaleManagerAbi {
     schains_abi: InterfaceAbi
     schains_internal_address: string
     schains_internal_abi: InterfaceAbi
+    validator_service_address: string
+    validator_service_abi: InterfaceAbi
+    skale_manager_address: string
+    skale_manager_abi: InterfaceAbi
 }
 
 export interface SChainImaAbi {

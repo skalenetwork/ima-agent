@@ -3,7 +3,6 @@ on: [push, pull_request]
 env:
   ETH_PRIVATE_KEY: ${{ secrets.ETH_PRIVATE_KEY }}
   MANAGER_TAG: "1.9.3-beta.0"
-  ENDPOINT: http://127.0.0.1:8545
 jobs:
   test_network_browser:
     runs-on: ubuntu-latest
@@ -26,4 +25,4 @@ jobs:
 
       - name: Run network-browser tests
         working-directory: network-browser
-        run: bun test
+        run: bash run_test.sh
