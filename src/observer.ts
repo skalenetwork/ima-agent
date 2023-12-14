@@ -68,7 +68,7 @@ export function getLastCachedSChains(): any[] {
 }
 
 export function pickRandomSChainNodeIndex( joSChain: any ): number {
-    let min = 0, max = joSChain.nodes.length - 1;
+    let min = 0; let max = joSChain.nodes.length - 1;
     min = Math.ceil( min );
     max = Math.floor( max );
     const idxNode = Math.floor( Math.random() * ( max - min + 1 ) ) + min;

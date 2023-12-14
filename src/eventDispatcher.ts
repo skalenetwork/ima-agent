@@ -54,7 +54,7 @@ export class EventDispatcher {
         this.isDisposing = true;
         this.isDisposed = true;
         this.dispatchEvent(
-            new UniversalDispatcherEvent( "dispose", { "detail": { "ref": this } } )
+            new UniversalDispatcherEvent( "dispose", { detail: { ref: this } } )
         );
         this.removeAllEventListeners();
     }

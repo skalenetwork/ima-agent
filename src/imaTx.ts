@@ -289,18 +289,18 @@ export async function payedCall(
     opts?: any
 ) {
     const optsPayedCall: any = {
-        details: details,
-        ethersProvider: ethersProvider,
-        strContractName: strContractName,
-        joContract: joContract,
-        strMethodName: strMethodName,
-        arrArguments: arrArguments,
-        joAccount: joAccount,
-        strActionName: strActionName,
-        gasPrice: gasPrice,
-        estimatedGas: estimatedGas,
-        weiHowMuch: weiHowMuch,
-        opts: opts,
+        details,
+        ethersProvider,
+        strContractName,
+        joContract,
+        strMethodName,
+        arrArguments,
+        joAccount,
+        strActionName,
+        gasPrice,
+        estimatedGas,
+        weiHowMuch,
+        opts,
         strContractCallDescription: "",
         strLogPrefix: "",
         joACI: null,
@@ -366,9 +366,9 @@ export async function payedCall(
         const ethSpent = owaspUtils.ethersMod.ethers.utils.formatEther(
             optsPayedCall.joReceipt.cumulativeGasUsed.mul( optsPayedCall.unsignedTx.gasPrice ) );
         optsPayedCall.joReceipt.summary = {
-            bnGasSpent: bnGasSpent,
-            gasSpent: gasSpent,
-            ethSpent: ethSpent
+            bnGasSpent,
+            gasSpent,
+            ethSpent
         };
         optsPayedCall.details.trace( "{p}gas spent: {}", optsPayedCall.strLogPrefix, gasSpent );
         optsPayedCall.details.trace( "{p}ETH spent: {}", optsPayedCall.strLogPrefix, ethSpent );
@@ -454,9 +454,9 @@ export async function calculatePowNumber(
 
 export function getAccountConnectivityInfo( joAccount: any ) {
     const joACI: any = {
-        "isBad": true,
-        "strType": "bad",
-        "isAutoSend": false
+        isBad: true,
+        strType: "bad",
+        isAutoSend: false
     };
     if( "strTransactionManagerURL" in joAccount &&
         typeof joAccount.strTransactionManagerURL == "string" &&
@@ -504,8 +504,8 @@ function tmMakeId( details: any ) {
 function tmMakeRecord( tx: any = {}, score: any ) {
     const status = "PROPOSED";
     return JSON.stringify( {
-        "score": score,
-        "status": status,
+        score,
+        status,
         ...tx
     } );
 }

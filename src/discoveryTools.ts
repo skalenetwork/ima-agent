@@ -271,12 +271,18 @@ async function handlePeriodicDiscoveryAttemptActions( isSilentReDiscovery: boole
         }
         fnAfter();
         continueSChainDiscoveryInBackgroundIfNeeded( isSilentReDiscovery, null )
-            .then( function() {} ).catch( function() {} ); ;
+            .then( function() {} ).catch( function( err ) {
+                log.error(
+                    "Failed to continue S-chain discovery, reported error is: {err}", err );
+            } ); ;
     } catch ( err ) { }
     gFlagIsInSChainDiscovery = false;
     // fnAfter() will be called here inside async call at beginning
     continueSChainDiscoveryInBackgroundIfNeeded( isSilentReDiscovery, fnAfter )
-        .then( function() {} ).catch( function() {} ); ;
+        .then( function() {} ).catch( function( err ) {
+            log.error(
+                "Failed to continue S-chain discovery, reported error is: {err}", err );
+        } );
 }
 
 export async function continueSChainDiscoveryInBackgroundIfNeeded(
@@ -320,7 +326,8 @@ export async function continueSChainDiscoveryInBackgroundIfNeeded(
         }
     }
     gTimerSChainDiscovery = setInterval( function() {
-        handlePeriodicDiscoveryAttemptActions( isSilentReDiscovery, fnAfter );
+        handlePeriodicDiscoveryAttemptActions( isSilentReDiscovery, fnAfter )
+            .then( function() {} ).catch( function() {} );
     }, imaState.joSChainDiscovery.periodicDiscoveryInterval );
 }
 
@@ -372,7 +379,7 @@ async function discoverSChainWalkNodes( optsDiscover: any ) {
             joCall = await rpcCall.create( strNodeURL, rpcCallOpts );
             if( ! joCall )
                 throw new Error( `Failed to create JSON RPC call object to ${strNodeURL}` );
-            const joIn: any = { "method": "skale_imaInfo", "params": { } };
+            const joIn: any = { method: "skale_imaInfo", params: { } };
             if( isSendImaAgentIndex() )
                 joIn.params.fromImaAgentIndex = optsDiscover.imaState.nNodeNumber;
             const joOut = await joCall.call( joIn );
@@ -521,6 +528,8 @@ async function handleDiscoverSkaleNodesRpcInfoResult(
             optsDiscover.fnAfter( null, optsDiscover.joSChainNetworkInfo );
         rv = true;
     } ).catch( function( err: Error | string ) {
+        log.error(
+            "Failed to wait until S-chain discovery complete, reported error is: {err}", err );
         if( optsDiscover.fnAfter )
             optsDiscover.fnAfter( err, null );
     } );
@@ -531,10 +540,10 @@ export async function discoverSChainNetwork(
     fnAfter: any, isSilentReDiscovery: boolean,
     joPrevSChainNetworkInfo: any, nCountToWait: number ) {
     const optsDiscover: any = {
-        fnAfter: fnAfter,
+        fnAfter,
         isSilentReDiscovery: ( !!isSilentReDiscovery ),
         joPrevSChainNetworkInfo: joPrevSChainNetworkInfo || null,
-        nCountToWait: nCountToWait,
+        nCountToWait,
         imaState: state.get(),
         strLogPrefix: "S-Chain network discovery: ",
         joSChainNetworkInfo: null,
@@ -557,7 +566,7 @@ export async function discoverSChainNetwork(
         joCall = await rpcCall.create( scURL, rpcCallOpts );
         if( ! joCall )
             throw new Error( `Failed to create JSON RPC call object to ${scURL}` );
-        const joIn: any = { "method": "skale_nodesRpcInfo", "params": { } };
+        const joIn: any = { method: "skale_nodesRpcInfo", params: { } };
         if( isSendImaAgentIndex() )
             joIn.params.fromImaAgentIndex = optsDiscover.imaState.nNodeNumber;
         const joOut = await joCall.call( joIn );
@@ -630,7 +639,7 @@ export async function doPeriodicSChainNetworkDiscoveryIfNeeded(
             periodicDiscoveryInterval );
     }
     fnAfterRediscover = fnAfterRediscover || function() { };
-    gIntervalPeriodicDiscovery = setInterval( async function() {
+    gIntervalPeriodicDiscovery = setInterval( function() {
         let nCountToWait = ( cntNodesOnChain > 2 )
             ? Math.ceil( cntNodesOnChain * 2 / 3 )
             : cntNodesOnChain;
@@ -638,20 +647,21 @@ export async function doPeriodicSChainNetworkDiscoveryIfNeeded(
             nCountToWait = cntNodesOnChain;
         if( !isSilentReDiscovery )
             log.information( "This S-Chain discovery will be done for periodic discovery update" );
-        await discoverSChainNetwork(
-            null, isSilentReDiscovery, joPrevSChainNetworkInfo, nCountToWait );
-        joPrevSChainNetworkInfo = imaState.joSChainNetworkInfo;
-        if( checkPeriodicDiscoveryNoLongerNeeded(
-            joPrevSChainNetworkInfo, isSilentReDiscovery ) ) {
-            if( ! isSilentReDiscovery )
-                log.information( "Final periodic S-Chain re-discovery done" );
-            fnAfterRediscover( true );
-            return // not needed anymore, all nodes completely discovered
-        }
-        if( ! isSilentReDiscovery )
-            log.information( "Partial periodic S-Chain re-discovery done" );
-
-        fnAfterRediscover( false );
+        discoverSChainNetwork(
+            null, isSilentReDiscovery, joPrevSChainNetworkInfo, nCountToWait )
+            .then( function() {
+                joPrevSChainNetworkInfo = imaState.joSChainNetworkInfo;
+                if( checkPeriodicDiscoveryNoLongerNeeded(
+                    joPrevSChainNetworkInfo, isSilentReDiscovery ) ) {
+                    if( ! isSilentReDiscovery )
+                        log.information( "Final periodic S-Chain re-discovery done" );
+                    fnAfterRediscover( true );
+                    return // not needed anymore, all nodes completely discovered
+                }
+                if( ! isSilentReDiscovery )
+                    log.information( "Partial periodic S-Chain re-discovery done" );
+                fnAfterRediscover( false );
+            } ).catch( function() {} );
     }, periodicDiscoveryInterval );
     if( ! isSilentReDiscovery ) {
         log.information( "Periodic S-Chain re-discovery was started with interval {}" +

@@ -325,7 +325,7 @@ function performBlsGlue(
             details.trace( "{p}Computing G1 hash point...", strLogPrefix );
             const strPath = strActionDir + "/hash.json";
             details.trace( "{p}Saving {} file...", strLogPrefix, strPath );
-            imaUtils.jsonFileSave( strPath, { "message": strMessageHash } );
+            imaUtils.jsonFileSave( strPath, { message: strMessageHash } );
             const strHasG1Command =
                 imaState.strPathHashG1 +
                 " --t " + nThreshold +
@@ -414,7 +414,7 @@ function performBlsGlueU256( details: any, u256: any, arrSignResults: any[] ): a
             details.trace( "{p}Computing G1 hash point...", strLogPrefix );
             const strPath = strActionDir + "/hash.json";
             details.trace( "{p}Saving {} file...", strLogPrefix, strPath );
-            imaUtils.jsonFileSave( strPath, { "message": strMessageHash } );
+            imaUtils.jsonFileSave( strPath, { message: strMessageHash } );
             const strHasG1Command =
                 imaState.strPathHashG1 +
                 " --t " + nThreshold +
@@ -485,7 +485,7 @@ function performBlsVerifyI(
             keccak256Message( jarrMessages, nIdxCurrentMsgBlockStart, strFromChainName ) );
         details.trace( "{p}BLS node #{} - hashed verify message is {}",
             strLogPrefix, nZeroBasedNodeIndex, strMessageHash );
-        const joMsg: any = { "message": strMessageHash };
+        const joMsg: any = { message: strMessageHash };
         details.debug(
             "{p}BLS node #{} - composed  {} composed from {} using glue {} and public key {}",
             strLogPrefix, nZeroBasedNodeIndex, joMsg, jarrMessages, joResultFromNode, joPublicKey );
@@ -539,7 +539,7 @@ function performBlsVerifyIU256(
     }
     let strOutput = "";
     try {
-        const joMsg: any = { "message": keccak256U256( u256, true ) };
+        const joMsg: any = { message: keccak256U256( u256, true ) };
         details.debug( "{p}BLS u256 node #{} verify message {} composed from {} using glue {} " +
             "and public key {}", strLogPrefix, nZeroBasedNodeIndex, joMsg, u256,
         joResultFromNode, joPublicKey );
@@ -605,7 +605,7 @@ function performBlsVerify(
             keccak256Message( jarrMessages, nIdxCurrentMsgBlockStart, strFromChainName ) );
         details.trace( "{p}BLS/summary verify message - hashed verify message is {}",
             strLogPrefix, strMessageHash );
-        const joMsg: any = { "message": strMessageHash };
+        const joMsg: any = { message: strMessageHash };
         details.debug(
             "{p}BLS/summary verify message - composed JSON {} from messages array {}" +
             " using glue {} and common public key {}",
@@ -664,7 +664,7 @@ function performBlsVerifyU256(
     let strOutput = "";
     const strLogPrefix = "BLS u256/Summary: ";
     try {
-        const joMsg: any = { "message": keccak256U256( u256, true ) };
+        const joMsg: any = { message: keccak256U256( u256, true ) };
         details.debug(
             "{p}BLS u256/summary verify message {} composed from {} using glue {}" +
             " and common public key {}",
@@ -712,7 +712,7 @@ async function checkCorrectnessOfMessagesToSign(
 ) {
     const imaState = state.get();
     let joMessageProxy: owaspUtils.ethersMod.ethers.Contract | null = null;
-    let joAccount: any = null, joChainName: any = null;
+    let joAccount: any = null; let joChainName: any = null;
     if( strDirection == "M2S" ) {
         joMessageProxy = imaState.joMessageProxyMainNet;
         joAccount = imaState.chainProperties.mn.joAccount;
@@ -750,7 +750,7 @@ async function checkCorrectnessOfMessagesToSign(
         joMessageProxy ? joMessageProxy.address : "<NullContract>",
         strCallerAccountAddress, jarrMessages.length, jarrMessages,
         nIdxCurrentMsgBlockStart, joChainName );
-    let cntBadMessages = 0, i = 0;
+    let cntBadMessages = 0; let i = 0;
     const cnt = jarrMessages.length;
     if( strDirection == "S2M" || strDirection == "S2S" ) {
         for( i = 0; i < cnt; ++i ) {
@@ -763,11 +763,11 @@ async function checkCorrectnessOfMessagesToSign(
                     strLogPrefix, strDirection, i, cnt, idxMessage, joMessage.sender,
                     joMessage.destinationContract, joMessage.data );
                 const outgoingMessageData: any = {
-                    "dstChainHash": owaspUtils.ethersMod.ethers.utils.id( joChainName ),
-                    "msgCounter": 0 + idxMessage,
-                    "srcContract": joMessage.sender,
-                    "dstContract": joMessage.destinationContract,
-                    "data": joMessage.data
+                    dstChainHash: owaspUtils.ethersMod.ethers.utils.id( joChainName ),
+                    msgCounter: 0 + idxMessage,
+                    srcContract: joMessage.sender,
+                    dstContract: joMessage.destinationContract,
+                    data: joMessage.data
                 };
                 if( ! joMessageProxy )
                     throw new Error( "No message proxy available" );
@@ -901,7 +901,7 @@ async function gatherSigningCheckFinish( optsSignOperation: any ) {
         return false;
     optsSignOperation.strLogPrefixB = `${optsSignOperation.strDirection} /# ` +
         `${optsSignOperation.nTransferLoopCounter}/BLS/Summary: `;
-    let strError: string | null = null, strSuccessfulResultDescription: string | null = null;
+    let strError: string | null = null; let strSuccessfulResultDescription: string | null = null;
     const joGlueResult = performBlsGlue( optsSignOperation.details,
         optsSignOperation.strDirection, optsSignOperation.jarrMessages,
         optsSignOperation.nIdxCurrentMsgBlockStart, optsSignOperation.strFromChainName,
@@ -1229,17 +1229,17 @@ async function doSignProcessOneImpl( i: number, optsSignOperation: any ) {
         return;
     await doSignConfigureChainAccessParams( optsSignOperation );
     const joParams: any = {
-        "direction": "" + optsSignOperation.strDirection,
-        "startMessageIdx": optsSignOperation.nIdxCurrentMsgBlockStart,
-        "dstChainName": optsSignOperation.targetChainName,
-        "srcChainName": optsSignOperation.fromChainName,
-        "dstChainID": optsSignOperation.targetChainID,
-        "srcChainID": optsSignOperation.fromChainID,
-        "messages": optsSignOperation.jarrMessages,
-        "qa": {
-            "skaledNumber": 0 + i,
+        direction: "" + optsSignOperation.strDirection,
+        startMessageIdx: optsSignOperation.nIdxCurrentMsgBlockStart,
+        dstChainName: optsSignOperation.targetChainName,
+        srcChainName: optsSignOperation.fromChainName,
+        dstChainID: optsSignOperation.targetChainID,
+        srcChainID: optsSignOperation.fromChainID,
+        messages: optsSignOperation.jarrMessages,
+        qa: {
+            skaledNumber: 0 + i,
             "optsSignOperation.sequenceId": "" + optsSignOperation.sequenceId,
-            "ts": "" + log.generateTimestampString( null, false )
+            ts: "" + log.generateTimestampString( null, false )
         }
     };
     optsSignOperation.details.trace(
@@ -1248,7 +1248,7 @@ async function doSignProcessOneImpl( i: number, optsSignOperation: any ) {
         log.generateTimestampString( null, true ), "skale_imaVerifyAndSign", i, strNodeURL,
         optsSignOperation.fromChainName, optsSignOperation.targetChainName,
         joParams, optsSignOperation.sequenceId );
-    const joIn: any = { "method": "skale_imaVerifyAndSign", "params": joParams };
+    const joIn: any = { method: "skale_imaVerifyAndSign", params: joParams };
     const joOut = await joCall.call( joIn );
     await doSignProcessHandleCall( optsSignOperation, joParams, joCall, joIn, joOut, i );
 }
@@ -1260,13 +1260,13 @@ async function doSignMessagesImpl(
 ) {
     const optsSignOperation: any = {
         imaState: state.get(),
-        nTransferLoopCounter: nTransferLoopCounter,
-        strDirection: strDirection,
-        jarrMessages: jarrMessages,
-        nIdxCurrentMsgBlockStart: nIdxCurrentMsgBlockStart,
-        strFromChainName: strFromChainName,
-        joExtraSignOpts: joExtraSignOpts,
-        fn: fn,
+        nTransferLoopCounter,
+        strDirection,
+        jarrMessages,
+        nIdxCurrentMsgBlockStart,
+        strFromChainName,
+        joExtraSignOpts,
+        fn,
         bHaveResultReportCalled: false,
         strLogPrefix: "",
         strLogPrefixA: "",
@@ -1318,7 +1318,10 @@ async function doSignMessagesImpl(
                 break
             }
             doSignProcessOneImpl( i, optsSignOperation )
-                .then( function() {} ).catch( function() {} );
+                .then( function() {} ).catch( function( err ) {
+                    log.error(
+                        "Failed single BLS sign processing, reported error is: {err}", err );
+                } );
         }
         await gatherSigningStartImpl( optsSignOperation );
         await gatherSigningFinishImpl( optsSignOperation );
@@ -1528,9 +1531,9 @@ async function doSignU256OneImpl( i: number, optsSignU256: any ) {
         optsSignU256.details.trace( "{p}Will invoke skale_imaBSU256 for to sign value {}",
             optsSignU256.strLogPrefix, optsSignU256.u256.toString() );
         const joIn: any = {
-            "method": "skale_imaBSU256",
-            "params": {
-                "valueToSign": optsSignU256.u256 // must be 0x string, came from outside 0x string
+            method: "skale_imaBSU256",
+            params: {
+                valueToSign: optsSignU256.u256 // must be 0x string, came from outside 0x string
             }
         };
         const joOut = await joCall.call( joIn );
@@ -1661,9 +1664,9 @@ async function doSignU256Gathering( optsSignU256: any ) {
 
 export async function doSignU256( u256: any, details: any, fn: any ) {
     const optsSignU256: any = {
-        u256: u256,
-        fn: fn,
-        details: details,
+        u256,
+        fn,
+        details,
         imaState: state.get(),
         strLogPrefix: "Sign u256: ",
         joGatheringTracker: {
@@ -1742,7 +1745,7 @@ export async function doVerifyReadyHash(
         details.trace( "{p}BLS node #{} - hashed verify message is {}",
             strLogPrefix, nZeroBasedNodeIndex, strMessageHash );
         const joMsg: any = {
-            "message": strMessageHash
+            message: strMessageHash
         };
         details.debug( "{p}BLS node #{} - composed {} using hash {} and glue {} and public key {}",
             strLogPrefix, nZeroBasedNodeIndex, joMsg, strMessageHash,
@@ -1821,7 +1824,7 @@ export async function doSignReadyHash( strMessageHash: string, isExposeOutput: a
     const imaState = state.get();
     const strLogPrefix = "";
     const details: any = log.createMemoryStream();
-    let joSignResult: any = null, joCall: any = null;
+    let joSignResult: any = null; let joCall: any = null;
     try {
         const nThreshold = discoverBlsThreshold( imaState.joSChainNetworkInfo );
         const nParticipants = discoverBlsParticipants( imaState.joSChainNetworkInfo );
@@ -1847,8 +1850,8 @@ export async function doSignReadyHash( strMessageHash: string, isExposeOutput: a
             typeof joAccount.strPathSslCert == "string" && joAccount.strPathSslCert.length > 0
         ) {
             rpcCallOpts = {
-                "cert": fs.readFileSync( joAccount.strPathSslCert, "utf8" ),
-                "key": fs.readFileSync( joAccount.strPathSslKey, "utf8" )
+                cert: fs.readFileSync( joAccount.strPathSslCert, "utf8" ),
+                key: fs.readFileSync( joAccount.strPathSslKey, "utf8" )
             };
         } else
             details.warning( "Will sign via SGX without SSL options" );
@@ -1857,15 +1860,15 @@ export async function doSignReadyHash( strMessageHash: string, isExposeOutput: a
         if( ! joCall )
             throw new Error( `Failed to create JSON RPC call object to ${joAccount.strSgxURL}` );
         const joIn: any = {
-            "jsonrpc": "2.0",
-            "id": utils.randomCallID(),
-            "method": "blsSignMessageHash",
-            "params": {
-                "keyShareName": joAccount.strBlsKeyName,
-                "messageHash": strMessageHash,
-                "n": nParticipants,
-                "t": nThreshold,
-                "signerIndex": signerIndex // 1-based
+            jsonrpc: "2.0",
+            id: utils.randomCallID(),
+            method: "blsSignMessageHash",
+            params: {
+                keyShareName: joAccount.strBlsKeyName,
+                messageHash: strMessageHash,
+                n: nParticipants,
+                t: nThreshold,
+                signerIndex // 1-based
             }
         };
         details.trace( "{p}Will invoke SGX with call data {}", strLogPrefix, joIn );
@@ -1958,7 +1961,7 @@ async function prepareS2sOfSkaleImaVerifyAndSign( optsHandleVerifyAndSign: any )
             "try again later" );
     }
 
-    let joSChainSrc: any = null, strUrlSrcSChain: string | null = null;
+    let joSChainSrc: any = null; let strUrlSrcSChain: string | null = null;
     for( let idxSChain = 0; idxSChain < arrSChainsCached.length; ++ idxSChain ) {
         const joSChain = arrSChainsCached[idxSChain];
         if( joSChain.name.toString() == strSChainNameSrc.toString() ) {
@@ -2034,7 +2037,7 @@ async function handleBlsSignMessageHashResult(
 
 export async function handleSkaleImaVerifyAndSign( joCallData: any ) {
     const optsHandleVerifyAndSign: any = {
-        joCallData: joCallData,
+        joCallData,
         imaState: state.get(),
         strLogPrefix: "",
         details: log.createMemoryStream(),
@@ -2082,8 +2085,8 @@ export async function handleSkaleImaVerifyAndSign( joCallData: any ) {
             typeof joAccount.strPathSslCert == "string" && joAccount.strPathSslCert.length > 0
         ) {
             rpcCallOpts = {
-                "cert": fs.readFileSync( joAccount.strPathSslCert, "utf8" ),
-                "key": fs.readFileSync( joAccount.strPathSslKey, "utf8" )
+                cert: fs.readFileSync( joAccount.strPathSslCert, "utf8" ),
+                key: fs.readFileSync( joAccount.strPathSslKey, "utf8" )
             };
         } else
             optsHandleVerifyAndSign.details.warning( "Will sign via SGX without SSL options" );
@@ -2092,15 +2095,15 @@ export async function handleSkaleImaVerifyAndSign( joCallData: any ) {
         if( ! joCall )
             throw new Error( `Failed to create JSON RPC call object to ${joAccount.strSgxURL}` );
         const joIn = {
-            "jsonrpc": "2.0",
-            "id": utils.randomCallID(),
-            "method": "blsSignMessageHash",
-            "params": {
-                "keyShareName": joAccount.strBlsKeyName,
-                "messageHash": optsHandleVerifyAndSign.strMessageHash,
-                "n": optsHandleVerifyAndSign.nParticipants,
-                "t": optsHandleVerifyAndSign.nThreshold,
-                "signerIndex": signerIndex // 1-based
+            jsonrpc: "2.0",
+            id: utils.randomCallID(),
+            method: "blsSignMessageHash",
+            params: {
+                keyShareName: joAccount.strBlsKeyName,
+                messageHash: optsHandleVerifyAndSign.strMessageHash,
+                n: optsHandleVerifyAndSign.nParticipants,
+                t: optsHandleVerifyAndSign.nThreshold,
+                signerIndex // 1-based
             }
         };
         optsHandleVerifyAndSign.details.trace(
@@ -2200,7 +2203,7 @@ async function handleBlsSignMessageHash256Result(
 
 export async function handleSkaleImaBSU256( joCallData: any ) {
     const optsBSU256: any = {
-        joCallData: joCallData,
+        joCallData,
         imaState: state.get(),
         strLogPrefix: "",
         details: log.createMemoryStream(),
@@ -2225,8 +2228,8 @@ export async function handleSkaleImaBSU256( joCallData: any ) {
             optsBSU256.joAccount.strPathSslCert.length > 0
         ) {
             rpcCallOpts = {
-                "cert": fs.readFileSync( optsBSU256.joAccount.strPathSslCert, "utf8" ),
-                "key": fs.readFileSync( optsBSU256.joAccount.strPathSslKey, "utf8" )
+                cert: fs.readFileSync( optsBSU256.joAccount.strPathSslCert, "utf8" ),
+                key: fs.readFileSync( optsBSU256.joAccount.strPathSslKey, "utf8" )
             };
         } else
             optsBSU256.details.warning( "Will sign via SGX without SSL options" );
@@ -2237,15 +2240,15 @@ export async function handleSkaleImaBSU256( joCallData: any ) {
                 `to ${optsBSU256.joAccount.strSgxURL}` );
         }
         const joIn = {
-            "jsonrpc": "2.0",
-            "id": utils.randomCallID(),
-            "method": "blsSignMessageHash",
-            "params": {
-                "keyShareName": optsBSU256.joAccount.strBlsKeyName,
-                "messageHash": optsBSU256.strMessageHash,
-                "n": optsBSU256.nParticipants,
-                "t": optsBSU256.nThreshold,
-                "signerIndex": signerIndex // 1-based
+            jsonrpc: "2.0",
+            id: utils.randomCallID(),
+            method: "blsSignMessageHash",
+            params: {
+                keyShareName: optsBSU256.joAccount.strBlsKeyName,
+                messageHash: optsBSU256.strMessageHash,
+                n: optsBSU256.nParticipants,
+                t: optsBSU256.nThreshold,
+                signerIndex // 1-based
             }
         };
         optsBSU256.details.trace( "{p}Will invoke SGX with call data {}",

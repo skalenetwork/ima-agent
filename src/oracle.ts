@@ -51,7 +51,7 @@ export function findPowNumber( strRequestPart: string, details: any, isVerbose?:
         details.debug( "source part of request to find PoW number is {}", strRequestPart );
 
     const t = getUtcTimestampString();
-    let i = 0, n = 0, s = "";
+    let i = 0; let n = 0; let s = "";
     if( isVerbose )
         details.debug( "source t={}, this is UTC timestamp", t );
     for( ; i < gConstMaxPowResultLimit; ++ i ) {
@@ -132,7 +132,7 @@ async function handleOracleSubmitRequestResult(
         if( nMillisecondsToSleep > 0 )
             await threadInfo.sleep( nMillisecondsToSleep );
         try {
-            const joIn: any = { "method": "oracle_checkResult", "params": [ joOut.result ] };
+            const joIn: any = { method: "oracle_checkResult", params: [ joOut.result ] };
             if( isVerboseTraceDetails ) {
                 details.debug( "RPC call oracle_checkResult attempt {} " +
                     "of {}...", idxAttempt, cntAttempts );
@@ -160,7 +160,7 @@ async function handleOracleSubmitRequestResult(
 export async function oracleGetGasPrice( oracleOpts: any, details: any ) {
     details = details || log;
     const url: string = oracleOpts.url;
-    let gp: any = null, joCall: any = null;
+    let gp: any = null; let joCall: any = null;
     try {
         const isVerbose = "isVerbose" in oracleOpts ? oracleOpts.isVerbose : false;
         let isVerboseTraceDetails = "isVerboseTraceDetails" in oracleOpts
@@ -176,7 +176,7 @@ export async function oracleGetGasPrice( oracleOpts: any, details: any ) {
             "\"post\":\"{\\\"jsonrpc\\\":\\\"2.0\\\"," +
             "\\\"method\\\":\\\"eth_gasPrice\\\",\\\"params\\\":[],\\\"id\\\":1}\"",
             details, isVerbose );
-        const joIn: any = { "method": "oracle_submitRequest", "params": [ s ] };
+        const joIn: any = { method: "oracle_submitRequest", params: [ s ] };
         if( isVerboseTraceDetails )
             details.debug( "RPC call {} is {}", "oracle_submitRequest", joIn );
         const joOut: any = await joCall.call( joIn );

@@ -110,17 +110,17 @@ function toWei( stringA, stringB ) {
 
 // mockup for `joAccountDst`
 const joAccountDst = {
-    "address": IMA.owaspUtils.fnAddressImpl_,
+    "address": function () { return IMA.owaspUtils.fnAddressImpl_( this ); },
     privateKey: "6270720ecca0185a979b6791bea433e9dbf23345e5b5b1b0258b1fbaf32b4390"
 };
 // mockup for `joAccountSrc`
 const joAccountSrc = {
-    "address": IMA.owaspUtils.fnAddressImpl_,
+    "address": function () { return IMA.owaspUtils.fnAddressImpl_( this ); },
     privateKey: "6270720ecca0185a979b6791bea433e9dbf23345e5b5b1b0258b1fbaf32b4390"
 };
 // mockup for `joMainNetAccount`
 const joMainNetAccount = {
-    "address": IMA.owaspUtils.fnAddressImpl_,
+    "address": function () { return IMA.owaspUtils.fnAddressImpl_( this ); },
     privateKey: "6270720ecca0185a979b6791bea433e9dbf23345e5b5b1b0258b1fbaf32b4390"
 };
 // mockup for `joDepositBox`

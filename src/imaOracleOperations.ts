@@ -124,7 +124,7 @@ async function prepareOracleGasPriceSetup( optsGasPriseSetup: any ) {
         if( log.exposeDetailsGet() )
             optsGasPriseSetup.details.exposeDetailsTo( log, "doOracleGasPriceSetup", true );
         optsGasPriseSetup.details.close();
-        return
+
     }
 }
 
@@ -203,8 +203,8 @@ async function handleOracleSigned(
         gasPrice, estimatedGasSetGasPrice, weiHowMuch, opts );
     if( joReceipt && typeof joReceipt == "object" ) {
         optsGasPriseSetup.jarrReceipts.push( {
-            "description": "doOracleGasPriceSetup/setGasPrice",
-            "receipt": joReceipt
+            description: "doOracleGasPriceSetup/setGasPrice",
+            receipt: joReceipt
         } );
         imaGasUsage.printGasUsageReportFromArray(
             "(intermediate result) ORACLE GAS PRICE SETUP ",
@@ -226,14 +226,14 @@ export async function doOracleGasPriceSetup(
     if( ! getEnabledOracle() )
         return true;
     const optsGasPriseSetup: any = {
-        ethersProviderMainNet: ethersProviderMainNet,
-        ethersProviderSChain: ethersProviderSChain,
-        transactionCustomizerSChain: transactionCustomizerSChain,
-        joCommunityLocker: joCommunityLocker,
-        joAccountSC: joAccountSC,
-        chainIdMainNet: chainIdMainNet,
-        chainIdSChain: chainIdSChain,
-        fnSignMsgOracle: fnSignMsgOracle,
+        ethersProviderMainNet,
+        ethersProviderSChain,
+        transactionCustomizerSChain,
+        joCommunityLocker,
+        joAccountSC,
+        chainIdMainNet,
+        chainIdSChain,
+        fnSignMsgOracle,
         details: log.createMemoryStream(),
         jarrReceipts: [],
         strLogPrefix: "Oracle gas price setup: ",

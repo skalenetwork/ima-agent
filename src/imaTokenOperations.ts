@@ -183,8 +183,8 @@ export async function doErc721PaymentFromMainNet(
             joAccountSrc, strActionName, gasPrice, estimatedGasApprove, weiHowMuchApprove, null );
         if( joReceiptApprove && typeof joReceiptApprove == "object" ) {
             jarrReceipts.push( {
-                "description": "doErc721PaymentFromMainNet/approve",
-                "receipt": joReceiptApprove
+                description: "doErc721PaymentFromMainNet/approve",
+                receipt: joReceiptApprove
             } );
         }
 
@@ -215,8 +215,8 @@ export async function doErc721PaymentFromMainNet(
             weiHowMuchDepositERC721, null );
         if( joReceiptDeposit && typeof joReceiptDeposit == "object" ) {
             jarrReceipts.push( {
-                "description": "doErc721PaymentFromMainNet/deposit",
-                "receipt": joReceiptDeposit
+                description: "doErc721PaymentFromMainNet/deposit",
+                receipt: joReceiptDeposit
             } );
         }
 
@@ -321,8 +321,8 @@ export async function doErc20PaymentFromMainNet(
             joAccountSrc, strActionName, gasPrice, estimatedGasApprove, weiHowMuchApprove, null );
         if( joReceiptApprove && typeof joReceiptApprove == "object" ) {
             jarrReceipts.push( {
-                "description": "doErc20PaymentFromMainNet/approve",
-                "receipt": joReceiptApprove
+                description: "doErc20PaymentFromMainNet/approve",
+                receipt: joReceiptApprove
             } );
         }
 
@@ -352,8 +352,8 @@ export async function doErc20PaymentFromMainNet(
             weiHowMuchDepositERC20, null );
         if( joReceiptDeposit && typeof joReceiptDeposit == "object" ) {
             jarrReceipts.push( {
-                "description": "doErc20PaymentFromMainNet/deposit",
-                "receipt": joReceiptDeposit
+                description: "doErc20PaymentFromMainNet/deposit",
+                receipt: joReceiptDeposit
             } );
         }
 
@@ -464,8 +464,8 @@ export async function doErc1155PaymentFromMainNet(
                 null );
         if( joReceiptApprove && typeof joReceiptApprove == "object" ) {
             jarrReceipts.push( {
-                "description": "doErc1155PaymentFromMainNet/approve",
-                "receipt": joReceiptApprove
+                description: "doErc1155PaymentFromMainNet/approve",
+                receipt: joReceiptApprove
             } );
         }
         strActionName = "ERC1155 payment from Main Net, depositERC1155";
@@ -500,8 +500,8 @@ export async function doErc1155PaymentFromMainNet(
                 gasPrice, estimatedGasDeposit, weiHowMuchDepositERC1155, null );
         if( joReceiptDeposit && typeof joReceiptDeposit == "object" ) {
             jarrReceipts.push( {
-                "description": "doErc1155PaymentFromMainNet/deposit",
-                "receipt": joReceiptDeposit
+                description: "doErc1155PaymentFromMainNet/deposit",
+                receipt: joReceiptDeposit
             } );
         }
         // Must-have event(s) analysis as indicator(s) of success
@@ -597,8 +597,8 @@ export async function doErc1155BatchPaymentFromMainNet(
             joAccountSrc, strActionName, gasPrice, estimatedGasApprove, weiHowMuchApprove, null );
         if( joReceiptApprove && typeof joReceiptApprove == "object" ) {
             jarrReceipts.push( {
-                "description": "doErc1155BatchPaymentFromMainNet/approve",
-                "receipt": joReceiptApprove
+                description: "doErc1155BatchPaymentFromMainNet/approve",
+                receipt: joReceiptApprove
             } );
         }
         strActionName = "ERC1155 batch-payment from Main Net, depositERC1155Batch";
@@ -629,8 +629,8 @@ export async function doErc1155BatchPaymentFromMainNet(
             gasPrice, estimatedGasDeposit, weiHowMuchDepositERC1155Batch, null );
         if( joReceiptDeposit && typeof joReceiptDeposit == "object" ) {
             jarrReceipts.push( {
-                "description": "doErc1155BatchPaymentFromMainNet/deposit",
-                "receipt": joReceiptDeposit
+                description: "doErc1155BatchPaymentFromMainNet/deposit",
+                receipt: joReceiptDeposit
             } );
         }
         // Must-have event(s) analysis as indicator(s) of success
@@ -732,8 +732,8 @@ export async function doErc20PaymentFromSChain(
             joAccountSrc, strActionName, gasPrice, estimatedGasApprove, weiHowMuchApprove, opts );
         if( joReceiptApprove && typeof joReceiptApprove == "object" ) {
             jarrReceipts.push( {
-                "description": "doErc20PaymentFromSChain/approve",
-                "receipt": joReceiptApprove
+                description: "doErc20PaymentFromSChain/approve",
+                receipt: joReceiptApprove
             } );
         }
         const nSleep = imaHelperAPIs.getSleepBetweenTransactionsOnSChainMilliseconds();
@@ -773,8 +773,8 @@ export async function doErc20PaymentFromSChain(
             estimatedGasExitToMainERC20, weiHowMuchExitToMainERC20, opts );
         if( joReceiptExitToMainERC20 && typeof joReceiptExitToMainERC20 == "object" ) {
             jarrReceipts.push( {
-                "description": "doErc20PaymentFromSChain/exit-to-main",
-                "receipt": joReceiptExitToMainERC20
+                description: "doErc20PaymentFromSChain/exit-to-main",
+                receipt: joReceiptExitToMainERC20
             } );
         }
         // Must-have event(s) analysis as indicator(s) of success
@@ -878,8 +878,8 @@ export async function doErc721PaymentFromSChain(
             joAccountSrc, strActionName, gasPrice, estimatedGasApprove, weiHowMuchApprove, opts );
         if( joReceiptApprove && typeof joReceiptApprove == "object" ) {
             jarrReceipts.push( {
-                "description": "doErc721PaymentFromSChain/transfer-from",
-                "receipt": joReceiptApprove
+                description: "doErc721PaymentFromSChain/transfer-from",
+                receipt: joReceiptApprove
             } );
         }
         const nSleep = imaHelperAPIs.getSleepBetweenTransactionsOnSChainMilliseconds();
@@ -919,8 +919,8 @@ export async function doErc721PaymentFromSChain(
             estimatedGasExitToMainERC721, weiHowMuchExitToMainERC721, opts );
         if( joReceiptExitToMainERC721 && typeof joReceiptExitToMainERC721 == "object" ) {
             jarrReceipts.push( {
-                "description": "doErc721PaymentFromSChain/exit-to-main",
-                "receipt": joReceiptExitToMainERC721
+                description: "doErc721PaymentFromSChain/exit-to-main",
+                receipt: joReceiptExitToMainERC721
             } );
         }
         // Must-have event(s) analysis as indicator(s) of success
@@ -1026,8 +1026,8 @@ export async function doErc1155PaymentFromSChain(
             joAccountSrc, strActionName, gasPrice, estimatedGasApprove, weiHowMuchApprove, opts );
         if( joReceiptApprove && typeof joReceiptApprove == "object" ) {
             jarrReceipts.push( {
-                "description": "doErc1155PaymentFromSChain/transfer-from",
-                "receipt": joReceiptApprove
+                description: "doErc1155PaymentFromSChain/transfer-from",
+                receipt: joReceiptApprove
             } );
         }
         const nSleep = imaHelperAPIs.getSleepBetweenTransactionsOnSChainMilliseconds();
@@ -1067,8 +1067,8 @@ export async function doErc1155PaymentFromSChain(
             estimatedGasExitToMainERC1155, weiHowMuchExitToMainERC1155, opts );
         if( joReceiptExitToMainERC1155 && typeof joReceiptExitToMainERC1155 == "object" ) {
             jarrReceipts.push( {
-                "description": "doErc1155PaymentFromSChain/exit-to-main",
-                "receipt": joReceiptExitToMainERC1155
+                description: "doErc1155PaymentFromSChain/exit-to-main",
+                receipt: joReceiptExitToMainERC1155
             } );
         }
         // Must-have event(s) analysis as indicator(s) of success
@@ -1169,8 +1169,8 @@ export async function doErc1155BatchPaymentFromSChain(
             joAccountSrc, strActionName, gasPrice, estimatedGasApprove, weiHowMuchApprove, opts );
         if( joReceiptApprove && typeof joReceiptApprove == "object" ) {
             jarrReceipts.push( {
-                "description": "doErc1155BatchPaymentFromSChain/transfer-from",
-                "receipt": joReceiptApprove
+                description: "doErc1155BatchPaymentFromSChain/transfer-from",
+                receipt: joReceiptApprove
             } );
         }
         const nSleep = imaHelperAPIs.getSleepBetweenTransactionsOnSChainMilliseconds();
@@ -1213,8 +1213,8 @@ export async function doErc1155BatchPaymentFromSChain(
             typeof joReceiptExitToMainERC1155Batch == "object"
         ) {
             jarrReceipts.push( {
-                "description": "doErc1155BatchPaymentFromSChain/exit-to-main",
-                "receipt": joReceiptExitToMainERC1155Batch
+                description: "doErc1155BatchPaymentFromSChain/exit-to-main",
+                receipt: joReceiptExitToMainERC1155Batch
             } );
         }
         // Must-have event(s) analysis as indicator(s) of success
@@ -1342,8 +1342,8 @@ export async function doErc20PaymentS2S(
             joAccountSrc, strActionName, gasPrice, estimatedGasApprove, weiHowMuchApprove, null );
         if( joReceiptApprove && typeof joReceiptApprove == "object" ) {
             jarrReceipts.push( {
-                "description": `doErc20PaymentS2S/approve/${( isForward ? "forward" : "reverse" )}`,
-                "receipt": joReceiptApprove
+                description: `doErc20PaymentS2S/approve/${( isForward ? "forward" : "reverse" )}`,
+                receipt: joReceiptApprove
             } );
         }
         strActionName = `ERC20 payment S2S, transferERC20 ${( isForward ? "forward" : "reverse" )}`;
@@ -1373,8 +1373,8 @@ export async function doErc20PaymentS2S(
             estimatedGasTransfer, weiHowMuchTransferERC20, null );
         if( joReceiptTransfer && typeof joReceiptTransfer == "object" ) {
             jarrReceipts.push( {
-                "description": "doErc20PaymentS2S/transfer",
-                "receipt": joReceiptTransfer
+                description: "doErc20PaymentS2S/transfer",
+                receipt: joReceiptTransfer
             } );
         }
     } catch ( err ) {
@@ -1482,9 +1482,9 @@ export async function doErc721PaymentS2S(
             joAccountSrc, strActionName, gasPrice, estimatedGasApprove, weiHowMuchApprove, null );
         if( joReceiptApprove && typeof joReceiptApprove == "object" ) {
             jarrReceipts.push( {
-                "description":
+                description:
                 `doErc721PaymentS2S/approve/${( isForward ? "forward" : "reverse" )}`,
-                "receipt": joReceiptApprove
+                receipt: joReceiptApprove
             } );
         }
         const isIgnoreTransferERC721 = true;
@@ -1516,8 +1516,8 @@ export async function doErc721PaymentS2S(
             gasPrice, estimatedGasTransfer, weiHowMuchTransferERC721, null );
         if( joReceiptTransfer && typeof joReceiptTransfer == "object" ) {
             jarrReceipts.push( {
-                "description": "doErc721PaymentS2S/transfer",
-                "receipt": joReceiptTransfer
+                description: "doErc721PaymentS2S/transfer",
+                receipt: joReceiptTransfer
             } );
         }
     } catch ( err ) {
@@ -1628,9 +1628,9 @@ export async function doErc1155PaymentS2S(
             estimatedGasApprove, weiHowMuchApprove, null );
         if( joReceiptApprove && typeof joReceiptApprove == "object" ) {
             jarrReceipts.push( {
-                "description":
+                description:
                     `doErc1155PaymentS2S/approve/${( isForward ? "forward" : "reverse" )}`,
-                "receipt": joReceiptApprove
+                receipt: joReceiptApprove
             } );
         }
         strActionName =
@@ -1661,8 +1661,8 @@ export async function doErc1155PaymentS2S(
             weiHowMuchTransferERC1155, null );
         if( joReceiptTransfer && typeof joReceiptTransfer == "object" ) {
             jarrReceipts.push( {
-                "description": "doErc1155PaymentS2S/transfer",
-                "receipt": joReceiptTransfer
+                description: "doErc1155PaymentS2S/transfer",
+                receipt: joReceiptTransfer
             } );
         }
     } catch ( err ) {
@@ -1774,9 +1774,9 @@ export async function doErc1155BatchPaymentS2S(
             joAccountSrc, strActionName, gasPrice, estimatedGasApprove, weiHowMuchApprove, null );
         if( joReceiptApprove && typeof joReceiptApprove == "object" ) {
             jarrReceipts.push( {
-                "description":
+                description:
                     `doErc1155BatchPaymentS2S/approve/${( isForward ? "forward" : "reverse" )}`,
-                "receipt": joReceiptApprove
+                receipt: joReceiptApprove
             } );
         }
         strActionName =
@@ -1808,8 +1808,8 @@ export async function doErc1155BatchPaymentS2S(
             gasPrice, estimatedGasTransfer, weiHowMuchTransferERC1155, null );
         if( joReceiptTransfer && typeof joReceiptTransfer == "object" ) {
             jarrReceipts.push( {
-                "description": "doErc1155PaymentS2S/transfer",
-                "receipt": joReceiptTransfer
+                description: "doErc1155PaymentS2S/transfer",
+                receipt: joReceiptTransfer
             } );
         }
     } catch ( err ) {
@@ -1885,8 +1885,8 @@ export async function mintErc20(
             "ERC20", contract, "mint", arrArgumentsMint,
             joAccount, strActionName, gasPrice, estimatedGasMint, weiHowMuchMint, opts );
         imaGasUsage.printGasUsageReportFromArray( "MINT ERC20 ", [ {
-            "description": "mintErc20()/mint",
-            "receipt": joReceipt
+            description: "mintErc20()/mint",
+            receipt: joReceipt
         } ], details );
         if( log.exposeDetailsGet() )
             details.exposeDetailsTo( log, "mintErc20", true );
@@ -1955,8 +1955,8 @@ export async function mintErc721(
             "ERC721", contract, "mint", arrArgumentsMint,
             joAccount, strActionName, gasPrice, estimatedGasMint, weiHowMuchMint, opts );
         imaGasUsage.printGasUsageReportFromArray( "MINT ERC721 ", [ {
-            "description": "mintErc721()/mint",
-            "receipt": joReceipt
+            description: "mintErc721()/mint",
+            receipt: joReceipt
         } ], details );
         if( log.exposeDetailsGet() )
             details.exposeDetailsTo( log, "mintErc721", true );
@@ -2029,8 +2029,8 @@ export async function mintErc1155(
             "ERC1155", contract, "mint", arrArgumentsMint,
             joAccount, strActionName, gasPrice, estimatedGasMint, weiHowMuchMint, opts );
         imaGasUsage.printGasUsageReportFromArray( "MINT ERC1155 ", [ {
-            "description": "mintErc1155()/mint",
-            "receipt": joReceipt
+            description: "mintErc1155()/mint",
+            receipt: joReceipt
         } ], details );
         if( log.exposeDetailsGet() )
             details.exposeDetailsTo( log, "mintErc1155", true );
@@ -2099,8 +2099,8 @@ export async function burnErc20(
             "ERC20", contract, "burnFrom", arrArgumentsBurn,
             joAccount, strActionName, gasPrice, estimatedGasBurn, weiHowMuchBurn, opts );
         imaGasUsage.printGasUsageReportFromArray( "BURN ERC20 ", [ {
-            "description": "burnErc20()/burn",
-            "receipt": joReceipt
+            description: "burnErc20()/burn",
+            receipt: joReceipt
         } ], details );
         if( log.exposeDetailsGet() )
             details.exposeDetailsTo( log, "burnErc20", true );
@@ -2166,8 +2166,8 @@ export async function burnErc721(
             "ERC721", contract, "burn", arrArgumentsBurn,
             joAccount, strActionName, gasPrice, estimatedGasBurn, weiHowMuchBurn, opts );
         imaGasUsage.printGasUsageReportFromArray( "BURN ERC721 ", [ {
-            "description": "burnErc721()/burn",
-            "receipt": joReceipt
+            description: "burnErc721()/burn",
+            receipt: joReceipt
         } ], details );
         if( log.exposeDetailsGet() )
             details.exposeDetailsTo( log, "burnErc721", true );
@@ -2240,8 +2240,8 @@ export async function burnErc1155(
             joAccount, strActionName,
             gasPrice, estimatedGasBurn, weiHowMuchBurn, opts );
         imaGasUsage.printGasUsageReportFromArray( "BURN ERC1155 ", [ {
-            "description": "burnErc1155()/burn",
-            "receipt": joReceipt
+            description: "burnErc1155()/burn",
+            receipt: joReceipt
         } ], details );
         if( log.exposeDetailsGet() )
             details.exposeDetailsTo( log, "burnErc1155", true );

@@ -2656,7 +2656,7 @@ export function imaInitEthersProviders() {
         imaState.chainProperties.mn.strURL.length > 0
     ) {
         const u = imaState.chainProperties.mn.strURL;
-        asyncCheckUrlAtStartup( u, "Main-net" );
+        asyncCheckUrlAtStartup( u, "Main-net" ).then( function() {} ).catch( function() {} );
         imaState.chainProperties.mn.ethersProvider = owaspUtils.getEthersProviderFromURL( u );
     } else {
         log.warning( "No Main-net URL specified in command line arguments" +
@@ -2668,7 +2668,7 @@ export function imaInitEthersProviders() {
         imaState.chainProperties.sc.strURL.length > 0
     ) {
         const u = imaState.chainProperties.sc.strURL;
-        asyncCheckUrlAtStartup( u, "S-Chain" );
+        asyncCheckUrlAtStartup( u, "S-Chain" ).then( function() {} ).catch( function() {} );
         imaState.chainProperties.sc.ethersProvider = owaspUtils.getEthersProviderFromURL( u );
     } else {
         log.warning( "No S-Chain URL specified in command line arguments" +
@@ -2680,7 +2680,8 @@ export function imaInitEthersProviders() {
         imaState.chainProperties.tc.strURL.length > 0
     ) {
         const u = imaState.chainProperties.tc.strURL;
-        asyncCheckUrlAtStartup( u, "S<->S Target S-Chain" );
+        asyncCheckUrlAtStartup( u, "S<->S Target S-Chain" )
+            .then( function() {} ).catch( function() {} );
         imaState.chainProperties.tc.ethersProvider = owaspUtils.getEthersProviderFromURL( u );
     } else {
         log.warning( "No S<->S Target S-Chain URL specified in command line arguments" +

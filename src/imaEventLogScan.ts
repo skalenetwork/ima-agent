@@ -39,30 +39,30 @@ export function createProgressiveEventsScanPlan( details: any, nLatestBlockNumbe
     const blocksInOneYear = blocksInOneDay * 366;
     const blocksInThreeYears = blocksInOneYear * 3;
     const arrProgressiveEventsScanPlanA = [ {
-        "nBlockFrom":
+        nBlockFrom:
             nLatestBlockNumber - blocksInOneDay,
-        "nBlockTo": "latest",
-        "type": "1 day"
+        nBlockTo: "latest",
+        type: "1 day"
     }, {
-        "nBlockFrom":
+        nBlockFrom:
             nLatestBlockNumber - blocksInOneWeek,
-        "nBlockTo": "latest",
-        "type": "1 week"
+        nBlockTo: "latest",
+        type: "1 week"
     }, {
-        "nBlockFrom":
+        nBlockFrom:
             nLatestBlockNumber - blocksInOneMonth,
-        "nBlockTo": "latest",
-        "type": "1 month"
+        nBlockTo: "latest",
+        type: "1 month"
     }, {
-        "nBlockFrom":
+        nBlockFrom:
             nLatestBlockNumber - blocksInOneYear,
-        "nBlockTo": "latest",
-        "type": "1 year"
+        nBlockTo: "latest",
+        type: "1 year"
     }, {
-        "nBlockFrom":
+        nBlockFrom:
             nLatestBlockNumber - blocksInThreeYears,
-        "nBlockTo": "latest",
-        "type": "3 years"
+        nBlockTo: "latest",
+        type: "3 years"
     } ];
     const arrProgressiveEventsScanPlan: any[] = [];
     for( let idxPlan = 0; idxPlan < arrProgressiveEventsScanPlanA.length; ++idxPlan ) {
@@ -75,11 +75,11 @@ export function createProgressiveEventsScanPlan( details: any, nLatestBlockNumbe
         arrProgressiveEventsScanPlan[arrProgressiveEventsScanPlan.length - 1];
         if( ! ( joLastPlan.nBlockFrom == 0 && joLastPlan.nBlockTo == "latest" ) ) {
             arrProgressiveEventsScanPlan.push(
-                { "nBlockFrom": 0, "nBlockTo": "latest", "type": "entire block range" } );
+                { nBlockFrom: 0, nBlockTo: "latest", type: "entire block range" } );
         }
     } else {
         arrProgressiveEventsScanPlan.push(
-            { "nBlockFrom": 0, "nBlockTo": "latest", "type": "entire block range" } );
+            { nBlockFrom: 0, nBlockTo: "latest", type: "entire block range" } );
     }
     return arrProgressiveEventsScanPlan;
 }
@@ -132,7 +132,7 @@ export async function safeGetPastEventsProgressive(
         createProgressiveEventsScanPlan( details, nLatestBlockNumberPlus1 );
     details.trace( "Composed progressive event log records scan plan is: {}",
         arrProgressiveEventsScanPlan );
-    let joLastPlan: any = { "nBlockFrom": 0, "nBlockTo": "latest", "type": "entire block range" };
+    let joLastPlan: any = { nBlockFrom: 0, nBlockTo: "latest", type: "entire block range" };
     for( let idxPlan = 0; idxPlan < arrProgressiveEventsScanPlan.length; ++idxPlan ) {
         const joPlan = arrProgressiveEventsScanPlan[idxPlan];
         if( joPlan.nBlockFrom < 0 )
@@ -173,7 +173,7 @@ export async function getContractCallEvents(
     joFilter = joFilter || {};
     nBlockNumber = owaspUtils.toBN( nBlockNumber );
     const n10 = owaspUtils.toBN( 10 );
-    let nBlockFrom = nBlockNumber.sub( n10 ), nBlockTo = nBlockNumber.add( n10 );
+    let nBlockFrom = nBlockNumber.sub( n10 ); let nBlockTo = nBlockNumber.add( n10 );
     const nBlockZero = owaspUtils.toBN( 0 );
     const nLatestBlockNumber = owaspUtils.toBN(
         await imaHelperAPIs.safeGetBlockNumber( details, 10, ethersProvider ) );

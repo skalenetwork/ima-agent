@@ -113,8 +113,8 @@ export async function doEthPaymentFromMainNet(
             gasPrice, estimatedGas, weiHowMuch );
         if( joReceipt && typeof joReceipt == "object" ) {
             jarrReceipts.push( {
-                "description": "doEthPaymentFromMainNet",
-                "receipt": joReceipt
+                description: "doEthPaymentFromMainNet",
+                receipt: joReceipt
             } );
         }
 
@@ -210,8 +210,8 @@ export async function doEthPaymentFromSChain(
             gasPrice, estimatedGas, 0, opts );
         if( joReceipt && typeof joReceipt == "object" ) {
             jarrReceipts.push( {
-                "description": "doEthPaymentFromSChain",
-                "receipt": joReceipt
+                description: "doEthPaymentFromSChain",
+                receipt: joReceipt
             } );
         }
 
@@ -294,8 +294,8 @@ export async function receiveEthPaymentFromSchainOnMainNet(
             gasPrice, estimatedGas, weiHowMuch );
         if( joReceipt && typeof joReceipt == "object" ) {
             jarrReceipts.push( {
-                "description": "receiveEthPaymentFromSchainOnMainNet",
-                "receipt": joReceipt
+                description: "receiveEthPaymentFromSchainOnMainNet",
+                receipt: joReceipt
             } );
         }
     } catch ( err ) {

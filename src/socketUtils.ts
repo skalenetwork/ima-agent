@@ -27,7 +27,7 @@ import { settings } from "./socketSettings.js";
 
 export const UUIDv4 = function(): string {
     return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace( /[xy]/g, function( c ) {
-        const r = Math.random() * 16 | 0, v = c == "x" ? r : ( r & 0x3 | 0x8 );
+        const r = Math.random() * 16 | 0; const v = c == "x" ? r : ( r & 0x3 | 0x8 );
         return v.toString( 16 );
     } );
 }
@@ -125,17 +125,17 @@ export const randomDirectPipeID = function(): string {
 
 export const prepareAnswerJSON = function( joMessage: any ): any {
     const joAnswer: any = {
-        "id": "" +
+        id: "" +
             ( ( joMessage != null &&
                 joMessage != undefined &&
                 typeof joMessage.id == "string" )
                 ? joMessage.id : randomCallID() ),
-        "method": "" +
+        method: "" +
             ( ( joMessage != null &&
                 joMessage != undefined &&
                 typeof joMessage.method == "string" )
                 ? joMessage.method : "" ),
-        "error": null
+        error: null
     };
     return joAnswer;
 }

@@ -460,7 +460,7 @@ export function ipFromHex( hex?: any ): string {
 }
 
 export function cloneObjectByRootKeys( joIn?: any ): any {
-    const joOut: any = { }, arrKeys = Object.keys( joIn );
+    const joOut: any = { }; const arrKeys = Object.keys( joIn );
     for( let i = 0; i < arrKeys.length; ++ i ) {
         const key = arrKeys[i];
         const value = joIn[key];
@@ -472,77 +472,77 @@ export function cloneObjectByRootKeys( joIn?: any ): any {
 // example: "1ether" -> "1000000000000000000"
 // supported suffix aliases, lowercase
 const gMapMoneyNameSuffixAliases: any = {
-    "ethe": "ether",
-    "ethr": "ether",
-    "eth": "ether",
-    "eter": "ether",
-    "ete": "ether",
-    "et": "ether",
-    "eh": "ether",
-    "er": "ether",
-    "finne": "finney",
-    "finn": "finney",
-    "fin": "finney",
-    "fn": "finney",
-    "fi": "finney",
-    "szab": "szabo",
-    "szb": "szabo",
-    "sza": "szabo",
-    "sz": "szabo",
-    "shanno": "shannon",
-    "shannn": "shannon",
-    "shann": "shannon",
-    "shan": "shannon",
-    "sha": "shannon",
-    "shn": "shannon",
-    "sh": "shannon",
-    "lovelac": "lovelace",
-    "lovela": "lovelace",
-    "lovel": "lovelace",
-    "love": "lovelace",
-    "lovl": "lovelace",
-    "lvl": "lovelace",
-    "lvla": "lovelace",
-    "lvlc": "lovelace",
-    "lvc": "lovelace",
-    "lv": "lovelace",
-    "lo": "lovelace",
-    "lc": "lovelace",
-    "ll": "lovelace",
-    "babbag": "babbage",
-    "babba": "babbage",
-    "babbg": "babbage",
-    "babb": "babbage",
-    "bab": "babbage",
-    "bag": "babbage",
-    "bbb": "babbage",
-    "bb": "babbage",
-    "bg": "babbage",
-    "ba": "babbage",
-    "be": "babbage",
-    "we": "wei",
-    "wi": "wei",
+    ethe: "ether",
+    ethr: "ether",
+    eth: "ether",
+    eter: "ether",
+    ete: "ether",
+    et: "ether",
+    eh: "ether",
+    er: "ether",
+    finne: "finney",
+    finn: "finney",
+    fin: "finney",
+    fn: "finney",
+    fi: "finney",
+    szab: "szabo",
+    szb: "szabo",
+    sza: "szabo",
+    sz: "szabo",
+    shanno: "shannon",
+    shannn: "shannon",
+    shann: "shannon",
+    shan: "shannon",
+    sha: "shannon",
+    shn: "shannon",
+    sh: "shannon",
+    lovelac: "lovelace",
+    lovela: "lovelace",
+    lovel: "lovelace",
+    love: "lovelace",
+    lovl: "lovelace",
+    lvl: "lovelace",
+    lvla: "lovelace",
+    lvlc: "lovelace",
+    lvc: "lovelace",
+    lv: "lovelace",
+    lo: "lovelace",
+    lc: "lovelace",
+    ll: "lovelace",
+    babbag: "babbage",
+    babba: "babbage",
+    babbg: "babbage",
+    babb: "babbage",
+    bab: "babbage",
+    bag: "babbage",
+    bbb: "babbage",
+    bb: "babbage",
+    bg: "babbage",
+    ba: "babbage",
+    be: "babbage",
+    we: "wei",
+    wi: "wei",
 
     // next are advanced kind of
-    "noether": "noether",
-    "noeth": "noether",
-    "kwei": "kwei",
-    "femtoether": "femtoether",
-    "femto": "femtoether",
-    "mwei": "mwei",
-    "picoether": "picoether",
-    "pico": "picoether",
-    "gwei": "gwei",
-    "nanoether": "nanoether",
-    "nano": "nanoether",
-    "microether": "microether",
-    "micro": "microether",
-    "milliether": "milliether",
-    "milli": "milliether",
-    "kether": "kether",
-    "mether": "mether",
-    "gether": "gether",
-    "tether": "tether"
+    noether: "noether",
+    noeth: "noether",
+    kwei: "kwei",
+    femtoether: "femtoether",
+    femto: "femtoether",
+    mwei: "mwei",
+    picoether: "picoether",
+    pico: "picoether",
+    gwei: "gwei",
+    nanoether: "nanoether",
+    nano: "nanoether",
+    microether: "microether",
+    micro: "microether",
+    milliether: "milliether",
+    milli: "milliether",
+    kether: "kether",
+    mether: "mether",
+    gether: "gether",
+    tether: "tether"
 };
 
 export function parseMoneyUnitName( s: string ): string {
@@ -622,8 +622,8 @@ export function parseMoneySpecToWei( s?: any, isThrowException?: boolean ): stri
         if( strNumber == "" )
             throw new Error( "no number or float value found" );
         s = parseMoneyUnitName( s );
-        const ddr = moneyUnitNameToPostDivider( s ),
-            mlr = moneyUnitNameToPostMultiplier( s );
+        const ddr = moneyUnitNameToPostDivider( s );
+        const mlr = moneyUnitNameToPostMultiplier( s );
         s = moneyUnitNameToEthersParseSpec( s );
         s = ethersMod.ethers.utils.parseUnits( strNumber, s );
         if( ddr != null )
@@ -680,7 +680,7 @@ export function fnAddressImpl_( anyThis: any ): string {
 export function getEthersProviderFromURL(
     strURL: URL | string ): ethersMod.ethers.providers.JsonRpcProvider {
     const url = new URL( strURL.toString() );
-    let userName: string | null = null, userPwd: string | null = null;
+    let userName: string | null = null; let userPwd: string | null = null;
     if( url.username ) {
         userName = url.username;
         userPwd = url.password;

@@ -48,13 +48,13 @@ if( parentPort ) {
 function doSendMessage( type: any, endpoint: any, workerUUID: any, data: any ) {
     const jo: any = networkLayer.socketReceivedDataReverseMarshall( data );
     const joSend: any = {
-        "workerMessageType":
+        workerMessageType:
             ( type && typeof type == "string" && type.length > 0 )
                 ? type
                 : "inWorkerMessage",
-        "workerEndPoint": endpoint,
-        "workerUUID": workerUUID,
-        "data": jo
+        workerEndPoint: endpoint,
+        workerUUID,
+        data: jo
     };
     if( parentPort )
         parentPort.postMessage( networkLayer.socketSentDataMarshall( joSend ) );
@@ -76,17 +76,17 @@ class ObserverServer extends SocketServer {
         self.mapApiHandlers.init =
         function( joMessage: any, joAnswer: any, eventData: any, socket: any ) {
             joAnswer.message = {
-                "method": "" + joMessage.method,
-                "error": null
+                method: "" + joMessage.method,
+                error: null
             };
             if( self.initComplete )
                 return joAnswer;
             self.log = function() {
                 const args = Array.prototype.slice.call( arguments );
                 const jo: any = {
-                    "method": "log",
-                    "error": null,
-                    "message": args.join( " " )
+                    method: "log",
+                    error: null,
+                    message: args.join( " " )
                 };
                 const isFlush = true;
                 socket.send( jo, isFlush );
@@ -94,35 +94,35 @@ class ObserverServer extends SocketServer {
             self.initLogMethods();
             self.opts = JSON.parse( JSON.stringify( joMessage.message.opts ) );
             self.opts.details = {
-                "write": self.log,
-                "fatal": self.fatal,
-                "critical": self.critical,
-                "error": self.error,
-                "warning": self.warning,
-                "attention": self.attention,
-                "information": self.information,
-                "info": self.info,
-                "notice": self.notice,
-                "note": self.note,
-                "debug": self.debug,
-                "trace": self.trace,
-                "success": self.success
+                write: self.log,
+                fatal: self.fatal,
+                critical: self.critical,
+                error: self.error,
+                warning: self.warning,
+                attention: self.attention,
+                information: self.information,
+                info: self.info,
+                notice: self.notice,
+                note: self.note,
+                debug: self.debug,
+                trace: self.trace,
+                success: self.success
             };
             log.enableColorization( joMessage.message.colorization.isEnabled );
             log.verboseSet( self.opts.imaState.verbose_ );
             log.exposeDetailsSet( self.opts.imaState.expose_details_ );
             imaTransferErrorHandling.saveTransferEvents.on( "error", function( eventData: any ) {
                 const jo: any = {
-                    "method": "saveTransferError",
-                    "message": eventData.detail
+                    method: "saveTransferError",
+                    message: eventData.detail
                 };
                 const isFlush = true;
                 socket.send( jo, isFlush );
             } );
             imaTransferErrorHandling.saveTransferEvents.on( "success", function( eventData: any ) {
                 const jo: any = {
-                    "method": "saveTransferSuccess",
-                    "message": eventData.detail
+                    method: "saveTransferSuccess",
+                    message: eventData.detail
                 };
                 const isFlush = true;
                 socket.send( jo, isFlush );
@@ -181,7 +181,8 @@ class ObserverServer extends SocketServer {
                 "    S2S", log.fmtDebug( " transfers........." ),
                 log.yn( self.opts.imaState.optsLoop.enableStepS2S ) );
             /* await */
-            loop.runTransferLoop( self.opts.imaState.optsLoop );
+            loop.runTransferLoop( self.opts.imaState.optsLoop )
+                .then( function() {} ).catch( function() {} );
             self.information( "Full init compete for in-worker IMA loop {} in {}",
                 workerData.url, threadInfo.threadDescription() );
             return joAnswer;
@@ -208,7 +209,7 @@ class ObserverServer extends SocketServer {
                     ( !!( joMessage.params.isStart ) ),
                     owaspUtils.toInteger( joMessage.params.ts ),
                     joMessage.params.signature
-                );
+                ).then( function() {} ).catch( function() {} );
             };
         console.log( "Initialized in-worker IMA loop {} server in {}",
             workerData.url, threadInfo.threadDescription() );

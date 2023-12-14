@@ -28,9 +28,9 @@ import * as owaspUtils from "./owaspUtils.js";
 
 export function composeGasUsageReportFromArray( strName: string, jarrReceipts: any[] ): any {
     if( ! ( strName && typeof strName == "string" && jarrReceipts ) )
-        return { "sumGasUsed": 0, "strReport": "N/A" };
-    let i, sumGasUsed = owaspUtils.toBN( "0" ),
-        s = "\n" + log.fmtInformation( "Gas usage report for " ) +
+        return { sumGasUsed: 0, strReport: "N/A" };
+    let i; let sumGasUsed = owaspUtils.toBN( "0" );
+    let s = "\n" + log.fmtInformation( "Gas usage report for " ) +
             log.fmtInformation( "{p}\n", strName );
     for( i = 0; i < jarrReceipts.length; ++ i ) {
         try {
@@ -42,7 +42,7 @@ export function composeGasUsageReportFromArray( strName: string, jarrReceipts: a
     }
     s += "    " + log.fmtAttention( "SUM" ) + log.fmtDebug( "....." ) +
         log.fmtInformation( "{}", sumGasUsed.toString() );
-    return { "sumGasUsed": sumGasUsed, "strReport": s };
+    return { sumGasUsed, strReport: s };
 }
 
 export function printGasUsageReportFromArray(

@@ -349,7 +349,7 @@ export async function singleTransferLoop( optsLoop: any ) {
     const strLogPrefix = `Single Loop in ${threadInfo.threadDescription( false )} `;
     try {
         log.debug( "{p}{p}", strLogPrefix, imaHelperAPIs.longSeparator );
-        let b0 = false, b1 = false, b2 = false, b3 = false;
+        let b0 = false; let b1 = false; let b2 = false; let b3 = false;
         // Oracle loop part:
         if( optsLoop.enableStepOracle ) {
             if( imaState.loopState.oracle.isInProgress ) {
@@ -408,16 +408,16 @@ export async function singleTransferLoop( optsLoop: any ) {
 export async function singleTransferLoopWithRepeat( optsLoop: any ) {
     const imaState = state.get();
     await singleTransferLoop( optsLoop );
-    setTimeout( async function() {
-        await singleTransferLoopWithRepeat( optsLoop );
+    setTimeout( function() {
+        singleTransferLoopWithRepeat( optsLoop ).then( function() {} ).catch( function() {} );
     }, imaState.nLoopPeriodSeconds * 1000 );
 };
 export async function runTransferLoop( optsLoop: any ) {
     const imaState = state.get();
     const isDelayFirstRun = owaspUtils.toBoolean( optsLoop.isDelayFirstRun );
     if( isDelayFirstRun ) {
-        setTimeout( async function() {
-            await singleTransferLoopWithRepeat( optsLoop );
+        setTimeout( function() {
+            singleTransferLoopWithRepeat( optsLoop ).then( function() {} ).catch( function() {} );
         }, imaState.nLoopPeriodSeconds * 1000 );
     } else
         await singleTransferLoopWithRepeat( optsLoop );
@@ -431,65 +431,65 @@ const gArrClients: any[] = [];
 
 function constructChainProperties( opts: any ) {
     return {
-        "mn": {
-            "joAccount": {
-                "privateKey": opts.imaState.chainProperties.mn.joAccount.privateKey,
-                "address_": opts.imaState.chainProperties.mn.joAccount.address_,
-                "strTransactionManagerURL":
+        mn: {
+            joAccount: {
+                privateKey: opts.imaState.chainProperties.mn.joAccount.privateKey,
+                address_: opts.imaState.chainProperties.mn.joAccount.address_,
+                strTransactionManagerURL:
                     opts.imaState.chainProperties.mn.joAccount.strTransactionManagerURL,
-                "nTmPriority": opts.imaState.chainProperties.mn.joAccount.nTmPriority,
-                "strSgxURL": opts.imaState.chainProperties.mn.joAccount.strSgxURL,
-                "strSgxKeyName": opts.imaState.chainProperties.mn.joAccount.strSgxKeyName,
-                "strPathSslKey": opts.imaState.chainProperties.mn.joAccount.strPathSslKey,
-                "strPathSslCert": opts.imaState.chainProperties.mn.joAccount.strPathSslCert,
-                "strBlsKeyName": opts.imaState.chainProperties.mn.joAccount.strBlsKeyName
+                nTmPriority: opts.imaState.chainProperties.mn.joAccount.nTmPriority,
+                strSgxURL: opts.imaState.chainProperties.mn.joAccount.strSgxURL,
+                strSgxKeyName: opts.imaState.chainProperties.mn.joAccount.strSgxKeyName,
+                strPathSslKey: opts.imaState.chainProperties.mn.joAccount.strPathSslKey,
+                strPathSslCert: opts.imaState.chainProperties.mn.joAccount.strPathSslCert,
+                strBlsKeyName: opts.imaState.chainProperties.mn.joAccount.strBlsKeyName
             },
-            "ethersProvider": null,
-            "strURL": opts.imaState.chainProperties.mn.strURL,
-            "strChainName": opts.imaState.chainProperties.mn.strChainName,
-            "chainId": opts.imaState.chainProperties.mn.chainId,
-            "joAbiIMA": opts.imaState.chainProperties.mn.joAbiIMA,
-            "bHaveAbiIMA": opts.imaState.chainProperties.mn.bHaveAbiIMA
+            ethersProvider: null,
+            strURL: opts.imaState.chainProperties.mn.strURL,
+            strChainName: opts.imaState.chainProperties.mn.strChainName,
+            chainId: opts.imaState.chainProperties.mn.chainId,
+            joAbiIMA: opts.imaState.chainProperties.mn.joAbiIMA,
+            bHaveAbiIMA: opts.imaState.chainProperties.mn.bHaveAbiIMA
         },
-        "sc": {
-            "joAccount": {
-                "privateKey": opts.imaState.chainProperties.sc.joAccount.privateKey,
-                "address_": opts.imaState.chainProperties.sc.joAccount.address_,
-                "strTransactionManagerURL":
+        sc: {
+            joAccount: {
+                privateKey: opts.imaState.chainProperties.sc.joAccount.privateKey,
+                address_: opts.imaState.chainProperties.sc.joAccount.address_,
+                strTransactionManagerURL:
                     opts.imaState.chainProperties.sc.joAccount.strTransactionManagerURL,
-                "nTmPriority": opts.imaState.chainProperties.sc.joAccount.nTmPriority,
-                "strSgxURL": opts.imaState.chainProperties.sc.joAccount.strSgxURL,
-                "strSgxKeyName": opts.imaState.chainProperties.sc.joAccount.strSgxKeyName,
-                "strPathSslKey": opts.imaState.chainProperties.sc.joAccount.strPathSslKey,
-                "strPathSslCert": opts.imaState.chainProperties.mn.joAccount.strPathSslCert,
-                "strBlsKeyName": opts.imaState.chainProperties.mn.joAccount.strBlsKeyName
+                nTmPriority: opts.imaState.chainProperties.sc.joAccount.nTmPriority,
+                strSgxURL: opts.imaState.chainProperties.sc.joAccount.strSgxURL,
+                strSgxKeyName: opts.imaState.chainProperties.sc.joAccount.strSgxKeyName,
+                strPathSslKey: opts.imaState.chainProperties.sc.joAccount.strPathSslKey,
+                strPathSslCert: opts.imaState.chainProperties.mn.joAccount.strPathSslCert,
+                strBlsKeyName: opts.imaState.chainProperties.mn.joAccount.strBlsKeyName
             },
-            "ethersProvider": null,
-            "strURL": opts.imaState.chainProperties.sc.strURL,
-            "strChainName": opts.imaState.chainProperties.sc.strChainName,
-            "chainId": opts.imaState.chainProperties.sc.chainId,
-            "joAbiIMA": opts.imaState.chainProperties.sc.joAbiIMA,
-            "bHaveAbiIMA": opts.imaState.chainProperties.sc.bHaveAbiIMA
+            ethersProvider: null,
+            strURL: opts.imaState.chainProperties.sc.strURL,
+            strChainName: opts.imaState.chainProperties.sc.strChainName,
+            chainId: opts.imaState.chainProperties.sc.chainId,
+            joAbiIMA: opts.imaState.chainProperties.sc.joAbiIMA,
+            bHaveAbiIMA: opts.imaState.chainProperties.sc.bHaveAbiIMA
         },
-        "tc": {
-            "joAccount": {
-                "privateKey": opts.imaState.chainProperties.tc.joAccount.privateKey,
-                "address_": opts.imaState.chainProperties.tc.joAccount.address_,
-                "strTransactionManagerURL":
+        tc: {
+            joAccount: {
+                privateKey: opts.imaState.chainProperties.tc.joAccount.privateKey,
+                address_: opts.imaState.chainProperties.tc.joAccount.address_,
+                strTransactionManagerURL:
                     opts.imaState.chainProperties.tc.joAccount.strTransactionManagerURL,
-                "nTmPriority": opts.imaState.chainProperties.tc.joAccount.nTmPriority,
-                "strSgxURL": opts.imaState.chainProperties.tc.joAccount.strSgxURL,
-                "strSgxKeyName": opts.imaState.chainProperties.tc.joAccount.strSgxKeyName,
-                "strPathSslKey": opts.imaState.chainProperties.tc.joAccount.strPathSslKey,
-                "strPathSslCert": opts.imaState.chainProperties.tc.joAccount.strPathSslCert,
-                "strBlsKeyName": opts.imaState.chainProperties.tc.joAccount.strBlsKeyName
+                nTmPriority: opts.imaState.chainProperties.tc.joAccount.nTmPriority,
+                strSgxURL: opts.imaState.chainProperties.tc.joAccount.strSgxURL,
+                strSgxKeyName: opts.imaState.chainProperties.tc.joAccount.strSgxKeyName,
+                strPathSslKey: opts.imaState.chainProperties.tc.joAccount.strPathSslKey,
+                strPathSslCert: opts.imaState.chainProperties.tc.joAccount.strPathSslCert,
+                strBlsKeyName: opts.imaState.chainProperties.tc.joAccount.strBlsKeyName
             },
-            "ethersProvider": null,
-            "strURL": opts.imaState.chainProperties.tc.strURL,
-            "strChainName": opts.imaState.chainProperties.tc.strChainName,
-            "chainId": opts.imaState.chainProperties.tc.chainId,
-            "joAbiIMA": opts.imaState.chainProperties.tc.joAbiIMA,
-            "bHaveAbiIMA": opts.imaState.chainProperties.tc.bHaveAbiIMA
+            ethersProvider: null,
+            strURL: opts.imaState.chainProperties.tc.strURL,
+            strChainName: opts.imaState.chainProperties.tc.strChainName,
+            chainId: opts.imaState.chainProperties.tc.chainId,
+            joAbiIMA: opts.imaState.chainProperties.tc.joAbiIMA,
+            bHaveAbiIMA: opts.imaState.chainProperties.tc.bHaveAbiIMA
         }
     };
 }
@@ -516,13 +516,13 @@ export async function ensureHaveWorkers( opts: any ) {
         cntWorkers, " worker(s) in ", threadInfo.threadDescription(), "..." );
     for( let idxWorker = 0; idxWorker < cntWorkers; ++ idxWorker ) {
         const workerData: any = {
-            "url": "ima_loop_server" + idxWorker,
-            "colorization": { isEnabled: log.isEnabledColorization() }
+            url: "ima_loop_server" + idxWorker,
+            colorization: { isEnabled: log.isEnabledColorization() }
         };
         gArrWorkers.push( new threadInfo.Worker(
             path.join( __dirname, "loopWorker.js" ),
             { // "type": "module",
-                "workerData": workerData
+                workerData
             }
         ) );
         gArrWorkers[idxWorker].on( "message", function( jo: any ) {
@@ -560,107 +560,107 @@ export async function ensureHaveWorkers( opts: any ) {
             } // switch ( joMessage.method )
         } );
         const jo: any = {
-            "method": "init",
-            "message": {
-                "opts": {
-                    "imaState": {
-                        "optsLoop": getDefaultOptsLoop( idxWorker ),
-                        "verbose_": log.verboseGet(),
-                        "expose_details_": log.exposeDetailsGet(),
-                        "loopState": state.gDefaultValueForLoopState,
-                        "isPrintGathered": opts.imaState.isPrintGathered,
-                        "isPrintSecurityValues": opts.imaState.isPrintSecurityValues,
-                        "isPrintPWA": opts.imaState.isPrintPWA,
-                        "isDynamicLogInDoTransfer": opts.imaState.isDynamicLogInDoTransfer,
-                        "isDynamicLogInBlsSigner": opts.imaState.isDynamicLogInBlsSigner,
-                        "bIsNeededCommonInit": false,
-                        "bSignMessages": opts.imaState.bSignMessages,
-                        "joSChainNetworkInfo": opts.imaState.joSChainNetworkInfo,
-                        "strPathBlsGlue": opts.imaState.strPathBlsGlue,
-                        "strPathHashG1": opts.imaState.strPathHashG1,
-                        "strPathBlsVerify": opts.imaState.strPathBlsVerify,
-                        "isEnabledMultiCall": opts.imaState.isEnabledMultiCall,
-                        "bNoWaitSChainStarted": opts.imaState.bNoWaitSChainStarted,
-                        "nMaxWaitSChainAttempts": opts.imaState.nMaxWaitSChainAttempts,
-                        "nTransferBlockSizeM2S": opts.imaState.nTransferBlockSizeM2S,
-                        "nTransferBlockSizeS2M": opts.imaState.nTransferBlockSizeS2M,
-                        "nTransferBlockSizeS2S": opts.imaState.nTransferBlockSizeS2S,
-                        "nTransferStepsM2S": opts.imaState.nTransferStepsM2S,
-                        "nTransferStepsS2M": opts.imaState.nTransferStepsS2M,
-                        "nTransferStepsS2S": opts.imaState.nTransferStepsS2S,
-                        "nMaxTransactionsM2S": opts.imaState.nMaxTransactionsM2S,
-                        "nMaxTransactionsS2M": opts.imaState.nMaxTransactionsS2M,
-                        "nMaxTransactionsS2S": opts.imaState.nMaxTransactionsS2S,
+            method: "init",
+            message: {
+                opts: {
+                    imaState: {
+                        optsLoop: getDefaultOptsLoop( idxWorker ),
+                        verbose_: log.verboseGet(),
+                        expose_details_: log.exposeDetailsGet(),
+                        loopState: state.gDefaultValueForLoopState,
+                        isPrintGathered: opts.imaState.isPrintGathered,
+                        isPrintSecurityValues: opts.imaState.isPrintSecurityValues,
+                        isPrintPWA: opts.imaState.isPrintPWA,
+                        isDynamicLogInDoTransfer: opts.imaState.isDynamicLogInDoTransfer,
+                        isDynamicLogInBlsSigner: opts.imaState.isDynamicLogInBlsSigner,
+                        bIsNeededCommonInit: false,
+                        bSignMessages: opts.imaState.bSignMessages,
+                        joSChainNetworkInfo: opts.imaState.joSChainNetworkInfo,
+                        strPathBlsGlue: opts.imaState.strPathBlsGlue,
+                        strPathHashG1: opts.imaState.strPathHashG1,
+                        strPathBlsVerify: opts.imaState.strPathBlsVerify,
+                        isEnabledMultiCall: opts.imaState.isEnabledMultiCall,
+                        bNoWaitSChainStarted: opts.imaState.bNoWaitSChainStarted,
+                        nMaxWaitSChainAttempts: opts.imaState.nMaxWaitSChainAttempts,
+                        nTransferBlockSizeM2S: opts.imaState.nTransferBlockSizeM2S,
+                        nTransferBlockSizeS2M: opts.imaState.nTransferBlockSizeS2M,
+                        nTransferBlockSizeS2S: opts.imaState.nTransferBlockSizeS2S,
+                        nTransferStepsM2S: opts.imaState.nTransferStepsM2S,
+                        nTransferStepsS2M: opts.imaState.nTransferStepsS2M,
+                        nTransferStepsS2S: opts.imaState.nTransferStepsS2S,
+                        nMaxTransactionsM2S: opts.imaState.nMaxTransactionsM2S,
+                        nMaxTransactionsS2M: opts.imaState.nMaxTransactionsS2M,
+                        nMaxTransactionsS2S: opts.imaState.nMaxTransactionsS2S,
 
-                        "nBlockAwaitDepthM2S": opts.imaState.nBlockAwaitDepthM2S,
-                        "nBlockAwaitDepthS2M": opts.imaState.nBlockAwaitDepthS2M,
-                        "nBlockAwaitDepthS2S": opts.imaState.nBlockAwaitDepthS2S,
-                        "nBlockAgeM2S": opts.imaState.nBlockAgeM2S,
-                        "nBlockAgeS2M": opts.imaState.nBlockAgeS2M,
-                        "nBlockAgeS2S": opts.imaState.nBlockAgeS2S,
+                        nBlockAwaitDepthM2S: opts.imaState.nBlockAwaitDepthM2S,
+                        nBlockAwaitDepthS2M: opts.imaState.nBlockAwaitDepthS2M,
+                        nBlockAwaitDepthS2S: opts.imaState.nBlockAwaitDepthS2S,
+                        nBlockAgeM2S: opts.imaState.nBlockAgeM2S,
+                        nBlockAgeS2M: opts.imaState.nBlockAgeS2M,
+                        nBlockAgeS2S: opts.imaState.nBlockAgeS2S,
 
-                        "nLoopPeriodSeconds": opts.imaState.nLoopPeriodSeconds,
-                        "nNodeNumber": opts.imaState.nNodeNumber,
-                        "nNodesCount": opts.imaState.nNodesCount,
-                        "nTimeFrameSeconds": opts.imaState.nTimeFrameSeconds,
-                        "nNextFrameGap": opts.imaState.nNextFrameGap,
+                        nLoopPeriodSeconds: opts.imaState.nLoopPeriodSeconds,
+                        nNodeNumber: opts.imaState.nNodeNumber,
+                        nNodesCount: opts.imaState.nNodesCount,
+                        nTimeFrameSeconds: opts.imaState.nTimeFrameSeconds,
+                        nNextFrameGap: opts.imaState.nNextFrameGap,
 
-                        "joCommunityPool": null,
-                        "joDepositBoxETH": null,
-                        "joDepositBoxERC20": null,
-                        "joDepositBoxERC721": null,
-                        "joDepositBoxERC1155": null,
-                        "joDepositBoxERC721WithMetadata": null,
-                        "joLinker": null,
-                        "isWithMetadata721": false,
+                        joCommunityPool: null,
+                        joDepositBoxETH: null,
+                        joDepositBoxERC20: null,
+                        joDepositBoxERC721: null,
+                        joDepositBoxERC1155: null,
+                        joDepositBoxERC721WithMetadata: null,
+                        joLinker: null,
+                        isWithMetadata721: false,
 
-                        "joTokenManagerETH": null,
-                        "joTokenManagerERC20": null,
-                        "joTokenManagerERC20Target": null,
-                        "joTokenManagerERC721": null,
-                        "joTokenManagerERC721Target": null,
-                        "joTokenManagerERC1155": null,
-                        "joTokenManagerERC1155Target": null,
-                        "joTokenManagerERC721WithMetadata": null,
-                        "joTokenManagerERC721WithMetadataTarget": null,
-                        "joCommunityLocker": null,
-                        "joCommunityLockerTarget": null,
-                        "joMessageProxyMainNet": null,
-                        "joMessageProxySChain": null,
-                        "joMessageProxySChainTarget": null,
-                        "joTokenManagerLinker": null,
-                        "joTokenManagerLinkerTarget": null,
-                        "joEthErc20": null,
-                        "joEthErc20Target": null,
+                        joTokenManagerETH: null,
+                        joTokenManagerERC20: null,
+                        joTokenManagerERC20Target: null,
+                        joTokenManagerERC721: null,
+                        joTokenManagerERC721Target: null,
+                        joTokenManagerERC1155: null,
+                        joTokenManagerERC1155Target: null,
+                        joTokenManagerERC721WithMetadata: null,
+                        joTokenManagerERC721WithMetadataTarget: null,
+                        joCommunityLocker: null,
+                        joCommunityLockerTarget: null,
+                        joMessageProxyMainNet: null,
+                        joMessageProxySChain: null,
+                        joMessageProxySChainTarget: null,
+                        joTokenManagerLinker: null,
+                        joTokenManagerLinkerTarget: null,
+                        joEthErc20: null,
+                        joEthErc20Target: null,
 
-                        "chainProperties": constructChainProperties( opts ),
-                        "joAbiSkaleManager": opts.imaState.joAbiSkaleManager,
-                        "bHaveSkaleManagerABI": opts.imaState.bHaveSkaleManagerABI,
-                        "strChainNameOriginChain": opts.imaState.strChainNameOriginChain,
-                        "isPWA": opts.imaState.isPWA,
-                        "nTimeoutSecondsPWA": opts.imaState.nTimeoutSecondsPWA,
-                        "strReimbursementChain": opts.imaState.strReimbursementChain,
-                        "isShowReimbursementBalance": opts.imaState.isShowReimbursementBalance,
-                        "nReimbursementRecharge": opts.imaState.nReimbursementRecharge,
-                        "nReimbursementWithdraw": opts.imaState.nReimbursementWithdraw,
-                        "nReimbursementRange": opts.imaState.nReimbursementRange,
-                        "joSChainDiscovery": {
-                            "isSilentReDiscovery":
+                        chainProperties: constructChainProperties( opts ),
+                        joAbiSkaleManager: opts.imaState.joAbiSkaleManager,
+                        bHaveSkaleManagerABI: opts.imaState.bHaveSkaleManagerABI,
+                        strChainNameOriginChain: opts.imaState.strChainNameOriginChain,
+                        isPWA: opts.imaState.isPWA,
+                        nTimeoutSecondsPWA: opts.imaState.nTimeoutSecondsPWA,
+                        strReimbursementChain: opts.imaState.strReimbursementChain,
+                        isShowReimbursementBalance: opts.imaState.isShowReimbursementBalance,
+                        nReimbursementRecharge: opts.imaState.nReimbursementRecharge,
+                        nReimbursementWithdraw: opts.imaState.nReimbursementWithdraw,
+                        nReimbursementRange: opts.imaState.nReimbursementRange,
+                        joSChainDiscovery: {
+                            isSilentReDiscovery:
                                 opts.imaState.joSChainDiscovery.isSilentReDiscovery,
-                            "repeatIntervalMilliseconds":
+                            repeatIntervalMilliseconds:
                                 opts.imaState.joSChainDiscovery.repeatIntervalMilliseconds,
-                            "periodicDiscoveryInterval":
+                            periodicDiscoveryInterval:
                                 opts.imaState.joSChainDiscovery.periodicDiscoveryInterval
                         },
-                        "optsS2S": { // S-Chain to S-Chain transfer options
-                            "isEnabled": true,
-                            "strNetworkBrowserPath": opts.imaState.optsS2S.strNetworkBrowserPath
+                        optsS2S: { // S-Chain to S-Chain transfer options
+                            isEnabled: true,
+                            strNetworkBrowserPath: opts.imaState.optsS2S.strNetworkBrowserPath
                         },
-                        "nJsonRpcPort": opts.imaState.nJsonRpcPort,
-                        "isCrossImaBlsMode": opts.imaState.isCrossImaBlsMode
+                        nJsonRpcPort: opts.imaState.nJsonRpcPort,
+                        isCrossImaBlsMode: opts.imaState.isCrossImaBlsMode
                     }
                 },
-                "colorization": { "isEnabled": log.isEnabledColorization() }
+                colorization: { isEnabled: log.isEnabledColorization() }
             }
         };
         while( ! aClient.logicalInitComplete ) {
@@ -695,9 +695,9 @@ export async function spreadArrivedStateOfPendingWorkAnalysis( joMessage: any ) 
 export async function spreadUpdatedSChainNetwork( isFinal: boolean ) {
     const imaState = state.get();
     const joMessage: any = {
-        "method": "spreadUpdatedSChainNetwork",
-        "isFinal": ( !!isFinal ),
-        "joSChainNetworkInfo": imaState.joSChainNetworkInfo
+        method: "spreadUpdatedSChainNetwork",
+        isFinal: ( !!isFinal ),
+        joSChainNetworkInfo: imaState.joSChainNetworkInfo
     };
     const cntWorkers = gArrWorkers.length;
     for( let idxWorker = 0; idxWorker < cntWorkers; ++ idxWorker )

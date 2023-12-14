@@ -175,8 +175,8 @@ export async function registerSChainInDepositBoxes( // step 1
             gasPrice, estimatedGas, weiHowMuch );
         if( joReceipt && typeof joReceipt == "object" ) {
             jarrReceipts.push( {
-                "description": "registerSChainInDepositBoxes",
-                "receipt": joReceipt
+                description: "registerSChainInDepositBoxes",
+                receipt: joReceipt
             } );
         }
         const isSChainStatusOKay = await waitForHasChain(

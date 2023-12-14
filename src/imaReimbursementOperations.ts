@@ -195,8 +195,8 @@ export async function reimbursementWalletRecharge(
             joAccountMN, strActionName, gasPrice, estimatedGas, nReimbursementRecharge, null );
         if( joReceipt && typeof joReceipt == "object" ) {
             jarrReceipts.push( {
-                "description": "reimbursementWalletRecharge",
-                "receipt": joReceipt
+                description: "reimbursementWalletRecharge",
+                receipt: joReceipt
             } );
         }
     } catch ( err ) {
@@ -262,8 +262,8 @@ export async function reimbursementWalletWithdraw(
             gasPrice, estimatedGas, weiHowMuch );
         if( joReceipt && typeof joReceipt == "object" ) {
             jarrReceipts.push( {
-                "description": "reimbursementWalletWithdraw",
-                "receipt": joReceipt
+                description: "reimbursementWalletWithdraw",
+                receipt: joReceipt
             } );
         }
     } catch ( err ) {
@@ -327,8 +327,8 @@ export async function reimbursementSetRange(
             joAccountSC, strActionName, gasPrice, estimatedGas, weiHowMuch, opts );
         if( joReceipt && typeof joReceipt == "object" ) {
             jarrReceipts.push( {
-                "description": "reimbursementSetRange",
-                "receipt": joReceipt
+                description: "reimbursementSetRange",
+                receipt: joReceipt
             } );
         }
     } catch ( err ) {

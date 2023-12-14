@@ -59,8 +59,8 @@ function parseCommandLine() {
     log.autoEnableColorizationFromCommandLineArgs();
     const strPrintedArguments = process.argv.join( " " );
     imaCLI.parse( {
-        "register": clpTools.commandLineTaskRegister,
-        "register1": clpTools.commandLineTaskRegister1,
+        register: clpTools.commandLineTaskRegister,
+        register1: clpTools.commandLineTaskRegister1,
         "check-registration": clpTools.commandLineTaskCheckRegistration,
         "check-registration1": clpTools.commandLineTaskCheckRegistration1,
         "mint-erc20": clpTools.commandLineTaskMintErc20,
@@ -78,8 +78,8 @@ function parseCommandLine() {
         "m2s-transfer": clpTools.commandLineTaskTransferM2S,
         "s2m-transfer": clpTools.commandLineTaskTransferS2M,
         "s2s-transfer": clpTools.commandLineTaskTransferS2S,
-        "transfer": clpTools.commandLineTaskTransfer,
-        "loop": clpTools.commandLineTaskLoop,
+        transfer: clpTools.commandLineTaskTransfer,
+        loop: clpTools.commandLineTaskLoop,
         "simple-loop": clpTools.commandLineTaskLoopSimple,
         "browse-s-chain": clpTools.commandLineTaskBrowseSChain
     } );
@@ -162,9 +162,9 @@ function initMonitoringServer(): void {
             log.debug( "{p}New connection from {}", strLogPrefix, ip );
         wsPeer.on( "message", function( message: any ) {
             const joAnswer: any = {
-                "method": null,
-                "id": null,
-                "error": null
+                method: null,
+                id: null,
+                error: null
             };
             try {
                 const joMessage: any = JSON.parse( message );
@@ -276,9 +276,9 @@ function initJsonRpcServer(): void {
             }
         };
         let joAnswer: any = {
-            "method": null,
-            "id": null,
-            "error": null
+            method: null,
+            id: null,
+            error: null
         };
         try {
             const joMessage: any = JSON.parse( message );
@@ -391,8 +391,9 @@ function handleFirstSChainDiscoveryAttemptDone(
     discoveryTools.continueSChainDiscoveryInBackgroundIfNeeded(
         isSilentReDiscovery, function() {
             discoveryTools.doPeriodicSChainNetworkDiscoveryIfNeeded(
-                isSilentReDiscovery, fnOnPeriodicDiscoveryResultAvailable );
-        } );
+                isSilentReDiscovery, fnOnPeriodicDiscoveryResultAvailable )
+                .then( function() {} ).catch( function() {} );
+        } ).then( function() {} ).catch( function() {} );
     imaState.joSChainNetworkInfo = joSChainNetworkInfo;
 }
 
@@ -423,7 +424,7 @@ async function main() {
     const isSilentReDiscovery = imaState.isPrintSecurityValues
         ? false : imaState.joSChainDiscovery.isSilentReDiscovery;
     const fnOnPeriodicDiscoveryResultAvailable = function( isFinal: boolean ) {
-        loop.spreadUpdatedSChainNetwork( isFinal );
+        loop.spreadUpdatedSChainNetwork( isFinal ).then( function() {} ).catch( function() {} );
     }
     if( imaState.bSignMessages ) {
         if( imaState.strPathBlsGlue.length == 0 ) {
@@ -449,7 +450,7 @@ async function main() {
                     handleFirstSChainDiscoveryAttemptDone(
                         err, joSChainNetworkInfo, isSilentReDiscovery,
                         fnOnPeriodicDiscoveryResultAvailable );
-                    doTheJob();
+                    doTheJob().then( function() {} ).catch( function() {} );
                     // Finish of IMA Agent startup,
                     // everything else is in async calls executed later
                     return 0;
@@ -457,13 +458,14 @@ async function main() {
             ).catch( function( err: Error | string ) {
                 const strError = owaspUtils.extractErrorMessage( err );
                 log.critical( "S-Chain network discovery failed: {err}", strError );
-                doTheJob();
+                doTheJob().then( function() {} ).catch( function() {} );
             } );
         }
     } else {
         discoveryTools.doPeriodicSChainNetworkDiscoveryIfNeeded(
-            isSilentReDiscovery, fnOnPeriodicDiscoveryResultAvailable );
-        doTheJob();
+            isSilentReDiscovery, fnOnPeriodicDiscoveryResultAvailable )
+            .then( function() {} ).catch( function() {} );
+        doTheJob().then( function() {} ).catch( function() {} );
     // Finish of IMA Agent startup,
     // everything else is in async calls executed later,
     // skip exit here to avoid early termination while tasks ase still running
@@ -471,4 +473,4 @@ async function main() {
 
 }
 
-main();
+main().then( function() {} ).catch( function() {} );

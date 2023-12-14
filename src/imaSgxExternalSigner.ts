@@ -88,19 +88,19 @@ async function run() {
             log.debug( "--- TX hash ---> {}", txHash );
 
         const rpcCallOpts: any = {
-            "cert": fs.readFileSync( strPathCert, "utf8" ),
-            "key": fs.readFileSync( strPathKey, "utf8" )
+            cert: fs.readFileSync( strPathCert, "utf8" ),
+            key: fs.readFileSync( strPathKey, "utf8" )
         };
 
         const joCall: any = await rpcCall.create( strSgxWalletURL, rpcCallOpts );
         if( ! joCall )
             throw new Error( `Failed to create JSON RPC call object to ${strSgxWalletURL}` );
         const joIn: any = {
-            "method": "ecdsaSignMessageHash",
-            "params": {
-                "keyName": "" + strSgxKeyName,
-                "messageHash": txHash,
-                "base": 16
+            method: "ecdsaSignMessageHash",
+            params: {
+                keyName: "" + strSgxKeyName,
+                messageHash: txHash,
+                base: 16
             }
         };
         const joOut: any = await joCall.call( joIn );
@@ -111,10 +111,10 @@ async function run() {
             const v = parseInt( joOut.result.signature_v );
             const ethV = v + owaspUtils.parseIntOrHex( chainId ) * 2 + 35;
             const joExpanded = {
-                "recoveryParam": v,
-                "v": ethV,
-                "r": joOut.result.signature_r,
-                "s": joOut.result.signature_s
+                recoveryParam: v,
+                v: ethV,
+                r: joOut.result.signature_r,
+                s: joOut.result.signature_s
             };
             if( gIsDebugLogging )
                 log.debug( "--- Expanded signature ---> {}", joExpanded );
@@ -145,14 +145,14 @@ async function run() {
         } catch ( err ) {
             if( gIsDebugLogging )
                 log.debug( "--- Call error ---> {}", log.em, ( err ) );
-            finalizeOutput( { "error": owaspUtils.extractErrorMessage( err ) } );
+            finalizeOutput( { error: owaspUtils.extractErrorMessage( err ) } );
             process.exit( 1 );
         }
     } catch ( err ) {
         if( gIsDebugLogging )
             log.error( "RPC call to SGX failed: {err}", err );
-        finalizeOutput( { "error": owaspUtils.extractErrorMessage( err ) } );
+        finalizeOutput( { error: owaspUtils.extractErrorMessage( err ) } );
         process.exit( 1 );
     }
 }
-run();
+run().then( function() {} ).catch( function() {} );

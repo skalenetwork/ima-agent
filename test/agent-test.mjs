@@ -138,7 +138,7 @@ const imaState = {
         "mn": {
             "joAccount": {
                 "privateKey": owaspUtils.toEthPrivateKey( process.env.PRIVATE_KEY_FOR_ETHEREUM ),
-                "address": owaspUtils.fnAddressImpl_,
+                "address": function () { return owaspUtils.fnAddressImpl_( this ); },
                 "strTransactionManagerURL":
                     owaspUtils.toStringURL( process.env.TRANSACTION_MANAGER_URL_ETHEREUM ),
                 "nTmPriority":
@@ -174,7 +174,7 @@ const imaState = {
         "sc": {
             "joAccount": {
                 "privateKey": owaspUtils.toEthPrivateKey( process.env.PRIVATE_KEY_FOR_SCHAIN ),
-                "address": owaspUtils.fnAddressImpl_,
+                "address": function () { return owaspUtils.fnAddressImpl_( this ); },
                 "strTransactionManagerURL":
                     owaspUtils.toStringURL( process.env.TRANSACTION_MANAGER_URL_S_CHAIN ),
                 "nTmPriority":
@@ -211,7 +211,7 @@ const imaState = {
             "joAccount": {
                 "privateKey":
                     owaspUtils.toEthPrivateKey( process.env.PRIVATE_KEY_FOR_SCHAIN_TARGET ),
-                "address": owaspUtils.fnAddressImpl_,
+                "address": function () { return owaspUtils.fnAddressImpl_( this ); },
                 "strTransactionManagerURL":
                     owaspUtils.toStringURL( process.env.TRANSACTION_MANAGER_URL_S_CHAIN_TARGET ),
                 "nTmPriority":
@@ -720,7 +720,7 @@ describe( "OWASP-5", function() {
             "privateKey":
                 owaspUtils.toEthPrivateKey(
                     "23ABDBD3C61B5330AF61EBE8BEF582F4E5CC08E554053A718BDCE7813B9DC1FC" ),
-            "address": owaspUtils.fnAddressImpl_
+            "address": function () { return owaspUtils.fnAddressImpl_( this ); }
         };
 
         it( "Extract address from private key", function() {
@@ -950,7 +950,7 @@ describe( "CLI", function() {
                 "privateKey":
                     owaspUtils.toEthPrivateKey(
                         "23ABDBD3C61B5330AF61EBE8BEF582F4E5CC08E554053A718BDCE7813B9DC1FC" ),
-                "address": owaspUtils.fnAddressImpl_
+                "address": function () { return owaspUtils.fnAddressImpl_( this ); }
             };
             assert.equal(
                 imaCLI.ensureHaveCredentials(

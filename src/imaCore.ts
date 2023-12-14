@@ -61,13 +61,13 @@ async function findOutReferenceLogRecord(
     for( let idxLogRecord = 0; idxLogRecord < cntLogRecord; ++ idxLogRecord ) {
         const joEvent = arrLogRecords[idxLogRecord];
         const ev: any = {
-            "currentMessage": joEvent.args[0],
-            "previousOutgoingMessageBlockId": joEvent.args[1]
+            currentMessage: joEvent.args[0],
+            previousOutgoingMessageBlockId: joEvent.args[1]
         };
         const joReferenceLogRecord: any = {
-            "currentMessage": ev.currentMessage,
-            "previousOutgoingMessageBlockId": ev.previousOutgoingMessageBlockId,
-            "currentBlockId": bnBlockId
+            currentMessage: ev.currentMessage,
+            previousOutgoingMessageBlockId: ev.previousOutgoingMessageBlockId,
+            currentBlockId: bnBlockId
         };
         const bnCurrentMessage =
             owaspUtils.toBN( joReferenceLogRecord.currentMessage.toString() );
@@ -275,11 +275,11 @@ async function analyzeGatheredRecords( optsTransfer: any, r: any ) {
         optsTransfer.details.debug( "{p}Will review found event record {} with data {}",
             optsTransfer.strLogPrefix, i, joEvent );
         const ev: any = {
-            "dstChainHash": joEvent.args[0],
-            "msgCounter": joEvent.args[1],
-            "srcContract": joEvent.args[2],
-            "dstContract": joEvent.args[3],
-            "data": joEvent.args[4]
+            dstChainHash: joEvent.args[0],
+            msgCounter: joEvent.args[1],
+            srcContract: joEvent.args[2],
+            dstContract: joEvent.args[3],
+            data: joEvent.args[4]
         };
         if( ev.dstChainHash == strChainHashWeAreLookingFor ) {
             joValues = ev;
@@ -321,7 +321,7 @@ async function gatherMessages( optsTransfer: any ) {
         const idxProcessing = optsTransfer.cntProcessed + idxInBlock;
         if( idxProcessing > optsTransfer.nMaxTransactionsCount )
             break;
-        let nBlockFrom = 0, nBlockTo = "latest";
+        let nBlockFrom = 0; let nBlockTo = "latest";
         if( optsTransfer.arrLogRecordReferences.length > 0 ) {
             const joReferenceLogRecord = optsTransfer.arrLogRecordReferences.shift();
             if( joReferenceLogRecord && "currentBlockId" in joReferenceLogRecord &&
@@ -444,12 +444,12 @@ async function gatherMessages( optsTransfer: any ) {
             optsTransfer.strLogPrefix, optsTransfer.nIdxCurrentMsg );
         optsTransfer.arrMessageCounters.push( optsTransfer.nIdxCurrentMsg );
         const joMessage: any = {
-            "sender": joValues.srcContract,
-            "destinationContract": joValues.dstContract,
-            "to": joValues.to,
-            "amount": joValues.amount,
-            "data": joValues.data,
-            "savedBlockNumberForOptimizations": joValues.savedBlockNumberForOptimizations
+            sender: joValues.srcContract,
+            destinationContract: joValues.dstContract,
+            to: joValues.to,
+            amount: joValues.amount,
+            data: joValues.data,
+            savedBlockNumberForOptimizations: joValues.savedBlockNumberForOptimizations
         };
         optsTransfer.jarrMessages.push( joMessage );
     }
@@ -563,10 +563,10 @@ async function callbackAllMessagesSign(
         weiHowMuchPostIncomingMessages, opts );
     if( joReceipt && typeof joReceipt == "object" ) {
         optsTransfer.jarrReceipts.push( {
-            "description": "doTransfer/postIncomingMessages()",
+            description: "doTransfer/postIncomingMessages()",
             "optsTransfer.detailsString":
                 "" + optsTransfer.strGatheredDetailsName,
-            "receipt": joReceipt
+            receipt: joReceipt
         } );
         imaGasUsage.printGasUsageReportFromArray( "(intermediate result) TRANSFER " +
             optsTransfer.chainNameSrc + " -> " + optsTransfer.chainNameDst,
@@ -632,7 +632,7 @@ async function handleAllMessagesSigning( optsTransfer: any ) {
             optsTransfer.chainNameSrc, optsTransfer.joExtraSignOpts,
             async function( err: Error | string, jarrMessages: any[], joGlueResult: any ) {
                 await callbackAllMessagesSign( optsTransfer, err, jarrMessages, joGlueResult );
-                return
+
             } ).catch( function( err: Error | string ) {
             // callback fn as argument of optsTransfer.fnSignMessages
             optsTransfer.bErrorInSigningMessages = true;
@@ -689,11 +689,11 @@ async function checkOutgoingMessageEventInOneNode(
         for( let idxEvent = 0; idxEvent < cntEvents; ++ idxEvent ) {
             const joEvent = nodeRV[idxEvent];
             const eventValuesByName: any = {
-                "dstChainHash": joEvent.args[0],
-                "msgCounter": joEvent.args[1],
-                "srcContract": joEvent.args[2],
-                "dstContract": joEvent.args[3],
-                "data": joEvent.args[4]
+                dstChainHash: joEvent.args[0],
+                msgCounter: joEvent.args[1],
+                srcContract: joEvent.args[2],
+                dstContract: joEvent.args[3],
+                data: joEvent.args[4]
             };
             if( owaspUtils.ensureStartsWith0x( joMessage.sender ).toLowerCase() ==
                     owaspUtils.ensureStartsWith0x( eventValuesByName.srcContract ).toLowerCase() &&
@@ -753,12 +753,12 @@ async function checkOutgoingMessageEvent( optsTransfer: any, joSChain: any ) {
             "message envelope data: {}", optsTransfer.strLogPrefix, optsTransfer.strDirection,
             idxMessage + 1, cntMessages, idxImaMessage, joMessage );
         const optsOutgoingMessageAnalysis: any = {
-            idxMessage: idxMessage,
-            idxImaMessage: idxImaMessage,
-            joMessage: joMessage,
+            idxMessage,
+            idxImaMessage,
+            joMessage,
             joNode: null,
             idxNode: 0,
-            cntNodes: cntNodes,
+            cntNodes,
             cntPassedNodes: 0,
             cntFailedNodes: 0
         };
@@ -942,28 +942,28 @@ export async function doTransfer(
     transactionCustomizerDst: imaTx.TransactionCustomizer
 ) {
     const optsTransfer: any = {
-        strDirection: strDirection,
-        joRuntimeOpts: joRuntimeOpts,
-        ethersProviderSrc: ethersProviderSrc,
-        joMessageProxySrc: joMessageProxySrc,
-        joAccountSrc: joAccountSrc,
-        ethersProviderDst: ethersProviderDst,
-        joMessageProxyDst: joMessageProxyDst,
-        joAccountDst: joAccountDst,
-        chainNameSrc: chainNameSrc,
-        chainNameDst: chainNameDst,
-        chainIdSrc: chainIdSrc,
-        chainIdDst: chainIdDst,
-        joDepositBoxMainNet: joDepositBoxMainNet, // for logs validation on mainnet
-        joTokenManagerSChain: joTokenManagerSChain, // for logs validation on s-chain
-        nTransactionsCountInBlock: nTransactionsCountInBlock,
-        nTransferSteps: nTransferSteps,
-        nMaxTransactionsCount: nMaxTransactionsCount,
-        nBlockAwaitDepth: nBlockAwaitDepth,
-        nBlockAge: nBlockAge,
-        fnSignMessages: fnSignMessages,
-        joExtraSignOpts: joExtraSignOpts,
-        transactionCustomizerDst: transactionCustomizerDst,
+        strDirection,
+        joRuntimeOpts,
+        ethersProviderSrc,
+        joMessageProxySrc,
+        joAccountSrc,
+        ethersProviderDst,
+        joMessageProxyDst,
+        joAccountDst,
+        chainNameSrc,
+        chainNameDst,
+        chainIdSrc,
+        chainIdDst,
+        joDepositBoxMainNet, // for logs validation on mainnet
+        joTokenManagerSChain, // for logs validation on s-chain
+        nTransactionsCountInBlock,
+        nTransferSteps,
+        nMaxTransactionsCount,
+        nBlockAwaitDepth,
+        nBlockAge,
+        fnSignMessages,
+        joExtraSignOpts,
+        transactionCustomizerDst,
         imaState: state.get(),
         nTransferLoopCounter: 0 + gTransferLoopCounter,
         strTransferErrorCategoryName: "loop-" + strDirection,
@@ -1107,7 +1107,7 @@ export async function doAllS2S( // s-chain --> s-chain
     fnSignMessages: any,
     transactionCustomizerDst: imaTx.TransactionCustomizer
 ) {
-    let cntOK = 0, cntFail = 0, nIndexS2S = 0;
+    let cntOK = 0; let cntFail = 0; let nIndexS2S = 0;
     const sc = imaState.chainProperties.sc;
     const strDirection = "S2S";
     const arrSChainsCached = skaleObserver.getLastCachedSChains();
@@ -1145,14 +1145,14 @@ export async function doAllS2S( // s-chain --> s-chain
                             sc.joAbiIMA.message_proxy_chain_abi,
                             ethersProviderSrc );
                     const joExtraSignOpts: any = {
-                        chainNameSrc: chainNameSrc,
-                        chainIdSrc: chainIdSrc,
-                        chainNameDst: chainNameDst,
-                        chainIdDst: chainIdDst,
-                        joAccountSrc: joAccountSrc,
-                        joAccountDst: joAccountDst,
-                        ethersProviderSrc: ethersProviderSrc,
-                        ethersProviderDst: ethersProviderDst
+                        chainNameSrc,
+                        chainIdSrc,
+                        chainNameDst,
+                        chainIdDst,
+                        joAccountSrc,
+                        joAccountDst,
+                        ethersProviderSrc,
+                        ethersProviderDst
                     };
                     joRuntimeOpts.idxChainKnownForS2S = idxSChain;
                     joRuntimeOpts.cntChainsKnownForS2S = cntSChains;

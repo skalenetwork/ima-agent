@@ -935,7 +935,7 @@ export function capitalizeFirstLetter( s?: any ): string {
 function errFnDottedName( s?: any ): string {
     const arr = s.split( "." );
     const cnt = arr.length;
-    let i, s2 = "";
+    let i; let s2 = "";
     for( i = 0; i < cnt; ++ i ) {
         if( i > 0 )
             s2 += bright( "." );

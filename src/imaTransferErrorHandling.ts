@@ -40,9 +40,9 @@ export function saveTransferError( strCategory: string, textLog: any, ts?: any )
     ts = ts || Math.round( ( new Date() ).getTime() / 1000 );
     const c = verifyTransferErrorCategoryName( strCategory );
     const joTransferEventError: any = {
-        "ts": ts,
-        "category": "" + c,
-        "textLog": "" + textLog.toString()
+        ts,
+        category: "" + c,
+        textLog: "" + textLog.toString()
     };
     gArrLastTransferErrors.push( joTransferEventError );
     while( gArrLastTransferErrors.length > gMaxLastTransferErrors )
@@ -51,7 +51,7 @@ export function saveTransferError( strCategory: string, textLog: any, ts?: any )
     saveTransferEvents.dispatchEvent(
         new UniversalDispatcherEvent(
             "error",
-            { "detail": joTransferEventError } ) );
+            { detail: joTransferEventError } ) );
 }
 
 export function saveTransferSuccess( strCategory: string ): void {
@@ -60,7 +60,7 @@ export function saveTransferSuccess( strCategory: string ): void {
     saveTransferEvents.dispatchEvent(
         new UniversalDispatcherEvent(
             "success",
-            { "detail": { "category": strCategory } } ) );
+            { detail: { category: strCategory } } ) );
 }
 
 export function saveTransferSuccessAll(): void {

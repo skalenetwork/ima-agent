@@ -90,7 +90,7 @@ export async function doConnect( joCall: any, opts: any, fn?: any ) {
                 const wsConn = joCall.wsConn;
                 joCall.wsConn = null;
                 wsConn.close();
-                doReconnectWsStep( joCall, opts );
+                doReconnectWsStep( joCall, opts ).then( function() {} ).catch( function() {} );
             } );
             joCall.wsConn.on( "fail", async function( err: any ) {
                 strWsError = err.toString() || "internal web socket failure";
@@ -98,7 +98,7 @@ export async function doConnect( joCall: any, opts: any, fn?: any ) {
                 const wsConn = joCall.wsConn;
                 joCall.wsConn = null;
                 wsConn.close();
-                doReconnectWsStep( joCall, opts );
+                doReconnectWsStep( joCall, opts ).then( function() {} ).catch( function() {} );
             } );
             joCall.wsConn.on( "message", async function incoming( data: any ) {
                 const joOut = JSON.parse( data );
@@ -129,7 +129,8 @@ export async function doConnect( joCall: any, opts: any, fn?: any ) {
                         const wsConn = joCall.wsConn;
                         joCall.wsConn = null;
                         wsConn.close();
-                        doReconnectWsStep( joCall, opts );
+                        doReconnectWsStep( joCall, opts )
+                            .then( function() {} ).catch( function() {} );
                         return false; // stop waiting
                     }
                     return true; // continue waiting
@@ -177,12 +178,13 @@ async function doReconnectWsStep( joCall: any, opts: any, fn?: any ) {
         return;
     doConnect( joCall, opts, async function( joCall: any, err: any ) {
         if( err ) {
-            doReconnectWsStep( joCall, opts );
+            doReconnectWsStep( joCall, opts )
+                .then( function() {} ).catch( function() {} );
             return
         }
         if( fn )
             await fn( joCall, null );
-    } );
+    } ).then( function() {} ).catch( function() {} );
 }
 
 async function doDisconnect( joCall: any, fn: any ) {
@@ -208,8 +210,8 @@ export async function doCall( joCall: any, joIn: any, fn: any ) {
     joIn = enrichTopLevelFieldsInJSON( joIn );
     if( joCall.wsConn ) {
         const entry: any = {
-            joIn: joIn,
-            fn: fn,
+            joIn,
+            fn,
             out: null
         };
         joCall.mapPendingByCallID[joIn.id] = entry;
@@ -228,26 +230,26 @@ export async function doCall( joCall: any, joIn: any, fn: any ) {
             return;
         }
         const strBody = JSON.stringify( joIn );
-        let errCall: string | null = null, joOut: any = null;
+        let errCall: string | null = null; let joOut: any = null;
         if( joCall.joRpcOptions?.cert && typeof joCall.joRpcOptions.cert == "string" &&
             joCall.joRpcOptions.key && typeof joCall.joRpcOptions.key == "string"
         ) {
             const u = new URL( joCall.url );
             const options: any = {
-                "hostname": u.hostname,
-                "port": u.port,
-                "path": "/",
-                "method": "POST",
-                "headers": {
+                hostname: u.hostname,
+                port: u.port,
+                path: "/",
+                method: "POST",
+                headers: {
                     "Content-Type": "application/json"
                 },
-                "ca": ( joCall.joRpcOptions?.ca &&
+                ca: ( joCall.joRpcOptions?.ca &&
                     typeof joCall.joRpcOptions.ca == "string" )
                     ? joCall.joRpcOptions.ca : null,
-                "cert": ( joCall.joRpcOptions?.cert &&
+                cert: ( joCall.joRpcOptions?.cert &&
                     typeof joCall.joRpcOptions.cert == "string" )
                     ? joCall.joRpcOptions.cert : null,
-                "key": ( joCall.joRpcOptions?.key &&
+                key: ( joCall.joRpcOptions?.key &&
                     typeof joCall.joRpcOptions.key == "string" )
                     ? joCall.joRpcOptions.key : null
             };
@@ -300,23 +302,23 @@ export async function doCall( joCall: any, joIn: any, fn: any ) {
         } else {
             try {
                 const requestOpts = {
-                    "method": "POST",
-                    "timeout": gSecondsConnectionTimeout * 1000, // in milliseconds
-                    "headers": {
+                    method: "POST",
+                    timeout: gSecondsConnectionTimeout * 1000, // in milliseconds
+                    headers: {
                         "Content-Type": "application/json"
                     },
-                    "content": strBody,
-                    "rejectUnauthorized": false,
+                    content: strBody,
+                    rejectUnauthorized: false,
                     // "requestCert": true,
-                    "agent": false,
-                    "httpsAgent": false,
-                    "ca": ( joCall.joRpcOptions?.ca &&
+                    agent: false,
+                    httpsAgent: false,
+                    ca: ( joCall.joRpcOptions?.ca &&
                         typeof joCall.joRpcOptions.ca == "string" )
                         ? joCall.joRpcOptions.ca : null,
-                    "cert": ( joCall.joRpcOptions?.cert &&
+                    cert: ( joCall.joRpcOptions?.cert &&
                         typeof joCall.joRpcOptions.cert == "string" )
                         ? joCall.joRpcOptions.cert : null,
-                    "key": ( joCall.joRpcOptions?.key &&
+                    key: ( joCall.joRpcOptions?.key &&
                         typeof joCall.joRpcOptions.key == "string" )
                         ? joCall.joRpcOptions.key : null
                 };
@@ -350,20 +352,20 @@ export async function rpcCallCreate( strURL: string, opts: any ) {
             `bad parameters: ${JSON.stringify( arguments )}` );
     }
     const joCall: any = {
-        "url": "" + strURL,
-        "joRpcOptions": opts ? opts : null,
-        "mapPendingByCallID": { },
-        "wsConn": null,
-        "isAutoReconnect":
+        url: "" + strURL,
+        joRpcOptions: opts ? opts : null,
+        mapPendingByCallID: { },
+        wsConn: null,
+        isAutoReconnect:
             ( opts && "isAutoReconnect" in opts && opts.isAutoReconnect ) ? true : false,
-        "isDisconnectMode": false,
-        "reconnect": async function( fnAfter: any ) {
+        isDisconnectMode: false,
+        reconnect: async function( fnAfter: any ) {
             await doConnect( joCall, fnAfter );
         },
-        "reconnect_if_needed": async function( fnAfter: any ) {
+        reconnect_if_needed: async function( fnAfter: any ) {
             await doConnectIfNeeded( joCall, opts, fnAfter );
         },
-        "call": async function( joIn: any, fnAfter: any ) {
+        call: async function( joIn: any, fnAfter: any ) {
             const self = this;
             const promiseComplete = new Promise( function( resolve: any, reject: any ) {
                 self.reconnect_if_needed( async function( joCall: any, err: any ) {
@@ -391,7 +393,7 @@ export async function rpcCallCreate( strURL: string, opts: any ) {
                     "{url} JSON RPC call(awaiter) error: {err}", strURL, err );
             } );
         },
-        "disconnect": async function( fnAfter?: any ) {
+        disconnect: async function( fnAfter?: any ) {
             await doDisconnect( joCall, fnAfter );
         }
     };

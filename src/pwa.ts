@@ -63,10 +63,10 @@ export function checkLoopWorkTypeStringIsCorrect( strLoopWorkType: string ): boo
 
 function composeEmptyStateForPendingWorkAnalysis(): any {
     return {
-        "oracle": { "isInProgress": false, "ts": 0 },
-        "m2s": { "isInProgress": false, "ts": 0 },
-        "s2m": { "isInProgress": false, "ts": 0 },
-        "s2s": { "mapS2S": { } }
+        oracle: { isInProgress: false, ts: 0 },
+        m2s: { isInProgress: false, ts: 0 },
+        s2m: { isInProgress: false, ts: 0 },
+        s2s: { mapS2S: { } }
     };
 }
 
@@ -81,7 +81,7 @@ function getNodeProgressAndTimestamp( joNode: any, strLoopWorkType: string, nInd
     if( strLoopWorkType != "s2s" )
         return joNode.pwaState[strLoopWorkType];
     if( ! ( nIndexS2S in joNode.pwaState[strLoopWorkType].mapS2S ) )
-        joNode.pwaState[strLoopWorkType].mapS2S[nIndexS2S] = { "isInProgress": false, "ts": 0 };
+        joNode.pwaState[strLoopWorkType].mapS2S[nIndexS2S] = { isInProgress: false, ts: 0 };
 
     return joNode.pwaState[strLoopWorkType].mapS2S[nIndexS2S];
 }
@@ -251,14 +251,14 @@ async function notifyOnLoopImpl(
             if( ! joCall )
                 return false;
             const joIn: any = {
-                "method": "skale_imaNotifyLoopWork",
-                "params": {
-                    "nNodeNumber": 0 + imaState.nNodeNumber,
-                    "strLoopWorkType": "" + strLoopWorkType,
-                    "nIndexS2S": 0 + nIndexS2S,
-                    "isStart": ( !!isStart ),
-                    "ts": nUtcUnixTimeStamp,
-                    "signature": signature
+                method: "skale_imaNotifyLoopWork",
+                params: {
+                    nNodeNumber: 0 + imaState.nNodeNumber,
+                    strLoopWorkType: "" + strLoopWorkType,
+                    nIndexS2S: 0 + nIndexS2S,
+                    isStart: ( !!isStart ),
+                    ts: nUtcUnixTimeStamp,
+                    signature
                 }
             };
             await joCall.call( joIn ); // no return value needed here

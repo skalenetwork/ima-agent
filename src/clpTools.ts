@@ -133,8 +133,8 @@ export function printSummaryRegistrationCosts( details?: any ) {
 export function commandLineTaskRegister() {
     const imaState = state.get();
     imaState.arrActions.push( {
-        "name": "Full registration(all steps)",
-        "fn": async function() {
+        name: "Full registration(all steps)",
+        fn: async function() {
             if( ! imaState.bNoWaitSChainStarted )
                 await discoveryTools.waitUntilSChainStarted(); // registerAll
             return await registerAll( true );
@@ -145,8 +145,8 @@ export function commandLineTaskRegister() {
 export function commandLineTaskRegister1() {
     const imaState = state.get();
     imaState.arrActions.push( {
-        "name": "Registration step 1, register S-Chain in deposit box",
-        "fn": async function() {
+        name: "Registration step 1, register S-Chain in deposit box",
+        fn: async function() {
             if( ! imaState.bNoWaitSChainStarted )
                 await discoveryTools.waitUntilSChainStarted(); // registerStep1
             return await registerStep1( true );
@@ -157,8 +157,8 @@ export function commandLineTaskRegister1() {
 export function commandLineTaskCheckRegistration() {
     const imaState = state.get();
     imaState.arrActions.push( {
-        "name": "Full registration status check(all steps)",
-        "fn": async function() {
+        name: "Full registration status check(all steps)",
+        fn: async function() {
             if( ! imaState.bNoWaitSChainStarted )
                 await discoveryTools.waitUntilSChainStarted(); // checkRegistrationAll
             const b = await checkRegistrationAll();
@@ -173,8 +173,8 @@ export function commandLineTaskCheckRegistration() {
 export function commandLineTaskCheckRegistration1() {
     const imaState = state.get();
     imaState.arrActions.push( {
-        "name": "Registration status check step 1, register S-Chain in deposit box",
-        "fn": async function() {
+        name: "Registration status check step 1, register S-Chain in deposit box",
+        fn: async function() {
             if( ! imaState.bNoWaitSChainStarted )
                 await discoveryTools.waitUntilSChainStarted(); // checkRegistrationStep1
             const b = await checkRegistrationStep1();
@@ -189,8 +189,8 @@ export function commandLineTaskCheckRegistration1() {
 export function commandLineTaskMintErc20() {
     const imaState = state.get();
     imaState.arrActions.push( {
-        "name": "mint ERC20",
-        "fn": async function() {
+        name: "mint ERC20",
+        fn: async function() {
             let bMintIsOK = false;
             if( imaState.chainProperties.tc.strCoinNameErc20.length > 0 ) {
                 try {
@@ -222,8 +222,8 @@ export function commandLineTaskMintErc20() {
 export function commandLineTaskMintErc721() {
     const imaState = state.get();
     imaState.arrActions.push( {
-        "name": "mint ERC721",
-        "fn": async function() {
+        name: "mint ERC721",
+        fn: async function() {
             let bMintIsOK = false;
             if( imaState.chainProperties.tc.strCoinNameErc721.length > 0 ) {
                 try {
@@ -263,8 +263,8 @@ export function commandLineTaskMintErc721() {
 export function commandLineTaskMintErc1155() {
     const imaState = state.get();
     imaState.arrActions.push( {
-        "name": "mint ERC1155",
-        "fn": async function() {
+        name: "mint ERC1155",
+        fn: async function() {
             let bMintIsOK = false;
             if( imaState.chainProperties.tc.strCoinNameErc1155.length > 0 ) {
                 try {
@@ -307,8 +307,8 @@ export function commandLineTaskMintErc1155() {
 export function commandLineTaskBurnErc20() {
     const imaState = state.get();
     imaState.arrActions.push( {
-        "name": "burn ERC20",
-        "fn": async function() {
+        name: "burn ERC20",
+        fn: async function() {
             let bBurnIsOK = false;
             if( imaState.chainProperties.tc.strCoinNameErc20.length > 0 ) {
                 try {
@@ -342,8 +342,8 @@ export function commandLineTaskBurnErc20() {
 export function commandLineTaskBurnErc721() {
     const imaState = state.get();
     imaState.arrActions.push( {
-        "name": "burn ERC721",
-        "fn": async function() {
+        name: "burn ERC721",
+        fn: async function() {
             let bBurnIsOK = false;
             if( imaState.chainProperties.tc.strCoinNameErc721.length > 0 ) {
                 try {
@@ -382,8 +382,8 @@ export function commandLineTaskBurnErc721() {
 export function commandLineTaskBurnErc1155() {
     const imaState = state.get();
     imaState.arrActions.push( {
-        "name": "burn ERC1155",
-        "fn": async function() {
+        name: "burn ERC1155",
+        fn: async function() {
             let bBurnIsOK = false;
             if( imaState.chainProperties.tc.strCoinNameErc1155.length > 0 ) {
                 try {
@@ -430,14 +430,14 @@ export async function commandLineTaskShowBalanceEth(
     let assetAddress = null;
     if( imaState.chainProperties.mn.ethersProvider ) {
         arrBalancesMN.push( {
-            "assetName": "RealETH",
-            "balance": await imaEth.getBalanceEth( true, // isMainNet
+            assetName: "RealETH",
+            balance: await imaEth.getBalanceEth( true, // isMainNet
                 imaState.chainProperties.mn.ethersProvider,
                 imaState.chainProperties.mn.chainId, imaState.chainProperties.mn.joAccount )
         } );
         arrBalancesMN.push( {
-            "assetName": "CanReceiveETH",
-            "balance": await imaEth.viewEthPaymentFromSchainOnMainNet(
+            assetName: "CanReceiveETH",
+            balance: await imaEth.viewEthPaymentFromSchainOnMainNet(
                 imaState.chainProperties.mn.ethersProvider,
                 imaState.chainProperties.mn.joAccount, imaState.joDepositBoxETH )
         } );
@@ -449,30 +449,30 @@ export async function commandLineTaskShowBalanceEth(
     }
     if( imaState.chainProperties.sc.ethersProvider ) {
         arrBalancesSC.push( {
-            "assetName": "S-Chain Real ETH as ERC20",
-            "assetAddress": assetAddress,
-            "balance": await imaEth.getBalanceEth( false, // isMainNet
+            assetName: "S-Chain Real ETH as ERC20",
+            assetAddress,
+            balance: await imaEth.getBalanceEth( false, // isMainNet
                 imaState.chainProperties.sc.ethersProvider, imaState.chainProperties.sc.chainId,
                 imaState.chainProperties.sc.joAccount, imaState.joEthErc20 )
         } );
         arrBalancesSC.push( {
-            "assetName": "S-Chain ETH Fuel",
-            "balance": await imaEth.getBalanceEth( true, // isMainNet=true here, but we call S-Chain
+            assetName: "S-Chain ETH Fuel",
+            balance: await imaEth.getBalanceEth( true, // isMainNet=true here, but we call S-Chain
                 imaState.chainProperties.sc.ethersProvider,
                 imaState.chainProperties.sc.chainId, imaState.chainProperties.sc.joAccount )
         } );
     }
     if( imaState.chainProperties.tc.ethersProvider ) {
         arrBalancesSC.push( {
-            "assetName": "Target S-Chain Real ETH as ERC20",
-            "assetAddress": assetAddress,
-            "balance": await imaEth.getBalanceEth( false, // isMainNet
+            assetName: "Target S-Chain Real ETH as ERC20",
+            assetAddress,
+            balance: await imaEth.getBalanceEth( false, // isMainNet
                 imaState.chainProperties.tc.ethersProvider, imaState.chainProperties.sc.chainId,
                 imaState.chainProperties.tc.joAccount, imaState.joEthErc20 )
         } );
         arrBalancesTC.push( {
-            "assetName": "Target S-Chain ETH Fuel",
-            "balance": await imaEth.getBalanceEth( true, // isMainNet=true here, but we call S-Chain
+            assetName: "Target S-Chain ETH Fuel",
+            balance: await imaEth.getBalanceEth( true, // isMainNet=true here, but we call S-Chain
                 imaState.chainProperties.tc.ethersProvider,
                 imaState.chainProperties.tc.chainId, imaState.chainProperties.tc.joAccount )
         } );
@@ -492,9 +492,9 @@ export async function commandLineTaskShowBalanceErc20(
                 imaState.chainProperties.mn.strCoinNameErc20 + "_address"];
         } catch ( err ) { assetAddress = null; }
         arrBalancesMN.push( {
-            "assetName": "ERC20",
-            "assetAddress": assetAddress,
-            "balance": await imaToken.getBalanceErc20( true, // isMainNet
+            assetName: "ERC20",
+            assetAddress,
+            balance: await imaToken.getBalanceErc20( true, // isMainNet
                 imaState.chainProperties.mn.ethersProvider, imaState.chainProperties.mn.chainId,
                 imaState.chainProperties.mn.joAccount,
                 imaState.chainProperties.mn.strCoinNameErc20,
@@ -509,9 +509,9 @@ export async function commandLineTaskShowBalanceErc20(
                 imaState.chainProperties.sc.strCoinNameErc20 + "_address"];
         } catch ( err ) { assetAddress = null; }
         arrBalancesSC.push( {
-            "assetName": "ERC20",
-            "assetAddress": assetAddress,
-            "balance": await imaToken.getBalanceErc20( false, // isMainNet
+            assetName: "ERC20",
+            assetAddress,
+            balance: await imaToken.getBalanceErc20( false, // isMainNet
                 imaState.chainProperties.sc.ethersProvider, imaState.chainProperties.sc.chainId,
                 imaState.chainProperties.sc.joAccount,
                 imaState.chainProperties.sc.strCoinNameErc20,
@@ -526,9 +526,9 @@ export async function commandLineTaskShowBalanceErc20(
                 imaState.chainProperties.tc.strCoinNameErc20 + "_address"];
         } catch ( err ) { assetAddress = null; }
         arrBalancesTC.push( {
-            "assetName": "ERC20",
-            "assetAddress": assetAddress,
-            "balance": await imaToken.getBalanceErc20( true, // isMainNet
+            assetName: "ERC20",
+            assetAddress,
+            balance: await imaToken.getBalanceErc20( true, // isMainNet
                 imaState.chainProperties.tc.ethersProvider, imaState.chainProperties.mn.chainId,
                 imaState.chainProperties.tc.joAccount,
                 imaState.chainProperties.tc.strCoinNameErc20,
@@ -552,10 +552,10 @@ export async function commandLineTaskShowBalanceErc721(
                     imaState.chainProperties.mn.strCoinNameErc721 + "_address"];
             } catch ( err ) { assetAddress = null; }
             arrBalancesMN.push( {
-                "assetName": "ERC721",
-                "assetAddress": assetAddress,
-                "idToken": idToken,
-                "owner": await imaToken.getOwnerOfErc721( true, // isMainNet
+                assetName: "ERC721",
+                assetAddress,
+                idToken,
+                owner: await imaToken.getOwnerOfErc721( true, // isMainNet
                     imaState.chainProperties.mn.ethersProvider,
                     imaState.chainProperties.mn.chainId,
                     imaState.chainProperties.mn.joAccount,
@@ -574,10 +574,10 @@ export async function commandLineTaskShowBalanceErc721(
                     imaState.chainProperties.sc.strCoinNameErc721 + "_address"];
             } catch ( err ) { assetAddress = null; }
             arrBalancesSC.push( {
-                "assetName": "ERC721",
-                "assetAddress": assetAddress,
-                "idToken": idToken,
-                "owner": await imaToken.getOwnerOfErc721( false, // isMainNet
+                assetName: "ERC721",
+                assetAddress,
+                idToken,
+                owner: await imaToken.getOwnerOfErc721( false, // isMainNet
                     imaState.chainProperties.sc.ethersProvider,
                     imaState.chainProperties.sc.chainId,
                     imaState.chainProperties.sc.joAccount,
@@ -596,10 +596,10 @@ export async function commandLineTaskShowBalanceErc721(
                     imaState.chainProperties.tc.strCoinNameErc721 + "_address"];
             } catch ( err ) { assetAddress = null; }
             arrBalancesTC.push( {
-                "assetName": "ERC721",
-                "assetAddress": assetAddress,
-                "idToken": idToken,
-                "owner": await imaToken.getOwnerOfErc721( false, // isMainNet
+                assetName: "ERC721",
+                assetAddress,
+                idToken,
+                owner: await imaToken.getOwnerOfErc721( false, // isMainNet
                     imaState.chainProperties.tc.ethersProvider,
                     imaState.chainProperties.tc.chainId,
                     imaState.chainProperties.tc.joAccount,
@@ -625,10 +625,10 @@ export async function commandLineTaskShowBalanceErc1155(
                     imaState.chainProperties.mn.strCoinNameErc1155 + "_address"];
             } catch ( err ) { assetAddress = null; }
             arrBalancesMN.push( {
-                "assetName": "ERC1155",
-                "assetAddress": assetAddress,
-                "idToken": idToken,
-                "balance": await imaToken.getBalanceErc1155( true, // isMainNet
+                assetName: "ERC1155",
+                assetAddress,
+                idToken,
+                balance: await imaToken.getBalanceErc1155( true, // isMainNet
                     imaState.chainProperties.mn.ethersProvider,
                     imaState.chainProperties.mn.chainId,
                     imaState.chainProperties.mn.joAccount,
@@ -647,10 +647,10 @@ export async function commandLineTaskShowBalanceErc1155(
                     imaState.chainProperties.sc.strCoinNameErc1155 + "_address"];
             } catch ( err ) { assetAddress = null; }
             arrBalancesSC.push( {
-                "assetName": "ERC1155",
-                "assetAddress": assetAddress,
-                "idToken": idToken,
-                "balance": await imaToken.getBalanceErc1155( false, // isMainNet
+                assetName: "ERC1155",
+                assetAddress,
+                idToken,
+                balance: await imaToken.getBalanceErc1155( false, // isMainNet
                     imaState.chainProperties.sc.ethersProvider,
                     imaState.chainProperties.sc.chainId,
                     imaState.chainProperties.sc.joAccount,
@@ -669,10 +669,10 @@ export async function commandLineTaskShowBalanceErc1155(
                     imaState.chainProperties.tc.strCoinNameErc1155 + "_address"];
             } catch ( err ) { assetAddress = null; }
             arrBalancesTC.push( {
-                "assetName": "ERC1155",
-                "assetAddress": assetAddress,
-                "idToken": idToken,
-                "balance": await imaToken.getBalanceErc1155( false, // isMainNet
+                assetName: "ERC1155",
+                assetAddress,
+                idToken,
+                balance: await imaToken.getBalanceErc1155( false, // isMainNet
                     imaState.chainProperties.tc.ethersProvider,
                     imaState.chainProperties.tc.chainId,
                     imaState.chainProperties.tc.joAccount,
@@ -686,9 +686,10 @@ export async function commandLineTaskShowBalanceErc1155(
 export function commandLineTaskShowBalance() {
     const imaState = state.get();
     imaState.arrActions.push( {
-        "name": "show balance",
-        "fn": async function() {
-            const arrBalancesMN: any = [], arrBalancesSC: any = [], arrBalancesTC: any = [];
+        name: "show balance",
+        fn: async function() {
+            const arrBalancesMN: any = [];
+            const arrBalancesSC: any = []; const arrBalancesTC: any = [];
             await commandLineTaskShowBalanceEth(
                 arrBalancesMN, arrBalancesSC, arrBalancesTC );
             await commandLineTaskShowBalanceErc20(
@@ -743,8 +744,8 @@ export function commandLineTaskShowBalance() {
 export function commandLineTaskPaymentM2S() {
     const imaState = state.get();
     imaState.arrActions.push( {
-        "name": "one M->S single payment",
-        "fn": async function() {
+        name: "one M->S single payment",
+        fn: async function() {
             if( imaState.chainProperties.mn.strCoinNameErc721.length > 0 ) {
                 // ERC721 payment
                 log.information( "one M->S single ERC721 payment: {}", imaState.idToken );
@@ -893,8 +894,8 @@ export function commandLineTaskPaymentM2S() {
 export function commandLineTaskPaymentS2M() {
     const imaState = state.get();
     imaState.arrActions.push( {
-        "name": "one S->M single payment",
-        "fn": async function() {
+        name: "one S->M single payment",
+        fn: async function() {
             if( imaState.chainProperties.sc.strCoinNameErc721.length > 0 ) {
                 // ERC721 payment
                 log.information( "one S->M single ERC721 payment: {}", imaState.idToken );
@@ -1038,10 +1039,10 @@ export function commandLineTaskPaymentS2M() {
 export function commandLineTaskPaymentS2S() {
     const imaState = state.get();
     imaState.arrActions.push( {
-        "name": "one S->S single payment",
-        "fn": async function() {
+        name: "one S->S single payment",
+        fn: async function() {
             const isForward = imaHelperAPIs.isForwardS2S();
-            const sc = imaState.chainProperties.sc, tc = imaState.chainProperties.tc;
+            const sc = imaState.chainProperties.sc; const tc = imaState.chainProperties.tc;
             const ethersProviderSrc: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider =
                 isForward ? sc.ethersProvider : tc.ethersProvider;
             const chainIdSrc = isForward ? sc.chainId : tc.chainId;
@@ -1207,8 +1208,8 @@ export function commandLineTaskPaymentS2S() {
 export function commandLineTaskReceiveS2M() {
     const imaState = state.get();
     imaState.arrActions.push( {
-        "name": "receive one S->M single ETH payment",
-        "fn": async function() {
+        name: "receive one S->M single ETH payment",
+        fn: async function() {
             log.information( "receive one S->M single ETH payment:" );
             return await imaEth.receiveEthPaymentFromSchainOnMainNet(
                 imaState.chainProperties.mn.ethersProvider,
@@ -1224,8 +1225,8 @@ export function commandLineTaskReceiveS2M() {
 export function commandLineTaskViewS2M() {
     const imaState = state.get();
     imaState.arrActions.push( {
-        "name": "view one S->M single ETH payment",
-        "fn": async function() {
+        name: "view one S->M single ETH payment",
+        fn: async function() {
             log.information( "view one S->M single ETH payment:" );
             const xWei = await imaEth.viewEthPaymentFromSchainOnMainNet(
                 imaState.chainProperties.mn.ethersProvider,
@@ -1245,8 +1246,8 @@ export function commandLineTaskViewS2M() {
 export function commandLineTaskTransferM2S() {
     const imaState = state.get();
     imaState.arrActions.push( {
-        "name": "single M->S transfer loop",
-        "fn": async function() {
+        name: "single M->S transfer loop",
+        fn: async function() {
             if( ! imaState.bNoWaitSChainStarted )
                 await discoveryTools.waitUntilSChainStarted(); // main-net --> s-chain transfer
             const joRuntimeOpts: any = {
@@ -1285,8 +1286,8 @@ export function commandLineTaskTransferM2S() {
 export function commandLineTaskTransferS2M() {
     const imaState = state.get();
     imaState.arrActions.push( {
-        "name": "single S->M transfer loop",
-        "fn": async function() {
+        name: "single S->M transfer loop",
+        fn: async function() {
             if( ! imaState.bNoWaitSChainStarted )
                 await discoveryTools.waitUntilSChainStarted(); // s-chain --> main-net transfer
             const joRuntimeOpts: any = {
@@ -1325,8 +1326,8 @@ export function commandLineTaskTransferS2M() {
 export function commandLineTaskTransferS2S() {
     const imaState = state.get();
     imaState.arrActions.push( {
-        "name": "single S->S transfer loop",
-        "fn": async function() {
+        name: "single S->S transfer loop",
+        fn: async function() {
             if( ! imaState.optsS2S.isEnabled )
                 return;
             if( ! imaState.bNoWaitSChainStarted )
@@ -1361,8 +1362,8 @@ export function commandLineTaskTransferS2S() {
 export function commandLineTaskTransfer() {
     const imaState = state.get();
     imaState.arrActions.push( {
-        "name": "Single M<->S transfer loop iteration",
-        "fn": async function() {
+        name: "Single M<->S transfer loop iteration",
+        fn: async function() {
             if( ! imaState.bNoWaitSChainStarted )
                 await discoveryTools.waitUntilSChainStarted();
             const joRuntimeOpts: any = {
@@ -1371,7 +1372,7 @@ export function commandLineTaskTransfer() {
                 cntChainsKnownForS2S: 0
             };
             const optsLoop: any = {
-                joRuntimeOpts: joRuntimeOpts,
+                joRuntimeOpts,
                 isDelayFirstRun: false,
                 enableStepOracle: true,
                 enableStepM2S: true,
@@ -1386,8 +1387,8 @@ export function commandLineTaskTransfer() {
 export function commandLineTaskLoop() {
     const imaState = state.get();
     imaState.arrActions.push( {
-        "name": "M<->S and S->S transfer loop, startup in parallel mode",
-        "fn": async function() {
+        name: "M<->S and S->S transfer loop, startup in parallel mode",
+        fn: async function() {
             state.setPreventExitAfterLastAction( true );
             if( ! imaState.bNoWaitSChainStarted )
                 await discoveryTools.waitUntilSChainStarted(); // M<->S transfer loop
@@ -1400,8 +1401,8 @@ export function commandLineTaskLoop() {
             if( isPrintSummaryRegistrationCosts )
                 printSummaryRegistrationCosts();
             const opts: any = {
-                imaState: imaState,
-                "details": log
+                imaState,
+                details: log
             };
             return await loop.runParallelLoops(
                 opts
@@ -1413,8 +1414,8 @@ export function commandLineTaskLoop() {
 export function commandLineTaskLoopSimple() {
     const imaState = state.get();
     imaState.arrActions.push( {
-        "name": "M<->S and S->S transfer loop, startup simple mode",
-        "fn": async function() {
+        name: "M<->S and S->S transfer loop, startup simple mode",
+        fn: async function() {
             state.setPreventExitAfterLastAction( true );
             if( ! imaState.bNoWaitSChainStarted )
                 await discoveryTools.waitUntilSChainStarted(); // M<->S transfer loop
@@ -1432,7 +1433,7 @@ export function commandLineTaskLoopSimple() {
                 cntChainsKnownForS2S: 0
             };
             const optsLoop: any = {
-                joRuntimeOpts: joRuntimeOpts,
+                joRuntimeOpts,
                 isDelayFirstRun: false,
                 enableStepOracle: true,
                 enableStepM2S: true,
@@ -1465,7 +1466,7 @@ async function handleBrowseSkaleModesRpcInfoResult(
             joCall = await rpcCall.create( strNodeURL, rpcCallOpts );
             if( ! joCall )
                 throw new Error( `Failed to create JSON RPC call object to ${strNodeURL}` );
-            const jIn: any = { "method": "skale_imaInfo", "params": { } };
+            const jIn: any = { method: "skale_imaInfo", params: { } };
             if( discoveryTools.isSendImaAgentIndex() )
                 jIn.params.fromImaAgentIndex = imaState.nNodeNumber;
             const joOut = await joCall.call( joIn );
@@ -1493,8 +1494,8 @@ export function commandLineTaskBrowseSChain() {
     const imaState = state.get();
     imaState.bIsNeededCommonInit = false;
     imaState.arrActions.push( {
-        "name": "Browse S-Chain network",
-        "fn": async function() {
+        name: "Browse S-Chain network",
+        fn: async function() {
             const strLogPrefix = "S-Chain Browse: ";
             if( imaState.chainProperties.sc.strURL.length === 0 ) {
                 log.fatal( "Missing S-Chain URL, please specify {}", "--url-s-chain" );
@@ -1509,7 +1510,7 @@ export function commandLineTaskBrowseSChain() {
                     throw new Error( "Failed to create JSON RPC call object " +
                         `to ${imaState.chainProperties.sc.strURL}` );
                 }
-                const joIn: any = { "method": "skale_nodesRpcInfo", "params": { } };
+                const joIn: any = { method: "skale_nodesRpcInfo", params: { } };
                 if( discoveryTools.isSendImaAgentIndex() )
                     joIn.params.fromImaAgentIndex = imaState.nNodeNumber;
                 const joOut = await joCall.call( joIn );
@@ -1528,8 +1529,8 @@ export function commandLineTaskBrowseSChain() {
 export function commandLineTaskReimbursementShowBalance() {
     const imaState = state.get();
     imaState.arrActions.push( {
-        "name": "Gas Reimbursement - Show Balance",
-        "fn": async function() {
+        name: "Gas Reimbursement - Show Balance",
+        fn: async function() {
             await imaReimbursement.reimbursementShowBalance(
                 imaState.chainProperties.mn.ethersProvider,
                 imaState.joCommunityPool,
@@ -1548,8 +1549,8 @@ export function commandLineTaskReimbursementShowBalance() {
 export function commandLineTaskReimbursementEstimateAmount() {
     const imaState = state.get();
     imaState.arrActions.push( {
-        "name": "Gas Reimbursement - Estimate Amount",
-        "fn": async function() {
+        name: "Gas Reimbursement - Estimate Amount",
+        fn: async function() {
             await imaReimbursement.reimbursementEstimateAmount(
                 imaState.chainProperties.mn.ethersProvider,
                 imaState.joCommunityPool,
@@ -1568,8 +1569,8 @@ export function commandLineTaskReimbursementEstimateAmount() {
 export function commandLineTaskReimbursementRecharge() {
     const imaState = state.get();
     imaState.arrActions.push( {
-        "name": "Gas Reimbursement - Recharge User Wallet",
-        "fn": async function() {
+        name: "Gas Reimbursement - Recharge User Wallet",
+        fn: async function() {
             await imaReimbursement.reimbursementWalletRecharge(
                 imaState.chainProperties.mn.ethersProvider,
                 imaState.joCommunityPool,
@@ -1588,8 +1589,8 @@ export function commandLineTaskReimbursementRecharge() {
 export function commandLineTaskReimbursementWithdraw() {
     const imaState = state.get();
     imaState.arrActions.push( {
-        "name": "Gas Reimbursement - Withdraw User Wallet",
-        "fn": async function() {
+        name: "Gas Reimbursement - Withdraw User Wallet",
+        fn: async function() {
             await imaReimbursement.reimbursementWalletWithdraw(
                 imaState.chainProperties.mn.ethersProvider,
                 imaState.joCommunityPool,
@@ -1608,8 +1609,8 @@ export function commandLineTaskReimbursementWithdraw() {
 export function commandLineTaskReimbursementSetRange() {
     const imaState = state.get();
     imaState.arrActions.push( {
-        "name": "Gas Reimbursement - Set Minimal time interval from S2M and S2S transfers",
-        "fn": async function() {
+        name: "Gas Reimbursement - Set Minimal time interval from S2M and S2S transfers",
+        fn: async function() {
             await imaReimbursement.reimbursementSetRange(
                 imaState.chainProperties.sc.ethersProvider,
                 imaState.joCommunityLocker,
