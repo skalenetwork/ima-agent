@@ -25,4 +25,4 @@ jobs:
 
       - name: Run network-browser tests
         working-directory: network-browser
-        run: bash run_test.sh
+        run: bash run_tests.sh
