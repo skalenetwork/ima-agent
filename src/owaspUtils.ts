@@ -31,7 +31,6 @@
 import * as log from "./log.js";
 import * as ethersMod from "ethers";
 import * as fs from "fs";
-import * as imaUtils from "./utils.js";
 const BigNumber = ethersMod.ethers.BigNumber;
 
 const safeURL = log.safeURL;
@@ -651,34 +650,6 @@ export function computeChainIdFromSChainName( strName: string ): string {
 export function privateKeyToAccountAddress( keyPrivate: string ): string {
     return ethersMod.ethers.utils.computeAddress(
         ensureStartsWith0x( keyPrivate ) );
-}
-
-export function privateKeyToPublicKey( keyPrivate: string ): string {
-    try {
-        if( ! keyPrivate )
-            return "";
-        if( keyPrivate.trim().length == 0 )
-            return "";
-        const ethersWallet = new ethersMod.ethers.Wallet(
-            imaUtils.hexToBytes( ensureStartsWith0x( keyPrivate ), false ) );
-        return removeStarting0x( ethersWallet.publicKey );
-    } catch ( err ) {
-        return "";
-    }
-}
-
-export function publicKeyToAccountAddress( keyPublic: string ): string {
-    try {
-        if( ! keyPublic )
-            return "";
-        if( keyPublic.trim().length == 0 )
-            return "";
-        const hash = ethersMod.ethers.utils.keccak256( ensureStartsWith0x( keyPublic ) );
-        const strAddress = ensureStartsWith0x( hash.substr( hash.length - 40 ) );
-        return strAddress;
-    } catch ( err ) {
-        return "";
-    }
 }
 
 export function fnAddressImpl_( anyThis: any ): string {

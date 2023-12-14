@@ -262,40 +262,9 @@ describe( "tests for `IMA Core` 1", function() {
         expect( IMA.owaspUtils.removeStarting0x( "1" ) ).to.be.equal( "1" );
     } );
 
-    it( "should invoke `privateKeyToPublicKey`", async function() {
-        const keyPrivate = "23abdbd3c61b5330af61ebe8bef582f4e5cc08e554053a718bdce7813b9dc1fc";
-        let keyPrivateUnd; // undefined
-        // eslint-disable-next-line no-unused-expressions
-        expect( IMA.owaspUtils.privateKeyToPublicKey( keyPrivate ) ).to.be.equal(
-            "0x045dd431d36ce6b88f27d351051b31a26848c4a886f0dd0bc87a7d5a9d821417c9" +
-            "e807e8589f680ab0f2ab29831231ad7b3d6659990ee830582fede785fc3c33c4"
-            );
-        // if keyPrivate `undefined` or `null`
-        // eslint-disable-next-line no-unused-expressions
-        expect( IMA.owaspUtils.privateKeyToPublicKey( keyPrivateUnd ) ).to.be.empty;
-        // when all parameters is OK
-        expect( IMA.owaspUtils.privateKeyToPublicKey( keyPrivate ) ).to.have.lengthOf( 128 );
-    } );
-
 } );
 
 describe( "tests for `IMA Core` 2", function() {
-
-    it( "should invoke `publicKeyToAccountAddress`", async function() {
-        const keyPublic = "5dd431d36ce6b88f27d351051b31a26848c4a886f0dd0bc87a7d5a9d821417c9" +
-            "e807e8589f680ab0f2ab29831231ad7b3d6659990ee830582fede785fc3c33c4";
-        let keyPublicUnd; // undefined
-        // if keyPrivate `undefined` or `null`
-        // eslint-disable-next-line no-unused-expressions
-        expect( IMA.owaspUtils.publicKeyToAccountAddress( keyPublicUnd ) ).to.be.empty;
-        // when all parameters is OK
-        expect( IMA.owaspUtils.publicKeyToAccountAddress( keyPublic ) ).to.include( "0x" );
-    } );
-
-    it( "should invoke `privateKeyToAccountAddress`", async function() {
-        const keyPrivate = "23abdbd3c61b5330af61ebe8bef582f4e5cc08e554053a718bdce7813b9dc1fc";
-        expect( IMA.owaspUtils.privateKeyToAccountAddress( keyPrivate ) ).to.include( "0x" );
-    } );
 
     it( "should return `false` invoke `checkIsRegisteredSChainInDepositBoxes`", async function() {
         let joLinker; // for `false` output

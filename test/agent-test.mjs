@@ -715,42 +715,6 @@ describe( "OWASP-5", function() {
 
     } );
 
-    describe( "Key/address utilities", function() {
-        const joTestAccount = {
-            "privateKey":
-                owaspUtils.toEthPrivateKey(
-                    "23ABDBD3C61B5330AF61EBE8BEF582F4E5CC08E554053A718BDCE7813B9DC1FC" ),
-            "address": function () { return owaspUtils.fnAddressImpl_( this ); }
-        };
-
-        it( "Extract address from private key", function() {
-            const address = joTestAccount.address();
-            const address2 =
-                owaspUtils.privateKeyToAccountAddress( joTestAccount.privateKey );
-            assert.equal(
-                address.toLowerCase(),
-                "0x7aa5E36AA15E93D10F4F26357C30F052DacDde5F".toLowerCase() );
-            assert.equal(
-                address2.toLowerCase(),
-                "0x7aa5E36AA15E93D10F4F26357C30F052DacDde5F".toLowerCase() );
-        } );
-
-        it( "Extract public key from private key", function() {
-            const publicKey = owaspUtils.privateKeyToPublicKey( joTestAccount.privateKey );
-            assert.equal(
-                publicKey.toLowerCase(),
-                ( "5dd431d36ce6b88f27d351051b31a26848c4a886f0dd0bc87a7d5a9d82" +
-                "1417c9e807e8589f680ab0f2ab29831231ad" +
-                "7b3d6659990ee830582fede785fc3c33c4" ).toLowerCase() );
-        } );
-
-        it( "Extract address from public key", function() {
-            const address = joTestAccount.address();
-            const publicKey = owaspUtils.privateKeyToPublicKey( joTestAccount.privateKey );
-            const address2 = owaspUtils.publicKeyToAccountAddress( publicKey );
-            assert.equal( address.toLowerCase(), address2.toLowerCase() );
-        } );
-    } );
 } );
 
 describe( "OWASP-6", function() {
