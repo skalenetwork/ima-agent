@@ -31,6 +31,7 @@ describe('nodes module test', () => {
     let wallet: Wallet
 
     beforeAll(async () => {
+        console.log('initializing provider and contracts')
         const provider = getMainnetProvider(MAINNET_RPC_URL, false)
         wallet = new Wallet(ETH_PRIVATE_KEY, provider)
 

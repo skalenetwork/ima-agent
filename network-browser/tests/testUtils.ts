@@ -47,24 +47,32 @@ export async function addAllPermissions(
     const VALIDATOR_MANAGER_ROLE = await validators.VALIDATOR_MANAGER_ROLE()
     let hasRole = await validators.hasRole(VALIDATOR_MANAGER_ROLE, wallet.address)
     if (!hasRole) {
+        console.log('granting ROLE: VALIDATOR_MANAGER_ROLE')
         await (await validators.grantRole(VALIDATOR_MANAGER_ROLE, wallet.address)).wait()
     }
     const SCHAIN_TYPE_MANAGER_ROLE = await schainsInternal.SCHAIN_TYPE_MANAGER_ROLE()
     hasRole = await schainsInternal.hasRole(SCHAIN_TYPE_MANAGER_ROLE, wallet.address)
     if (!hasRole) {
+        console.log('granting ROLE: SCHAIN_TYPE_MANAGER_ROLE')
         await (await schainsInternal.grantRole(SCHAIN_TYPE_MANAGER_ROLE, wallet.address)).wait()
     }
     const SCHAIN_CREATOR_ROLE = await schains.SCHAIN_CREATOR_ROLE()
     hasRole = await schains.hasRole(SCHAIN_CREATOR_ROLE, wallet.address)
     if (!hasRole) {
+        console.log('granting ROLE: SCHAIN_CREATOR_ROLE')
         await (await schains.grantRole(SCHAIN_CREATOR_ROLE, wallet.address)).wait()
     }
 }
 
 export async function initDefaultValidator(validators: Contract): Promise<void> {
     if ((await validators.numberOfValidators()) === 0n) {
+        console.log('going to register validator')
         await (await validators.registerValidator(TEST_VALIDATOR_NAME, '', 10, 0)).wait()
+        console.log('going to enable validator')
         await (await validators.enableValidator(1)).wait()
+        console.log('validator registered and enabled')
+    } else {
+        console.log('validator  already exist, skipping')
     }
 }
 
