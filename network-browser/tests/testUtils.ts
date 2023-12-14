@@ -66,14 +66,14 @@ export async function addAllPermissions(
 }
 
 export async function initDefaultValidator(validators: Contract): Promise<void> {
-    if ((await validators.numberOfValidators()) === 0n) {
+    let number = await validators.numberOfValidators()
+    if (number === 0n) {
         console.log('going to register validator')
-        let tx: TransactionResponse
-        tx = await validators.registerValidator(TEST_VALIDATOR_NAME, '', 10, 0)
-        await tx.wait(2)
+        await (await validators.registerValidator(TEST_VALIDATOR_NAME, '', 10, 0)).wait()
+        number = await validators.numberOfValidators()
+        console.log(`number of active validators: ${number}`)
         console.log('going to enable validator')
-        tx = await validators.enableValidator(1)
-        await tx.wait(2)
+        await (await validators.enableValidator(1)).wait()
         console.log('validator registered and enabled')
     } else {
         console.log('validator  already exist, skipping')
