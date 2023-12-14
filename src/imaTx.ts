@@ -39,16 +39,17 @@ import * as imaEventLogScan from "./imaEventLogScan.js";
 
 import * as threadInfo from "./threadInfo.js";
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 const __dirname: string = path.dirname( url.fileURLToPath( import.meta.url ) );
 
 let redis: any = null;
 
 let gFlagDryRunIsEnabled: boolean = true;
 
-export function dryRunIsEnabled() : boolean {
+export function dryRunIsEnabled(): boolean {
     return ( !!gFlagDryRunIsEnabled );
 }
-export function dryRunEnable( isEnable: any ) : boolean {
+export function dryRunEnable( isEnable: any ): boolean {
     gFlagDryRunIsEnabled = ( isEnable != null && isEnable != undefined )
         ? ( !!isEnable ) : true;
     return ( !!gFlagDryRunIsEnabled );
@@ -56,11 +57,11 @@ export function dryRunEnable( isEnable: any ) : boolean {
 
 let gFlagDryRunIsIgnored = true;
 
-export function dryRunIsIgnored() : boolean {
+export function dryRunIsIgnored(): boolean {
     return ( !!gFlagDryRunIsIgnored );
 }
 
-export function dryRunIgnore( isIgnored: boolean ) : boolean {
+export function dryRunIgnore( isIgnored: boolean ): boolean {
     gFlagDryRunIsIgnored = ( isIgnored != null && isIgnored != undefined )
         ? ( !!isIgnored ) : true;
     return ( !!gFlagDryRunIsIgnored );
@@ -145,7 +146,7 @@ async function payedCallPrepare( optsPayedCall: any ) {
     optsPayedCall.unsignedTx.nonce = owaspUtils.toBN(
         await optsPayedCall.ethersProvider.getTransactionCount(
             optsPayedCall.joAccount.address() ) );
-    if( optsPayedCall.opts && optsPayedCall.opts.isCheckTransactionToSchain ) {
+    if( optsPayedCall.opts?.isCheckTransactionToSchain ) {
         optsPayedCall.unsignedTx = await checkTransactionToSchain(
             optsPayedCall.unsignedTx, optsPayedCall.details,
             optsPayedCall.ethersProvider, optsPayedCall.joAccount );
@@ -343,9 +344,9 @@ export async function payedCall(
             const strErrorPrefix = "Transaction sign and send error(INNER FLOW): ";
             optsPayedCall.details.critical(
                 "{p}bad credentials information specified, no explicit SGX and no explicit " +
-                "private key found", strErrorPrefix );
+                    "private key found", strErrorPrefix );
             throw new Error( `${strErrorPrefix} bad credentials information specified, ` +
-                "no explicit SGX and no explicit private key found" );
+                    "no explicit SGX and no explicit private key found" );
         } // NOTICE: "break;" is not needed here because of "throw" above
         } // switch( optsPayedCall.joACI.strType )
     } catch ( err ) {
@@ -399,9 +400,9 @@ export async function checkTransactionToSchain(
         if( balance.lt( requiredBalance ) ) {
             details.warning( "{p}Insufficient funds for {}, will run PoW-mining to get {} of gas",
                 strLogPrefix, strFromAddress, owaspUtils.toHexStringSafe( unsignedTx.gasLimit ) );
-            let powNumberBuffer = await calculatePowNumber(
+            const powNumberBuffer = await calculatePowNumber(
                 strFromAddress, owaspUtils.toBN( unsignedTx.nonce ).toHexString(),
-                owaspUtils.toHexStringSafe( unsignedTx.gasLimit ), details, strLogPrefix );
+                owaspUtils.toHexStringSafe( unsignedTx.gasLimit ), details, strLogPrefix )
             details.debug( "{p}Returned PoW-mining number {}", strLogPrefix, powNumberBuffer );
             let powNumber: string = powNumberBuffer.toString( "utf8" ).trim();
             powNumber = imaUtils.replaceAll( powNumber, "\r", "" );
@@ -413,7 +414,7 @@ export async function checkTransactionToSchain(
                 throw new Error( "Failed to compute gas price with PoW-mining(1), got empty text" );
             powNumber = owaspUtils.toBN( owaspUtils.ensureStartsWith0x( powNumber ) );
             details.trace( "{p}BN PoW-mining number is {}", strLogPrefix, powNumber );
-            let powNumberBN = owaspUtils.toBN( powNumber);
+            const powNumberBN = owaspUtils.toBN( powNumber );
             if( powNumberBN.eq( owaspUtils.toBN( "0" ) ) )
                 throw new Error( "Failed to compute gas price with PoW-mining(2), got zero value" );
             unsignedTx.gasPrice = owaspUtils.toBN( powNumberBN.toHexString() );
@@ -480,16 +481,17 @@ export function getAccountConnectivityInfo( joAccount: any ) {
         joACI.isBad = false;
         joACI.strType = "direct";
     } else {
-        // bad by default
+    // bad by default
     }
     return joACI;
 }
 
 const gTransactionManagerPool = "transactions";
 
-const tmGenerateRandomHex =
-    function( size: number ) { [ ...Array( size ) ]
-        .map( () => Math.floor( Math.random() * 16 ).toString( 16 ) ).join( "" ) };
+function tmGenerateRandomHex( size: number ): string {
+    return [ ...Array( size ) ]
+        .map( () => Math.floor( Math.random() * 16 ).toString( 16 ) ).join( "" )
+}
 
 function tmMakeId( details: any ) {
     const prefix = "tx-";
@@ -576,7 +578,8 @@ async function tmWait(
 }
 
 async function tmEnsureTransaction(
-    details: any, ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider, priority: any, txAdjusted: any,
+    details: any, ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
+    priority: any, txAdjusted: any,
     cntAttempts?: number, sleepMilliseconds?: number
 ) {
     cntAttempts = cntAttempts || 1;
@@ -607,7 +610,7 @@ async function tmEnsureTransaction(
 export class TransactionCustomizer {
     gasPriceMultiplier: any;
     gasMultiplier: any;
-    constructor( gasPriceMultiplier: any, gasMultiplier: any ) {
+    constructor ( gasPriceMultiplier: any, gasMultiplier: any ) {
         this.gasPriceMultiplier = gasPriceMultiplier
             ? ( 0.0 + gasPriceMultiplier )
             : null; // null means use current gasPrice or recommendedGasPrice
@@ -700,25 +703,25 @@ export class TransactionCustomizer {
     }
 };
 
-let gTransactionCustomizerMainNet: TransactionCustomizer|null = null;
-let gTransactionCustomizerSChain: TransactionCustomizer|null = null;
-let gTransactionCustomizerSChainTarget: TransactionCustomizer|null = null;
+let gTransactionCustomizerMainNet: TransactionCustomizer | null = null;
+let gTransactionCustomizerSChain: TransactionCustomizer | null = null;
+let gTransactionCustomizerSChainTarget: TransactionCustomizer | null = null;
 
-export function getTransactionCustomizerForMainNet() : TransactionCustomizer {
+export function getTransactionCustomizerForMainNet(): TransactionCustomizer {
     if( gTransactionCustomizerMainNet )
         return gTransactionCustomizerMainNet;
     gTransactionCustomizerMainNet = new TransactionCustomizer( 1.25, 1.25 );
     return gTransactionCustomizerMainNet;
 }
 
-export function getTransactionCustomizerForSChain() : TransactionCustomizer {
+export function getTransactionCustomizerForSChain(): TransactionCustomizer {
     if( gTransactionCustomizerSChain )
         return gTransactionCustomizerSChain;
     gTransactionCustomizerSChain = new TransactionCustomizer( null, 1.25 );
     return gTransactionCustomizerSChain;
 }
 
-export function getTransactionCustomizerForSChainTarget() : TransactionCustomizer {
+export function getTransactionCustomizerForSChainTarget(): TransactionCustomizer {
     if( gTransactionCustomizerSChainTarget )
         return gTransactionCustomizerSChainTarget;
     gTransactionCustomizerSChainTarget = new TransactionCustomizer( null, 1.25 );

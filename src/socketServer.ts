@@ -36,7 +36,7 @@ export class SocketServer extends EventDispatcher {
     isLogSocketErrors?: boolean;
     isLogSocketTraffic?: boolean;
     isLogSocketTrafficRaw?: boolean;
-    constructor( acceptor: any ) {
+    constructor ( acceptor: any ) {
         super();
         if( acceptor == null || acceptor == undefined || typeof acceptor != "object" )
             throw new Error( "Cannot create server on bad acceptor" );
@@ -73,7 +73,7 @@ export class SocketServer extends EventDispatcher {
                     _offAllPipeEventListeners = null;
                 }
                 delete self.mapAcceptedPipes[socket];
-            };
+            }
             let _onPipeError: any = function( eventData: any ) {
                 if( self.isLogSocketErrors ) {
                     self.log( log.fmtError( "Socket {url} error {err}",
@@ -84,7 +84,7 @@ export class SocketServer extends EventDispatcher {
                     _offAllPipeEventListeners = null;
                 }
                 delete self.mapAcceptedPipes[socket];
-            };
+            }
             let _onPipeMessage: any = function( eventData: any ) {
                 if( self.isLogSocketTrafficRaw ) {
                     self.log( log.fmtInformation( "Socket {url} did received {sunny} {}",
@@ -114,14 +114,14 @@ export class SocketServer extends EventDispatcher {
                         }
                         isFlush = true;
                     }
-                } catch ( err ) {
+                } catch ( err: any ) {
                     if( self.isLogSocketErrors ) {
                         self.log( log.fmtError(
                             "Server method {} RPC exception: {err}, stack is: {stack}",
                             joMessage.method, err, err ) );
                     }
                     joAnswer = utils.prepareAnswerJSON( joMessage );
-                    joAnswer.error = "" + err;
+                    joAnswer.error = "" + err.toString();
                 }
 
                 if( joAnswer != null && joAnswer != undefined ) {
@@ -153,7 +153,7 @@ export class SocketServer extends EventDispatcher {
                     _onPipeMessage = null;
                 }
                 socket.disposeImpersonatedEntries();
-            };
+            }
             socket.on( "close", _onPipeClose );
             socket.on( "error", _onPipeError );
             socket.on( "message", _onPipeMessage );
@@ -161,7 +161,7 @@ export class SocketServer extends EventDispatcher {
         this.dispatchEvent(
             new UniversalDispatcherEvent( "initialized", { "detail": { "ref": this } } ) );
     }
-    dispose() : void {
+    dispose(): void {
         this.isDisposing = true;
         super.dispose();
     }

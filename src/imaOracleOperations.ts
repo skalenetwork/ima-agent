@@ -32,10 +32,10 @@ import * as imaTransferErrorHandling from "./imaTransferErrorHandling.js";
 
 let gFlagIsEnabledOracle: boolean = false;
 
-export function getEnabledOracle() : boolean {
+export function getEnabledOracle(): boolean {
     return ( !!gFlagIsEnabledOracle );
 }
-export function setEnabledOracle( isEnabled: boolean ) : void {
+export function setEnabledOracle( isEnabled: boolean ): void {
     gFlagIsEnabledOracle = ( !!isEnabled );
 }
 
@@ -85,7 +85,8 @@ async function prepareOracleGasPriceSetup( optsGasPriseSetup: any ) {
             nMillisecondsSleepBefore: 1000,
             nMillisecondsSleepPeriod: 3000,
             cntAttempts: 40,
-            isVerbose: ( log.verboseGet() >= log.verboseName2Number( "information" ) ) ? true : false,
+            isVerbose:
+                ( log.verboseGet() >= log.verboseName2Number( "information" ) ) ? true : false,
             isVerboseTraceDetails:
                 ( log.verboseGet() >= log.verboseName2Number( "debug" ) ) ? true : false
         };
@@ -123,7 +124,7 @@ async function prepareOracleGasPriceSetup( optsGasPriseSetup: any ) {
         if( log.exposeDetailsGet() )
             optsGasPriseSetup.details.exposeDetailsTo( log, "doOracleGasPriceSetup", true );
         optsGasPriseSetup.details.close();
-        return;
+        return
     }
 }
 
@@ -137,7 +138,7 @@ async function handleOracleSigned(
         imaTransferErrorHandling.saveTransferError(
             "oracle", optsGasPriseSetup.details.toString() );
         optsGasPriseSetup.details.close();
-        return;
+        return
     }
     optsGasPriseSetup.strActionName = "doOracleGasPriceSetup.formatSignature";
     let signature = joGlueResult ? joGlueResult.signature : null;
@@ -252,7 +253,7 @@ export async function doOracleGasPriceSetup(
                 details.trace( "{p}u256 signing callback was not provided",
                     optsGasPriseSetup.strLogPrefix );
                 await fnAfter( null, u256, null ); // null - no error, null - no signatures
-            };
+            }
     } else {
         optsGasPriseSetup.details.trace( "{p}Using externally provided u256 signing function",
             optsGasPriseSetup.strLogPrefix );

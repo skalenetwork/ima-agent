@@ -25,28 +25,28 @@
 
 let gFlagIsEnabled: boolean = false;
 
-export function autoEnableFromCommandLineArgs() : void {
+export function autoEnableFromCommandLineArgs(): void {
     const b: boolean =
-        ( process.argv.indexOf( "--colors" ) >= 0 || process.argv.indexOf( "-colors" ) >= 0 )
+        ( process.argv.includes( "--colors" ) || process.argv.includes( "-colors" ) )
             ? true : false;
     enable( b );
 }
 
-export function enable( b?: boolean ) : void {
+export function enable( b?: boolean ): void {
     gFlagIsEnabled = !!b;
 }
 
-export function isStringAlreadyColorized( s?: any ) : boolean {
+export function isStringAlreadyColorized( s?: any ): boolean {
     if( s && typeof s == "string" && s.length > 0 && s[0] == "\x1b" )
         return true;
     return false;
 }
 
-export function isEnabled() : boolean {
+export function isEnabled(): boolean {
     return !!gFlagIsEnabled;
 }
 
-export function replaceAll( str: string, find: string, replace: string ) : string {
+export function replaceAll( str: string, find: string, replace: string ): string {
     return str.replace( new RegExp( find, "g" ), replace );
 }
 
@@ -60,7 +60,7 @@ export function validateRadix( value?: any, radix?: any ) {
     return radix;
 }
 
-export function validateInteger( value?: any, radix?: any ) : boolean {
+export function validateInteger( value?: any, radix?: any ): boolean {
     try {
         value = "" + value;
         value = value.trim();
@@ -77,7 +77,7 @@ export function validateInteger( value?: any, radix?: any ) : boolean {
     return false;
 }
 
-export function toInteger( value?: any, radix?: any ) : number {
+export function toInteger( value?: any, radix?: any ): number {
     try {
         radix = validateRadix( value, radix );
         if( !validateInteger( value, radix ) )
@@ -88,7 +88,7 @@ export function toInteger( value?: any, radix?: any ) : number {
     return 0;
 }
 
-export function validateFloat( value?: any ) : boolean {
+export function validateFloat( value?: any ): boolean {
     try {
         const f = parseFloat( value );
         if( isNaN( f ) )
@@ -99,7 +99,7 @@ export function validateFloat( value?: any ) : boolean {
     return false;
 }
 
-function toFloat( value?: any ) : number {
+function toFloat( value?: any ): number {
     try {
         const f = parseFloat( value );
         return f;
@@ -108,7 +108,7 @@ function toFloat( value?: any ) : number {
     return 0.0;
 }
 
-export function toBoolean( value?: any ) : boolean {
+export function toBoolean( value?: any ): boolean {
     let b = false;
     try {
         if( typeof value === "boolean" )
@@ -131,19 +131,19 @@ export function toBoolean( value?: any ) : boolean {
     return b;
 }
 
-export function yn( flag?: any ) : string {
+export function yn( flag?: any ): string {
     if( !gFlagIsEnabled )
         return flag ? "true" : "false";
     return toBoolean( flag ) ? yes( "yes" ) : no( "no" );
 }
 
-export function tf( flag?: any ) : string {
+export function tf( flag?: any ): string {
     if( !gFlagIsEnabled )
         return flag ? "true" : "false";
     return toBoolean( flag ) ? yes( "true" ) : no( "false" );
 }
 
-export function onOff( flag?: any ) : string {
+export function onOff( flag?: any ): string {
     if( !gFlagIsEnabled )
         return flag ? "true" : "false";
     return toBoolean( flag ) ? yes( "on" ) : no( "off" );
@@ -196,7 +196,7 @@ export function rainbowPart( s: string, i: number ) {
     return gArrRainbowParts[j] + s + gMapColorDefinitions.reset;
 }
 
-export function rainbow( s?: any ) : string {
+export function rainbow( s?: any ): string {
     if( ( !gFlagIsEnabled ) || ( !s ) || ( typeof s != "string" ) || s.length == 0 )
         return s ? s.toString() : JSON.stringify( s );
     let res = "";
@@ -206,7 +206,7 @@ export function rainbow( s?: any ) : string {
     return res;
 }
 
-export function isInt2( n?: any ) : boolean {
+export function isInt2( n?: any ): boolean {
     const intRegex = /^-?\d+$/;
     if( !intRegex.test( n ) )
         return false;
@@ -215,12 +215,12 @@ export function isInt2( n?: any ) : boolean {
     return parseFloat( n ) == intVal && !isNaN( intVal );
 }
 
-export function isFloat2( n?: any ) : boolean {
+export function isFloat2( n?: any ): boolean {
     const val = parseFloat( n );
     return !isNaN( val );
 }
 
-function urlObjColorized( objURL?: any ) : string {
+function urlObjColorized( objURL?: any ): string {
     let strURL = "";
     if( !objURL )
         return strURL;
@@ -244,24 +244,24 @@ function urlObjColorized( objURL?: any ) : string {
     return strURL;
 }
 
-export function urlStrColorized( s?: any ) : string {
+export function urlStrColorized( s?: any ): string {
     const objURL = safeURL( s );
     if( !objURL )
         return "";
     return urlObjColorized( objURL );
 }
 
-export function urlColorized( x?: any ) : string {
+export function urlColorized( x?: any ): string {
     if( typeof x === "string" || x instanceof String )
         return urlStrColorized( x );
     return urlObjColorized( x );
 }
 
-export function u( x?: any ) : string {
+export function u( x?: any ): string {
     return urlColorized( x );
 }
 
-export function safeURL( arg?: any ) : URL|null {
+export function safeURL( arg?: any ): URL | null {
     try {
         const sc = arg[0];
         if( sc == "\"" || sc == "'" ) {
@@ -271,7 +271,7 @@ export function safeURL( arg?: any ) : URL|null {
                 const objURL = safeURL( ss );
                 if( objURL != null && objURL != undefined ) {
                     const anyURL: any = objURL;
-                    anyURL["strStrippedStringComma"] = sc;
+                    anyURL.strStrippedStringComma = sc;
                 }
 
                 return objURL;
@@ -286,14 +286,14 @@ export function safeURL( arg?: any ) : URL|null {
             return null;
 
         const anyURL: any = objURL;
-        anyURL["strStrippedStringComma"] = null;
+        anyURL.strStrippedStringComma = null;
         return objURL;
     } catch ( err ) {
         return null;
     }
 }
 
-export function toIpv4Arr( s: string ) : any[]|null {
+export function toIpv4Arr( s: string ): any[] | null {
     // eslint-disable-next-line max-len
     if( /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test( s ) ) {
         const arr = s.split( "." );
@@ -305,7 +305,7 @@ export function toIpv4Arr( s: string ) : any[]|null {
     return null;
 }
 
-export function logArgToStringAsIpv4( arg?: any ) : string {
+export function logArgToStringAsIpv4( arg?: any ): string {
     const arr = toIpv4Arr( arg );
     if( !arr )
         return arg.toString();
@@ -319,7 +319,7 @@ export function logArgToStringAsIpv4( arg?: any ) : string {
     return s;
 }
 
-export function logArgToString( ...args: any[] ) : string {
+export function logArgToString( ...args: any[] ): string {
     let i;
     const cnt = arguments.length;
     let s = "";
@@ -327,39 +327,39 @@ export function logArgToString( ...args: any[] ) : string {
         const arg = arguments[i];
         if( arg === undefined ) {
             s += "" + undefval( arg );
-            continue;
+            continue
         }
         if( arg === null ) {
             s += "" + nullval( arg );
-            continue;
+            continue
         }
         if( isNaN( arg ) ) {
             s += "" + nanval( arg );
-            continue;
+            continue
         }
         if( typeof arg === "boolean" ) {
             s += "" + tf( arg );
-            continue;
+            continue
         }
         if( typeof arg === "object" && typeof arg.valueOf() === "boolean" )
             s += "" + tf( arg.valueOf() );
 
         if( typeof arg === "number" || typeof arg === "bigint" ) {
             s += "" + number( arg );
-            continue;
+            continue
         }
         if( typeof arg === "object" &&
             ( typeof arg.valueOf() === "number" || typeof arg.valueOf() === "bigint" ) ) {
             s += "" + number( arg.valueOf() );
-            continue;
+            continue
         }
         if( typeof arg === "string" || arg instanceof String ) {
             const objURL = safeURL( arg );
             if( objURL != null && objURL != undefined ) {
                 let strURL = "";
                 const anyURL: any = objURL;
-                if( anyURL["strStrippedStringComma"] )
-                    strURL += normal( anyURL["strStrippedStringComma"] );
+                if( anyURL.strStrippedStringComma )
+                    strURL += normal( anyURL.strStrippedStringComma );
 
                 if( objURL.protocol )
                     strURL += "" + yellow( objURL.protocol ) + normal( "//" );
@@ -383,55 +383,55 @@ export function logArgToString( ...args: any[] ) : string {
                 if( objURL.search )
                     strURL += "" + magenta( objURL.search );
 
-                if( anyURL["strStrippedStringComma"] )
-                    strURL += normal( anyURL["strStrippedStringComma"] );
+                if( anyURL.strStrippedStringComma )
+                    strURL += normal( anyURL.strStrippedStringComma );
 
                 s += strURL;
-                continue;
+                continue
             }
             if( ( arg.length > 1 && arg[0] == "-" && arg[1] != "-" ) ||
                 ( arg.length > 2 && arg[0] == "-" && arg[1] == "-" && arg[2] != "-" )
             ) {
                 s += "" + cla( arg );
-                continue;
+                continue
             }
             if( arg.length > 0 && ( arg[0] == "\"" || arg[0] == "'" ) ) {
                 s += "" + strval( arg );
-                continue;
+                continue
             }
             if( isFloat2( arg ) ) {
                 s += "" + real( arg );
-                continue;
+                continue
             }
             if( isInt2( arg ) ) {
                 s += "" + number( arg );
-                continue;
+                continue
             }
         }
         if( Array.isArray( arg ) || typeof arg === "object" ) {
             s += jsonColorizer.prettyPrintConsole( arg );
-            continue;
+            continue
         }
         s += "" + kk( arg );
     }
     return s;
 }
 
-export const getCircularReplacerForJsonStringify = () : any => {
+export const getCircularReplacerForJsonStringify = (): any => {
     const seen = new WeakSet();
-    return ( key: any, value: any ) : any => {
+    return ( key: any, value: any ): any => {
         if( typeof value === "object" && value !== null ) {
             if( seen.has( value ) )
                 return;
             seen.add( value );
         }
         return value;
-    };
-};
+    }
+}
 
 export const jsonColorizer: any = { // see http://jsfiddle.net/unLSJ/
     cntCensoredMax: 30000, // zero to disable censoring
-    censor: ( censor: any ) : any => {
+    censor: ( censor: any ): any => {
         let i = 0;
         return ( key: any, value: any ) => {
             if( i !== 0 && typeof ( censor ) === "object" &&
@@ -442,11 +442,11 @@ export const jsonColorizer: any = { // see http://jsfiddle.net/unLSJ/
             if( i >= jsonColorizer.cntCensoredMax )
                 return "[Unknown]";
 
-            ++i; // so we know we aren't using the original object anymore
+            ++i // so we know we aren't using the original object anymore
             return value;
-        };
+        }
     },
-    replacerHTML: ( match?: any, pIndent?: any, pKey?: any, pVal?: any, pEnd?: any ) : any => {
+    replacerHTML: ( match?: any, pIndent?: any, pKey?: any, pVal?: any, pEnd?: any ): any => {
         const key = "<span class=json-key>";
         const val = "<span class=json-value>";
         const str = "<span class=json-string>";
@@ -471,7 +471,7 @@ export const jsonColorizer: any = { // see http://jsfiddle.net/unLSJ/
                 .replace( jsonLine, jsonColorizer.replacerHTML );
         return s;
     },
-    replacerConsole: ( match?: any, pIndent?: any, pKey?: any, pVal?: any, pEnd?: any ) : any => {
+    replacerConsole: ( match?: any, pIndent?: any, pKey?: any, pVal?: any, pEnd?: any ): any => {
         let r = pIndent || "";
         if( pKey )
             r = r + logArgToString( pKey.replace( /[": ]/g, "" ) ) + ": ";
@@ -481,7 +481,7 @@ export const jsonColorizer: any = { // see http://jsfiddle.net/unLSJ/
 
         return r + ( pEnd || "" );
     },
-    prettyPrintConsole: ( obj?: any ) : any => {
+    prettyPrintConsole: ( obj?: any ): any => {
         if( !gFlagIsEnabled ) {
             if( obj === null )
                 return "null";
@@ -526,11 +526,11 @@ export const jsonColorizer: any = { // see http://jsfiddle.net/unLSJ/
 // see:
 // http://jsfiddle.net/KJQ9K/554
 // https://qastack.ru/programming/4810841/pretty-print-json-using-javascript
-export function syntaxHighlightJSON( jo?: any, strKeyNamePrefix?: string ) : string {
+export function syntaxHighlightJSON( jo?: any, strKeyNamePrefix?: string ): string {
     strKeyNamePrefix = strKeyNamePrefix || "";
     jo = jo.replace( /&/g, "&amp;" ).replace( /</g, "&lt;" ).replace( />/g, "&gt;" );
     return jo.replace(
-        // eslint-disable-next-line max-len
+    // eslint-disable-next-line max-len
         /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g,
         function( match: any ) {
             if( ! gFlagIsEnabled )
@@ -550,9 +550,9 @@ export function syntaxHighlightJSON( jo?: any, strKeyNamePrefix?: string ) : str
             else if( /undefined/.test( match ) )
                 cls = "undefined";
             else if( ( typeof match === "string" || match instanceof String ) &&
-            match.length >= 2 &&
-            ( ( match[0] == "\"" && match[match.length - 1] == "\"" ) ||
-            ( match[0] == "'" && match[match.length - 1] == "'" ) )
+                match.length >= 2 &&
+                ( ( match[0] == "\"" && match[match.length - 1] == "\"" ) ||
+                ( match[0] == "'" && match[match.length - 1] == "'" ) )
             )
                 cls = "string";
             switch ( cls ) {
@@ -576,7 +576,7 @@ export function syntaxHighlightJSON( jo?: any, strKeyNamePrefix?: string ) : str
         } );
 }
 
-export function safeStringifyJSON( jo?: any, n?: number ) : string|undefined {
+export function safeStringifyJSON( jo?: any, n?: number ): string | undefined {
     try {
         const s = "" + JSON.stringify( jo, getCircularReplacerForJsonStringify(), n );
         return s;
@@ -585,11 +585,11 @@ export function safeStringifyJSON( jo?: any, n?: number ) : string|undefined {
     return undefined;
 }
 
-export function jn( x?: any ) : string {
+export function jn( x?: any ): string {
     return "" + jsonColorizer.prettyPrintConsole( x );
 }
 
-export function j1( x?: any, n?: number, strKeyNamePrefix?: string ) : string {
+export function j1( x?: any, n?: number, strKeyNamePrefix?: string ): string {
     let isDefaultKeyNamePrefix = false;
     if( typeof strKeyNamePrefix !== "string" ) {
         strKeyNamePrefix = " ";
@@ -604,7 +604,7 @@ export function j1( x?: any, n?: number, strKeyNamePrefix?: string ) : string {
     return s;
 }
 
-export function j( x?: any ) : string {
+export function j( x?: any ): string {
     return j1( x ); // jn
 }
 
@@ -657,204 +657,204 @@ export {
     bBgWhite
 };
 
-export function normal( s?: any ) : string {
+export function normal( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return "" + fgWhite + s + reset;
 }
 
-export function trace( s?: any ) : string {
+export function trace( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return "" + fgWhite + s + reset;
 }
 
-export function debug( s?: any ) : string {
+export function debug( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return "" + fgWhite + s + reset;
 }
-export function debugDark( s?: any ) : string {
+export function debugDark( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return "" + fgBlack + enlight + s + reset;
 }
 
-export function note( s?: any ) : string {
+export function note( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return "" + fgBlue + s + reset;
 }
 
-export function notice( s?: any ) : string {
+export function notice( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return "" + fgMagenta + s + reset;
 }
 
-export function info( s?: any ) : string {
+export function info( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return "" + fgBlue + enlight + s + reset;
 }
 
-export function warning( s?: any ) : string {
+export function warning( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return "" + fgYellow + s + reset;
 }
 
-export function warn( s?: any ) : string {
+export function warn( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return "" + fgYellow + s + reset;
 }
 
-export function error( s?: any ) : string {
+export function error( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return "" + fgRed + s + reset;
 }
 
-export function fatal( s?: any ) : string {
+export function fatal( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return "" + bgRed + fgYellow + enlight + s + reset;
 }
 
-export function success( s?: any ) : string {
+export function success( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return "" + fgGreen + enlight + s + reset;
 }
 
-export function attention( s?: any ) : string {
+export function attention( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return "" + fgCyan + s + reset;
 }
 
-export function bright( s?: any ) : string {
+export function bright( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return "" + fgWhite + enlight + s + reset;
 }
 
-export function sunny( s?: any ) : string {
+export function sunny( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return "" + fgYellow + enlight + s + reset;
 }
 
-export function rx( s?: any ) : string {
+export function rx( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return "" + fgMagenta + s + reset;
 }
 
-export function rxa( s?: any ) : string {
+export function rxa( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return "" + fgMagenta + enlight + s + reset;
 }
 
-export function tx( s?: any ) : string {
+export function tx( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return "" + fgGreen + s + reset;
 }
 
-export function txa( s?: any ) : string {
+export function txa( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return "" + fgGreen + enlight + s + reset;
 }
 
-export function date( s?: any ) : string {
+export function date( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return "" + fgYellow + s + reset;
 }
 
-export function time( s?: any ) : string {
+export function time( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return "" + fgMagenta + enlight + s + reset;
 }
 
-export function frac_time( s?: any ) : string {
+export function fracTime( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return "" + fgMagenta + s + reset;
 }
 
-export function yes( s?: any ) : string {
+export function yes( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return "" + fgGreen + enlight + s + reset;
 }
 
-export function no( s?: any ) : string {
+export function no( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return "" + fgRed + s + reset;
 }
 
-export function number( s?: any ) : string {
+export function number( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return "" + fgBlue + enlight + s + reset;
 }
 
-export function real( s?: any ) : string {
+export function real( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return "" + fgMagenta + s + reset;
 }
 
-export function undefval( s?: any ) : string {
+export function undefval( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return "" + fgGreen + enlight + s + reset;
 }
 
-export function nullval( s?: any ) : string {
+export function nullval( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return "" + fgGreen + enlight + s + reset;
 }
 
-export function nanval( s?: any ) : string {
+export function nanval( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return "" + fgGreen + enlight + s + reset;
 }
 
-export function yellow( s?: any ) : string {
+export function yellow( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return "" + fgYellow + s + reset;
 }
 
-export function magenta( s?: any ) : string {
+export function magenta( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return "" + fgMagenta + s + reset;
 }
 
-export function cla( s?: any ) : string {
+export function cla( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return "" + fgBlue + dim + s + reset;
 }
 
-export function kk( s?: any ) : string {
+export function kk( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return "" + fgYellow + enlight + s + reset;
 }
 
-export function strval( s?: any ) : string {
+export function strval( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return "" + fgYellow + s + reset;
@@ -867,19 +867,19 @@ export function n2s( n: any, sz: number ) {
     return s;
 }
 
-export function timestampHR() : number {
+export function timestampHR(): number {
     const d = new Date();
     const ts = Math.floor( ( d ).getTime() );
     return ts;
 }
 
-export function timestampUnix() : number {
+export function timestampUnix(): number {
     const d = new Date();
     const ts = Math.floor( ( d ).getTime() / 1000 );
     return ts;
 }
 
-function trimLeftUnneededTimestampZeros( s?: any ) : string {
+function trimLeftUnneededTimestampZeros( s?: any ): string {
     while( s.length >= 2 ) {
         if( s[0] == "0" && s[1] >= "0" && s[1] <= "9" )
             s = s.substring( 1 );
@@ -889,7 +889,7 @@ function trimLeftUnneededTimestampZeros( s?: any ) : string {
     return s;
 }
 
-export function getDurationString( tsFrom : number, tsTo : number ) : string {
+export function getDurationString( tsFrom: number, tsTo: number ): string {
     let s = "";
     let n = tsTo - tsFrom;
 
@@ -922,7 +922,7 @@ export function getDurationString( tsFrom : number, tsTo : number ) : string {
     return "" + n + " " + ( ( n > 1 ) ? "days" : "day" ) + "," + s;
 }
 
-export function capitalizeFirstLetter( s?: any ) : string {
+export function capitalizeFirstLetter( s?: any ): string {
     if( ! s )
         return JSON.stringify( s );
     let s2 = s.toString();
@@ -932,7 +932,7 @@ export function capitalizeFirstLetter( s?: any ) : string {
     return s2;
 }
 
-function errFnDottedName( s?: any ) : string {
+function errFnDottedName( s?: any ): string {
     const arr = s.split( "." );
     const cnt = arr.length;
     let i, s2 = "";
@@ -944,13 +944,13 @@ function errFnDottedName( s?: any ) : string {
     return s2;
 }
 
-function errFnName( s?: any ) : string {
+function errFnName( s?: any ): string {
     if( s.indexOf( "async " ) == 0 )
         return bright( "async" ) + " " + errFnDottedName( s.substring( 6 ) );
     return errFnDottedName( s );
 }
 
-function errLocLn( s: string, isWithBraces?: boolean ) : string {
+function errLocLn( s: string, isWithBraces?: boolean ): string {
     let s2 = "";
     s = s.replace( "file://", "" );
     s = s.replace( "node:", "" );
@@ -973,11 +973,11 @@ function errLocLn( s: string, isWithBraces?: boolean ) : string {
     return s2;
 }
 
-export function stack( err?: any ) : string {
+export function stack( err?: any ): string {
     if( ! err )
         return "";
-    if( err && "stack" in err )  {
-        const st = err[ "stack" ];
+    if( err && "stack" in err ) {
+        const st = err.stack
         if( st && typeof st == "string" )
             err = st;
     }

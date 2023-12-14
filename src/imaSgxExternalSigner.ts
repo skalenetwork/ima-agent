@@ -109,10 +109,10 @@ async function run() {
                 log.debug( "SGX wallet ECDSA sign result is: {}", joOut );
 
             const v = parseInt( joOut.result.signature_v );
-            const eth_v = v + owaspUtils.parseIntOrHex( chainId ) * 2 + 35;
+            const ethV = v + owaspUtils.parseIntOrHex( chainId ) * 2 + 35;
             const joExpanded = {
                 "recoveryParam": v,
-                "v": eth_v,
+                "v": ethV,
                 "r": joOut.result.signature_r,
                 "s": joOut.result.signature_s
             };
@@ -144,7 +144,7 @@ async function run() {
             process.exit( 0 );
         } catch ( err ) {
             if( gIsDebugLogging )
-                log.debug( "--- Call error ---> {}", log.em,( err ) );
+                log.debug( "--- Call error ---> {}", log.em, ( err ) );
             finalizeOutput( { "error": owaspUtils.extractErrorMessage( err ) } );
             process.exit( 1 );
         }

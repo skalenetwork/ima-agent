@@ -82,7 +82,7 @@ const settings: any = {
                 "stun:stun.voipbuster.com",
                 "stun:stun.voipstunt.com",
                 "stun:stun.voxgratia.org"
-            ] ,
+            ],
             peerConfiguration: {
                 iceServers: [ {
                     urls: "stun:some.ip.address.here:3478",

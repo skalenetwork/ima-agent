@@ -36,25 +36,25 @@ export { uuid };
 const ethersMod = owaspUtils.ethersMod;
 export { ethersMod };
 
-export function replaceAll( str: string, find: string, replace: string ) : string {
+export function replaceAll( str: string, find: string, replace: string ): string {
     return str.replace( new RegExp( find, "g" ), replace );
 }
 
-export function normalizePath( strPath: string ) : string {
+export function normalizePath( strPath: string ): string {
     strPath = strPath.replace( /^~/, os.homedir() );
     strPath = path.normalize( strPath );
     strPath = path.resolve( strPath );
     return strPath;
 }
 
-export function getRandomFileName() : string {
-    const timestamp = new Date().toISOString().replace( /[-:.]/g,"" );
+export function getRandomFileName(): string {
+    const timestamp = new Date().toISOString().replace( /[-:.]/g, "" );
     const random = ( "" + Math.random() ).substring( 2, 8 );
     const randomNumber = timestamp + random;
     return randomNumber;
 }
 
-export function fileExists( strPath: string ) : boolean {
+export function fileExists( strPath: string ): boolean {
     try {
         if( fs.existsSync( strPath ) ) {
             const stats = fs.statSync( strPath );
@@ -65,7 +65,7 @@ export function fileExists( strPath: string ) : boolean {
     return false;
 }
 
-export function fileLoad( strPath: string, strDefault?: string ) : string {
+export function fileLoad( strPath: string, strDefault?: string | null ): string {
     strDefault = strDefault || "";
     if( !fileExists( strPath ) )
         return strDefault;
@@ -76,7 +76,7 @@ export function fileLoad( strPath: string, strDefault?: string ) : string {
     return strDefault;
 }
 
-export function fileSave( strPath: string, s: string ) : boolean {
+export function fileSave( strPath: string, s: string ): boolean {
     try {
         fs.writeFileSync( strPath, s );
         return true;
@@ -84,7 +84,7 @@ export function fileSave( strPath: string, s: string ) : boolean {
     return false;
 }
 
-export function jsonFileLoad( strPath: string, joDefault?: any, bLogOutput?: boolean ) : any {
+export function jsonFileLoad( strPath: string, joDefault?: any, bLogOutput?: boolean ): any {
     if( bLogOutput == undefined || bLogOutput == null )
         bLogOutput = false;
     joDefault = joDefault || {};
@@ -112,7 +112,7 @@ export function jsonFileLoad( strPath: string, joDefault?: any, bLogOutput?: boo
     return joDefault;
 }
 
-export function jsonFileSave( strPath: string, jo?: any, bLogOutput?: boolean ) : any {
+export function jsonFileSave( strPath: string, jo?: any, bLogOutput?: boolean ): any {
     if( bLogOutput == undefined || bLogOutput == null )
         bLogOutput = false;
     if( bLogOutput )
@@ -187,7 +187,7 @@ export async function waitForClonedTokenAppearErc20(
         "address" in tokenERC20SC && typeof tokenERC20SC.address == "string"
     ) {
         log.warning( "Skipping automatic ERC20 instantiation discovery, already done before" );
-        return;
+        return
     }
     const addressCallFrom = joAccountSC.address();
     const addressOnSChain = await waitForClonedTokenToAppear(
@@ -203,7 +203,7 @@ export async function waitForClonedTokenAppearErc721(
         "address" in tokenERC721SC && typeof tokenERC721SC.address == "string"
     ) {
         log.warning( "Skipping automatic ERC721instantiation discovery, already done before" );
-        return;
+        return
     }
     const addressCallFrom = joAccountSC.address();
     const addressOnSChain =
@@ -221,7 +221,7 @@ export async function waitForClonedTokenAppearErc721WithMetadata(
     ) {
         log.warning( "Skipping automatic ERC721_with_metadata instantiation discovery, " +
             "already done before" );
-        return;
+        return
     }
     const addressCallFrom = joAccountSC.address();
     const addressOnSChain = await waitForClonedTokenToAppear(
@@ -237,7 +237,7 @@ export async function waitForClonedTokenAppearErc1155(
         "address" in tokenERC1155SC && typeof tokenERC1155SC.address == "string"
     ) {
         log.warning( "Skipping automatic ERC1155 instantiation discovery, already done before" );
-        return;
+        return
     }
     const addressCallFrom = joAccountSC.address();
     const addressOnSChain = await waitForClonedTokenToAppear(
@@ -246,7 +246,9 @@ export async function waitForClonedTokenAppearErc1155(
     tokenERC1155SC.address = "" + addressOnSChain;
 }
 
-export function hexToBytes( strHex?: any, isInversiveOrder?: boolean ) : Uint8Array { // convert a hex string to a byte array
+export function hexToBytes(
+    strHex?: any, isInversiveOrder?: boolean
+): Uint8Array { // convert a hex string to a byte array
     isInversiveOrder = !!(
         ( isInversiveOrder != null && isInversiveOrder != undefined && isInversiveOrder )
     );
@@ -267,7 +269,9 @@ export function hexToBytes( strHex?: any, isInversiveOrder?: boolean ) : Uint8Ar
     return arrBytes;
 }
 
-export function bytesToHex( arrBytes: Uint8Array, isInversiveOrder?: boolean ) : string { // convert a byte array to a hex string
+export function bytesToHex(
+    arrBytes: Uint8Array, isInversiveOrder?: boolean
+): string { // convert a byte array to a hex string
     isInversiveOrder = !!(
         ( isInversiveOrder != null && isInversiveOrder != undefined && isInversiveOrder )
     );
@@ -287,7 +291,7 @@ export function bytesToHex( arrBytes: Uint8Array, isInversiveOrder?: boolean ) :
     return hex.join( "" );
 }
 
-export function bytesAlignLeftWithZeroes( arrBytes: Uint8Array, cntMin: number ) : Uint8Array {
+export function bytesAlignLeftWithZeroes( arrBytes: Uint8Array, cntMin: number ): Uint8Array {
     if( arrBytes.length >= cntMin )
         return arrBytes;
     const cntNewZeros = cntMin - arrBytes.length;
@@ -297,7 +301,7 @@ export function bytesAlignLeftWithZeroes( arrBytes: Uint8Array, cntMin: number )
     return arrBytes;
 }
 
-export function bytesAlignRightWithZeroes( arrBytes: Uint8Array, cntMin: number ) : Uint8Array {
+export function bytesAlignRightWithZeroes( arrBytes: Uint8Array, cntMin: number ): Uint8Array {
     if( arrBytes.length >= cntMin )
         return arrBytes;
     const cntNewZeros = cntMin - arrBytes.length;
@@ -307,34 +311,35 @@ export function bytesAlignRightWithZeroes( arrBytes: Uint8Array, cntMin: number 
     return arrBytes;
 }
 
-export function concatUint8Arrays( a: Uint8Array, b: Uint8Array ) : Uint8Array { // a, b TypedArray of same type
+export function concatUint8Arrays(
+    a: Uint8Array, b: Uint8Array ): Uint8Array { // a, b TypedArray of same type
     if( typeof a == "string" )
         a = hexToBytes( a );
     if( typeof b == "string" )
         b = hexToBytes( b );
-    const c = new Uint8Array( a["length"] + b["length"] );
+    const c = new Uint8Array( a.length + b.length );
     c.set( a, 0 );
-    c.set( b, a["length"] );
+    c.set( b, a.length );
     return c;
 }
 
-export function concatByte( ui8a: Uint8Array, byte: number ) : Uint8Array {
+export function concatByte( ui8a: Uint8Array, byte: number ): Uint8Array {
     const b = new Uint8Array( 1 );
     b[0] = byte;
     return concatUint8Arrays( ui8a, b );
 }
 
-export function bytesConcat( a1: Uint8Array, a2: Uint8Array ) : Uint8Array {
+export function bytesConcat( a1?: Uint8Array, a2?: Uint8Array ): Uint8Array {
     a1 = a1 || new Uint8Array();
     a2 = a2 || new Uint8Array();
     return concatUint8Arrays( a1, a2 );
 }
 
-export function toBuffer( ab?: any ) {
+export function toBuffer( ab?: any ): Buffer {
     return Buffer.from( new Uint8Array( ab ) );
 }
 
-export function discoverCoinNameInJSON( jo?: any ) : string {
+export function discoverCoinNameInJSON( jo?: any ): string {
     if( typeof jo !== "object" )
         return "";
     const arrKeys = Object.keys( jo );
@@ -349,12 +354,12 @@ export function discoverCoinNameInJSON( jo?: any ) : string {
         j = k.indexOf( "_address" );
         if( j > 0 ) {
             s1 = k.substring( 0, j );
-            continue;
+            continue
         }
         j = k.indexOf( "_abi" );
         if( j > 0 ) {
             s2 = k.substring( 0, j );
-            continue;
+            continue
         }
     }
     if( s1.length === 0 || s2.length === 0 )
@@ -366,7 +371,7 @@ export function discoverCoinNameInJSON( jo?: any ) : string {
 
 export function checkKeyExistInABI(
     strName: string, strFile: string, joABI: any, strKey: string, isExitOnError?: boolean
-    ) : boolean {
+): boolean {
     if( isExitOnError == null || isExitOnError == undefined )
         isExitOnError = true;
     try {
@@ -374,7 +379,8 @@ export function checkKeyExistInABI(
             return true;
     } catch ( err ) {
         if( isExitOnError ) {
-            log.fatal( "Loaded {} ABI JSON file {} does not contain needed key {}, stack is:\n{stack}",
+            log.fatal(
+                "Loaded {} ABI JSON file {} does not contain needed key {}, stack is:\n{stack}",
                 strName, strFile, strKey, err );
             process.exit( 126 );
         }
@@ -384,7 +390,7 @@ export function checkKeyExistInABI(
 
 export function checkKeysExistInABI(
     strName: string, strFile: string, joABI: any, arrKeys: any[], isExitOnError?: boolean
-    ): boolean {
+): boolean {
     const cnt = arrKeys.length;
     for( let i = 0; i < cnt; ++i ) {
         const strKey = arrKeys[i];
@@ -394,7 +400,7 @@ export function checkKeysExistInABI(
     return true;
 }
 
-export function composeSChainNodeUrl( joNode: any ) : string {
+export function composeSChainNodeUrl( joNode: any ): string {
     if( "ip" in joNode && typeof joNode.ip === "string" && joNode.ip.length > 0 ) {
         if( "httpRpcPort" in joNode &&
             typeof joNode.httpRpcPort === "number" &&

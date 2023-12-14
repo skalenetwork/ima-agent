@@ -207,6 +207,11 @@ jobs:
       run: |
         yarn install
 
+    - name: INIT - build IMA
+      working-directory: ${{env.working-directory}}
+      run: |
+        yarn rebuild
+
     - name: INIT - initialize comprehensive test tokens
       working-directory: ${{env.working-directory}}
       run: |

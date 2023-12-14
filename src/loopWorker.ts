@@ -63,9 +63,9 @@ function doSendMessage( type: any, endpoint: any, workerUUID: any, data: any ) {
 class ObserverServer extends SocketServer {
     initComplete?: boolean;
     opts: any;
-    intervalPeriodicSchainsCaching?: number|null;
+    intervalPeriodicSchainsCaching?: number | null
     bIsPeriodicCachingStepInProgress?: boolean;
-    constructor( acceptor: any ) {
+    constructor ( acceptor: any ) {
         super( acceptor );
         const self: any = this;
         self.initComplete = false;
@@ -90,7 +90,7 @@ class ObserverServer extends SocketServer {
                 };
                 const isFlush = true;
                 socket.send( jo, isFlush );
-            };
+            }
             self.initLogMethods();
             self.opts = JSON.parse( JSON.stringify( joMessage.message.opts ) );
             self.opts.details = {
@@ -128,9 +128,9 @@ class ObserverServer extends SocketServer {
                 socket.send( jo, isFlush );
             } );
             self.opts.imaState.chainProperties.mn.joAccount.address =
-                function() { return owaspUtils.fnAddressImpl_( this ); };
+                function() { return owaspUtils.fnAddressImpl_( this ); }
             self.opts.imaState.chainProperties.sc.joAccount.address =
-                function() { return owaspUtils.fnAddressImpl_( this ); };
+                function() { return owaspUtils.fnAddressImpl_( this ); }
             if( self.opts.imaState.chainProperties.mn.strURL &&
                 typeof self.opts.imaState.chainProperties.mn.strURL == "string" &&
                 self.opts.imaState.chainProperties.mn.strURL.length > 0
@@ -185,7 +185,7 @@ class ObserverServer extends SocketServer {
             self.information( "Full init compete for in-worker IMA loop {} in {}",
                 workerData.url, threadInfo.threadDescription() );
             return joAnswer;
-        };
+        }
         self.mapApiHandlers.spreadUpdatedSChainNetwork =
             function( joMessage: any, joAnswer: any, eventData: any, socket: any ) {
                 self.initLogMethods();
@@ -195,9 +195,9 @@ class ObserverServer extends SocketServer {
                     threadInfo.threadDescription(), joMessage.joSChainNetworkInfo,
                     log.posNeg( joMessage.isFinal, "final", "partial" ) );
                 imaState.joSChainNetworkInfo = joMessage.joSChainNetworkInfo;
-            };
+            }
         // eslint-disable-next-line dot-notation
-        self.mapApiHandlers["skale_imaNotifyLoopWork"] =
+        self.mapApiHandlers.skale_imaNotifyLoopWork =
             function( joMessage: any, joAnswer: any, eventData: any, socket: any ) {
                 self.initLogMethods();
                 pwa.handleLoopStateArrived( // NOTICE: no await here, executed async

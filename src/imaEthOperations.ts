@@ -33,7 +33,7 @@ import * as threadInfo from "./threadInfo.js";
 
 export async function getBalanceEth(
     isMainNet: boolean,
-    ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider|null,
+    ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider | null,
     chainId: string,
     joAccount?: any,
     contractERC20?: any

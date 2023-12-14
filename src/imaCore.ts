@@ -157,7 +157,7 @@ let gTransferLoopCounter = 0;
 async function doQueryOutgoingMessageCounter( optsTransfer: any ) {
     let nPossibleIntegerValue = 0;
     optsTransfer.details.debug( "{p}SRC MessageProxy address is.....{}",
-        optsTransfer.strLogPrefixShort,optsTransfer.joMessageProxySrc.address );
+        optsTransfer.strLogPrefixShort, optsTransfer.joMessageProxySrc.address );
     optsTransfer.details.debug( "{p}DST MessageProxy address is.....",
         optsTransfer.strLogPrefixShort, optsTransfer.joMessageProxyDst.address );
     optsTransfer.strActionName = "src-chain.MessageProxy.getOutgoingMessagesCounter()";
@@ -288,7 +288,7 @@ async function analyzeGatheredRecords( optsTransfer: any, r: any ) {
                 "{p}Found event record {} reviewed and accepted for processing, found event " +
                 "values are {}, found block number is {}", optsTransfer.strLogPrefix, i, joValues,
                 joValues.savedBlockNumberForOptimizations );
-            break;
+            break
         } else {
             optsTransfer.details.debug( "{p}Found event record {} reviewed and skipped",
                 optsTransfer.strLogPrefix, i );
@@ -381,7 +381,7 @@ async function gatherMessages( optsTransfer: any ) {
             if( !bSecurityCheckPassed ) {
                 optsTransfer.details.warning( "{p}Block depth check was not passed, canceling " +
                     "search for transfer events", optsTransfer.strLogPrefix );
-                break;
+                break
             }
         }
         if( optsTransfer.nBlockAge > 0 ) {
@@ -433,7 +433,7 @@ async function gatherMessages( optsTransfer: any ) {
             if( !bSecurityCheckPassed ) {
                 optsTransfer.details.warning( "{p}Block age check was not passed, " +
                     "canceling search for transfer events", optsTransfer.strLogPrefix );
-                break;
+                break
             }
         }
         optsTransfer.details.success(
@@ -456,7 +456,7 @@ async function gatherMessages( optsTransfer: any ) {
 }
 
 async function preCheckAllMessagesSign(
-    optsTransfer: any, err: Error|string, jarrMessages: any[], joGlueResult: any ) {
+    optsTransfer: any, err: Error | string, jarrMessages: any[], joGlueResult: any ) {
     const strDidInvokedSigningCallbackMessage = log.fmtDebug(
         "{p}Did invoked message signing callback, first real message index is: {}, have {} " +
         "message(s) to process {}", optsTransfer.strLogPrefix,
@@ -481,7 +481,7 @@ async function preCheckAllMessagesSign(
 }
 
 async function callbackAllMessagesSign(
-    optsTransfer: any, err: Error|string, jarrMessages: any[], joGlueResult: any ) {
+    optsTransfer: any, err: Error | string, jarrMessages: any[], joGlueResult: any ) {
     if( ! await preCheckAllMessagesSign( optsTransfer, err, jarrMessages, joGlueResult ) )
         return;
     const nBlockSize = optsTransfer.arrMessageCounters.length;
@@ -626,24 +626,24 @@ async function callbackAllMessagesSign(
 
 async function handleAllMessagesSigning( optsTransfer: any ) {
     try {
-        let errFinal = null;
+        let strErrFinal: string = "";
         await optsTransfer.fnSignMessages( optsTransfer.nTransferLoopCounter,
             optsTransfer.jarrMessages, optsTransfer.nIdxCurrentMsgBlockStart,
             optsTransfer.chainNameSrc, optsTransfer.joExtraSignOpts,
-            async function( err: Error|string, jarrMessages: any[], joGlueResult: any ) {
+            async function( err: Error | string, jarrMessages: any[], joGlueResult: any ) {
                 await callbackAllMessagesSign( optsTransfer, err, jarrMessages, joGlueResult );
-                return;
-            } ).catch( function( err: Error|string ) {
+                return
+            } ).catch( function( err: Error | string ) {
             // callback fn as argument of optsTransfer.fnSignMessages
             optsTransfer.bErrorInSigningMessages = true;
             optsTransfer.details.error( "{p}Problem in transfer handler(in signer): {err}",
                 optsTransfer.strLogPrefix, err );
             imaTransferErrorHandling.saveTransferError(
                 optsTransfer.strTransferErrorCategoryName, optsTransfer.details.toString() );
-            errFinal = err;
+            strErrFinal = err.toString();
         } );
-        if( errFinal )
-            throw errFinal;
+        if( strErrFinal )
+            throw new Error( strErrFinal );
         return true;
     } catch ( err ) {
         optsTransfer.details.error( "{p}Problem in transfer handler(general): {err}",
@@ -654,7 +654,8 @@ async function handleAllMessagesSigning( optsTransfer: any ) {
     }
 }
 
-async function checkOutgoingMessageEventInOneNode( optsTransfer: any, optsOutgoingMessageAnalysis: any ) {
+async function checkOutgoingMessageEventInOneNode(
+    optsTransfer: any, optsOutgoingMessageAnalysis: any ) {
     const sc = optsTransfer.imaState.chainProperties.sc;
     const strUrlHttp = optsOutgoingMessageAnalysis.joNode.endpoints.ip.http;
     optsTransfer.details.trace(
@@ -672,7 +673,7 @@ async function checkOutgoingMessageEventInOneNode( optsTransfer: any, optsOutgoi
                 sc.joAbiIMA.message_proxy_chain_abi,
                 ethersProviderNode );
         const strEventName = "OutgoingMessage";
-        const node_r = await imaEventLogScan.safeGetPastEventsProgressive(
+        const nodeRV = await imaEventLogScan.safeGetPastEventsProgressive(
             optsTransfer.details, optsTransfer.strLogPrefixShort, ethersProviderNode,
             10, joMessageProxyNode, strEventName,
             joMessage.savedBlockNumberForOptimizations,
@@ -680,13 +681,13 @@ async function checkOutgoingMessageEventInOneNode( optsTransfer: any, optsOutgoi
             joMessageProxyNode.filters[strEventName](
                 owaspUtils.ethersMod.ethers.utils.id( optsTransfer.chainNameDst ),
                 owaspUtils.toBN( optsOutgoingMessageAnalysis.idxImaMessage ) ) );
-        const cntEvents = node_r.length;
+        const cntEvents = nodeRV.length;
         optsTransfer.details.trace(
             "{p}Got {} event(s) ({}) on node {} with data: {}",
             optsTransfer.strLogPrefix, cntEvents, strEventName,
-            optsOutgoingMessageAnalysis.joNode.name, node_r );
+            optsOutgoingMessageAnalysis.joNode.name, nodeRV );
         for( let idxEvent = 0; idxEvent < cntEvents; ++ idxEvent ) {
-            const joEvent = node_r[idxEvent];
+            const joEvent = nodeRV[idxEvent];
             const eventValuesByName: any = {
                 "dstChainHash": joEvent.args[0],
                 "msgCounter": joEvent.args[1],
@@ -700,7 +701,7 @@ async function checkOutgoingMessageEventInOneNode( optsTransfer: any, optsOutgoi
                     owaspUtils.ensureStartsWith0x( eventValuesByName.dstContract ).toLowerCase()
             ) {
                 bEventIsFound = true;
-                break;
+                break
             }
         }
     } catch ( err ) {
@@ -930,10 +931,13 @@ export async function doTransfer(
     ethersProviderDst: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     joMessageProxyDst: owaspUtils.ethersMod.ethers.Contract, joAccountDst: any,
     chainNameSrc: string, chainNameDst: string, chainIdSrc: string, chainIdDst: string,
-    joDepositBoxMainNet: owaspUtils.ethersMod.ethers.Contract|null, // for logs validation on mainnet
-    joTokenManagerSChain: owaspUtils.ethersMod.ethers.Contract|null, // for logs validation on s-chain
+    joDepositBoxMainNet:
+    owaspUtils.ethersMod.ethers.Contract | null, // for logs validation on mainnet
+    joTokenManagerSChain:
+    owaspUtils.ethersMod.ethers.Contract | null, // for logs validation on s-chain
     nTransactionsCountInBlock: number,
-    nTransferSteps: number, nMaxTransactionsCount: number, nBlockAwaitDepth: number, nBlockAge: number,
+    nTransferSteps: number, nMaxTransactionsCount: number,
+    nBlockAwaitDepth: number, nBlockAge: number,
     fnSignMessages: any, joExtraSignOpts: any,
     transactionCustomizerDst: imaTx.TransactionCustomizer
 ) {
@@ -1020,7 +1024,7 @@ export async function doTransfer(
                     nIdxCurrentMsgBlockStart, optsTransfer.jarrMessages.length,
                     optsTransfer.jarrMessages );
                 await fnAfter( null, jarrMessages ); // null - no error, null - no signatures
-            };
+            }
         } else {
             optsTransfer.details.debug( "{p}Using externally provided signing function",
                 optsTransfer.strLogPrefix );
@@ -1047,7 +1051,7 @@ export async function doTransfer(
         } catch ( err ) {
             optsTransfer.details.critical( "{p}Error in {} during {bright}: {err}, " +
                 "stack is:\n{stack}", optsTransfer.strLogPrefix,
-            optsTransfer.strGatheredDetailsName, optsTransfer.strActionName,err, err );
+            optsTransfer.strGatheredDetailsName, optsTransfer.strActionName, err, err );
             optsTransfer.details.exposeDetailsTo( log,
                 optsTransfer.strGatheredDetailsName, false );
             imaTransferErrorHandling.saveTransferError(

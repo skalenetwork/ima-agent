@@ -132,14 +132,14 @@ function parseCommandLine() {
         imaCLI.initContracts();
     }
     if( imaState.bShowConfigMode ) {
-        // just show configuration values and exit
+    // just show configuration values and exit
         process.exit( 0 );
     }
 }
 
 let gServerMonitoringWS: any = null;
 
-function initMonitoringServer() : void {
+function initMonitoringServer(): void {
     const imaState = state.get();
     if( imaState.nMonitoringPort <= 0 )
         return;
@@ -219,9 +219,9 @@ function initMonitoringServer() : void {
 
                             "nMonitoringPort"
                         ];
-                        for( const param_name of arrRuntimeParamNames ) {
-                            if( param_name in imaState )
-                                joAnswer.runtime_params[param_name] = imaState[param_name];
+                        for( const paramName of arrRuntimeParamNames ) {
+                            if( paramName in imaState )
+                                joAnswer.runtime_params[paramName] = imaState[paramName];
 
                         }
                     } break;
@@ -253,7 +253,7 @@ function initMonitoringServer() : void {
 
 let gExpressJsonRpcAppIMA: any = null;
 
-function initJsonRpcServer() : void {
+function initJsonRpcServer(): void {
     const imaState = state.get();
     if( imaState.nJsonRpcPort <= 0 )
         return;
@@ -351,7 +351,7 @@ async function doTheJob() {
     for( idxAction = 0; idxAction < cntActions; ++idxAction ) {
         log.information( "{p}{p}", strLogPrefix, imaHelperAPIs.longSeparator );
         const joAction = imaState.arrActions[idxAction];
-        log.debug( "{p}Will execute action: {bright} ({} of {})" ,
+        log.debug( "{p}Will execute action: {bright} ({} of {})",
             strLogPrefix, joAction.name, idxAction + 1, cntActions );
         try {
             if( await joAction.fn() ) {
@@ -380,9 +380,9 @@ async function doTheJob() {
 
 function handleFirstSChainDiscoveryAttemptDone(
     err: any, joSChainNetworkInfo: any,
-    isSilentReDiscovery: boolean, fnOnPeriodicDiscoveryResultAvailable: any ) : void {
+    isSilentReDiscovery: boolean, fnOnPeriodicDiscoveryResultAvailable: any ): void {
     if( err ) {
-        // error information is printed by discoveryTools.discoverSChainNetwork()
+    // error information is printed by discoveryTools.discoverSChainNetwork()
         process.exit( 166 );
     }
     log.success( "S-Chain network was discovered: {}", joSChainNetworkInfo );
@@ -424,7 +424,7 @@ async function main() {
         ? false : imaState.joSChainDiscovery.isSilentReDiscovery;
     const fnOnPeriodicDiscoveryResultAvailable = function( isFinal: boolean ) {
         loop.spreadUpdatedSChainNetwork( isFinal );
-    };
+    }
     if( imaState.bSignMessages ) {
         if( imaState.strPathBlsGlue.length == 0 ) {
             log.fatal( "Please specify {} command line parameter.", "--bls-glue" );
@@ -445,16 +445,16 @@ async function main() {
             }
             const nCountToWait = -1;
             discoveryTools.discoverSChainNetwork(
-                function( err: Error|string, joSChainNetworkInfo: any ) {
-                handleFirstSChainDiscoveryAttemptDone(
-                    err, joSChainNetworkInfo, isSilentReDiscovery,
-                    fnOnPeriodicDiscoveryResultAvailable );
-                doTheJob();
-                // Finish of IMA Agent startup,
-                // everything else is in async calls executed later
-                return 0;
-            }, isSilentReDiscovery, imaState.joSChainNetworkInfo, nCountToWait
-            ).catch( function( err: Error|string ) {
+                function( err: Error | string, joSChainNetworkInfo: any ) {
+                    handleFirstSChainDiscoveryAttemptDone(
+                        err, joSChainNetworkInfo, isSilentReDiscovery,
+                        fnOnPeriodicDiscoveryResultAvailable );
+                    doTheJob();
+                    // Finish of IMA Agent startup,
+                    // everything else is in async calls executed later
+                    return 0;
+                }, isSilentReDiscovery, imaState.joSChainNetworkInfo, nCountToWait
+            ).catch( function( err: Error | string ) {
                 const strError = owaspUtils.extractErrorMessage( err );
                 log.critical( "S-Chain network discovery failed: {err}", strError );
                 doTheJob();
@@ -464,9 +464,9 @@ async function main() {
         discoveryTools.doPeriodicSChainNetworkDiscoveryIfNeeded(
             isSilentReDiscovery, fnOnPeriodicDiscoveryResultAvailable );
         doTheJob();
-        // Finish of IMA Agent startup,
-        // everything else is in async calls executed later,
-        // skip exit here to avoid early termination while tasks ase still running
+    // Finish of IMA Agent startup,
+    // everything else is in async calls executed later,
+    // skip exit here to avoid early termination while tasks ase still running
     }
 
 }

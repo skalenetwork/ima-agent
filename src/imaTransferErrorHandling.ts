@@ -36,7 +36,7 @@ let gMapTransferErrorCategories: any = { };
 
 export const saveTransferEvents = new EventDispatcher();
 
-export function saveTransferError( strCategory: string, textLog: any, ts?: any ) : void {
+export function saveTransferError( strCategory: string, textLog: any, ts?: any ): void {
     ts = ts || Math.round( ( new Date() ).getTime() / 1000 );
     const c = verifyTransferErrorCategoryName( strCategory );
     const joTransferEventError: any = {
@@ -54,7 +54,7 @@ export function saveTransferError( strCategory: string, textLog: any, ts?: any )
             { "detail": joTransferEventError } ) );
 }
 
-export function saveTransferSuccess( strCategory: string ) : void {
+export function saveTransferSuccess( strCategory: string ): void {
     const c = verifyTransferErrorCategoryName( strCategory );
     try { delete gMapTransferErrorCategories["" + c]; } catch ( err ) { }
     saveTransferEvents.dispatchEvent(
@@ -63,12 +63,12 @@ export function saveTransferSuccess( strCategory: string ) : void {
             { "detail": { "category": strCategory } } ) );
 }
 
-export function saveTransferSuccessAll() : void {
+export function saveTransferSuccessAll(): void {
     // clear all transfer error categories, out of time frame
     gMapTransferErrorCategories = { };
 }
 
-export function getLastTransferErrors( isIncludeTextLog: boolean ) : any[] {
+export function getLastTransferErrors( isIncludeTextLog: boolean ): any[] {
     if( typeof isIncludeTextLog == "undefined" )
         isIncludeTextLog = true;
     const jarr = JSON.parse( JSON.stringify( gArrLastTransferErrors ) );
@@ -82,15 +82,15 @@ export function getLastTransferErrors( isIncludeTextLog: boolean ) : any[] {
     return jarr;
 }
 
-export function getLastErrorCategories() : string[] {
+export function getLastErrorCategories(): string[] {
     return Object.keys( gMapTransferErrorCategories );
 }
 
 let gFlagIsEnabledProgressiveEventsScan = true;
 
-export function getEnabledProgressiveEventsScan() : boolean {
+export function getEnabledProgressiveEventsScan(): boolean {
     return ( !!gFlagIsEnabledProgressiveEventsScan );
 }
-export function setEnabledProgressiveEventsScan( isEnabled: boolean ) : void {
+export function setEnabledProgressiveEventsScan( isEnabled: boolean ): void {
     gFlagIsEnabledProgressiveEventsScan = ( !!isEnabled );
 }

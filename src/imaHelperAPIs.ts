@@ -36,30 +36,30 @@ let gMillisecondsSleepBeforeFetchOutgoingMessageEvent: number = 5000;
 let gMillisecondsSleepBetweenTransactionsOnSChain: number = 0; // example - 5000
 let gFlagWaitForNextBlockOnSChain: boolean = false;
 
-export function getMillisecondsSleepBeforeFetchOutgoingMessageEvent() : number {
+export function getMillisecondsSleepBeforeFetchOutgoingMessageEvent(): number {
     return gMillisecondsSleepBeforeFetchOutgoingMessageEvent;
 }
-export function setMillisecondsSleepBeforeFetchOutgoingMessageEvent( val?: number ) : void {
+export function setMillisecondsSleepBeforeFetchOutgoingMessageEvent( val?: number ): void {
     gMillisecondsSleepBeforeFetchOutgoingMessageEvent = val ? val : 0;
 }
 
-export function getSleepBetweenTransactionsOnSChainMilliseconds() : number {
+export function getSleepBetweenTransactionsOnSChainMilliseconds(): number {
     return gMillisecondsSleepBetweenTransactionsOnSChain;
 }
-export function setSleepBetweenTransactionsOnSChainMilliseconds( val?: number ) : void {
+export function setSleepBetweenTransactionsOnSChainMilliseconds( val?: number ): void {
     gMillisecondsSleepBetweenTransactionsOnSChain = val ? val : 0;
 }
 
-export function getWaitForNextBlockOnSChain() : boolean {
+export function getWaitForNextBlockOnSChain(): boolean {
     return ( !!gFlagWaitForNextBlockOnSChain );
 }
 export function setWaitForNextBlockOnSChain( val: any ) {
     gFlagWaitForNextBlockOnSChain = ( !!val );
 }
 
-export const currentTimestamp = () : number => {
+export const currentTimestamp = (): number => {
     return Date.now().valueOf() / 1000;
-};
+}
 
 export async function safeWaitForNextBlockToAppear(
     details: any, ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider ) {
@@ -127,7 +127,7 @@ let gMaxBlockScanIterationsInAllRange: number = 5000;
 export function getBlocksCountInInIterativeStepOfEventsScan(): number {
     return gCountOfBlocksInIterativeStep;
 }
-export function setBlocksCountInInIterativeStepOfEventsScan( n?: number ) : void {
+export function setBlocksCountInInIterativeStepOfEventsScan( n?: number ): void {
     if( ! n )
         gCountOfBlocksInIterativeStep = 0;
     else {
@@ -137,10 +137,10 @@ export function setBlocksCountInInIterativeStepOfEventsScan( n?: number ) : void
     }
 }
 
-export function getMaxIterationsInAllRangeEventsScan() : number {
+export function getMaxIterationsInAllRangeEventsScan(): number {
     return gCountOfBlocksInIterativeStep;
 }
-export function setMaxIterationsInAllRangeEventsScan( n?: number ) : void {
+export function setMaxIterationsInAllRangeEventsScan( n?: number ): void {
     if( ! n )
         gMaxBlockScanIterationsInAllRange = 0;
     else {
@@ -153,29 +153,29 @@ export function setMaxIterationsInAllRangeEventsScan( n?: number ) : void {
 // default S<->S transfer mode for "--s2s-transfer" is "forward"
 let gFlagIsForwardS2S: boolean = true;
 
-export function getS2STransferModeDescription() : string {
+export function getS2STransferModeDescription(): string {
     return gFlagIsForwardS2S ? "forward" : "reverse";
 }
 
-export function getS2STransferModeDescriptionColorized() : string {
+export function getS2STransferModeDescriptionColorized(): string {
     return log.posNeg( gFlagIsForwardS2S, "forward", "reverse" );
 }
 
-export function isForwardS2S() : boolean {
+export function isForwardS2S(): boolean {
     return ( !!gFlagIsForwardS2S );
 }
 
-export function isReverseS2S() : boolean {
+export function isReverseS2S(): boolean {
     return ( !!gFlagIsForwardS2S );
 }
 
-export function setForwardS2S( b?: boolean ) : void {
+export function setForwardS2S( b?: boolean ): void {
     if( b == null || b == undefined )
         b = true;
     gFlagIsForwardS2S = ( !!b );
 }
 
-export function setReverseS2S( b?: boolean ) : void {
+export function setReverseS2S( b?: boolean ): void {
     if( b == null || b == undefined )
         b = true;
     gFlagIsForwardS2S = b ? false : true;

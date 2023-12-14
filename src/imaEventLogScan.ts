@@ -345,7 +345,7 @@ export async function safeGetPastEvents(
                 idxAttempt, cntAttempts, strEventName, u,
                 nBlockFrom.toHexString(), nBlockTo.toHexString(), err, err );
             if( owaspUtils.extractErrorMessage( err )
-                .indexOf( strErrorTextAboutNotExistingEvent ) >= 0
+                .includes( strErrorTextAboutNotExistingEvent )
             ) {
                 details.error( "{p}Did stopped {} event filtering because no such event exist " +
                     "in smart contract", strLogPrefix, strEventName );

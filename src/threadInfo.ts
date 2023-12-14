@@ -32,19 +32,19 @@ export { Worker };
 const joCustomThreadProperties: any = { };
 export { joCustomThreadProperties };
 
-export const sleep = ( milliseconds: number ) : Promise<void> => {
-    return new Promise( resolve => setTimeout( resolve, milliseconds ) );
-};
+export const sleep = async( milliseconds: number ): Promise<void> => {
+    await new Promise( resolve => setTimeout( resolve, milliseconds ) )
+}
 
-export function getCurrentThreadID() : number {
+export function getCurrentThreadID(): number {
     return worker_threads.threadId;
 }
 
-export function isMainThread() : boolean {
+export function isMainThread(): boolean {
     return ( !!( worker_threads.isMainThread ) );
 }
 
-export function threadDescription( isColorized?: boolean ) : string {
+export function threadDescription( isColorized?: boolean ): string {
     if( typeof isColorized == "undefined" )
         isColorized = true;
     const tid: number = getCurrentThreadID();

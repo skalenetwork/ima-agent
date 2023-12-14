@@ -15,13 +15,6 @@
         // "skipLibCheck": true /* Skip type checking of declaration files. */,
         // "forceConsistentCasingInFileNames": true, /* Disallow inconsistently-cased references to the same file. */
 
-        // "noImplicitAny": true,
-        // "alwaysStrict": true,
-        // "rootDir": ".",
-        // "baseUrl": ".",
-
-        "allowArbitraryExtensions": true,
-
         "paths": {
             "*": [
                 "./*.ts"

@@ -39,7 +39,7 @@ export function findSChainIndexInArrayByName( arrSChains: any[], strSChainName: 
 
 let gConnectedChainsData: any = null;
 
-export function autoUpdateLastCachedSChains() : boolean {
+export function autoUpdateLastCachedSChains(): boolean {
     const imaState = state.get();
     if( ! imaState.optsS2S.strNetworkBrowserPath )
         return false;
@@ -60,26 +60,26 @@ export function autoUpdateLastCachedSChains() : boolean {
     return true;
 }
 
-export function getLastCachedSChains() : any[] {
+export function getLastCachedSChains(): any[] {
     autoUpdateLastCachedSChains();
     if( ! gConnectedChainsData )
         return [];
     return JSON.parse( JSON.stringify( gConnectedChainsData.schains ) );
 }
 
-export function pickRandomSChainNodeIndex( joSChain: any ) : number {
+export function pickRandomSChainNodeIndex( joSChain: any ): number {
     let min = 0, max = joSChain.nodes.length - 1;
     min = Math.ceil( min );
     max = Math.floor( max );
     const idxNode = Math.floor( Math.random() * ( max - min + 1 ) ) + min;
     return idxNode;
 }
-export function pickRandomSChainNode( joSChain: any ) : any {
+export function pickRandomSChainNode( joSChain: any ): any {
     const idxNode = pickRandomSChainNodeIndex( joSChain );
     return joSChain.nodes[idxNode];
 }
 
-export function pickRandomSChainUrl( joSChain: any ) : string {
+export function pickRandomSChainUrl( joSChain: any ): string {
     const joNode = pickRandomSChainNode( joSChain );
     return "" + joNode.endpoints.ip.http;
 }

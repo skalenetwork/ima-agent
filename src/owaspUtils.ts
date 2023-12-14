@@ -34,7 +34,6 @@ import * as fs from "fs";
 import * as ethereumJsUtilModule from "ethereumjs-util";
 import * as ethereumJsWalletModule from "ethereumjs-wallet";
 const Wallet = ethereumJsWalletModule.default;
-const BN = ethereumJsUtilModule.BN;
 const BigNumber = ethersMod.ethers.BigNumber;
 
 const safeURL = log.safeURL;
@@ -43,7 +42,7 @@ const extractErrorMessage = log.extractErrorMessage;
 
 export { ethersMod, safeURL, replaceAll, extractErrorMessage, BigNumber };
 
-export function rxIsInt( val: any ) : boolean {
+export function rxIsInt( val: any ): boolean {
     try {
         const intRegex = /^-?\d+$/;
         if( !intRegex.test( val ) )
@@ -56,7 +55,7 @@ export function rxIsInt( val: any ) : boolean {
     return false;
 }
 
-export function rxIsFloat( val: any ) : boolean {
+export function rxIsFloat( val: any ): boolean {
     try {
         const floatRegex = /^-?\d+(?:[.,]\d*?)?$/;
         if( !floatRegex.test( val ) )
@@ -70,7 +69,7 @@ export function rxIsFloat( val: any ) : boolean {
     return false;
 }
 
-export function parseIntOrHex( s: any ) : number {
+export function parseIntOrHex( s: any ): number {
     if( typeof s != "string" )
         return parseInt( s );
     s = s.trim();
@@ -79,7 +78,7 @@ export function parseIntOrHex( s: any ) : number {
     return parseInt( s, 10 );
 }
 
-export function validateRadix( value: any, radix?: any ) : boolean {
+export function validateRadix( value: any, radix?: any ): boolean {
     value = "" + ( value ? value.toString() : "10" );
     value = value.trim();
     radix = ( radix == null || radix == undefined )
@@ -89,7 +88,7 @@ export function validateRadix( value: any, radix?: any ) : boolean {
     return radix;
 }
 
-export function validateInteger( value: any, radix?: any ) : boolean {
+export function validateInteger( value: any, radix?: any ): boolean {
     try {
         value = "" + value;
         value = value.trim();
@@ -106,7 +105,7 @@ export function validateInteger( value: any, radix?: any ) : boolean {
     return false;
 }
 
-export function toInteger( value: any, radix?: any ) : number {
+export function toInteger( value: any, radix?: any ): number {
     try {
         radix = validateRadix( value, radix );
         if( !validateInteger( value, radix ) )
@@ -117,7 +116,7 @@ export function toInteger( value: any, radix?: any ) : number {
     return 0;
 }
 
-export function validateFloat( value: any ) : boolean {
+export function validateFloat( value: any ): boolean {
     try {
         const f = parseFloat( value );
         if( isNaN( f ) )
@@ -128,7 +127,7 @@ export function validateFloat( value: any ) : boolean {
     return false;
 }
 
-export function toFloat( value: any ) : number {
+export function toFloat( value: any ): number {
     try {
         const f = parseFloat( value );
         return f;
@@ -137,14 +136,14 @@ export function toFloat( value: any ) : number {
     return 0.0;
 }
 
-export function validateURL( s: any ) : boolean {
+export function validateURL( s: any ): boolean {
     const url = toURL( s );
     if( url == null )
         return false;
     return true;
 }
 
-export function toURL( s: any ) : URL | null {
+export function toURL( s: any ): URL | null {
     try {
         if( s == null || s == undefined )
             return null;
@@ -161,7 +160,7 @@ export function toURL( s: any ) : URL | null {
                 const objURL = toURL( ss );
                 if( objURL != null && objURL != undefined ) {
                     const anyURL: any = objURL;
-                    anyURL["strStrippedStringComma"] = sc;
+                    anyURL.strStrippedStringComma = sc;
                 }
                 return objURL;
             }
@@ -173,14 +172,14 @@ export function toURL( s: any ) : URL | null {
         if( objURL.hostname.length === 0 )
             return null;
         const anyURL: any = objURL;
-        anyURL["strStrippedStringComma"] = null;
+        anyURL.strStrippedStringComma = null;
         return objURL;
     } catch ( err ) {
         return null;
     }
 }
 
-export function toStringURL( s?: any, defValue?: string ) : string {
+export function toStringURL( s?: any, defValue?: string ): string {
     defValue = defValue || "";
     try {
         const url = toURL( s );
@@ -192,7 +191,7 @@ export function toStringURL( s?: any, defValue?: string ) : string {
     }
 }
 
-export function isUrlHTTP( strURL?: any ) : boolean {
+export function isUrlHTTP( strURL?: any ): boolean {
     try {
         if( !validateURL( strURL ) )
             return false;
@@ -204,7 +203,7 @@ export function isUrlHTTP( strURL?: any ) : boolean {
     return false;
 }
 
-export function isUrlWS( strURL?: any ) : boolean {
+export function isUrlWS( strURL?: any ): boolean {
     try {
         if( !validateURL( strURL ) )
             return false;
@@ -216,7 +215,7 @@ export function isUrlWS( strURL?: any ) : boolean {
     return false;
 }
 
-export function toBoolean( value?: any ) : boolean {
+export function toBoolean( value?: any ): boolean {
     let b = false;
     try {
         if( typeof value === "boolean" )
@@ -237,11 +236,11 @@ export function toBoolean( value?: any ) : boolean {
     return b;
 }
 
-export function validateInputAddresses( address?: any ) : boolean {
+export function validateInputAddresses( address?: any ): boolean {
     return ( /^(0x){1}[0-9a-fA-F]{40}$/i.test( address ) );
 }
 
-export function validateEthAddress( value?: any ) : boolean {
+export function validateEthAddress( value?: any ): boolean {
     try {
         if( validateInputAddresses( ensureStartsWith0x( value ) ) )
             return true;
@@ -250,7 +249,7 @@ export function validateEthAddress( value?: any ) : boolean {
     return false;
 }
 
-export function validateEthPrivateKey( value?: any ) : boolean {
+export function validateEthPrivateKey( value?: any ): boolean {
     try {
         const ethersWallet = new ethersMod.ethers.Wallet( ensureStartsWith0x( value ) );
         if( ethersWallet.address )
@@ -260,7 +259,7 @@ export function validateEthPrivateKey( value?: any ) : boolean {
     return false;
 }
 
-export function toEthAddress( value?: any, defValue?: string ) : string {
+export function toEthAddress( value?: any, defValue?: string ): string {
     try {
         value = "" + ( value ? ensureStartsWith0x( value.toString() ) : "" );
         defValue = defValue || "";
@@ -271,7 +270,7 @@ export function toEthAddress( value?: any, defValue?: string ) : string {
     return value;
 }
 
-export function toEthPrivateKey( value?: any, defValue?: string ) : string {
+export function toEthPrivateKey( value?: any, defValue?: string ): string {
     try {
         value = "" + ( value ? value.toString() : "" );
         defValue = defValue || "";
@@ -282,7 +281,7 @@ export function toEthPrivateKey( value?: any, defValue?: string ) : string {
     return value;
 }
 
-export function verifyArgumentWithNonEmptyValue( joArg?: any ) : any {
+export function verifyArgumentWithNonEmptyValue( joArg?: any ): any {
     if( ( !joArg.value ) || ( typeof joArg.value === "string" && joArg.value.length === 0 ) ) {
         console.log( log.fmtFatal( "(OWASP) Value {} of argument {} must not be empty",
             joArg.value, joArg.name ) );
@@ -291,7 +290,7 @@ export function verifyArgumentWithNonEmptyValue( joArg?: any ) : any {
     return joArg;
 }
 
-export function verifyArgumentIsURL( joArg?: any ) : any {
+export function verifyArgumentIsURL( joArg?: any ): any {
     try {
         verifyArgumentWithNonEmptyValue( joArg );
         const url = toURL( joArg.value );
@@ -313,7 +312,7 @@ export function verifyArgumentIsURL( joArg?: any ) : any {
     }
 }
 
-export function verifyArgumentIsInteger( joArg?: any ) : any {
+export function verifyArgumentIsInteger( joArg?: any ): any {
     try {
         verifyArgumentWithNonEmptyValue( joArg );
         if( !validateInteger( joArg.value ) ) {
@@ -330,7 +329,7 @@ export function verifyArgumentIsInteger( joArg?: any ) : any {
     }
 }
 
-export function verifyArgumentIsIntegerIpPortNumber( joArg: any ) : any {
+export function verifyArgumentIsIntegerIpPortNumber( joArg: any ): any {
     try {
         verifyArgumentIsInteger( joArg );
         if( joArg.value < 0 )
@@ -347,7 +346,7 @@ export function verifyArgumentIsIntegerIpPortNumber( joArg: any ) : any {
     }
 }
 
-export function verifyArgumentIsPathToExistingFile( joArg?: any ) : any {
+export function verifyArgumentIsPathToExistingFile( joArg?: any ): any {
     try {
         verifyArgumentWithNonEmptyValue( joArg );
         const stats = fs.lstatSync( joArg.value );
@@ -369,7 +368,7 @@ export function verifyArgumentIsPathToExistingFile( joArg?: any ) : any {
     }
 }
 
-export function verifyArgumentIsPathToExistingFolder( joArg?: any ) : any {
+export function verifyArgumentIsPathToExistingFolder( joArg?: any ): any {
     try {
         verifyArgumentWithNonEmptyValue( joArg );
         const stats = fs.lstatSync( joArg.value );
@@ -391,7 +390,7 @@ export function verifyArgumentIsPathToExistingFolder( joArg?: any ) : any {
     }
 }
 
-export function verifyArgumentIsArrayOfIntegers( joArg?: any ) : any {
+export function verifyArgumentIsArrayOfIntegers( joArg?: any ): any {
     try {
         verifyArgumentWithNonEmptyValue( joArg );
         if( joArg.value.length < 3 ) {
@@ -428,7 +427,7 @@ export function verifyArgumentIsArrayOfIntegers( joArg?: any ) : any {
     }
 }
 
-export function ensureStartsWith0x( s?: any ) : string {
+export function ensureStartsWith0x( s?: any ): string {
     if( s == null || s == undefined || typeof s !== "string" )
         return s;
     if( s.length < 2 )
@@ -438,7 +437,7 @@ export function ensureStartsWith0x( s?: any ) : string {
     return "0x" + s;
 }
 
-export function removeStarting0x( s?: any ) : string {
+export function removeStarting0x( s?: any ): string {
     if( s == null || s == undefined || typeof s !== "string" )
         return s;
     if( s.length < 2 )
@@ -448,7 +447,7 @@ export function removeStarting0x( s?: any ) : string {
     return s;
 }
 
-export function inetNtoA( n: number ) : string {
+export function inetNtoA( n: number ): string {
     const a = ( ( n >> 24 ) & 0xFF ) >>> 0;
     const b = ( ( n >> 16 ) & 0xFF ) >>> 0;
     const c = ( ( n >> 8 ) & 0xFF ) >>> 0;
@@ -456,11 +455,11 @@ export function inetNtoA( n: number ) : string {
     return ( a + "." + b + "." + c + "." + d );
 }
 
-export function ipFromHex( hex?: any ) : string {
+export function ipFromHex( hex?: any ): string {
     return inetNtoA( parseInt( removeStarting0x( hex ), 16 ) );
 }
 
-export function cloneObjectByRootKeys( joIn?: any ) : any {
+export function cloneObjectByRootKeys( joIn?: any ): any {
     const joOut: any = { }, arrKeys = Object.keys( joIn );
     for( let i = 0; i < arrKeys.length; ++ i ) {
         const key = arrKeys[i];
@@ -472,7 +471,7 @@ export function cloneObjectByRootKeys( joIn?: any ) : any {
 
 // example: "1ether" -> "1000000000000000000"
 // supported suffix aliases, lowercase
-const gMapMoneyNameSuffixAliases : any = {
+const gMapMoneyNameSuffixAliases: any = {
     "ethe": "ether",
     "ethr": "ether",
     "eth": "ether",
@@ -546,7 +545,7 @@ const gMapMoneyNameSuffixAliases : any = {
     "tether": "tether"
 };
 
-export function parseMoneyUnitName( s: string ) : string {
+export function parseMoneyUnitName( s: string ): string {
     s = s.trim().toLowerCase();
     if( s == "" )
         return "wei";
@@ -557,7 +556,7 @@ export function parseMoneyUnitName( s: string ) : string {
     return s;
 }
 
-function moneyUnitNameToEthersParseSpec( s: string ) : string|number {
+function moneyUnitNameToEthersParseSpec( s: string ): string | number {
     switch ( s.toString().trim().toLowerCase() ) {
     case "shannon": return 9;
     case "lovelace": return 6;
@@ -575,7 +574,7 @@ function moneyUnitNameToEthersParseSpec( s: string ) : string|number {
     return s;
 }
 
-function moneyUnitNameToPostDivider( s: string ) : string|null {
+function moneyUnitNameToPostDivider( s: string ): string | null {
     switch ( s.toString().trim().toLowerCase() ) {
     case "femtoether": return "1000000000000000";
     case "picoether": return "1000000000000";
@@ -585,7 +584,7 @@ function moneyUnitNameToPostDivider( s: string ) : string|null {
     }
     return null;
 }
-function moneyUnitNameToPostMultiplier( s: string ) : string|null {
+function moneyUnitNameToPostMultiplier( s: string ): string | null {
     switch ( s.toString().trim().toLowerCase() ) {
     case "kether": return "1000";
     case "mether": return "1000000";
@@ -595,7 +594,7 @@ function moneyUnitNameToPostMultiplier( s: string ) : string|null {
     return null;
 }
 
-export function parseMoneySpecToWei( s?: any, isThrowException?: boolean ) : string {
+export function parseMoneySpecToWei( s?: any, isThrowException?: boolean ): string {
     try {
         isThrowException = ( !!isThrowException );
         if( s == null || s == undefined ) {
@@ -612,12 +611,12 @@ export function parseMoneySpecToWei( s?: any, isThrowException?: boolean ) : str
             ) {
                 strNumber += chr;
                 s = s.substr( 1 ); // remove first character
-                continue;
+                continue
             }
             if( chr == " " || chr == "\t" || chr == "\r" || chr == "\n" )
                 s = s.substr( 1 ); // remove first character
             s = s.trim().toLowerCase();
-            break;
+            break
         }
         // here s is rest suffix string, number is number as string or empty string
         if( strNumber == "" )
@@ -633,7 +632,7 @@ export function parseMoneySpecToWei( s?: any, isThrowException?: boolean ) : str
             s = s.mul( toBN( mlr ) );
         s = s.toString();
         return s;
-    } catch ( err ) {
+    } catch ( err: any ) {
         if( isThrowException ) {
             throw new Error( `Parse error in parseMoneySpecToWei( ${s} ), ` +
                 `error is: ${err}` );
@@ -642,7 +641,7 @@ export function parseMoneySpecToWei( s?: any, isThrowException?: boolean ) : str
     return "0";
 }
 
-export function computeChainIdFromSChainName( strName: string ) : string {
+export function computeChainIdFromSChainName( strName: string ): string {
     let h = ethersMod.ethers.utils.id( strName );
     h = removeStarting0x( h ).toLowerCase();
     while( h.length < 64 )
@@ -651,12 +650,12 @@ export function computeChainIdFromSChainName( strName: string ) : string {
     return ensureStartsWith0x( h );
 }
 
-export function privateKeyToAccountAddress( keyPrivate: string ) : string {
+export function privateKeyToAccountAddress( keyPrivate: string ): string {
     return ethersMod.ethers.utils.computeAddress(
         ensureStartsWith0x( keyPrivate ) );
 }
 
-export function privateKeyToPublicKey( keyPrivate: string ) : string {
+export function privateKeyToPublicKey( keyPrivate: string ): string {
     const privateKeyBuffer =
     ethereumJsUtilModule.toBuffer( ensureStartsWith0x( keyPrivate ) );
     const wallet = Wallet.fromPrivateKey( privateKeyBuffer );
@@ -664,13 +663,13 @@ export function privateKeyToPublicKey( keyPrivate: string ) : string {
     return removeStarting0x( publicKey );
 }
 
-export function publicKeyToAccountAddress( keyPublic : string ) : string {
+export function publicKeyToAccountAddress( keyPublic: string ): string {
     const hash = ethersMod.ethers.utils.keccak256( ensureStartsWith0x( keyPublic ) );
     const strAddress = ensureStartsWith0x( hash.substr( hash.length - 40 ) );
     return strAddress;
 }
 
-export function fnAddressImpl_( anyThis: any ) : string {
+export function fnAddressImpl_( anyThis: any ): string {
     if( anyThis.address_ == undefined || anyThis.address_ == null || anyThis.address_ == "" ) {
         if( anyThis.privateKey )
             anyThis.address_ = "" + privateKeyToAccountAddress( anyThis.privateKey );
@@ -678,10 +677,10 @@ export function fnAddressImpl_( anyThis: any ) : string {
     return anyThis.address_;
 }
 
-export function getEthersProviderFromURL( strURL: URL|string )
-    :ethersMod.ethers.providers.JsonRpcProvider {
+export function getEthersProviderFromURL(
+    strURL: URL | string ): ethersMod.ethers.providers.JsonRpcProvider {
     const url = new URL( strURL.toString() );
-    let userName:string|null = null, userPwd:string|null = null;
+    let userName: string | null = null, userPwd: string | null = null;
     if( url.username ) {
         userName = url.username;
         userPwd = url.password;
@@ -704,9 +703,9 @@ export function getEthersProviderFromURL( strURL: URL|string )
 }
 
 export function ethersProviderToUrl(
-    ethersProvider: ethersMod.ethers.providers.JsonRpcProvider|null
-    ) : string {
-    let strURL: string|null = null;
+    ethersProvider: ethersMod.ethers.providers.JsonRpcProvider | null
+): string {
+    let strURL: string | null = null;
     if( ethersProvider &&
         "connection" in ethersProvider && typeof ethersProvider.connection == "object" &&
         "url" in ethersProvider.connection && typeof ethersProvider.connection.url == "string"
@@ -715,67 +714,70 @@ export function ethersProviderToUrl(
     return strURL || "N/A-URL";
 }
 
-export function isHexPrefixed( s: any ) : boolean {
-    if( typeof s !== "string" )
+export function isHexPrefixed( s: any ): boolean {
+    if( typeof s !== "string" ) {
         throw new Error(
             "Parameter value of owaspUtils.isHexPrefixed() must be type 'string' but it's " +
             `type ${typeof s}, while checking isHexPrefixed.` );
+    }
     return ( s.slice( 0, 2 ) === "0x" ) ? true : false;
 }
 
-export function stripHexPrefix( s: any ) : string {
+export function stripHexPrefix( s: any ): string {
     if( typeof s !== "string" )
         return s;
     return isHexPrefixed( s ) ? s.slice( 2 ) : s;
 }
 
-export function toBNbasic( x?: any, optionalRadix?: number ) : any {
+export function toBNbasic( x?: any, optionalRadix?: number ): any {
     try {
         if( optionalRadix && typeof optionalRadix == "number" && optionalRadix == 16 )
             x = ensureStartsWith0x( x );
         const bn = ethersMod.ethers.BigNumber.from( x );
         return bn;
-    } catch( err ) {
+    } catch ( err: any ) {
         console.log( `CRITICAL ERROR: Failure in owaspUtils.toBNbasic( ${x} ): ${err}` );
         throw err;
     }
 }
 
-export function toBN( arg: any ) : any {
-    if( typeof arg === 'string' || typeof arg === "number" ) {
+export function toBN( arg: any ): any {
+    if( typeof arg === "string" || typeof arg === "number" ) {
         let multiplier = toBNbasic( 1 ); // eslint-disable-line
-        let formattedString = String( arg ).toLowerCase().trim();
-        let isHexPrefixed = formattedString.substr(0, 2) === "0x" || formattedString.substr(0, 3) === "-0x";
+        const formattedString = String( arg ).toLowerCase().trim()
+        const isHexPrefixed =
+            formattedString.substr( 0, 2 ) === "0x" ||
+            formattedString.substr( 0, 3 ) === "-0x"
         let stringArg = stripHexPrefix(formattedString); // eslint-disable-line
-        if( stringArg.substr(0, 1) === "-" ) {
-            stringArg = stripHexPrefix(stringArg.slice(1));
+        if( stringArg.substr( 0, 1 ) === "-" ) {
+            stringArg = stripHexPrefix( stringArg.slice( 1 ) )
             multiplier = toBNbasic( -1, 10 );
         }
         stringArg = stringArg === "" ? "0" : stringArg;
-        if( ( ! stringArg.match(/^-?[0-9]+$/) && stringArg.match(/^[0-9A-Fa-f]+$/) )
-            || stringArg.match(/^[a-fA-F]+$/)
-            || (isHexPrefixed === true && stringArg.match(/^[0-9A-Fa-f]+$/)) )
-            return toBNbasic( stringArg, 16).mul(multiplier);
-        if( ( stringArg.match(/^-?[0-9]+$/) || stringArg === "" ) && isHexPrefixed === false )
+        if( ( ! stringArg.match( /^-?[0-9]+$/ ) && stringArg.match( /^[0-9A-Fa-f]+$/ ) ) ||
+            stringArg.match( /^[a-fA-F]+$/ ) ||
+            ( isHexPrefixed && stringArg.match( /^[0-9A-Fa-f]+$/ ) ) )
+            return toBNbasic( stringArg, 16 ).mul( multiplier )
+        if( ( stringArg.match( /^-?[0-9]+$/ ) || stringArg === "" ) && !isHexPrefixed )
             return toBNbasic( stringArg, 10 ).mul( multiplier );
-    } else if( typeof arg === "object" && arg.toString && (!arg.pop && !arg.push) ) {
-        if( arg.toString().match(/^-?[0-9]+$/) && (arg.mul || arg.dividedToIntegerBy) )
+    } else if( typeof arg === "object" && arg.toString && ( !arg.pop && !arg.push ) ) {
+        if( arg.toString().match( /^-?[0-9]+$/ ) && ( arg.mul || arg.dividedToIntegerBy ) )
             return toBNbasic( arg.toString(), 10 );
-    } else if( arg ) {
-        return toBNbasic( arg ); // try to convert as is
-    }
+    } else if( arg )
+        return toBNbasic( arg ) // try to convert as is
+
     throw new Error(
         "Error in owaspUtils.toBN() while converting " +
-        `number ${JSON.stringify(arg)}to BN.js instance, error: ` +
+        `number ${JSON.stringify( arg )}to BN.js instance, error: ` +
         "invalid number value. Value must be an integer, hex string, BN or BigNumber instance. " +
         "Note, decimals are not supported." );
 }
 
-export function isNumeric( s?: any ) : boolean {
+export function isNumeric( s?: any ): boolean {
     return /^\d+$/.test( s );
 }
 
-export function toHexStringSafe( val?: any ) : string {
+export function toHexStringSafe( val?: any ): string {
     if( ! val )
         return "0x0";
     if( "toHexString" in val && typeof val.toHexString == "function" )
@@ -787,7 +789,7 @@ export function toHexStringSafe( val?: any ) : string {
     return "" + val;
 }
 
-export function setInterval2( fn: any, t: number, stepMilliSeconds?: number ) : any {
+export function setInterval2( fn: any, t: number, stepMilliSeconds?: number ): any {
     const iv: any = {
         real_iv: null,
         stepMilliSeconds: stepMilliSeconds || 1000,
@@ -804,7 +806,7 @@ export function setInterval2( fn: any, t: number, stepMilliSeconds?: number ) : 
     return iv;
 }
 
-export function clearInterval2( iv: any ) : void {
+export function clearInterval2( iv: any ): void {
     if( ! iv )
         return;
     if( ! ( "real_iv" in iv ) )
@@ -815,7 +817,6 @@ export function clearInterval2( iv: any ) : void {
     iv.real_iv = null;
 }
 
-export function escapeShell( cmd: string ) : string {
-    return "\"" + cmd.replace( /(["'$`\\])/g,"\\$1" ) + "\"";
+export function escapeShell( cmd: string ): string {
+    return "\"" + cmd.replace( /(["'$`\\])/g, "\\$1" ) + "\"";
 }
-

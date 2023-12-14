@@ -25,14 +25,14 @@
 
 export class UniversalDispatcherEvent {
     type: any;
-    constructor( type: any, jo: any ) {
+    constructor ( type: any, jo: any ) {
         this.type = type;
         for( const [ key, value ] of Object.entries( jo ) ) {
             if( key in this ) {
                 console.warn( "UniversalDispatcherEvent will skip", key, "data field" );
-                continue;
+                continue
             }
-            let anyThis: any = this;
+            const anyThis: any = this
             anyThis[key] = value;
         }
     }
@@ -43,7 +43,7 @@ export class EventDispatcher {
     _listeners: any[];
     isDisposing: boolean;
     isDisposed: boolean;
-    constructor() {
+    constructor () {
         this._listeners = [];
         this.isDisposed = false;
         this.isDisposing = false;
@@ -80,7 +80,7 @@ export class EventDispatcher {
                     item => item.type === type );
             if( index >= 0 ) {
                 this._listeners.splice( index, 1 );
-                continue;
+                continue
             }
             break;
         }

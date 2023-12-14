@@ -27,7 +27,7 @@ import * as log from "./log.js";
 import * as imaHelperAPIs from "./imaHelperAPIs.js";
 import * as imaTx from "./imaTx.js";
 import * as threadInfo from "./threadInfo.js";
-import * as owaspUtils from "./owaspUtils.js";
+import type * as owaspUtils from "./owaspUtils.js";
 
 export async function invokeHasChain(
     details: any,

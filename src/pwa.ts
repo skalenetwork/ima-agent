@@ -28,7 +28,7 @@ import * as rpcCall from "./rpcCall.js";
 import * as imaBLS from "./bls.js";
 import * as imaUtils from "./utils.js";
 
-function computeWalkNodeIndices( nNodeNumber: number, nNodesCount: number ) : number[] {
+function computeWalkNodeIndices( nNodeNumber: number, nNodesCount: number ): number[] {
     if( nNodesCount <= 1 )
         return []; // PWA is N/A
     if( !( nNodeNumber >= 0 && nNodeNumber < nNodesCount ) )
@@ -48,7 +48,7 @@ function computeWalkNodeIndices( nNodeNumber: number, nNodesCount: number ) : nu
     return arrWalkNodeIndices;
 }
 
-export function checkLoopWorkTypeStringIsCorrect( strLoopWorkType: string ) : boolean {
+export function checkLoopWorkTypeStringIsCorrect( strLoopWorkType: string ): boolean {
     if( ! strLoopWorkType )
         return false;
     switch ( strLoopWorkType.toString().toLowerCase() ) {
@@ -61,7 +61,7 @@ export function checkLoopWorkTypeStringIsCorrect( strLoopWorkType: string ) : bo
     return false;
 }
 
-function composeEmptyStateForPendingWorkAnalysis() : any {
+function composeEmptyStateForPendingWorkAnalysis(): any {
     return {
         "oracle": { "isInProgress": false, "ts": 0 },
         "m2s": { "isInProgress": false, "ts": 0 },
@@ -112,8 +112,8 @@ export async function checkOnLoopStart(
         }
         const nUtcUnixTimeStamp = Math.floor( ( new Date() ).getTime() / 1000 );
         for( let i = 0; i < arrWalkNodeIndices.length; ++i ) {
-            const walk_node_index = arrWalkNodeIndices[i];
-            const joNode: any = jarrNodes[walk_node_index];
+            const walkNodeIndex = arrWalkNodeIndices[i];
+            const joNode: any = jarrNodes[walkNodeIndex];
             const joProps: any = getNodeProgressAndTimestamp( joNode, strLoopWorkType, nIndexS2S );
             if( joProps && typeof joProps == "object" &&
                 "isInProgress" in joProps && joProps.isInProgress &&
@@ -125,15 +125,15 @@ export async function checkOnLoopStart(
                         log.warning(
                             "PWA busy state timeout for node #{}, old timestamp is {}, current " +
                             "system timestamp is {}, duration {} is greater than conditionally " +
-                            "allowed {} and exceeded by {} second(s)", walk_node_index, joProps.ts,
+                            "allowed {} and exceeded by {} second(s)", walkNodeIndex, joProps.ts,
                             nUtcUnixTimeStamp, d, imaState.nTimeoutSecondsPWA,
                             d - imaState.nTimeoutSecondsPWA );
                     };
                     joProps.isInProgress = false;
                     joProps.ts = 0;
-                    continue;
+                    continue
                 }
-                arrBusyNodeIndices.push( walk_node_index );
+                arrBusyNodeIndices.push( walkNodeIndex );
             }
         }
         if( arrBusyNodeIndices.length > 0 ) {
@@ -240,7 +240,7 @@ async function notifyOnLoopImpl(
             const strNodeURL = imaUtils.composeImaAgentNodeUrl( joNode, isThisNode );
             const rpcCallOpts: any = null;
             let joCall: any = await rpcCall.create( strNodeURL, rpcCallOpts )
-                .catch( async function( err: Error|string ) {
+                .catch( async function( err: Error | string ) {
                     log.error(
                         "PWA failed to perform] loop-{} notification RPC call to node #{} with " +
                         "URL {url}, error is: {err}", se, i, strNodeURL, err );
@@ -275,10 +275,12 @@ async function notifyOnLoopImpl(
     return true;
 }
 
-export async function notifyOnLoopStart( imaState: any, strLoopWorkType: string, nIndexS2S?: number ) {
+export async function notifyOnLoopStart(
+    imaState: any, strLoopWorkType: string, nIndexS2S?: number ) {
     return await notifyOnLoopImpl( imaState, strLoopWorkType, true, nIndexS2S );
 }
 
-export async function notifyOnLoopEnd( imaState: any, strLoopWorkType: string, nIndexS2S?: number ) {
+export async function notifyOnLoopEnd(
+    imaState: any, strLoopWorkType: string, nIndexS2S?: number ) {
     return await notifyOnLoopImpl( imaState, strLoopWorkType, false, nIndexS2S );
 }

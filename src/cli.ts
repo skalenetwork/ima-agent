@@ -36,13 +36,14 @@ import * as imaOracleOperations from "./imaOracleOperations.js";
 import * as imaTx from "./imaTx.js";
 import * as state from "./state.js";
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 const __dirname: string = path.dirname( url.fileURLToPath( import.meta.url ) );
 
 const gStrAppName = "IMA AGENT";
 const gStrVersion =
     imaUtils.fileLoad( path.join( __dirname, "../VERSION" ), "N/A" ).toString().trim();
 
-function att( ...args: any[] ) : string { return log.fmtAttention( ...args ); };
+function att( ...args: any[] ): string { return log.fmtAttention( ...args ); };
 
 export function printAbout( isLog?: boolean ) {
     isLog = isLog || false;
@@ -213,7 +214,9 @@ function parseHelp( imaState: any, joArg: any ) { // exits process on "--help"
     if( joArg.name != "help" )
         return false;
     printAbout();
-    const strAboutText = imaUtils.fileLoad( path.join( __dirname, "../about.txt" ), "N/A" ).toString();
+    const strAboutText =
+        imaUtils.fileLoad( path.join( __dirname, "../about.txt" ), "N/A" )
+            .toString();
     console.log( strAboutText );
     process.exit( 0 );
 }
@@ -631,7 +634,7 @@ function parseTransactionArgs( imaState: any, joArg: any ) {
         return true;
     }
     if( joArg.name == "gas-price-multiplier-mn" ) {
-        let gasPriceMultiplier : number = owaspUtils.toFloat( joArg.value );
+        let gasPriceMultiplier: number = owaspUtils.toFloat( joArg.value );
         if( gasPriceMultiplier < 0.0 )
             gasPriceMultiplier = 0.0;
         imaState.chainProperties.mn.transactionCustomizer.gasPriceMultiplier =
@@ -1279,7 +1282,7 @@ export function parse( joExternalHandlers: any ) {
             joArg.name == "browse-s-chain"
         ) {
             joExternalHandlers[joArg.name]();
-            continue;
+            continue
         }
         console.log( log.fmtFatal( "COMMAND LINE PARSER ERROR: unknown command line argument {}",
             joArg.name ) );
@@ -1288,7 +1291,7 @@ export function parse( joExternalHandlers: any ) {
     return 0;
 }
 
-async function asyncCheckUrlAtStartup( u: URL|string, name: string ) {
+async function asyncCheckUrlAtStartup( u: URL | string, name: string ) {
     const details = log.createMemoryStream();
     const nTimeoutMilliseconds = 10 * 1000;
     try {
@@ -1331,7 +1334,7 @@ function commonInitPrintSysInfo() {
         log.debug( "This process {sunny} is {}", "architecture", process.arch );
         log.debug( "This process {sunny} is {}", "execPath", process.execPath );
         log.debug( "This process {sunny} is {}", "platform", process.platform );
-        log.debug( "This process {sunny} is {}", "release",process.release );
+        log.debug( "This process {sunny} is {}", "release", process.release );
         log.debug( "This process {sunny} is {}", "report", process.report );
         log.debug( "This process {sunny} is {}", "config", process.config );
         log.debug( "Node JS {sunny} is {}", "detailed version information", process.versions );
@@ -1526,11 +1529,12 @@ function commonInitPrintFoundContracts() {
     // message_proxy_mainnet_address              --> message_proxy_mainnet_abi
     // message_proxy_chain_address                --> message_proxy_chain_abi
 
-    const oct = function( joContract: owaspUtils.ethersMod.ethers.Contract ) { // optional contract address
+    const oct = function(
+        joContract?: owaspUtils.ethersMod.ethers.Contract ) { // optional contract address
         if( joContract && "address" in joContract && joContract.address )
             return log.fmtInformation( "{}", joContract.address );
         return log.fmtError( "contract is not available" );
-    };
+    }
 
     if( isPrintGathered ) {
         log.debug( "IMA contracts(Main Net):" );
@@ -2713,8 +2717,8 @@ function initContractsIMA() {
             new owaspUtils.ethersMod.ethers.Contract(
                 joABI.deposit_box_erc1155_address,
                 joABI.deposit_box_erc1155_abi,
-                ep )
-        ; // only main net
+                ep );
+        // only main net
         imaState.joDepositBoxERC721WithMetadata =
             new owaspUtils.ethersMod.ethers.Contract(
                 joABI.deposit_box_erc721_with_metadata_address,

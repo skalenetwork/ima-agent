@@ -927,7 +927,7 @@ export async function doErc721PaymentFromSChain(
         const strEventName = "OutgoingMessage";
         if( joMessageProxySChain ) {
             details.debug( "{p}Verifying the {} event of the MessageProxy/{} contract...",
-                strLogPrefix, strEventName,joMessageProxySChain.address );
+                strLogPrefix, strEventName, joMessageProxySChain.address );
             await threadInfo.sleep(
                 imaHelperAPIs.getMillisecondsSleepBeforeFetchOutgoingMessageEvent() );
             const joEvents = await imaEventLogScan.getContractCallEvents(
@@ -1221,7 +1221,7 @@ export async function doErc1155BatchPaymentFromSChain(
         const strEventName = "OutgoingMessage";
         if( joMessageProxySChain ) {
             details.debug( "{p}Verifying the {} event of the MessageProxy/{} contract...",
-                strLogPrefix, strEventName,joMessageProxySChain.address );
+                strLogPrefix, strEventName, joMessageProxySChain.address );
             await threadInfo.sleep(
                 imaHelperAPIs.getMillisecondsSleepBeforeFetchOutgoingMessageEvent() );
             const joEvents = await imaEventLogScan.getContractCallEvents(
@@ -1878,7 +1878,8 @@ export async function mintErc20(
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
-        const opts: any = { isCheckTransactionToSchain: ( chainName !== "Mainnet" ) ? true : false };
+        const opts: any =
+            { isCheckTransactionToSchain: ( chainName !== "Mainnet" ) ? true : false };
         const joReceipt = await imaTx.payedCall(
             details, ethersProvider,
             "ERC20", contract, "mint", arrArgumentsMint,
@@ -1947,7 +1948,8 @@ export async function mintErc721(
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
-        const opts: any = { isCheckTransactionToSchain: ( chainName !== "Mainnet" ) ? true : false };
+        const opts: any =
+            { isCheckTransactionToSchain: ( chainName !== "Mainnet" ) ? true : false };
         const joReceipt = await imaTx.payedCall(
             details, ethersProvider,
             "ERC721", contract, "mint", arrArgumentsMint,
@@ -2020,7 +2022,8 @@ export async function mintErc1155(
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
-        const opts: any = { isCheckTransactionToSchain: ( chainName !== "Mainnet" ) ? true : false };
+        const opts: any =
+            { isCheckTransactionToSchain: ( chainName !== "Mainnet" ) ? true : false };
         const joReceipt = await imaTx.payedCall(
             details, ethersProvider,
             "ERC1155", contract, "mint", arrArgumentsMint,
@@ -2089,7 +2092,8 @@ export async function burnErc20(
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
-        const opts: any = { isCheckTransactionToSchain: ( chainName !== "Mainnet" ) ? true : false };
+        const opts: any =
+            { isCheckTransactionToSchain: ( chainName !== "Mainnet" ) ? true : false };
         const joReceipt = await imaTx.payedCall(
             details, ethersProvider,
             "ERC20", contract, "burnFrom", arrArgumentsBurn,
@@ -2155,7 +2159,8 @@ export async function burnErc721(
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
-        const opts: any = { isCheckTransactionToSchain: ( chainName !== "Mainnet" ) ? true : false };
+        const opts: any =
+            { isCheckTransactionToSchain: ( chainName !== "Mainnet" ) ? true : false };
         const joReceipt = await imaTx.payedCall(
             details, ethersProvider,
             "ERC721", contract, "burn", arrArgumentsBurn,
@@ -2227,7 +2232,8 @@ export async function burnErc1155(
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
-        const opts: any = { isCheckTransactionToSchain: ( chainName !== "Mainnet" ) ? true : false };
+        const opts: any =
+            { isCheckTransactionToSchain: ( chainName !== "Mainnet" ) ? true : false };
         const joReceipt = await imaTx.payedCall(
             details, ethersProvider,
             "ERC1155", contract, "burn", arrArgumentsBurn,

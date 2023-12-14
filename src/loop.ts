@@ -38,12 +38,13 @@ import * as skaleObserver from "./observer.js";
 import * as pwa from "./pwa.js";
 import * as state from "./state.js";
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 const __dirname: string = path.dirname( url.fileURLToPath( import.meta.url ) );
 
 // Run transfer loop
 
 export function checkTimeFraming(
-    d: Date|null, strDirection: string, joRuntimeOpts: any ) : boolean {
+    d: Date | null, strDirection: string, joRuntimeOpts: any ): boolean {
     try {
         const imaState = state.get();
         if( imaState.nTimeFrameSeconds <= 0 || imaState.nNodesCount <= 1 )
@@ -252,20 +253,20 @@ async function singleTransferLoopPartS2M( optsLoop: any, strLogPrefix: string ) 
                     b2 = await IMA.doTransfer( // s-chain --> main-net
                         "S2M",
                         optsLoop.joRuntimeOpts,
-                        
+
                         imaState.chainProperties.sc.ethersProvider,
                         imaState.joMessageProxySChain,
                         imaState.chainProperties.sc.joAccount,
-                        
+
                         imaState.chainProperties.mn.ethersProvider,
                         imaState.joMessageProxyMainNet,
                         imaState.chainProperties.mn.joAccount,
-                        
+
                         imaState.chainProperties.sc.strChainName,
                         imaState.chainProperties.mn.strChainName,
                         imaState.chainProperties.sc.chainId,
                         imaState.chainProperties.mn.chainId,
-                        
+
                         imaState.joDepositBoxETH, // for logs validation on mainnet
                         null,
                         imaState.nTransferBlockSizeS2M,
@@ -521,7 +522,8 @@ export async function ensureHaveWorkers( opts: any ) {
         gArrWorkers.push( new threadInfo.Worker(
             path.join( __dirname, "loopWorker.js" ),
             { // "type": "module",
-            "workerData": workerData }
+                "workerData": workerData
+            }
         ) );
         gArrWorkers[idxWorker].on( "message", function( jo: any ) {
             if( networkLayer.outOfWorkerAPIs.onMessage( gArrWorkers[idxWorker], jo ) )
@@ -541,7 +543,8 @@ export async function ensureHaveWorkers( opts: any ) {
                     break;
                 }
                 aClient.errorLogicalInit = joMessage.error;
-                opts.details.critical( " Loop worker thread {} reported/returned init error: {err}",
+                opts.details.critical(
+                    " Loop worker thread {} reported/returned init error: {err}",
                     idxWorker, joMessage.error );
                 break;
             case "log":

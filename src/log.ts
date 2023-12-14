@@ -42,40 +42,41 @@ const getDurationString = cc.getDurationString;
 
 export { safeURL, replaceAll, timestampHR, capitalizeFirstLetter, getDurationString };
 
-export function autoEnableColorizationFromCommandLineArgs() : void {
-    return cc.autoEnableFromCommandLineArgs();
+export function autoEnableColorizationFromCommandLineArgs(): void {
+    cc.autoEnableFromCommandLineArgs()
 }
-export function enableColorization( bIsEnable?: boolean ) : void {
+export function enableColorization( bIsEnable?: boolean ): void {
     cc.enable( !!bIsEnable );
 }
-export function isEnabledColorization() : boolean {
+export function isEnabledColorization(): boolean {
     return ( !! ( cc.isEnabled() ) );
 }
 
-export function getPrintTimestamps() : boolean {
+export function getPrintTimestamps(): boolean {
     return gFlagLogWithTimeStamps;
 }
 
-export function setPrintTimestamps( b?: boolean ) : void {
+export function setPrintTimestamps( b?: boolean ): void {
     gFlagLogWithTimeStamps = ( !!b );
 }
 
-export function n2s( n: any, sz: number ) : string {
-    let s:string = "" + n;
+export function n2s( n: any, sz: number ): string {
+    let s: string = "" + n;
     while( s.length < sz )
         s = "0" + s;
     return s;
 }
 
-export function generateTimestampString( ts?: any, isColorized?: boolean ) : string {
+export function generateTimestampString( ts?: any, isColorized?: boolean ): string {
     isColorized =
         ( typeof isColorized == "undefined" )
             ? true : ( !!isColorized );
     ts = ( ts instanceof Date ) ? ts : new Date();
-    const ccDate = function( x?: any ) : string { return isColorized ? cc.date( x ) : x; };
-    const ccTime = function( x?: any ) : string { return isColorized ? cc.time( x ) : x; };
-    const ccFractionPartOfTime = function( x?: any ) : string { return isColorized ? cc.frac_time( x ) : x; };
-    const ccBright = function( x?: any ) : string { return isColorized ? cc.bright( x ) : x; };
+    const ccDate = function( x?: any ): string { return isColorized ? cc.date( x ) : x; }
+    const ccTime = function( x?: any ): string { return isColorized ? cc.time( x ) : x; }
+    const ccFractionPartOfTime =
+        function( x?: any ): string { return isColorized ? cc.fracTime( x ) : x; }
+    const ccBright = function( x?: any ): string { return isColorized ? cc.bright( x ) : x; }
     const s =
         "" + ccDate( n2s( ts.getUTCFullYear(), 4 ) ) +
         ccBright( "-" ) + ccDate( n2s( ts.getUTCMonth() + 1, 2 ) ) +
@@ -83,16 +84,16 @@ export function generateTimestampString( ts?: any, isColorized?: boolean ) : str
         " " + ccTime( n2s( ts.getUTCHours(), 2 ) ) +
         ccBright( ":" ) + ccTime( n2s( ts.getUTCMinutes(), 2 ) ) +
         ccBright( ":" ) + ccTime( n2s( ts.getUTCSeconds(), 2 ) ) +
-        ccBright( "." ) + ccFractionPartOfTime( n2s( ts.getUTCMilliseconds(), 3 ) )
-        ;
+        ccBright( "." ) + ccFractionPartOfTime( n2s( ts.getUTCMilliseconds(), 3 ) );
+
     return s;
 }
 
-export function generateTimestampPrefix( ts?: any, isColorized?: boolean ) : string {
+export function generateTimestampPrefix( ts?: any, isColorized?: boolean ): string {
     return generateTimestampString( ts, isColorized ) + cc.bright( ":" ) + " ";
 }
 
-export function removeAllStreams() : void {
+export function removeAllStreams(): void {
     let i = 0; let cnt = 0;
     try {
         cnt = gArrStreams.length;
@@ -108,7 +109,7 @@ export function removeAllStreams() : void {
     gArrStreams = [];
 }
 
-export function getStreamWithFilePath( strFilePath: string ) : any {
+export function getStreamWithFilePath( strFilePath: string ): any {
     try {
         let i = 0; const cnt = gArrStreams.length;
         for( i = 0; i < cnt; ++i ) {
@@ -124,7 +125,7 @@ export function getStreamWithFilePath( strFilePath: string ) : any {
     return null;
 }
 
-export function createStandardOutputStream() : any {
+export function createStandardOutputStream(): any {
     try {
         const objEntry: any = {
             "id": gIdentifierAllocatorCounter ++,
@@ -135,7 +136,7 @@ export function createStandardOutputStream() : any {
             "haveOwnTimestamps": false,
             "isPausedTimeStamps": false,
             "strOwnIndent": "",
-            "write": function( ...args: any[] ) : void {
+            "write": function( ...args: any[] ): void {
                 let s = ( this.strOwnIndent ? this.strOwnIndent : "" ) +
                     ( ( this.haveOwnTimestamps && ( !this.isPausedTimeStamps ) )
                         ? generateTimestampPrefix( null, true ) : "" );
@@ -145,7 +146,7 @@ export function createStandardOutputStream() : any {
                         this.objStream.write( s );
                 } catch ( err ) { }
             },
-            "writeRaw": function( ...args: any[] ) : void {
+            "writeRaw": function( ...args: any[] ): void {
                 const s = fmtArgumentsArray( args );
                 try {
                     if( this.objStream && s.length > 0 )
@@ -156,63 +157,63 @@ export function createStandardOutputStream() : any {
             "open": function() { try { this.objStream = process.stdout; } catch ( err ) { } },
             "size": function() { return 0; },
             "rotate": function( nBytesToWrite: number ) { },
-            "toString": function() : string { return "" + this.strFilePath; },
+            "toString": function(): string { return "" + this.strFilePath; },
             "exposeDetailsTo":
-                function( otherStream: any, strTitle: string, isSuccess: boolean ) : void { },
+                function( otherStream: any, strTitle: string, isSuccess: boolean ): void { },
             // high-level formatters
-            "fatal": function( ...args: any[] ) : void {
+            "fatal": function( ...args: any[] ): void {
                 if( verboseGet() >= verboseName2Number( "fatal" ) )
                     this.write( getLogLinePrefixFatal() + fmtFatal( ...args ) );
             },
-            "critical": function( ...args: any[] ) : void {
+            "critical": function( ...args: any[] ): void {
                 if( verboseGet() >= verboseName2Number( "critical" ) ) {
                     this.write(
                         getLogLinePrefixCritical() + fmtCritical( ...args ) );
                 }
             },
-            "error": function( ...args: any[] ) : void {
+            "error": function( ...args: any[] ): void {
                 if( verboseGet() >= verboseName2Number( "error" ) )
                     this.write( getLogLinePrefixError() + fmtError( ...args ) );
             },
-            "warning": function( ...args: any[] ) : void {
+            "warning": function( ...args: any[] ): void {
                 if( verboseGet() >= verboseName2Number( "warning" ) )
                     this.write( getLogLinePrefixWarning() + fmtWarning( ...args ) );
             },
-            "attention": function( ...args: any[] ) : void {
+            "attention": function( ...args: any[] ): void {
                 if( verboseGet() >= verboseName2Number( "attention" ) ) {
                     this.write(
                         getLogLinePrefixAttention() + fmtAttention( ...args ) );
                 }
             },
-            "information": function( ...args: any[] ) : void {
+            "information": function( ...args: any[] ): void {
                 if( verboseGet() >= verboseName2Number( "information" ) ) {
                     this.write(
                         getLogLinePrefixInformation() + fmtInformation( ...args ) );
                 }
             },
-            "info": function( ...args: any[] ) : void {
+            "info": function( ...args: any[] ): void {
                 if( verboseGet() >= verboseName2Number( "information" ) ) {
                     this.write(
                         getLogLinePrefixInformation() + fmtInformation( ...args ) );
                 }
             },
-            "notice": function( ...args: any[] ) : void {
+            "notice": function( ...args: any[] ): void {
                 if( verboseGet() >= verboseName2Number( "notice" ) )
                     this.write( getLogLinePrefixNotice() + fmtNotice( ...args ) );
             },
-            "note": function( ...args: any[] ) : void {
+            "note": function( ...args: any[] ): void {
                 if( verboseGet() >= verboseName2Number( "notice" ) )
                     this.write( getLogLinePrefixNote() + fmtNote( ...args ) );
             },
-            "debug": function( ...args: any[] ) : void {
+            "debug": function( ...args: any[] ): void {
                 if( verboseGet() >= verboseName2Number( "debug" ) )
                     this.write( getLogLinePrefixDebug() + fmtDebug( ...args ) );
             },
-            "trace": function( ...args: any[] ) : void {
+            "trace": function( ...args: any[] ): void {
                 if( verboseGet() >= verboseName2Number( "trace" ) )
                     this.write( getLogLinePrefixTrace() + fmtTrace( ...args ) );
             },
-            "success": function( ...args: any[] ) : void {
+            "success": function( ...args: any[] ): void {
                 if( verboseGet() >= verboseName2Number( "information" ) )
                     this.write( getLogLinePrefixSuccess() + fmtSuccess( ...args ) );
             }
@@ -224,7 +225,7 @@ export function createStandardOutputStream() : any {
     return null;
 }
 
-export function insertStandardOutputStream() : boolean {
+export function insertStandardOutputStream(): boolean {
     let objEntry = getStreamWithFilePath( "stdout" );
     if( objEntry !== null )
         return true;
@@ -235,7 +236,7 @@ export function insertStandardOutputStream() : boolean {
     return true;
 }
 
-export function createMemoryOutputStream() : any {
+export function createMemoryOutputStream(): any {
     try {
         const objEntry: any = {
             "id": gIdentifierAllocatorCounter ++,
@@ -262,7 +263,7 @@ export function createMemoryOutputStream() : any {
                     return true;
                 return false;
             },
-            "write": function( ...args: any[] ) : void {
+            "write": function( ...args: any[] ): void {
                 const s = fmtArgumentsArray( args );
                 const arr = s.split( "\n" );
                 for( let i = 0; i < arr.length; ++ i ) {
@@ -277,7 +278,7 @@ export function createMemoryOutputStream() : any {
                     this.arrAccumulatedLogTextLines.push( strHeader + strLine + "\n" );
                 }
             },
-            "writeRaw": function( ...args: any[] ) : void {
+            "writeRaw": function( ...args: any[] ): void {
                 const s = fmtArgumentsArray( args );
                 const arr = s.split( "\n" );
                 for( let i = 0; i < arr.length; ++ i ) {
@@ -289,14 +290,16 @@ export function createMemoryOutputStream() : any {
             "close": function() { this.clear(); },
             "open": function() { this.clear(); },
             "size": function() { return 0; },
-            "rotate": function( nBytesToWrite: number ) { this.this.arrAccumulatedLogTextLines = []; },
-            "toString": function() : string {
+            "rotate":
+            function( nBytesToWrite: number ) { this.this.arrAccumulatedLogTextLines = []; },
+            "toString": function(): string {
                 let s = "";
                 for( let i = 0; i < this.arrAccumulatedLogTextLines.length; ++ i )
                     s += this.arrAccumulatedLogTextLines[i];
                 return s;
             },
-            "exposeDetailsTo": function( otherStream: any, strTitle: string, isSuccess: boolean ) : void {
+            "exposeDetailsTo":
+            function( otherStream: any, strTitle: string, isSuccess: boolean ): void {
                 if( ! ( this.arrAccumulatedLogTextLines &&
                     this.arrAccumulatedLogTextLines.length > 0 ) )
                     return;
@@ -336,57 +339,57 @@ export function createMemoryOutputStream() : any {
                 }
             },
             // high-level formatters
-            "fatal": function( ...args: any[] ) : void {
+            "fatal": function( ...args: any[] ): void {
                 if( verboseGet() >= verboseName2Number( "fatal" ) )
                     this.write( getLogLinePrefixFatal() + fmtFatal( ...args ) );
             },
-            "critical": function( ...args: any[] ) : void {
+            "critical": function( ...args: any[] ): void {
                 if( verboseGet() >= verboseName2Number( "critical" ) )
                     this.write( getLogLinePrefixCritical() + fmtCritical( ...args ) );
             },
-            "error": function( ...args: any[] ) : void {
+            "error": function( ...args: any[] ): void {
                 if( verboseGet() >= verboseName2Number( "error" ) )
                     this.write( getLogLinePrefixError() + fmtError( ...args ) );
             },
-            "warning": function( ...args: any[] ) : void {
+            "warning": function( ...args: any[] ): void {
                 if( verboseGet() >= verboseName2Number( "warning" ) )
                     this.write( getLogLinePrefixWarning() + fmtWarning( ...args ) );
             },
-            "attention": function( ...args: any[] ) : void {
+            "attention": function( ...args: any[] ): void {
                 if( verboseGet() >= verboseName2Number( "attention" ) ) {
                     this.write(
                         getLogLinePrefixAttention() + fmtAttention( ...args ) );
                 }
             },
-            "information": function( ...args: any[] ) : void {
+            "information": function( ...args: any[] ): void {
                 if( verboseGet() >= verboseName2Number( "information" ) ) {
                     this.write(
                         getLogLinePrefixInformation() + fmtInformation( ...args ) );
                 }
             },
-            "info": function( ...args: any[] ) : void {
+            "info": function( ...args: any[] ): void {
                 if( verboseGet() >= verboseName2Number( "information" ) ) {
                     this.write(
                         getLogLinePrefixInformation() + fmtInformation( ...args ) );
                 }
             },
-            "notice": function( ...args: any[] ) : void {
+            "notice": function( ...args: any[] ): void {
                 if( verboseGet() >= verboseName2Number( "notice" ) )
                     this.write( getLogLinePrefixNotice() + fmtNotice( ...args ) );
             },
-            "note": function( ...args: any[] ) : void {
+            "note": function( ...args: any[] ): void {
                 if( verboseGet() >= verboseName2Number( "notice" ) )
                     this.write( getLogLinePrefixNote() + fmtNote( ...args ) );
             },
-            "debug": function( ...args: any[] ) : void {
+            "debug": function( ...args: any[] ): void {
                 if( verboseGet() >= verboseName2Number( "debug" ) )
                     this.write( getLogLinePrefixDebug() + fmtDebug( ...args ) );
             },
-            "trace": function( ...args: any[] ) : void {
+            "trace": function( ...args: any[] ): void {
                 if( verboseGet() >= verboseName2Number( "trace" ) )
                     this.write( getLogLinePrefixTrace() + fmtTrace( ...args ) );
             },
-            "success": function( ...args: any[] ) : void {
+            "success": function( ...args: any[] ): void {
                 if( verboseGet() >= verboseName2Number( "information" ) )
                     this.write( getLogLinePrefixSuccess() + fmtSuccess( ...args ) );
             }
@@ -398,7 +401,7 @@ export function createMemoryOutputStream() : any {
     return null;
 }
 
-export function insertMemoryOutputStream() : boolean {
+export function insertMemoryOutputStream(): boolean {
     let objEntry = getStreamWithFilePath( "memory" );
     if( objEntry !== null )
         return true;
@@ -410,7 +413,7 @@ export function insertMemoryOutputStream() : boolean {
 }
 
 export function createFileOutput(
-    strFilePath: string, nMaxSizeBeforeRotation?: number, nMaxFilesCount?: number ) : any {
+    strFilePath: string, nMaxSizeBeforeRotation?: number, nMaxFilesCount?: number ): any {
     try {
         const objEntry: any = {
             "id": gIdentifierAllocatorCounter ++,
@@ -421,7 +424,7 @@ export function createFileOutput(
             "haveOwnTimestamps": false,
             "isPausedTimeStamps": false,
             "strOwnIndent": "",
-            "write": function( ...args: any[] ) : void {
+            "write": function( ...args: any[] ): void {
                 let s = ( this.strOwnIndent ? this.strOwnIndent : "" ) +
                     ( ( this.haveOwnTimestamps && ( !this.isPausedTimeStamps ) )
                         ? generateTimestampPrefix( null, true ) : "" );
@@ -433,7 +436,7 @@ export function createFileOutput(
                     }
                 } catch ( err ) { }
             },
-            "writeRaw": function( ...args: any[] ) : void {
+            "writeRaw": function( ...args: any[] ): void {
                 const s = fmtArgumentsArray( args );
                 try {
                     if( s.length > 0 ) {
@@ -464,7 +467,7 @@ export function createFileOutput(
                     const nNextSize = nFileSize + nBytesToWrite;
                     if( nNextSize <= this.nMaxSizeBeforeRotation ) {
                         this.open();
-                        return;
+                        return
                     }
                     let i = 0; const cnt = 0 + this.nMaxFilesCount;
                     for( i = 0; i < cnt; ++i ) {
@@ -485,63 +488,63 @@ export function createFileOutput(
                 } catch ( err ) {
                 }
             },
-            "toString": function() : string { return "" + strFilePath; },
+            "toString": function(): string { return "" + strFilePath; },
             "exposeDetailsTo":
-                function( otherStream: any, strTitle: string, isSuccess: boolean ) : void { },
+                function( otherStream: any, strTitle: string, isSuccess: boolean ): void { },
             // high-level formatters
-            "fatal": function( ...args: any[] ) : void {
+            "fatal": function( ...args: any[] ): void {
                 if( verboseGet() >= verboseName2Number( "fatal" ) )
                     this.write( getLogLinePrefixFatal() + fmtFatal( ...args ) );
             },
-            "critical": function( ...args: any[] ) : void {
+            "critical": function( ...args: any[] ): void {
                 if( verboseGet() >= verboseName2Number( "critical" ) ) {
                     this.write(
                         getLogLinePrefixCritical() + fmtCritical( ...args ) );
                 }
             },
-            "error": function( ...args: any[] ) : void {
+            "error": function( ...args: any[] ): void {
                 if( verboseGet() >= verboseName2Number( "error" ) )
                     this.write( getLogLinePrefixError() + fmtError( ...args ) );
             },
-            "warning": function( ...args: any[] ) : void {
+            "warning": function( ...args: any[] ): void {
                 if( verboseGet() >= verboseName2Number( "warning" ) )
                     this.write( getLogLinePrefixWarning() + fmtWarning( ...args ) );
             },
-            "attention": function( ...args: any[] ) : void {
+            "attention": function( ...args: any[] ): void {
                 if( verboseGet() >= verboseName2Number( "attention" ) ) {
                     this.write(
                         getLogLinePrefixAttention() + fmtAttention( ...args ) );
                 }
             },
-            "information": function( ...args: any[] ) : void {
+            "information": function( ...args: any[] ): void {
                 if( verboseGet() >= verboseName2Number( "information" ) ) {
                     this.write(
                         getLogLinePrefixInformation() + fmtInformation( ...args ) );
                 }
             },
-            "info": function( ...args: any[] ) : void {
+            "info": function( ...args: any[] ): void {
                 if( verboseGet() >= verboseName2Number( "information" ) ) {
                     this.write(
                         getLogLinePrefixInformation() + fmtInformation( ...args ) );
                 }
             },
-            "notice": function( ...args: any[] ) : void {
+            "notice": function( ...args: any[] ): void {
                 if( verboseGet() >= verboseName2Number( "notice" ) )
                     this.write( getLogLinePrefixNotice() + fmtNotice( ...args ) );
             },
-            "note": function( ...args: any[] ) : void {
+            "note": function( ...args: any[] ): void {
                 if( verboseGet() >= verboseName2Number( "notice" ) )
                     this.write( getLogLinePrefixNote() + fmtNote( ...args ) );
             },
-            "debug": function( ...args: any[] ) : void {
+            "debug": function( ...args: any[] ): void {
                 if( verboseGet() >= verboseName2Number( "debug" ) )
                     this.write( getLogLinePrefixDebug() + fmtDebug( ...args ) );
             },
-            "trace": function( ...args: any[] ) : void {
+            "trace": function( ...args: any[] ): void {
                 if( verboseGet() >= verboseName2Number( "trace" ) )
                     this.write( getLogLinePrefixTrace() + fmtTrace( ...args ) );
             },
-            "success": function( ...args: any[] ) : void {
+            "success": function( ...args: any[] ): void {
                 if( verboseGet() >= verboseName2Number( "information" ) )
                     this.write( getLogLinePrefixSuccess() + fmtSuccess( ...args ) );
             }
@@ -557,7 +560,7 @@ export function createFileOutput(
     return null;
 }
 export function insertFileOutput(
-    strFilePath: string, nMaxSizeBeforeRotation?: number, nMaxFilesCount?: number ) : any {
+    strFilePath: string, nMaxSizeBeforeRotation?: number, nMaxFilesCount?: number ): any {
     let objEntry = getStreamWithFilePath( "" + strFilePath );
     if( objEntry !== null )
         return true;
@@ -568,14 +571,14 @@ export function insertFileOutput(
     return true;
 }
 
-export function extractErrorMessage( jo?: any, strDefaultErrorText?: string ) : string {
+export function extractErrorMessage( jo?: any, strDefaultErrorText?: string ): string {
     strDefaultErrorText = strDefaultErrorText || "unknown error or error without a description";
     if( ! jo )
         return strDefaultErrorText;
     try {
-        const isError = function( err: Error|string ) {
+        const isError = function( err: Error | string ) {
             return err && err instanceof Error && err.stack && err.message;
-        };
+        }
         if( ! isError( jo ) ) {
             if( "error" in jo ) {
                 jo = jo.error;
@@ -596,7 +599,7 @@ export function extractErrorMessage( jo?: any, strDefaultErrorText?: string ) : 
     return strDefaultErrorText;
 }
 
-function tryToSplitFormatString( strFormat?: string, cntArgsMax?: number ) : any[]|null {
+function tryToSplitFormatString( strFormat?: string, cntArgsMax?: number ): any[] | null {
     if( !( strFormat && typeof strFormat == "string" ) )
         return null;
     if( ! cntArgsMax )
@@ -629,12 +632,12 @@ function tryToSplitFormatString( strFormat?: string, cntArgsMax?: number ) : any
     return arrParts;
 }
 
-export function fmtArgumentsArray( arrArgs: any[], fnFormatter?: any ) : string {
-    fnFormatter = fnFormatter || function( arg: any ) { return arg; };
+export function fmtArgumentsArray( arrArgs: any[], fnFormatter?: any ): string {
+    fnFormatter = fnFormatter || function( arg: any ) { return arg; }
     const arrParts = ( arrArgs && arrArgs.length > 0 )
         ? tryToSplitFormatString( arrArgs[0], arrArgs.length - 1 ) : null;
     let s = "", isValueMode = false;
-    const fnDefaultOneArgumentFormatter = function( arg?: any, fnCustomFormatter?: any ) : string {
+    const fnDefaultOneArgumentFormatter = function( arg?: any, fnCustomFormatter?: any ): string {
         if( ! fnCustomFormatter )
             fnCustomFormatter = fnFormatter;
         const t = typeof arg;
@@ -648,8 +651,8 @@ export function fmtArgumentsArray( arrArgs: any[], fnFormatter?: any ) : string 
         } else
             return cc.logArgToString( arg );
         return arg;
-    };
-    const fnFormatOneArgument = function( arg: any, fmt?: any ) : string {
+    }
+    const fnFormatOneArgument = function( arg: any, fmt?: any ): string {
         if( ! arg )
             return arg;
         if( arg == " " || arg == "\n" )
@@ -681,7 +684,7 @@ export function fmtArgumentsArray( arrArgs: any[], fnFormatter?: any ) : string 
                 return fnDefaultOneArgumentFormatter( arg, cc.rainbow );
         }
         return v( arg );
-    };
+    }
     try {
         let idxArgNextPrinted = 0;
         if( arrParts && arrParts.length > 0 ) {
@@ -693,7 +696,7 @@ export function fmtArgumentsArray( arrArgs: any[], fnFormatter?: any ) : string 
                     if( idxArgNextPrinted < arrArgs.length )
                         s += fnFormatOneArgument( arrArgs[idxArgNextPrinted], joPart.text );
                     ++ idxArgNextPrinted;
-                    continue;
+                    continue
                 }
                 // assume joPart.type == "text" always here, at this point
                 if( ! cc.isStringAlreadyColorized( joPart.text ) )
@@ -713,7 +716,7 @@ export function fmtArgumentsArray( arrArgs: any[], fnFormatter?: any ) : string 
     return s;
 }
 
-export function outputStringToAllStreams( s: string ) : void {
+export function outputStringToAllStreams( s: string ): void {
     try {
         if( s.length <= 0 )
             return;
@@ -729,160 +732,160 @@ export function outputStringToAllStreams( s: string ) : void {
     }
 }
 
-export function write( ...args: any[] ) : void {
+export function write( ...args: any[] ): void {
     let s: string = getPrintTimestamps() ? generateTimestampPrefix( null, true ) : "";
     s += fmtArgumentsArray( args );
     outputStringToAllStreams( s );
 }
-export function writeRaw( ...args: any[] ) : void {
+export function writeRaw( ...args: any[] ): void {
     const s: string = fmtArgumentsArray( args );
     outputStringToAllStreams( s );
 }
 
-export function getLogLinePrefixFatal() : string {
+export function getLogLinePrefixFatal(): string {
     return cc.fatal( "FATAL ERROR:" ) + " ";
 }
-export function getLogLinePrefixCritical() : string {
+export function getLogLinePrefixCritical(): string {
     return cc.fatal( "CRITICAL ERROR:" ) + " ";
 }
-export function getLogLinePrefixError() : string {
+export function getLogLinePrefixError(): string {
     return cc.fatal( "ERROR:" ) + " ";
 }
-export function getLogLinePrefixWarning() : string {
+export function getLogLinePrefixWarning(): string {
     return cc.error( "WARNING:" ) + " ";
 }
-export function getLogLinePrefixAttention() : string {
+export function getLogLinePrefixAttention(): string {
     return "";
 }
-export function getLogLinePrefixInformation() : string {
+export function getLogLinePrefixInformation(): string {
     return "";
 }
-export function getLogLinePrefixNotice() : string {
+export function getLogLinePrefixNotice(): string {
     return "";
 }
-export function getLogLinePrefixNote() : string {
+export function getLogLinePrefixNote(): string {
     return "";
 }
-export function getLogLinePrefixDebug() : string {
+export function getLogLinePrefixDebug(): string {
     return "";
 }
-export function getLogLinePrefixTrace() : string {
+export function getLogLinePrefixTrace(): string {
     return "";
 }
-export function getLogLinePrefixSuccess() : string {
+export function getLogLinePrefixSuccess(): string {
     return "";
 }
 
 // high-level format to returned string
-export function fmtFatal( ...args: any[] ) : string {
+export function fmtFatal( ...args: any[] ): string {
     return fmtArgumentsArray( args, cc.error );
 }
-export function fmtCritical( ...args: any[] ) : string {
+export function fmtCritical( ...args: any[] ): string {
     return fmtArgumentsArray( args, cc.error );
 }
-export function fmtError( ...args: any[] ) : string {
+export function fmtError( ...args: any[] ): string {
     return fmtArgumentsArray( args, cc.error );
 }
-export function fmtWarning( ...args: any[] ) : string {
+export function fmtWarning( ...args: any[] ): string {
     return fmtArgumentsArray( args, cc.warning );
 }
-export function fmtAttention( ...args: any[] ) : string {
+export function fmtAttention( ...args: any[] ): string {
     return fmtArgumentsArray( args, cc.attention );
 }
-export function fmtInformation( ...args: any[] ) : string {
+export function fmtInformation( ...args: any[] ): string {
     return fmtArgumentsArray( args, cc.info );
 }
-export function fmtInfo( ...args: any[] ) : string {
+export function fmtInfo( ...args: any[] ): string {
     return fmtArgumentsArray( args, cc.info );
 }
-export function fmtNotice( ...args: any[] ) : string {
+export function fmtNotice( ...args: any[] ): string {
     return fmtArgumentsArray( args, cc.notice );
 }
-export function fmtNote( ...args: any[] ) : string {
+export function fmtNote( ...args: any[] ): string {
     return fmtArgumentsArray( args, cc.note );
 }
-export function fmtDebug( ...args: any[] ) : string {
+export function fmtDebug( ...args: any[] ): string {
     return fmtArgumentsArray( args, cc.debug );
 }
-export function fmtTrace( ...args: any[] ) : string {
+export function fmtTrace( ...args: any[] ): string {
     return fmtArgumentsArray( args, cc.trace );
 }
-export function fmtSuccess( ...args: any[] ) : string {
+export function fmtSuccess( ...args: any[] ): string {
     return fmtArgumentsArray( args, cc.success );
 }
 
 // high-level formatted output
-export function fatal( ...args: any[] ) : void {
+export function fatal( ...args: any[] ): void {
     if( verboseGet() >= verboseName2Number( "fatal" ) )
         write( getLogLinePrefixFatal() + fmtFatal( ...args ) + "\n" );
 }
-export function critical( ...args: any[] ) : void {
+export function critical( ...args: any[] ): void {
     if( verboseGet() >= verboseName2Number( "critical" ) )
         write( getLogLinePrefixCritical() + fmtCritical( ...args ) + "\n" );
 }
-export function error( ...args: any[] ) : void {
+export function error( ...args: any[] ): void {
     if( verboseGet() >= verboseName2Number( "error" ) )
         write( getLogLinePrefixError() + fmtError( ...args ) + "\n" );
 }
-export function warning( ...args: any[] ) : void {
+export function warning( ...args: any[] ): void {
     if( verboseGet() >= verboseName2Number( "warning" ) )
         write( getLogLinePrefixWarning() + fmtWarning( ...args ) + "\n" );
 }
-export function attention( ...args: any[] ) : void {
+export function attention( ...args: any[] ): void {
     if( verboseGet() >= verboseName2Number( "attention" ) )
         write( getLogLinePrefixAttention() + fmtAttention( ...args ) + "\n" );
 }
-export function information( ...args: any[] ) : void {
+export function information( ...args: any[] ): void {
     if( verboseGet() >= verboseName2Number( "information" ) )
         write( getLogLinePrefixInformation() + fmtInformation( ...args ) + "\n" );
 }
-export function info( ...args: any[] ) : void {
+export function info( ...args: any[] ): void {
     if( verboseGet() >= verboseName2Number( "information" ) )
         write( getLogLinePrefixInformation() + fmtInformation( ...args ) + "\n" );
 }
-export function notice( ...args: any[] ) : void {
+export function notice( ...args: any[] ): void {
     if( verboseGet() >= verboseName2Number( "notice" ) )
         write( getLogLinePrefixNotice() + fmtNotice( ...args ) + "\n" );
 }
-export function note( ...args: any[] ) : void {
+export function note( ...args: any[] ): void {
     if( verboseGet() >= verboseName2Number( "notice" ) )
         write( getLogLinePrefixNote() + fmtNote( ...args ) + "\n" );
 }
-export function debug( ...args: any[] ) : void {
+export function debug( ...args: any[] ): void {
     if( verboseGet() >= verboseName2Number( "debug" ) )
         write( getLogLinePrefixDebug() + fmtDebug( ...args ) + "\n" );
 }
-export function trace( ...args: any[] ) : void {
+export function trace( ...args: any[] ): void {
     if( verboseGet() >= verboseName2Number( "trace" ) )
         write( getLogLinePrefixTrace() + fmtTrace( ...args ) + "\n" );
 }
-export function success( ...args: any[] ) : void {
+export function success( ...args: any[] ): void {
     if( verboseGet() >= verboseName2Number( "information" ) )
         write( getLogLinePrefixSuccess() + fmtSuccess( ...args ) + "\n" );
 }
 
-export function removeAll() : void {
+export function removeAll(): void {
     removeAllStreams();
 }
 
-export function addStdout() : boolean {
+export function addStdout(): boolean {
     return insertStandardOutputStream();
 }
 
-export function addMemory() : boolean {
+export function addMemory(): boolean {
     return insertMemoryOutputStream();
 }
 
-export function createMemoryStream() : any {
+export function createMemoryStream(): any {
     return createMemoryOutputStream();
 }
 
 export function add(
-    strFilePath: string, nMaxSizeBeforeRotation?: number, nMaxFilesCount?: number ) : boolean {
+    strFilePath: string, nMaxSizeBeforeRotation?: number, nMaxFilesCount?: number ): boolean {
     if( ! nMaxSizeBeforeRotation )
         nMaxSizeBeforeRotation = 0;
     if( ! nMaxFilesCount )
-    nMaxFilesCount = 0;
+        nMaxFilesCount = 0;
     return insertFileOutput(
         strFilePath,
         ( nMaxSizeBeforeRotation <= 0 ) ? -1 : nMaxSizeBeforeRotation,
@@ -890,20 +893,20 @@ export function add(
     );
 }
 
-export function close() : void {
+export function close(): void {
     // for compatibility with created streams
 }
 
-export function exposeDetailsTo( otherStream: any, strTitle: string, isSuccess: boolean ) : void {
+export function exposeDetailsTo( otherStream: any, strTitle: string, isSuccess: boolean ): void {
     // for compatibility with created streams
 }
 
-export function toString() : string {
+export function toString(): string {
     // for compatibility with created streams
     return "";
 }
 
-const gMapVerbose : Map < number, string > = new Map < number, string > ();
+const gMapVerbose: Map < number, string > = new Map < number, string >();
 gMapVerbose.set( 0, "silent" );
 gMapVerbose.set( 1, "fatal" );
 gMapVerbose.set( 2, "critical" );
@@ -916,7 +919,7 @@ gMapVerbose.set( 8, "debug" );
 gMapVerbose.set( 9, "trace" );
 
 function computeVerboseAlias() {
-    const m: Map < string, number > = new Map < string, number > ();
+    const m: Map < string, number > = new Map < string, number >();
     for( const [ key, val ] of gMapVerbose ) {
         const name = val;
         if( name )
@@ -936,15 +939,15 @@ function computeVerboseAlias() {
     m.set( "detailed", m.get( "trace" ) || 0 ); // alias
     return m;
 }
-let gMapReversedVerbose: Map < string, number > = new Map < string, number > ();
+let gMapReversedVerbose: Map < string, number > = new Map < string, number >();
 
-export function verbose() : any { return gMapVerbose; }
-export function verboseReversed() : Map < string, number > {
+export function verbose(): any { return gMapVerbose; }
+export function verboseReversed(): Map < string, number > {
     if( ! gMapReversedVerbose )
         gMapReversedVerbose = computeVerboseAlias();
     return gMapReversedVerbose;
 }
-export function verboseLevelAsTextForLog( vl: any ) : string {
+export function verboseLevelAsTextForLog( vl: any ): string {
     if( typeof vl == "undefined" )
         vl = verboseGet();
     if( vl in gMapVerbose ) {
@@ -953,9 +956,9 @@ export function verboseLevelAsTextForLog( vl: any ) : string {
     }
     return "unknown(" + JSON.stringify( vl ) + ")";
 }
-export function verboseName2Number( s: string ) : number {
+export function verboseName2Number( s: string ): number {
     const mapReversedVerbose: Map < string, number > = verboseReversed();
-    let n = mapReversedVerbose.get( s );
+    const n = mapReversedVerbose.get( s )
     if( typeof n == "undefined" )
         return 9;
     return n;
@@ -971,14 +974,14 @@ export function exposeDetailsSet( isExpose: any ) {
     gFlagIsExposeDetails = ( !!isExpose );
 }
 
-export function verboseGet() : number {
+export function verboseGet(): number {
     return 0 + gVerboseLevel;
 }
-export function verboseSet( vl?: any ) : void {
+export function verboseSet( vl?: any ): void {
     gVerboseLevel = parseInt( vl );
 }
 
-export function verboseParse( s: string ) : number {
+export function verboseParse( s: string ): number {
     let n: number = 5;
     try {
         const isNumbersOnly = /^\d+$/.test( s );
@@ -988,7 +991,7 @@ export function verboseParse( s: string ) : number {
             const ch0 = s[0].toLowerCase();
             for( const [ key, val ] of gMapVerbose ) {
                 const name = val;
-                const ch1:string = name[0].toLowerCase();
+                const ch1: string = name[0].toLowerCase();
                 if( ch0 == ch1 ) {
                     n = key;
                     return n;
@@ -999,38 +1002,38 @@ export function verboseParse( s: string ) : number {
     return n;
 }
 
-export function verboseList() : void {
+export function verboseList(): void {
     for( const [ key, val ] of gMapVerbose ) {
         const name = val;
         console.log( "    " + cc.j( key ) + cc.sunny( "=" ) + cc.bright( name ) );
     }
 }
 
-export function u( x?: any ) : string {
+export function u( x?: any ): string {
     return cc.isStringAlreadyColorized( x ) ? x : cc.u( x );
 }
 
-export function v( x?: any ) : string {
+export function v( x?: any ): string {
     return cc.isStringAlreadyColorized( x ) ? x : cc.j( x );
 }
 
-export function em( x?: any ) : string {
+export function em( x?: any ): string {
     return cc.isStringAlreadyColorized( x ) ? x : cc.warning( x );
 }
 
-export function stack( err?: any ) : string {
+export function stack( err?: any ): string {
     return cc.stack( err );
 }
 
-export function onOff( x?: any ) : string {
+export function onOff( x?: any ): string {
     return cc.isStringAlreadyColorized( x ) ? x : cc.onOff( x );
 }
 
-export function yn( x?: any ) : string {
+export function yn( x?: any ): string {
     return cc.isStringAlreadyColorized( x ) ? x : cc.yn( x );
 }
 
-export function posNeg( condition: any, strPositive: string, strNegative: string ) : string {
+export function posNeg( condition: any, strPositive: string, strNegative: string ): string {
     return condition
         ? ( cc.isStringAlreadyColorized( strPositive ) ? strPositive : cc.success( strPositive ) )
         : ( cc.isStringAlreadyColorized( strNegative ) ? strNegative : cc.error( strNegative ) );

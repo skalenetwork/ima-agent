@@ -38,7 +38,7 @@ const gBigNum2: any = owaspUtils.toBN( 2 );
 const gBigNum256: any = owaspUtils.toBN( 256 );
 const gBigNumUpperPart: any = gBigNum2.pow( gBigNum256 ).sub( gBigNum1 );
 
-function getUtcTimestampString( d?: Date ) : string {
+function getUtcTimestampString( d?: Date ): string {
     d = d || new Date(); // use now time if d is not specified
     const nUtcUnixTimeStampWithMilliseconds = d.getTime();
     const t = "" + nUtcUnixTimeStampWithMilliseconds;
@@ -91,7 +91,7 @@ async function handleOracleCheckResultResult(
         if( isVerboseTraceDetails )
             details.error( "Bad unexpected result in oracle_checkResult" );
         await joCall.disconnect();
-        return;
+        return
     }
     const joResult: any = JSON.parse( joOut.result );
     if( isVerboseTraceDetails )
@@ -139,7 +139,7 @@ async function handleOracleSubmitRequestResult(
                 details.debug( "RPC call(oracle_checkResult) is {}", joIn );
             }
             gp = null;
-            joOut= await joCall.call( joIn );
+            joOut = await joCall.call( joIn );
             gp = await handleOracleCheckResultResult(
                 oracleOpts, details, isVerboseTraceDetails, joCall, joIn, joOut );
             if( gp )

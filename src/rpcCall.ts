@@ -34,7 +34,7 @@ const gSecondsConnectionTimeout = 60;
 
 export async function waitWebSocketIsOpen( socket: any, fnDone: any, fnStep: any ) {
     fnDone = fnDone || async function( nStep: number ) {};
-    fnDone = fnStep || async function( nStep: number ) { return true; };
+    fnDone = fnStep || async function( nStep: number ) { return true; }
     let nStep = 0;
     const promiseComplete = new Promise( function( resolve, reject ) {
         let isInsideAsyncHandler = false;
@@ -56,7 +56,7 @@ export async function waitWebSocketIsOpen( socket: any, fnDone: any, fnStep: any
                 }
             }
             isInsideAsyncHandler = false;
-        };
+        }
         const iv = setInterval( function() {
             if( isInsideAsyncHandler )
                 return;
@@ -100,7 +100,7 @@ export async function doConnect( joCall: any, opts: any, fn?: any ) {
                 wsConn.close();
                 doReconnectWsStep( joCall, opts );
             } );
-            joCall.wsConn.on( "message", async function incoming(  data: any ) {
+            joCall.wsConn.on( "message", async function incoming( data: any ) {
                 const joOut = JSON.parse( data );
                 if( joOut.id in joCall.mapPendingByCallID ) {
                     const entry = joCall.mapPendingByCallID[joOut.id];
@@ -138,7 +138,7 @@ export async function doConnect( joCall: any, opts: any, fn?: any ) {
                 const err = new Error( strWsError );
                 if( fn )
                     await fn( joCall, err );
-                return;
+                return
             }
         }
         if( fn )
@@ -159,7 +159,7 @@ export async function doConnectIfNeeded( joCall: any, opts: any, fn: any ) {
         }
         if( isUrlWS( joCall.url ) && ( !joCall.wsConn ) ) {
             await joCall.reconnect( fn );
-            return;
+            return
         }
         if( fn )
             await fn( joCall, null );
@@ -178,7 +178,7 @@ async function doReconnectWsStep( joCall: any, opts: any, fn?: any ) {
     doConnect( joCall, opts, async function( joCall: any, err: any ) {
         if( err ) {
             doReconnectWsStep( joCall, opts );
-            return;
+            return
         }
         if( fn )
             await fn( joCall, null );
@@ -228,9 +228,8 @@ export async function doCall( joCall: any, joIn: any, fn: any ) {
             return;
         }
         const strBody = JSON.stringify( joIn );
-        let errCall: string|null = null, joOut: any = null;
-        if( joCall.joRpcOptions &&
-            joCall.joRpcOptions.cert && typeof joCall.joRpcOptions.cert == "string" &&
+        let errCall: string | null = null, joOut: any = null;
+        if( joCall.joRpcOptions?.cert && typeof joCall.joRpcOptions.cert == "string" &&
             joCall.joRpcOptions.key && typeof joCall.joRpcOptions.key == "string"
         ) {
             const u = new URL( joCall.url );
@@ -242,13 +241,13 @@ export async function doCall( joCall: any, joIn: any, fn: any ) {
                 "headers": {
                     "Content-Type": "application/json"
                 },
-                "ca": ( joCall.joRpcOptions && joCall.joRpcOptions.ca &&
+                "ca": ( joCall.joRpcOptions?.ca &&
                     typeof joCall.joRpcOptions.ca == "string" )
                     ? joCall.joRpcOptions.ca : null,
-                "cert": ( joCall.joRpcOptions && joCall.joRpcOptions.cert &&
+                "cert": ( joCall.joRpcOptions?.cert &&
                     typeof joCall.joRpcOptions.cert == "string" )
                     ? joCall.joRpcOptions.cert : null,
-                "key": ( joCall.joRpcOptions && joCall.joRpcOptions.key &&
+                "key": ( joCall.joRpcOptions?.key &&
                     typeof joCall.joRpcOptions.key == "string" )
                     ? joCall.joRpcOptions.key : null
             };
@@ -271,9 +270,9 @@ export async function doCall( joCall: any, joIn: any, fn: any ) {
                                 joOut = JSON.parse( accumulatedBody );
                                 errCall = null;
                                 resolve( joOut );
-                            } catch ( err ) {
+                            } catch ( err: any ) {
                                 joOut = null;
-                                errCall = "Response body parse error: " + err;
+                                errCall = `Response body parse error: ${err}`;
                                 reject( errCall );
                             }
                         } );
@@ -286,17 +285,17 @@ export async function doCall( joCall: any, joIn: any, fn: any ) {
                     } );
                     req.write( strBody );
                     req.end();
-                } catch ( err ) {
+                } catch ( err: any ) {
                     log.error( "{url} REST error {err}", joCall.url, err );
                     joOut = null;
                     errCall = `HTTP(S)/RPC call(processing) error: ${err}`;
                     reject( errCall );
                 }
             } );
-            await promiseComplete.catch( function( err: Error|string ) {
+            await promiseComplete.catch( function( err: Error | string ) {
                 log.error( "{url} HTTP call error {err}", joCall.url, err );
                 if( ! errCall )
-                    errCall = `HTTP(S)/RPC call(catch) error: ${err}`;
+                    errCall = `HTTP(S)/RPC call(catch) error: ${err.toString()}`;
             } );
         } else {
             try {
@@ -311,27 +310,28 @@ export async function doCall( joCall: any, joIn: any, fn: any ) {
                     // "requestCert": true,
                     "agent": false,
                     "httpsAgent": false,
-                    "ca": ( joCall.joRpcOptions && joCall.joRpcOptions.ca &&
+                    "ca": ( joCall.joRpcOptions?.ca &&
                         typeof joCall.joRpcOptions.ca == "string" )
                         ? joCall.joRpcOptions.ca : null,
-                    "cert": ( joCall.joRpcOptions && joCall.joRpcOptions.cert &&
+                    "cert": ( joCall.joRpcOptions?.cert &&
                         typeof joCall.joRpcOptions.cert == "string" )
                         ? joCall.joRpcOptions.cert : null,
-                    "key": ( joCall.joRpcOptions && joCall.joRpcOptions.key &&
+                    "key": ( joCall.joRpcOptions?.key &&
                         typeof joCall.joRpcOptions.key == "string" )
                         ? joCall.joRpcOptions.key : null
                 };
-                const response = await urllib.request( joCall.url, requestOpts as urllib.RequestOptions );
+                const response =
+                    await urllib.request( joCall.url, requestOpts as urllib.RequestOptions );
                 const body = response.data.toString( "utf8" );
                 if( response && response.statusCode && response.statusCode !== 200 )
                     log.warning( "REST call status code is {}", response.statusCode );
 
                 joOut = JSON.parse( body );
                 errCall = null;
-            } catch ( err ) {
+            } catch ( err: any ) {
                 log.error( "{url} request error {err}", joCall.url, err );
                 joOut = null;
-                errCall = "request error: " + err;
+                errCall = `request error: ${err}`;
             }
         }
         try {
@@ -363,7 +363,7 @@ export async function rpcCallCreate( strURL: string, opts: any ) {
         "reconnect_if_needed": async function( fnAfter: any ) {
             await doConnectIfNeeded( joCall, opts, fnAfter );
         },
-        "call": function( joIn: any, fnAfter: any ) {
+        "call": async function( joIn: any, fnAfter: any ) {
             const self = this;
             const promiseComplete = new Promise( function( resolve: any, reject: any ) {
                 self.reconnect_if_needed( async function( joCall: any, err: any ) {
@@ -371,7 +371,7 @@ export async function rpcCallCreate( strURL: string, opts: any ) {
                         if( fnAfter )
                             await fnAfter( joIn, null, err );
                         reject( err );
-                        return;
+                        return
                     }
                     await doCall( joCall, joIn, async function( joIn: any, joOut: any, err: any ) {
                         if( fnAfter )
@@ -380,13 +380,13 @@ export async function rpcCallCreate( strURL: string, opts: any ) {
                             reject( err );
                         else
                             resolve( joOut );
-                    } ).catch( function( err: Error|string ) {
+                    } ).catch( function( err: Error | string ) {
                         log.error(
                             "{url} JSON RPC call(performer) error: {err}", strURL, err );
                     } );
                 } );
             } );
-            return promiseComplete.catch( function( err: Error|string ) {
+            return await promiseComplete.catch( function( err: Error | string ) {
                 log.error(
                     "{url} JSON RPC call(awaiter) error: {err}", strURL, err );
             } );
@@ -471,9 +471,9 @@ export function getValidHostAndPort( s: any ) {
 
 const gStrTcpConnectionHeader: string = "TCP connection checker: ";
 
-export function checkTcpPromise( strHost: string, nPort: number, nTimeoutMilliseconds: number,
+export async function checkTcpPromise( strHost: string, nPort: number, nTimeoutMilliseconds: number,
     isLog?: boolean ) {
-    return new Promise( ( resolve, reject ) => {
+    return await new Promise( ( resolve, reject ) => {
         if( isLog ) {
             console.log(
                 `${gStrTcpConnectionHeader}Will establish ` +
@@ -542,8 +542,8 @@ export async function checkTcp( strHost: string, nPort: number, nTimeoutMillisec
         const promiseCompleteTcpCheck = checkTcpPromise(
             strHost, nPort, nTimeoutMilliseconds, isLog )
             .then( function() { isOnline = true; } )
-            .catch( function() { isOnline = false; } )
-            ;
+            .catch( function() { isOnline = false; } );
+
         if( isLog ) {
             console.log(
                 `${gStrTcpConnectionHeader}Waiting for ` +
@@ -555,7 +555,7 @@ export async function checkTcp( strHost: string, nPort: number, nTimeoutMillisec
                 `${gStrTcpConnectionHeader}TCP connection ` +
                 `to ${strHost}:${nPort} check finished` );
         }
-    } catch ( err ) {
+    } catch ( err: any ) {
         isOnline = false;
         console.log(
             `${gStrTcpConnectionHeader}TCP connection ` +
@@ -564,7 +564,7 @@ export async function checkTcp( strHost: string, nPort: number, nTimeoutMillisec
     return isOnline;
 }
 
-export async function checkUrl( u: URL|string, nTimeoutMilliseconds: number, isLog?: boolean ) {
+export async function checkUrl( u: URL | string, nTimeoutMilliseconds: number, isLog?: boolean ) {
     if( ! u )
         return false;
     const jo: any = getValidHostAndPort( u );
@@ -572,7 +572,7 @@ export async function checkUrl( u: URL|string, nTimeoutMilliseconds: number, isL
         console.log( `${gStrTcpConnectionHeader}Extracted from URL ${u.toString()} data ` +
             `fields are: ${JSON.stringify( jo )}` );
     }
-    if( ! ( jo && jo.strHost && "nPort" in jo ) ) {
+    if( ! ( jo?.strHost && "nPort" in jo ) ) {
         console.log( `${gStrTcpConnectionHeader}Extracted from URL ${u.toString()} data ` +
             "fields are bad, returning \"false\" as result of TCP connection check" );
         return false;

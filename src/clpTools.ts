@@ -40,7 +40,7 @@ import * as discoveryTools from "./discoveryTools.js";
 import * as loop from "./loop.js";
 import * as imaUtils from "./utils.js";
 import * as imaBLS from "./bls.js";
-import * as imaTx from "./imaTx.js";
+import type * as imaTx from "./imaTx.js";
 
 export async function registerAll( isPrintSummaryRegistrationCosts: boolean ) {
     if( !await registerStep1( false ) )
@@ -1054,8 +1054,8 @@ export function commandLineTaskPaymentS2S() {
                     : imaState.joTokenManagerERC721 )
                 : ( imaState.isWithMetadata721
                     ? imaState.joTokenManagerERC721WithMetadataTarget
-                    : imaState.joTokenManagerERC721Target )
-            ;
+                    : imaState.joTokenManagerERC721Target );
+
             const joTokenManagerERC1155Src: owaspUtils.ethersMod.ethers.Contract = isForward
                 ? imaState.joTokenManagerERC1155 : imaState.joTokenManagerERC1155Target;
             const strChainNameDst = isForward ? tc.strChainName : sc.strChainName;
@@ -1090,7 +1090,8 @@ export function commandLineTaskPaymentS2S() {
                 ? strAddrErc721ExplicitTarget : strAddrErc721Explicit;
             const strAddrErc1155Dst = isForward
                 ? strAddrErc1155ExplicitTarget : strAddrErc1155Explicit;
-            const tx_customizer: imaTx.TransactionCustomizer = isForward ? sc.transactionCustomizer : tc.transactionCustomizer;
+            const txCustomizer: imaTx.TransactionCustomizer =
+                isForward ? sc.transactionCustomizer : tc.transactionCustomizer;
             if( strCoinNameErc721Src.length > 0 ) {
                 // ERC721 payment
                 log.information( "one S->S single ERC721 payment: {}", imaState.idToken );
@@ -1106,7 +1107,7 @@ export function commandLineTaskPaymentS2S() {
                     strCoinNameErc721Src,
                     joSrcErc721,
                     strAddrErc721Dst, // only reverse payment needs it
-                    tx_customizer
+                    txCustomizer
                 );
             }
             if( strCoinNameErc20Src.length > 0 ) {
@@ -1124,7 +1125,7 @@ export function commandLineTaskPaymentS2S() {
                     strCoinNameErc20Src,
                     joSrcErc20,
                     strAddrErc20Dst, // only reverse payment needs it
-                    tx_customizer
+                    txCustomizer
                 );
             }
             if(
@@ -1158,7 +1159,7 @@ export function commandLineTaskPaymentS2S() {
                     strCoinNameErc1155Src,
                     joSrcErc1155,
                     strAddrErc1155Dst, // only reverse payment needs it
-                    tx_customizer
+                    txCustomizer
                 );
             }
             if(
@@ -1192,7 +1193,7 @@ export function commandLineTaskPaymentS2S() {
                     strCoinNameErc1155Src,
                     joSrcErc1155,
                     strAddrErc1155Dst,
-                    tx_customizer
+                    txCustomizer
                 );
             }
             // ETH payment
@@ -1455,7 +1456,7 @@ async function handleBrowseSkaleModesRpcInfoResult(
         if( ! joNode ) {
             log.critical( "{p}Discovery node {} is completely unknown and will be skipped",
                 strLogPrefix, i );
-            continue;
+            continue
         }
         const strNodeURL = imaUtils.composeSChainNodeUrl( joNode );
         const rpcCallOpts: any = null;
