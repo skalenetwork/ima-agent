@@ -26,6 +26,8 @@ export const NODES_IN_SCHAIN = 2
 export const TEST_VALIDATOR_NAME = 'test_val'
 const TEST_VALIDATOR_ID = 1n
 const ETH_TRANSFER_AMOUNT = '0.1'
+const CONFIRMATION_BLOCKS = 2
+
 
 export function validatorsContract(abi: SkaleManagerAbi, wallet: Wallet): Contract {
     return new Contract(abi.validator_service_address, abi.validator_service_abi, wallet)
@@ -49,31 +51,34 @@ export async function addAllPermissions(
     let hasRole = await validators.hasRole(VALIDATOR_MANAGER_ROLE, wallet.address)
     if (!hasRole) {
         console.log('granting ROLE: VALIDATOR_MANAGER_ROLE')
-        await (await validators.grantRole(VALIDATOR_MANAGER_ROLE, wallet.address)).wait()
+        await sendTx(validators.grantRole, [VALIDATOR_MANAGER_ROLE, wallet.address])
     }
     const SCHAIN_TYPE_MANAGER_ROLE = await schainsInternal.SCHAIN_TYPE_MANAGER_ROLE()
     hasRole = await schainsInternal.hasRole(SCHAIN_TYPE_MANAGER_ROLE, wallet.address)
     if (!hasRole) {
         console.log('granting ROLE: SCHAIN_TYPE_MANAGER_ROLE')
-        await (await schainsInternal.grantRole(SCHAIN_TYPE_MANAGER_ROLE, wallet.address)).wait()
+        await sendTx(schainsInternal.grantRole, [SCHAIN_TYPE_MANAGER_ROLE, wallet.address])
     }
     const SCHAIN_CREATOR_ROLE = await schains.SCHAIN_CREATOR_ROLE()
     hasRole = await schains.hasRole(SCHAIN_CREATOR_ROLE, wallet.address)
     if (!hasRole) {
         console.log('granting ROLE: SCHAIN_CREATOR_ROLE')
-        await (await schains.grantRole(SCHAIN_CREATOR_ROLE, wallet.address)).wait()
+        await sendTx(schains.grantRole, [SCHAIN_CREATOR_ROLE, wallet.address])
     }
+    console.log('all roles granted')
 }
 
 export async function initDefaultValidator(validators: Contract): Promise<void> {
     let number = await validators.numberOfValidators()
     if (number === 0n) {
         console.log('going to register validator')
-        await (await validators.registerValidator(TEST_VALIDATOR_NAME, '', 10, 0)).wait()
+        await sendTx(validators.registerValidator, [TEST_VALIDATOR_NAME, '', 10, 0])
+
         number = await validators.numberOfValidators()
         console.log(`number of active validators: ${number}`)
+
         console.log('going to enable validator')
-        await (await validators.enableValidator(1)).wait()
+        await sendTx(validators.enableValidator, [1])
         console.log('validator registered and enabled')
     } else {
         console.log('validator  already exist, skipping')
@@ -171,12 +176,12 @@ export async function registerNodes(nodes: Contract, wallets: Wallet[]): Promise
 }
 
 export async function addTestSchainType(schains: Contract): Promise<void> {
-    await (await schains.addSchainType(8, NODES_IN_SCHAIN)).wait()
+    await sendTx(schains.addSchainType, [8, NODES_IN_SCHAIN])
 }
 
 export async function createSchain(schains: Contract, name: string, owner: string): Promise<void> {
     console.log(`creating new schain: ${name}, owner: ${owner}`)
-    await (await schains.addSchainByFoundation(1000, 1, 10, name, owner, owner, [])).wait()
+    await sendTx(schains.addSchainByFoundation, [1000, 1, 10, name, owner, owner, []])
     console.log(`schain created: ${name}`)
 }
 
@@ -210,4 +215,9 @@ function ipToHex(ip: string): string {
     const hexParts = parts.map((part) => parseInt(part).toString(16).padStart(2, '0')).join('')
     const hexIp = `0x${hexParts}`
     return hexIp
+}
+
+export async function sendTx(func: any, args: any[]): Promise<TransactionReceipt | null> {
+    const response: TransactionResponse = await func(...args)
+    return await response.wait(CONFIRMATION_BLOCKS)
 }
