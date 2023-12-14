@@ -1201,11 +1201,12 @@ function parseOtherArgs( imaState: any, joArg: any ) {
     return false;
 }
 
-export function parse( joExternalHandlers: any ) {
+export function parse( joExternalHandlers: any, argv?: any[] ) {
     const imaState = state.get();
-    const cntArgs = process.argv.length;
+    argv = argv || process.argv;
+    const cntArgs = argv.length;
     for( let idxArg = 2; idxArg < cntArgs; ++idxArg ) {
-        const joArg = parseCommandLineArgument( process.argv[idxArg] );
+        const joArg = parseCommandLineArgument( argv[idxArg] );
         parseHelp( imaState, joArg ); // exits process on "--help"
         parseVersion( imaState, joArg ); // exits process on "--version"
         if( parseBasicArgs( imaState, joArg ) )

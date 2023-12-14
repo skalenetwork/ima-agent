@@ -1151,11 +1151,11 @@ describe( "Agent Utils Module-2", function() {
             assert.equal( strDst, "01230000" );
         } );
 
-        it( "Typed array concatenation", function() {
+        it( "Uint8 arrays concatenation", function() {
             const strSrcLeft = "0xbaad", strSrcRight = "0xf00d";
             const arrBytesLeft = imaUtils.hexToBytes( strSrcLeft, false );
             const arrBytesRight = imaUtils.hexToBytes( strSrcRight, false );
-            const arrBytes = imaUtils.concatTypedArrays( arrBytesLeft, arrBytesRight );
+            const arrBytes = imaUtils.concatUint8Arrays( arrBytesLeft, arrBytesRight );
             const strDst = imaUtils.bytesToHex( arrBytes, false );
             assert.equal( strDst, "baadf00d" );
         } );

@@ -31,6 +31,7 @@
 import * as log from "./log.js";
 import * as ethersMod from "ethers";
 import * as fs from "fs";
+import { hexToBytes } from "utils";
 const BigNumber = ethersMod.ethers.BigNumber;
 
 const safeURL = log.safeURL;
@@ -658,8 +659,9 @@ export function privateKeyToPublicKey( keyPrivate: string ): string {
             return "";
         if( keyPrivate.trim().length == 0 )
             return "";
-        const ethersWallet = new ethersMod.ethers.Wallet( ensureStartsWith0x( keyPrivate ) );
-        return ethersWallet.publicKey;
+        const ethersWallet = new ethersMod.ethers.Wallet(
+            hexToBytes( ensureStartsWith0x( keyPrivate ), false ) );
+        return removeStarting0x( ethersWallet.publicKey );
     } catch ( err ) {
         return "";
     }
