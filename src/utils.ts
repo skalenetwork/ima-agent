@@ -187,7 +187,7 @@ export async function waitForClonedTokenAppearErc20(
         "address" in tokenERC20SC && typeof tokenERC20SC.address == "string"
     ) {
         log.warning( "Skipping automatic ERC20 instantiation discovery, already done before" );
-        return
+        return;
     }
     const addressCallFrom = joAccountSC.address();
     const addressOnSChain = await waitForClonedTokenToAppear(
@@ -203,7 +203,7 @@ export async function waitForClonedTokenAppearErc721(
         "address" in tokenERC721SC && typeof tokenERC721SC.address == "string"
     ) {
         log.warning( "Skipping automatic ERC721instantiation discovery, already done before" );
-        return
+        return;
     }
     const addressCallFrom = joAccountSC.address();
     const addressOnSChain =
@@ -221,7 +221,7 @@ export async function waitForClonedTokenAppearErc721WithMetadata(
     ) {
         log.warning( "Skipping automatic ERC721_with_metadata instantiation discovery, " +
             "already done before" );
-        return
+        return;
     }
     const addressCallFrom = joAccountSC.address();
     const addressOnSChain = await waitForClonedTokenToAppear(
@@ -237,7 +237,7 @@ export async function waitForClonedTokenAppearErc1155(
         "address" in tokenERC1155SC && typeof tokenERC1155SC.address == "string"
     ) {
         log.warning( "Skipping automatic ERC1155 instantiation discovery, already done before" );
-        return
+        return;
     }
     const addressCallFrom = joAccountSC.address();
     const addressOnSChain = await waitForClonedTokenToAppear(
@@ -354,12 +354,12 @@ export function discoverCoinNameInJSON( jo?: any ): string {
         j = k.indexOf( "_address" );
         if( j > 0 ) {
             s1 = k.substring( 0, j );
-            continue
+            continue;
         }
         j = k.indexOf( "_abi" );
         if( j > 0 ) {
             s2 = k.substring( 0, j );
-            continue
+            continue;
         }
     }
     if( s1.length === 0 || s2.length === 0 )

@@ -30,7 +30,7 @@ export class UniversalDispatcherEvent {
         for( const [ key, value ] of Object.entries( jo ) ) {
             if( key in this ) {
                 console.warn( "UniversalDispatcherEvent will skip", key, "data field" );
-                continue
+                continue;
             }
             const anyThis: any = this
             anyThis[key] = value;
@@ -80,7 +80,7 @@ export class EventDispatcher {
                     item => item.type === type );
             if( index >= 0 ) {
                 this._listeners.splice( index, 1 );
-                continue
+                continue;
             }
             break;
         }

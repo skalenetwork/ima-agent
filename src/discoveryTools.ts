@@ -135,7 +135,7 @@ export async function waitUntilSChainStarted() {
         imaState.chainProperties.sc.strURL.length === 0
     ) {
         log.warning( "Skipped, S-Chain URL was not provided." );
-        return
+        return;
     }
     let bSuccess = false;
     let idxWaitAttempt = 0;
@@ -163,7 +163,7 @@ export async function waitUntilSChainStarted() {
         if( idxWaitAttempt >= imaState.nMaxWaitSChainAttempts ) {
             log.warning( "Incomplete, S-Chain sanity check failed after {} attempts.",
                 idxWaitAttempt );
-            return
+            return;
         }
         await threadInfo.sleep( 1000 );
     }
@@ -205,7 +205,7 @@ function composeStillUnknownNodesMessage(
 async function handlePeriodicDiscoveryAttemptActions( isSilentReDiscovery: boolean, fnAfter: any ) {
     if( gFlagIsInSChainDiscovery ) {
         log.information( "Notice: long this S-Chain re-discovery is in progress now..." );
-        return
+        return;
     }
     const imaState = state.get();
     fnAfter = fnAfter || function() {};
@@ -231,7 +231,7 @@ async function handlePeriodicDiscoveryAttemptActions( isSilentReDiscovery: boole
             }
             // fnAfter() will be called here inside async call at beginning
             gFlagIsInSChainDiscovery = false;
-            return
+            return;
         }
         if( cntDiscovered < cntNodesOnChain ) {
             if( ! isSilentReDiscovery ) {
@@ -274,7 +274,7 @@ async function handlePeriodicDiscoveryAttemptActions( isSilentReDiscovery: boole
             .then( function() {} ).catch( function( err ) {
                 log.error(
                     "Failed to continue S-chain discovery, reported error is: {err}", err );
-            } ); ;
+            } )
     } catch ( err ) { }
     gFlagIsInSChainDiscovery = false;
     // fnAfter() will be called here inside async call at beginning
@@ -295,7 +295,7 @@ export async function continueSChainDiscoveryInBackgroundIfNeeded(
         if( ! isSilentReDiscovery )
             log.information( "This S-Chain re-discovery will not be preformed" );
         fnAfter();
-        return // no S-Chain re-discovery, special mode
+        return; // no S-Chain re-discovery, special mode
     }
     const cntNodesOnChain = getSChainNodesCount( imaState.joSChainNetworkInfo );
     let nCountToWait = ( cntNodesOnChain > 2 )
@@ -316,7 +316,7 @@ export async function continueSChainDiscoveryInBackgroundIfNeeded(
                 log.notice( "This S-Chain re-discovery stopped" );
         }
         fnAfter();
-        return
+        return;
     }
     if( cntDiscovered < cntNodesOnChain ) {
         if( ! isSilentReDiscovery ) {
@@ -438,7 +438,7 @@ async function discoverSChainWait( optsDiscover: any ) {
             clearInterval( iv );
             if( optsDiscover.fnAfter )
                 optsDiscover.fnAfter( null, optsDiscover.joSChainNetworkInfo );
-            return
+            return;
         }
         ++ nWaitAttempt;
         if( nWaitAttempt >= cntWaitAttempts ) {
@@ -628,7 +628,7 @@ export async function doPeriodicSChainNetworkDiscoveryIfNeeded(
         joPrevSChainNetworkInfo, isSilentReDiscovery ) ) {
         if( ! isSilentReDiscovery )
             log.success( "Periodic S-Chain re-discovery is not needed right from startup" );
-        return // not needed right from very beginning
+        return; // not needed right from very beginning
     }
     const cntNodesOnChain = getSChainNodesCount( imaState.joSChainNetworkInfo );
     let periodicDiscoveryInterval = imaState.joSChainDiscovery.periodicDiscoveryInterval;
@@ -656,7 +656,7 @@ export async function doPeriodicSChainNetworkDiscoveryIfNeeded(
                     if( ! isSilentReDiscovery )
                         log.information( "Final periodic S-Chain re-discovery done" );
                     fnAfterRediscover( true );
-                    return // not needed anymore, all nodes completely discovered
+                    return; // not needed anymore, all nodes completely discovered
                 }
                 if( ! isSilentReDiscovery )
                     log.information( "Partial periodic S-Chain re-discovery done" );

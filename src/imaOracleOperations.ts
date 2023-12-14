@@ -138,7 +138,7 @@ async function handleOracleSigned(
         imaTransferErrorHandling.saveTransferError(
             "oracle", optsGasPriseSetup.details.toString() );
         optsGasPriseSetup.details.close();
-        return
+        return;
     }
     optsGasPriseSetup.strActionName = "doOracleGasPriceSetup.formatSignature";
     let signature = joGlueResult ? joGlueResult.signature : null;
@@ -253,7 +253,7 @@ export async function doOracleGasPriceSetup(
                 details.trace( "{p}u256 signing callback was not provided",
                     optsGasPriseSetup.strLogPrefix );
                 await fnAfter( null, u256, null ); // null - no error, null - no signatures
-            }
+            };
     } else {
         optsGasPriseSetup.details.trace( "{p}Using externally provided u256 signing function",
             optsGasPriseSetup.strLogPrefix );

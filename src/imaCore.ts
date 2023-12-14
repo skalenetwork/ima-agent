@@ -288,7 +288,7 @@ async function analyzeGatheredRecords( optsTransfer: any, r: any ) {
                 "{p}Found event record {} reviewed and accepted for processing, found event " +
                 "values are {}, found block number is {}", optsTransfer.strLogPrefix, i, joValues,
                 joValues.savedBlockNumberForOptimizations );
-            break
+            break;
         } else {
             optsTransfer.details.debug( "{p}Found event record {} reviewed and skipped",
                 optsTransfer.strLogPrefix, i );
@@ -381,7 +381,7 @@ async function gatherMessages( optsTransfer: any ) {
             if( !bSecurityCheckPassed ) {
                 optsTransfer.details.warning( "{p}Block depth check was not passed, canceling " +
                     "search for transfer events", optsTransfer.strLogPrefix );
-                break
+                break;
             }
         }
         if( optsTransfer.nBlockAge > 0 ) {
@@ -433,7 +433,7 @@ async function gatherMessages( optsTransfer: any ) {
             if( !bSecurityCheckPassed ) {
                 optsTransfer.details.warning( "{p}Block age check was not passed, " +
                     "canceling search for transfer events", optsTransfer.strLogPrefix );
-                break
+                break;
             }
         }
         optsTransfer.details.success(
@@ -701,7 +701,7 @@ async function checkOutgoingMessageEventInOneNode(
                     owaspUtils.ensureStartsWith0x( eventValuesByName.dstContract ).toLowerCase()
             ) {
                 bEventIsFound = true;
-                break
+                break;
             }
         }
     } catch ( err ) {
@@ -1024,7 +1024,7 @@ export async function doTransfer(
                     nIdxCurrentMsgBlockStart, optsTransfer.jarrMessages.length,
                     optsTransfer.jarrMessages );
                 await fnAfter( null, jarrMessages ); // null - no error, null - no signatures
-            }
+            };
         } else {
             optsTransfer.details.debug( "{p}Using externally provided signing function",
                 optsTransfer.strLogPrefix );

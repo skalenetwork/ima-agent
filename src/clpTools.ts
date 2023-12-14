@@ -1457,7 +1457,7 @@ async function handleBrowseSkaleModesRpcInfoResult(
         if( ! joNode ) {
             log.critical( "{p}Discovery node {} is completely unknown and will be skipped",
                 strLogPrefix, i );
-            continue
+            continue;
         }
         const strNodeURL = imaUtils.composeSChainNodeUrl( joNode );
         const rpcCallOpts: any = null;

@@ -34,7 +34,7 @@ const gSecondsConnectionTimeout = 60;
 
 export async function waitWebSocketIsOpen( socket: any, fnDone: any, fnStep: any ) {
     fnDone = fnDone || async function( nStep: number ) {};
-    fnDone = fnStep || async function( nStep: number ) { return true; }
+    fnDone = fnStep || async function( nStep: number ) { return true; };
     let nStep = 0;
     const promiseComplete = new Promise( function( resolve, reject ) {
         let isInsideAsyncHandler = false;
@@ -56,7 +56,7 @@ export async function waitWebSocketIsOpen( socket: any, fnDone: any, fnStep: any
                 }
             }
             isInsideAsyncHandler = false;
-        }
+        };
         const iv = setInterval( function() {
             if( isInsideAsyncHandler )
                 return;
@@ -139,7 +139,7 @@ export async function doConnect( joCall: any, opts: any, fn?: any ) {
                 const err = new Error( strWsError );
                 if( fn )
                     await fn( joCall, err );
-                return
+                return;
             }
         }
         if( fn )
@@ -160,7 +160,7 @@ export async function doConnectIfNeeded( joCall: any, opts: any, fn: any ) {
         }
         if( isUrlWS( joCall.url ) && ( !joCall.wsConn ) ) {
             await joCall.reconnect( fn );
-            return
+            return;
         }
         if( fn )
             await fn( joCall, null );
@@ -180,7 +180,7 @@ async function doReconnectWsStep( joCall: any, opts: any, fn?: any ) {
         if( err ) {
             doReconnectWsStep( joCall, opts )
                 .then( function() {} ).catch( function() {} );
-            return
+            return;
         }
         if( fn )
             await fn( joCall, null );
@@ -373,7 +373,7 @@ export async function rpcCallCreate( strURL: string, opts: any ) {
                         if( fnAfter )
                             await fnAfter( joIn, null, err );
                         reject( err );
-                        return
+                        return;
                     }
                     await doCall( joCall, joIn, async function( joIn: any, joOut: any, err: any ) {
                         if( fnAfter )

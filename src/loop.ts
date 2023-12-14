@@ -540,23 +540,23 @@ export async function ensureHaveWorkers( opts: any ) {
             case "init":
                 if( ! joMessage.error ) {
                     aClient.logicalInitComplete = true;
-                    break;
+                    break
                 }
                 aClient.errorLogicalInit = joMessage.error;
                 opts.details.critical(
                     " Loop worker thread {} reported/returned init error: {err}",
                     idxWorker, joMessage.error );
-                break;
+                break
             case "log":
                 log.information( "LOOP WORKER {} {}", workerData.url, joMessage.message );
-                break;
+                break
             case "saveTransferError":
                 imaTransferErrorHandling.saveTransferError(
                     joMessage.message.category, joMessage.message.textLog, joMessage.message.ts );
-                break;
+                break
             case "saveTransferSuccess":
                 imaTransferErrorHandling.saveTransferSuccess( joMessage.message.category );
-                break;
+                break
             } // switch ( joMessage.method )
         } );
         const jo: any = {

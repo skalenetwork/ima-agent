@@ -327,31 +327,31 @@ export function logArgToString( ...args: any[] ): string {
         const arg = arguments[i];
         if( arg === undefined ) {
             s += "" + undefval( arg );
-            continue
+            continue;
         }
         if( arg === null ) {
             s += "" + nullval( arg );
-            continue
+            continue;
         }
         if( isNaN( arg ) ) {
             s += "" + nanval( arg );
-            continue
+            continue;
         }
         if( typeof arg === "boolean" ) {
             s += "" + tf( arg );
-            continue
+            continue;
         }
         if( typeof arg === "object" && typeof arg.valueOf() === "boolean" )
             s += "" + tf( arg.valueOf() );
 
         if( typeof arg === "number" || typeof arg === "bigint" ) {
             s += "" + number( arg );
-            continue
+            continue;
         }
         if( typeof arg === "object" &&
             ( typeof arg.valueOf() === "number" || typeof arg.valueOf() === "bigint" ) ) {
             s += "" + number( arg.valueOf() );
-            continue
+            continue;
         }
         if( typeof arg === "string" || arg instanceof String ) {
             const objURL = safeURL( arg );
@@ -387,30 +387,30 @@ export function logArgToString( ...args: any[] ): string {
                     strURL += normal( anyURL.strStrippedStringComma );
 
                 s += strURL;
-                continue
+                continue;
             }
             if( ( arg.length > 1 && arg[0] == "-" && arg[1] != "-" ) ||
                 ( arg.length > 2 && arg[0] == "-" && arg[1] == "-" && arg[2] != "-" )
             ) {
                 s += "" + cla( arg );
-                continue
+                continue;
             }
             if( arg.length > 0 && ( arg[0] == "\"" || arg[0] == "'" ) ) {
                 s += "" + strval( arg );
-                continue
+                continue;
             }
             if( isFloat2( arg ) ) {
                 s += "" + real( arg );
-                continue
+                continue;
             }
             if( isInt2( arg ) ) {
                 s += "" + number( arg );
-                continue
+                continue;
             }
         }
         if( Array.isArray( arg ) || typeof arg === "object" ) {
             s += jsonColorizer.prettyPrintConsole( arg );
-            continue
+            continue;
         }
         s += "" + kk( arg );
     }
@@ -426,7 +426,7 @@ export const getCircularReplacerForJsonStringify = (): any => {
             seen.add( value );
         }
         return value;
-    }
+    };
 }
 
 export const jsonColorizer: any = { // see http://jsfiddle.net/unLSJ/
@@ -444,7 +444,7 @@ export const jsonColorizer: any = { // see http://jsfiddle.net/unLSJ/
 
             ++i // so we know we aren't using the original object anymore
             return value;
-        }
+        };
     },
     replacerHTML: ( match?: any, pIndent?: any, pKey?: any, pVal?: any, pEnd?: any ): any => {
         const key = "<span class=json-key>";

@@ -183,7 +183,7 @@ function initMonitoringServer(): void {
                     break;
                 case "get_schain_network_info":
                     joAnswer.schain_network_info = imaState.joSChainNetworkInfo;
-                    break;
+                    break
                 case "get_runtime_params":
                     {
                         joAnswer.runtime_params = {};
@@ -231,7 +231,7 @@ function initMonitoringServer(): void {
                             ? true : false );
                     joAnswer.last_error_categories =
                         imaTransferErrorHandling.getLastErrorCategories();
-                    break;
+                    break
                 default:
                     throw new Error( `Unknown method name ${joMessage.method} was specified` );
                 } // switch( joMessage.method )
@@ -296,17 +296,17 @@ function initJsonRpcServer(): void {
             case "echo":
                 joAnswer.result = "echo";
                 fnSendAnswer( joAnswer );
-                break;
+                break
             case "ping":
                 joAnswer.result = "pong";
                 fnSendAnswer( joAnswer );
-                break;
+                break
             case "skale_imaVerifyAndSign":
                 joAnswer = await imaBLS.handleSkaleImaVerifyAndSign( joMessage );
-                break;
+                break
             case "skale_imaBSU256":
                 joAnswer = await imaBLS.handleSkaleImaBSU256( joMessage );
-                break;
+                break
             case "skale_imaNotifyLoopWork":
                 if( await pwa.handleLoopStateArrived(
                     imaState,
@@ -319,13 +319,13 @@ function initJsonRpcServer(): void {
                 ) )
                     await loop.spreadArrivedStateOfPendingWorkAnalysis( joMessage );
 
-                break;
+                break
             case "skale_getCachedSNB":
                 joAnswer.arrSChainsCached = skaleObserver.getLastCachedSChains();
-                break;
+                break
             default:
                 joAnswer.error = `Unknown method name ${joMessage.method} was specified`;
-                break;
+                break
             } // switch( joMessage.method )
             if( ( !joAnswer ) || typeof joAnswer != "object" ) {
                 joAnswer = {};
@@ -425,7 +425,7 @@ async function main() {
         ? false : imaState.joSChainDiscovery.isSilentReDiscovery;
     const fnOnPeriodicDiscoveryResultAvailable = function( isFinal: boolean ) {
         loop.spreadUpdatedSChainNetwork( isFinal ).then( function() {} ).catch( function() {} );
-    }
+    };
     if( imaState.bSignMessages ) {
         if( imaState.strPathBlsGlue.length == 0 ) {
             log.fatal( "Please specify {} command line parameter.", "--bls-glue" );

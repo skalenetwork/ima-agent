@@ -72,11 +72,11 @@ export function generateTimestampString( ts?: any, isColorized?: boolean ): stri
         ( typeof isColorized == "undefined" )
             ? true : ( !!isColorized );
     ts = ( ts instanceof Date ) ? ts : new Date();
-    const ccDate = function( x?: any ): string { return isColorized ? cc.date( x ) : x; }
-    const ccTime = function( x?: any ): string { return isColorized ? cc.time( x ) : x; }
+    const ccDate = function( x?: any ): string { return isColorized ? cc.date( x ) : x; };
+    const ccTime = function( x?: any ): string { return isColorized ? cc.time( x ) : x; };
     const ccFractionPartOfTime =
-        function( x?: any ): string { return isColorized ? cc.fracTime( x ) : x; }
-    const ccBright = function( x?: any ): string { return isColorized ? cc.bright( x ) : x; }
+        function( x?: any ): string { return isColorized ? cc.fracTime( x ) : x; };
+    const ccBright = function( x?: any ): string { return isColorized ? cc.bright( x ) : x; };
     const s =
         "" + ccDate( n2s( ts.getUTCFullYear(), 4 ) ) +
         ccBright( "-" ) + ccDate( n2s( ts.getUTCMonth() + 1, 2 ) ) +
@@ -467,7 +467,7 @@ export function createFileOutput(
                     const nNextSize = nFileSize + nBytesToWrite;
                     if( nNextSize <= this.nMaxSizeBeforeRotation ) {
                         this.open();
-                        return
+                        return;
                     }
                     let i = 0; const cnt = 0 + this.nMaxFilesCount;
                     for( i = 0; i < cnt; ++i ) {
@@ -578,7 +578,7 @@ export function extractErrorMessage( jo?: any, strDefaultErrorText?: string ): s
     try {
         const isError = function( err: Error | string ) {
             return err && err instanceof Error && err.stack && err.message;
-        }
+        };
         if( ! isError( jo ) ) {
             if( "error" in jo ) {
                 jo = jo.error;
@@ -633,7 +633,7 @@ function tryToSplitFormatString( strFormat?: string, cntArgsMax?: number ): any[
 }
 
 export function fmtArgumentsArray( arrArgs: any[], fnFormatter?: any ): string {
-    fnFormatter = fnFormatter || function( arg: any ) { return arg; }
+    fnFormatter = fnFormatter || function( arg: any ) { return arg; };
     const arrParts = ( arrArgs && arrArgs.length > 0 )
         ? tryToSplitFormatString( arrArgs[0], arrArgs.length - 1 ) : null;
     let s = ""; let isValueMode = false;
@@ -651,7 +651,7 @@ export function fmtArgumentsArray( arrArgs: any[], fnFormatter?: any ): string {
         } else
             return cc.logArgToString( arg );
         return arg;
-    }
+    };
     const fnFormatOneArgument = function( arg: any, fmt?: any ): string {
         if( ! arg )
             return arg;
@@ -684,7 +684,7 @@ export function fmtArgumentsArray( arrArgs: any[], fnFormatter?: any ): string {
                 return fnDefaultOneArgumentFormatter( arg, cc.rainbow );
         }
         return v( arg );
-    }
+    };
     try {
         let idxArgNextPrinted = 0;
         if( arrParts && arrParts.length > 0 ) {
@@ -696,7 +696,7 @@ export function fmtArgumentsArray( arrArgs: any[], fnFormatter?: any ): string {
                     if( idxArgNextPrinted < arrArgs.length )
                         s += fnFormatOneArgument( arrArgs[idxArgNextPrinted], joPart.text );
                     ++ idxArgNextPrinted;
-                    continue
+                    continue;
                 }
                 // assume joPart.type == "text" always here, at this point
                 if( ! cc.isStringAlreadyColorized( joPart.text ) )

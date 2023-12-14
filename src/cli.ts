@@ -1282,7 +1282,7 @@ export function parse( joExternalHandlers: any ) {
             joArg.name == "browse-s-chain"
         ) {
             joExternalHandlers[joArg.name]();
-            continue
+            continue;
         }
         console.log( log.fmtFatal( "COMMAND LINE PARSER ERROR: unknown command line argument {}",
             joArg.name ) );
@@ -1534,7 +1534,7 @@ function commonInitPrintFoundContracts() {
         if( joContract && "address" in joContract && joContract.address )
             return log.fmtInformation( "{}", joContract.address );
         return log.fmtError( "contract is not available" );
-    }
+    };
 
     if( isPrintGathered ) {
         log.debug( "IMA contracts(Main Net):" );

@@ -333,13 +333,13 @@ export async function payedCall(
         switch ( optsPayedCall.joACI.strType ) {
         case "tm":
             await payedCallTM( optsPayedCall );
-            break;
+            break
         case "sgx":
             await payedCallSGX( optsPayedCall );
-            break;
+            break
         case "direct":
             await payedCallDirect( optsPayedCall );
-            break;
+            break
         default: {
             const strErrorPrefix = "Transaction sign and send error(INNER FLOW): ";
             optsPayedCall.details.critical(

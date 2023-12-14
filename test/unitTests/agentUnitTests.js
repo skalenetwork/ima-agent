@@ -30,7 +30,6 @@ const imaTx = require( "../../src/build/imaTx.js" );
 const imaReg = require( "../../src/build/imaRegistrationOperations.js" );
 const imaEth = require( "../../src/build/imaEthOperations.js" );
 const imaToken = require( "../../src/build/imaTokenOperations.js" );
-const w3mod = IMA.w3mod;
 const transactionCustomizerMainNet = imaTx.getTransactionCustomizerForMainNet();
 const transactionCustomizerSChain = imaTx.getTransactionCustomizerForSChain();
 
@@ -266,15 +265,16 @@ describe( "tests for `IMA Core` 1", function() {
     it( "should invoke `privateKeyToPublicKey`", async function() {
         const keyPrivate = "23abdbd3c61b5330af61ebe8bef582f4e5cc08e554053a718bdce7813b9dc1fc";
         let keyPrivateUnd; // undefined
-        let w3mod_undefined; // undefined
-        // if w3mod `undefined` or `null`
         // eslint-disable-next-line no-unused-expressions
-        expect( IMA.owaspUtils.privateKeyToPublicKey( w3mod_undefined, keyPrivate ) ).to.be.empty;
+        expect( IMA.owaspUtils.privateKeyToPublicKey( keyPrivate ) ).to.be.equal(
+            "0x045dd431d36ce6b88f27d351051b31a26848c4a886f0dd0bc87a7d5a9d821417c9" +
+            "e807e8589f680ab0f2ab29831231ad7b3d6659990ee830582fede785fc3c33c4"
+            );
         // if keyPrivate `undefined` or `null`
         // eslint-disable-next-line no-unused-expressions
-        expect( IMA.owaspUtils.privateKeyToPublicKey( w3mod, keyPrivateUnd ) ).to.be.empty;
+        expect( IMA.owaspUtils.privateKeyToPublicKey( keyPrivateUnd ) ).to.be.empty;
         // when all parameters is OK
-        expect( IMA.owaspUtils.privateKeyToPublicKey( w3mod, keyPrivate ) ).to.have.lengthOf( 128 );
+        expect( IMA.owaspUtils.privateKeyToPublicKey( keyPrivate ) ).to.have.lengthOf( 128 );
     } );
 
 } );

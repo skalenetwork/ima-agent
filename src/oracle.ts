@@ -91,7 +91,7 @@ async function handleOracleCheckResultResult(
         if( isVerboseTraceDetails )
             details.error( "Bad unexpected result in oracle_checkResult" );
         await joCall.disconnect();
-        return
+        return;
     }
     const joResult: any = JSON.parse( joOut.result );
     if( isVerboseTraceDetails )

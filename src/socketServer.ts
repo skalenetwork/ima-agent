@@ -73,7 +73,7 @@ export class SocketServer extends EventDispatcher {
                     _offAllPipeEventListeners = null;
                 }
                 delete self.mapAcceptedPipes[socket];
-            }
+            };
             let _onPipeError: any = function( eventData: any ) {
                 if( self.isLogSocketErrors ) {
                     self.log( log.fmtError( "Socket {url} error {err}",
@@ -84,7 +84,7 @@ export class SocketServer extends EventDispatcher {
                     _offAllPipeEventListeners = null;
                 }
                 delete self.mapAcceptedPipes[socket];
-            }
+            };
             let _onPipeMessage: any = function( eventData: any ) {
                 if( self.isLogSocketTrafficRaw ) {
                     self.log( log.fmtInformation( "Socket {url} did received {sunny} {}",
@@ -153,7 +153,7 @@ export class SocketServer extends EventDispatcher {
                     _onPipeMessage = null;
                 }
                 socket.disposeImpersonatedEntries();
-            }
+            };
             socket.on( "close", _onPipeClose );
             socket.on( "error", _onPipeError );
             socket.on( "message", _onPipeMessage );

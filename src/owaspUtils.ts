@@ -31,9 +31,6 @@
 import * as log from "./log.js";
 import * as ethersMod from "ethers";
 import * as fs from "fs";
-import * as ethereumJsUtilModule from "ethereumjs-util";
-import * as ethereumJsWalletModule from "ethereumjs-wallet";
-const Wallet = ethereumJsWalletModule.default;
 const BigNumber = ethersMod.ethers.BigNumber;
 
 const safeURL = log.safeURL;
@@ -611,12 +608,12 @@ export function parseMoneySpecToWei( s?: any, isThrowException?: boolean ): stri
             ) {
                 strNumber += chr;
                 s = s.substr( 1 ); // remove first character
-                continue
+                continue;
             }
             if( chr == " " || chr == "\t" || chr == "\r" || chr == "\n" )
                 s = s.substr( 1 ); // remove first character
             s = s.trim().toLowerCase();
-            break
+            break;
         }
         // here s is rest suffix string, number is number as string or empty string
         if( strNumber == "" )
@@ -656,17 +653,30 @@ export function privateKeyToAccountAddress( keyPrivate: string ): string {
 }
 
 export function privateKeyToPublicKey( keyPrivate: string ): string {
-    const privateKeyBuffer =
-    ethereumJsUtilModule.toBuffer( ensureStartsWith0x( keyPrivate ) );
-    const wallet = Wallet.fromPrivateKey( privateKeyBuffer );
-    const publicKey = wallet.getPublicKeyString();
-    return removeStarting0x( publicKey );
+    try {
+        if( ! keyPrivate )
+            return "";
+        if( keyPrivate.trim().length == 0 )
+            return "";
+        const ethersWallet = new ethersMod.ethers.Wallet( ensureStartsWith0x( keyPrivate ) );
+        return ethersWallet.publicKey;
+    } catch ( err ) {
+        return "";
+    }
 }
 
 export function publicKeyToAccountAddress( keyPublic: string ): string {
-    const hash = ethersMod.ethers.utils.keccak256( ensureStartsWith0x( keyPublic ) );
-    const strAddress = ensureStartsWith0x( hash.substr( hash.length - 40 ) );
-    return strAddress;
+    try {
+        if( ! keyPublic )
+            return "";
+        if( keyPublic.trim().length == 0 )
+            return "";
+        const hash = ethersMod.ethers.utils.keccak256( ensureStartsWith0x( keyPublic ) );
+        const strAddress = ensureStartsWith0x( hash.substr( hash.length - 40 ) );
+        return strAddress;
+    } catch ( err ) {
+        return "";
+    }
 }
 
 export function fnAddressImpl_( anyThis: any ): string {

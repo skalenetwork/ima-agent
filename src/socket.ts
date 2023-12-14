@@ -51,7 +51,7 @@ export const socketSentDataMarshall = function( data?: any ): any {
         )
         : "";
     return s;
-}
+};
 export const socketReceivedDataReverseMarshall = function( data?: any ): object {
     try {
         const jo: any = data
@@ -81,7 +81,7 @@ export const updateSocketDataStatsForMessage = function( joMessage: any, joStats
         joStats[strMethod] ++;
     else
         joStats[strMethod] = 1;
-}
+};
 export const generateSocketDataStatsJSON = function( jo: any ) {
     const joStats: any = {};
     if( "arrPackedMessages" in jo &&
@@ -94,7 +94,7 @@ export const generateSocketDataStatsJSON = function( jo: any ) {
     } else
         updateSocketDataStatsForMessage( jo, joStats );
     return joStats;
-}
+};
 
 export class BasicServerAcceptor extends EventDispatcher {
     socketType: string;
@@ -265,7 +265,7 @@ export class BasicSocketPipe extends EventDispatcher {
             if( settings.logging.net.socket.send || settings.logging.net.socket.flush )
                 console.log( this.socketLoggingTextPrefix( "send+flush" ), data );
             this.implSend( data );
-            return
+            return;
         }
         isFlush = ( isFlush == undefined || isFlush == null ) ? true : ( !!( isFlush ) );
         const jo: any = socketReceivedDataReverseMarshall( data );
@@ -380,7 +380,7 @@ export const isRunningInWorker = function() {
     if( self.document === undefined )
         return true;
     return false;
-}
+};
 
 // in-worker clients in connecting state
 export const gMapAwaitingInWorkerClients: Record < string, any > = { };
@@ -830,7 +830,7 @@ export class OutOfWorkerRelay extends EventDispatcher {
                 pipeOutgoing.send( joMessage );
                 if( self.isAutoFlushIncoming )
                     pipeOutgoing.flush();
-            }
+            };
             let _onRelayPipeMessage: any = function( eventData: any ) {
                 if( settings.logging.net.relay.rawMessage ) {
                     console.log( "Relay \"" + self.strRelayName + "\" relay-client socket \"" +
@@ -856,7 +856,7 @@ export class OutOfWorkerRelay extends EventDispatcher {
                 pipeOutgoing.send( joMessage );
                 if( self.isAutoFlushOutgoing )
                     pipeOutgoing.flush();
-            }
+            };
             _offAllPipeEventListeners = function() {
                 if( _onExternalPipeClose ) {
                     pipeIncoming.off( "close", _onExternalPipeClose );
@@ -888,7 +888,7 @@ export class OutOfWorkerRelay extends EventDispatcher {
                 }
                 pipeIncoming.disconnect();
                 pipeIncoming.dispose();
-            }
+            };
             pipeIncoming.on( "close", _onExternalPipeClose );
             pipeIncoming.on( "error", _onExternalPipeError );
             pipeIncoming.on( "message", _onExternalPipeMessage );
@@ -902,7 +902,7 @@ export class OutOfWorkerRelay extends EventDispatcher {
             pipeOutgoing.on( "close", _onRelayPipeClose );
             pipeOutgoing.on( "error", _onRelayPipeError );
             pipeOutgoing.on( "message", _onRelayPipeMessage );
-        }
+        };
         self.acceptor.on( "connection", self.onConnection_ );
     }
     dispose() {
@@ -1074,7 +1074,7 @@ export class OneToOneRelay extends EventDispatcher {
             pipeOutgoing.send( joMessage );
             if( self.isAutoFlushIncoming )
                 pipeOutgoing.flush();
-        }
+        };
         let _onOutgoingPipeMessage: any = function( eventData: any ) {
             if( settings.logging.net.relay.rawMessage ) {
                 console.log(
@@ -1107,7 +1107,7 @@ export class OneToOneRelay extends EventDispatcher {
             pipeIncoming.send( joMessage );
             if( self.isAutoFlushOutgoing )
                 pipeIncoming.flush();
-        }
+        };
         _offAllPipeEventListeners = function() {
             if( _onIncomingPipeClose ) {
                 pipeIncoming.off( "close", _onIncomingPipeClose );
@@ -1139,7 +1139,7 @@ export class OneToOneRelay extends EventDispatcher {
             }
             pipeIncoming.disconnect();
             pipeIncoming.dispose();
-        }
+        };
         pipeIncoming.on( "close", _onIncomingPipeClose );
         pipeIncoming.on( "error", _onIncomingPipeError );
         pipeIncoming.on( "message", _onIncomingPipeMessage );
@@ -1382,14 +1382,14 @@ export class WebSocketServerPipe extends BasicSocketPipe {
         this._onWsClose = function() {
             self.dispatchEvent(
                 new UniversalDispatcherEvent( "close", { socket: self } ) );
-        }
+        };
         this._onWsError = function( event: any ) {
             self.dispatchEvent(
                 new UniversalDispatcherEvent( "error", { socket: self, message: event } ) );
-        }
+        };
         this._onWsMessage = function( event: any ) {
             self.receive( event.data );
-        }
+        };
         this._removeWsEventListeners = function() {
             if( self._onWsClose ) {
                 wsConnection.removeEventListener( "close", self._onWsClose );
@@ -1587,24 +1587,24 @@ export class WebSocketClientPipe extends BasicSocketPipe {
                 self.dispatchEvent(
                     new UniversalDispatcherEvent(
                         "open", { socket: self } ) );
-            }
+            };
             this._onWsClose = function( event: any ) {
                 // alert( JSON.stringify( event ) );
                 self.isConnected = false;
                 self.dispatchEvent(
                     new UniversalDispatcherEvent(
                         "close", { socket: self, message: event } ) );
-            }
+            };
             this._onWsError = function( event: any ) {
                 // alert( JSON.stringify( event ) );
                 self.isConnected = false;
                 self.dispatchEvent(
                     new UniversalDispatcherEvent(
                         "error", { socket: self, message: event } ) );
-            }
+            };
             this._onWsMessage = function( event: any ) {
                 self.receive( event.data );
-            }
+            };
             this._removeWsEventListeners = function() {
                 if( self._onWsOpen ) {
                     self.wsConnection.removeEventListener( "open", self._onWsOpen );
@@ -1797,7 +1797,7 @@ export class RTCConnection extends EventDispatcher {
         const s = socketSentDataMarshall( data );
         if( ! this.dc ) {
             this.onError( `Attempt to send message to uninitialized RTC data channel: ${s}` );
-            return
+            return;
         }
         try {
             this.dc.send( s );
@@ -1881,7 +1881,7 @@ export class RTCConnection extends EventDispatcher {
                 "WARNING: Participant \"" + this.idRtcParticipant +
                 "\" ICE gathering state changed event with no pc\", event is:", event
             );
-            return;
+            return
         }
         if( settings.logging.net.rtc.iceGatheringStateChange ) {
             console.log(
@@ -2371,15 +2371,15 @@ export class RTCServerPeer extends RTCConnection {
             new UniversalDispatcherEvent(
                 "publishStart", { detail: { participant: self } } ) );
         self.pc.oniceconnectionstatechange =
-            function( event: any ) { self.onIceConnectionStateChange( event ); }
+            function( event: any ) { self.onIceConnectionStateChange( event ); };
         self.pc.onicegatheringstatechange =
-            function( event: any ) { self.onIceGatheringStateChange( event ); }
+            function( event: any ) { self.onIceGatheringStateChange( event ); };
         self.pc.onidentityresult =
-            function( event: any ) { self.onIceIdentifyResult( event ); }
+            function( event: any ) { self.onIceIdentifyResult( event ); };
         self.pc.onsignalingstatechange =
-            function( event: any ) { self.onIceSignalingStateChange( event ); }
+            function( event: any ) { self.onIceSignalingStateChange( event ); };
         self.pc.onnegotiationneeded =
-            function( event: any ) { self.onIceNegotiationNeeded( event ); }
+            function( event: any ) { self.onIceNegotiationNeeded( event ); };
         self.pc.createOffer( self.offerOptions ).then(
             function( offerDescription: any ) {
                 // success
@@ -2411,7 +2411,7 @@ export class RTCServerPeer extends RTCConnection {
                         self.pc.onicecandidate = function( event: any ) {
                             self.iceComplete = true;
                             self.onIceComplete( event );
-                        } // onicecandidate
+                        }; // onicecandidate
                     }, function( err: any ) {
                         // error of setLocalDescription
                         self.publishCancel();
@@ -2607,7 +2607,7 @@ export class RTCCreator extends RTCActor {
                     idSomebodyOtherSide, "and offer ID", idOffer, ":", strError );
             }
             this.onError( strError );
-            return
+            return;
         }
         const rtcPeer = this.mapServerOffers[idOffer];
         if( settings.logging.net.signaling.offerUnregister ) {
@@ -2668,7 +2668,7 @@ export class RTCCreator extends RTCActor {
                         );
                     }
                     this.onError( strError );
-                    return;
+                    return
                 }
                 const rtcPeer = this.mapServerOffers[idOffer];
                 // OKay, finally got answer from candida
@@ -2745,7 +2745,7 @@ export class RTCCreator extends RTCActor {
             break;
         default:
             super.signalingPipeOnMessage( joMessage );
-            break;
+            break
         } // switch( joMessage.method )
     }
     send( data: any ) { // implementation in RTCCreator does send to all
@@ -2840,15 +2840,15 @@ export class RTCJoiner extends RTCActor {
                     { detail: { participant: self, event } } ) );
         } );
         self.pc.oniceconnectionstatechange =
-            function( event: any ) { self.onIceConnectionStateChange( event ); }
+            function( event: any ) { self.onIceConnectionStateChange( event ); };
         self.pc.onicegatheringstatechange =
-            function( event: any ) { self.onIceGatheringStateChange( event ); }
+            function( event: any ) { self.onIceGatheringStateChange( event ); };
         self.pc.onidentityresult =
-            function( event: any ) { self.onIceIdentifyResult( event ); }
+            function( event: any ) { self.onIceIdentifyResult( event ); };
         self.pc.onsignalingstatechange =
-            function( event: any ) { self.onIceSignalingStateChange( event ); }
+            function( event: any ) { self.onIceSignalingStateChange( event ); };
         self.pc.onnegotiationneeded =
-            function( event: any ) { self.onIceNegotiationNeeded( event ); }
+            function( event: any ) { self.onIceNegotiationNeeded( event ); };
         self.pc.ondatachannel = function( event: any ) {
             self.dispatchEvent(
                 new UniversalDispatcherEvent(
@@ -2869,7 +2869,7 @@ export class RTCJoiner extends RTCActor {
             self.dc.addEventListener(
                 "message",
                 function( event: any ) { self.onDataChannelMessage( event ); } );
-        }
+        };
         self.pc.onicecandidate = function( event: any ) {
             self.iceComplete = true;
             self.onIceComplete( event );
@@ -3085,7 +3085,7 @@ export class RTCJoiner extends RTCActor {
             break;
         default:
             super.signalingPipeOnMessage( joMessage );
-            break;
+            break
         } // switch( joMessage.method )
     }
 };
@@ -3331,7 +3331,7 @@ export class WebRTCServerAcceptor extends BasicServerAcceptor {
         const onTimeoutHandler = function() {
             self.disposePendingOffer( rtcPeer.idOffer );
             self.updateAllPendingOffers();
-        }
+        };
         rtcPeer.on( "publishTimeout", onTimeoutHandler );
         rtcPeer.on( "signalingNegotiationTimeout", onTimeoutHandler );
         rtcPeer.on( "signalingNegotiationStart", function() {
@@ -3350,7 +3350,7 @@ export class WebRTCServerAcceptor extends BasicServerAcceptor {
                             errorType: "rtcPeerError"
                         }
                     } ) );
-        }
+        };
         rtcPeer.on( "error", retranslateError );
         rtcPeer.on( "rtcPeerError", retranslateError );
 
@@ -3549,10 +3549,10 @@ export class WebRTCClientPipe extends BasicSocketPipe {
                         } )
                     );
                 } );
-                return
+                return;
             } catch ( err ) {
                 console.warn( "WebRTC client connect error:", err );
-                continue
+                continue;
             }
         }
     }

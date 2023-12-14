@@ -30,17 +30,17 @@ export const UUIDv4 = function(): string {
         const r = Math.random() * 16 | 0; const v = c == "x" ? r : ( r & 0x3 | 0x8 );
         return v.toString( 16 );
     } );
-}
+};
 
 export const getRandomInt = function( nMax: number ): number {
     return Math.floor( Math.random() * Math.floor( nMax ) );
-}
+};
 
 export const randomFixedInteger = function( length: number ): number {
     return Math.floor(
         Math.pow( 10, length - 1 ) +
         Math.random() * ( Math.pow( 10, length ) - Math.pow( 10, length - 1 ) - 1 ) );
-}
+};
 
 export const randomStringABC = function( length: number, arrCharacters: string ): string {
     if( length <= 0 || arrCharacters.length == 0 )
@@ -49,7 +49,7 @@ export const randomStringABC = function( length: number, arrCharacters: string )
     for( let i = 0; i < length; ++i )
         s += arrCharacters.charAt( Math.floor( Math.random() * arrCharacters.length ) );
     return s;
-}
+};
 
 export const randomString = function(
     length: number,
@@ -77,17 +77,17 @@ export const randomString = function(
     if( arrCharacters.length == 0 )
         return "";
     return randomStringABC( length, arrCharacters );
-}
+};
 
 export const randomHexString = function( length: number ): string {
     // length in characters, not bytes, each byte is 2 characters
     const arrCharacters = "0123456789abcdef";
     return randomStringABC( length, arrCharacters );
-}
+};
 
 export const replaceAll = function( str: string, find: string, replace: string ): string {
     return str.replace( new RegExp( find, "g" ), replace );
-}
+};
 
 export const simpleEscapeString = function( s?: any ): string {
     if( s == null || s == undefined || typeof s != "string" )
@@ -97,31 +97,31 @@ export const simpleEscapeString = function( s?: any ): string {
     s = replaceAll( s, ">", "&gt;" );
     s = replaceAll( s, " ", "&nbsp;" );
     return s;
-}
+};
 
 export const abstractUniqueID = function(): string {
     const id = replaceAll( UUIDv4(), "-", "" ).toLowerCase();
     return id;
-}
+};
 
 export const isEven = function( n: number ): boolean {
     return n % 2 == 0;
-}
+};
 export const isOdd = function( n: number ): boolean {
     return Math.abs( n % 2 ) == 1;
-}
+};
 
 const gCountOfCallIdDigits: number = 10;
 export const randomCallID = function(): string {
     const id = randomHexString( gCountOfCallIdDigits );
     return id;
-}
+};
 
 const gCountOfDirectPipeIdDigits: number = 10;
 export const randomDirectPipeID = function(): string {
     const id = randomHexString( gCountOfDirectPipeIdDigits );
     return id;
-}
+};
 
 export const prepareAnswerJSON = function( joMessage: any ): any {
     const joAnswer: any = {
@@ -138,7 +138,7 @@ export const prepareAnswerJSON = function( joMessage: any ): any {
         error: null
     };
     return joAnswer;
-}
+};
 
 export const makeValidSignalingServerURL = function( strSignalingServerURL?: string ): string {
     const proto = settings.net.secure ? "wss" : "ws";
@@ -150,7 +150,7 @@ export const makeValidSignalingServerURL = function( strSignalingServerURL?: str
             ? "" + strSignalingServerURL
             : "" + proto + "://" + settings.net.hostname + ":" + settings.net.ports.signaling
         );
-}
+};
 
 export const zeroPaddingLeft = function( val: any, cntCharsNeeded: number ): string {
     if( val == null || val == undefined )
@@ -159,7 +159,7 @@ export const zeroPaddingLeft = function( val: any, cntCharsNeeded: number ): str
     while( s.length < cntCharsNeeded )
         s = "0" + s;
     return s;
-}
+};
 export const zeroPaddingRight = function( val: any, cntCharsNeeded: number ): string {
     if( val == null || val == undefined )
         return val;
@@ -167,7 +167,7 @@ export const zeroPaddingRight = function( val: any, cntCharsNeeded: number ): st
     while( s.length < cntCharsNeeded )
         s = s + "0";
     return s;
-}
+};
 
 export const parseDateTime = function( ts?: any ): Date | null {
     if( ts === null || ts === undefined )
@@ -196,7 +196,7 @@ export const parseDateTime = function( ts?: any ): Date | null {
     const d = new Date( u );
     d.setMilliseconds( millisecond );
     return d;
-}
+};
 export const formatDateTime = function(
     dt: any,
     isDate?: boolean, isTime?: boolean, isMilliseconds?: boolean,
@@ -254,4 +254,4 @@ export const formatDateTime = function(
         s += strTime;
     }
     return s;
-}
+};

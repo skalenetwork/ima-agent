@@ -294,7 +294,7 @@ function performBlsGlue(
         strLogPrefix, "performBlsGlue", strActionDir, arrSignResults.length );
     const fnShellRestore = function() {
         shell.rm( "-rf", strActionDir );
-    }
+    };
     const strOutput = ""
     try {
         let strInput = "";
@@ -382,7 +382,7 @@ function performBlsGlueU256( details: any, u256: any, arrSignResults: any[] ): a
         strLogPrefix, strActionDir, arrSignResults.length );
     const fnShellRestore = function() {
         shell.rm( "-rf", strActionDir );
-    }
+    };
     let strOutput = "";
     try {
         let strInput = "";
@@ -472,7 +472,7 @@ function performBlsVerifyI(
     const strActionDir = allocBlsTmpActionDir();
     const fnShellRestore = function() {
         shell.rm( "-rf", strActionDir );
-    }
+    };
     let strOutput = "";
     try {
         details.trace( "{p}BLS node #{} - first message nonce is {}",
@@ -536,7 +536,7 @@ function performBlsVerifyIU256(
     const strActionDir = allocBlsTmpActionDir();
     const fnShellRestore = function() {
         shell.rm( "-rf", strActionDir );
-    }
+    };
     let strOutput = "";
     try {
         const joMsg: any = { message: keccak256U256( u256, true ) };
@@ -591,7 +591,7 @@ function performBlsVerify(
     const strActionDir = allocBlsTmpActionDir();
     const fnShellRestore = function() {
         shell.rm( "-rf", strActionDir );
-    }
+    };
     let strOutput = "";
     const strLogPrefix = `${strDirection}/BLS/Summary: "`;
     try {
@@ -660,7 +660,7 @@ function performBlsVerifyU256(
     const strActionDir = allocBlsTmpActionDir();
     const fnShellRestore = function() {
         shell.rm( "-rf", strActionDir );
-    }
+    };
     let strOutput = "";
     const strLogPrefix = "BLS u256/Summary: ";
     try {
@@ -1119,7 +1119,7 @@ async function doSignProcessHandleCall(
             owaspUtils.extractErrorMessage( joOut, "unknown wallet error(1)" ),
             optsSignOperation.sequenceId );
         await joCall.disconnect();
-        return
+        return;
     }
     optsSignOperation.details.debug( "{p}Node {} sign result: {}",
         optsSignOperation.strLogPrefix, joNode.nodeID, joOut.result ? joOut.result : null );
@@ -1142,7 +1142,7 @@ async function doSignProcessHandleCall(
                         optsSignOperation.strLogPrefixA, nZeroBasedNodeIndex,
                         optsSignOperation.nThreshold, optsSignOperation.nCountOfBlsPartsToCollect );
                     await joCall.disconnect();
-                    return
+                    return;
                 }
                 const arrTmp = joOut.result.signResult.signatureShare.split( ":" );
                 const joResultFromNode: any = {
@@ -1315,7 +1315,7 @@ async function doSignMessagesImpl(
                     "successfully gathered count is reached ", optsSignOperation.strLogPrefix,
                     log.generateTimestampString( null, true ), "skale_imaVerifyAndSign",
                     strFromChainName, i, cntSuccess );
-                break
+                break;
             }
             doSignProcessOneImpl( i, optsSignOperation )
                 .then( function() {} ).catch( function( err ) {
@@ -1440,7 +1440,7 @@ async function doSignU256OneImplHandleCallResult(
         optsSignU256.details.error( "{p}S-Chain node {} reported wallet error: {err}",
             optsSignU256.strLogPrefix, strNodeDescColorized, strErrorMessage );
         await joCall.disconnect();
-        return
+        return;
     }
     optsSignU256.details.trace( "{p}Node {} sign result: ",
         optsSignU256.strLogPrefix, joNode.nodeID, joOut.result ? joOut.result : null );
@@ -1461,7 +1461,7 @@ async function doSignU256OneImplHandleCallResult(
                         "number of BLS signature parts already gathered", strLogPrefixA,
                         nZeroBasedNodeIndex, optsSignU256.nThreshold,
                         optsSignU256.nCountOfBlsPartsToCollect );
-                    return
+                    return;
                 }
                 const arrTmp = joOut.result.signResult.signatureShare.split( ":" );
                 const joResultFromNode: any = {
@@ -1695,7 +1695,7 @@ export async function doSignU256( u256: any, details: any, fn: any ) {
         optsSignU256.details.warning( "{p}BLS u256 signing is unavailable",
             optsSignU256.strLogPrefix );
         await optsSignU256.fn( "BLS u256 signing is unavailable", optsSignU256.u256 );
-        return
+        return;
     }
     if( ! ( await prepareSignU256( optsSignU256 ) ) )
         return;
@@ -1706,7 +1706,7 @@ export async function doSignU256( u256: any, details: any, fn: any ) {
     if( optsSignU256.errGathering ) {
         optsSignU256.details.error( "Failed BLS u256 sign result awaiting: {err}",
             optsSignU256.errGathering.toString() );
-        return
+        return;
     }
     optsSignU256.details.information( "{p}Completed signing u256 procedure",
         optsSignU256.strLogPrefix );
@@ -1737,7 +1737,7 @@ export async function doVerifyReadyHash(
     const strActionDir = allocBlsTmpActionDir();
     const fnShellRestore = function() {
         shell.rm( "-rf", strActionDir );
-    }
+    };
     let strOutput = "";
     try {
         const joPublicKey = discoverPublicKeyByIndex(
@@ -1967,7 +1967,7 @@ async function prepareS2sOfSkaleImaVerifyAndSign( optsHandleVerifyAndSign: any )
         if( joSChain.name.toString() == strSChainNameSrc.toString() ) {
             joSChainSrc = joSChain;
             strUrlSrcSChain = skaleObserver.pickRandomSChainUrl( joSChain );
-            break
+            break;
         }
     }
     if( joSChainSrc == null || strUrlSrcSChain == null || strUrlSrcSChain.length == 0 ) {

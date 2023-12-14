@@ -59,7 +59,7 @@ export function setWaitForNextBlockOnSChain( val: any ) {
 
 export const currentTimestamp = (): number => {
     return Date.now().valueOf() / 1000;
-}
+};
 
 export async function safeWaitForNextBlockToAppear(
     details: any, ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider ) {

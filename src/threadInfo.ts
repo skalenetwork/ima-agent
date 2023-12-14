@@ -34,7 +34,7 @@ export { joCustomThreadProperties };
 
 export const sleep = async( milliseconds: number ): Promise<void> => {
     await new Promise( resolve => setTimeout( resolve, milliseconds ) )
-}
+};
 
 export function getCurrentThreadID(): number {
     return worker_threads.threadId;

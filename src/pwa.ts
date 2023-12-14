@@ -131,7 +131,7 @@ export async function checkOnLoopStart(
                     };
                     joProps.isInProgress = false;
                     joProps.ts = 0;
-                    continue
+                    continue;
                 }
                 arrBusyNodeIndices.push( walkNodeIndex );
             }
