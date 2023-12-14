@@ -9,7 +9,8 @@ import {
     solidityPackedKeccak256,
     BytesLike,
     hexlify,
-    zeroPadValue
+    zeroPadValue,
+    TransactionResponse
 } from 'ethers'
 import { ec } from 'elliptic'
 
@@ -67,9 +68,12 @@ export async function addAllPermissions(
 export async function initDefaultValidator(validators: Contract): Promise<void> {
     if ((await validators.numberOfValidators()) === 0n) {
         console.log('going to register validator')
-        await (await validators.registerValidator(TEST_VALIDATOR_NAME, '', 10, 0)).wait()
+        let tx: TransactionResponse
+        tx = await validators.registerValidator(TEST_VALIDATOR_NAME, '', 10, 0)
+        await tx.wait(2)
         console.log('going to enable validator')
-        await (await validators.enableValidator(1)).wait()
+        tx = await validators.enableValidator(1)
+        await tx.wait(2)
         console.log('validator registered and enabled')
     } else {
         console.log('validator  already exist, skipping')
