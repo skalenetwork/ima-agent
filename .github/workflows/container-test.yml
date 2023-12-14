@@ -291,22 +291,22 @@ jobs:
     - name: SELF-TEST A - use IMA to browse S-Chain via node 00-00 and test last is alive
       working-directory: ${{env.working-directory}}
       run: |
-        node ./src/main.mjs --colors --no-gathered --browse-s-chain --url-s-chain=http://127.0.0.1:2164 || true
+        node ./src/build/main.js --colors --no-gathered --browse-s-chain --url-s-chain=http://127.0.0.1:2164 || true
 
     - name: SELF-TEST B - use IMA to browse S-Chain via node 00-01 and test last is alive
       working-directory: ${{env.working-directory}}
       run: |
-        node ./src/main.mjs --colors --no-gathered --browse-s-chain --url-s-chain=http://127.0.0.2:2264 || true
+        node ./src/build/main.js --colors --no-gathered --browse-s-chain --url-s-chain=http://127.0.0.2:2264 || true
 
     - name: SELF-TEST C - use IMA to browse S-Chain via node 01-00 and test last is alive
       working-directory: ${{env.working-directory}}
       run: |
-        node ./src/main.mjs --colors --no-gathered --browse-s-chain --url-s-chain=http://127.0.0.3:2364 || true
+        node ./src/build/main.js --colors --no-gathered --browse-s-chain --url-s-chain=http://127.0.0.3:2364 || true
 
     - name: SELF-TEST D - use IMA to browse S-Chain via node 01-01 and test last is alive
       working-directory: ${{env.working-directory}}
       run: |
-        node ./src/main.mjs --colors --no-gathered --browse-s-chain --url-s-chain=http://127.0.0.4:2464 || true
+        node ./src/build/main.js --colors --no-gathered --browse-s-chain --url-s-chain=http://127.0.0.4:2464 || true
 
     - name: INIT - build IMA docker container
       working-directory: ${{env.working-directory}}

@@ -25,11 +25,11 @@
 
 const assert = require( "chai" ).assert;
 const expect = require( "chai" ).expect;
-const IMA = require( "../../src/imaCore.mjs" );
-const imaTx = require( "../../src/imaTx.mjs" );
-const imaReg = require( "../../src/imaRegistrationOperations.mjs" );
-const imaEth = require( "../../src/imaEthOperations.mjs" );
-const imaToken = require( "../../src/imaTokenOperations.mjs" );
+const IMA = require( "../../src/build/imaCore.js" );
+const imaTx = require( "../../src/build/imaTx.js" );
+const imaReg = require( "../../src/build/imaRegistrationOperations.js" );
+const imaEth = require( "../../src/build/imaEthOperations.js" );
+const imaToken = require( "../../src/build/imaTokenOperations.js" );
 const w3mod = IMA.w3mod;
 const transactionCustomizerMainNet = imaTx.getTransactionCustomizerForMainNet();
 const transactionCustomizerSChain = imaTx.getTransactionCustomizerForSChain();

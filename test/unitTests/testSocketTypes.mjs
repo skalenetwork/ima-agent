@@ -25,12 +25,12 @@
 
 import * as path from "path";
 import * as url from "url";
-import * as networkLayer from "../../src/socket.mjs";
+import * as networkLayer from "../../src/build/socket.js";
 import { TestSocketServer } from "./testSocketServer.mjs";
 import { Worker } from "worker_threads";
-import { settings } from "../../src/socketSettings.mjs";
+import { settings } from "../../src/build/socketSettings.js";
 import * as ws from "ws";
-import * as threadInfo from "../../src/threadInfo.mjs";
+import * as threadInfo from "../../src/build/threadInfo.js";
 
 const __dirname = path.dirname( url.fileURLToPath( import.meta.url ) );
 
