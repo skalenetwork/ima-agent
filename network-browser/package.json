@@ -22,8 +22,6 @@
     "tslog": "^4.9.2"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^25.0.7",
-    "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-typescript": "^11.1.5",
     "bun-types": "^1.0.11",
     "eslint": "^8.53.0",
