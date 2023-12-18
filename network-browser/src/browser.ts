@@ -33,10 +33,10 @@ import {
     filterConnectedHashes
 } from './schains'
 import { getNodesGroups } from './nodes'
-import { CONNECTED_ONLY, IMA_NETWORK_BROWSER_DATA_PATH } from './constants'
+import { CONNECTED_ONLY, IMA_NETWORK_BROWSER_DATA_PATH, LOG_LEVEL, LOG_PRETTY } from './constants'
 import { writeJson, currentTimestamp, chainIdInt } from './tools'
 
-const log = new Logger<ILogObj>()
+const log = new Logger<ILogObj>({ minLevel: LOG_LEVEL, stylePrettyLogs: LOG_PRETTY })
 
 export async function browse(schainsInternal: Contract, nodes: Contract): Promise<void> {
     log.info('Browse iteration started, collecting chains')

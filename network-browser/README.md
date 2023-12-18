@@ -20,6 +20,8 @@ Optional env variables:
 -   `POST_ERROR_DELAY` - delay before retry if error happened in browser loop (seconds, default: `5`)
 -   `NETWORK_BROWSER_DELAY` - delay between iterations of the network-browser (seconds, default: `10800`)
 -   `NETWORK_BROWSER_TIMEOUT` - maximum amount of time allocated to the browse function (seconds, default: `1200`)
+-   `NETWORK_BROWSER_LOG_LEVEL` - log level (0: silly, 1: trace, 2: debug, 3: info, 4: warn, 5: error, 6: fatal, default: `1`)
+-   `NETWORK_BROWSER_LOG_PRETTY` - colored logs, (boolean, default: `false`)
 
 ## Development
 

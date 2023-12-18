@@ -7,7 +7,8 @@ import {
     delay,
     withTimeout,
     chainIdHex,
-    chainIdInt
+    chainIdInt,
+    isValidNumber
 } from '../src/tools'
 import { BrowserTimeoutError } from '../src/errors'
 
@@ -42,5 +43,14 @@ describe('tools module test', () => {
     test('chainId', () => {
         expect(chainIdHex('elated-tan-skat')).toBe('0x79f99296')
         expect(chainIdInt('elated-tan-skat')).toBe(2046399126)
+    })
+
+    test('isValidNumber', () => {
+        expect(isValidNumber('123')).toBeTrue
+        expect(isValidNumber('12.34')).toBeTrue
+        expect(isValidNumber('-123')).toBeTrue
+        expect(isValidNumber('abc')).toBeFalse
+        expect(isValidNumber('123abc')).toBeFalse
+        expect(isValidNumber('')).toBeFalse
     })
 })

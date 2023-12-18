@@ -25,9 +25,9 @@ import { Logger, type ILogObj } from 'tslog'
 
 import { readFileSync, writeFileSync, renameSync } from 'fs'
 import { BrowserTimeoutError } from './errors'
-import { DEFAULT_PING_DELAY, DEFAULT_PING_ITERATIONS } from './constants'
+import { DEFAULT_PING_DELAY, DEFAULT_PING_ITERATIONS, LOG_LEVEL, LOG_PRETTY } from './constants'
 
-const log = new Logger<ILogObj>()
+const log = new Logger<ILogObj>({ minLevel: LOG_LEVEL, stylePrettyLogs: LOG_PRETTY })
 
 export function stringifyBigInt(obj: any): string {
     return JSON.stringify(
@@ -116,4 +116,8 @@ export function chainIdHex(schainName: string): string {
 
 export function chainIdInt(schainName: string): number {
     return parseInt(chainIdHex(schainName))
+}
+
+export function isValidNumber(str: string): boolean {
+    return !isNaN(+str) && str.trim().length > 0
 }

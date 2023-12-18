@@ -28,7 +28,6 @@ const TEST_VALIDATOR_ID = 1n
 const ETH_TRANSFER_AMOUNT = '0.1'
 const CONFIRMATION_BLOCKS = 2
 
-
 export function validatorsContract(abi: SkaleManagerAbi, wallet: Wallet): Contract {
     return new Contract(abi.validator_service_address, abi.validator_service_abi, wallet)
 }

@@ -20,6 +20,8 @@
  * @copyright SKALE Labs 2023-Present
  */
 
+import { isValidNumber } from './tools'
+
 const MS_MULTIPLIER = 1000
 
 export function secondsEnv(envValue: string | undefined, defaultSeconds: number): number {
@@ -42,10 +44,18 @@ export function requiredEnv(name: string): string {
     return value
 }
 
-export function optionalEnv(envVar: string, defaultValue: string): string {
-    const value = process.env[envVar]
+export function optionalEnv(name: string, defaultValue: string): string {
+    const value = process.env[name]
     if (value === undefined) {
         return defaultValue
     }
     return value
+}
+
+export function optionalEnvNumber(name: string, defaultValue: number): number {
+    const value = process.env[name]
+    if (value === undefined || !isValidNumber(value)) {
+        return defaultValue
+    }
+    return Number(value)
 }
