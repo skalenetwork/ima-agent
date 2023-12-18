@@ -53,7 +53,7 @@ async function safeNetworkBrowserLoop() {
     log.info(`NETWORK_BROWSER_TIMEOUT: ${NETWORK_BROWSER_TIMEOUT}`)
     log.info(`NETWORK_BROWSER_DELAY: ${NETWORK_BROWSER_DELAY}`)
 
-    const provider = getMainnetProvider(MAINNET_RPC_URL, MULTICALL)
+    const provider = await getMainnetProvider(MAINNET_RPC_URL, MULTICALL)
     const managerAbi = getMainnetManagerAbi()
     const schainsInternal = schainsInternalContract(managerAbi, provider)
     const nodes = nodesContract(managerAbi, provider)

@@ -28,6 +28,13 @@ export const PORTS_PER_SCHAIN = 64
 export const DEFAULT_PING_DELAY = 10000
 export const DEFAULT_PING_ITERATIONS = 50000
 
+export const NETWORKS_WITH_MULTICALL = [
+    1n, // mainnet
+    3n, // ropsten
+    4n, // rinkeby
+    5n // goerli
+]
+
 // required
 
 export const MAINNET_RPC_URL = requiredEnv('MAINNET_RPC_URL')
