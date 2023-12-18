@@ -55,7 +55,7 @@ process.on( "unhandledRejection", function( reason: any, p: any ) {
 } );
 
 function parseCommandLine() {
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     log.autoEnableColorizationFromCommandLineArgs();
     const strPrintedArguments = process.argv.join( " " );
     imaCLI.parse( {
@@ -86,18 +86,22 @@ function parseCommandLine() {
     let haveReimbursementCommands = false;
     if( imaState.isShowReimbursementBalance ) {
         haveReimbursementCommands = true;
+        log.trace( "Will require reimbursement chain name to show reimbursement balance" );
         clpTools.commandLineTaskReimbursementShowBalance();
     }
-    if( imaState.nReimbursementEstimate ) {
+    if( imaState.isReimbursementEstimate ) {
         haveReimbursementCommands = true;
+        log.trace( "Will require reimbursement chain name to do reimbursement estimation" );
         clpTools.commandLineTaskReimbursementEstimateAmount();
     }
     if( imaState.nReimbursementRecharge ) {
         haveReimbursementCommands = true;
+        log.trace( "Will require reimbursement chain name to do reimbursement recharge" );
         clpTools.commandLineTaskReimbursementRecharge();
     }
     if( imaState.nReimbursementWithdraw ) {
         haveReimbursementCommands = true;
+        log.trace( "Will require reimbursement chain name to do reimbursement withdraw" );
         clpTools.commandLineTaskReimbursementWithdraw();
     }
     if( haveReimbursementCommands ) {
@@ -140,7 +144,7 @@ function parseCommandLine() {
 let gServerMonitoringWS: any = null;
 
 function initMonitoringServer(): void {
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     if( imaState.nMonitoringPort <= 0 )
         return;
     const strLogPrefix = "Monitoring: ";
@@ -221,7 +225,7 @@ function initMonitoringServer(): void {
                         ];
                         for( const paramName of arrRuntimeParamNames ) {
                             if( paramName in imaState )
-                                joAnswer.runtime_params[paramName] = imaState[paramName];
+                                joAnswer.runtime_params[paramName] = ( imaState as any )[paramName];
 
                         }
                     } break;
@@ -254,7 +258,7 @@ function initMonitoringServer(): void {
 let gExpressJsonRpcAppIMA: any = null;
 
 function initJsonRpcServer(): void {
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     if( imaState.nJsonRpcPort <= 0 )
         return;
     const strLogPrefix = "JSON RPC: ";
@@ -342,7 +346,7 @@ function initJsonRpcServer(): void {
 }
 
 async function doTheJob() {
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     const strLogPrefix = "Job 1: ";
     let idxAction = 0;
     const cntActions = imaState.arrActions.length;
@@ -386,7 +390,7 @@ function handleFirstSChainDiscoveryAttemptDone(
         process.exit( 166 );
     }
     log.success( "S-Chain network was discovered: {}", joSChainNetworkInfo );
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     imaState.joSChainNetworkInfo = joSChainNetworkInfo;
     discoveryTools.continueSChainDiscoveryInBackgroundIfNeeded(
         isSilentReDiscovery, function() {
@@ -399,7 +403,7 @@ function handleFirstSChainDiscoveryAttemptDone(
 
 async function main() {
     log.autoEnableColorizationFromCommandLineArgs();
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     const strTmpAddressFromEnvMainNet =
         owaspUtils.toEthPrivateKey( process.env.ACCOUNT_FOR_ETHEREUM );
     const strTmpAddressFromEnvSChain =

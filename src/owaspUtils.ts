@@ -387,7 +387,7 @@ export function verifyArgumentIsPathToExistingFolder( joArg?: any ): any {
     }
 }
 
-export function verifyArgumentIsArrayOfIntegers( joArg?: any ): any {
+export function verifyArgumentIsArrayOfIntegers( joArg?: any ): any[] {
     try {
         verifyArgumentWithNonEmptyValue( joArg );
         if( joArg.value.length < 3 ) {

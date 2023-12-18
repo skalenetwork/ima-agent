@@ -129,7 +129,7 @@ export function getSChainDiscoveredNodesCount( joSChainNetworkInfo: any ): numbe
 }
 
 export async function waitUntilSChainStarted() {
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     log.debug( "Checking S-Chain is accessible and sane..." );
     if( ( !imaState.chainProperties.sc.strURL ) ||
         imaState.chainProperties.sc.strURL.length === 0
@@ -207,7 +207,7 @@ async function handlePeriodicDiscoveryAttemptActions( isSilentReDiscovery: boole
         log.information( "Notice: long this S-Chain re-discovery is in progress now..." );
         return;
     }
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     fnAfter = fnAfter || function() {};
     gFlagIsInSChainDiscovery = true;
     const cntNodesOnChain = getSChainNodesCount( imaState.joSChainNetworkInfo );
@@ -290,7 +290,7 @@ export async function continueSChainDiscoveryInBackgroundIfNeeded(
     if( gTimerSChainDiscovery != null )
         return;
     fnAfter = fnAfter || function() {};
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     if( imaState.joSChainDiscovery.repeatIntervalMilliseconds <= 0 ) {
         if( ! isSilentReDiscovery )
             log.information( "This S-Chain re-discovery will not be preformed" );
@@ -333,7 +333,7 @@ export async function continueSChainDiscoveryInBackgroundIfNeeded(
 
 function handleDiscoverSkaleImaInfoResult(
     optsDiscover: any, strNodeDescColorized: string,
-    joNode: any, joCall: any, joIn: any, joOut: any
+    joNode: any, joCall: rpcCall.TRPCCall, joIn: any, joOut: any
 ): void {
     joNode.imaInfo = joOut.result;
     if( isSChainNodeFullyDiscovered( joNode ) )
@@ -373,8 +373,8 @@ async function discoverSChainWalkNodes( optsDiscover: any ) {
                 }
             }
         } catch ( err ) { }
-        const rpcCallOpts: any = null;
-        let joCall: any = null;
+        const rpcCallOpts: rpcCall.TRPCCallOpts | null = null;
+        let joCall: rpcCall.TRPCCall | null = null;
         try {
             joCall = await rpcCall.create( strNodeURL, rpcCallOpts );
             if( ! joCall )
@@ -467,7 +467,7 @@ async function discoverSChainWait( optsDiscover: any ) {
 }
 
 async function handleDiscoverSkaleNodesRpcInfoResult(
-    optsDiscover: any, scURL: string, joCall: any, joIn: any, joOut: any ) {
+    optsDiscover: any, scURL: string, joCall: rpcCall.TRPCCall, joIn: any, joOut: any ) {
     if( ! optsDiscover.isSilentReDiscovery ) {
         log.trace( "{p}OK, got (own) S-Chain network information: {}",
             optsDiscover.strLogPrefix, joOut.result );
@@ -559,10 +559,10 @@ export async function discoverSChainNetwork(
         optsDiscover.nCountToWait = 0;
     if( !optsDiscover.isSilentReDiscovery )
         log.information( "{p}This S-Chain discovery will start...", optsDiscover.strLogPrefix );
-    let joCall: any = null;
+    let joCall: rpcCall.TRPCCall | null = null;
     try {
         const scURL = optsDiscover.imaState.chainProperties.sc.strURL;
-        const rpcCallOpts: any = null;
+        const rpcCallOpts: rpcCall.TRPCCallOpts | null = null;
         joCall = await rpcCall.create( scURL, rpcCallOpts );
         if( ! joCall )
             throw new Error( `Failed to create JSON RPC call object to ${scURL}` );
@@ -600,7 +600,7 @@ function checkPeriodicDiscoveryNoLongerNeeded(
     joSChainNetworkInfo: any, isSilentReDiscovery: boolean ) {
     if( ! joSChainNetworkInfo )
         return false;
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     const cntNodesOnChain = getSChainNodesCount( imaState.joSChainNetworkInfo );
     const cntAlreadyDiscovered = getSChainDiscoveredNodesCount( joSChainNetworkInfo );
     if( ! isSilentReDiscovery ) {
@@ -622,7 +622,7 @@ export async function doPeriodicSChainNetworkDiscoveryIfNeeded(
 ) {
     if( gIntervalPeriodicDiscovery )
         return; // already started
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     let joPrevSChainNetworkInfo = imaState.joSChainNetworkInfo;
     if( checkPeriodicDiscoveryNoLongerNeeded(
         joPrevSChainNetworkInfo, isSilentReDiscovery ) ) {

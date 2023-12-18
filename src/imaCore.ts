@@ -36,6 +36,64 @@ import * as imaTransferErrorHandling from "./imaTransferErrorHandling.js";
 import * as skaleObserver from "./observer.js";
 import * as threadInfo from "./threadInfo.js";
 
+export interface TTransferOptions {
+    strDirection: string
+    joRuntimeOpts: loop.TRuntimeOpts
+    ethersProviderSrc: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider
+    joMessageProxySrc: owaspUtils.ethersMod.Contract
+    joAccountSrc: state.TAccount
+    ethersProviderDst: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider
+    joMessageProxyDst: owaspUtils.ethersMod.Contract
+    joAccountDst: state.TAccount
+    chainNameSrc: string
+    chainNameDst: string
+    chainIdSrc: string
+    chainIdDst: string
+    joDepositBoxMainNet: owaspUtils.ethersMod.Contract | null // for logs validation on mainnet
+    joTokenManagerSChain: owaspUtils.ethersMod.Contract | null // for logs validation on s-chain
+    nTransactionsCountInBlock: number
+    nTransferSteps: number
+    nMaxTransactionsCount: number
+    nBlockAwaitDepth: number
+    nBlockAge: number
+    fnSignMessages: any
+    joExtraSignOpts?: loop.TExtraSignOpts | null
+    transactionCustomizerDst: imaTx.TransactionCustomizer
+    imaState: state.TIMAState
+    nTransferLoopCounter: number
+    strTransferErrorCategoryName: string
+    strGatheredDetailsName: string
+    details: any
+    jarrReceipts: any[]
+    bErrorInSigningMessages: boolean
+    strLogPrefixShort: string
+    strLogPrefix: string
+    nStepsDone: number
+    strActionName: string
+    nIdxCurrentMsg: number
+    nOutMsgCnt: number
+    nIncMsgCnt: number
+    cntProcessed: number
+    arrMessageCounters: any[]
+    jarrMessages: any[]
+    nIdxCurrentMsgBlockStart: number
+    cntAccumulatedForBlock: number
+    arrLogRecordReferences: any[]
+    cntNodesShouldPass: number
+    cntNodesMayFail: number
+}
+
+export interface TOutgoingMessageAnalysisOptions {
+    idxMessage: number
+    idxImaMessage: number
+    joMessage: any
+    joNode: any | null
+    idxNode: number
+    cntNodes: number
+    cntPassedNodes: number
+    cntFailedNodes: number
+}
+
 log.enableColorization( false );
 log.addStdout();
 
@@ -154,7 +212,7 @@ let gTransferLoopCounter = 0;
 //            [to]           // address[] memory to
 //            [amount]       // uint256[] memory amount / *uint256[2] memory blsSignature* /
 //            )
-async function doQueryOutgoingMessageCounter( optsTransfer: any ) {
+async function doQueryOutgoingMessageCounter( optsTransfer: TTransferOptions ) {
     let nPossibleIntegerValue = 0;
     optsTransfer.details.debug( "{p}SRC MessageProxy address is.....{}",
         optsTransfer.strLogPrefixShort, optsTransfer.joMessageProxySrc.address );
@@ -262,7 +320,7 @@ async function doQueryOutgoingMessageCounter( optsTransfer: any ) {
     return true;
 }
 
-async function analyzeGatheredRecords( optsTransfer: any, r: any ) {
+async function analyzeGatheredRecords( optsTransfer: TTransferOptions, r: any ) {
     let joValues: any = null;
     const strChainHashWeAreLookingFor =
         owaspUtils.ethersMod.ethers.utils.id( optsTransfer.chainNameDst );
@@ -307,7 +365,7 @@ async function analyzeGatheredRecords( optsTransfer: any, r: any ) {
     return joValues;
 }
 
-async function gatherMessages( optsTransfer: any ) {
+async function gatherMessages( optsTransfer: TTransferOptions ) {
     optsTransfer.arrMessageCounters = [];
     optsTransfer.jarrMessages = [];
     optsTransfer.nIdxCurrentMsgBlockStart = 0 + optsTransfer.nIdxCurrentMsg;
@@ -456,7 +514,7 @@ async function gatherMessages( optsTransfer: any ) {
 }
 
 async function preCheckAllMessagesSign(
-    optsTransfer: any, err: Error | string, jarrMessages: any[], joGlueResult: any ) {
+    optsTransfer: TTransferOptions, err: Error | string, jarrMessages: any[], joGlueResult: any ) {
     const strDidInvokedSigningCallbackMessage = log.fmtDebug(
         "{p}Did invoked message signing callback, first real message index is: {}, have {} " +
         "message(s) to process {}", optsTransfer.strLogPrefix,
@@ -481,7 +539,7 @@ async function preCheckAllMessagesSign(
 }
 
 async function callbackAllMessagesSign(
-    optsTransfer: any, err: Error | string, jarrMessages: any[], joGlueResult: any ) {
+    optsTransfer: TTransferOptions, err: Error | string, jarrMessages: any[], joGlueResult: any ) {
     if( ! await preCheckAllMessagesSign( optsTransfer, err, jarrMessages, joGlueResult ) )
         return;
     const nBlockSize = optsTransfer.arrMessageCounters.length;
@@ -550,7 +608,7 @@ async function callbackAllMessagesSign(
         weiHowMuchPostIncomingMessages, null );
     if( strErrorOfDryRun )
         throw new Error( strErrorOfDryRun );
-    const opts: any = {
+    const opts: imaTx.TCustomPayedCallOptions = {
         isCheckTransactionToSchain:
             ( optsTransfer.chainNameDst !== "Mainnet" ) ? true : false
     };
@@ -624,7 +682,7 @@ async function callbackAllMessagesSign(
     }
 }
 
-async function handleAllMessagesSigning( optsTransfer: any ) {
+async function handleAllMessagesSigning( optsTransfer: TTransferOptions ) {
     try {
         let strErrFinal: string = "";
         await optsTransfer.fnSignMessages( optsTransfer.nTransferLoopCounter,
@@ -655,7 +713,8 @@ async function handleAllMessagesSigning( optsTransfer: any ) {
 }
 
 async function checkOutgoingMessageEventInOneNode(
-    optsTransfer: any, optsOutgoingMessageAnalysis: any ) {
+    optsTransfer: TTransferOptions,
+    optsOutgoingMessageAnalysis: TOutgoingMessageAnalysisOptions ) {
     const sc = optsTransfer.imaState.chainProperties.sc;
     const strUrlHttp = optsOutgoingMessageAnalysis.joNode.endpoints.ip.http;
     optsTransfer.details.trace(
@@ -742,7 +801,7 @@ async function checkOutgoingMessageEventInOneNode(
     return true;
 }
 
-async function checkOutgoingMessageEvent( optsTransfer: any, joSChain: any ) {
+async function checkOutgoingMessageEvent( optsTransfer: TTransferOptions, joSChain: any ) {
     const cntNodes = joSChain.nodes.length;
     const cntMessages = optsTransfer.jarrMessages.length;
     for( let idxMessage = 0; idxMessage < cntMessages; ++ idxMessage ) {
@@ -752,7 +811,7 @@ async function checkOutgoingMessageEvent( optsTransfer: any, joSChain: any ) {
             "{p}{bright} message analysis for message {} of {} with IMA message index {} and " +
             "message envelope data: {}", optsTransfer.strLogPrefix, optsTransfer.strDirection,
             idxMessage + 1, cntMessages, idxImaMessage, joMessage );
-        const optsOutgoingMessageAnalysis: any = {
+        const optsOutgoingMessageAnalysis: TOutgoingMessageAnalysisOptions = {
             idxMessage,
             idxImaMessage,
             joMessage,
@@ -818,7 +877,7 @@ async function checkOutgoingMessageEvent( optsTransfer: any, joSChain: any ) {
     return true;
 }
 
-async function doMainTransferLoopActions( optsTransfer: any ) {
+async function doMainTransferLoopActions( optsTransfer: TTransferOptions ) {
     // classic scanner with optional usage of optimized IMA messages search algorithm
     // outer loop is block former/creator, then transfer
     optsTransfer.nIdxCurrentMsg = optsTransfer.nIncMsgCnt;
@@ -925,11 +984,11 @@ async function doMainTransferLoopActions( optsTransfer: any ) {
 let gIsOneTransferInProgressInThisThread = false;
 
 export async function doTransfer(
-    strDirection: string, joRuntimeOpts: any,
+    strDirection: string, joRuntimeOpts: loop.TRuntimeOpts,
     ethersProviderSrc: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
-    joMessageProxySrc: owaspUtils.ethersMod.ethers.Contract, joAccountSrc: any,
+    joMessageProxySrc: owaspUtils.ethersMod.ethers.Contract, joAccountSrc: state.TAccount,
     ethersProviderDst: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
-    joMessageProxyDst: owaspUtils.ethersMod.ethers.Contract, joAccountDst: any,
+    joMessageProxyDst: owaspUtils.ethersMod.ethers.Contract, joAccountDst: state.TAccount,
     chainNameSrc: string, chainNameDst: string, chainIdSrc: string, chainIdDst: string,
     joDepositBoxMainNet:
     owaspUtils.ethersMod.ethers.Contract | null, // for logs validation on mainnet
@@ -938,10 +997,10 @@ export async function doTransfer(
     nTransactionsCountInBlock: number,
     nTransferSteps: number, nMaxTransactionsCount: number,
     nBlockAwaitDepth: number, nBlockAge: number,
-    fnSignMessages: any, joExtraSignOpts: any,
+    fnSignMessages: any, joExtraSignOpts: loop.TExtraSignOpts | null,
     transactionCustomizerDst: imaTx.TransactionCustomizer
 ) {
-    const optsTransfer: any = {
+    const optsTransfer: TTransferOptions = {
         strDirection,
         joRuntimeOpts,
         ethersProviderSrc,
@@ -983,7 +1042,9 @@ export async function doTransfer(
         jarrMessages: [],
         nIdxCurrentMsgBlockStart: 0,
         cntAccumulatedForBlock: 0,
-        arrLogRecordReferences: []
+        arrLogRecordReferences: [],
+        cntNodesShouldPass: 0,
+        cntNodesMayFail: 0
     };
     ++ gTransferLoopCounter;
     optsTransfer.strGatheredDetailsName =
@@ -1016,7 +1077,7 @@ export async function doTransfer(
             optsTransfer.fnSignMessages = async function(
                 nTransferLoopCounter: number, jarrMessages: any[],
                 nIdxCurrentMsgBlockStart: number, strFromChainName: string,
-                joExtraSignOpts: any, fnAfter: any
+                joExtraSignOpts: loop.TExtraSignOpts, fnAfter: any
             ) {
                 optsTransfer.details.debug(
                     "{p}Message signing callback was not provided to IMA, first real message " +
@@ -1090,12 +1151,12 @@ export async function doTransfer(
 }
 
 export async function doAllS2S( // s-chain --> s-chain
-    joRuntimeOpts: any,
-    imaState: any,
+    joRuntimeOpts: loop.TRuntimeOpts,
+    imaState: state.TIMAState,
     skaleObserver: any,
     ethersProviderDst: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     joMessageProxyDst: owaspUtils.ethersMod.ethers.Contract,
-    joAccountDst: any,
+    joAccountDst: state.TAccount,
     chainNameDst: string,
     chainIdDst: string,
     joTokenManagerSChain: owaspUtils.ethersMod.ethers.Contract, // for logs validation on s-chain
@@ -1144,7 +1205,7 @@ export async function doAllS2S( // s-chain --> s-chain
                             sc.joAbiIMA.message_proxy_chain_address,
                             sc.joAbiIMA.message_proxy_chain_abi,
                             ethersProviderSrc );
-                    const joExtraSignOpts: any = {
+                    const joExtraSignOpts: loop.TExtraSignOpts = {
                         chainNameSrc,
                         chainIdSrc,
                         chainNameDst,

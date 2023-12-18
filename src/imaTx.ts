@@ -26,6 +26,7 @@
 import * as path from "path";
 import * as url from "url";
 import * as childProcessModule from "child_process";
+import type * as state from "./state.js";
 
 import Redis from "ioredis";
 import * as ethereumJsUtilModule from "ethereumjs-util";
@@ -38,6 +39,33 @@ import * as imaHelperAPIs from "./imaHelperAPIs.js";
 import * as imaEventLogScan from "./imaEventLogScan.js";
 
 import * as threadInfo from "./threadInfo.js";
+
+export interface TCustomPayedCallOptions {
+    isCheckTransactionToSchain?: boolean
+}
+
+export interface TRunTimePayedCallOptions {
+    details: any
+    ethersProvider: owaspUtils.ethersMod.providers.JsonRpcProvider
+    strContractName: string
+    joContract: owaspUtils.ethersMod.Contract
+    strMethodName: string
+    arrArguments: any[]
+    joAccount: state.TAccount
+    strActionName: string
+    gasPrice: any
+    estimatedGas: any
+    weiHowMuch: any
+    opts: TCustomPayedCallOptions
+    strContractCallDescription: string
+    strLogPrefix: string
+    joACI: any | null
+    unsignedTx: any | null
+    rawTx: any | null
+    txHash: any | null
+    joReceipt: any | null
+    callOpts: any
+}
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const __dirname: string = path.dirname( url.fileURLToPath( import.meta.url ) );
@@ -72,7 +100,7 @@ export async function dryRunCall(
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     strContractName: string, joContract: owaspUtils.ethersMod.ethers.Contract,
     strMethodName: string, arrArguments: any[],
-    joAccount: any, strActionName: string, isDryRunResultIgnore: boolean,
+    joAccount: state.TAccount, strActionName: string, isDryRunResultIgnore: boolean,
     gasPrice: any, gasValue: any, weiHowMuch: any,
     opts?: any
 ) {
@@ -121,7 +149,7 @@ export async function dryRunCall(
     }
 }
 
-async function payedCallPrepare( optsPayedCall: any ) {
+async function payedCallPrepare( optsPayedCall: TRunTimePayedCallOptions ) {
     optsPayedCall.joACI = getAccountConnectivityInfo( optsPayedCall.joAccount );
     if( optsPayedCall.gasPrice ) {
         optsPayedCall.callOpts.gasPrice =
@@ -162,7 +190,7 @@ async function payedCallPrepare( optsPayedCall: any ) {
         optsPayedCall.txHash );
 }
 
-async function payedCallTM( optsPayedCall: any ) {
+async function payedCallTM( optsPayedCall: TRunTimePayedCallOptions ) {
     const txAdjusted: any =
         optsPayedCall.unsignedTx; // JSON.parse( JSON.stringify( optsPayedCall.rawTx ) );
     const arrNamesConvertToHex = [ "gas", "gasLimit", "optsPayedCall.gasPrice", "value" ];
@@ -202,10 +230,10 @@ async function payedCallTM( optsPayedCall: any ) {
     }
 }
 
-async function payedCallSGX( optsPayedCall: any ) {
+async function payedCallSGX( optsPayedCall: TRunTimePayedCallOptions ) {
     const tx = optsPayedCall.unsignedTx;
     let { chainId } = await optsPayedCall.ethersProvider.getNetwork();
-    if( chainId == "string" )
+    if( typeof chainId == "string" && chainId )
         chainId = owaspUtils.parseIntOrHex( chainId );
     optsPayedCall.details.trace( "{p}Chain ID is: {}",
         optsPayedCall.strLogPrefix, chainId );
@@ -252,12 +280,12 @@ function postConvertBN( jo: any, name: any ) {
     jo[name] = owaspUtils.toBN( jo[name] );
 }
 
-async function payedCallDirect( optsPayedCall: any ) {
+async function payedCallDirect( optsPayedCall: TRunTimePayedCallOptions ) {
     const ethersWallet = new owaspUtils.ethersMod.ethers.Wallet(
         owaspUtils.ensureStartsWith0x( optsPayedCall.joAccount.privateKey ),
         optsPayedCall.ethersProvider );
     let { chainId } = await optsPayedCall.ethersProvider.getNetwork();
-    if( chainId == "string" )
+    if( typeof chainId == "string" && chainId )
         chainId = owaspUtils.parseIntOrHex( chainId );
     optsPayedCall.details.trace( "{p}Chain ID is: {}", optsPayedCall.strLogPrefix, chainId );
     if( ( !( chainId in optsPayedCall.unsignedTx ) ) ||
@@ -284,11 +312,11 @@ export async function payedCall(
     details: any, ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     strContractName: string, joContract: owaspUtils.ethersMod.ethers.Contract,
     strMethodName: any, arrArguments: any[],
-    joAccount: any, strActionName: string,
+    joAccount: state.TAccount, strActionName: string,
     gasPrice: any, estimatedGas: any, weiHowMuch: any,
     opts?: any
 ) {
-    const optsPayedCall: any = {
+    const optsPayedCall: TRunTimePayedCallOptions = {
         details,
         ethersProvider,
         strContractName,
@@ -383,7 +411,7 @@ export async function checkTransactionToSchain(
     unsignedTx: any,
     details: any,
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
-    joAccount: any
+    joAccount: state.TAccount
 ) {
     const strLogPrefix = "PoW-mining: ";
     try {
@@ -452,7 +480,7 @@ export async function calculatePowNumber(
     }
 }
 
-export function getAccountConnectivityInfo( joAccount: any ) {
+export function getAccountConnectivityInfo( joAccount: state.TAccount ) {
     const joACI: any = {
         isBad: true,
         strType: "bad",
@@ -648,7 +676,7 @@ export class TransactionCustomizer {
         ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
         strContractName: string, joContract: owaspUtils.ethersMod.ethers.Contract,
         strMethodName: string, arrArguments: any[],
-        joAccount: any, strActionName: string,
+        joAccount: state.TAccount, strActionName: string,
         gasPrice: any, gasValueRecommended: any, weiHowMuch: any,
         opts?: any
     ) {

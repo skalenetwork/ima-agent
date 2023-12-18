@@ -40,7 +40,7 @@ export function findSChainIndexInArrayByName( arrSChains: any[], strSChainName: 
 let gConnectedChainsData: any = null;
 
 export function autoUpdateLastCachedSChains(): boolean {
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     if( ! imaState.optsS2S.strNetworkBrowserPath )
         return false;
     const jo: any = imaUtils.jsonFileLoad( imaState.optsS2S.strNetworkBrowserPath, null );

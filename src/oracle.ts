@@ -82,7 +82,7 @@ export function findPowNumber( strRequestPart: string, details: any, isVerbose?:
 
 async function handleOracleCheckResultResult(
     oracleOpts: any, details: any, isVerboseTraceDetails: boolean,
-    joCall: any, joIn: any, joOut: any
+    joCall: rpcCall.TRPCCall, joIn: any, joOut: any
 ) {
     if( isVerboseTraceDetails )
         details.debug( "RPC call(oracle_checkResult) result is: {}", joOut );
@@ -107,7 +107,7 @@ async function handleOracleCheckResultResult(
 
 async function handleOracleSubmitRequestResult(
     oracleOpts: any, details: any, isVerboseTraceDetails: boolean,
-    joCall: any, joIn: any, joOut: any
+    joCall: rpcCall.TRPCCall, joIn: any, joOut: any
 ) {
     const nMillisecondsSleepBefore = "nMillisecondsSleepBefore" in oracleOpts
         ? oracleOpts.nMillisecondsSleepBefore : 1000;
@@ -160,7 +160,8 @@ async function handleOracleSubmitRequestResult(
 export async function oracleGetGasPrice( oracleOpts: any, details: any ) {
     details = details || log;
     const url: string = oracleOpts.url;
-    let gp: any = null; let joCall: any = null;
+    let gp: any = null;
+    let joCall: rpcCall.TRPCCall | null = null;
     try {
         const isVerbose = "isVerbose" in oracleOpts ? oracleOpts.isVerbose : false;
         let isVerboseTraceDetails = "isVerboseTraceDetails" in oracleOpts

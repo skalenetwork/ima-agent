@@ -79,7 +79,7 @@ export async function safeWaitForNextBlockToAppear(
 
 export async function safeGetBlockNumber(
     details: any, cntAttempts: number,
-    ethersProvider: any,
+    ethersProvider: owaspUtils.ethersMod.providers.JsonRpcProvider,
     retValOnFail?: any, throwIfServerOffline?: boolean
 ) {
     const strFnName: string = "getBlockNumber";
@@ -105,7 +105,7 @@ export async function safeGetBlockNumber(
         }
         details.trace( "Repeat call to {} via {url}, attempt {}", strFnName + "()", u, idxAttempt );
         try {
-            ret = await ethersProvider[strFnName]();
+            ret = await ( ethersProvider as any )[strFnName]();
             return ret;
         } catch ( err ) {
             ret = retValOnFail;

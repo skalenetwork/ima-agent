@@ -87,12 +87,12 @@ async function run() {
         if( gIsDebugLogging )
             log.debug( "--- TX hash ---> {}", txHash );
 
-        const rpcCallOpts: any = {
+        const rpcCallOpts: rpcCall.TRPCCallOpts | null = {
             cert: fs.readFileSync( strPathCert, "utf8" ),
             key: fs.readFileSync( strPathKey, "utf8" )
         };
 
-        const joCall: any = await rpcCall.create( strSgxWalletURL, rpcCallOpts );
+        const joCall: rpcCall.TRPCCall = await rpcCall.create( strSgxWalletURL, rpcCallOpts );
         if( ! joCall )
             throw new Error( `Failed to create JSON RPC call object to ${strSgxWalletURL}` );
         const joIn: any = {

@@ -29,6 +29,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
 import * as threadInfo from "./threadInfo.js";
+import type * as state from "./state.js";
 
 import { v4 as uuid } from "uuid";
 export { uuid };
@@ -181,7 +182,7 @@ export async function waitForClonedTokenToAppear(
 }
 
 export async function waitForClonedTokenAppearErc20(
-    sc: any, tokenERC20SC: any, joAccountSC: any, tokensMN: any, strMainnetName: string
+    sc: any, tokenERC20SC: any, joAccountSC: state.TAccount, tokensMN: any, strMainnetName: string
 ) {
     if( "abi" in tokenERC20SC && typeof tokenERC20SC.abi == "object" &&
         "address" in tokenERC20SC && typeof tokenERC20SC.address == "string"
@@ -197,7 +198,7 @@ export async function waitForClonedTokenAppearErc20(
 }
 
 export async function waitForClonedTokenAppearErc721(
-    sc: any, tokenERC721SC: any, joAccountSC: any, tokensMN: any, strMainnetName: string
+    sc: any, tokenERC721SC: any, joAccountSC: state.TAccount, tokensMN: any, strMainnetName: string
 ) {
     if( "abi" in tokenERC721SC && typeof tokenERC721SC.abi == "object" &&
         "address" in tokenERC721SC && typeof tokenERC721SC.address == "string"
@@ -214,7 +215,7 @@ export async function waitForClonedTokenAppearErc721(
 }
 
 export async function waitForClonedTokenAppearErc721WithMetadata(
-    sc: any, tokenERC721SC: any, joAccountSC: any, tokensMN: any, strMainnetName: string
+    sc: any, tokenERC721SC: any, joAccountSC: state.TAccount, tokensMN: any, strMainnetName: string
 ) {
     if( "abi" in tokenERC721SC && typeof tokenERC721SC.abi == "object" &&
         "address" in tokenERC721SC && typeof tokenERC721SC.address == "string"
@@ -231,7 +232,7 @@ export async function waitForClonedTokenAppearErc721WithMetadata(
 }
 
 export async function waitForClonedTokenAppearErc1155(
-    sc: any, tokenERC1155SC: any, joAccountSC: any, tokensMN: any, strMainnetName: string
+    sc: any, tokenERC1155SC: any, joAccountSC: state.TAccount, tokensMN: any, strMainnetName: string
 ) {
     if( "abi" in tokenERC1155SC && typeof tokenERC1155SC.abi == "object" &&
         "address" in tokenERC1155SC && typeof tokenERC1155SC.address == "string"

@@ -30,9 +30,28 @@ import * as net from "net";
 import { validateURL, isUrlWS } from "./owaspUtils.js";
 import * as log from "./log.js";
 
+export interface TRPCCallOpts {
+    cert?: string
+    key?: string
+    ca?: string
+}
+
+export interface TRPCCall {
+    url: string
+    joRpcOptions: TRPCCallOpts | null
+    mapPendingByCallID: any
+    wsConn: ws.WebSocket | null
+    isAutoReconnect: boolean
+    isDisconnectMode: boolean
+    reconnect: any
+    reconnect_if_needed: any
+    call: any
+    disconnect: any
+}
+
 const gSecondsConnectionTimeout = 60;
 
-export async function waitWebSocketIsOpen( socket: any, fnDone: any, fnStep: any ) {
+export async function waitWebSocketIsOpen( socket: ws.WebSocket, fnDone: any, fnStep: any ) {
     fnDone = fnDone || async function( nStep: number ) {};
     fnDone = fnStep || async function( nStep: number ) { return true; };
     let nStep = 0;
@@ -66,7 +85,7 @@ export async function waitWebSocketIsOpen( socket: any, fnDone: any, fnStep: any
     await promiseComplete;
 }
 
-export async function doConnect( joCall: any, opts: any, fn?: any ) {
+export async function doConnect( joCall: TRPCCall, opts: TRPCCallOpts | null, fn?: any ) {
     try {
         if( !validateURL( joCall.url ) ) {
             throw new Error( "JSON RPC CALLER cannot connect web socket " +
@@ -75,32 +94,34 @@ export async function doConnect( joCall: any, opts: any, fn?: any ) {
         if( isUrlWS( joCall.url ) ) {
             let strWsError: string = "";
             joCall.wsConn = new ws.WebSocket( joCall.url );
-            joCall.wsConn.on( "open", async function() {
+            joCall.wsConn.on( "open", function() {
                 if( fn )
-                    await fn( joCall, null );
+                    fn( joCall, null );
             } );
-            joCall.wsConn.on( "close", async function() {
+            joCall.wsConn.on( "close", function() {
                 strWsError =
                     "web socket was closed, please check provided URL is valid and accessible";
                 joCall.wsConn = null;
             } );
-            joCall.wsConn.on( "error", async function( err: any ) {
+            joCall.wsConn.on( "error", function( err: any ) {
                 strWsError = err.toString() || "internal web socket error";
                 log.error( "{url} web socket error: {err}", joCall.url, err );
                 const wsConn = joCall.wsConn;
                 joCall.wsConn = null;
-                wsConn.close();
+                if( wsConn )
+                    wsConn.close();
                 doReconnectWsStep( joCall, opts ).then( function() {} ).catch( function() {} );
             } );
-            joCall.wsConn.on( "fail", async function( err: any ) {
+            joCall.wsConn.on( "fail", function( err: any ) {
                 strWsError = err.toString() || "internal web socket failure";
                 log.error( "{url} web socket fail: {err}", joCall.url, err );
                 const wsConn = joCall.wsConn;
                 joCall.wsConn = null;
-                wsConn.close();
+                if( wsConn )
+                    wsConn.close();
                 doReconnectWsStep( joCall, opts ).then( function() {} ).catch( function() {} );
             } );
-            joCall.wsConn.on( "message", async function incoming( data: any ) {
+            joCall.wsConn.on( "message", function incoming( data: any ) {
                 const joOut = JSON.parse( data );
                 if( joOut.id in joCall.mapPendingByCallID ) {
                     const entry = joCall.mapPendingByCallID[joOut.id];
@@ -111,7 +132,7 @@ export async function doConnect( joCall: any, opts: any, fn?: any ) {
                     }
                     clearTimeout( entry.out );
                     if( entry.fn )
-                        await entry.fn( entry.joIn, joOut, null );
+                        entry.fn( entry.joIn, joOut, null );
                 }
             } );
             await waitWebSocketIsOpen( joCall.wsConn,
@@ -128,7 +149,8 @@ export async function doConnect( joCall: any, opts: any, fn?: any ) {
                         log.error( "{url} web socket wait timeout detected", joCall.url );
                         const wsConn = joCall.wsConn;
                         joCall.wsConn = null;
-                        wsConn.close();
+                        if( wsConn )
+                            wsConn.close();
                         doReconnectWsStep( joCall, opts )
                             .then( function() {} ).catch( function() {} );
                         return false; // stop waiting
@@ -152,7 +174,7 @@ export async function doConnect( joCall: any, opts: any, fn?: any ) {
     return joCall;
 }
 
-export async function doConnectIfNeeded( joCall: any, opts: any, fn: any ) {
+export async function doConnectIfNeeded( joCall: TRPCCall, opts: TRPCCallOpts | null, fn: any ) {
     try {
         if( !validateURL( joCall.url ) ) {
             throw new Error( "JSON RPC CALLER cannot connect web socket " +
@@ -171,12 +193,12 @@ export async function doConnectIfNeeded( joCall: any, opts: any, fn: any ) {
     return joCall;
 }
 
-async function doReconnectWsStep( joCall: any, opts: any, fn?: any ) {
+async function doReconnectWsStep( joCall: TRPCCall, opts: TRPCCallOpts | null, fn?: any ) {
     if( ! joCall.isAutoReconnect )
         return;
     if( joCall.isDisconnectMode )
         return;
-    doConnect( joCall, opts, async function( joCall: any, err: any ) {
+    doConnect( joCall, opts, async function( joCall: TRPCCall, err: any ) {
         if( err ) {
             doReconnectWsStep( joCall, opts )
                 .then( function() {} ).catch( function() {} );
@@ -187,7 +209,7 @@ async function doReconnectWsStep( joCall: any, opts: any, fn?: any ) {
     } ).then( function() {} ).catch( function() {} );
 }
 
-async function doDisconnect( joCall: any, fn: any ) {
+async function doDisconnect( joCall: TRPCCall, fn: any ) {
     try {
         joCall.isDisconnectMode = true;
         const wsConn = joCall.wsConn ? joCall.wsConn : null;
@@ -206,7 +228,7 @@ async function doDisconnect( joCall: any, fn: any ) {
     }
 }
 
-export async function doCall( joCall: any, joIn: any, fn: any ) {
+export async function doCall( joCall: TRPCCall, joIn: any, fn: any ) {
     joIn = enrichTopLevelFieldsInJSON( joIn );
     if( joCall.wsConn ) {
         const entry: any = {
@@ -344,14 +366,14 @@ export async function doCall( joCall: any, joIn: any, fn: any ) {
     }
 }
 
-export async function rpcCallCreate( strURL: string, opts: any ) {
+export async function rpcCallCreate( strURL: string, opts: TRPCCallOpts | null ) {
     if( !validateURL( strURL ) )
         throw new Error( `JSON RPC CALLER cannot create a call object invalid URL: ${strURL}` );
     if( !( strURL && typeof strURL == "string" && strURL.length > 0 ) ) {
         throw new Error( "rpcCallCreate() was invoked with " +
             `bad parameters: ${JSON.stringify( arguments )}` );
     }
-    const joCall: any = {
+    const joCall: TRPCCall = {
         url: "" + strURL,
         joRpcOptions: opts ? opts : null,
         mapPendingByCallID: { },
@@ -368,7 +390,7 @@ export async function rpcCallCreate( strURL: string, opts: any ) {
         call: async function( joIn: any, fnAfter: any ) {
             const self = this;
             const promiseComplete = new Promise( function( resolve: any, reject: any ) {
-                self.reconnect_if_needed( async function( joCall: any, err: any ) {
+                self.reconnect_if_needed( async function( joCall: TRPCCall, err: any ) {
                     if( err ) {
                         if( fnAfter )
                             await fnAfter( joIn, null, err );

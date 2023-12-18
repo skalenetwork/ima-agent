@@ -29,6 +29,7 @@ import * as imaOracle from "./oracle.js";
 import * as imaTx from "./imaTx.js";
 import * as imaGasUsage from "./imaGasUsageOperations.js";
 import * as imaTransferErrorHandling from "./imaTransferErrorHandling.js";
+import type * as state from "./state.js";
 
 let gFlagIsEnabledOracle: boolean = false;
 
@@ -192,7 +193,7 @@ async function handleOracleSigned(
         isIgnoreSetGasPrice, gasPrice, estimatedGasSetGasPrice, weiHowMuch );
     if( strErrorOfDryRun )
         throw new Error( strErrorOfDryRun );
-    const opts: any = {
+    const opts: imaTx.TCustomPayedCallOptions = {
         isCheckTransactionToSchain: ( optsGasPriseSetup.chainIdSChain !== "Mainnet" ) ? true : false
     };
     const joReceipt = await imaTx.payedCall( optsGasPriseSetup.details,
@@ -217,8 +218,8 @@ export async function doOracleGasPriceSetup(
     ethersProviderMainNet: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     ethersProviderSChain: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     transactionCustomizerSChain: imaTx.TransactionCustomizer,
-    joCommunityLocker: any,
-    joAccountSC: any,
+    joCommunityLocker: owaspUtils.ethersMod.Contract,
+    joAccountSC: state.TAccount,
     chainIdMainNet: string,
     chainIdSChain: string,
     fnSignMsgOracle: any

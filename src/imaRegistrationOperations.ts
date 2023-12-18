@@ -28,12 +28,13 @@ import * as imaHelperAPIs from "./imaHelperAPIs.js";
 import * as imaTx from "./imaTx.js";
 import * as threadInfo from "./threadInfo.js";
 import type * as owaspUtils from "./owaspUtils.js";
+import type * as state from "./state.js";
 
 export async function invokeHasChain(
     details: any,
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider, // Main-Net or S-Chin
-    joLinker: any, // Main-Net or S-Chin
-    joAccount: any, // Main-Net or S-Chin
+    joLinker: owaspUtils.ethersMod.Contract, // Main-Net or S-Chin
+    joAccount: state.TAccount, // Main-Net or S-Chin
     chainIdSChain: string
 ) {
     const strLogPrefix = "Wait for added chain status: ";
@@ -55,8 +56,8 @@ export async function invokeHasChain(
 export async function waitForHasChain(
     details: any,
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider, // Main-Net or S-Chin
-    joLinker: any, // Main-Net or S-Chin
-    joAccount: any, // Main-Net or S-Chin
+    joLinker: owaspUtils.ethersMod.Contract, // Main-Net or S-Chin
+    joAccount: state.TAccount, // Main-Net or S-Chin
     chainIdSChain: string,
     cntWaitAttempts?: number,
     nSleepMilliseconds?: number
@@ -80,12 +81,12 @@ export async function waitForHasChain(
 //
 export async function checkIsRegisteredSChainInDepositBoxes( // step 1
     ethersProviderMainNet: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
-    joLinker: any,
-    joAccountMN: any,
+    joLinker: owaspUtils.ethersMod.Contract | null,
+    joAccountMN: state.TAccount,
     chainIdSChain: string
 ) {
     const details = log.createMemoryStream();
-    details.debug( "Main-net Linker address is...........{}", joLinker.address );
+    details.debug( "Main-net Linker address is...........{}", joLinker ? joLinker.address : "N/A" );
     details.debug( "S-Chain  ID is.......................{}", chainIdSChain );
     const strLogPrefix = "RegChk S in depositBox: ";
     details.debug( "{p}{p}", strLogPrefix, imaHelperAPIs.longSeparator );
@@ -95,6 +96,8 @@ export async function checkIsRegisteredSChainInDepositBoxes( // step 1
     try {
         strActionName = "checkIsRegisteredSChainInDepositBoxes(reg-step1)";
         const addressFrom = joAccountMN.address();
+        if( ! joLinker )
+            throw new Error( "No Linker contract" );
         const bIsRegistered =
             await joLinker.callStatic.hasSchain( chainIdSChain, { from: addressFrom } );
         details.success( "{p}checkIsRegisteredSChainInDepositBoxes(reg-step1) status is: {}",
@@ -115,15 +118,15 @@ export async function checkIsRegisteredSChainInDepositBoxes( // step 1
 
 export async function registerSChainInDepositBoxes( // step 1
     ethersProviderMainNet: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
-    joLinker: owaspUtils.ethersMod.ethers.Contract,
-    joAccountMN: any,
-    joTokenManagerETH: owaspUtils.ethersMod.ethers.Contract, // only s-chain
-    joTokenManagerERC20: owaspUtils.ethersMod.ethers.Contract, // only s-chain
-    joTokenManagerERC721: owaspUtils.ethersMod.ethers.Contract, // only s-chain
-    joTokenManagerERC1155: owaspUtils.ethersMod.ethers.Contract, // only s-chain
-    joTokenManagerERC721WithMetadata: owaspUtils.ethersMod.ethers.Contract, // only s-chain
-    joCommunityLocker: owaspUtils.ethersMod.ethers.Contract, // only s-chain
-    joTokenManagerLinker: owaspUtils.ethersMod.ethers.Contract,
+    joLinker: owaspUtils.ethersMod.ethers.Contract | null,
+    joAccountMN: state.TAccount,
+    joTokenManagerETH: owaspUtils.ethersMod.ethers.Contract | null, // only s-chain
+    joTokenManagerERC20: owaspUtils.ethersMod.ethers.Contract | null, // only s-chain
+    joTokenManagerERC721: owaspUtils.ethersMod.ethers.Contract | null, // only s-chain
+    joTokenManagerERC1155: owaspUtils.ethersMod.ethers.Contract | null, // only s-chain
+    joTokenManagerERC721WithMetadata: owaspUtils.ethersMod.ethers.Contract | null, // only s-chain
+    joCommunityLocker: owaspUtils.ethersMod.ethers.Contract | null, // only s-chain
+    joTokenManagerLinker: owaspUtils.ethersMod.ethers.Contract | null,
     chainNameSChain: string,
     chainNameMainNet: string,
     transactionCustomizerMainNet: imaTx.TransactionCustomizer,
@@ -132,7 +135,7 @@ export async function registerSChainInDepositBoxes( // step 1
 ) {
     const details = log.createMemoryStream();
     const jarrReceipts: any[] = [];
-    details.debug( "Main-net Linker address is..........{}", joLinker.address );
+    details.debug( "Main-net Linker address is..........{}", joLinker ? joLinker.address : "N/A" );
     details.debug( "S-Chain ID is.......................{}", chainNameSChain );
     const strLogPrefix = "Reg S in depositBoxes: ";
     details.debug( "{p}{}", strLogPrefix, imaHelperAPIs.longSeparator );
@@ -142,6 +145,22 @@ export async function registerSChainInDepositBoxes( // step 1
     try {
         strActionName = "Register S-chain in deposit boxes, step 1, connectSchain";
         details.debug( "{p}Will register S-Chain in lock_and_data on Main-net", strLogPrefix );
+        if( ! joTokenManagerLinker )
+            throw new Error( "No TokenManagerLinker contract" )
+        if( ! joCommunityLocker )
+            throw new Error( "No CommunityLocker contract" )
+        if( ! joTokenManagerETH )
+            throw new Error( "No TokenManagerETH contract" )
+        if( ! joTokenManagerERC20 )
+            throw new Error( "No TokenManagerERC20 contract" )
+        if( ! joTokenManagerERC721 )
+            throw new Error( "No TokenManagerERC721 contract" )
+        if( ! joTokenManagerERC1155 )
+            throw new Error( "No TokenManagerERC1155 contract" )
+        if( ! joTokenManagerERC721WithMetadata )
+            throw new Error( "No TokenManagerERC721WithMetadata contract" )
+        if( ! joLinker )
+            throw new Error( "No Linker contract" )
         const arrArguments = [
             chainNameSChain, [
                 joTokenManagerLinker.address, // call params

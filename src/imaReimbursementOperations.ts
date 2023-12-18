@@ -27,12 +27,13 @@ import * as log from "./log.js";
 import * as owaspUtils from "./owaspUtils.js";
 import * as imaTx from "./imaTx.js";
 import * as imaGasUsage from "./imaGasUsageOperations.js";
+import type * as state from "./state.js";
 
 export async function reimbursementShowBalance(
     ethersProviderMainNet: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
-    joCommunityPool: any,
+    joCommunityPool: owaspUtils.ethersMod.Contract,
     joReceiverMainNet: any,
-    strChainNameMainNet: any,
+    strChainNameMainNet: string,
     chainIdMainNet: string,
     transactionCustomizerMainNet: imaTx.TransactionCustomizer,
     strReimbursementChain: string,
@@ -71,7 +72,7 @@ export async function reimbursementShowBalance(
 
 export async function reimbursementEstimateAmount(
     ethersProviderMainNet: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
-    joCommunityPool: any,
+    joCommunityPool: owaspUtils.ethersMod.Contract,
     joReceiverMainNet: any,
     strChainNameMainNet: string,
     chainIdMainNet: string,
@@ -154,13 +155,13 @@ export async function reimbursementEstimateAmount(
 
 export async function reimbursementWalletRecharge(
     ethersProviderMainNet: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
-    joCommunityPool: any,
-    joAccountMN: any,
+    joCommunityPool: owaspUtils.ethersMod.Contract,
+    joAccountMN: state.TAccount,
     strChainNameMainNet: string,
-    chainIdMainNet: any,
+    chainIdMainNet: string,
     transactionCustomizerMainNet: imaTx.TransactionCustomizer,
     strReimbursementChain: string,
-    nReimbursementRecharge: any
+    nReimbursementRecharge: string | number | null
 ) {
     const details = log.createMemoryStream();
     const jarrReceipts: any = [];
@@ -216,13 +217,13 @@ export async function reimbursementWalletRecharge(
 
 export async function reimbursementWalletWithdraw(
     ethersProviderMainNet: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
-    joCommunityPool: any,
-    joAccountMN: any,
+    joCommunityPool: owaspUtils.ethersMod.Contract,
+    joAccountMN: state.TAccount,
     strChainNameMainNet: string,
     chainIdMainNet: string,
     transactionCustomizerMainNet: imaTx.TransactionCustomizer,
     strReimbursementChain: string,
-    nReimbursementWithdraw: any
+    nReimbursementWithdraw: string | number | null
 ) {
     const details = log.createMemoryStream();
     const jarrReceipts: any = [];
@@ -283,8 +284,8 @@ export async function reimbursementWalletWithdraw(
 
 export async function reimbursementSetRange(
     ethersProviderSChain: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
-    joCommunityLocker: any,
-    joAccountSC: any,
+    joCommunityLocker: owaspUtils.ethersMod.Contract,
+    joAccountSC: state.TAccount,
     strChainNameSChain: string,
     chainIdSChain: string,
     transactionCustomizerSChain: imaTx.TransactionCustomizer,
@@ -320,7 +321,7 @@ export async function reimbursementSetRange(
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
-        const opts: any = { isCheckTransactionToSchain: true };
+        const opts: imaTx.TCustomPayedCallOptions = { isCheckTransactionToSchain: true };
         const joReceipt = await imaTx.payedCall(
             details, ethersProviderSChain,
             "CommunityLocker", joCommunityLocker, "setTimeLimitPerMessage", arrArguments,

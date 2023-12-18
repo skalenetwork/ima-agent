@@ -37,16 +37,49 @@ import * as imaBLS from "./bls.js";
 import * as skaleObserver from "./observer.js";
 import * as pwa from "./pwa.js";
 import * as state from "./state.js";
+import type * as worker_threads from "worker_threads";
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const __dirname: string = path.dirname( url.fileURLToPath( import.meta.url ) );
 
+export interface TExtraSignOpts {
+    chainNameSrc: string
+    chainIdSrc: string
+    chainNameDst: string
+    chainIdDst: string
+    joAccountSrc?: state.TAccount
+    joAccountDst?: state.TAccount
+    ethersProviderSrc?: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider
+    ethersProviderDst?: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider
+}
+
+export interface TRuntimeOpts {
+    isInsideWorker: boolean
+    idxChainKnownForS2S: number
+    cntChainsKnownForS2S: number
+    joExtraSignOpts?: TExtraSignOpts
+}
+
+export interface TLoopOptions {
+    joRuntimeOpts: TRuntimeOpts
+    isDelayFirstRun: boolean
+    enableStepOracle: boolean
+    enableStepM2S: boolean
+    enableStepS2M: boolean
+    enableStepS2S: boolean
+}
+
+export interface TParallelLoopRunOptions {
+    imaState: state.TIMAState
+    details: any
+}
+
 // Run transfer loop
 
 export function checkTimeFraming(
-    d: Date | null, strDirection: string, joRuntimeOpts: any ): boolean {
+    d: Date | null, strDirection: string, joRuntimeOpts: TRuntimeOpts ): boolean {
     try {
-        const imaState = state.get();
+        const imaState: state.TIMAState = state.get();
         if( imaState.nTimeFrameSeconds <= 0 || imaState.nNodesCount <= 1 )
             return true; // time framing is disabled
 
@@ -107,10 +140,14 @@ export function checkTimeFraming(
                     "/", log.fmtInformation( "{}", joRuntimeOpts.joExtraSignOpts.chainIdSrc ),
                     "\n" );
             } else {
+                const s1: string = log.fmtInformation( "{}",
+                    joRuntimeOpts.joExtraSignOpts
+                        ? joRuntimeOpts.joExtraSignOpts.chainNameDst : "N/A" )
+                const s2: string = log.fmtInformation( "{}",
+                    joRuntimeOpts.joExtraSignOpts
+                        ? joRuntimeOpts.joExtraSignOpts.chainIdDst : "N/A" )
                 strFrameInfo += log.fmtDebug( "    S-Chain destination", "........",
-                    log.fmtInformation( "{}", joRuntimeOpts.joExtraSignOpts.chainNameDst ),
-                    "/", log.fmtInformation( "{}", joRuntimeOpts.joExtraSignOpts.chainIdDst ),
-                    "\n" );
+                    s1, "/", s2, "\n" );
             }
         }
         strFrameInfo += log.fmtDebug(
@@ -129,8 +166,8 @@ export function checkTimeFraming(
     return true;
 };
 
-async function singleTransferLoopPartOracle( optsLoop: any, strLogPrefix: string ) {
-    const imaState = state.get();
+async function singleTransferLoopPartOracle( optsLoop: TLoopOptions, strLogPrefix: string ) {
+    const imaState: state.TIMAState = state.get();
     let b0 = true;
     if( optsLoop.enableStepOracle && imaOracleOperations.getEnabledOracle() ) {
         log.notice( "{p}Will invoke Oracle gas price setup in {}...",
@@ -144,14 +181,20 @@ async function singleTransferLoopPartOracle( optsLoop: any, strLogPrefix: string
                 if( checkTimeFraming( null, "oracle", optsLoop.joRuntimeOpts ) ) {
                     imaState.loopState.oracle.isInProgress = true;
                     await pwa.notifyOnLoopStart( imaState, "oracle" );
+                    if( ! imaState.chainProperties.mn.ethersProvider )
+                        throw new Error( "No provider for MN" );
+                    if( ! imaState.chainProperties.sc.ethersProvider )
+                        throw new Error( "No provider for SC" );
+                    if( ! imaState.joCommunityLocker )
+                        throw new Error( "No CommunityLocker contract" );
                     b0 = await imaOracleOperations.doOracleGasPriceSetup(
                         imaState.chainProperties.mn.ethersProvider,
                         imaState.chainProperties.sc.ethersProvider,
                         imaState.chainProperties.sc.transactionCustomizer,
                         imaState.joCommunityLocker,
                         imaState.chainProperties.sc.joAccount,
-                        imaState.chainProperties.mn.chainId,
-                        imaState.chainProperties.sc.chainId,
+                        imaState.chainProperties.mn.chainId.toString(),
+                        imaState.chainProperties.sc.chainId.toString(),
                         imaBLS.doSignU256
                     );
                     imaState.loopState.oracle.isInProgress = false;
@@ -174,8 +217,8 @@ async function singleTransferLoopPartOracle( optsLoop: any, strLogPrefix: string
     return b0;
 }
 
-async function singleTransferLoopPartM2S( optsLoop: any, strLogPrefix: string ) {
-    const imaState = state.get();
+async function singleTransferLoopPartM2S( optsLoop: TLoopOptions, strLogPrefix: string ) {
+    const imaState: state.TIMAState = state.get();
     let b1 = true;
     if( optsLoop.enableStepM2S ) {
         log.notice( "{p}Will invoke M2S transfer in {}...",
@@ -189,6 +232,14 @@ async function singleTransferLoopPartM2S( optsLoop: any, strLogPrefix: string ) 
                 if( checkTimeFraming( null, "m2s", optsLoop.joRuntimeOpts ) ) {
                     imaState.loopState.m2s.isInProgress = true;
                     await pwa.notifyOnLoopStart( imaState, "m2s" );
+                    if( ! imaState.chainProperties.mn.ethersProvider )
+                        throw new Error( "No provider for MN" );
+                    if( ! imaState.chainProperties.sc.ethersProvider )
+                        throw new Error( "No provider for SC" );
+                    if( ! imaState.joMessageProxyMainNet )
+                        throw new Error( "No MessageProxyMainNet contract" );
+                    if( ! imaState.joMessageProxySChain )
+                        throw new Error( "No MessageProxySChain ) contract" );
                     b1 = await IMA.doTransfer( // main-net --> s-chain
                         "M2S",
                         optsLoop.joRuntimeOpts,
@@ -200,8 +251,8 @@ async function singleTransferLoopPartM2S( optsLoop: any, strLogPrefix: string ) 
                         imaState.chainProperties.sc.joAccount,
                         imaState.chainProperties.mn.strChainName,
                         imaState.chainProperties.sc.strChainName,
-                        imaState.chainProperties.mn.chainId,
-                        imaState.chainProperties.sc.chainId,
+                        imaState.chainProperties.mn.chainId.toString(),
+                        imaState.chainProperties.sc.chainId.toString(),
                         null,
                         imaState.joTokenManagerETH, // for logs validation on s-chain
                         imaState.nTransferBlockSizeM2S,
@@ -235,8 +286,8 @@ async function singleTransferLoopPartM2S( optsLoop: any, strLogPrefix: string ) 
     return b1;
 }
 
-async function singleTransferLoopPartS2M( optsLoop: any, strLogPrefix: string ) {
-    const imaState = state.get();
+async function singleTransferLoopPartS2M( optsLoop: TLoopOptions, strLogPrefix: string ) {
+    const imaState: state.TIMAState = state.get();
     let b2 = true;
     if( optsLoop.enableStepS2M ) {
         log.notice( "{p}Will invoke S2M transfer in {}...",
@@ -250,6 +301,14 @@ async function singleTransferLoopPartS2M( optsLoop: any, strLogPrefix: string ) 
                 if( checkTimeFraming( null, "s2m", optsLoop.joRuntimeOpts ) ) {
                     imaState.loopState.s2m.isInProgress = true;
                     await pwa.notifyOnLoopStart( imaState, "s2m" );
+                    if( ! imaState.chainProperties.mn.ethersProvider )
+                        throw new Error( "No provider for MN" );
+                    if( ! imaState.chainProperties.sc.ethersProvider )
+                        throw new Error( "No provider for SC" );
+                    if( ! imaState.joMessageProxyMainNet )
+                        throw new Error( "No MessageProxyMainNet contract" );
+                    if( ! imaState.joMessageProxySChain )
+                        throw new Error( "No MessageProxySChain contract" );
                     b2 = await IMA.doTransfer( // s-chain --> main-net
                         "S2M",
                         optsLoop.joRuntimeOpts,
@@ -264,8 +323,8 @@ async function singleTransferLoopPartS2M( optsLoop: any, strLogPrefix: string ) 
 
                         imaState.chainProperties.sc.strChainName,
                         imaState.chainProperties.mn.strChainName,
-                        imaState.chainProperties.sc.chainId,
-                        imaState.chainProperties.mn.chainId,
+                        imaState.chainProperties.sc.chainId.toString(),
+                        imaState.chainProperties.mn.chainId.toString(),
 
                         imaState.joDepositBoxETH, // for logs validation on mainnet
                         null,
@@ -301,12 +360,18 @@ async function singleTransferLoopPartS2M( optsLoop: any, strLogPrefix: string ) 
     return b2;
 }
 
-async function singleTransferLoopPartS2S( optsLoop: any, strLogPrefix: string ) {
-    const imaState = state.get();
+async function singleTransferLoopPartS2S( optsLoop: TLoopOptions, strLogPrefix: string ) {
+    const imaState: state.TIMAState = state.get();
     let b3 = true;
     if( optsLoop.enableStepS2S && imaState.optsS2S.isEnabled ) {
         log.notice( "{p}Will invoke all S2S transfers...", strLogPrefix );
         try {
+            if( ! imaState.chainProperties.sc.ethersProvider )
+                throw new Error( "No provider for SC" );
+            if( ! imaState.joMessageProxySChain )
+                throw new Error( "No MessageProxySChain contract" );
+            if( ! imaState.joTokenManagerETH )
+                throw new Error( "No TokenManagerETH contract" );
             b3 = await IMA.doAllS2S( // s-chain --> s-chain
                 optsLoop.joRuntimeOpts,
                 imaState,
@@ -315,12 +380,12 @@ async function singleTransferLoopPartS2S( optsLoop: any, strLogPrefix: string ) 
                 imaState.joMessageProxySChain,
                 imaState.chainProperties.sc.joAccount,
                 imaState.chainProperties.sc.strChainName,
-                imaState.chainProperties.sc.chainId,
+                imaState.chainProperties.sc.chainId.toString(),
                 imaState.joTokenManagerETH, // for logs validation on s-chain
                 imaState.nTransferBlockSizeS2S,
                 imaState.nTransferStepsS2S,
                 imaState.nMaxTransactionsS2S,
-                imaState.nBlockAwaitDepthMSS,
+                imaState.nBlockAwaitDepthS2S,
                 imaState.nBlockAgeS2S,
                 imaBLS.doSignMessagesS2S,
                 imaState.chainProperties.sc.transactionCustomizer
@@ -344,8 +409,8 @@ function printLoopPartSkippedWarning( strLoopPartName: string ) {
         "progress right now", strLoopPartName );
 }
 
-export async function singleTransferLoop( optsLoop: any ) {
-    const imaState = state.get();
+export async function singleTransferLoop( optsLoop: TLoopOptions ) {
+    const imaState: state.TIMAState = state.get();
     const strLogPrefix = `Single Loop in ${threadInfo.threadDescription( false )} `;
     try {
         log.debug( "{p}{p}", strLogPrefix, imaHelperAPIs.longSeparator );
@@ -405,15 +470,15 @@ export async function singleTransferLoop( optsLoop: any ) {
     imaState.loopState.s2s.isInProgress = false;
     return false;
 }
-export async function singleTransferLoopWithRepeat( optsLoop: any ) {
-    const imaState = state.get();
+export async function singleTransferLoopWithRepeat( optsLoop: TLoopOptions ) {
+    const imaState: state.TIMAState = state.get();
     await singleTransferLoop( optsLoop );
     setTimeout( function() {
         singleTransferLoopWithRepeat( optsLoop ).then( function() {} ).catch( function() {} );
     }, imaState.nLoopPeriodSeconds * 1000 );
 };
-export async function runTransferLoop( optsLoop: any ) {
-    const imaState = state.get();
+export async function runTransferLoop( optsLoop: TLoopOptions ) {
+    const imaState: state.TIMAState = state.get();
     const isDelayFirstRun = owaspUtils.toBoolean( optsLoop.isDelayFirstRun );
     if( isDelayFirstRun ) {
         setTimeout( function() {
@@ -426,10 +491,10 @@ export async function runTransferLoop( optsLoop: any ) {
 
 // Parallel thread based loop
 
-const gArrWorkers: any[] = [];
-const gArrClients: any[] = [];
+const gArrWorkers: worker_threads.Worker[] = [];
+const gArrClients: networkLayer.OutOfWorkerSocketClientPipe[] = [];
 
-function constructChainProperties( opts: any ) {
+function constructChainProperties( opts: TParallelLoopRunOptions ) {
     return {
         mn: {
             joAccount: {
@@ -494,8 +559,8 @@ function constructChainProperties( opts: any ) {
     };
 }
 
-function getDefaultOptsLoop( idxWorker: number ) {
-    const optsLoop: any = {
+function getDefaultOptsLoop( idxWorker: number ): TLoopOptions {
+    const optsLoop: TLoopOptions = {
         joRuntimeOpts: {
             isInsideWorker: true, idxChainKnownForS2S: 0, cntChainsKnownForS2S: 0
         },
@@ -508,14 +573,21 @@ function getDefaultOptsLoop( idxWorker: number ) {
     return optsLoop;
 }
 
-export async function ensureHaveWorkers( opts: any ) {
+interface TWorkerData {
+    url: string
+    colorization: {
+        isEnabled: boolean
+    }
+}
+
+export async function ensureHaveWorkers( opts: TParallelLoopRunOptions ) {
     if( gArrWorkers.length > 0 )
         return gArrWorkers;
     const cntWorkers = 2;
     log.debug( "Loop module will create its ",
         cntWorkers, " worker(s) in ", threadInfo.threadDescription(), "..." );
     for( let idxWorker = 0; idxWorker < cntWorkers; ++ idxWorker ) {
-        const workerData: any = {
+        const workerData: TWorkerData = {
             url: "ima_loop_server" + idxWorker,
             colorization: { isEnabled: log.isEnabledColorization() }
         };
@@ -615,6 +687,7 @@ export async function ensureHaveWorkers( opts: any ) {
                         isWithMetadata721: false,
 
                         joTokenManagerETH: null,
+                        joTokenManagerETHTarget: null,
                         joTokenManagerERC20: null,
                         joTokenManagerERC20Target: null,
                         joTokenManagerERC721: null,
@@ -673,7 +746,7 @@ export async function ensureHaveWorkers( opts: any ) {
         gArrWorkers.length, " worker(s) in ", threadInfo.threadDescription() );
 }
 
-export async function runParallelLoops( opts: any ) {
+export async function runParallelLoops( opts: TParallelLoopRunOptions ) {
     log.notice( "Will start parallel IMA transfer loops in {}...", threadInfo.threadDescription() );
     await ensureHaveWorkers( opts );
     log.success( "Done, did started parallel IMA transfer loops in {}, have {} worker(s) and {} " +
@@ -693,7 +766,7 @@ export async function spreadArrivedStateOfPendingWorkAnalysis( joMessage: any ) 
 }
 
 export async function spreadUpdatedSChainNetwork( isFinal: boolean ) {
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     const joMessage: any = {
         method: "spreadUpdatedSChainNetwork",
         isFinal: ( !!isFinal ),

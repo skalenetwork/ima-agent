@@ -36,7 +36,7 @@ import * as pwa from "./pwa.js";
 import * as log from "./log.js";
 import * as threadInfo from "./threadInfo.js";
 
-let imaState: any = state.get();
+let imaState: state.TIMAState = state.get();
 
 if( parentPort ) {
     parentPort.on( "message", jo => {
@@ -62,15 +62,15 @@ function doSendMessage( type: any, endpoint: any, workerUUID: any, data: any ) {
 
 class ObserverServer extends SocketServer {
     initComplete?: boolean;
-    opts: any;
+    opts: loop.TParallelLoopRunOptions | null;
     intervalPeriodicSchainsCaching?: number | null
     bIsPeriodicCachingStepInProgress?: boolean;
     constructor ( acceptor: any ) {
         super( acceptor );
+        this.opts = null;
         const self: any = this;
         self.initComplete = false;
         log.enableColorization( workerData.colorization.isEnabled );
-        self.opts = null;
         self.intervalPeriodicSchainsCaching = null;
         self.bIsPeriodicCachingStepInProgress = false;
         self.mapApiHandlers.init =

@@ -61,10 +61,12 @@ const gInfoRegistrationCost: any = {
 };
 
 export async function registerStep1( isPrintSummaryRegistrationCosts: boolean ) {
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     imaCLI.initContracts();
     const strLogPrefix = "Reg 1: ";
     log.information( "{p}Will check chain registration now...", strLogPrefix );
+    if( ! imaState.chainProperties.mn.ethersProvider )
+        throw new Error( "No provider for MN" );
     let bSuccess = await imaReg.checkIsRegisteredSChainInDepositBoxes( // step 1
         imaState.chainProperties.mn.ethersProvider,
         imaState.joLinker,
@@ -88,7 +90,7 @@ export async function registerStep1( isPrintSummaryRegistrationCosts: boolean ) 
             imaState.joCommunityLocker, // only s-chain
             imaState.joTokenManagerLinker, // only s-chain
             imaState.chainProperties.sc.strChainName,
-            imaState.chainProperties.mn.chainId,
+            imaState.chainProperties.mn.chainId.toString(),
             imaState.chainProperties.mn.transactionCustomizer //,
         );
     bSuccess = ( jarrReceipts != null && jarrReceipts.length > 0 ) ? true : false;
@@ -110,8 +112,10 @@ export async function registerStep1( isPrintSummaryRegistrationCosts: boolean ) 
 }
 
 export async function checkRegistrationStep1() {
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     imaCLI.initContracts();
+    if( ! imaState.chainProperties.mn.ethersProvider )
+        throw new Error( "No provider for MN" );
     const bRetVal = await imaReg.checkIsRegisteredSChainInDepositBoxes( // step 1
         imaState.chainProperties.mn.ethersProvider,
         imaState.joLinker,
@@ -131,7 +135,7 @@ export function printSummaryRegistrationCosts( details?: any ) {
 }
 
 export function commandLineTaskRegister() {
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "Full registration(all steps)",
         fn: async function() {
@@ -143,7 +147,7 @@ export function commandLineTaskRegister() {
 }
 
 export function commandLineTaskRegister1() {
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "Registration step 1, register S-Chain in deposit box",
         fn: async function() {
@@ -155,7 +159,7 @@ export function commandLineTaskRegister1() {
 }
 
 export function commandLineTaskCheckRegistration() {
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "Full registration status check(all steps)",
         fn: async function() {
@@ -171,7 +175,7 @@ export function commandLineTaskCheckRegistration() {
 }
 
 export function commandLineTaskCheckRegistration1() {
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "Registration status check step 1, register S-Chain in deposit box",
         fn: async function() {
@@ -187,7 +191,7 @@ export function commandLineTaskCheckRegistration1() {
 }
 
 export function commandLineTaskMintErc20() {
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "mint ERC20",
         fn: async function() {
@@ -196,10 +200,12 @@ export function commandLineTaskMintErc20() {
                 try {
                     const strAddressMintTo = // same as caller/transaction signer
                         imaState.chainProperties.tc.joAccount.address();
+                    if( ! imaState.chainProperties.tc.ethersProvider )
+                        throw new Error( "No provider for target chain" );
                     bMintIsOK =
                         await imaToken.mintErc20(
                             imaState.chainProperties.tc.ethersProvider,
-                            imaState.chainProperties.tc.chainId,
+                            imaState.chainProperties.tc.chainId.toString(),
                             imaState.chainProperties.tc.strChainName,
                             imaState.chainProperties.tc.joAccount,
                             strAddressMintTo,
@@ -220,7 +226,7 @@ export function commandLineTaskMintErc20() {
 }
 
 export function commandLineTaskMintErc721() {
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "mint ERC721",
         fn: async function() {
@@ -229,16 +235,20 @@ export function commandLineTaskMintErc721() {
                 try {
                     const strAddressMintTo = // same as caller/transaction signer
                         imaState.chainProperties.tc.joAccount.address();
-                    const idTokens = imaState.haveArrayOfTokenIdentifiers ? imaState.idTokens : [];
+                    const idTokens: any[] =
+                        ( imaState.haveArrayOfTokenIdentifiers && imaState.idTokens )
+                            ? imaState.idTokens : [];
                     if( imaState.haveOneTokenIdentifier )
                         idTokens.push( imaState.idToken );
                     if( idTokens.length > 0 ) {
                         for( let i = 0; i < idTokens.length; ++ i ) {
                             const idToken = idTokens[i];
+                            if( ! imaState.chainProperties.tc.ethersProvider )
+                                throw new Error( "No provider for target chain" );
                             bMintIsOK =
                                 await imaToken.mintErc721(
                                     imaState.chainProperties.tc.ethersProvider,
-                                    imaState.chainProperties.tc.chainId,
+                                    imaState.chainProperties.tc.chainId.toString(),
                                     imaState.chainProperties.tc.strChainName,
                                     imaState.chainProperties.tc.joAccount,
                                     strAddressMintTo,
@@ -261,7 +271,7 @@ export function commandLineTaskMintErc721() {
 }
 
 export function commandLineTaskMintErc1155() {
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "mint ERC1155",
         fn: async function() {
@@ -270,16 +280,20 @@ export function commandLineTaskMintErc1155() {
                 try {
                     const strAddressMintTo = // same as caller/transaction signer
                         imaState.chainProperties.tc.joAccount.address();
-                    const idTokens = imaState.haveArrayOfTokenIdentifiers ? imaState.idTokens : [];
+                    const idTokens: any[] =
+                        ( imaState.haveArrayOfTokenIdentifiers && imaState.idTokens )
+                            ? imaState.idTokens : [];
                     if( imaState.haveOneTokenIdentifier )
                         idTokens.push( imaState.idToken );
                     if( idTokens.length > 0 ) {
                         for( let i = 0; i < idTokens.length; ++ i ) {
                             const idToken = idTokens[i];
+                            if( ! imaState.chainProperties.tc.ethersProvider )
+                                throw new Error( "No provider for target chain" );
                             bMintIsOK =
                                 await imaToken.mintErc1155(
                                     imaState.chainProperties.tc.ethersProvider,
-                                    imaState.chainProperties.tc.chainId,
+                                    imaState.chainProperties.tc.chainId.toString(),
                                     imaState.chainProperties.tc.strChainName,
                                     imaState.chainProperties.tc.joAccount,
                                     strAddressMintTo,
@@ -305,7 +319,7 @@ export function commandLineTaskMintErc1155() {
 }
 
 export function commandLineTaskBurnErc20() {
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "burn ERC20",
         fn: async function() {
@@ -314,10 +328,12 @@ export function commandLineTaskBurnErc20() {
                 try {
                     const strAddressBurnFrom = // same as caller/transaction signer
                         imaState.chainProperties.tc.joAccount.address();
+                    if( ! imaState.chainProperties.tc.ethersProvider )
+                        throw new Error( "No provider for target chain" );
                     bBurnIsOK =
                         await imaToken.burnErc20(
                             imaState.chainProperties.tc.ethersProvider,
-                            imaState.chainProperties.tc.chainId,
+                            imaState.chainProperties.tc.chainId.toString(),
                             imaState.chainProperties.tc.strChainName,
                             imaState.chainProperties.tc.joAccount,
                             strAddressBurnFrom,
@@ -340,23 +356,27 @@ export function commandLineTaskBurnErc20() {
 }
 
 export function commandLineTaskBurnErc721() {
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "burn ERC721",
         fn: async function() {
             let bBurnIsOK = false;
             if( imaState.chainProperties.tc.strCoinNameErc721.length > 0 ) {
                 try {
-                    const idTokens = imaState.haveArrayOfTokenIdentifiers ? imaState.idTokens : [];
+                    const idTokens: any[] =
+                        ( imaState.haveArrayOfTokenIdentifiers && imaState.idTokens )
+                            ? imaState.idTokens : [];
                     if( imaState.haveOneTokenIdentifier )
                         idTokens.push( imaState.idToken );
                     if( idTokens.length > 0 ) {
                         for( let i = 0; i < idTokens.length; ++ i ) {
                             const idToken = idTokens[i];
+                            if( ! imaState.chainProperties.tc.ethersProvider )
+                                throw new Error( "No provider for target chain" );
                             bBurnIsOK =
                                 await imaToken.burnErc721(
                                     imaState.chainProperties.tc.ethersProvider,
-                                    imaState.chainProperties.tc.chainId,
+                                    imaState.chainProperties.tc.chainId.toString(),
                                     imaState.chainProperties.tc.strChainName,
                                     imaState.chainProperties.tc.joAccount,
                                     idToken,
@@ -364,7 +384,7 @@ export function commandLineTaskBurnErc721() {
                                         .joErc721[imaState.chainProperties
                                             .tc.strCoinNameErc721 + "_address"],
                                     imaState.chainProperties.tc
-                                        .oErc721[imaState.chainProperties
+                                        .joErc721[imaState.chainProperties
                                             .tc.strCoinNameErc721 + "_abi"],
                                     imaState.chainProperties.tc.transactionCustomizer
                                 ) ? true : false;
@@ -380,7 +400,7 @@ export function commandLineTaskBurnErc721() {
 }
 
 export function commandLineTaskBurnErc1155() {
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "burn ERC1155",
         fn: async function() {
@@ -389,16 +409,20 @@ export function commandLineTaskBurnErc1155() {
                 try {
                     const strAddressBurnFrom = // same as caller/transaction signer
                         imaState.chainProperties.tc.joAccount.address();
-                    const idTokens = imaState.haveArrayOfTokenIdentifiers ? imaState.idTokens : [];
+                    const idTokens: any[] =
+                        ( imaState.haveArrayOfTokenIdentifiers && imaState.idTokens )
+                            ? imaState.idTokens : [];
                     if( imaState.haveOneTokenIdentifier )
                         idTokens.push( imaState.idToken );
                     if( idTokens.length > 0 ) {
                         for( let i = 0; i < idTokens.length; ++ i ) {
                             const idToken = idTokens[i];
+                            if( ! imaState.chainProperties.tc.ethersProvider )
+                                throw new Error( "No provider for target chain" );
                             bBurnIsOK =
                                 await imaToken.burnErc1155(
                                     imaState.chainProperties.tc.ethersProvider,
-                                    imaState.chainProperties.tc.chainId,
+                                    imaState.chainProperties.tc.chainId.toString(),
                                     imaState.chainProperties.tc.strChainName,
                                     imaState.chainProperties.tc.joAccount,
                                     strAddressBurnFrom,
@@ -426,15 +450,18 @@ export function commandLineTaskBurnErc1155() {
 export async function commandLineTaskShowBalanceEth(
     arrBalancesMN: any[], arrBalancesSC: any[], arrBalancesTC: any[]
 ) {
-    const imaState = state.get();
-    let assetAddress = null;
+    const imaState: state.TIMAState = state.get();
+    let assetAddress: string | null = null;
     if( imaState.chainProperties.mn.ethersProvider ) {
         arrBalancesMN.push( {
             assetName: "RealETH",
             balance: await imaEth.getBalanceEth( true, // isMainNet
                 imaState.chainProperties.mn.ethersProvider,
-                imaState.chainProperties.mn.chainId, imaState.chainProperties.mn.joAccount )
+                imaState.chainProperties.mn.chainId.toString(),
+                imaState.chainProperties.mn.joAccount )
         } );
+        if( ! imaState.joDepositBoxETH )
+            throw new Error( "No DepositBoxETH contract" );
         arrBalancesMN.push( {
             assetName: "CanReceiveETH",
             balance: await imaEth.viewEthPaymentFromSchainOnMainNet(
@@ -443,7 +470,7 @@ export async function commandLineTaskShowBalanceEth(
         } );
     }
     try {
-        assetAddress = imaState.joEthErc20.address;
+        assetAddress = imaState.joEthErc20 ? imaState.joEthErc20.address : "";
     } catch ( err ) {
         assetAddress = null;
     }
@@ -452,14 +479,16 @@ export async function commandLineTaskShowBalanceEth(
             assetName: "S-Chain Real ETH as ERC20",
             assetAddress,
             balance: await imaEth.getBalanceEth( false, // isMainNet
-                imaState.chainProperties.sc.ethersProvider, imaState.chainProperties.sc.chainId,
+                imaState.chainProperties.sc.ethersProvider,
+                imaState.chainProperties.sc.chainId.toString(),
                 imaState.chainProperties.sc.joAccount, imaState.joEthErc20 )
         } );
         arrBalancesSC.push( {
             assetName: "S-Chain ETH Fuel",
             balance: await imaEth.getBalanceEth( true, // isMainNet=true here, but we call S-Chain
                 imaState.chainProperties.sc.ethersProvider,
-                imaState.chainProperties.sc.chainId, imaState.chainProperties.sc.joAccount )
+                imaState.chainProperties.sc.chainId.toString(),
+                imaState.chainProperties.sc.joAccount )
         } );
     }
     if( imaState.chainProperties.tc.ethersProvider ) {
@@ -467,14 +496,16 @@ export async function commandLineTaskShowBalanceEth(
             assetName: "Target S-Chain Real ETH as ERC20",
             assetAddress,
             balance: await imaEth.getBalanceEth( false, // isMainNet
-                imaState.chainProperties.tc.ethersProvider, imaState.chainProperties.sc.chainId,
+                imaState.chainProperties.tc.ethersProvider,
+                imaState.chainProperties.sc.chainId.toString(),
                 imaState.chainProperties.tc.joAccount, imaState.joEthErc20 )
         } );
         arrBalancesTC.push( {
             assetName: "Target S-Chain ETH Fuel",
             balance: await imaEth.getBalanceEth( true, // isMainNet=true here, but we call S-Chain
                 imaState.chainProperties.tc.ethersProvider,
-                imaState.chainProperties.tc.chainId, imaState.chainProperties.tc.joAccount )
+                imaState.chainProperties.tc.chainId.toString(),
+                imaState.chainProperties.tc.joAccount )
         } );
     }
 }
@@ -482,7 +513,7 @@ export async function commandLineTaskShowBalanceEth(
 export async function commandLineTaskShowBalanceErc20(
     arrBalancesMN: any[], arrBalancesSC: any[], arrBalancesTC: any[]
 ) {
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     let assetAddress = null;
     if( imaState.chainProperties.mn.ethersProvider &&
         imaState.chainProperties.mn.strCoinNameErc20.length > 0
@@ -495,7 +526,8 @@ export async function commandLineTaskShowBalanceErc20(
             assetName: "ERC20",
             assetAddress,
             balance: await imaToken.getBalanceErc20( true, // isMainNet
-                imaState.chainProperties.mn.ethersProvider, imaState.chainProperties.mn.chainId,
+                imaState.chainProperties.mn.ethersProvider,
+                imaState.chainProperties.mn.chainId.toString(),
                 imaState.chainProperties.mn.joAccount,
                 imaState.chainProperties.mn.strCoinNameErc20,
                 imaState.chainProperties.mn.joErc20 )
@@ -512,7 +544,8 @@ export async function commandLineTaskShowBalanceErc20(
             assetName: "ERC20",
             assetAddress,
             balance: await imaToken.getBalanceErc20( false, // isMainNet
-                imaState.chainProperties.sc.ethersProvider, imaState.chainProperties.sc.chainId,
+                imaState.chainProperties.sc.ethersProvider,
+                imaState.chainProperties.sc.chainId.toString(),
                 imaState.chainProperties.sc.joAccount,
                 imaState.chainProperties.sc.strCoinNameErc20,
                 imaState.chainProperties.sc.joErc20 )
@@ -529,7 +562,8 @@ export async function commandLineTaskShowBalanceErc20(
             assetName: "ERC20",
             assetAddress,
             balance: await imaToken.getBalanceErc20( true, // isMainNet
-                imaState.chainProperties.tc.ethersProvider, imaState.chainProperties.mn.chainId,
+                imaState.chainProperties.tc.ethersProvider,
+                imaState.chainProperties.mn.chainId.toString(),
                 imaState.chainProperties.tc.joAccount,
                 imaState.chainProperties.tc.strCoinNameErc20,
                 imaState.chainProperties.tc.joErc20 )
@@ -540,7 +574,7 @@ export async function commandLineTaskShowBalanceErc20(
 export async function commandLineTaskShowBalanceErc721(
     arrBalancesMN: any[], arrBalancesSC: any[], arrBalancesTC: any[], idTokens: any[]
 ) {
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     let assetAddress = null;
     if( imaState.chainProperties.mn.ethersProvider &&
         imaState.chainProperties.mn.strCoinNameErc721.length > 0
@@ -557,7 +591,7 @@ export async function commandLineTaskShowBalanceErc721(
                 idToken,
                 owner: await imaToken.getOwnerOfErc721( true, // isMainNet
                     imaState.chainProperties.mn.ethersProvider,
-                    imaState.chainProperties.mn.chainId,
+                    imaState.chainProperties.mn.chainId.toString(),
                     imaState.chainProperties.mn.joAccount,
                     imaState.chainProperties.mn.strCoinNameErc721,
                     imaState.chainProperties.mn.joErc721, idToken )
@@ -579,7 +613,7 @@ export async function commandLineTaskShowBalanceErc721(
                 idToken,
                 owner: await imaToken.getOwnerOfErc721( false, // isMainNet
                     imaState.chainProperties.sc.ethersProvider,
-                    imaState.chainProperties.sc.chainId,
+                    imaState.chainProperties.sc.chainId.toString(),
                     imaState.chainProperties.sc.joAccount,
                     imaState.chainProperties.sc.strCoinNameErc721,
                     imaState.chainProperties.sc.joErc721, idToken )
@@ -601,7 +635,7 @@ export async function commandLineTaskShowBalanceErc721(
                 idToken,
                 owner: await imaToken.getOwnerOfErc721( false, // isMainNet
                     imaState.chainProperties.tc.ethersProvider,
-                    imaState.chainProperties.tc.chainId,
+                    imaState.chainProperties.tc.chainId.toString(),
                     imaState.chainProperties.tc.joAccount,
                     imaState.chainProperties.tc.strCoinNameErc721,
                     imaState.chainProperties.tc.joErc721, idToken )
@@ -613,7 +647,7 @@ export async function commandLineTaskShowBalanceErc721(
 export async function commandLineTaskShowBalanceErc1155(
     arrBalancesMN: any[], arrBalancesSC: any[], arrBalancesTC: any[], idTokens: any[]
 ) {
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     let assetAddress = null;
     if( imaState.chainProperties.mn.ethersProvider &&
         imaState.chainProperties.mn.strCoinNameErc1155.length > 0
@@ -630,7 +664,7 @@ export async function commandLineTaskShowBalanceErc1155(
                 idToken,
                 balance: await imaToken.getBalanceErc1155( true, // isMainNet
                     imaState.chainProperties.mn.ethersProvider,
-                    imaState.chainProperties.mn.chainId,
+                    imaState.chainProperties.mn.chainId.toString(),
                     imaState.chainProperties.mn.joAccount,
                     imaState.chainProperties.mn.strCoinNameErc1155,
                     imaState.chainProperties.mn.joErc1155, idToken )
@@ -652,7 +686,7 @@ export async function commandLineTaskShowBalanceErc1155(
                 idToken,
                 balance: await imaToken.getBalanceErc1155( false, // isMainNet
                     imaState.chainProperties.sc.ethersProvider,
-                    imaState.chainProperties.sc.chainId,
+                    imaState.chainProperties.sc.chainId.toString(),
                     imaState.chainProperties.sc.joAccount,
                     imaState.chainProperties.sc.strCoinNameErc1155,
                     imaState.chainProperties.sc.joErc1155, idToken )
@@ -674,7 +708,7 @@ export async function commandLineTaskShowBalanceErc1155(
                 idToken,
                 balance: await imaToken.getBalanceErc1155( false, // isMainNet
                     imaState.chainProperties.tc.ethersProvider,
-                    imaState.chainProperties.tc.chainId,
+                    imaState.chainProperties.tc.chainId.toString(),
                     imaState.chainProperties.tc.joAccount,
                     imaState.chainProperties.tc.strCoinNameErc1155,
                     imaState.chainProperties.tc.joErc1155, idToken )
@@ -684,7 +718,7 @@ export async function commandLineTaskShowBalanceErc1155(
 }
 
 export function commandLineTaskShowBalance() {
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "show balance",
         fn: async function() {
@@ -694,7 +728,9 @@ export function commandLineTaskShowBalance() {
                 arrBalancesMN, arrBalancesSC, arrBalancesTC );
             await commandLineTaskShowBalanceErc20(
                 arrBalancesMN, arrBalancesSC, arrBalancesTC );
-            const idTokens = imaState.haveArrayOfTokenIdentifiers ? imaState.idTokens : [];
+            const idTokens: any[] =
+                ( imaState.haveArrayOfTokenIdentifiers && imaState.idTokens )
+                    ? imaState.idTokens : [];
             if( imaState.haveOneTokenIdentifier )
                 idTokens.push( imaState.idToken );
             if( idTokens.length > 0 ) {
@@ -742,30 +778,42 @@ export function commandLineTaskShowBalance() {
 }
 
 export function commandLineTaskPaymentM2S() {
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "one M->S single payment",
         fn: async function() {
             if( imaState.chainProperties.mn.strCoinNameErc721.length > 0 ) {
                 // ERC721 payment
                 log.information( "one M->S single ERC721 payment: {}", imaState.idToken );
+                if( ! imaState.chainProperties.mn.ethersProvider )
+                    throw new Error( "No provider for MN" );
+                if( ! imaState.chainProperties.sc.ethersProvider )
+                    throw new Error( "No provider for SC" );
+                const joDepositBoxERC721 = imaState.isWithMetadata721
+                    ? imaState.joDepositBoxERC721WithMetadata
+                    : imaState.joDepositBoxERC721;
+                if( ! joDepositBoxERC721 )
+                    throw new Error( "No DepositBoxERC721 contract" );
+                if( ! imaState.joMessageProxyMainNet )
+                    throw new Error( "No MessageProxyMainNet contract" );
+                const joTokenManagerERC721 = imaState.isWithMetadata721
+                    ? imaState.joTokenManagerERC721WithMetadata
+                    : imaState.joTokenManagerERC721;
+                if( ! joTokenManagerERC721 )
+                    throw new Error( "No TokenManagerERC721 contract" );
                 return await imaToken.doErc721PaymentFromMainNet(
                     imaState.chainProperties.mn.ethersProvider,
                     imaState.chainProperties.sc.ethersProvider,
-                    imaState.chainProperties.mn.chainId,
-                    imaState.chainProperties.sc.chainId,
+                    imaState.chainProperties.mn.chainId.toString(),
+                    imaState.chainProperties.sc.chainId.toString(),
                     imaState.chainProperties.mn.joAccount,
                     imaState.chainProperties.sc.joAccount,
-                    imaState.isWithMetadata721
-                        ? imaState.joDepositBoxERC721WithMetadata
-                        : imaState.joDepositBoxERC721, // only main net
+                    joDepositBoxERC721, // only main net
                     imaState.joMessageProxyMainNet, // for checking logs
                     imaState.chainProperties.sc.strChainName,
                     imaState.idToken, // which ERC721 token id to send
                     imaState.nAmountOfWei, // how much to send
-                    imaState.isWithMetadata721
-                        ? imaState.joTokenManagerERC721WithMetadata
-                        : imaState.joTokenManagerERC721, // only s-chain
+                    joTokenManagerERC721, // only s-chain
                     imaState.chainProperties.mn.strCoinNameErc721,
                     imaState.chainProperties.mn.joErc721,
                     imaState.chainProperties.sc.strCoinNameErc721,
@@ -776,11 +824,21 @@ export function commandLineTaskPaymentM2S() {
             if( imaState.chainProperties.tc.strCoinNameErc20.length > 0 ) {
                 // ERC20 payment
                 log.information( "one M->S single ERC20 payment: {}", imaState.nAmountOfToken );
+                if( ! imaState.chainProperties.mn.ethersProvider )
+                    throw new Error( "No provider for MN" );
+                if( ! imaState.chainProperties.sc.ethersProvider )
+                    throw new Error( "No provider for SC" );
+                if( ! imaState.joDepositBoxERC20 )
+                    throw new Error( "No DepositBoxERC20 contract" );
+                if( ! imaState.joMessageProxyMainNet )
+                    throw new Error( "No MessageProxyMainNet contract" );
+                if( ! imaState.joTokenManagerERC20 )
+                    throw new Error( "No TokenManagerERC20 contract" );
                 return await imaToken.doErc20PaymentFromMainNet(
                     imaState.chainProperties.mn.ethersProvider,
                     imaState.chainProperties.sc.ethersProvider,
-                    imaState.chainProperties.mn.chainId,
-                    imaState.chainProperties.sc.chainId,
+                    imaState.chainProperties.mn.chainId.toString(),
+                    imaState.chainProperties.sc.chainId.toString(),
                     imaState.chainProperties.mn.joAccount,
                     imaState.chainProperties.sc.joAccount,
                     imaState.joDepositBoxERC20, // only main net
@@ -796,29 +854,34 @@ export function commandLineTaskPaymentM2S() {
                     imaState.chainProperties.mn.transactionCustomizer
                 );
             }
-            if(
-                imaState.chainProperties.mn.strCoinNameErc1155.length > 0 &&
-                imaState.idToken &&
-                imaState.idToken !== null &&
+            if( imaState.chainProperties.mn.strCoinNameErc1155.length > 0 &&
+                imaState.idToken && imaState.idToken !== null &&
                 imaState.idToken !== undefined &&
-                imaState.nAmountOfToken &&
-                imaState.nAmountOfToken !== null &&
+                imaState.nAmountOfToken && imaState.nAmountOfToken !== null &&
                 imaState.nAmountOfToken !== undefined &&
-                ( ( !imaState.idTokens ) ||
-                    imaState.idTokens === null ||
+                ( ( !imaState.idTokens ) || imaState.idTokens === null ||
                     imaState.idTokens === undefined ) &&
-                ( ( !imaState.arrAmountsOfTokens ) ||
-                    imaState.arrAmountsOfTokens === null ||
+                ( ( !imaState.arrAmountsOfTokens ) || imaState.arrAmountsOfTokens === null ||
                     imaState.arrAmountsOfTokens === undefined )
             ) {
                 // ERC1155 payment
                 log.information( "one M->S single ERC1155 payment: {} {}",
                     imaState.idToken, imaState.nAmountOfToken );
+                if( ! imaState.chainProperties.mn.ethersProvider )
+                    throw new Error( "No provider for MN" );
+                if( ! imaState.chainProperties.sc.ethersProvider )
+                    throw new Error( "No provider for SC" );
+                if( ! imaState.joDepositBoxERC1155 )
+                    throw new Error( "No DepositBoxERC1155 contract" );
+                if( ! imaState.joMessageProxyMainNet )
+                    throw new Error( "No MessageProxyMainNet contract" );
+                if( ! imaState.joTokenManagerERC1155 )
+                    throw new Error( "No TokenManagerERC1155 contract" );
                 return await imaToken.doErc1155PaymentFromMainNet(
                     imaState.chainProperties.mn.ethersProvider,
                     imaState.chainProperties.sc.ethersProvider,
-                    imaState.chainProperties.mn.chainId,
-                    imaState.chainProperties.sc.chainId,
+                    imaState.chainProperties.mn.chainId.toString(),
+                    imaState.chainProperties.sc.chainId.toString(),
                     imaState.chainProperties.mn.joAccount,
                     imaState.chainProperties.sc.joAccount,
                     imaState.joDepositBoxERC1155, // only main net
@@ -853,11 +916,21 @@ export function commandLineTaskPaymentM2S() {
                 // ERC1155 Batch payment
                 log.information( "one M->S single ERC1155 Batch payment: {} {}",
                     imaState.idTokens, imaState.arrAmountsOfTokens );
+                if( ! imaState.chainProperties.mn.ethersProvider )
+                    throw new Error( "No provider for MN" );
+                if( ! imaState.chainProperties.sc.ethersProvider )
+                    throw new Error( "No provider for SC" );
+                if( ! imaState.joMessageProxyMainNet )
+                    throw new Error( "No MessageProxyMainNet contract" );
+                if( ! imaState.joDepositBoxERC1155 )
+                    throw new Error( "No DepositBoxERC1155 contract" );
+                if( ! imaState.joTokenManagerERC1155 )
+                    throw new Error( "No TokenManagerERC1155 contract" );
                 return await imaToken.doErc1155BatchPaymentFromMainNet(
                     imaState.chainProperties.mn.ethersProvider,
                     imaState.chainProperties.sc.ethersProvider,
-                    imaState.chainProperties.mn.chainId,
-                    imaState.chainProperties.sc.chainId,
+                    imaState.chainProperties.mn.chainId.toString(),
+                    imaState.chainProperties.sc.chainId.toString(),
                     imaState.chainProperties.mn.joAccount,
                     imaState.chainProperties.sc.joAccount,
                     imaState.joDepositBoxERC1155, // only main net
@@ -876,9 +949,15 @@ export function commandLineTaskPaymentM2S() {
             }
             // ETH payment
             log.information( "one M->S single ETH payment: {}", imaState.nAmountOfWei );
+            if( ! imaState.chainProperties.mn.ethersProvider )
+                throw new Error( "No provider for MN" );
+            if( ! imaState.joDepositBoxETH )
+                throw new Error( "No DepositBoxETH contract" );
+            if( ! imaState.joMessageProxyMainNet )
+                throw new Error( "No MessageProxyMainNet contract" );
             return await imaEth.doEthPaymentFromMainNet(
                 imaState.chainProperties.mn.ethersProvider,
-                imaState.chainProperties.mn.chainId,
+                imaState.chainProperties.mn.chainId.toString(),
                 imaState.chainProperties.mn.joAccount,
                 imaState.chainProperties.sc.joAccount,
                 imaState.joDepositBoxETH, // only main net
@@ -892,27 +971,41 @@ export function commandLineTaskPaymentM2S() {
 }
 
 export function commandLineTaskPaymentS2M() {
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "one S->M single payment",
         fn: async function() {
             if( imaState.chainProperties.sc.strCoinNameErc721.length > 0 ) {
                 // ERC721 payment
                 log.information( "one S->M single ERC721 payment: {}", imaState.idToken );
+                if( ! imaState.chainProperties.mn.ethersProvider )
+                    throw new Error( "No provider for MN" );
+                if( ! imaState.chainProperties.sc.ethersProvider )
+                    throw new Error( "No provider for SC" );
+                const joTokenManagerERC721 = imaState.isWithMetadata721
+                    ? imaState.joTokenManagerERC721WithMetadata
+                    : imaState.joTokenManagerERC721;
+                if( ! joTokenManagerERC721 )
+                    throw new Error( "No TokenManagerERC721 contract" );
+                if( ! imaState.joMessageProxySChain )
+                    throw new Error( "No oMessageProxySChain contract" );
+                const joDepositBoxERC721 = imaState.isWithMetadata721
+                    ? imaState.joDepositBoxERC721WithMetadata
+                    : imaState.joDepositBoxERC721;
+                if( ! joTokenManagerERC721 )
+                    throw new Error( "No DepositBoxERC721 contract" );
+                if( ! joDepositBoxERC721 )
+                    throw new Error( "No DepositBoxERC721 contract" );
                 return await imaToken.doErc721PaymentFromSChain(
                     imaState.chainProperties.mn.ethersProvider,
                     imaState.chainProperties.sc.ethersProvider,
-                    imaState.chainProperties.mn.chainId,
-                    imaState.chainProperties.sc.chainId,
+                    imaState.chainProperties.mn.chainId.toString(),
+                    imaState.chainProperties.sc.chainId.toString(),
                     imaState.chainProperties.sc.joAccount,
                     imaState.chainProperties.mn.joAccount,
-                    imaState.isWithMetadata721
-                        ? imaState.joTokenManagerERC721WithMetadata
-                        : imaState.joTokenManagerERC721, // only s-chain
+                    joTokenManagerERC721, // only s-chain
                     imaState.joMessageProxySChain, // for checking logs
-                    imaState.isWithMetadata721
-                        ? imaState.joDepositBoxERC721WithMetadata
-                        : imaState.joDepositBoxERC721, // only main net
+                    joDepositBoxERC721, // only main net
                     imaState.idToken, // which ERC721 token id to send
                     imaState.nAmountOfWei, // how much to send
                     imaState.chainProperties.mn.strCoinNameErc721,
@@ -925,11 +1018,21 @@ export function commandLineTaskPaymentS2M() {
             if( imaState.chainProperties.sc.strCoinNameErc20.length > 0 ) {
                 // ERC20 payment
                 log.information( "one S->M single ERC20 payment: {}", imaState.nAmountOfToken );
+                if( ! imaState.chainProperties.mn.ethersProvider )
+                    throw new Error( "No provider for MN" );
+                if( ! imaState.chainProperties.sc.ethersProvider )
+                    throw new Error( "No provider for SC" );
+                if( ! imaState.joTokenManagerERC20 )
+                    throw new Error( "No TokenManagerERC20 contract" );
+                if( ! imaState.joMessageProxySChain )
+                    throw new Error( "No MessageProxySChain contract" );
+                if( ! imaState.joDepositBoxERC20 )
+                    throw new Error( "No DepositBoxERC20 contract" );
                 return await imaToken.doErc20PaymentFromSChain(
                     imaState.chainProperties.mn.ethersProvider,
                     imaState.chainProperties.sc.ethersProvider,
-                    imaState.chainProperties.mn.chainId,
-                    imaState.chainProperties.sc.chainId,
+                    imaState.chainProperties.mn.chainId.toString(),
+                    imaState.chainProperties.sc.chainId.toString(),
                     imaState.chainProperties.sc.joAccount,
                     imaState.chainProperties.mn.joAccount,
                     imaState.joTokenManagerERC20, // only s-chain
@@ -962,11 +1065,21 @@ export function commandLineTaskPaymentS2M() {
                 // ERC1155 payment
                 log.information( "one S->M single ERC1155 payment: {} {}",
                     imaState.idToken, imaState.nAmountOfToken );
+                if( ! imaState.chainProperties.mn.ethersProvider )
+                    throw new Error( "No provider for MN" );
+                if( ! imaState.chainProperties.sc.ethersProvider )
+                    throw new Error( "No provider for SC" );
+                if( ! imaState.joTokenManagerERC1155 )
+                    throw new Error( "No TokenManagerERC1155 contract" );
+                if( ! imaState.joMessageProxySChain )
+                    throw new Error( "No MessageProxySChain contract" );
+                if( ! imaState.joDepositBoxERC1155 )
+                    throw new Error( "No DepositBoxERC1155 contract" );
                 return await imaToken.doErc1155PaymentFromSChain(
                     imaState.chainProperties.mn.ethersProvider,
                     imaState.chainProperties.sc.ethersProvider,
-                    imaState.chainProperties.mn.chainId,
-                    imaState.chainProperties.sc.chainId,
+                    imaState.chainProperties.mn.chainId.toString(),
+                    imaState.chainProperties.sc.chainId.toString(),
                     imaState.chainProperties.sc.joAccount,
                     imaState.chainProperties.mn.joAccount,
                     imaState.joTokenManagerERC1155, // only s-chain
@@ -1000,11 +1113,21 @@ export function commandLineTaskPaymentS2M() {
                 // ERC1155 payment
                 log.information( "one S->M single ERC1155 payment: {} {}",
                     imaState.idTokens, imaState.arrAmountsOfTokens );
+                if( ! imaState.chainProperties.mn.ethersProvider )
+                    throw new Error( "No provider for MN" );
+                if( ! imaState.chainProperties.sc.ethersProvider )
+                    throw new Error( "No provider for SC" );
+                if( ! imaState.joTokenManagerERC1155 )
+                    throw new Error( "No TokenManagerERC1155 contract" );
+                if( ! imaState.joMessageProxySChain )
+                    throw new Error( "No MessageProxySChain contract" );
+                if( ! imaState.joDepositBoxERC1155 )
+                    throw new Error( "No DepositBoxERC1155 contract" );
                 return await imaToken.doErc1155BatchPaymentFromSChain(
                     imaState.chainProperties.mn.ethersProvider,
                     imaState.chainProperties.sc.ethersProvider,
-                    imaState.chainProperties.mn.chainId,
-                    imaState.chainProperties.sc.chainId,
+                    imaState.chainProperties.mn.chainId.toString(),
+                    imaState.chainProperties.sc.chainId.toString(),
                     imaState.chainProperties.sc.joAccount,
                     imaState.chainProperties.mn.joAccount,
                     imaState.joTokenManagerERC1155, // only s-chain
@@ -1022,9 +1145,15 @@ export function commandLineTaskPaymentS2M() {
             }
             // ETH payment
             log.information( "one S->M single ETH payment: {}", imaState.nAmountOfWei );
+            if( ! imaState.chainProperties.sc.ethersProvider )
+                throw new Error( "No provider for SC" );
+            if( ! imaState.joTokenManagerETH )
+                throw new Error( "No TokenManagerETH contract" );
+            if( ! imaState.joMessageProxySChain )
+                throw new Error( "No MessageProxySChain contract" );
             return await imaEth.doEthPaymentFromSChain(
                 imaState.chainProperties.sc.ethersProvider,
-                imaState.chainProperties.sc.chainId,
+                imaState.chainProperties.sc.chainId.toString(),
                 imaState.chainProperties.sc.joAccount,
                 imaState.chainProperties.mn.joAccount,
                 imaState.joTokenManagerETH, // only s-chain
@@ -1037,19 +1166,19 @@ export function commandLineTaskPaymentS2M() {
 }
 
 export function commandLineTaskPaymentS2S() {
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "one S->S single payment",
         fn: async function() {
             const isForward = imaHelperAPIs.isForwardS2S();
             const sc = imaState.chainProperties.sc; const tc = imaState.chainProperties.tc;
-            const ethersProviderSrc: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider =
+            const ethersProviderSrc: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider | null =
                 isForward ? sc.ethersProvider : tc.ethersProvider;
             const chainIdSrc = isForward ? sc.chainId : tc.chainId;
             const joAccountSrc = isForward ? sc.joAccount : tc.joAccount;
-            const joTokenManagerERC20Src: owaspUtils.ethersMod.ethers.Contract = isForward
+            const joTokenManagerERC20Src: owaspUtils.ethersMod.ethers.Contract | null = isForward
                 ? imaState.joTokenManagerERC20 : imaState.joTokenManagerERC20Target;
-            const joTokenManagerERC721Src: owaspUtils.ethersMod.ethers.Contract = isForward
+            const joTokenManagerERC721Src: owaspUtils.ethersMod.ethers.Contract | null = isForward
                 ? ( imaState.isWithMetadata721
                     ? imaState.joTokenManagerERC721WithMetadata
                     : imaState.joTokenManagerERC721 )
@@ -1057,7 +1186,7 @@ export function commandLineTaskPaymentS2S() {
                     ? imaState.joTokenManagerERC721WithMetadataTarget
                     : imaState.joTokenManagerERC721Target );
 
-            const joTokenManagerERC1155Src: owaspUtils.ethersMod.ethers.Contract = isForward
+            const joTokenManagerERC1155Src: owaspUtils.ethersMod.ethers.Contract | null = isForward
                 ? imaState.joTokenManagerERC1155 : imaState.joTokenManagerERC1155Target;
             const strChainNameDst = isForward ? tc.strChainName : sc.strChainName;
             const strCoinNameErc20Src = isForward ? sc.strCoinNameErc20 : tc.strCoinNameErc20;
@@ -1096,10 +1225,14 @@ export function commandLineTaskPaymentS2S() {
             if( strCoinNameErc721Src.length > 0 ) {
                 // ERC721 payment
                 log.information( "one S->S single ERC721 payment: {}", imaState.idToken );
+                if( ! ethersProviderSrc )
+                    throw new Error( "No S2S source provider" );
+                if( ! joTokenManagerERC721Src )
+                    throw new Error( "No S2S source TokenManagerERC721 contract" );
                 return await imaToken.doErc721PaymentS2S(
                     isForward,
                     ethersProviderSrc,
-                    chainIdSrc,
+                    chainIdSrc.toString(),
                     strChainNameDst,
                     joAccountSrc,
                     joTokenManagerERC721Src,
@@ -1114,10 +1247,14 @@ export function commandLineTaskPaymentS2S() {
             if( strCoinNameErc20Src.length > 0 ) {
                 // ERC20 payment
                 log.information( "one S->S single ERC20 payment: {}", imaState.nAmountOfToken );
+                if( ! ethersProviderSrc )
+                    throw new Error( "No S2S source provider" );
+                if( ! joTokenManagerERC20Src )
+                    throw new Error( "No S2S source TokenManagerERC20Src contract" );
                 return await imaToken.doErc20PaymentS2S(
                     isForward,
                     ethersProviderSrc,
-                    chainIdSrc,
+                    chainIdSrc.toString(),
                     strChainNameDst,
                     joAccountSrc,
                     joTokenManagerERC20Src,
@@ -1147,10 +1284,14 @@ export function commandLineTaskPaymentS2S() {
                 // ERC1155 payment
                 log.information( "one S->S single ERC1155 payment: {} {}",
                     imaState.idToken, imaState.nAmountOfToken );
+                if( ! ethersProviderSrc )
+                    throw new Error( "No S2S source provider" );
+                if( ! joTokenManagerERC1155Src )
+                    throw new Error( "No S2S source joTokenManagerERC1155 contract" );
                 return await imaToken.doErc1155PaymentS2S(
                     isForward,
                     ethersProviderSrc,
-                    chainIdSrc,
+                    chainIdSrc.toString(),
                     strChainNameDst,
                     joAccountSrc,
                     joTokenManagerERC1155Src,
@@ -1181,10 +1322,14 @@ export function commandLineTaskPaymentS2S() {
                 // ERC1155 Batch payment
                 log.information( "one S->S single ERC1155 Batch payment: {} {}",
                     imaState.idTokens, imaState.arrAmountsOfTokens );
+                if( ! ethersProviderSrc )
+                    throw new Error( "No S2S source provider" );
+                if( ! joTokenManagerERC1155Src )
+                    throw new Error( "No S2S source joTokenManagerERC1155 contract" );
                 return await imaToken.doErc1155BatchPaymentS2S(
                     isForward,
                     ethersProviderSrc,
-                    chainIdSrc,
+                    chainIdSrc.toString(),
                     strChainNameDst,
                     joAccountSrc,
                     joTokenManagerERC1155Src,
@@ -1206,14 +1351,18 @@ export function commandLineTaskPaymentS2S() {
 }
 
 export function commandLineTaskReceiveS2M() {
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "receive one S->M single ETH payment",
         fn: async function() {
             log.information( "receive one S->M single ETH payment:" );
+            if( ! imaState.chainProperties.mn.ethersProvider )
+                throw new Error( "No provider for MN" );
+            if( ! imaState.joDepositBoxETH )
+                throw new Error( "No DepositBoxETH contract" );
             return await imaEth.receiveEthPaymentFromSchainOnMainNet(
                 imaState.chainProperties.mn.ethersProvider,
-                imaState.chainProperties.mn.chainId,
+                imaState.chainProperties.mn.chainId.toString(),
                 imaState.chainProperties.mn.joAccount,
                 imaState.joDepositBoxETH,
                 imaState.chainProperties.mn.transactionCustomizer
@@ -1223,11 +1372,16 @@ export function commandLineTaskReceiveS2M() {
 }
 
 export function commandLineTaskViewS2M() {
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "view one S->M single ETH payment",
         fn: async function() {
             log.information( "view one S->M single ETH payment:" );
+            log.information( "receive one S->M single ETH payment:" );
+            if( ! imaState.chainProperties.mn.ethersProvider )
+                throw new Error( "No provider for MN" );
+            if( ! imaState.joDepositBoxETH )
+                throw new Error( "No DepositBoxETH contract" );
             const xWei = await imaEth.viewEthPaymentFromSchainOnMainNet(
                 imaState.chainProperties.mn.ethersProvider,
                 imaState.chainProperties.mn.joAccount,
@@ -1244,17 +1398,25 @@ export function commandLineTaskViewS2M() {
 }
 
 export function commandLineTaskTransferM2S() {
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "single M->S transfer loop",
         fn: async function() {
             if( ! imaState.bNoWaitSChainStarted )
                 await discoveryTools.waitUntilSChainStarted(); // main-net --> s-chain transfer
-            const joRuntimeOpts: any = {
+            const joRuntimeOpts: loop.TRuntimeOpts = {
                 isInsideWorker: false,
                 idxChainKnownForS2S: 0,
                 cntChainsKnownForS2S: 0
             };
+            if( ! imaState.chainProperties.mn.ethersProvider )
+                throw new Error( "No provider for MN" );
+            if( ! imaState.chainProperties.sc.ethersProvider )
+                throw new Error( "No provider for SC" );
+            if( ! imaState.joMessageProxyMainNet )
+                throw new Error( "No MessageProxyMainNet contract" );
+            if( ! imaState.joMessageProxySChain )
+                throw new Error( "No MessageProxySChain contract" );
             return await IMA.doTransfer( // main-net --> s-chain
                 "M2S",
                 joRuntimeOpts,
@@ -1266,8 +1428,8 @@ export function commandLineTaskTransferM2S() {
                 imaState.chainProperties.sc.joAccount,
                 imaState.chainProperties.mn.strChainName,
                 imaState.chainProperties.sc.strChainName,
-                imaState.chainProperties.mn.chainId,
-                imaState.chainProperties.sc.chainId,
+                imaState.chainProperties.mn.chainId.toString(),
+                imaState.chainProperties.sc.chainId.toString(),
                 null,
                 imaState.joTokenManagerETH, // for logs validation on s-chain
                 imaState.nTransferBlockSizeM2S,
@@ -1284,17 +1446,25 @@ export function commandLineTaskTransferM2S() {
 }
 
 export function commandLineTaskTransferS2M() {
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "single S->M transfer loop",
         fn: async function() {
             if( ! imaState.bNoWaitSChainStarted )
                 await discoveryTools.waitUntilSChainStarted(); // s-chain --> main-net transfer
-            const joRuntimeOpts: any = {
+            const joRuntimeOpts: loop.TRuntimeOpts = {
                 isInsideWorker: false,
                 idxChainKnownForS2S: 0,
                 cntChainsKnownForS2S: 0
             };
+            if( ! imaState.chainProperties.mn.ethersProvider )
+                throw new Error( "No provider for MN" );
+            if( ! imaState.chainProperties.sc.ethersProvider )
+                throw new Error( "No provider for SC" );
+            if( ! imaState.joMessageProxyMainNet )
+                throw new Error( "No MessageProxyMainNet contract" );
+            if( ! imaState.joMessageProxySChain )
+                throw new Error( "No MessageProxySChain contract" );
             return await IMA.doTransfer( // s-chain --> main-net
                 "S2M",
                 joRuntimeOpts,
@@ -1306,8 +1476,8 @@ export function commandLineTaskTransferS2M() {
                 imaState.chainProperties.mn.joAccount,
                 imaState.chainProperties.sc.strChainName,
                 imaState.chainProperties.mn.strChainName,
-                imaState.chainProperties.sc.chainId,
-                imaState.chainProperties.mn.chainId,
+                imaState.chainProperties.sc.chainId.toString(),
+                imaState.chainProperties.mn.chainId.toString(),
                 imaState.joDepositBoxETH, // for logs validation on mainnet
                 null,
                 imaState.nTransferBlockSizeS2M,
@@ -1324,7 +1494,7 @@ export function commandLineTaskTransferS2M() {
 }
 
 export function commandLineTaskTransferS2S() {
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "single S->S transfer loop",
         fn: async function() {
@@ -1332,11 +1502,17 @@ export function commandLineTaskTransferS2S() {
                 return;
             if( ! imaState.bNoWaitSChainStarted )
                 await discoveryTools.waitUntilSChainStarted(); // s-chain --> main-net transfer
-            const joRuntimeOpts: any = {
+            const joRuntimeOpts: loop.TRuntimeOpts = {
                 isInsideWorker: false,
                 idxChainKnownForS2S: 0,
                 cntChainsKnownForS2S: 0
             };
+            if( ! imaState.chainProperties.sc.ethersProvider )
+                throw new Error( "No provider for SC" );
+            if( ! imaState.joMessageProxySChain )
+                throw new Error( "No MessageProxySChain contract" );
+            if( ! imaState.joTokenManagerETH )
+                throw new Error( "No TokenManagerETH contract" );
             return await IMA.doAllS2S( // s-chain --> s-chain
                 joRuntimeOpts,
                 imaState,
@@ -1345,7 +1521,7 @@ export function commandLineTaskTransferS2S() {
                 imaState.joMessageProxySChain,
                 imaState.chainProperties.sc.joAccount,
                 imaState.chainProperties.sc.strChainName,
-                imaState.chainProperties.sc.chainId,
+                imaState.chainProperties.sc.chainId.toString(),
                 imaState.joTokenManagerETH, // for logs validation on s-chain
                 imaState.nTransferBlockSizeM2S,
                 imaState.nTransferStepsS2S,
@@ -1360,18 +1536,18 @@ export function commandLineTaskTransferS2S() {
 }
 
 export function commandLineTaskTransfer() {
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "Single M<->S transfer loop iteration",
         fn: async function() {
             if( ! imaState.bNoWaitSChainStarted )
                 await discoveryTools.waitUntilSChainStarted();
-            const joRuntimeOpts: any = {
+            const joRuntimeOpts: loop.TRuntimeOpts = {
                 isInsideWorker: false,
                 idxChainKnownForS2S: 0,
                 cntChainsKnownForS2S: 0
             };
-            const optsLoop: any = {
+            const optsLoop: loop.TLoopOptions = {
                 joRuntimeOpts,
                 isDelayFirstRun: false,
                 enableStepOracle: true,
@@ -1385,7 +1561,7 @@ export function commandLineTaskTransfer() {
 }
 
 export function commandLineTaskLoop() {
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "M<->S and S->S transfer loop, startup in parallel mode",
         fn: async function() {
@@ -1400,19 +1576,17 @@ export function commandLineTaskLoop() {
             }
             if( isPrintSummaryRegistrationCosts )
                 printSummaryRegistrationCosts();
-            const opts: any = {
+            const opts: loop.TParallelLoopRunOptions = {
                 imaState,
                 details: log
             };
-            return await loop.runParallelLoops(
-                opts
-            );
+            return await loop.runParallelLoops( opts );
         }
     } );
 }
 
 export function commandLineTaskLoopSimple() {
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "M<->S and S->S transfer loop, startup simple mode",
         fn: async function() {
@@ -1427,12 +1601,12 @@ export function commandLineTaskLoopSimple() {
             }
             if( isPrintSummaryRegistrationCosts )
                 printSummaryRegistrationCosts();
-            const joRuntimeOpts: any = {
+            const joRuntimeOpts: loop.TRuntimeOpts = {
                 isInsideWorker: false,
                 idxChainKnownForS2S: 0,
                 cntChainsKnownForS2S: 0
             };
-            const optsLoop: any = {
+            const optsLoop: loop.TLoopOptions = {
                 joRuntimeOpts,
                 isDelayFirstRun: false,
                 enableStepOracle: true,
@@ -1446,8 +1620,8 @@ export function commandLineTaskLoopSimple() {
 }
 
 async function handleBrowseSkaleModesRpcInfoResult(
-    strLogPrefix: string, joCall: any, joIn: any, joOut: any ) {
-    const imaState = state.get();
+    strLogPrefix: string, joCall: rpcCall.TRPCCall, joIn: any, joOut: any ) {
+    const imaState: state.TIMAState = state.get();
     log.information( "{p}S-Chain network information: {}",
         strLogPrefix, joOut.result );
     let nCountReceivedImaDescriptions = 0;
@@ -1460,8 +1634,8 @@ async function handleBrowseSkaleModesRpcInfoResult(
             continue;
         }
         const strNodeURL = imaUtils.composeSChainNodeUrl( joNode );
-        const rpcCallOpts: any = null;
-        let joCall: any = null;
+        const rpcCallOpts: rpcCall.TRPCCallOpts | null = null;
+        let joCall: rpcCall.TRPCCall | null = null;
         try {
             joCall = await rpcCall.create( strNodeURL, rpcCallOpts );
             if( ! joCall )
@@ -1491,7 +1665,7 @@ async function handleBrowseSkaleModesRpcInfoResult(
 }
 
 export function commandLineTaskBrowseSChain() {
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     imaState.bIsNeededCommonInit = false;
     imaState.arrActions.push( {
         name: "Browse S-Chain network",
@@ -1502,8 +1676,8 @@ export function commandLineTaskBrowseSChain() {
                 process.exit( 155 );
             }
             log.information( "{p}Downloading S-Chain network information...", strLogPrefix );
-            const rpcCallOpts: any = null;
-            let joCall: any = null;
+            const rpcCallOpts: rpcCall.TRPCCallOpts | null = null;
+            let joCall: rpcCall.TRPCCall | null = null;
             try {
                 joCall = await rpcCall.create( imaState.chainProperties.sc.strURL, rpcCallOpts );
                 if( ! joCall ) {
@@ -1527,16 +1701,20 @@ export function commandLineTaskBrowseSChain() {
 }
 
 export function commandLineTaskReimbursementShowBalance() {
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "Gas Reimbursement - Show Balance",
         fn: async function() {
+            if( ! imaState.chainProperties.mn.ethersProvider )
+                throw new Error( "No provider for MN" );
+            if( ! imaState.joCommunityPool )
+                throw new Error( "No CommunityPool contract" );
             await imaReimbursement.reimbursementShowBalance(
                 imaState.chainProperties.mn.ethersProvider,
                 imaState.joCommunityPool,
                 imaState.chainProperties.mn.joAccount.address(),
                 imaState.chainProperties.mn.strChainName,
-                imaState.chainProperties.mn.chainId,
+                imaState.chainProperties.mn.chainId.toString(),
                 imaState.chainProperties.mn.transactionCustomizer,
                 imaState.strReimbursementChain,
                 true
@@ -1547,16 +1725,20 @@ export function commandLineTaskReimbursementShowBalance() {
 }
 
 export function commandLineTaskReimbursementEstimateAmount() {
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "Gas Reimbursement - Estimate Amount",
         fn: async function() {
+            if( ! imaState.chainProperties.mn.ethersProvider )
+                throw new Error( "No provider for MN" );
+            if( ! imaState.joCommunityPool )
+                throw new Error( "No CommunityPool contract" );
             await imaReimbursement.reimbursementEstimateAmount(
                 imaState.chainProperties.mn.ethersProvider,
                 imaState.joCommunityPool,
                 imaState.chainProperties.mn.joAccount.address(),
                 imaState.chainProperties.mn.strChainName,
-                imaState.chainProperties.mn.chainId,
+                imaState.chainProperties.mn.chainId.toString(),
                 imaState.chainProperties.mn.transactionCustomizer,
                 imaState.strReimbursementChain,
                 true
@@ -1567,16 +1749,20 @@ export function commandLineTaskReimbursementEstimateAmount() {
 }
 
 export function commandLineTaskReimbursementRecharge() {
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "Gas Reimbursement - Recharge User Wallet",
         fn: async function() {
+            if( ! imaState.chainProperties.mn.ethersProvider )
+                throw new Error( "No provider for MN" );
+            if( ! imaState.joCommunityPool )
+                throw new Error( "No CommunityPool contract" );
             await imaReimbursement.reimbursementWalletRecharge(
                 imaState.chainProperties.mn.ethersProvider,
                 imaState.joCommunityPool,
                 imaState.chainProperties.mn.joAccount,
                 imaState.chainProperties.mn.strChainName,
-                imaState.chainProperties.mn.chainId,
+                imaState.chainProperties.mn.chainId.toString(),
                 imaState.chainProperties.mn.transactionCustomizer,
                 imaState.strReimbursementChain,
                 imaState.nReimbursementRecharge
@@ -1587,16 +1773,20 @@ export function commandLineTaskReimbursementRecharge() {
 }
 
 export function commandLineTaskReimbursementWithdraw() {
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "Gas Reimbursement - Withdraw User Wallet",
         fn: async function() {
+            if( ! imaState.chainProperties.mn.ethersProvider )
+                throw new Error( "No provider for MN" );
+            if( ! imaState.joCommunityPool )
+                throw new Error( "No CommunityPool contract" );
             await imaReimbursement.reimbursementWalletWithdraw(
                 imaState.chainProperties.mn.ethersProvider,
                 imaState.joCommunityPool,
                 imaState.chainProperties.mn.joAccount,
                 imaState.chainProperties.mn.strChainName,
-                imaState.chainProperties.mn.chainId,
+                imaState.chainProperties.mn.chainId.toString(),
                 imaState.chainProperties.mn.transactionCustomizer,
                 imaState.strReimbursementChain,
                 imaState.nReimbursementWithdraw
@@ -1607,16 +1797,20 @@ export function commandLineTaskReimbursementWithdraw() {
 }
 
 export function commandLineTaskReimbursementSetRange() {
-    const imaState = state.get();
+    const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "Gas Reimbursement - Set Minimal time interval from S2M and S2S transfers",
         fn: async function() {
+            if( ! imaState.chainProperties.sc.ethersProvider )
+                throw new Error( "No provider for SC" );
+            if( ! imaState.joCommunityLocker )
+                throw new Error( "No CommunityLocker contract" );
             await imaReimbursement.reimbursementSetRange(
                 imaState.chainProperties.sc.ethersProvider,
                 imaState.joCommunityLocker,
                 imaState.chainProperties.sc.joAccount,
                 imaState.chainProperties.sc.strChainName,
-                imaState.chainProperties.sc.chainId,
+                imaState.chainProperties.sc.chainId.toString(),
                 imaState.chainProperties.sc.transactionCustomizer,
                 imaState.strChainNameOriginChain,
                 imaState.nReimbursementRange

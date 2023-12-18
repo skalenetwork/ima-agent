@@ -30,12 +30,13 @@ import * as imaTx from "./imaTx.js";
 import * as imaGasUsage from "./imaGasUsageOperations.js";
 import * as imaEventLogScan from "./imaEventLogScan.js";
 import * as threadInfo from "./threadInfo.js";
+import type * as state from "./state.js";
 
 export async function getBalanceEth(
     isMainNet: boolean,
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider | null,
     chainId: string,
-    joAccount?: any,
+    joAccount?: state.TAccount,
     contractERC20?: any
 ) {
     const strLogPrefix = "getBalanceEth() call ";
@@ -69,8 +70,8 @@ export async function getBalanceEth(
 export async function doEthPaymentFromMainNet(
     ethersProviderMainNet: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainIdMainNet: string,
-    joAccountSrc: any,
-    joAccountDst: any,
+    joAccountSrc: state.TAccount,
+    joAccountDst: state.TAccount,
     joDepositBox: owaspUtils.ethersMod.ethers.Contract,
     joMessageProxyMainNet: owaspUtils.ethersMod.ethers.Contract, // for checking logs
     chainIdSChain: string,
@@ -166,8 +167,8 @@ export async function doEthPaymentFromMainNet(
 export async function doEthPaymentFromSChain(
     ethersProviderSChain: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainIdSChain: string,
-    joAccountSrc: any,
-    joAccountDst: any,
+    joAccountSrc: state.TAccount,
+    joAccountDst: state.TAccount,
     joTokenManagerETH: owaspUtils.ethersMod.ethers.Contract,
     joMessageProxySChain: owaspUtils.ethersMod.ethers.Contract, // for checking logs
     weiHowMuch: any, // how much WEI money to send
@@ -200,7 +201,7 @@ export async function doEthPaymentFromSChain(
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
-        const opts: any = {
+        const opts: imaTx.TCustomPayedCallOptions = {
             isCheckTransactionToSchain: true
         };
         const joReceipt = await imaTx.payedCall(
@@ -255,7 +256,7 @@ export async function doEthPaymentFromSChain(
 export async function receiveEthPaymentFromSchainOnMainNet(
     ethersProviderMainNet: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainIdMainNet: string,
-    joAccountMN: any,
+    joAccountMN: state.TAccount,
     joDepositBoxETH: owaspUtils.ethersMod.ethers.Contract,
     transactionCustomizerMainNet: imaTx.TransactionCustomizer
 ) {
@@ -314,7 +315,7 @@ export async function receiveEthPaymentFromSchainOnMainNet(
 
 export async function viewEthPaymentFromSchainOnMainNet(
     ethersProviderMainNet: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
-    joAccountMN: any,
+    joAccountMN: state.TAccount,
     joDepositBoxETH: owaspUtils.ethersMod.ethers.Contract
 ) {
     const details = log.createMemoryStream();

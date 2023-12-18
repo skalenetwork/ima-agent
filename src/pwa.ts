@@ -27,6 +27,7 @@ import * as log from "./log.js";
 import * as rpcCall from "./rpcCall.js";
 import * as imaBLS from "./bls.js";
 import * as imaUtils from "./utils.js";
+import type * as state from "./state.js";
 
 function computeWalkNodeIndices( nNodeNumber: number, nNodesCount: number ): number[] {
     if( nNodesCount <= 1 )
@@ -87,7 +88,7 @@ function getNodeProgressAndTimestamp( joNode: any, strLoopWorkType: string, nInd
 }
 
 export async function checkOnLoopStart(
-    imaState: any, strLoopWorkType: string, nIndexS2S?: number ) {
+    imaState: state.TIMAState, strLoopWorkType: string, nIndexS2S?: number ) {
     try {
         nIndexS2S = nIndexS2S || 0; // convert to number if undefined
         if( ! checkLoopWorkTypeStringIsCorrect( strLoopWorkType ) )
@@ -153,7 +154,7 @@ export async function checkOnLoopStart(
 }
 
 export async function handleLoopStateArrived(
-    imaState: any, nNodeNumber: number, strLoopWorkType: string, nIndexS2S: number,
+    imaState: state.TIMAState, nNodeNumber: number, strLoopWorkType: string, nIndexS2S: number,
     isStart: boolean, ts: any, signature: any
 ) {
     const se = isStart ? "start" : "end";
@@ -205,7 +206,7 @@ export async function handleLoopStateArrived(
 }
 
 async function notifyOnLoopImpl(
-    imaState: any, strLoopWorkType: string, isStart: boolean, nIndexS2S?: number ) {
+    imaState: state.TIMAState, strLoopWorkType: string, isStart: boolean, nIndexS2S?: number ) {
     const se = isStart ? "start" : "end";
     try {
         nIndexS2S = nIndexS2S || 0; // convert to number if undefined
@@ -238,16 +239,17 @@ async function notifyOnLoopImpl(
                 continue; // skip this node
             const joNode: any = jarrNodes[i];
             const strNodeURL = imaUtils.composeImaAgentNodeUrl( joNode, isThisNode );
-            const rpcCallOpts: any = null;
-            let joCall: any = await rpcCall.create( strNodeURL, rpcCallOpts )
-                .catch( async function( err: Error | string ) {
-                    log.error(
-                        "PWA failed to perform] loop-{} notification RPC call to node #{} with " +
-                        "URL {url}, error is: {err}", se, i, strNodeURL, err );
-                    if( joCall )
-                        await joCall.disconnect();
-                    joCall = null;
-                } );
+            const rpcCallOpts: rpcCall.TRPCCallOpts | null = null;
+            const joCall =
+                await rpcCall.create( strNodeURL, rpcCallOpts )
+                    .catch( async function( err: Error | string ) {
+                        log.error(
+                            "PWA failed to perform] loop-{} notification RPC call to node " +
+                            "#{} with URL {url}, error is: {err}",
+                            se, i, strNodeURL, err );
+                        if( joCall )
+                            await joCall.disconnect();
+                    } );
             if( ! joCall )
                 return false;
             const joIn: any = {
@@ -276,11 +278,11 @@ async function notifyOnLoopImpl(
 }
 
 export async function notifyOnLoopStart(
-    imaState: any, strLoopWorkType: string, nIndexS2S?: number ) {
+    imaState: state.TIMAState, strLoopWorkType: string, nIndexS2S?: number ) {
     return await notifyOnLoopImpl( imaState, strLoopWorkType, true, nIndexS2S );
 }
 
 export async function notifyOnLoopEnd(
-    imaState: any, strLoopWorkType: string, nIndexS2S?: number ) {
+    imaState: state.TIMAState, strLoopWorkType: string, nIndexS2S?: number ) {
     return await notifyOnLoopImpl( imaState, strLoopWorkType, false, nIndexS2S );
 }

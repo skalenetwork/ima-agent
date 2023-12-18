@@ -30,12 +30,13 @@ import * as imaTx from "./imaTx.js";
 import * as imaGasUsage from "./imaGasUsageOperations.js";
 import * as imaEventLogScan from "./imaEventLogScan.js";
 import * as threadInfo from "./threadInfo.js";
+import type * as state from "./state.js";
 
 export async function getBalanceErc20(
     isMainNet: boolean,
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainId: string,
-    joAccount: any,
+    joAccount: state.TAccount,
     strCoinName: string,
     joABI: any
 ) {
@@ -64,7 +65,7 @@ export async function getOwnerOfErc721(
     isMainNet: boolean,
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainId: string,
-    joAccount: any,
+    joAccount: state.TAccount,
     strCoinName: string,
     joABI: any,
     idToken: any
@@ -93,7 +94,7 @@ export async function getBalanceErc1155(
     isMainNet: boolean,
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainId: string,
-    joAccount: any,
+    joAccount: state.TAccount,
     strCoinName: string,
     joABI: any,
     idToken: any
@@ -124,8 +125,8 @@ export async function doErc721PaymentFromMainNet(
     ethersProviderSChain: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainIdMainNet: string,
     chainIdSChain: string,
-    joAccountSrc: any,
-    joAccountDst: any,
+    joAccountSrc: state.TAccount,
+    joAccountDst: state.TAccount,
     joDepositBoxERC721: owaspUtils.ethersMod.ethers.Contract,
     joMessageProxyMainNet: owaspUtils.ethersMod.ethers.Contract, // for checking logs
     chainNameSChain: string,
@@ -262,8 +263,8 @@ export async function doErc20PaymentFromMainNet(
     ethersProviderSChain: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainIdMainNet: string,
     chainIdSChain: string,
-    joAccountSrc: any,
-    joAccountDst: any,
+    joAccountSrc: state.TAccount,
+    joAccountDst: state.TAccount,
     joDepositBoxERC20: owaspUtils.ethersMod.ethers.Contract,
     joMessageProxyMainNet: owaspUtils.ethersMod.ethers.Contract, // for checking logs
     chainNameSChain: string,
@@ -399,8 +400,8 @@ export async function doErc1155PaymentFromMainNet(
     ethersProviderSChain: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainIdMainNet: string,
     chainIdSChain: string,
-    joAccountSrc: any,
-    joAccountDst: any,
+    joAccountSrc: state.TAccount,
+    joAccountDst: state.TAccount,
     joDepositBoxERC1155: owaspUtils.ethersMod.ethers.Contract,
     joMessageProxyMainNet: owaspUtils.ethersMod.ethers.Contract, // for checking logs
     chainNameSChain: string,
@@ -545,7 +546,7 @@ export async function doErc1155BatchPaymentFromMainNet(
     ethersProviderMainNet: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     ethersProviderSChain: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainIdMainNet: string, chainIdSChain: string,
-    joAccountSrc: any, joAccountDst: any,
+    joAccountSrc: state.TAccount, joAccountDst: state.TAccount,
     joDepositBoxERC1155: owaspUtils.ethersMod.ethers.Contract,
     joMessageProxyMainNet: owaspUtils.ethersMod.ethers.Contract, // for checking logs
     chainNameSChain: string,
@@ -675,8 +676,8 @@ export async function doErc20PaymentFromSChain(
     ethersProviderSChain: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainIdMainNet: string,
     chainIdSChain: string,
-    joAccountSrc: any,
-    joAccountDst: any,
+    joAccountSrc: state.TAccount,
+    joAccountDst: state.TAccount,
     joTokenManagerERC20: owaspUtils.ethersMod.ethers.Contract, // only s-chain
     joMessageProxySChain: owaspUtils.ethersMod.ethers.Contract, // for checking logs
     joDepositBox: owaspUtils.ethersMod.ethers.Contract, // only main net
@@ -725,7 +726,7 @@ export async function doErc20PaymentFromSChain(
             weiHowMuchApprove, null );
         if( strErrorOfDryRunApprove )
             throw new Error( strErrorOfDryRunApprove );
-        const opts: any = { isCheckTransactionToSchain: true };
+        const opts: imaTx.TCustomPayedCallOptions = { isCheckTransactionToSchain: true };
         const joReceiptApprove = await imaTx.payedCall(
             details, ethersProviderSChain,
             "ERC20", contractERC20, "approve", arrArgumentsApprove,
@@ -819,8 +820,8 @@ export async function doErc721PaymentFromSChain(
     ethersProviderSChain: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainIdMainNet: string,
     chainIdSChain: string,
-    joAccountSrc: any,
-    joAccountDst: any,
+    joAccountSrc: state.TAccount,
+    joAccountDst: state.TAccount,
     joTokenManagerERC721: owaspUtils.ethersMod.ethers.Contract, // only s-chain
     joMessageProxySChain: owaspUtils.ethersMod.ethers.Contract, // for checking logs
     joDepositBox: owaspUtils.ethersMod.ethers.Contract, // only main net
@@ -871,7 +872,7 @@ export async function doErc721PaymentFromSChain(
             gasPrice, estimatedGasApprove, weiHowMuchApprove, null );
         if( strErrorOfDryRunApprove )
             throw new Error( strErrorOfDryRunApprove );
-        const opts: any = { isCheckTransactionToSchain: true };
+        const opts: imaTx.TCustomPayedCallOptions = { isCheckTransactionToSchain: true };
         const joReceiptApprove = await imaTx.payedCall(
             details, ethersProviderSChain,
             "ERC721", contractERC721, "approve", arrArgumentsApprove,
@@ -967,8 +968,8 @@ export async function doErc1155PaymentFromSChain(
     ethersProviderSChain: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainIdMainNet: string,
     chainIdSChain: string,
-    joAccountSrc: any,
-    joAccountDst: any,
+    joAccountSrc: state.TAccount,
+    joAccountDst: state.TAccount,
     joTokenManagerERC1155: owaspUtils.ethersMod.ethers.Contract, // only s-chain
     joMessageProxySChain: owaspUtils.ethersMod.ethers.Contract, // for checking logs
     joDepositBox: owaspUtils.ethersMod.ethers.Contract, // only main net
@@ -1019,7 +1020,7 @@ export async function doErc1155PaymentFromSChain(
             gasPrice, estimatedGasApprove, weiHowMuchApprove, null );
         if( strErrorOfDryRunApprove )
             throw new Error( strErrorOfDryRunApprove );
-        const opts: any = { isCheckTransactionToSchain: true };
+        const opts: imaTx.TCustomPayedCallOptions = { isCheckTransactionToSchain: true };
         const joReceiptApprove = await imaTx.payedCall(
             details, ethersProviderSChain,
             "ERC1155", contractERC1155, "setApprovalForAll", arrArgumentsApprove,
@@ -1114,8 +1115,8 @@ export async function doErc1155BatchPaymentFromSChain(
     ethersProviderSChain: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainIdMainNet: string,
     chainIdSChain: string,
-    joAccountSrc: any,
-    joAccountDst: any,
+    joAccountSrc: state.TAccount,
+    joAccountDst: state.TAccount,
     joTokenManagerERC1155: owaspUtils.ethersMod.ethers.Contract, // only s-chain
     joMessageProxySChain: owaspUtils.ethersMod.ethers.Contract, // for checking logs
     joDepositBox: owaspUtils.ethersMod.ethers.Contract, // only main net
@@ -1162,7 +1163,7 @@ export async function doErc1155BatchPaymentFromSChain(
             gasPrice, estimatedGasApprove, weiHowMuchApprove, null );
         if( strErrorOfDryRunApprove )
             throw new Error( strErrorOfDryRunApprove );
-        const opts: any = { isCheckTransactionToSchain: true };
+        const opts: imaTx.TCustomPayedCallOptions = { isCheckTransactionToSchain: true };
         const joReceiptApprove = await imaTx.payedCall(
             details, ethersProviderSChain,
             "ERC1155", contractERC1155, "setApprovalForAll", arrArgumentsApprove,
@@ -1260,7 +1261,7 @@ export async function doErc20PaymentS2S(
     ethersProviderSrc: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainIdSrc: string,
     strChainNameDst: string,
-    joAccountSrc: any,
+    joAccountSrc: state.TAccount,
     joTokenManagerERC20Src: owaspUtils.ethersMod.ethers.Contract,
     nAmountOfToken: any, // how much ERC20 tokens to send
     nAmountOfWei: any, // how much to send
@@ -1400,7 +1401,7 @@ export async function doErc721PaymentS2S(
     ethersProviderSrc: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainIdSrc: string,
     strChainNameDst: string,
-    joAccountSrc: any,
+    joAccountSrc: state.TAccount,
     joTokenManagerERC721Src: owaspUtils.ethersMod.ethers.Contract,
     tokenId: any, // which ERC721 token id to send
     nAmountOfWei: any, // how much to send
@@ -1544,7 +1545,7 @@ export async function doErc1155PaymentS2S(
     ethersProviderSrc: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainIdSrc: string,
     strChainNameDst: string,
-    joAccountSrc: any,
+    joAccountSrc: state.TAccount,
     joTokenManagerERC1155Src: owaspUtils.ethersMod.ethers.Contract,
     tokenId: any, // which ERC721 token id to send
     nAmountOfToken: any, // how much ERC1155 tokens to send
@@ -1689,7 +1690,7 @@ export async function doErc1155BatchPaymentS2S(
     ethersProviderSrc: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainIdSrc: string,
     strChainNameDst: string,
-    joAccountSrc: any,
+    joAccountSrc: state.TAccount,
     joTokenManagerERC1155Src: owaspUtils.ethersMod.ethers.Contract,
     arrTokenIds: any[], // which ERC1155 token id to send
     arrTokenAmounts: any[], // which ERC1155 token id to send
@@ -1835,7 +1836,7 @@ export async function mintErc20(
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainId: string,
     chainName: string,
-    joAccount: any,
+    joAccount: state.TAccount,
     strAddressMintTo: string,
     nAmount: any,
     strTokenContractAddress: string,
@@ -1878,7 +1879,7 @@ export async function mintErc20(
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
-        const opts: any =
+        const opts: imaTx.TCustomPayedCallOptions =
             { isCheckTransactionToSchain: ( chainName !== "Mainnet" ) ? true : false };
         const joReceipt = await imaTx.payedCall(
             details, ethersProvider,
@@ -1905,7 +1906,7 @@ export async function mintErc721(
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainId: string,
     chainName: string,
-    joAccount: any,
+    joAccount: state.TAccount,
     strAddressMintTo: string,
     idToken: any,
     strTokenContractAddress: string,
@@ -1948,7 +1949,7 @@ export async function mintErc721(
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
-        const opts: any =
+        const opts: imaTx.TCustomPayedCallOptions =
             { isCheckTransactionToSchain: ( chainName !== "Mainnet" ) ? true : false };
         const joReceipt = await imaTx.payedCall(
             details, ethersProvider,
@@ -1975,7 +1976,7 @@ export async function mintErc1155(
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainId: string,
     chainName: any,
-    joAccount: any,
+    joAccount: state.TAccount,
     strAddressMintTo: string,
     idToken: any,
     nAmount: any,
@@ -2022,7 +2023,7 @@ export async function mintErc1155(
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
-        const opts: any =
+        const opts: imaTx.TCustomPayedCallOptions =
             { isCheckTransactionToSchain: ( chainName !== "Mainnet" ) ? true : false };
         const joReceipt = await imaTx.payedCall(
             details, ethersProvider,
@@ -2049,7 +2050,7 @@ export async function burnErc20(
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainId: string,
     chainName: string,
-    joAccount: any,
+    joAccount: state.TAccount,
     strAddressBurnFrom: string,
     nAmount: any,
     strTokenContractAddress: string,
@@ -2092,7 +2093,7 @@ export async function burnErc20(
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
-        const opts: any =
+        const opts: imaTx.TCustomPayedCallOptions =
             { isCheckTransactionToSchain: ( chainName !== "Mainnet" ) ? true : false };
         const joReceipt = await imaTx.payedCall(
             details, ethersProvider,
@@ -2119,7 +2120,7 @@ export async function burnErc721(
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainId: string,
     chainName: string,
-    joAccount: any,
+    joAccount: state.TAccount,
     idToken: any,
     strTokenContractAddress: string,
     joTokenContractABI: any,
@@ -2159,7 +2160,7 @@ export async function burnErc721(
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
-        const opts: any =
+        const opts: imaTx.TCustomPayedCallOptions =
             { isCheckTransactionToSchain: ( chainName !== "Mainnet" ) ? true : false };
         const joReceipt = await imaTx.payedCall(
             details, ethersProvider,
@@ -2186,7 +2187,7 @@ export async function burnErc1155(
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     chainId: string,
     chainName: string,
-    joAccount: any,
+    joAccount: state.TAccount,
     strAddressBurnFrom: string,
     idToken: any,
     nAmount: any,
@@ -2232,7 +2233,7 @@ export async function burnErc1155(
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
-        const opts: any =
+        const opts: imaTx.TCustomPayedCallOptions =
             { isCheckTransactionToSchain: ( chainName !== "Mainnet" ) ? true : false };
         const joReceipt = await imaTx.payedCall(
             details, ethersProvider,
