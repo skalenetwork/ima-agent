@@ -117,7 +117,3 @@ export function chainIdHex(schainName: string): string {
 export function chainIdInt(schainName: string): number {
     return parseInt(chainIdHex(schainName))
 }
-
-export function isValidNumber(str: string): boolean {
-    return !isNaN(+str) && str.trim().length > 0
-}

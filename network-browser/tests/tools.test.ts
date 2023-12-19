@@ -7,9 +7,9 @@ import {
     delay,
     withTimeout,
     chainIdHex,
-    chainIdInt,
-    isValidNumber
+    chainIdInt
 } from '../src/tools'
+import { isValidNumber } from '../src/envTools'
 import { BrowserTimeoutError } from '../src/errors'
 
 describe('tools module test', () => {

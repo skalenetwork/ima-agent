@@ -1,5 +1,5 @@
 import { describe, beforeAll, test, expect } from 'bun:test'
-import { Contract, Wallet } from 'ethers'
+import { Contract, Wallet, id } from 'ethers'
 
 import {
     getMainnetProvider,
@@ -7,8 +7,10 @@ import {
     getMainnetManagerAbi,
     schainsInternalContract
 } from '../src/contracts'
-import { getSChain } from '../src/schains'
+import { getNodes } from '../src/nodes'
+import { getNodeIdsInGroups } from '../src/schains'
 import { MAINNET_RPC_URL } from '../src/constants'
+import { Node } from '../src/interfaces'
 
 import {
     ETH_PRIVATE_KEY,
@@ -21,18 +23,23 @@ import {
     initDefaultValidator,
     linkNodes,
     registerNodes,
-    addTestSchainType,
-    createSchain
+    addTestSchainTypes,
+    createSchain,
+    randomString,
+    nodeNamesToIds
 } from './testUtils'
 
 describe('nodes module test', () => {
     let nodes: Contract
     let schainsInternal: Contract
     let wallet: Wallet
+    let nodeNames: string[]
+    let nodeIds: number[]
+    const chainName = randomString()
 
     beforeAll(async () => {
         console.log('initializing provider and contracts')
-        const provider = getMainnetProvider(MAINNET_RPC_URL, false)
+        const provider = await getMainnetProvider(MAINNET_RPC_URL, false)
         wallet = new Wallet(ETH_PRIVATE_KEY, provider)
 
         const managerAbi = getMainnetManagerAbi()
@@ -45,16 +52,31 @@ describe('nodes module test', () => {
 
         await addAllPermissions(validators, schainsInternal, schains, wallet)
         await initDefaultValidator(validators)
-        const wallets = await generateWallets(provider, wallet, NODES_IN_SCHAIN * 3)
+        const wallets = await generateWallets(provider, wallet, NODES_IN_SCHAIN)
         await linkNodes(validators, wallet, wallets)
-        await registerNodes(nodes, wallets)
+        nodeNames = await registerNodes(nodes, wallets)
 
-        await addTestSchainType(schainsInternal)
-        await createSchain(schains, 'test1', wallet.address)
+        nodeIds = await nodeNamesToIds(nodes, nodeNames)
+
+        await addTestSchainTypes(schainsInternal)
+        await createSchain(schains, chainName, wallet.address)
     })
-    test('module', async () => {
-        const schain = await getSChain(schainsInternal, 'test1')
-        expect(schain.name).toBe('test1')
-        expect(schain.mainnetOwner).toBe(wallet.address)
+    test('getNodes', async () => {
+        const chainHash = id(chainName)
+        const nodeIds = await getNodeIdsInGroups(schainsInternal, [chainHash])
+        const nodesRes: Node[] = await getNodes(nodes, schainsInternal, nodeIds[0], chainHash)
+
+        expect(nodesRes).toBeArrayOfSize(NODES_IN_SCHAIN)
+
+        expect(nodesRes[0].endpoints).toBeDefined
+        expect(nodesRes[0].endpoints?.domain.http).toBeString
+        expect(nodesRes[0].endpoints?.domain.https).toBeString
+        expect(nodesRes[0].endpoints?.domain.ws).toBeString
+        expect(nodesRes[0].endpoints?.domain.wss).toBeString
+
+        expect(nodesRes[0].endpoints?.ip.http).toBeString
+        expect(nodesRes[0].endpoints?.ip.https).toBeString
+        expect(nodesRes[0].endpoints?.ip.ws).toBeString
+        expect(nodesRes[0].endpoints?.ip.wss).toBeString
     })
 })

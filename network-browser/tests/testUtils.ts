@@ -9,6 +9,7 @@ import {
     solidityPackedKeccak256,
     BytesLike,
     hexlify,
+    id,
     zeroPadValue,
     TransactionResponse
 } from 'ethers'
@@ -22,11 +23,12 @@ import { type SkaleManagerAbi } from '../src/interfaces'
 
 export const ETH_PRIVATE_KEY = process.env.ETH_PRIVATE_KEY!
 
-export const NODES_IN_SCHAIN = 2
+export const NODES_IN_SCHAIN = 16
 export const TEST_VALIDATOR_NAME = 'test_val'
 const TEST_VALIDATOR_ID = 1n
 const ETH_TRANSFER_AMOUNT = '0.1'
 const CONFIRMATION_BLOCKS = 2
+const GAS_MULTIPLIER = 2n
 
 export function validatorsContract(abi: SkaleManagerAbi, wallet: Wallet): Contract {
     return new Contract(abi.validator_service_address, abi.validator_service_abi, wallet)
@@ -89,9 +91,10 @@ export async function generateWallets(
     adminWallet: Wallet,
     num: number
 ): Promise<Wallet[]> {
-    const wallets = []
+    const wallets: Promise<Wallet>[] = []
     const baseNonce = await adminWallet.getNonce()
     for (let i = 0; i < num; i++) {
+        console.log(`${i + 1}/${num} generating new wallet...`)
         wallets.push(generateWallet(provider, adminWallet, baseNonce + i))
     }
     return await Promise.all(wallets)
@@ -102,7 +105,6 @@ export async function generateWallet(
     adminWallet: Wallet,
     nonce?: number
 ): Promise<Wallet> {
-    console.log('generating new wallet...')
     const wallet = Wallet.createRandom()
     wallet.connect(provider)
     await sendEth(adminWallet, wallet.address, ETH_TRANSFER_AMOUNT, provider, nonce)
@@ -147,9 +149,9 @@ export async function linkNodes(
     await Promise.all(promises)
 }
 
-export async function registerNodes(nodes: Contract, wallets: Wallet[]): Promise<number[]> {
+export async function registerNodes(nodes: Contract, wallets: Wallet[]): Promise<string[]> {
     const promises = wallets.map(async (wallet, i) => {
-        console.log(`registering node for: ${wallet.address}`)
+        console.log(`${i + 1}/${wallets.length} registering node for: ${wallet.address}`)
         const managerAbi = getMainnetManagerAbi()
         const manager = managerContract(managerAbi, wallet)
 
@@ -158,7 +160,7 @@ export async function registerNodes(nodes: Contract, wallets: Wallet[]): Promise
         const skaleNonce = randNum(0, 10000)
         const pkPartsBytes = getPublicKey(wallet)
 
-        await manager.createNode(
+        await sendTx(manager.createNode, [
             port,
             skaleNonce,
             ipToHex(ip),
@@ -166,15 +168,22 @@ export async function registerNodes(nodes: Contract, wallets: Wallet[]): Promise
             pkPartsBytes,
             name,
             domainName
-        )
-
+        ])
         console.log(`new node created: ${ip}:${port} - ${name} - ${domainName}`)
-        return 1 // todo: return node id
+        return name
     })
     return await Promise.all(promises)
 }
 
-export async function addTestSchainType(schains: Contract): Promise<void> {
+export async function nodeNamesToIds(nodes: Contract, nodeNames: string[]): Promise<number[]> {
+    const promises = nodeNames.map(async (name, i) => {
+        return await nodes.nodesNameToIndex(id(name))
+    })
+    return await Promise.all(promises)
+}
+
+export async function addTestSchainTypes(schains: Contract): Promise<void> {
+    await sendTx(schains.addSchainType, [8, NODES_IN_SCHAIN])
     await sendTx(schains.addSchainType, [8, NODES_IN_SCHAIN])
 }
 
@@ -217,6 +226,13 @@ function ipToHex(ip: string): string {
 }
 
 export async function sendTx(func: any, args: any[]): Promise<TransactionReceipt | null> {
-    const response: TransactionResponse = await func(...args)
+    const estimatedGas = await func.estimateGas(...args)
+    const response: TransactionResponse = await func(...args, {
+        gasLimit: estimatedGas * GAS_MULTIPLIER
+    })
     return await response.wait(CONFIRMATION_BLOCKS)
+}
+
+export function randomString(): string {
+    return (Math.random() + 1).toString(36).substring(7)
 }

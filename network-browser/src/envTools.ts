@@ -20,9 +20,11 @@
  * @copyright SKALE Labs 2023-Present
  */
 
-import { isValidNumber } from './tools'
-
 const MS_MULTIPLIER = 1000
+
+export function isValidNumber(str: string): boolean {
+    return !isNaN(+str) && str.trim().length > 0
+}
 
 export function secondsEnv(envValue: string | undefined, defaultSeconds: number): number {
     return (envValue !== undefined ? Number(envValue) : defaultSeconds) * MS_MULTIPLIER

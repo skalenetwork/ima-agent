@@ -7,5 +7,10 @@ export default {
         format: 'es',
         preserveModules: true
     },
-    plugins: [typescript()]
+    plugins: [
+        typescript({
+            include: ['src/**', 'index.ts'],
+            exclude: ['**/tests', '**/build']
+        })
+    ]
 }
