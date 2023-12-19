@@ -28,7 +28,7 @@ export const TEST_VALIDATOR_NAME = 'test_val'
 const TEST_VALIDATOR_ID = 1n
 const ETH_TRANSFER_AMOUNT = '0.1'
 const CONFIRMATION_BLOCKS = 2
-const GAS_MULTIPLIER = 2n
+const GAS_MULTIPLIER = 1.2
 
 export function validatorsContract(abi: SkaleManagerAbi, wallet: Wallet): Contract {
     return new Contract(abi.validator_service_address, abi.validator_service_abi, wallet)
@@ -228,7 +228,7 @@ function ipToHex(ip: string): string {
 export async function sendTx(func: any, args: any[]): Promise<TransactionReceipt | null> {
     const estimatedGas = await func.estimateGas(...args)
     const response: TransactionResponse = await func(...args, {
-        gasLimit: estimatedGas * GAS_MULTIPLIER
+        gasLimit: BigInt(Math.round(Number(estimatedGas) * GAS_MULTIPLIER))
     })
     return await response.wait(CONFIRMATION_BLOCKS)
 }
