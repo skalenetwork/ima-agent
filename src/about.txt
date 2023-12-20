@@ -96,7 +96,7 @@ PAYMENT TRANSACTION options:
     --gas-price-multiplier-tc ..............Sets Gas Price Multiplier for S<->S Target S-Chain transactions, Default value is 0.0.
     --gas-price-multiplier .................Sets Gas Price Multiplier for both Main Net and S-Chain(s).
     --gas-multiplier-mn ....................Sets Gas Value Multiplier for Main Net transactions, Default value is 1.25. Specify value 0.0 to disable Gas Price Customization for Main Net.
-    --gas-multiplier-sc ....................Sets Gas Value Multiplierfor S-Chain transactions, Default value is 1.25.
+    --gas-multiplier-sc ....................Sets Gas Value Multiplier S-Chain transactions, Default value is 1.25.
     --gas-multiplier-tc ....................Sets Gas Value Multiplier for S<->S Target S-Chain transactions, Default value is 1.25.
     --gas-multiplier .......................Sets Gas Value Multiplier for both Main Net and S-Chain(s).
 REGISTRATION commands:
