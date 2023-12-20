@@ -28,7 +28,66 @@ import * as imaUtils from "./utils.js";
 import * as log from "./log.js";
 import * as threadInfo from "./threadInfo.js";
 
-export function findSChainIndexInArrayByName( arrSChains: any[], strSChainName: string ) {
+export interface TSChainNode {
+    name: string
+    ip: string
+    publicIP: string
+    port: string
+    startBlock: string
+    lastRewardDate: string
+    finishTime: string
+    status: string
+    validatorId: string
+    domainName: string
+    schainHashes: string[]
+    endpoints: {
+        ports: {
+            http: string
+            https: string
+            ws: string
+            wss: string
+            infoHttp: string
+        }
+        domain: {
+            http: string
+            https: string
+            ws: string
+            wss: string
+            infoHttp: string
+        }
+        ip: {
+            http: string
+            https: string
+            ws: string
+            wss: string
+            infoHttp: string
+        }
+    }
+}
+
+export interface TSChainInformation {
+    name: string
+    mainnetOwner: string
+    indexInOwnerList: string
+    partOfNode: string
+    lifetime: string
+    startDate: string
+    startBlock: string
+    deposit: string
+    index: string
+    generation: string
+    originator: string
+    chainId: number
+    nodes: TSChainNode[]
+}
+
+export interface TSChainsInformation {
+    updatedAt: number
+    schains: TSChainInformation[]
+}
+
+export function findSChainIndexInArrayByName(
+    arrSChains: TSChainInformation[], strSChainName: string ) {
     for( let idxSChain = 0; idxSChain < arrSChains.length; ++ idxSChain ) {
         const joSChain = arrSChains[idxSChain];
         if( joSChain.name.toString() == strSChainName.toString() )
@@ -37,13 +96,14 @@ export function findSChainIndexInArrayByName( arrSChains: any[], strSChainName: 
     return -1;
 }
 
-let gConnectedChainsData: any = null;
+let gConnectedChainsData: TSChainsInformation | null = null;
 
 export function autoUpdateLastCachedSChains(): boolean {
     const imaState: state.TIMAState = state.get();
     if( ! imaState.optsS2S.strNetworkBrowserPath )
         return false;
-    const jo: any = imaUtils.jsonFileLoad( imaState.optsS2S.strNetworkBrowserPath, null );
+    const jo: TSChainsInformation =
+        imaUtils.jsonFileLoad( imaState.optsS2S.strNetworkBrowserPath, null );
     if( ! ( jo && "schains" in jo && "updatedAt" in jo ) ) {
         log.error(
             "Connected S-chains cache in thread {} was not updated from file {}, bad data format",
@@ -60,26 +120,26 @@ export function autoUpdateLastCachedSChains(): boolean {
     return true;
 }
 
-export function getLastCachedSChains(): any[] {
+export function getLastCachedSChains(): TSChainInformation[] {
     autoUpdateLastCachedSChains();
     if( ! gConnectedChainsData )
         return [];
     return JSON.parse( JSON.stringify( gConnectedChainsData.schains ) );
 }
 
-export function pickRandomSChainNodeIndex( joSChain: any ): number {
+export function pickRandomSChainNodeIndex( joSChain: TSChainInformation ): number {
     let min = 0; let max = joSChain.nodes.length - 1;
     min = Math.ceil( min );
     max = Math.floor( max );
     const idxNode = Math.floor( Math.random() * ( max - min + 1 ) ) + min;
     return idxNode;
 }
-export function pickRandomSChainNode( joSChain: any ): any {
+export function pickRandomSChainNode( joSChain: TSChainInformation ): TSChainNode {
     const idxNode = pickRandomSChainNodeIndex( joSChain );
     return joSChain.nodes[idxNode];
 }
 
-export function pickRandomSChainUrl( joSChain: any ): string {
-    const joNode = pickRandomSChainNode( joSChain );
+export function pickRandomSChainUrl( joSChain: TSChainInformation ): string {
+    const joNode: TSChainNode = pickRandomSChainNode( joSChain );
     return "" + joNode.endpoints.ip.http;
 }

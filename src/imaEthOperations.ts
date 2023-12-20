@@ -36,8 +36,8 @@ export async function getBalanceEth(
     isMainNet: boolean,
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider | null,
     chainId: string,
-    joAccount?: state.TAccount,
-    contractERC20?: any
+    joAccount: state.TAccount | null,
+    contractERC20: owaspUtils.ethersMod.Contract | null
 ) {
     const strLogPrefix = "getBalanceEth() call ";
     try {
@@ -145,13 +145,13 @@ export async function doEthPaymentFromMainNet(
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
             strLogPrefix, strActionName, err, err );
-        details.exposeDetailsTo( log, "doEthPaymentFromMainNet", false );
+        details.exposeDetailsTo( log.globalStream(), "doEthPaymentFromMainNet", false );
         details.close();
         return false;
     }
     imaGasUsage.printGasUsageReportFromArray( "ETH PAYMENT FROM MAIN NET", jarrReceipts, details );
     if( log.exposeDetailsGet() )
-        details.exposeDetailsTo( log, "doEthPaymentFromMainNet", true );
+        details.exposeDetailsTo( log.globalStream(), "doEthPaymentFromMainNet", true );
     details.close();
     return true;
 }
@@ -242,13 +242,13 @@ export async function doEthPaymentFromSChain(
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
             strLogPrefix, strActionName, err, err );
-        details.exposeDetailsTo( log, "doEthPaymentFromSChain", false );
+        details.exposeDetailsTo( log.globalStream(), "doEthPaymentFromSChain", false );
         details.close();
         return false;
     }
     imaGasUsage.printGasUsageReportFromArray( "ETH PAYMENT FROM S-CHAIN", jarrReceipts, details );
     if( log.exposeDetailsGet() )
-        details.exposeDetailsTo( log, "doEthPaymentFromSChain", true );
+        details.exposeDetailsTo( log.globalStream(), "doEthPaymentFromSChain", true );
     details.close();
     return true;
 }
@@ -302,13 +302,14 @@ export async function receiveEthPaymentFromSchainOnMainNet(
     } catch ( err ) {
         details.critical( "{p}Receive payment error in {bright}: {err}, stack is:\n{stack}",
             strLogPrefix, strActionName, err, err );
-        details.exposeDetailsTo( log, "receiveEthPaymentFromSchainOnMainNet", false );
+        details.exposeDetailsTo( log.globalStream(),
+            "receiveEthPaymentFromSchainOnMainNet", false );
         details.close();
         return false;
     }
     imaGasUsage.printGasUsageReportFromArray( "RECEIVE ETH ON MAIN NET", jarrReceipts, details );
     if( log.exposeDetailsGet() )
-        details.exposeDetailsTo( log, "receiveEthPaymentFromSchainOnMainNet", true );
+        details.exposeDetailsTo( log.globalStream(), "receiveEthPaymentFromSchainOnMainNet", true );
     details.close();
     return true;
 }
@@ -332,14 +333,16 @@ export async function viewEthPaymentFromSchainOnMainNet(
         details.success( "{p}You can receive(wei): {}", strLogPrefix, xWei );
         const xEth = owaspUtils.ethersMod.ethers.utils.formatEther( owaspUtils.toBN( xWei ) );
         details.success( "{p}You can receive(eth): {}", strLogPrefix, xEth );
-        if( log.exposeDetailsGet() )
-            details.exposeDetailsTo( log, "viewEthPaymentFromSchainOnMainNet", true );
+        if( log.exposeDetailsGet() ) {
+            details.exposeDetailsTo( log.globalStream(),
+                "viewEthPaymentFromSchainOnMainNet", true );
+        }
         details.close();
         return xWei;
     } catch ( err ) {
         details.critical( "{p}View payment error in {bright}: {err}, stack is:\n{stack}",
             strLogPrefix, strActionName, err, err );
-        details.exposeDetailsTo( log, "viewEthPaymentFromSchainOnMainNet", false );
+        details.exposeDetailsTo( log.globalStream(), "viewEthPaymentFromSchainOnMainNet", false );
         details.close();
         return null;
     }

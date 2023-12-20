@@ -55,7 +55,12 @@ export async function checkRegistrationAll() {
     return b1;
 }
 
-const gInfoRegistrationCost: any = {
+export interface TRegistrationCostInformation {
+    mn: any[]
+    sc: any[]
+}
+
+const gInfoRegistrationCost: TRegistrationCostInformation = {
     mn: [],
     sc: []
 };
@@ -458,7 +463,7 @@ export async function commandLineTaskShowBalanceEth(
             balance: await imaEth.getBalanceEth( true, // isMainNet
                 imaState.chainProperties.mn.ethersProvider,
                 imaState.chainProperties.mn.chainId.toString(),
-                imaState.chainProperties.mn.joAccount )
+                imaState.chainProperties.mn.joAccount, null )
         } );
         if( ! imaState.joDepositBoxETH )
             throw new Error( "No DepositBoxETH contract" );
@@ -488,7 +493,7 @@ export async function commandLineTaskShowBalanceEth(
             balance: await imaEth.getBalanceEth( true, // isMainNet=true here, but we call S-Chain
                 imaState.chainProperties.sc.ethersProvider,
                 imaState.chainProperties.sc.chainId.toString(),
-                imaState.chainProperties.sc.joAccount )
+                imaState.chainProperties.sc.joAccount, null )
         } );
     }
     if( imaState.chainProperties.tc.ethersProvider ) {
@@ -505,7 +510,7 @@ export async function commandLineTaskShowBalanceEth(
             balance: await imaEth.getBalanceEth( true, // isMainNet=true here, but we call S-Chain
                 imaState.chainProperties.tc.ethersProvider,
                 imaState.chainProperties.tc.chainId.toString(),
-                imaState.chainProperties.tc.joAccount )
+                imaState.chainProperties.tc.joAccount, null )
         } );
     }
 }
@@ -1499,7 +1504,7 @@ export function commandLineTaskTransferS2S() {
         name: "single S->S transfer loop",
         fn: async function() {
             if( ! imaState.optsS2S.isEnabled )
-                return;
+                return true;
             if( ! imaState.bNoWaitSChainStarted )
                 await discoveryTools.waitUntilSChainStarted(); // s-chain --> main-net transfer
             const joRuntimeOpts: loop.TRuntimeOpts = {
@@ -1578,7 +1583,7 @@ export function commandLineTaskLoop() {
                 printSummaryRegistrationCosts();
             const opts: loop.TParallelLoopRunOptions = {
                 imaState,
-                details: log
+                details: log.globalStream()
             };
             return await loop.runParallelLoops( opts );
         }

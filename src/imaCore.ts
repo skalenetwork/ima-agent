@@ -36,6 +36,14 @@ import * as imaTransferErrorHandling from "./imaTransferErrorHandling.js";
 import * as skaleObserver from "./observer.js";
 import * as threadInfo from "./threadInfo.js";
 
+export type TFunctionAfterSigningMessages =
+    ( err: Error | string | null, jarrMessages: any[], joGlueResult: any | null
+    ) => Promise < void >;
+export type TFunctionDoSignMessages =
+    ( nTransferLoopCounter: number, jarrMessages: any[], nIdxCurrentMsgBlockStart: number,
+        chainNameSrc: string, joExtraSignOpts?: loop.TExtraSignOpts | null,
+        fnAfter?: TFunctionAfterSigningMessages ) => Promise < void >;
+
 export interface TTransferOptions {
     strDirection: string
     joRuntimeOpts: loop.TRuntimeOpts
@@ -56,14 +64,14 @@ export interface TTransferOptions {
     nMaxTransactionsCount: number
     nBlockAwaitDepth: number
     nBlockAge: number
-    fnSignMessages: any
+    fnSignMessages: TFunctionDoSignMessages
     joExtraSignOpts?: loop.TExtraSignOpts | null
     transactionCustomizerDst: imaTx.TransactionCustomizer
     imaState: state.TIMAState
     nTransferLoopCounter: number
     strTransferErrorCategoryName: string
     strGatheredDetailsName: string
-    details: any
+    details: log.TLogger
     jarrReceipts: any[]
     bErrorInSigningMessages: boolean
     strLogPrefixShort: string
@@ -87,7 +95,7 @@ export interface TOutgoingMessageAnalysisOptions {
     idxMessage: number
     idxImaMessage: number
     joMessage: any
-    joNode: any | null
+    joNode: skaleObserver.TSChainNode | null
     idxNode: number
     cntNodes: number
     cntPassedNodes: number
@@ -101,10 +109,10 @@ const perMessageGasForTransfer = 1000000;
 const additionalS2MTransferOverhead = 200000;
 
 async function findOutReferenceLogRecord(
-    details: any, strLogPrefix: string,
+    details: log.TLogger, strLogPrefix: string,
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     joMessageProxy: owaspUtils.ethersMod.ethers.Contract,
-    bnBlockId: any, nMessageNumberToFind: any, isVerbose?: boolean
+    bnBlockId: any, nMessageNumberToFind: number, isVerbose?: boolean
 ) {
     const bnMessageNumberToFind = owaspUtils.toBN( nMessageNumberToFind.toString() );
     const strEventName = "PreviousMessageReference";
@@ -118,7 +126,7 @@ async function findOutReferenceLogRecord(
     }
     for( let idxLogRecord = 0; idxLogRecord < cntLogRecord; ++ idxLogRecord ) {
         const joEvent = arrLogRecords[idxLogRecord];
-        const ev: any = {
+        const ev = {
             currentMessage: joEvent.args[0],
             previousOutgoingMessageBlockId: joEvent.args[1]
         };
@@ -145,7 +153,7 @@ async function findOutReferenceLogRecord(
 }
 
 async function findOutAllReferenceLogRecords(
-    details: any, strLogPrefix: string,
+    details: log.TLogger, strLogPrefix: string,
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     joMessageProxy: owaspUtils.ethersMod.ethers.Contract,
     bnBlockId: any, nIncMsgCnt: number, nOutMsgCnt: number, isVerbose?: boolean
@@ -332,7 +340,7 @@ async function analyzeGatheredRecords( optsTransfer: TTransferOptions, r: any ) 
         const joEvent = r[i];
         optsTransfer.details.debug( "{p}Will review found event record {} with data {}",
             optsTransfer.strLogPrefix, i, joEvent );
-        const ev: any = {
+        const ev = {
             dstChainHash: joEvent.args[0],
             msgCounter: joEvent.args[1],
             srcContract: joEvent.args[2],
@@ -356,7 +364,7 @@ async function analyzeGatheredRecords( optsTransfer: TTransferOptions, r: any ) 
         optsTransfer.details.critical( "{p}Can't get events from MessageProxy",
             optsTransfer.strLogPrefix );
         optsTransfer.details.exposeDetailsTo(
-            log, optsTransfer.strGatheredDetailsName, false );
+            log.globalStream(), optsTransfer.strGatheredDetailsName, false );
         imaTransferErrorHandling.saveTransferError(
             optsTransfer.strTransferErrorCategoryName, optsTransfer.details.toString() );
         optsTransfer.details.close();
@@ -429,7 +437,7 @@ async function gatherMessages( optsTransfer: TTransferOptions ) {
                     "block number during {bright}: {err}, stack is:\n{stack}",
                     optsTransfer.strLogPrefix, optsTransfer.strActionName, err, err );
                 optsTransfer.details.exposeDetailsTo(
-                    log, optsTransfer.strGatheredDetailsName, false );
+                    log.globalStream(), optsTransfer.strGatheredDetailsName, false );
                 imaTransferErrorHandling.saveTransferError(
                     optsTransfer.strTransferErrorCategoryName, optsTransfer.details.toString() );
                 optsTransfer.details.close();
@@ -481,7 +489,7 @@ async function gatherMessages( optsTransfer: TTransferOptions ) {
                     "during {bright}: {err}, stack is:\n{stack}", optsTransfer.strLogPrefix,
                     optsTransfer.strActionName, err, err );
                 optsTransfer.details.exposeDetailsTo(
-                    log, optsTransfer.strGatheredDetailsName, false );
+                    log.globalStream(), optsTransfer.strGatheredDetailsName, false );
                 imaTransferErrorHandling.saveTransferError(
                     optsTransfer.strTransferErrorCategoryName, optsTransfer.details.toString() );
                 optsTransfer.details.close();
@@ -514,7 +522,8 @@ async function gatherMessages( optsTransfer: TTransferOptions ) {
 }
 
 async function preCheckAllMessagesSign(
-    optsTransfer: TTransferOptions, err: Error | string, jarrMessages: any[], joGlueResult: any ) {
+    optsTransfer: TTransferOptions, err: Error | string | null,
+    jarrMessages: any[], joGlueResult: any ) {
     const strDidInvokedSigningCallbackMessage = log.fmtDebug(
         "{p}Did invoked message signing callback, first real message index is: {}, have {} " +
         "message(s) to process {}", optsTransfer.strLogPrefix,
@@ -539,7 +548,8 @@ async function preCheckAllMessagesSign(
 }
 
 async function callbackAllMessagesSign(
-    optsTransfer: TTransferOptions, err: Error | string, jarrMessages: any[], joGlueResult: any ) {
+    optsTransfer: TTransferOptions, err: Error | string | null,
+    jarrMessages: any[], joGlueResult: any ) {
     if( ! await preCheckAllMessagesSign( optsTransfer, err, jarrMessages, joGlueResult ) )
         return;
     const nBlockSize = optsTransfer.arrMessageCounters.length;
@@ -549,7 +559,7 @@ async function callbackAllMessagesSign(
         optsTransfer.strLogPrefix, optsTransfer.strActionName,
         nBlockSize, optsTransfer.arrMessageCounters );
     optsTransfer.details.debug( strWillCallPostIncomingMessagesAction );
-    let signature = joGlueResult ? joGlueResult.signature : null;
+    let signature: owaspUtils.TXYSignature | null = joGlueResult ? joGlueResult.signature : null;
     if( !signature )
         signature = { X: "0", Y: "0" };
     let hashPoint = joGlueResult ? joGlueResult.hashPoint : null;
@@ -558,7 +568,7 @@ async function callbackAllMessagesSign(
     let hint = joGlueResult ? joGlueResult.hint : null;
     if( !hint )
         hint = "0";
-    const sign: any = {
+    const sign: owaspUtils.TBLSSignature = {
         blsSignature: [ signature.X, signature.Y ], // BLS glue of signatures
         hashA: hashPoint.X, // G1.X from joGlueResult.hashSrc
         hashB: hashPoint.Y, // G1.Y from joGlueResult.hashSrc
@@ -688,9 +698,8 @@ async function handleAllMessagesSigning( optsTransfer: TTransferOptions ) {
         await optsTransfer.fnSignMessages( optsTransfer.nTransferLoopCounter,
             optsTransfer.jarrMessages, optsTransfer.nIdxCurrentMsgBlockStart,
             optsTransfer.chainNameSrc, optsTransfer.joExtraSignOpts,
-            async function( err: Error | string, jarrMessages: any[], joGlueResult: any ) {
+            async function( err: Error | string | null, jarrMessages: any[], joGlueResult: any ) {
                 await callbackAllMessagesSign( optsTransfer, err, jarrMessages, joGlueResult );
-
             } ).catch( function( err: Error | string ) {
             // callback fn as argument of optsTransfer.fnSignMessages
             optsTransfer.bErrorInSigningMessages = true;
@@ -715,6 +724,12 @@ async function handleAllMessagesSigning( optsTransfer: TTransferOptions ) {
 async function checkOutgoingMessageEventInOneNode(
     optsTransfer: TTransferOptions,
     optsOutgoingMessageAnalysis: TOutgoingMessageAnalysisOptions ) {
+    if( ! optsOutgoingMessageAnalysis.joNode ) {
+        optsTransfer.details.error(
+            "{p}{bright} no S-Chain node provided",
+            optsTransfer.strLogPrefix, optsTransfer.strDirection );
+        return false;
+    }
     const sc = optsTransfer.imaState.chainProperties.sc;
     const strUrlHttp = optsOutgoingMessageAnalysis.joNode.endpoints.ip.http;
     optsTransfer.details.trace(
@@ -801,7 +816,8 @@ async function checkOutgoingMessageEventInOneNode(
     return true;
 }
 
-async function checkOutgoingMessageEvent( optsTransfer: TTransferOptions, joSChain: any ) {
+async function checkOutgoingMessageEvent(
+    optsTransfer: TTransferOptions, joSChain: skaleObserver.TSChainInformation ) {
     const cntNodes = joSChain.nodes.length;
     const cntMessages = optsTransfer.jarrMessages.length;
     for( let idxMessage = 0; idxMessage < cntMessages; ++ idxMessage ) {
@@ -854,7 +870,7 @@ async function checkOutgoingMessageEvent( optsTransfer: TTransferOptions, joSCha
                 "allowed to fail {}", optsTransfer.strLogPrefix, optsTransfer.strDirection,
                 optsOutgoingMessageAnalysis.cntFailedNodes, optsTransfer.cntNodesMayFail );
             optsTransfer.details.exposeDetailsTo(
-                log, optsTransfer.strGatheredDetailsName, false );
+                log.globalStream(), optsTransfer.strGatheredDetailsName, false );
             imaTransferErrorHandling.saveTransferError(
                 optsTransfer.strTransferErrorCategoryName,
                 optsTransfer.details.toString() );
@@ -867,7 +883,7 @@ async function checkOutgoingMessageEvent( optsTransfer: TTransferOptions, joSCha
                 "needed count {}", optsTransfer.strLogPrefix, optsTransfer.strDirection,
                 optsOutgoingMessageAnalysis.cntFailedNodes, optsTransfer.cntNodesShouldPass );
             optsTransfer.details.exposeDetailsTo(
-                log, optsTransfer.strGatheredDetailsName, false );
+                log.globalStream(), optsTransfer.strGatheredDetailsName, false );
             imaTransferErrorHandling.saveTransferError(
                 optsTransfer.strTransferErrorCategoryName, optsTransfer.details.toString() );
             optsTransfer.details.close();
@@ -957,12 +973,14 @@ async function doMainTransferLoopActions( optsTransfer: TTransferOptions ) {
         optsTransfer.details.information( strWillInvokeSigningCallbackMessage );
         // will re-open optsTransfer.details B log here for next step,
         // it can be delayed so we will flush accumulated optsTransfer.details A now
-        if( log.exposeDetailsGet() && optsTransfer.details.exposeDetailsTo )
-            optsTransfer.details.exposeDetailsTo( log, optsTransfer.strGatheredDetailsName, true );
+        if( log.exposeDetailsGet() && optsTransfer.details.exposeDetailsTo ) {
+            optsTransfer.details.exposeDetailsTo(
+                log.globalStream(), optsTransfer.strGatheredDetailsName, true );
+        }
 
         optsTransfer.details.close();
         optsTransfer.details = optsTransfer.imaState.isDynamicLogInDoTransfer
-            ? log : log.createMemoryStream();
+            ? log.globalStream() : log.createMemoryStream();
         optsTransfer.strGatheredDetailsName = `${optsTransfer.strDirection}/#` +
             `${optsTransfer.nTransferLoopCounter}-doTransfer-B-${optsTransfer.chainNameSrc}` +
             `-->${optsTransfer.chainNameDst}`;
@@ -997,7 +1015,7 @@ export async function doTransfer(
     nTransactionsCountInBlock: number,
     nTransferSteps: number, nMaxTransactionsCount: number,
     nBlockAwaitDepth: number, nBlockAge: number,
-    fnSignMessages: any, joExtraSignOpts: loop.TExtraSignOpts | null,
+    fnSignMessages: TFunctionDoSignMessages, joExtraSignOpts: loop.TExtraSignOpts | null,
     transactionCustomizerDst: imaTx.TransactionCustomizer
 ) {
     const optsTransfer: TTransferOptions = {
@@ -1027,7 +1045,7 @@ export async function doTransfer(
         nTransferLoopCounter: 0 + gTransferLoopCounter,
         strTransferErrorCategoryName: "loop-" + strDirection,
         strGatheredDetailsName: "",
-        details: null,
+        details: log.globalStream(),
         jarrReceipts: [],
         bErrorInSigningMessages: false,
         strLogPrefixShort: "",
@@ -1051,7 +1069,7 @@ export async function doTransfer(
         `${optsTransfer.strDirection}/#${optsTransfer.nTransferLoopCounter}-doTransfer-A-` +
         `${optsTransfer.chainNameSrc}-->${optsTransfer.chainNameDst}`;
     optsTransfer.details = optsTransfer.imaState.isDynamicLogInDoTransfer
-        ? log : log.createMemoryStream();
+        ? log.globalStream() : log.createMemoryStream();
     optsTransfer.strLogPrefixShort =
         `${optsTransfer.strDirection}/#${optsTransfer.nTransferLoopCounter} `;
     optsTransfer.strLogPrefix = `${optsTransfer.strLogPrefixShort}transfer loop from ` +
@@ -1059,9 +1077,10 @@ export async function doTransfer(
     if( gIsOneTransferInProgressInThisThread ) {
         optsTransfer.details.warning( "{p}Transfer loop step is skipped because previous one " +
             "is still in progress", optsTransfer.strLogPrefix );
-        if( log.exposeDetailsGet() && optsTransfer.details.exposeDetailsTo )
-            optsTransfer.details.exposeDetailsTo( log, optsTransfer.strGatheredDetailsName, true );
-
+        if( log.exposeDetailsGet() && optsTransfer.details.exposeDetailsTo ) {
+            optsTransfer.details.exposeDetailsTo(
+                log.globalStream(), optsTransfer.strGatheredDetailsName, true );
+        }
         optsTransfer.details.close();
         return false;
     }
@@ -1077,14 +1096,16 @@ export async function doTransfer(
             optsTransfer.fnSignMessages = async function(
                 nTransferLoopCounter: number, jarrMessages: any[],
                 nIdxCurrentMsgBlockStart: number, strFromChainName: string,
-                joExtraSignOpts: loop.TExtraSignOpts, fnAfter: any
+                joExtraSignOpts?: loop.TExtraSignOpts | null,
+                fnAfter?: TFunctionAfterSigningMessages
             ) {
                 optsTransfer.details.debug(
                     "{p}Message signing callback was not provided to IMA, first real message " +
                     "index is: {}, have {} message(s) to process {}", optsTransfer.strLogPrefix,
                     nIdxCurrentMsgBlockStart, optsTransfer.jarrMessages.length,
                     optsTransfer.jarrMessages );
-                await fnAfter( null, jarrMessages ); // null - no error, null - no signatures
+                if( fnAfter ) // null - no error, null - no signatures
+                    await fnAfter( null, jarrMessages, null );
             };
         } else {
             optsTransfer.details.debug( "{p}Using externally provided signing function",
@@ -1113,7 +1134,7 @@ export async function doTransfer(
             optsTransfer.details.critical( "{p}Error in {} during {bright}: {err}, " +
                 "stack is:\n{stack}", optsTransfer.strLogPrefix,
             optsTransfer.strGatheredDetailsName, optsTransfer.strActionName, err, err );
-            optsTransfer.details.exposeDetailsTo( log,
+            optsTransfer.details.exposeDetailsTo( log.globalStream(),
                 optsTransfer.strGatheredDetailsName, false );
             imaTransferErrorHandling.saveTransferError(
                 optsTransfer.strTransferErrorCategoryName, optsTransfer.details.toString() );
@@ -1126,7 +1147,7 @@ export async function doTransfer(
         if( optsTransfer.details ) {
             if( log.exposeDetailsGet() && optsTransfer.details.exposeDetailsTo ) {
                 optsTransfer.details.exposeDetailsTo(
-                    log, optsTransfer.strGatheredDetailsName, true );
+                    log.globalStream(), optsTransfer.strGatheredDetailsName, true );
             }
             optsTransfer.details.close();
         }
@@ -1143,7 +1164,7 @@ export async function doTransfer(
             optsTransfer.strLogPrefix, err, threadInfo.threadDescription(), err );
         if( log.exposeDetailsGet() && optsTransfer.details.exposeDetailsTo ) {
             optsTransfer.details.exposeDetailsTo(
-                log, optsTransfer.strGatheredDetailsName, true );
+                log.globalStream(), optsTransfer.strGatheredDetailsName, true );
         }
         optsTransfer.details.close();
         return false;
@@ -1165,7 +1186,7 @@ export async function doAllS2S( // s-chain --> s-chain
     nMaxTransactionsCount: number,
     nBlockAwaitDepth: number,
     nBlockAge: number,
-    fnSignMessages: any,
+    fnSignMessages: TFunctionDoSignMessages,
     transactionCustomizerDst: imaTx.TransactionCustomizer
 ) {
     let cntOK = 0; let cntFail = 0; let nIndexS2S = 0;

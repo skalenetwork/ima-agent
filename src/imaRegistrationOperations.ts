@@ -31,7 +31,7 @@ import type * as owaspUtils from "./owaspUtils.js";
 import type * as state from "./state.js";
 
 export async function invokeHasChain(
-    details: any,
+    details: log.TLogger,
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider, // Main-Net or S-Chin
     joLinker: owaspUtils.ethersMod.Contract, // Main-Net or S-Chin
     joAccount: state.TAccount, // Main-Net or S-Chin
@@ -54,7 +54,7 @@ export async function invokeHasChain(
 }
 
 export async function waitForHasChain(
-    details: any,
+    details: log.TLogger,
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider, // Main-Net or S-Chin
     joLinker: owaspUtils.ethersMod.Contract, // Main-Net or S-Chin
     joAccount: state.TAccount, // Main-Net or S-Chin
@@ -102,15 +102,18 @@ export async function checkIsRegisteredSChainInDepositBoxes( // step 1
             await joLinker.callStatic.hasSchain( chainIdSChain, { from: addressFrom } );
         details.success( "{p}checkIsRegisteredSChainInDepositBoxes(reg-step1) status is: {}",
             strLogPrefix, bIsRegistered );
-        if( log.exposeDetailsGet() )
-            details.exposeDetailsTo( log, "checkIsRegisteredSChainInDepositBoxes", true );
+        if( log.exposeDetailsGet() ) {
+            details.exposeDetailsTo(
+                log.globalStream(), "checkIsRegisteredSChainInDepositBoxes", true );
+        }
         details.close();
         return bIsRegistered;
     } catch ( err ) {
         details.critical(
             "{p}Error in checkIsRegisteredSChainInDepositBoxes(reg-step1)() during {bright}: " +
             "{err}, stack is:\n{stack}", strLogPrefix, strActionName, err, err );
-        details.exposeDetailsTo( log, "checkIsRegisteredSChainInDepositBoxes", false );
+        details.exposeDetailsTo(
+            log.globalStream(), "checkIsRegisteredSChainInDepositBoxes", false );
         details.close();
     }
     return false;
@@ -207,12 +210,15 @@ export async function registerSChainInDepositBoxes( // step 1
     } catch ( err ) {
         details.critical( "{p}Error in registerSChainInDepositBoxes() during {bright}: {err}" +
             ", stack is:\n{stack}", strLogPrefix, strActionName, err, err );
-        details.exposeDetailsTo( log, "registerSChainInDepositBoxes", false );
+        details.exposeDetailsTo(
+            log.globalStream(), "registerSChainInDepositBoxes", false );
         details.close();
         return null;
     }
-    if( log.exposeDetailsGet() )
-        details.exposeDetailsTo( log, "registerSChainInDepositBoxes", true );
+    if( log.exposeDetailsGet() ) {
+        details.exposeDetailsTo(
+            log.globalStream(), "registerSChainInDepositBoxes", true );
+    }
     details.close();
     return jarrReceipts;
 }

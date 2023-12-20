@@ -30,12 +30,17 @@ import * as path from "path";
 import * as os from "os";
 import * as threadInfo from "./threadInfo.js";
 import type * as state from "./state.js";
+import type * as discoveryTools from "./discoveryTools.js";
 
 import { v4 as uuid } from "uuid";
 export { uuid };
 
 const ethersMod = owaspUtils.ethersMod;
 export { ethersMod };
+
+export interface TTokesABIHolder {
+    joABI: object
+}
 
 export function replaceAll( str: string, find: string, replace: string ): string {
     return str.replace( new RegExp( find, "g" ), replace );
@@ -138,7 +143,7 @@ export async function waitForClonedTokenToAppear(
     strTokenSuffix: string, // example "erc20"
     addressCallFrom: string,
     cntAttempts: number,
-    tokensMN: any,
+    tokensMN: TTokesABIHolder,
     strMainnetName: string
 ) {
     const strTokenSuffixLC = strTokenSuffix.toLowerCase();
@@ -164,7 +169,7 @@ export async function waitForClonedTokenToAppear(
             await contractTokenManager.callStatic[
                 "clones" + log.capitalizeFirstLetter( strTokenSuffixLCshort )](
                 sc.ethersMod.ethers.utils.id( strMainnetName ),
-                tokensMN.joABI[strTokenSuffixUC + "_address"],
+                ( tokensMN.joABI as any )[strTokenSuffixUC + "_address"],
                 { from: addressCallFrom }
             );
         if( addressOnSChain != "0x0000000000000000000000000000000000000000" ) {
@@ -182,7 +187,8 @@ export async function waitForClonedTokenToAppear(
 }
 
 export async function waitForClonedTokenAppearErc20(
-    sc: any, tokenERC20SC: any, joAccountSC: state.TAccount, tokensMN: any, strMainnetName: string
+    sc: any, tokenERC20SC: state.TTokeInformation, joAccountSC: state.TAccount,
+    tokensMN: TTokesABIHolder, strMainnetName: string
 ) {
     if( "abi" in tokenERC20SC && typeof tokenERC20SC.abi == "object" &&
         "address" in tokenERC20SC && typeof tokenERC20SC.address == "string"
@@ -193,12 +199,13 @@ export async function waitForClonedTokenAppearErc20(
     const addressCallFrom = joAccountSC.address();
     const addressOnSChain = await waitForClonedTokenToAppear(
         sc, "erc20", addressCallFrom, 40, tokensMN, strMainnetName );
-    tokenERC20SC.abi = JSON.parse( JSON.stringify( tokensMN.joABI.ERC20_abi ) );
+    tokenERC20SC.abi = JSON.parse( JSON.stringify( ( tokensMN.joABI as any ).ERC20_abi ) );
     tokenERC20SC.address = "" + addressOnSChain;
 }
 
 export async function waitForClonedTokenAppearErc721(
-    sc: any, tokenERC721SC: any, joAccountSC: state.TAccount, tokensMN: any, strMainnetName: string
+    sc: any, tokenERC721SC: state.TTokeInformation, joAccountSC: state.TAccount,
+    tokensMN: TTokesABIHolder, strMainnetName: string
 ) {
     if( "abi" in tokenERC721SC && typeof tokenERC721SC.abi == "object" &&
         "address" in tokenERC721SC && typeof tokenERC721SC.address == "string"
@@ -210,12 +217,13 @@ export async function waitForClonedTokenAppearErc721(
     const addressOnSChain =
         await waitForClonedTokenToAppear(
             sc, "erc721", addressCallFrom, 40, tokensMN, strMainnetName );
-    tokenERC721SC.abi = JSON.parse( JSON.stringify( tokensMN.joABI.ERC721_abi ) );
+    tokenERC721SC.abi = JSON.parse( JSON.stringify( ( tokensMN.joABI as any ).ERC721_abi ) );
     tokenERC721SC.address = "" + addressOnSChain;
 }
 
 export async function waitForClonedTokenAppearErc721WithMetadata(
-    sc: any, tokenERC721SC: any, joAccountSC: state.TAccount, tokensMN: any, strMainnetName: string
+    sc: any, tokenERC721SC: state.TTokeInformation, joAccountSC: state.TAccount,
+    tokensMN: TTokesABIHolder, strMainnetName: string
 ) {
     if( "abi" in tokenERC721SC && typeof tokenERC721SC.abi == "object" &&
         "address" in tokenERC721SC && typeof tokenERC721SC.address == "string"
@@ -227,12 +235,14 @@ export async function waitForClonedTokenAppearErc721WithMetadata(
     const addressCallFrom = joAccountSC.address();
     const addressOnSChain = await waitForClonedTokenToAppear(
         sc, "erc721_with_metadata", addressCallFrom, 40, tokensMN, strMainnetName );
-    tokenERC721SC.abi = JSON.parse( JSON.stringify( tokensMN.joABI.ERC721_with_metadata_abi ) );
+    tokenERC721SC.abi =
+        JSON.parse( JSON.stringify( ( tokensMN.joABI as any ).ERC721_with_metadata_abi ) );
     tokenERC721SC.address = "" + addressOnSChain;
 }
 
 export async function waitForClonedTokenAppearErc1155(
-    sc: any, tokenERC1155SC: any, joAccountSC: state.TAccount, tokensMN: any, strMainnetName: string
+    sc: any, tokenERC1155SC: state.TTokeInformation, joAccountSC: state.TAccount,
+    tokensMN: TTokesABIHolder, strMainnetName: string
 ) {
     if( "abi" in tokenERC1155SC && typeof tokenERC1155SC.abi == "object" &&
         "address" in tokenERC1155SC && typeof tokenERC1155SC.address == "string"
@@ -243,7 +253,7 @@ export async function waitForClonedTokenAppearErc1155(
     const addressCallFrom = joAccountSC.address();
     const addressOnSChain = await waitForClonedTokenToAppear(
         sc, "erc1155", addressCallFrom, 40, tokensMN, strMainnetName );
-    tokenERC1155SC.abi = JSON.parse( JSON.stringify( tokensMN.joABI.ERC1155_abi ) );
+    tokenERC1155SC.abi = JSON.parse( JSON.stringify( ( tokensMN.joABI as any ).ERC1155_abi ) );
     tokenERC1155SC.address = "" + addressOnSChain;
 }
 
@@ -401,7 +411,7 @@ export function checkKeysExistInABI(
     return true;
 }
 
-export function composeSChainNodeUrl( joNode: any ): string {
+export function composeSChainNodeUrl( joNode: discoveryTools.TSChainNode ): string {
     if( "ip" in joNode && typeof joNode.ip === "string" && joNode.ip.length > 0 ) {
         if( "httpRpcPort" in joNode &&
             typeof joNode.httpRpcPort === "number" &&
@@ -442,7 +452,8 @@ export function composeSChainNodeUrl( joNode: any ): string {
     return "";
 }
 
-export function composeImaAgentNodeUrl( joNode: any, isThisNode: boolean ): string {
+export function composeImaAgentNodeUrl(
+    joNode: discoveryTools.TSChainNode, isThisNode: boolean ): string {
     let nPort = -1;
     if( "imaAgentRpcPort" in joNode &&
         typeof joNode.imaAgentRpcPort === "number" &&

@@ -29,6 +29,107 @@ import * as state from "./state.js";
 import * as imaUtils from "./utils.js";
 import * as threadInfo from "./threadInfo.js";
 
+export type TFunctionAfterDiscovery = (
+    err?: Error | string | null,
+    joSChainNetworkInfo?: TSChainNetworkInfo | null
+) => void;
+
+export type TFunctionAfterRediscovery = (
+    status: boolean
+) => void;
+
+export interface TBLSPublicKey {
+    BLSPublicKey0: string
+    BLSPublicKey1: string
+    BLSPublicKey2: string
+    BLSPublicKey3: string
+}
+
+export interface TBLSCommonPublicKey {
+    commonBLSPublicKey0: string
+    commonBLSPublicKey1: string
+    commonBLSPublicKey2: string
+    commonBLSPublicKey3: string
+}
+
+export interface TNodeImaInfo extends TBLSPublicKey, TBLSCommonPublicKey {
+    n: number
+    t: number
+    thisNodeIndex: number
+}
+
+export interface TPWAStateItem {
+    isInProgress: boolean
+    ts: number
+}
+
+export interface TPWAState {
+    oracle: TPWAStateItem
+    m2s: TPWAStateItem
+    s2m: TPWAStateItem
+    s2s: { mapS2S: any }
+}
+
+export interface TSChainNode {
+    httpRpcPort?: number
+    httpRpcPort6?: number
+    httpsRpcPort?: number
+    httpsRpcPort6?: number
+    ip?: string
+    ip6?: string
+    nodeID: number
+    schainIndex: number
+    wsRpcPort?: number
+    wsRpcPort6?: number
+    wssRpcPort?: number
+    wssRpcPort6?: number
+    imaInfo: TNodeImaInfo
+    pwaState?: TPWAState
+}
+
+export interface TThisNodeProperties {
+    acceptors: number
+    bindIP: string
+    bindIP6: string
+    "enable-admin-apis"?: boolean
+    "enable-debug-behavior-apis"?: boolean
+    "enable-performance-tracker-apis"?: boolean
+    "enable-personal-apis"?: true
+    httpRpcPort?: number
+    httpRpcPort6?: number
+    httpsRpcPort?: number
+    httpsRpcPort6?: number
+    nodeID: number
+    schainName: string
+    thisNodeIndex: number
+    "unsafe-transactions"?: boolean
+    wsRpcPort?: number
+    wsRpcPort6?: number
+    wssRpcPort?: number
+    wssRpcPort6?: number
+}
+
+export interface TSChainNetworkInfo {
+    network: TSChainNode[]
+    node: TThisNodeProperties
+    schainID: number
+}
+
+export interface TDiscoveryOptions {
+    fnAfter: TFunctionAfterDiscovery | null
+    isSilentReDiscovery: boolean
+    joPrevSChainNetworkInfo: TSChainNetworkInfo | null
+    nCountToWait: number
+    imaState: state.TIMAState
+    strLogPrefix: string
+    joSChainNetworkInfo: TSChainNetworkInfo | null
+    jarrNodes: TSChainNode[]
+    cntNodes: number
+    cntFailed: number
+    nCountReceivedImaDescriptions: number
+    nCountAvailable: number
+}
+
 export function formatBalanceInfo( bi: any, strAddress: string ): string {
     let s = "";
     s += log.fmtInformation( "{p}", bi.assetName );
@@ -53,7 +154,7 @@ export function formatBalanceInfo( bi: any, strAddress: string ): string {
     return s;
 }
 
-function getSChainNodesCount( joSChainNetworkInfo: any ): number {
+function getSChainNodesCount( joSChainNetworkInfo: TSChainNetworkInfo ): number {
     try {
         if( ! joSChainNetworkInfo )
             return 0;
@@ -65,7 +166,7 @@ function getSChainNodesCount( joSChainNetworkInfo: any ): number {
     }
 }
 
-export function isSChainNodeFullyDiscovered( joNode: any ): boolean {
+export function isSChainNodeFullyDiscovered( joNode: TSChainNode ): boolean {
     if( ! joNode )
         return false;
     if( joNode && "imaInfo" in joNode && typeof joNode.imaInfo == "object" &&
@@ -102,7 +203,8 @@ export function isSChainNodeFullyDiscovered( joNode: any ): boolean {
     return false;
 }
 
-export function getSChainDiscoveredNodesCount( joSChainNetworkInfo: any ): number {
+export function getSChainDiscoveredNodesCount(
+    joSChainNetworkInfo: TSChainNetworkInfo | null ): number {
     try {
         if( ! joSChainNetworkInfo )
             return 0;
@@ -178,7 +280,8 @@ let gTimerSChainDiscovery: any = null;
 let gFlagIsInSChainDiscovery: boolean = false;
 
 function composeStillUnknownNodesMessage(
-    joSChainNetworkInfo: any, cntStillUnknown: number, cntNodesOnChain: number ): string {
+    joSChainNetworkInfo: TSChainNetworkInfo,
+    cntStillUnknown: number, cntNodesOnChain: number ): string {
     let strMessage = log.fmtSuccess( ", {} of {} still unknown (",
         cntStillUnknown, cntNodesOnChain );
     try {
@@ -202,12 +305,15 @@ function composeStillUnknownNodesMessage(
     return strMessage;
 }
 
-async function handlePeriodicDiscoveryAttemptActions( isSilentReDiscovery: boolean, fnAfter: any ) {
+async function handlePeriodicDiscoveryAttemptActions(
+    isSilentReDiscovery: boolean, fnAfter: TFunctionAfterDiscovery | null ) {
     if( gFlagIsInSChainDiscovery ) {
         log.information( "Notice: long this S-Chain re-discovery is in progress now..." );
         return;
     }
     const imaState: state.TIMAState = state.get();
+    if( ! imaState.joSChainNetworkInfo )
+        throw new Error( "No own S-Chain network information" );
     fnAfter = fnAfter || function() {};
     gFlagIsInSChainDiscovery = true;
     const cntNodesOnChain = getSChainNodesCount( imaState.joSChainNetworkInfo );
@@ -246,12 +352,12 @@ async function handlePeriodicDiscoveryAttemptActions( isSilentReDiscovery: boole
                 "discovered...", nCountToWait, cntDiscovered );
         }
         let isError = false;
-        const joSChainNetworkInfo = await discoverSChainNetwork(
+        const joSChainNetworkInfo: TSChainNetworkInfo = await discoverSChainNetwork(
             null, isSilentReDiscovery, imaState.joSChainNetworkInfo, nCountToWait
         ).catch( function( err: Error | string ) {
             isError = true;
             log.critical( "S-Chain network re-discovery failed: {err}", err );
-        } );
+        } ) as TSChainNetworkInfo;
         if( ! isError ) {
             const cntDiscoveredNow = getSChainDiscoveredNodesCount( joSChainNetworkInfo );
             let strMessage =
@@ -286,7 +392,7 @@ async function handlePeriodicDiscoveryAttemptActions( isSilentReDiscovery: boole
 }
 
 export async function continueSChainDiscoveryInBackgroundIfNeeded(
-    isSilentReDiscovery: boolean, fnAfter: any ) {
+    isSilentReDiscovery: boolean, fnAfter: TFunctionAfterDiscovery | null ) {
     if( gTimerSChainDiscovery != null )
         return;
     fnAfter = fnAfter || function() {};
@@ -297,6 +403,8 @@ export async function continueSChainDiscoveryInBackgroundIfNeeded(
         fnAfter();
         return; // no S-Chain re-discovery, special mode
     }
+    if( ! imaState.joSChainNetworkInfo )
+        throw new Error( "No own S-Chain network information" );
     const cntNodesOnChain = getSChainNodesCount( imaState.joSChainNetworkInfo );
     let nCountToWait = ( cntNodesOnChain > 2 )
         ? Math.ceil( cntNodesOnChain * 2 / 3 + 1 )
@@ -332,7 +440,7 @@ export async function continueSChainDiscoveryInBackgroundIfNeeded(
 }
 
 function handleDiscoverSkaleImaInfoResult(
-    optsDiscover: any, strNodeDescColorized: string,
+    optsDiscover: TDiscoveryOptions, strNodeDescColorized: string,
     joNode: any, joCall: rpcCall.TRPCCall, joIn: any, joOut: any
 ): void {
     joNode.imaInfo = joOut.result;
@@ -345,7 +453,7 @@ function handleDiscoverSkaleImaInfoResult(
     }
 }
 
-async function discoverSChainWalkNodes( optsDiscover: any ) {
+async function discoverSChainWalkNodes( optsDiscover: TDiscoveryOptions ) {
     optsDiscover.cntFailed = 0;
     for( let i = 0; i < optsDiscover.cntNodes; ++ i ) {
         const nCurrentNodeIdx = 0 + i;
@@ -398,7 +506,7 @@ async function discoverSChainWalkNodes( optsDiscover: any ) {
     }
 }
 
-async function discoverSChainWait( optsDiscover: any ) {
+async function discoverSChainWait( optsDiscover: TDiscoveryOptions ) {
     if( ! optsDiscover.isSilentReDiscovery ) {
         log.debug( "{p}Waiting for response from at least {} node(s)...",
             optsDiscover.strLogPrefix, optsDiscover.nCountToWait );
@@ -467,7 +575,8 @@ async function discoverSChainWait( optsDiscover: any ) {
 }
 
 async function handleDiscoverSkaleNodesRpcInfoResult(
-    optsDiscover: any, scURL: string, joCall: rpcCall.TRPCCall, joIn: any, joOut: any ) {
+    optsDiscover: TDiscoveryOptions, scURL: string,
+    joCall: rpcCall.TRPCCall, joIn: any, joOut: any ) {
     if( ! optsDiscover.isSilentReDiscovery ) {
         log.trace( "{p}OK, got (own) S-Chain network information: {}",
             optsDiscover.strLogPrefix, joOut.result );
@@ -537,9 +646,9 @@ async function handleDiscoverSkaleNodesRpcInfoResult(
 }
 
 export async function discoverSChainNetwork(
-    fnAfter: any, isSilentReDiscovery: boolean,
+    fnAfter: TFunctionAfterDiscovery | null, isSilentReDiscovery: boolean,
     joPrevSChainNetworkInfo: any, nCountToWait: number ) {
-    const optsDiscover: any = {
+    const optsDiscover: TDiscoveryOptions = {
         fnAfter,
         isSilentReDiscovery: ( !!isSilentReDiscovery ),
         joPrevSChainNetworkInfo: joPrevSChainNetworkInfo || null,
@@ -586,7 +695,7 @@ export async function discoverSChainNetwork(
         }
         optsDiscover.joSChainNetworkInfo = null;
         if( optsDiscover.fnAfter )
-            optsDiscover.fnAfter( err, null );
+            optsDiscover.fnAfter( err as Error, null );
         if( joCall )
             await joCall.disconnect();
         throw err;
@@ -597,10 +706,12 @@ export async function discoverSChainNetwork(
 let gIntervalPeriodicDiscovery: any = null;
 
 function checkPeriodicDiscoveryNoLongerNeeded(
-    joSChainNetworkInfo: any, isSilentReDiscovery: boolean ) {
+    joSChainNetworkInfo: TSChainNetworkInfo | null, isSilentReDiscovery: boolean ) {
     if( ! joSChainNetworkInfo )
         return false;
     const imaState: state.TIMAState = state.get();
+    if( ! imaState.joSChainNetworkInfo )
+        throw new Error( "No own S-Chain network information" );
     const cntNodesOnChain = getSChainNodesCount( imaState.joSChainNetworkInfo );
     const cntAlreadyDiscovered = getSChainDiscoveredNodesCount( joSChainNetworkInfo );
     if( ! isSilentReDiscovery ) {
@@ -618,7 +729,7 @@ function checkPeriodicDiscoveryNoLongerNeeded(
 }
 
 export async function doPeriodicSChainNetworkDiscoveryIfNeeded(
-    isSilentReDiscovery: boolean, fnAfterRediscover: any
+    isSilentReDiscovery: boolean, fnAfterRediscover?: TFunctionAfterRediscovery
 ) {
     if( gIntervalPeriodicDiscovery )
         return; // already started
@@ -630,6 +741,8 @@ export async function doPeriodicSChainNetworkDiscoveryIfNeeded(
             log.success( "Periodic S-Chain re-discovery is not needed right from startup" );
         return; // not needed right from very beginning
     }
+    if( ! imaState.joSChainNetworkInfo )
+        throw new Error( "No own S-Chain network information" );
     const cntNodesOnChain = getSChainNodesCount( imaState.joSChainNetworkInfo );
     let periodicDiscoveryInterval = imaState.joSChainDiscovery.periodicDiscoveryInterval;
     if( periodicDiscoveryInterval <= 0 )
@@ -638,7 +751,7 @@ export async function doPeriodicSChainNetworkDiscoveryIfNeeded(
         log.debug( "Periodic S-Chain re-discovery will be done with {} interval...",
             periodicDiscoveryInterval );
     }
-    fnAfterRediscover = fnAfterRediscover || function() { };
+    fnAfterRediscover = fnAfterRediscover || function( status: boolean ) { };
     gIntervalPeriodicDiscovery = setInterval( function() {
         let nCountToWait = ( cntNodesOnChain > 2 )
             ? Math.ceil( cntNodesOnChain * 2 / 3 )
@@ -655,12 +768,14 @@ export async function doPeriodicSChainNetworkDiscoveryIfNeeded(
                     joPrevSChainNetworkInfo, isSilentReDiscovery ) ) {
                     if( ! isSilentReDiscovery )
                         log.information( "Final periodic S-Chain re-discovery done" );
-                    fnAfterRediscover( true );
+                    if( fnAfterRediscover )
+                        fnAfterRediscover( true );
                     return; // not needed anymore, all nodes completely discovered
                 }
                 if( ! isSilentReDiscovery )
                     log.information( "Partial periodic S-Chain re-discovery done" );
-                fnAfterRediscover( false );
+                if( fnAfterRediscover )
+                    fnAfterRediscover( false );
             } ).catch( function() {} );
     }, periodicDiscoveryInterval );
     if( ! isSilentReDiscovery ) {

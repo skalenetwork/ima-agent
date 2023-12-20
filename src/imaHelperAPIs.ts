@@ -62,7 +62,7 @@ export const currentTimestamp = (): number => {
 };
 
 export async function safeWaitForNextBlockToAppear(
-    details: any, ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider ) {
+    details: log.TLogger, ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider ) {
     const nBlockNumber: any =
         owaspUtils.toBN( await safeGetBlockNumber( details, 10, ethersProvider ) );
     details.trace( "Waiting for next block to appear..." );
@@ -78,7 +78,7 @@ export async function safeWaitForNextBlockToAppear(
 }
 
 export async function safeGetBlockNumber(
-    details: any, cntAttempts: number,
+    details: log.TLogger, cntAttempts: number,
     ethersProvider: owaspUtils.ethersMod.providers.JsonRpcProvider,
     retValOnFail?: any, throwIfServerOffline?: boolean
 ) {

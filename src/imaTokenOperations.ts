@@ -76,7 +76,7 @@ export async function getOwnerOfErc721(
                 joABI && ( strCoinName + "_address" ) in joABI ) )
             return "<no-data>";
         const strAddress = joAccount.address();
-        const contractERC721: any = new owaspUtils.ethersMod.ethers.Contract(
+        const contractERC721 = new owaspUtils.ethersMod.ethers.Contract(
             joABI[strCoinName + "_address"],
             joABI[strCoinName + "_abi"],
             ethersProvider
@@ -246,14 +246,14 @@ export async function doErc721PaymentFromMainNet(
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
             strLogPrefix, strActionName, err, err );
-        details.exposeDetailsTo( log, "doErc721PaymentFromMainNet", false );
+        details.exposeDetailsTo( log.globalStream(), "doErc721PaymentFromMainNet", false );
         details.close();
         return false;
     }
     imaGasUsage.printGasUsageReportFromArray(
         "ERC-721 PAYMENT FROM MAIN NET", jarrReceipts, details );
     if( log.exposeDetailsGet() )
-        details.exposeDetailsTo( log, "doErc721PaymentFromMainNet", true );
+        details.exposeDetailsTo( log.globalStream(), "doErc721PaymentFromMainNet", true );
     details.close();
     return true;
 }
@@ -383,14 +383,14 @@ export async function doErc20PaymentFromMainNet(
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
             strLogPrefix, strActionName, err, err );
-        details.exposeDetailsTo( log, "doErc20PaymentFromMainNet", false );
+        details.exposeDetailsTo( log.globalStream(), "doErc20PaymentFromMainNet", false );
         details.close();
         return false;
     }
     imaGasUsage.printGasUsageReportFromArray(
         "ERC-20 PAYMENT FROM MAIN NET", jarrReceipts, details );
     if( log.exposeDetailsGet() )
-        details.exposeDetailsTo( log, "doErc20PaymentFromMainNet", true );
+        details.exposeDetailsTo( log.globalStream(), "doErc20PaymentFromMainNet", true );
     details.close();
     return true;
 }
@@ -530,14 +530,14 @@ export async function doErc1155PaymentFromMainNet(
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
             strLogPrefix, strActionName, err, err );
-        details.exposeDetailsTo( log, "doErc1155PaymentFromMainNet", false );
+        details.exposeDetailsTo( log.globalStream(), "doErc1155PaymentFromMainNet", false );
         details.close();
         return false;
     }
     imaGasUsage.printGasUsageReportFromArray(
         "ERC-1155 PAYMENT FROM MAIN NET", jarrReceipts, details );
     if( log.exposeDetailsGet() )
-        details.exposeDetailsTo( log, "doErc1155PaymentFromMainNet", true );
+        details.exposeDetailsTo( log.globalStream(), "doErc1155PaymentFromMainNet", true );
     details.close();
     return true;
 }
@@ -659,14 +659,14 @@ export async function doErc1155BatchPaymentFromMainNet(
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
             strLogPrefix, strActionName, err, err );
-        details.exposeDetailsTo( log, "doErc1155BatchPaymentFromMainNet", false );
+        details.exposeDetailsTo( log.globalStream(), "doErc1155BatchPaymentFromMainNet", false );
         details.close();
         return false;
     }
     imaGasUsage.printGasUsageReportFromArray(
         "ERC-1155 PAYMENT FROM MAIN NET", jarrReceipts, details );
     if( log.exposeDetailsGet() )
-        details.exposeDetailsTo( log, "doErc1155BatchPaymentFromMainNet", true );
+        details.exposeDetailsTo( log.globalStream(), "doErc1155BatchPaymentFromMainNet", true );
     details.close();
     return true;
 }
@@ -803,14 +803,14 @@ export async function doErc20PaymentFromSChain(
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
             strLogPrefix, strActionName, err, err );
-        details.exposeDetailsTo( log, "doErc20PaymentFromSChain", false );
+        details.exposeDetailsTo( log.globalStream(), "doErc20PaymentFromSChain", false );
         details.close();
         return false;
     }
     imaGasUsage.printGasUsageReportFromArray(
         "ERC-20 PAYMENT FROM S-CHAIN", jarrReceipts, details );
     if( log.exposeDetailsGet() )
-        details.exposeDetailsTo( log, "doErc20PaymentFromSChain", true );
+        details.exposeDetailsTo( log.globalStream(), "doErc20PaymentFromSChain", true );
     details.close();
     return true;
 }
@@ -951,14 +951,14 @@ export async function doErc721PaymentFromSChain(
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
             strLogPrefix, strActionName, err, err );
-        details.exposeDetailsTo( log, "doErc721PaymentFromSChain", false );
+        details.exposeDetailsTo( log.globalStream(), "doErc721PaymentFromSChain", false );
         details.close();
         return false;
     }
     imaGasUsage.printGasUsageReportFromArray(
         "ERC-721 PAYMENT FROM S-CHAIN", jarrReceipts, details );
     if( log.exposeDetailsGet() )
-        details.exposeDetailsTo( log, "doErc721PaymentFromSChain", true );
+        details.exposeDetailsTo( log.globalStream(), "doErc721PaymentFromSChain", true );
     details.close();
     return true;
 }
@@ -1098,14 +1098,14 @@ export async function doErc1155PaymentFromSChain(
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
             strLogPrefix, strActionName, err, err );
-        details.exposeDetailsTo( log, "doErc1155PaymentFromSChain", false );
+        details.exposeDetailsTo( log.globalStream(), "doErc1155PaymentFromSChain", false );
         details.close();
         return false;
     }
     imaGasUsage.printGasUsageReportFromArray(
         "ERC-1155 PAYMENT FROM S-CHAIN", jarrReceipts, details );
     if( log.exposeDetailsGet() )
-        details.exposeDetailsTo( log, "doErc1155PaymentFromSChain", true );
+        details.exposeDetailsTo( log.globalStream(), "doErc1155PaymentFromSChain", true );
     details.close();
     return true;
 }
@@ -1244,14 +1244,14 @@ export async function doErc1155BatchPaymentFromSChain(
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
             strLogPrefix, strActionName, err, err );
-        details.exposeDetailsTo( log, "doErc1155BatchPaymentFromSChain", false );
+        details.exposeDetailsTo( log.globalStream(), "doErc1155BatchPaymentFromSChain", false );
         details.close();
         return false;
     }
     imaGasUsage.printGasUsageReportFromArray(
         "ERC-1155 PAYMENT FROM S-CHAIN", jarrReceipts, details );
     if( log.exposeDetailsGet() )
-        details.exposeDetailsTo( log, "doErc1155BatchPaymentFromSChain", true );
+        details.exposeDetailsTo( log.globalStream(), "doErc1155BatchPaymentFromSChain", true );
     details.close();
     return true;
 }
@@ -1381,16 +1381,16 @@ export async function doErc20PaymentS2S(
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
             strLogPrefix, strActionName, err, err );
-        details.exposeDetailsTo(
-            log, `doErc20PaymentS2S/${( isForward ? "forward" : "reverse" )}`, false );
+        details.exposeDetailsTo( log.globalStream(),
+            `doErc20PaymentS2S/${( isForward ? "forward" : "reverse" )}`, false );
         details.close();
         return false;
     }
     imaGasUsage.printGasUsageReportFromArray(
         `ERC-20 PAYMENT FROM S2S/${( isForward ? "forward" : "reverse" )}`, jarrReceipts, details );
     if( log.exposeDetailsGet() ) {
-        details.exposeDetailsTo(
-            log, `doErc20PaymentS2S/${( isForward ? "forward" : "reverse" )}`, true );
+        details.exposeDetailsTo( log.globalStream(),
+            `doErc20PaymentS2S/${( isForward ? "forward" : "reverse" )}`, true );
     }
     details.close();
     return true;
@@ -1524,8 +1524,8 @@ export async function doErc721PaymentS2S(
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
             strLogPrefix, strActionName, err, err );
-        details.exposeDetailsTo(
-            log, `doErc721PaymentS2S/${( isForward ? "forward" : "reverse" )}`, false );
+        details.exposeDetailsTo( log.globalStream(),
+            `doErc721PaymentS2S/${( isForward ? "forward" : "reverse" )}`, false );
         details.close();
         return false;
     }
@@ -1533,8 +1533,8 @@ export async function doErc721PaymentS2S(
         `ERC-721 PAYMENT FROM S2S/${( isForward ? "forward" : "reverse" )}`,
         jarrReceipts, details );
     if( log.exposeDetailsGet() ) {
-        details.exposeDetailsTo(
-            log, `doErc721PaymentS2S/${( isForward ? "forward" : "reverse" )}`, true );
+        details.exposeDetailsTo( log.globalStream(),
+            `doErc721PaymentS2S/${( isForward ? "forward" : "reverse" )}`, true );
     }
     details.close();
     return true;
@@ -1669,8 +1669,8 @@ export async function doErc1155PaymentS2S(
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
             strLogPrefix, strActionName, err, err );
-        details.exposeDetailsTo(
-            log, `doErc1155PaymentS2S/${( isForward ? "forward" : "reverse" )}`, false );
+        details.exposeDetailsTo( log.globalStream(),
+            `doErc1155PaymentS2S/${( isForward ? "forward" : "reverse" )}`, false );
         details.close();
         return false;
     }
@@ -1678,8 +1678,8 @@ export async function doErc1155PaymentS2S(
         `ERC-1155 PAYMENT FROM S2S/${( isForward ? "forward" : "reverse" )}`,
         jarrReceipts, details );
     if( log.exposeDetailsGet() ) {
-        details.exposeDetailsTo(
-            log, `doErc1155PaymentS2S/${( isForward ? "forward" : "reverse" )}`, true );
+        details.exposeDetailsTo( log.globalStream(),
+            `doErc1155PaymentS2S/${( isForward ? "forward" : "reverse" )}`, true );
     }
     details.close();
     return true;
@@ -1816,8 +1816,8 @@ export async function doErc1155BatchPaymentS2S(
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
             strLogPrefix, strActionName, err, err );
-        details.exposeDetailsTo(
-            log, `doErc1155BatchPaymentS2S/${( isForward ? "forward" : "reverse" )}`, false );
+        details.exposeDetailsTo( log.globalStream(),
+            `doErc1155BatchPaymentS2S/${( isForward ? "forward" : "reverse" )}`, false );
         details.close();
         return false;
     }
@@ -1825,8 +1825,8 @@ export async function doErc1155BatchPaymentS2S(
         `ERC-1155-batch PAYMENT FROM S2S/${( isForward ? "forward" : "reverse" )}`,
         jarrReceipts, details );
     if( log.exposeDetailsGet() ) {
-        details.exposeDetailsTo(
-            log, `doErc1155BatchPaymentS2S/${( isForward ? "forward" : "reverse" )}`, true );
+        details.exposeDetailsTo( log.globalStream(),
+            `doErc1155BatchPaymentS2S/${( isForward ? "forward" : "reverse" )}`, true );
     }
     details.close();
     return true;
@@ -1890,13 +1890,13 @@ export async function mintErc20(
             receipt: joReceipt
         } ], details );
         if( log.exposeDetailsGet() )
-            details.exposeDetailsTo( log, "mintErc20", true );
+            details.exposeDetailsTo( log.globalStream(), "mintErc20", true );
         details.close();
         return joReceipt; // can be used as "true" boolean value
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
             strLogPrefix, strActionName, err, err );
-        details.exposeDetailsTo( log, "mintErc20()", false );
+        details.exposeDetailsTo( log.globalStream(), "mintErc20()", false );
         details.close();
         return false;
     }
@@ -1960,13 +1960,13 @@ export async function mintErc721(
             receipt: joReceipt
         } ], details );
         if( log.exposeDetailsGet() )
-            details.exposeDetailsTo( log, "mintErc721", true );
+            details.exposeDetailsTo( log.globalStream(), "mintErc721", true );
         details.close();
         return joReceipt; // can be used as "true" boolean value
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
             strLogPrefix, strActionName, err, err );
-        details.exposeDetailsTo( log, "mintErc721()", false );
+        details.exposeDetailsTo( log.globalStream(), "mintErc721()", false );
         details.close();
         return false;
     }
@@ -2034,13 +2034,13 @@ export async function mintErc1155(
             receipt: joReceipt
         } ], details );
         if( log.exposeDetailsGet() )
-            details.exposeDetailsTo( log, "mintErc1155", true );
+            details.exposeDetailsTo( log.globalStream(), "mintErc1155", true );
         details.close();
         return joReceipt; // can be used as "true" boolean value
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
             strLogPrefix, strActionName, err, err );
-        details.exposeDetailsTo( log, "mintErc1155()", false );
+        details.exposeDetailsTo( log.globalStream(), "mintErc1155()", false );
         details.close();
         return false;
     }
@@ -2104,13 +2104,13 @@ export async function burnErc20(
             receipt: joReceipt
         } ], details );
         if( log.exposeDetailsGet() )
-            details.exposeDetailsTo( log, "burnErc20", true );
+            details.exposeDetailsTo( log.globalStream(), "burnErc20", true );
         details.close();
         return joReceipt; // can be used as "true" boolean value
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
             strLogPrefix, strActionName, err, err );
-        details.exposeDetailsTo( log, "burnErc20()", false );
+        details.exposeDetailsTo( log.globalStream(), "burnErc20()", false );
         details.close();
         return false;
     }
@@ -2171,13 +2171,13 @@ export async function burnErc721(
             receipt: joReceipt
         } ], details );
         if( log.exposeDetailsGet() )
-            details.exposeDetailsTo( log, "burnErc721", true );
+            details.exposeDetailsTo( log.globalStream(), "burnErc721", true );
         details.close();
         return joReceipt; // can be used as "true" boolean value
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
             strLogPrefix, strActionName, err, err );
-        details.exposeDetailsTo( log, "burnErc721()", false );
+        details.exposeDetailsTo( log.globalStream(), "burnErc721()", false );
         details.close();
         return false;
     }
@@ -2245,13 +2245,13 @@ export async function burnErc1155(
             receipt: joReceipt
         } ], details );
         if( log.exposeDetailsGet() )
-            details.exposeDetailsTo( log, "burnErc1155", true );
+            details.exposeDetailsTo( log.globalStream(), "burnErc1155", true );
         details.close();
         return joReceipt; // can be used as "true" boolean value
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
             strLogPrefix, strActionName, err, err );
-        details.exposeDetailsTo( log, "burnErc1155()", false );
+        details.exposeDetailsTo( log.globalStream(), "burnErc1155()", false );
         details.close();
         return false;
     }

@@ -58,13 +58,13 @@ export async function reimbursementShowBalance(
             log.information( s );
         details.information( s );
         if( log.exposeDetailsGet() )
-            details.exposeDetailsTo( log, "reimbursementShowBalance", true );
+            details.exposeDetailsTo( log.globalStream(), "reimbursementShowBalance", true );
         details.close();
         return xWei;
     } catch ( err ) {
         details.critical( "{p}Payment error in reimbursementShowBalance(): {err}, " +
             "stack is:\n{stack}", strLogPrefix, err, err );
-        details.exposeDetailsTo( log, "reimbursementShowBalance", false );
+        details.exposeDetailsTo( log.globalStream(), "reimbursementShowBalance", false );
         details.close();
         return 0;
     }
@@ -141,13 +141,13 @@ export async function reimbursementEstimateAmount(
         details.information( s );
 
         if( log.exposeDetailsGet() )
-            details.exposeDetailsTo( log, "reimbursementEstimateAmount", true );
+            details.exposeDetailsTo( log.globalStream(), "reimbursementEstimateAmount", true );
         details.close();
         return amountToRecharge;
     } catch ( err ) {
         details.critical( "{p} Payment error in reimbursementEstimateAmount(): {err}, " +
             "stack is:\n{stack}", strLogPrefix, err, err );
-        details.exposeDetailsTo( log, "reimbursementEstimateAmount", false );
+        details.exposeDetailsTo( log.globalStream(), "reimbursementEstimateAmount", false );
         details.close();
         return 0;
     }
@@ -203,14 +203,14 @@ export async function reimbursementWalletRecharge(
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
             strLogPrefix, strActionName, err, err );
-        details.exposeDetailsTo( log, "reimbursementWalletRecharge", false );
+        details.exposeDetailsTo( log.globalStream(), "reimbursementWalletRecharge", false );
         details.close();
         return false;
     }
     imaGasUsage.printGasUsageReportFromArray(
         "REIMBURSEMENT_WALLET_RECHARGE", jarrReceipts, details );
     if( log.exposeDetailsGet() )
-        details.exposeDetailsTo( log, "reimbursementWalletRecharge", true );
+        details.exposeDetailsTo( log.globalStream(), "reimbursementWalletRecharge", true );
     details.close();
     return true;
 }
@@ -270,14 +270,14 @@ export async function reimbursementWalletWithdraw(
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
             strLogPrefix, strActionName, err, err );
-        details.exposeDetailsTo( log, "reimbursementWalletWithdraw", false );
+        details.exposeDetailsTo( log.globalStream(), "reimbursementWalletWithdraw", false );
         details.close();
         return false;
     }
     imaGasUsage.printGasUsageReportFromArray(
         "REIMBURSEMENT_WALLET_WITHDRAW", jarrReceipts, details );
     if( log.exposeDetailsGet() )
-        details.exposeDetailsTo( log, "reimbursementWalletWithdraw", true );
+        details.exposeDetailsTo( log.globalStream(), "reimbursementWalletWithdraw", true );
     details.close();
     return true;
 }
@@ -335,14 +335,14 @@ export async function reimbursementSetRange(
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",
             strLogPrefix, strActionName, err, err );
-        details.exposeDetailsTo( log, "reimbursementSetRange", false );
+        details.exposeDetailsTo( log.globalStream(), "reimbursementSetRange", false );
         details.close();
         return false;
     }
     imaGasUsage.printGasUsageReportFromArray(
         "REIMBURSEMENT_SET_RANGE", jarrReceipts, details );
     if( log.exposeDetailsGet() )
-        details.exposeDetailsTo( log, "reimbursementSetRange", true );
+        details.exposeDetailsTo( log.globalStream(), "reimbursementSetRange", true );
     details.close();
     return true;
 }

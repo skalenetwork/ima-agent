@@ -383,7 +383,7 @@ async function doTheJob() {
 }
 
 function handleFirstSChainDiscoveryAttemptDone(
-    err: any, joSChainNetworkInfo: any,
+    err: any, joSChainNetworkInfo: discoveryTools.TSChainNetworkInfo,
     isSilentReDiscovery: boolean, fnOnPeriodicDiscoveryResultAvailable: any ): void {
     if( err ) {
     // error information is printed by discoveryTools.discoverSChainNetwork()
@@ -450,14 +450,16 @@ async function main() {
             }
             const nCountToWait = -1;
             discoveryTools.discoverSChainNetwork(
-                function( err: Error | string, joSChainNetworkInfo: any ) {
-                    handleFirstSChainDiscoveryAttemptDone(
-                        err, joSChainNetworkInfo, isSilentReDiscovery,
-                        fnOnPeriodicDiscoveryResultAvailable );
+                function( err?: Error | string | null,
+                    joSChainNetworkInfo?: discoveryTools.TSChainNetworkInfo | null ) {
+                    if( joSChainNetworkInfo ) {
+                        handleFirstSChainDiscoveryAttemptDone(
+                            err, joSChainNetworkInfo, isSilentReDiscovery,
+                            fnOnPeriodicDiscoveryResultAvailable );
+                    }
                     doTheJob().then( function() {} ).catch( function() {} );
                     // Finish of IMA Agent startup,
                     // everything else is in async calls executed later
-                    return 0;
                 }, isSilentReDiscovery, imaState.joSChainNetworkInfo, nCountToWait
             ).catch( function( err: Error | string ) {
                 const strError = owaspUtils.extractErrorMessage( err );

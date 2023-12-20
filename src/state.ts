@@ -1,15 +1,22 @@
 import * as owaspUtils from "./owaspUtils.js";
 import * as imaTx from "./imaTx.js";
+import type * as discoveryTools from "./discoveryTools.js";
 
 export interface TLoopStateSubPart {
     isInProgress: boolean
     wasInProgress: boolean
 }
+
 export interface TLoopState {
     oracle: TLoopStateSubPart
     m2s: TLoopStateSubPart
     s2m: TLoopStateSubPart
     s2s: TLoopStateSubPart
+}
+
+export interface TTokeInformation {
+    abi: object
+    address: string
 }
 
 export const gDefaultValueForLoopState: TLoopState = {
@@ -192,6 +199,11 @@ function constructChainProperties(): TPropertiesOfChains {
     };
 }
 
+export interface TIMAAction {
+    name: string
+    fn: () => Promise < boolean >
+}
+
 export interface TIMAState {
     loopState: TLoopState
 
@@ -208,7 +220,7 @@ export interface TIMAState {
     // use BLS message signing, turned on with --sign-messages
     bSignMessages: boolean
     // scanned S-Chain network description
-    joSChainNetworkInfo: any
+    joSChainNetworkInfo: discoveryTools.TSChainNetworkInfo | null
     // path to bls_glue app, must have if --sign-messages specified
     strPathBlsGlue: string
     // path to hash_g1 app, must have if --sign-messages specified
@@ -343,7 +355,7 @@ export interface TIMAState {
     nJsonRpcPort: number // 0 to disable
     isCrossImaBlsMode: boolean
 
-    arrActions: any[] // array of actions to run
+    arrActions: TIMAAction[] // array of actions to run
 
     receiver?: any | null
 

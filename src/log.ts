@@ -28,11 +28,63 @@ import * as fs from "fs";
 
 export { cc };
 
-let gArrStreams: any[] = [];
+export type TFunctionWrite = ( ...args: any[] ) => void;
+export type TFunctionClose = () => void;
+export type TFunctionOpen = () => void;
+export type TFunctionSize = () => number;
+export type TFunctionRotate = ( nBytesToWrite: number ) => void;
+export type TFunctionToString = () => string;
+export type TFunctionExposeDetailsTo =
+    ( otherStream: TLogger, strTitle: string, isSuccess: boolean ) => void;
+
+export interface TLogger {
+    id: number
+    strPath: string
+    nMaxSizeBeforeRotation: number
+    nMaxFilesCount: number
+    objStream: any | null
+    haveOwnTimestamps: boolean
+    isPausedTimeStamps: boolean
+    strOwnIndent: string
+    write: TFunctionWrite
+    writeRaw: TFunctionWrite
+    close: TFunctionClose
+    open: TFunctionOpen
+    size: TFunctionSize
+    rotate: TFunctionRotate
+    toString: TFunctionToString
+    exposeDetailsTo: TFunctionExposeDetailsTo
+    // high-level formatters
+    fatal: TFunctionWrite
+    critical: TFunctionWrite
+    error: TFunctionWrite
+    warning: TFunctionWrite
+    attention: TFunctionWrite
+    information: TFunctionWrite
+    info: TFunctionWrite
+    notice: TFunctionWrite
+    note: TFunctionWrite
+    debug: TFunctionWrite
+    trace: TFunctionWrite
+    success: TFunctionWrite
+}
+
+export type TFunctionIsBeginningOfAccumulatedLog = () => boolean;
+export type TFunctionIsLastLineEndsWithCarriageReturn = () => boolean;
+export type TFunctionClear = () => void;
+
+export interface TLoggerMemory extends TLogger {
+    arrAccumulatedLogTextLines: string[]
+    isBeginningOfAccumulatedLog: TFunctionIsBeginningOfAccumulatedLog
+    isLastLineEndsWithCarriageReturn: TFunctionIsLastLineEndsWithCarriageReturn
+    clear: TFunctionClear
+};
+
+let gArrStreams: TLogger[] = [];
 
 let gFlagLogWithTimeStamps: boolean = true;
 
-let gIdentifierAllocatorCounter = 0;
+let gIdentifierAllocatorCounter = 1;
 
 const safeURL = cc.safeURL;
 const replaceAll = cc.replaceAll;
@@ -109,7 +161,7 @@ export function removeAllStreams(): void {
     gArrStreams = [];
 }
 
-export function getStreamWithFilePath( strFilePath: string ): any {
+export function getStreamWithFilePath( strFilePath: string ): TLogger | null {
     try {
         let i = 0; const cnt = gArrStreams.length;
         for( i = 0; i < cnt; ++i ) {
@@ -125,9 +177,48 @@ export function getStreamWithFilePath( strFilePath: string ): any {
     return null;
 }
 
-export function createStandardOutputStream(): any {
+let gStreamGlobal: TLogger | null;
+
+export function globalStream(): TLogger {
+    if( ! gStreamGlobal ) {
+        gStreamGlobal = {
+            id: 0,
+            strPath: "global",
+            nMaxSizeBeforeRotation: -1,
+            nMaxFilesCount: -1,
+            objStream: null,
+            haveOwnTimestamps: false,
+            isPausedTimeStamps: false,
+            strOwnIndent: "",
+            write,
+            writeRaw,
+            close: function() { },
+            open: function() { },
+            size: function() { return 0; },
+            rotate: function( nBytesToWrite: number ) { },
+            toString: function(): string { return ""; },
+            exposeDetailsTo,
+            // high-level formatters
+            fatal,
+            critical,
+            error,
+            warning,
+            attention,
+            information,
+            info,
+            notice,
+            note,
+            debug,
+            trace,
+            success
+        };
+    }
+    return gStreamGlobal;
+};
+
+export function createStandardOutputStream(): TLogger | null {
     try {
-        const objEntry: any = {
+        const objEntry: TLogger = {
             id: gIdentifierAllocatorCounter ++,
             strPath: "stdout",
             nMaxSizeBeforeRotation: -1,
@@ -157,9 +248,9 @@ export function createStandardOutputStream(): any {
             open: function() { try { this.objStream = process.stdout; } catch ( err ) { } },
             size: function() { return 0; },
             rotate: function( nBytesToWrite: number ) { },
-            toString: function(): string { return "" + this.strFilePath; },
+            toString: function(): string { return "" + this.strPath; },
             exposeDetailsTo:
-                function( otherStream: any, strTitle: string, isSuccess: boolean ): void { },
+                function( otherStream: TLogger, strTitle: string, isSuccess: boolean ): void { },
             // high-level formatters
             fatal: function( ...args: any[] ): void {
                 if( verboseGet() >= verboseName2Number( "fatal" ) )
@@ -236,13 +327,14 @@ export function insertStandardOutputStream(): boolean {
     return true;
 }
 
-export function createMemoryOutputStream(): any {
+export function createMemoryOutputStream(): TLogger {
     try {
-        const objEntry: any = {
+        const objEntry: TLoggerMemory = {
             id: gIdentifierAllocatorCounter ++,
             strPath: "memory",
             nMaxSizeBeforeRotation: -1,
             nMaxFilesCount: -1,
+            objStream: null,
             arrAccumulatedLogTextLines: [],
             haveOwnTimestamps: true,
             isPausedTimeStamps: false,
@@ -291,7 +383,7 @@ export function createMemoryOutputStream(): any {
             open: function() { this.clear(); },
             size: function() { return 0; },
             rotate:
-            function( nBytesToWrite: number ) { this.this.arrAccumulatedLogTextLines = []; },
+            function( nBytesToWrite: number ) { this.arrAccumulatedLogTextLines = []; },
             toString: function(): string {
                 let s = "";
                 for( let i = 0; i < this.arrAccumulatedLogTextLines.length; ++ i )
@@ -299,7 +391,7 @@ export function createMemoryOutputStream(): any {
                 return s;
             },
             exposeDetailsTo:
-            function( otherStream: any, strTitle: string, isSuccess: boolean ): void {
+            function( otherStream: TLogger, strTitle: string, isSuccess: boolean ): void {
                 if( ! ( this.arrAccumulatedLogTextLines &&
                     this.arrAccumulatedLogTextLines.length > 0 ) )
                     return;
@@ -398,7 +490,7 @@ export function createMemoryOutputStream(): any {
         return objEntry;
     } catch ( err ) {
     }
-    return null;
+    return globalStream();
 }
 
 export function insertMemoryOutputStream(): boolean {
@@ -413,9 +505,10 @@ export function insertMemoryOutputStream(): boolean {
 }
 
 export function createFileOutput(
-    strFilePath: string, nMaxSizeBeforeRotation?: number, nMaxFilesCount?: number ): any {
+    strFilePath: string, nMaxSizeBeforeRotation?: number, nMaxFilesCount?: number
+): TLogger | null {
     try {
-        const objEntry: any = {
+        const objEntry: TLogger = {
             id: gIdentifierAllocatorCounter ++,
             strPath: "" + strFilePath,
             nMaxSizeBeforeRotation: 0 + ( nMaxSizeBeforeRotation || 0 ),
@@ -490,7 +583,7 @@ export function createFileOutput(
             },
             toString: function(): string { return "" + strFilePath; },
             exposeDetailsTo:
-                function( otherStream: any, strTitle: string, isSuccess: boolean ): void { },
+                function( otherStream: TLogger, strTitle: string, isSuccess: boolean ): void { },
             // high-level formatters
             fatal: function( ...args: any[] ): void {
                 if( verboseGet() >= verboseName2Number( "fatal" ) )
@@ -560,7 +653,7 @@ export function createFileOutput(
     return null;
 }
 export function insertFileOutput(
-    strFilePath: string, nMaxSizeBeforeRotation?: number, nMaxFilesCount?: number ): any {
+    strFilePath: string, nMaxSizeBeforeRotation?: number, nMaxFilesCount?: number ): boolean {
     let objEntry = getStreamWithFilePath( "" + strFilePath );
     if( objEntry !== null )
         return true;
@@ -876,7 +969,7 @@ export function addMemory(): boolean {
     return insertMemoryOutputStream();
 }
 
-export function createMemoryStream(): any {
+export function createMemoryStream(): TLogger {
     return createMemoryOutputStream();
 }
 
@@ -897,7 +990,8 @@ export function close(): void {
     // for compatibility with created streams
 }
 
-export function exposeDetailsTo( otherStream: any, strTitle: string, isSuccess: boolean ): void {
+export function exposeDetailsTo(
+    otherStream: TLogger, strTitle: string, isSuccess: boolean ): void {
     // for compatibility with created streams
 }
 

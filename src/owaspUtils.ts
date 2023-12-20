@@ -31,6 +31,19 @@
 import * as log from "./log.js";
 import * as ethersMod from "ethers";
 import * as fs from "fs";
+
+export interface TXYSignature {
+    X: string
+    Y: string
+}
+
+export interface TBLSSignature {
+    blsSignature: any[2] // BLS glue of signatures, X then Y
+    hashA: string // G1.X from joGlueResult.hashSrc
+    hashB: string // G1.Y from joGlueResult.hashSrc
+    counter: string | number | null
+}
+
 const BigNumber = ethersMod.ethers.BigNumber;
 
 const safeURL = log.safeURL;
@@ -772,7 +785,7 @@ export function toHexStringSafe( val?: any ): string {
     return "" + val;
 }
 
-export function setInterval2( fn: any, t: number, stepMilliSeconds?: number ): any {
+export function setInterval2( fn: () => void, t: number, stepMilliSeconds?: number ): any {
     const iv: any = {
         real_iv: null,
         stepMilliSeconds: stepMilliSeconds || 1000,

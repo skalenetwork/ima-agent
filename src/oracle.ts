@@ -45,7 +45,7 @@ function getUtcTimestampString( d?: Date ): string {
     return t;
 }
 
-export function findPowNumber( strRequestPart: string, details: any, isVerbose?: boolean ) {
+export function findPowNumber( strRequestPart: string, details: log.TLogger, isVerbose?: boolean ) {
     details = details || log;
     if( isVerbose )
         details.debug( "source part of request to find PoW number is {}", strRequestPart );
@@ -81,7 +81,7 @@ export function findPowNumber( strRequestPart: string, details: any, isVerbose?:
 }
 
 async function handleOracleCheckResultResult(
-    oracleOpts: any, details: any, isVerboseTraceDetails: boolean,
+    oracleOpts: any, details: log.TLogger, isVerboseTraceDetails: boolean,
     joCall: rpcCall.TRPCCall, joIn: any, joOut: any
 ) {
     if( isVerboseTraceDetails )
@@ -106,7 +106,7 @@ async function handleOracleCheckResultResult(
 }
 
 async function handleOracleSubmitRequestResult(
-    oracleOpts: any, details: any, isVerboseTraceDetails: boolean,
+    oracleOpts: any, details: log.TLogger, isVerboseTraceDetails: boolean,
     joCall: rpcCall.TRPCCall, joIn: any, joOut: any
 ) {
     const nMillisecondsSleepBefore = "nMillisecondsSleepBefore" in oracleOpts
@@ -157,7 +157,7 @@ async function handleOracleSubmitRequestResult(
     throw new Error( "RPC call(oracle_checkResult) all attempts timed out" );
 }
 
-export async function oracleGetGasPrice( oracleOpts: any, details: any ) {
+export async function oracleGetGasPrice( oracleOpts: any, details: log.TLogger ) {
     details = details || log;
     const url: string = oracleOpts.url;
     let gp: any = null;

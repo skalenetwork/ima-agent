@@ -28,6 +28,7 @@ import * as rpcCall from "./rpcCall.js";
 import * as imaBLS from "./bls.js";
 import * as imaUtils from "./utils.js";
 import type * as state from "./state.js";
+import type * as discoveryTools from "./discoveryTools.js";
 
 function computeWalkNodeIndices( nNodeNumber: number, nNodesCount: number ): number[] {
     if( nNodesCount <= 1 )
@@ -71,16 +72,17 @@ function composeEmptyStateForPendingWorkAnalysis(): any {
     };
 }
 
-function getNodeProgressAndTimestamp( joNode: any, strLoopWorkType: string, nIndexS2S: number ) {
+function getNodeProgressAndTimestamp(
+    joNode: discoveryTools.TSChainNode, strLoopWorkType: string, nIndexS2S: number ) {
     if( ! ( "pwaState" in joNode ) )
         joNode.pwaState = composeEmptyStateForPendingWorkAnalysis();
     strLoopWorkType = strLoopWorkType.toLowerCase();
-    if( ! ( strLoopWorkType in joNode.pwaState ) ) {
+    if( ( !joNode.pwaState ) || ( ! ( strLoopWorkType in joNode.pwaState ) ) ) {
         throw new Error( `Specified value ${strLoopWorkType} is not a correct loop work type, ` +
             "cannot access info" );
     }
     if( strLoopWorkType != "s2s" )
-        return joNode.pwaState[strLoopWorkType];
+        return ( joNode.pwaState as any )[strLoopWorkType];
     if( ! ( nIndexS2S in joNode.pwaState[strLoopWorkType].mapS2S ) )
         joNode.pwaState[strLoopWorkType].mapS2S[nIndexS2S] = { isInProgress: false, ts: 0 };
 
@@ -114,7 +116,7 @@ export async function checkOnLoopStart(
         const nUtcUnixTimeStamp = Math.floor( ( new Date() ).getTime() / 1000 );
         for( let i = 0; i < arrWalkNodeIndices.length; ++i ) {
             const walkNodeIndex = arrWalkNodeIndices[i];
-            const joNode: any = jarrNodes[walkNodeIndex];
+            const joNode = jarrNodes[walkNodeIndex];
             const joProps: any = getNodeProgressAndTimestamp( joNode, strLoopWorkType, nIndexS2S );
             if( joProps && typeof joProps == "object" &&
                 "isInProgress" in joProps && joProps.isInProgress &&
@@ -237,7 +239,7 @@ async function notifyOnLoopImpl(
             const isThisNode = ( i == imaState.nNodeNumber ) ? true : false;
             if( isThisNode )
                 continue; // skip this node
-            const joNode: any = jarrNodes[i];
+            const joNode = jarrNodes[i];
             const strNodeURL = imaUtils.composeImaAgentNodeUrl( joNode, isThisNode );
             const rpcCallOpts: rpcCall.TRPCCallOpts | null = null;
             const joCall =
