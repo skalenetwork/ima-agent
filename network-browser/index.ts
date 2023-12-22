@@ -37,12 +37,14 @@ import {
     NETWORK_BROWSER_DELAY,
     MULTICALL,
     CONNECTED_ONLY,
-    SCHAIN_RPC_URL
+    SCHAIN_RPC_URL,
+    LOG_LEVEL,
+    LOG_PRETTY
 } from './src/constants'
 
 import { Logger, type ILogObj } from 'tslog'
 
-const log = new Logger<ILogObj>()
+const log = new Logger<ILogObj>({ minLevel: LOG_LEVEL, stylePrettyLogs: LOG_PRETTY })
 
 async function safeNetworkBrowserLoop() {
     log.info(`Running network-browser...`)

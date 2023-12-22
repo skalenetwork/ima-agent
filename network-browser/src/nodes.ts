@@ -78,7 +78,7 @@ async function getNodesRaw(
     )
 }
 
-function nodeStruct(
+export function nodeStruct(
     nodeArray: NodeArray,
     domainName: string,
     schainHash?: string,
