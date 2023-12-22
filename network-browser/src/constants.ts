@@ -20,7 +20,7 @@
  * @copyright SKALE Labs 2023-Present
  */
 
-import { requiredEnv, booleanEnv, secondsEnv } from './envTools'
+import { requiredEnv, booleanEnv, secondsEnv, optionalEnvNumber } from './envTools'
 
 // internal
 
@@ -53,3 +53,6 @@ export const CONNECTED_ONLY = booleanEnv('CONNECTED_ONLY', true)
 export const POST_ERROR_DELAY = secondsEnv(process.env.POST_ERROR_DELAY, 5)
 export const NETWORK_BROWSER_DELAY = secondsEnv(process.env.NETWORK_BROWSER_DELAY, 10800)
 export const NETWORK_BROWSER_TIMEOUT = secondsEnv(process.env.NETWORK_BROWSER_TIMEOUT, 1200)
+
+export const LOG_LEVEL = optionalEnvNumber('NETWORK_BROWSER_LOG_LEVEL', 1)
+export const LOG_PRETTY = booleanEnv('NETWORK_BROWSER_LOG_PRETTY', false)
