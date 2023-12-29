@@ -231,8 +231,8 @@ function initMonitoringServer(): void {
                     } break;
                 case "get_last_transfer_errors":
                     joAnswer.last_transfer_errors = imaTransferErrorHandling.getLastTransferErrors(
-                        ( ( "isIncludeTextLog" in joMessage ) && joMessage.isIncludeTextLog )
-                            ? true : false );
+                        !!( ( ( "isIncludeTextLog" in joMessage ) &&
+                            joMessage.isIncludeTextLog ) ) );
                     joAnswer.last_error_categories =
                         imaTransferErrorHandling.getLastErrorCategories();
                     break

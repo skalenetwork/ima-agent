@@ -620,7 +620,7 @@ async function callbackAllMessagesSign(
         throw new Error( strErrorOfDryRun );
     const opts: imaTx.TCustomPayedCallOptions = {
         isCheckTransactionToSchain:
-            ( optsTransfer.chainNameDst !== "Mainnet" ) ? true : false
+            ( optsTransfer.chainNameDst !== "Mainnet" )
     };
     const joReceipt = await imaTx.payedCall(
         optsTransfer.details, optsTransfer.ethersProviderDst,
@@ -1303,5 +1303,5 @@ export async function doAllS2S( // s-chain --> s-chain
         }
         log.debug( s );
     }
-    return ( cntFail == 0 ) ? true : false;
+    return ( cntFail == 0 );
 }

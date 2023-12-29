@@ -27,8 +27,7 @@ let gFlagIsEnabled: boolean = false;
 
 export function autoEnableFromCommandLineArgs(): void {
     const b: boolean =
-        ( process.argv.includes( "--colors" ) || process.argv.includes( "-colors" ) )
-            ? true : false;
+        !!( ( process.argv.includes( "--colors" ) || process.argv.includes( "-colors" ) ) );
     enable( b );
 }
 

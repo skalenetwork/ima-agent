@@ -138,7 +138,7 @@ export function formatBalanceInfo( bi: any, strAddress: string ): string {
         s += log.fmtDebug( "/{}", bi.assetAddress );
     if( "idToken" in bi )
         s += log.fmtDebug( " token ID {}", bi.idToken );
-    s += log.posNeg( ( bi.assetName == "ERC721" ) ? true : false, " owner is ", " balance is " );
+    s += log.posNeg( ( bi.assetName == "ERC721" ), " owner is ", " balance is " );
     s += ( bi.assetName == "ERC721" )
         ? log.fmtInformation( "{p}", bi.owner ) : log.fmtInformation( "{p}", bi.balance );
     if( bi.assetName == "ERC721" ) {

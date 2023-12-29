@@ -40,14 +40,14 @@ export function getMillisecondsSleepBeforeFetchOutgoingMessageEvent(): number {
     return gMillisecondsSleepBeforeFetchOutgoingMessageEvent;
 }
 export function setMillisecondsSleepBeforeFetchOutgoingMessageEvent( val?: number ): void {
-    gMillisecondsSleepBeforeFetchOutgoingMessageEvent = val ? val : 0;
+    gMillisecondsSleepBeforeFetchOutgoingMessageEvent = val || 0;
 }
 
 export function getSleepBetweenTransactionsOnSChainMilliseconds(): number {
     return gMillisecondsSleepBetweenTransactionsOnSChain;
 }
 export function setSleepBetweenTransactionsOnSChainMilliseconds( val?: number ): void {
-    gMillisecondsSleepBetweenTransactionsOnSChain = val ? val : 0;
+    gMillisecondsSleepBetweenTransactionsOnSChain = val || 0;
 }
 
 export function getWaitForNextBlockOnSChain(): boolean {
@@ -178,5 +178,5 @@ export function setForwardS2S( b?: boolean ): void {
 export function setReverseS2S( b?: boolean ): void {
     if( b == null || b == undefined )
         b = true;
-    gFlagIsForwardS2S = b ? false : true;
+    gFlagIsForwardS2S = !b;
 }

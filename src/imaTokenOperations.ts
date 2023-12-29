@@ -1270,7 +1270,7 @@ export async function doErc20PaymentS2S(
     ercDstAddress20: any, // only reverse payment needs it
     tc: imaTx.TransactionCustomizer
 ) {
-    const isReverse = isForward ? false : true;
+    const isReverse = !isForward;
     const details = log.createMemoryStream();
     const jarrReceipts: any = [];
     let strActionName = "";
@@ -1410,7 +1410,7 @@ export async function doErc721PaymentS2S(
     ercDstAddress721: any, // only reverse payment needs it
     tc: imaTx.TransactionCustomizer
 ) {
-    const isReverse = isForward ? false : true;
+    const isReverse = !isForward;
     const details = log.createMemoryStream();
     const jarrReceipts: any = [];
     let strActionName = "";
@@ -1555,7 +1555,7 @@ export async function doErc1155PaymentS2S(
     ercDstAddress1155: any, // only reverse payment needs it
     tc: imaTx.TransactionCustomizer
 ) {
-    const isReverse = isForward ? false : true;
+    const isReverse = !isForward;
     const details = log.createMemoryStream();
     const jarrReceipts: any = [];
     let strActionName = "";
@@ -1700,7 +1700,7 @@ export async function doErc1155BatchPaymentS2S(
     ercDstAddress1155: any, // only reverse payment needs it
     tc: imaTx.TransactionCustomizer
 ) {
-    const isReverse = isForward ? false : true;
+    const isReverse = !isForward;
     const details = log.createMemoryStream();
     const jarrReceipts: any = [];
     let strActionName = "";
@@ -1880,7 +1880,7 @@ export async function mintErc20(
             throw new Error( strErrorOfDryRun );
 
         const opts: imaTx.TCustomPayedCallOptions =
-            { isCheckTransactionToSchain: ( chainName !== "Mainnet" ) ? true : false };
+            { isCheckTransactionToSchain: ( chainName !== "Mainnet" ) };
         const joReceipt = await imaTx.payedCall(
             details, ethersProvider,
             "ERC20", contract, "mint", arrArgumentsMint,
@@ -1950,7 +1950,7 @@ export async function mintErc721(
             throw new Error( strErrorOfDryRun );
 
         const opts: imaTx.TCustomPayedCallOptions =
-            { isCheckTransactionToSchain: ( chainName !== "Mainnet" ) ? true : false };
+            { isCheckTransactionToSchain: ( chainName !== "Mainnet" ) };
         const joReceipt = await imaTx.payedCall(
             details, ethersProvider,
             "ERC721", contract, "mint", arrArgumentsMint,
@@ -2024,7 +2024,7 @@ export async function mintErc1155(
             throw new Error( strErrorOfDryRun );
 
         const opts: imaTx.TCustomPayedCallOptions =
-            { isCheckTransactionToSchain: ( chainName !== "Mainnet" ) ? true : false };
+            { isCheckTransactionToSchain: ( chainName !== "Mainnet" ) };
         const joReceipt = await imaTx.payedCall(
             details, ethersProvider,
             "ERC1155", contract, "mint", arrArgumentsMint,
@@ -2094,7 +2094,7 @@ export async function burnErc20(
             throw new Error( strErrorOfDryRun );
 
         const opts: imaTx.TCustomPayedCallOptions =
-            { isCheckTransactionToSchain: ( chainName !== "Mainnet" ) ? true : false };
+            { isCheckTransactionToSchain: ( chainName !== "Mainnet" ) };
         const joReceipt = await imaTx.payedCall(
             details, ethersProvider,
             "ERC20", contract, "burnFrom", arrArgumentsBurn,
@@ -2161,7 +2161,7 @@ export async function burnErc721(
             throw new Error( strErrorOfDryRun );
 
         const opts: imaTx.TCustomPayedCallOptions =
-            { isCheckTransactionToSchain: ( chainName !== "Mainnet" ) ? true : false };
+            { isCheckTransactionToSchain: ( chainName !== "Mainnet" ) };
         const joReceipt = await imaTx.payedCall(
             details, ethersProvider,
             "ERC721", contract, "burn", arrArgumentsBurn,
@@ -2234,7 +2234,7 @@ export async function burnErc1155(
             throw new Error( strErrorOfDryRun );
 
         const opts: imaTx.TCustomPayedCallOptions =
-            { isCheckTransactionToSchain: ( chainName !== "Mainnet" ) ? true : false };
+            { isCheckTransactionToSchain: ( chainName !== "Mainnet" ) };
         const joReceipt = await imaTx.payedCall(
             details, ethersProvider,
             "ERC1155", contract, "burn", arrArgumentsBurn,

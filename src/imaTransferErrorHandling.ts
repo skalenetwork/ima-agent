@@ -27,7 +27,7 @@ import { UniversalDispatcherEvent, EventDispatcher }
     from "./eventDispatcher.js";
 
 export function verifyTransferErrorCategoryName( strCategory: string ) {
-    return "" + ( strCategory ? strCategory : "default" );
+    return "" + ( strCategory || "default" );
 }
 
 const gMaxLastTransferErrors: number = 20;

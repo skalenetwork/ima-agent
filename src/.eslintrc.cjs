@@ -31,7 +31,6 @@ module.exports = {
         "object-curly-spacing": [ "error", "always" ],
         "curly": [ "error", "multi-or-nest" ],
         "nonblock-statement-body-position": [ "error", "below" ],
-        "no-unneeded-ternary": "off",
         "no-cond-assign": [ "error", "always" ],
         "no-fallthrough": "off",
         "padded-blocks": "off",

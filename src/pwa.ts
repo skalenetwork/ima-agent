@@ -236,7 +236,7 @@ async function notifyOnLoopImpl(
             nIndexS2S, isStart, nUtcUnixTimeStamp, signature
         ); // save own started
         for( let i = 0; i < jarrNodes.length; ++i ) {
-            const isThisNode = ( i == imaState.nNodeNumber ) ? true : false;
+            const isThisNode = ( i == imaState.nNodeNumber );
             if( isThisNode )
                 continue; // skip this node
             const joNode = jarrNodes[i];

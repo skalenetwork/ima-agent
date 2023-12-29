@@ -99,7 +99,7 @@ export function checkTimeFraming(
             nActiveNodeFrameIndex += nFrameShift;
             nActiveNodeFrameIndex %= imaState.nNodesCount; // for safety only
         }
-        let bSkip = ( nActiveNodeFrameIndex != imaState.nNodeNumber ) ? true : false;
+        let bSkip = ( nActiveNodeFrameIndex != imaState.nNodeNumber );
         let bInsideGap = false;
 
         const nRangeStart =
@@ -565,10 +565,10 @@ function getDefaultOptsLoop( idxWorker: number ): TLoopOptions {
             isInsideWorker: true, idxChainKnownForS2S: 0, cntChainsKnownForS2S: 0
         },
         isDelayFirstRun: false,
-        enableStepOracle: ( idxWorker == 0 ) ? true : false,
-        enableStepM2S: ( idxWorker == 0 ) ? true : false,
-        enableStepS2M: ( idxWorker == 1 ) ? true : false,
-        enableStepS2S: ( idxWorker == 0 ) ? true : false
+        enableStepOracle: ( idxWorker == 0 ),
+        enableStepM2S: ( idxWorker == 0 ),
+        enableStepS2M: ( idxWorker == 1 ),
+        enableStepS2S: ( idxWorker == 0 )
     };
     return optsLoop;
 }

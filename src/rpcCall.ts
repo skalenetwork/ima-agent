@@ -418,11 +418,11 @@ export async function rpcCallCreate( strURL: string, opts: TRPCCallOpts | null )
     }
     const joCall: TRPCCall = {
         url: "" + strURL,
-        joRpcOptions: opts ? opts : null,
+        joRpcOptions: opts || null,
         mapPendingByCallID: new Map < TCallID, TCallHandlerEntry >(),
         wsConn: null,
         isAutoReconnect:
-            ( opts && "isAutoReconnect" in opts && opts.isAutoReconnect ) ? true : false,
+            !!( ( opts && "isAutoReconnect" in opts && opts.isAutoReconnect ) ),
         isDisconnectMode: false,
         reconnect: async function( fnAfter: TFunctionConnectionResultHandler ) {
             await doConnect( joCall, opts, fnAfter );

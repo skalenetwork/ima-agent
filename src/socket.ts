@@ -32,13 +32,13 @@ export let wsModule: any = null; // server side only
 export let webRtcModule: any = null; // server side only
 
 export function setHttpsModule( mod: any ): void {
-    httpsModule = mod ? mod : null;
+    httpsModule = mod || null;
 }
 export function setWsModule( mod: any ): void {
-    wsModule = mod ? mod : null;
+    wsModule = mod || null;
 }
 export function setWebRtcModule( mod: any ): void {
-    webRtcModule = mod ? mod : null;
+    webRtcModule = mod || null;
 }
 
 export const gMapLocalServers: any = { }; // used both for local and in-worker servers
@@ -1984,17 +1984,14 @@ export class RTCActor extends RTCConnection {
         };
         if( offerOptions ) {
             this.offerOptions.offerToReceiveAudio =
-                ( "offerToReceiveAudio" in offerOptions && offerOptions.offerToReceiveAudio )
-                    ? true : false;
+                !!( ( "offerToReceiveAudio" in offerOptions && offerOptions.offerToReceiveAudio ) );
             this.offerOptions.offerToReceiveVideo =
-                ( "offerToReceiveVideo" in offerOptions && offerOptions.offerToReceiveVideo )
-                    ? true : false;
+                !!( ( "offerToReceiveVideo" in offerOptions && offerOptions.offerToReceiveVideo ) );
             this.offerOptions.voiceActivityDetection =
-                ( "voiceActivityDetection" in offerOptions && offerOptions.voiceActivityDetection )
-                    ? true : false;
+                !!( ( "voiceActivityDetection" in offerOptions &&
+                offerOptions.voiceActivityDetection ) );
             this.offerOptions.iceRestart =
-                ( "iceRestart" in offerOptions && offerOptions.iceRestart )
-                    ? true : false;
+                !!( ( "iceRestart" in offerOptions && offerOptions.iceRestart ) );
         }
 
         this.signalingOptions = {
@@ -2240,12 +2237,10 @@ export class RTCServerPeer extends RTCConnection {
         this.isSignalingNegotiationTimeout = false;
         this.timerPublishing = null;
         this.timerSignalingNegotiation = null;
-        this.timeToPublishMilliseconds = timeToPublishMilliseconds
-            ? timeToPublishMilliseconds
-            : settings.net.rtc.timeToPublishMilliseconds;
-        this.timeToSignalingNegotiationMilliseconds = timeToSignalingNegotiationMilliseconds
-            ? timeToSignalingNegotiationMilliseconds
-            : settings.net.rtc.timeToSignalingNegotiationMilliseconds;
+        this.timeToPublishMilliseconds = timeToPublishMilliseconds ||
+            settings.net.rtc.timeToPublishMilliseconds;
+        this.timeToSignalingNegotiationMilliseconds = timeToSignalingNegotiationMilliseconds ||
+            settings.net.rtc.timeToSignalingNegotiationMilliseconds;
         this.peerConfiguration =
             ( peerConfiguration && typeof peerConfiguration === "object" )
                 ? peerConfiguration : settings.net.rtc.peerConfiguration;
@@ -3222,8 +3217,8 @@ export class WebRTCServerAcceptor extends BasicServerAcceptor {
             ( ( idRtcParticipant != null && idRtcParticipant != undefined &&
                 typeof idRtcParticipant === "string" && idRtcParticipant.length > 0 )
                 ? idRtcParticipant : utils.UUIDv4() );
-        this.offerOptions = offerOptions ? offerOptions : null;
-        this.signalingOptions = signalingOptions ? signalingOptions : null;
+        this.offerOptions = offerOptions || null;
+        this.signalingOptions = signalingOptions || null;
         this.peerConfiguration =
             ( peerConfiguration && typeof peerConfiguration === "object" )
                 ? peerConfiguration : settings.net.rtc.peerConfiguration;
@@ -3237,12 +3232,10 @@ export class WebRTCServerAcceptor extends BasicServerAcceptor {
         if( this.maxActiveOfferCount < 1 )
             this.maxActiveOfferCount = 1;
         this.mapPendingOffers = { }; // idOffer -> RTCServerPeer
-        this.timeToPublishMilliseconds = timeToPublishMilliseconds
-            ? timeToPublishMilliseconds
-            : settings.net.rtc.timeToPublishMilliseconds;
-        this.timeToSignalingNegotiationMilliseconds = timeToSignalingNegotiationMilliseconds
-            ? timeToSignalingNegotiationMilliseconds
-            : settings.net.rtc.timeToSignalingNegotiationMilliseconds;
+        this.timeToPublishMilliseconds = timeToPublishMilliseconds ||
+            settings.net.rtc.timeToPublishMilliseconds;
+        this.timeToSignalingNegotiationMilliseconds = timeToSignalingNegotiationMilliseconds ||
+            settings.net.rtc.timeToSignalingNegotiationMilliseconds;
         this.rtcCreator =
             new RTCCreator(
                 "" + this.strSignalingServerURL,
@@ -3415,8 +3408,8 @@ export class WebRTCClientPipe extends BasicSocketPipe {
             ( ( idRtcParticipant != null && idRtcParticipant != undefined &&
                 typeof idRtcParticipant === "string" && idRtcParticipant.length > 0 )
                 ? idRtcParticipant : utils.UUIDv4() );
-        this.offerOptions = offerOptions ? offerOptions : null;
-        this.signalingOptions = signalingOptions ? signalingOptions : null;
+        this.offerOptions = offerOptions || null;
+        this.signalingOptions = signalingOptions || null;
         this.peerConfiguration =
             ( peerConfiguration && typeof peerConfiguration === "object" )
                 ? peerConfiguration : settings.net.rtc.peerConfiguration;

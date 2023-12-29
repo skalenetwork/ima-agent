@@ -98,7 +98,7 @@ export async function registerStep1( isPrintSummaryRegistrationCosts: boolean ) 
             imaState.chainProperties.mn.chainId.toString(),
             imaState.chainProperties.mn.transactionCustomizer //,
         );
-    bSuccess = ( jarrReceipts != null && jarrReceipts.length > 0 ) ? true : false;
+    bSuccess = !!( ( jarrReceipts != null && jarrReceipts.length > 0 ) );
     log.information( "{p}Chain was {}", strLogPrefix,
         log.posNeg( bSuccess, "registered successfully", "not registered" ) );
     if( bSuccess ) {
@@ -208,7 +208,7 @@ export function commandLineTaskMintErc20() {
                     if( !imaState.chainProperties.tc.ethersProvider )
                         throw new Error( "No provider for target chain" );
                     bMintIsOK =
-                        await imaToken.mintErc20(
+                        !!await imaToken.mintErc20(
                             imaState.chainProperties.tc.ethersProvider,
                             imaState.chainProperties.tc.chainId.toString(),
                             imaState.chainProperties.tc.strChainName,
@@ -220,7 +220,7 @@ export function commandLineTaskMintErc20() {
                             imaState.chainProperties.tc.joErc20[imaState.chainProperties
                                 .tc.strCoinNameErc20 + "_abi"],
                             imaState.chainProperties.tc.transactionCustomizer
-                        ) ? true : false;
+                        );
                 } catch ( err ) {
                     bMintIsOK = false;
                 }
@@ -251,7 +251,7 @@ export function commandLineTaskMintErc721() {
                             if( !imaState.chainProperties.tc.ethersProvider )
                                 throw new Error( "No provider for target chain" );
                             bMintIsOK =
-                                await imaToken.mintErc721(
+                                !!await imaToken.mintErc721(
                                     imaState.chainProperties.tc.ethersProvider,
                                     imaState.chainProperties.tc.chainId.toString(),
                                     imaState.chainProperties.tc.strChainName,
@@ -263,7 +263,7 @@ export function commandLineTaskMintErc721() {
                                     imaState.chainProperties.tc.joErc721[imaState
                                         .chainProperties.tc.strCoinNameErc721 + "_abi"],
                                     imaState.chainProperties.tc.transactionCustomizer
-                                ) ? true : false;
+                                );
                         }
                     }
                 } catch ( err ) {
@@ -296,7 +296,7 @@ export function commandLineTaskMintErc1155() {
                             if( !imaState.chainProperties.tc.ethersProvider )
                                 throw new Error( "No provider for target chain" );
                             bMintIsOK =
-                                await imaToken.mintErc1155(
+                                !!await imaToken.mintErc1155(
                                     imaState.chainProperties.tc.ethersProvider,
                                     imaState.chainProperties.tc.chainId.toString(),
                                     imaState.chainProperties.tc.strChainName,
@@ -311,7 +311,7 @@ export function commandLineTaskMintErc1155() {
                                         .joErc1155[imaState.chainProperties.tc
                                             .strCoinNameErc1155 + "_abi"],
                                     imaState.chainProperties.tc.transactionCustomizer
-                                ) ? true : false;
+                                );
                         }
                     }
                 } catch ( err ) {
@@ -336,7 +336,7 @@ export function commandLineTaskBurnErc20() {
                     if( !imaState.chainProperties.tc.ethersProvider )
                         throw new Error( "No provider for target chain" );
                     bBurnIsOK =
-                        await imaToken.burnErc20(
+                        !!await imaToken.burnErc20(
                             imaState.chainProperties.tc.ethersProvider,
                             imaState.chainProperties.tc.chainId.toString(),
                             imaState.chainProperties.tc.strChainName,
@@ -350,7 +350,7 @@ export function commandLineTaskBurnErc20() {
                                 .joErc20[imaState.chainProperties
                                     .tc.strCoinNameErc20 + "_abi"],
                             imaState.chainProperties.tc.transactionCustomizer
-                        ) ? true : false;
+                        );
                 } catch ( err ) {
                     bBurnIsOK = false;
                 }
@@ -379,7 +379,7 @@ export function commandLineTaskBurnErc721() {
                             if( !imaState.chainProperties.tc.ethersProvider )
                                 throw new Error( "No provider for target chain" );
                             bBurnIsOK =
-                                await imaToken.burnErc721(
+                                !!await imaToken.burnErc721(
                                     imaState.chainProperties.tc.ethersProvider,
                                     imaState.chainProperties.tc.chainId.toString(),
                                     imaState.chainProperties.tc.strChainName,
@@ -392,7 +392,7 @@ export function commandLineTaskBurnErc721() {
                                         .joErc721[imaState.chainProperties
                                             .tc.strCoinNameErc721 + "_abi"],
                                     imaState.chainProperties.tc.transactionCustomizer
-                                ) ? true : false;
+                                );
                         }
                     }
                 } catch ( err ) {
@@ -425,7 +425,7 @@ export function commandLineTaskBurnErc1155() {
                             if( !imaState.chainProperties.tc.ethersProvider )
                                 throw new Error( "No provider for target chain" );
                             bBurnIsOK =
-                                await imaToken.burnErc1155(
+                                !!await imaToken.burnErc1155(
                                     imaState.chainProperties.tc.ethersProvider,
                                     imaState.chainProperties.tc.chainId.toString(),
                                     imaState.chainProperties.tc.strChainName,
@@ -440,7 +440,7 @@ export function commandLineTaskBurnErc1155() {
                                         .joErc1155[imaState.chainProperties
                                             .tc.strCoinNameErc1155 + "_abi"],
                                     imaState.chainProperties.tc.transactionCustomizer
-                                ) ? true : false;
+                                );
                         }
                     }
                 } catch ( err ) {

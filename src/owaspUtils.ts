@@ -716,7 +716,7 @@ export function isHexPrefixed( s: any ): boolean {
             "Parameter value of owaspUtils.isHexPrefixed() must be type 'string' but it's " +
             `type ${typeof s}, while checking isHexPrefixed.` );
     }
-    return ( s.slice( 0, 2 ) === "0x" ) ? true : false;
+    return ( s.slice( 0, 2 ) === "0x" );
 }
 
 export function stripHexPrefix( s: any ): string {

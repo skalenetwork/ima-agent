@@ -1252,7 +1252,7 @@ async function doSignProcessHandleCall(
     optsSignOperation: TSignOperationOptions, joParams: any, joCall: rpcCall.TRPCCall,
     joIn: any, joOut: any, i: number ) {
     const imaState: state.TIMAState = state.get();
-    const isThisNode = ( i == imaState.nNodeNumber ) ? true : false;
+    const isThisNode = ( i == imaState.nNodeNumber );
     const joNode = optsSignOperation.jarrNodes[i];
     const strNodeURL = optsSignOperation.imaState.isCrossImaBlsMode
         ? imaUtils.composeImaAgentNodeUrl( joNode, isThisNode )
@@ -1365,7 +1365,7 @@ async function doSignProcessHandleCall(
 
 async function doSignProcessOneImpl( i: number, optsSignOperation: TSignOperationOptions ) {
     const imaState: state.TIMAState = state.get();
-    const isThisNode = ( i == imaState.nNodeNumber ) ? true : false;
+    const isThisNode = ( i == imaState.nNodeNumber );
     const joNode = optsSignOperation.jarrNodes[i];
     const strNodeURL = optsSignOperation.imaState.isCrossImaBlsMode
         ? imaUtils.composeImaAgentNodeUrl( joNode, isThisNode )
@@ -1590,7 +1590,7 @@ async function prepareSignU256( optsSignU256: TSignU256Options ) {
 async function doSignU256OneImplHandleCallResult(
     i: number, optsSignU256: TSignU256Options, joCall: rpcCall.TRPCCall, joIn: any, joOut: any ) {
     const imaState: state.TIMAState = state.get();
-    const isThisNode = ( i == imaState.nNodeNumber ) ? true : false;
+    const isThisNode = ( i == imaState.nNodeNumber );
     const joNode = optsSignU256.jarrNodes[i];
     const strNodeURL = optsSignU256.imaState.isCrossImaBlsMode
         ? imaUtils.composeImaAgentNodeUrl( joNode, isThisNode )
@@ -1690,7 +1690,7 @@ async function doSignU256OneImplHandleCallResult(
 
 async function doSignU256OneImpl( i: number, optsSignU256: TSignU256Options ) {
     const imaState: state.TIMAState = state.get();
-    const isThisNode = ( i == imaState.nNodeNumber ) ? true : false;
+    const isThisNode = ( i == imaState.nNodeNumber );
     const joNode = optsSignU256.jarrNodes[i];
     const strNodeURL = optsSignU256.imaState.isCrossImaBlsMode
         ? imaUtils.composeImaAgentNodeUrl( joNode, isThisNode )
@@ -2069,9 +2069,8 @@ export async function doSignReadyHash( strMessageHash: string, isExposeOutput: a
         if( joCall )
             await joCall.disconnect();
     }
-    const isSuccess = (
-        joSignResult && typeof joSignResult === "object" && ( !joSignResult.error ) )
-        ? true : false;
+    const isSuccess = !!( (
+        joSignResult && typeof joSignResult === "object" && ( !joSignResult.error ) ) );
     if( isExposeOutput || ( !isSuccess ) )
         details.exposeDetailsTo( log.globalStream(), "BLS-raw-signer", isSuccess );
     details.close();

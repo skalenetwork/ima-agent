@@ -116,7 +116,7 @@ export async function safeGetPastEventsProgressive(
     }
     nBlockFrom = owaspUtils.toBN( nBlockFrom );
     const nBlockZero = owaspUtils.toBN( 0 );
-    const isFirstZero = ( nBlockFrom.eq( nBlockZero ) ) ? true : false;
+    const isFirstZero = !!( nBlockFrom.eq( nBlockZero ) );
     if( !( isFirstZero && isLastLatest ) ) {
         details.trace( "{p}Will skip progressive event log records scan and use scan in block " +
             "range from {} to {}", strLogPrefix, nBlockFrom.toHexString(), nBlockTo.toHexString() );
@@ -395,7 +395,7 @@ export async function safeGetPastEventsIterative(
     }
     nBlockFrom = owaspUtils.toBN( nBlockFrom );
     const nBlockZero = owaspUtils.toBN( 0 );
-    const isFirstZero = ( nBlockFrom.eq( nBlockZero ) ) ? true : false;
+    const isFirstZero = !!( nBlockFrom.eq( nBlockZero ) );
     if( isFirstZero && isLastLatest ) {
         if( nLatestBlockNumber.div(
             owaspUtils.toBN( imaHelperAPIs.getBlocksCountInInIterativeStepOfEventsScan() )

@@ -112,9 +112,9 @@ async function prepareOracleGasPriceSetup( optsGasPriceSetup: TGasPriceSetupOpti
             nMillisecondsSleepPeriod: 3000,
             cntAttempts: 40,
             isVerbose:
-                ( log.verboseGet() >= log.verboseName2Number( "information" ) ) ? true : false,
+                ( log.verboseGet() >= log.verboseName2Number( "information" ) ),
             isVerboseTraceDetails:
-                ( log.verboseGet() >= log.verboseName2Number( "debug" ) ) ? true : false
+                ( log.verboseGet() >= log.verboseName2Number( "debug" ) )
         };
         optsGasPriceSetup.details.debug(
             "Will fetch Main Net gas price via call to Oracle with options {}...", oracleOpts );
@@ -222,7 +222,7 @@ async function handleOracleSigned(
     if( strErrorOfDryRun )
         throw new Error( strErrorOfDryRun );
     const opts: imaTx.TCustomPayedCallOptions = {
-        isCheckTransactionToSchain: ( optsGasPriceSetup.chainIdSChain !== "Mainnet" ) ? true : false
+        isCheckTransactionToSchain: ( optsGasPriceSetup.chainIdSChain !== "Mainnet" )
     };
     const joReceipt = await imaTx.payedCall( optsGasPriceSetup.details,
         optsGasPriceSetup.ethersProviderSChain,
