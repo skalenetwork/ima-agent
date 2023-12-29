@@ -79,7 +79,8 @@ export function dryRunIsEnabled(): boolean {
 }
 export function dryRunEnable( isEnable: any ): boolean {
     gFlagDryRunIsEnabled = ( isEnable != null && isEnable != undefined )
-        ? ( !!isEnable ) : true;
+        ? ( !!isEnable )
+        : true;
     return ( !!gFlagDryRunIsEnabled );
 }
 
@@ -91,7 +92,8 @@ export function dryRunIsIgnored(): boolean {
 
 export function dryRunIgnore( isIgnored: boolean ): boolean {
     gFlagDryRunIsIgnored = ( isIgnored != null && isIgnored != undefined )
-        ? ( !!isIgnored ) : true;
+        ? ( !!isIgnored )
+        : true;
     return ( !!gFlagDryRunIsIgnored );
 }
 
@@ -107,7 +109,8 @@ export async function dryRunCall(
     if( !dryRunIsEnabled() )
         return null; // success
     isDryRunResultIgnore = ( isDryRunResultIgnore != null && isDryRunResultIgnore != undefined )
-        ? ( !!isDryRunResultIgnore ) : false;
+        ? ( !!isDryRunResultIgnore )
+        : false;
     const strContractMethodDescription = log.fmtDebug( "{p}({}).{sunny}",
         strContractName, joContract.address, strMethodName );
     let strArgumentsDescription = "";
@@ -250,9 +253,11 @@ async function payedCallSGX( optsPayedCall: TRunTimePayedCallOptions ) {
         "\"" + owaspUtils.toHexStringSafe( tx.gasLimit ) + "\" " +
         "\"" + owaspUtils.toHexStringSafe( tx.nonce ) + "\" " +
         "\"" + ( optsPayedCall.joAccount.strPathSslCert
-        ? optsPayedCall.joAccount.strPathSslCert : "" ) + "\" " +
+        ? optsPayedCall.joAccount.strPathSslCert
+        : "" ) + "\" " +
         "\"" + ( optsPayedCall.joAccount.strPathSslKey
-        ? optsPayedCall.joAccount.strPathSslKey : "" ) + "\" " +
+        ? optsPayedCall.joAccount.strPathSslKey
+        : "" ) + "\" " +
         "";
     const joSpawnOptions: any = {
         shell: true,

@@ -2565,11 +2565,13 @@ function commonInitGasMultipliersAndTransactionArgs() {
         log.debug( log.fmtInformation( "Oracle based gas reimbursement is" ),
             "...................." +
             ( imaOracleOperations.getEnabledOracle()
-                ? log.fmtSuccess( "enabled" ) : log.fmtError( "disabled" ) ) );
+                ? log.fmtSuccess( "enabled" )
+                : log.fmtError( "disabled" ) ) );
         log.debug( log.fmtInformation(
             "S-Chain to S-Chain transferring is" ) +
             "..................." + ( imaState.optsS2S.isEnabled
-            ? log.fmtSuccess( "enabled" ) : log.fmtError( "disabled" ) ) );
+            ? log.fmtSuccess( "enabled" )
+            : log.fmtError( "disabled" ) ) );
         log.debug( log.fmtInformation( "SKALE network browser file path is" ),
             "................." +
             ( imaState.optsS2S.strNetworkBrowserPath
@@ -2581,11 +2583,13 @@ function commonInitGasMultipliersAndTransactionArgs() {
         log.debug( log.fmtInformation( "IMA JSON RPC server port is" ),
             ".........................." +
             ( ( imaState.nJsonRpcPort > 0 )
-                ? log.fmtInformation( imaState.nJsonRpcPort ) : log.fmtError( "disabled" ) ) );
+                ? log.fmtInformation( imaState.nJsonRpcPort )
+                : log.fmtError( "disabled" ) ) );
         log.debug( log.fmtInformation( "Cross-IMA mode is" ),
             "...................................." +
             ( imaState.isCrossImaBlsMode
-                ? log.fmtSuccess( "enabled" ) : log.fmtError( "disabled" ) ) );
+                ? log.fmtSuccess( "enabled" )
+                : log.fmtError( "disabled" ) ) );
         log.debug( log.fmtInformation( "Dry-run is enabled" ),
             "..................................." +
             log.yn( imaTx.dryRunIsEnabled() ) );

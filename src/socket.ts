@@ -430,7 +430,8 @@ export const outOfWorkerAPIs: any = {
         const joSend: any = {
             workerMessageType:
                 ( type && typeof type === "string" && type.length > 0 )
-                    ? type : "inWorkerMessage",
+                    ? type
+                    : "inWorkerMessage",
             workerEndPoint: endpoint,
             workerUUID,
             data: jo
@@ -473,7 +474,8 @@ export const inWorkerAPIs: any = {
         const joSend: any = {
             workerMessageType:
                 ( type && typeof type === "string" && type.length > 0 )
-                    ? type : "inWorkerMessage",
+                    ? type
+                    : "inWorkerMessage",
             workerEndPoint: endpoint,
             workerUUID,
             data: jo
@@ -553,7 +555,8 @@ export class InWorkerSocketServerAcceptor extends BasicServerAcceptor {
         this.socketType = "InWorker";
         this.strEndPoint =
             ( strEndPoint && typeof strEndPoint === "string" && strEndPoint.length > 0 )
-                ? strEndPoint : "default_local_endpoint";
+                ? strEndPoint
+                : "default_local_endpoint";
         if( this.strEndPoint in gMapLocalServers ) {
             const s =
                 "Cannot start in-worker socket server on already listening \"" +
@@ -697,13 +700,16 @@ export class OutOfWorkerRelay extends EventDispatcher {
         const self = this;
         self.strRelayName = ( strRelayName != null && strRelayName != undefined &&
             typeof strRelayName === "string" && strRelayName.length > 0 )
-            ? ( "" + strRelayName ) : "unnamed";
+            ? ( "" + strRelayName )
+            : "unnamed";
         self.isAutoFlushIncoming =
             ( isAutoFlushIncoming == null || isAutoFlushIncoming == undefined )
-                ? true : ( !!isAutoFlushIncoming );
+                ? true
+                : ( !!isAutoFlushIncoming );
         self.isAutoFlushOutgoing =
             ( isAutoFlushOutgoing == null || isAutoFlushOutgoing == undefined )
-                ? true : ( !!( isAutoFlushOutgoing ) );
+                ? true
+                : ( !!( isAutoFlushOutgoing ) );
         if( !acceptor ) {
             throw new Error( `OutOfWorkerRelay ${self.strRelayName} needs acceptor ` +
                 "for normal functionality" );
@@ -937,13 +943,16 @@ export class OneToOneRelay extends EventDispatcher {
         self.strRelayName =
             ( strRelayName != null && strRelayName != undefined &&
             typeof strRelayName === "string" && strRelayName.length > 0 )
-                ? ( "" + strRelayName ) : "unnamed";
+                ? ( "" + strRelayName )
+                : "unnamed";
         self.isAutoFlushIncoming =
             ( isAutoFlushIncoming == null || isAutoFlushIncoming == undefined )
-                ? true : ( !!isAutoFlushIncoming );
+                ? true
+                : ( !!isAutoFlushIncoming );
         self.isAutoFlushOutgoing =
             ( isAutoFlushOutgoing == null || isAutoFlushOutgoing == undefined )
-                ? true : ( !!isAutoFlushIncoming );
+                ? true
+                : ( !!isAutoFlushIncoming );
         self.pipeIncoming = pipeIncoming;
         self.pipeOutgoing = pipeOutgoing;
         if( ( !( "strSavedRemoteAddress" in pipeIncoming ) ) ||
@@ -1181,9 +1190,11 @@ export class DirectPipe extends BasicSocketPipe {
         this.isConnected = false;
         this.acceptor = null;
         this.counterPipe = ( counterPipe != null && counterPipe != undefined )
-            ? counterPipe : null; // set outside after this constructor call
+            ? counterPipe
+            : null; // set outside after this constructor call
         this.strEndPoint = this.counterPipe
-            ? ( "2-" + this.counterPipe.strEndPoint ) : ( "1-" + utils.randomDirectPipeID() );
+            ? ( "2-" + this.counterPipe.strEndPoint )
+            : ( "1-" + utils.randomDirectPipeID() );
         this.clientPort = this.counterPipe ? 2 : 1;
         this.socketSubtype = "direct." + this.clientPort;
         this.url = "direct_pipe://" + this.strEndPoint + ":" + this.clientPort;
@@ -1277,7 +1288,8 @@ export class LocalSocketServerAcceptor extends BasicServerAcceptor {
         this.nextClientPort = 1;
         this.strEndPoint =
             ( strEndPoint && typeof strEndPoint === "string" && strEndPoint.length > 0 )
-                ? strEndPoint : "default_local_endpoint";
+                ? strEndPoint
+                : "default_local_endpoint";
         if( this.strEndPoint in gMapLocalServers ) {
             const s =
                 "Cannot start local socket server on already listening \"" +
@@ -1322,7 +1334,8 @@ export class LocalSocketClientPipe extends DirectPipe {
         this.counterPipe = null;
         this.strEndPoint =
             ( strEndPoint && typeof strEndPoint === "string" && strEndPoint.length > 0 )
-                ? strEndPoint : "default_local_endpoint";
+                ? strEndPoint
+                : "default_local_endpoint";
         if( !( this.strEndPoint in gMapLocalServers ) ) {
             const s =
                 "Cannot connect to local socket server \"" + this.strEndPoint +
@@ -1706,7 +1719,8 @@ export class RTCConnection extends EventDispatcher {
         this.idRtcParticipant = "" +
             ( ( idRtcParticipant != null && idRtcParticipant != undefined &&
                 typeof idRtcParticipant === "string" && idRtcParticipant.length > 0 )
-                ? idRtcParticipant : utils.UUIDv4() );
+                ? idRtcParticipant
+                : utils.UUIDv4() );
         this.wasIdentified = false;
         this.iceComplete = false;
         this.pc = null;
@@ -2242,14 +2256,17 @@ export class RTCServerPeer extends RTCConnection {
             settings.net.rtc.timeToSignalingNegotiationMilliseconds;
         this.peerConfiguration =
             ( peerConfiguration && typeof peerConfiguration === "object" )
-                ? peerConfiguration : settings.net.rtc.peerConfiguration;
+                ? peerConfiguration
+                : settings.net.rtc.peerConfiguration;
         this.peerAdditionalOptions =
             ( peerAdditionalOptions && typeof peerAdditionalOptions === "object" )
-                ? peerAdditionalOptions : settings.net.rtc.peerAdditionalOptions;
+                ? peerAdditionalOptions
+                : settings.net.rtc.peerAdditionalOptions;
         this.localMediaStream =
             ( localMediaStream != null && localMediaStream != undefined &&
                 typeof localMediaStream === "object" )
-                ? localMediaStream : null;
+                ? localMediaStream
+                : null;
         this.isOfferPublishedOnSignalingServer = false;
         this.initPeer();
         this.publish();
@@ -2797,10 +2814,12 @@ export class RTCJoiner extends RTCActor {
         this.signalingPipeOpen();
         this.peerConfiguration =
             ( peerConfiguration && typeof peerConfiguration === "object" )
-                ? peerConfiguration : settings.net.rtc.peerConfiguration;
+                ? peerConfiguration
+                : settings.net.rtc.peerConfiguration;
         this.peerAdditionalOptions =
             ( peerAdditionalOptions && typeof peerAdditionalOptions === "object" )
-                ? peerAdditionalOptions : settings.net.rtc.peerAdditionalOptions;
+                ? peerAdditionalOptions
+                : settings.net.rtc.peerAdditionalOptions;
     }
     dispose() {
         if( this.isDisposed )
@@ -3215,19 +3234,23 @@ export class WebRTCServerAcceptor extends BasicServerAcceptor {
         this.idRtcParticipant = "" +
             ( ( idRtcParticipant != null && idRtcParticipant != undefined &&
                 typeof idRtcParticipant === "string" && idRtcParticipant.length > 0 )
-                ? idRtcParticipant : utils.UUIDv4() );
+                ? idRtcParticipant
+                : utils.UUIDv4() );
         this.offerOptions = offerOptions || null;
         this.signalingOptions = signalingOptions || null;
         this.peerConfiguration =
             ( peerConfiguration && typeof peerConfiguration === "object" )
-                ? peerConfiguration : settings.net.rtc.peerConfiguration;
+                ? peerConfiguration
+                : settings.net.rtc.peerConfiguration;
         this.peerAdditionalOptions =
             ( peerAdditionalOptions && typeof peerAdditionalOptions === "object" )
-                ? peerAdditionalOptions : settings.net.rtc.peerAdditionalOptions;
+                ? peerAdditionalOptions
+                : settings.net.rtc.peerAdditionalOptions;
         this.socketType = "WebRTC";
         this.maxActiveOfferCount =
             ( maxActiveOfferCount != null && maxActiveOfferCount != undefined )
-                ? maxActiveOfferCount : settings.net.rtc.maxActiveOfferCount;
+                ? maxActiveOfferCount
+                : settings.net.rtc.maxActiveOfferCount;
         if( this.maxActiveOfferCount < 1 )
             this.maxActiveOfferCount = 1;
         this.mapPendingOffers = { }; // idOffer -> RTCServerPeer
@@ -3406,15 +3429,18 @@ export class WebRTCClientPipe extends BasicSocketPipe {
         this.idRtcParticipant = "" +
             ( ( idRtcParticipant != null && idRtcParticipant != undefined &&
                 typeof idRtcParticipant === "string" && idRtcParticipant.length > 0 )
-                ? idRtcParticipant : utils.UUIDv4() );
+                ? idRtcParticipant
+                : utils.UUIDv4() );
         this.offerOptions = offerOptions || null;
         this.signalingOptions = signalingOptions || null;
         this.peerConfiguration =
             ( peerConfiguration && typeof peerConfiguration === "object" )
-                ? peerConfiguration : settings.net.rtc.peerConfiguration;
+                ? peerConfiguration
+                : settings.net.rtc.peerConfiguration;
         this.peerAdditionalOptions =
             ( peerAdditionalOptions && typeof peerAdditionalOptions === "object" )
-                ? peerAdditionalOptions : settings.net.rtc.peerAdditionalOptions;
+                ? peerAdditionalOptions
+                : settings.net.rtc.peerAdditionalOptions;
         this.socketType = "WebRTC";
         this.socketSubtype = "client";
         this.isConnected = false;

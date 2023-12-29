@@ -33,7 +33,6 @@ module.exports = {
         "nonblock-statement-body-position": [ "error", "below" ],
         "no-cond-assign": [ "error", "always" ],
         "lines-between-class-members": [ "error", "never" ],
-        "multiline-ternary": "off",
         "max-len": [ "error", { "code": 100, "tabWidth": 4 } ],
         "max-lines-per-function": [ "error", { "max": 200, "skipBlankLines": false } ],
         "@typescript-eslint/indent": [ "error", 4,  { "ignoredNodes": [ "SwitchCase" ] } ],

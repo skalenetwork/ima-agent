@@ -54,7 +54,8 @@ export function validateRadix( value?: any, radix?: any ) {
     value = value.trim();
     radix = ( radix == null || radix == undefined )
         ? ( ( value.length > 2 && value[0] == "0" && ( value[1] == "x" || value[1] == "X" ) )
-            ? 16 : 10 )
+            ? 16
+            : 10 )
         : parseInt( radix, 10 );
     return radix;
 }
@@ -463,7 +464,8 @@ export const jsonColorizer: any = { // see http://jsfiddle.net/unLSJ/
         const s =
             JSON.stringify(
                 obj, ( jsonColorizer.cntCensoredMax > 0 )
-                    ? jsonColorizer.censor( obj ) : null, 4
+                    ? jsonColorizer.censor( obj )
+                    : null, 4
             )
                 .replace( /&/g, "&amp;" ).replace( /\\"/g, "&quot;" )
                 .replace( /</g, "&lt;" ).replace( />/g, "&gt;" )

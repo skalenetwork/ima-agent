@@ -110,9 +110,11 @@ async function handleOracleSubmitRequestResult(
     joCall: rpcCall.TRPCCall, joIn: any, joOut: any
 ) {
     const nMillisecondsSleepBefore = "nMillisecondsSleepBefore" in oracleOpts
-        ? oracleOpts.nMillisecondsSleepBefore : 1000;
+        ? oracleOpts.nMillisecondsSleepBefore
+        : 1000;
     const nMillisecondsSleepPeriod = "nMillisecondsSleepPeriod" in oracleOpts
-        ? oracleOpts.nMillisecondsSleepPeriod : 3000;
+        ? oracleOpts.nMillisecondsSleepPeriod
+        : 3000;
     let cntAttempts = "cntAttempts" in oracleOpts ? oracleOpts.cntAttempts : 40;
     if( cntAttempts < 1 )
         cntAttempts = 1;
@@ -128,7 +130,8 @@ async function handleOracleSubmitRequestResult(
     let gp = null;
     for( let idxAttempt = 0; idxAttempt < cntAttempts; ++idxAttempt ) {
         const nMillisecondsToSleep = ( !idxAttempt )
-            ? nMillisecondsSleepBefore : nMillisecondsSleepPeriod;
+            ? nMillisecondsSleepBefore
+            : nMillisecondsSleepPeriod;
         if( nMillisecondsToSleep > 0 )
             await threadInfo.sleep( nMillisecondsToSleep );
         try {
@@ -165,7 +168,8 @@ export async function oracleGetGasPrice( oracleOpts: any, details: log.TLogger )
     try {
         const isVerbose = "isVerbose" in oracleOpts ? oracleOpts.isVerbose : false;
         let isVerboseTraceDetails = "isVerboseTraceDetails" in oracleOpts
-            ? oracleOpts.isVerboseTraceDetails : false;
+            ? oracleOpts.isVerboseTraceDetails
+            : false;
         if( !( log.verboseGet() >= log.verboseName2Number( "trace" ) ) )
             isVerboseTraceDetails = false;
         const callOpts = "callOpts" in oracleOpts ? oracleOpts.callOpts : { };

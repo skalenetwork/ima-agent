@@ -122,7 +122,8 @@ export function n2s( n: any, sz: number ): string {
 export function generateTimestampString( ts?: any, isColorized?: boolean ): string {
     isColorized =
         ( typeof isColorized === "undefined" )
-            ? true : ( !!isColorized );
+            ? true
+            : ( !!isColorized );
     ts = ( ts instanceof Date ) ? ts : new Date();
     const ccDate = function( x?: any ): string { return isColorized ? cc.date( x ) : x; };
     const ccTime = function( x?: any ): string { return isColorized ? cc.time( x ) : x; };
@@ -230,7 +231,8 @@ export function createStandardOutputStream(): TLogger | null {
             write: function( ...args: any[] ): void {
                 let s = ( this.strOwnIndent ? this.strOwnIndent : "" ) +
                     ( ( this.haveOwnTimestamps && ( !this.isPausedTimeStamps ) )
-                        ? generateTimestampPrefix( null, true ) : "" );
+                        ? generateTimestampPrefix( null, true )
+                        : "" );
                 s += fmtArgumentsArray( args );
                 try {
                     if( this.objStream && s.length > 0 )
@@ -403,9 +405,11 @@ export function createMemoryOutputStream(): TLogger {
                 }
                 try {
                     strTitle = strTitle
-                        ? ( cc.bright( " (" ) + cc.attention( strTitle ) + cc.bright( ")" ) ) : "";
+                        ? ( cc.bright( " (" ) + cc.attention( strTitle ) + cc.bright( ")" ) )
+                        : "";
                     const strSuccessPrefix = isSuccess
-                        ? cc.success( "SUCCESS" ) : cc.error( "ERROR" );
+                        ? cc.success( "SUCCESS" )
+                        : cc.error( "ERROR" );
                     otherStream.write( "\n" );
                     otherStream.write( cc.bright( "--- --- --- --- --- GATHERED " ) +
                         strSuccessPrefix + cc.bright( " DETAILS FOR LATEST(" ) +
@@ -520,7 +524,8 @@ export function createFileOutput(
             write: function( ...args: any[] ): void {
                 let s = ( this.strOwnIndent ? this.strOwnIndent : "" ) +
                     ( ( this.haveOwnTimestamps && ( !this.isPausedTimeStamps ) )
-                        ? generateTimestampPrefix( null, true ) : "" );
+                        ? generateTimestampPrefix( null, true )
+                        : "" );
                 s += fmtArgumentsArray( args );
                 try {
                     if( s.length > 0 ) {
@@ -728,7 +733,8 @@ function tryToSplitFormatString( strFormat?: string, cntArgsMax?: number ): any[
 export function fmtArgumentsArray( arrArgs: any[], fnFormatter?: any ): string {
     fnFormatter = fnFormatter || function( arg: any ) { return arg; };
     const arrParts = ( arrArgs && arrArgs.length > 0 )
-        ? tryToSplitFormatString( arrArgs[0], arrArgs.length - 1 ) : null;
+        ? tryToSplitFormatString( arrArgs[0], arrArgs.length - 1 )
+        : null;
     let s = ""; let isValueMode = false;
     const fnDefaultOneArgumentFormatter = function( arg?: any, fnCustomFormatter?: any ): string {
         if( !fnCustomFormatter )

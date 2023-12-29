@@ -425,7 +425,8 @@ async function main() {
     initMonitoringServer();
     initJsonRpcServer();
     const isSilentReDiscovery = imaState.isPrintSecurityValues
-        ? false : imaState.joSChainDiscovery.isSilentReDiscovery;
+        ? false
+        : imaState.joSChainDiscovery.isSilentReDiscovery;
     const fnOnPeriodicDiscoveryResultAvailable = function( isFinal: boolean ) {
         loop.spreadUpdatedSChainNetwork( isFinal ).then( function() {} ).catch( function() {} );
     };
@@ -440,7 +441,8 @@ async function main() {
         }
         log.information( "S-Chain network was discovery uses {} mode",
             ( isSilentReDiscovery
-                ? log.fmtWarning( "silent" ) : log.fmtSuccess( "exposed details" ) ) );
+                ? log.fmtWarning( "silent" )
+                : log.fmtSuccess( "exposed details" ) ) );
         if( !imaState.bNoWaitSChainStarted ) {
             await discoveryTools.waitUntilSChainStarted();
             if( !isSilentReDiscovery ) {

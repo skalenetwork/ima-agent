@@ -851,7 +851,8 @@ async function checkOutgoingMessageEvent(
             }
         } catch ( err ) {
             const strUrlHttp = optsOutgoingMessageAnalysis.joNode
-                ? optsOutgoingMessageAnalysis.joNode.endpoints.ip.http : "";
+                ? optsOutgoingMessageAnalysis.joNode.endpoints.ip.http
+                : "";
             const strNodeName = optsOutgoingMessageAnalysis.joNode
                 ? log.fmtInformation( optsOutgoingMessageAnalysis.joNode.name )
                 : log.fmtError( "<<unknown node name>>" );
@@ -980,7 +981,8 @@ async function doMainTransferLoopActions( optsTransfer: TTransferOptions ) {
 
         optsTransfer.details.close();
         optsTransfer.details = optsTransfer.imaState.isDynamicLogInDoTransfer
-            ? log.globalStream() : log.createMemoryStream();
+            ? log.globalStream()
+            : log.createMemoryStream();
         optsTransfer.strGatheredDetailsName = `${optsTransfer.strDirection}/#` +
             `${optsTransfer.nTransferLoopCounter}-doTransfer-B-${optsTransfer.chainNameSrc}` +
             `-->${optsTransfer.chainNameDst}`;
@@ -1069,7 +1071,8 @@ export async function doTransfer(
         `${optsTransfer.strDirection}/#${optsTransfer.nTransferLoopCounter}-doTransfer-A-` +
         `${optsTransfer.chainNameSrc}-->${optsTransfer.chainNameDst}`;
     optsTransfer.details = optsTransfer.imaState.isDynamicLogInDoTransfer
-        ? log.globalStream() : log.createMemoryStream();
+        ? log.globalStream()
+        : log.createMemoryStream();
     optsTransfer.strLogPrefixShort =
         `${optsTransfer.strDirection}/#${optsTransfer.nTransferLoopCounter} `;
     optsTransfer.strLogPrefix = `${optsTransfer.strLogPrefixShort}transfer loop from ` +

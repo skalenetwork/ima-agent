@@ -140,7 +140,8 @@ export function formatBalanceInfo( bi: any, strAddress: string ): string {
         s += log.fmtDebug( " token ID {}", bi.idToken );
     s += log.posNeg( ( bi.assetName == "ERC721" ), " owner is ", " balance is " );
     s += ( bi.assetName == "ERC721" )
-        ? log.fmtInformation( "{p}", bi.owner ) : log.fmtInformation( "{p}", bi.balance );
+        ? log.fmtInformation( "{p}", bi.owner )
+        : log.fmtInformation( "{p}", bi.balance );
     if( bi.assetName == "ERC721" ) {
         const isSame =
             ( bi.owner.trim().toLowerCase() == strAddress.trim().toLowerCase() );

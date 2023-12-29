@@ -142,10 +142,12 @@ export function checkTimeFraming(
             } else {
                 const s1: string = log.fmtInformation( "{}",
                     joRuntimeOpts.joExtraSignOpts
-                        ? joRuntimeOpts.joExtraSignOpts.chainNameDst : "N/A" )
+                        ? joRuntimeOpts.joExtraSignOpts.chainNameDst
+                        : "N/A" )
                 const s2: string = log.fmtInformation( "{}",
                     joRuntimeOpts.joExtraSignOpts
-                        ? joRuntimeOpts.joExtraSignOpts.chainIdDst : "N/A" )
+                        ? joRuntimeOpts.joExtraSignOpts.chainIdDst
+                        : "N/A" )
                 strFrameInfo += log.fmtDebug( "    S-Chain destination", "........",
                     s1, "/", s2, "\n" );
             }

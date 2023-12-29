@@ -878,7 +878,8 @@ async function checkCorrectnessOfMessagesToSign(
         const ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider | null =
             ( joExtraSignOpts && "ethersProviderSrc" in joExtraSignOpts &&
             joExtraSignOpts.ethersProviderSrc )
-                ? joExtraSignOpts.ethersProviderSrc : null;
+                ? joExtraSignOpts.ethersProviderSrc
+                : null;
         if( !ethersProvider ) {
             throw new Error( "CRITICAL ERROR: No provider specified in extra signing options " +
                 `for checking messages of direction ${strDirection}` );
@@ -1467,7 +1468,8 @@ async function doSignMessagesImpl(
     };
     optsSignOperation.details =
         optsSignOperation.imaState.isDynamicLogInBlsSigner
-            ? log.globalStream() : log.createMemoryStream();
+            ? log.globalStream()
+            : log.createMemoryStream();
     optsSignOperation.strGatheredDetailsName = optsSignOperation.strDirection + "-" +
         "doSignMessagesImpl-#" + optsSignOperation.nTransferLoopCounter +
         "-" + optsSignOperation.strFromChainName + "-msg#" +

@@ -58,13 +58,17 @@ export const randomString = function(
     if( length <= 0 )
         return "";
     isABC = ( isABC == null || isABC == undefined )
-        ? true : ( !!isABC );
+        ? true
+        : ( !!isABC );
     isDigits = ( isDigits == null || isDigits == undefined )
-        ? false : ( !!isDigits );
+        ? false
+        : ( !!isDigits );
     isSpecChr = ( isSpecChr == null || isSpecChr == undefined )
-        ? false : ( !!isSpecChr );
+        ? false
+        : ( !!isSpecChr );
     isPunctuation = ( isPunctuation == null || isPunctuation == undefined )
-        ? false : ( !!isPunctuation );
+        ? false
+        : ( !!isPunctuation );
     let arrCharacters = "";
     if( isABC )
         arrCharacters += "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -129,12 +133,14 @@ export const prepareAnswerJSON = function( joMessage: any ): any {
             ( ( joMessage != null &&
                 joMessage != undefined &&
                 typeof joMessage.id === "string" )
-                ? joMessage.id : randomCallID() ),
+                ? joMessage.id
+                : randomCallID() ),
         method: "" +
             ( ( joMessage != null &&
                 joMessage != undefined &&
                 typeof joMessage.method === "string" )
-                ? joMessage.method : "" ),
+                ? joMessage.method
+                : "" ),
         error: null
     };
     return joAnswer;
@@ -215,7 +221,8 @@ export const formatDateTime = function(
     let s = "";
     if( isDate ) {
         sepDate = ( sepDate == null || sepDate == undefined || ( typeof sepDate !== "string" ) )
-            ? "/" : sepDate;
+            ? "/"
+            : sepDate;
         const strDate = "" +
             zeroPaddingLeft( dt.getFullYear(), 4 ) +
             sepDate +
@@ -226,13 +233,15 @@ export const formatDateTime = function(
     }
     if( isTime ) {
         sepTime = ( sepTime == null || sepTime == undefined || ( typeof sepTime !== "string" ) )
-            ? ":" : sepTime;
+            ? ":"
+            : sepTime;
         if( isDate ) {
             sepBetween =
                 ( sepBetween == null ||
                     sepBetween == undefined ||
                     ( typeof sepBetween !== "string" ) )
-                    ? "-" : sepBetween;
+                    ? "-"
+                    : sepBetween;
             s += sepBetween;
         }
         let strTime = "" +
@@ -242,13 +251,15 @@ export const formatDateTime = function(
             sepDate +
             zeroPaddingLeft( dt.getSeconds(), 2 );
         isMilliseconds = ( isMilliseconds == null || isMilliseconds == undefined )
-            ? true : ( !!isMilliseconds );
+            ? true
+            : ( !!isMilliseconds );
         if( isMilliseconds ) {
             sepMilliseconds =
                 ( sepMilliseconds == null ||
                     sepMilliseconds == undefined ||
                     ( typeof sepMilliseconds !== "string" ) )
-                    ? "." : sepMilliseconds;
+                    ? "."
+                    : sepMilliseconds;
             strTime += sepMilliseconds + zeroPaddingRight( dt.getMilliseconds(), 3 );
         }
         s += strTime;

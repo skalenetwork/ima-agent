@@ -207,7 +207,8 @@ export async function safeGetTransactionCount(
     if( throwIfServerOffline == null || throwIfServerOffline == undefined )
         throwIfServerOffline = true;
     cntAttempts = ( owaspUtils.parseIntOrHex( cntAttempts ) < 1 )
-        ? 1 : owaspUtils.parseIntOrHex( cntAttempts );
+        ? 1
+        : owaspUtils.parseIntOrHex( cntAttempts );
     if( retValOnFail == null || retValOnFail == undefined )
         retValOnFail = "";
     let ret = retValOnFail;
@@ -252,7 +253,8 @@ export async function safeGetTransactionReceipt(
     if( throwIfServerOffline == null || throwIfServerOffline == undefined )
         throwIfServerOffline = true;
     cntAttempts = ( owaspUtils.parseIntOrHex( cntAttempts ) < 1 )
-        ? 1 : owaspUtils.parseIntOrHex( cntAttempts );
+        ? 1
+        : owaspUtils.parseIntOrHex( cntAttempts );
     if( retValOnFail == null || retValOnFail == undefined )
         retValOnFail = "";
     let ret = retValOnFail;
@@ -298,7 +300,8 @@ export async function safeGetPastEvents(
     if( throwIfServerOffline == null || throwIfServerOffline == undefined )
         throwIfServerOffline = true;
     cntAttempts = ( owaspUtils.parseIntOrHex( cntAttempts ) < 1 )
-        ? 1 : owaspUtils.parseIntOrHex( cntAttempts );
+        ? 1
+        : owaspUtils.parseIntOrHex( cntAttempts );
     if( retValOnFail == null || retValOnFail == undefined )
         retValOnFail = "";
     let ret = retValOnFail;

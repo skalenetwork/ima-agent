@@ -310,13 +310,16 @@ export async function doCall( joCall: TRPCCall, joIn: any, fn: TFunctionCallResu
                 },
                 ca: ( joCall.joRpcOptions?.ca &&
                     typeof joCall.joRpcOptions.ca === "string" )
-                    ? joCall.joRpcOptions.ca : null,
+                    ? joCall.joRpcOptions.ca
+                    : null,
                 cert: ( joCall.joRpcOptions?.cert &&
                     typeof joCall.joRpcOptions.cert === "string" )
-                    ? joCall.joRpcOptions.cert : null,
+                    ? joCall.joRpcOptions.cert
+                    : null,
                 key: ( joCall.joRpcOptions?.key &&
                     typeof joCall.joRpcOptions.key === "string" )
-                    ? joCall.joRpcOptions.key : null
+                    ? joCall.joRpcOptions.key
+                    : null
             };
             let accumulatedBody = "";
             const promiseComplete = new Promise( ( resolve, reject ) => {
@@ -379,13 +382,16 @@ export async function doCall( joCall: TRPCCall, joIn: any, fn: TFunctionCallResu
                     httpsAgent: false,
                     ca: ( joCall.joRpcOptions?.ca &&
                         typeof joCall.joRpcOptions.ca === "string" )
-                        ? joCall.joRpcOptions.ca : null,
+                        ? joCall.joRpcOptions.ca
+                        : null,
                     cert: ( joCall.joRpcOptions?.cert &&
                         typeof joCall.joRpcOptions.cert === "string" )
-                        ? joCall.joRpcOptions.cert : null,
+                        ? joCall.joRpcOptions.cert
+                        : null,
                     key: ( joCall.joRpcOptions?.key &&
                         typeof joCall.joRpcOptions.key === "string" )
-                        ? joCall.joRpcOptions.key : null
+                        ? joCall.joRpcOptions.key
+                        : null
                 };
                 const response =
                     await urllib.request( joCall.url, requestOpts as urllib.RequestOptions );

@@ -242,7 +242,8 @@ export function commandLineTaskMintErc721() {
                         imaState.chainProperties.tc.joAccount.address();
                     const idTokens: any[] =
                         ( imaState.haveArrayOfTokenIdentifiers && imaState.idTokens )
-                            ? imaState.idTokens : [];
+                            ? imaState.idTokens
+                            : [];
                     if( imaState.haveOneTokenIdentifier )
                         idTokens.push( imaState.idToken );
                     if( idTokens.length > 0 ) {
@@ -287,7 +288,8 @@ export function commandLineTaskMintErc1155() {
                         imaState.chainProperties.tc.joAccount.address();
                     const idTokens: any[] =
                         ( imaState.haveArrayOfTokenIdentifiers && imaState.idTokens )
-                            ? imaState.idTokens : [];
+                            ? imaState.idTokens
+                            : [];
                     if( imaState.haveOneTokenIdentifier )
                         idTokens.push( imaState.idToken );
                     if( idTokens.length > 0 ) {
@@ -370,7 +372,8 @@ export function commandLineTaskBurnErc721() {
                 try {
                     const idTokens: any[] =
                         ( imaState.haveArrayOfTokenIdentifiers && imaState.idTokens )
-                            ? imaState.idTokens : [];
+                            ? imaState.idTokens
+                            : [];
                     if( imaState.haveOneTokenIdentifier )
                         idTokens.push( imaState.idToken );
                     if( idTokens.length > 0 ) {
@@ -416,7 +419,8 @@ export function commandLineTaskBurnErc1155() {
                         imaState.chainProperties.tc.joAccount.address();
                     const idTokens: any[] =
                         ( imaState.haveArrayOfTokenIdentifiers && imaState.idTokens )
-                            ? imaState.idTokens : [];
+                            ? imaState.idTokens
+                            : [];
                     if( imaState.haveOneTokenIdentifier )
                         idTokens.push( imaState.idToken );
                     if( idTokens.length > 0 ) {
@@ -735,7 +739,8 @@ export function commandLineTaskShowBalance() {
                 arrBalancesMN, arrBalancesSC, arrBalancesTC );
             const idTokens: any[] =
                 ( imaState.haveArrayOfTokenIdentifiers && imaState.idTokens )
-                    ? imaState.idTokens : [];
+                    ? imaState.idTokens
+                    : [];
             if( imaState.haveOneTokenIdentifier )
                 idTokens.push( imaState.idToken );
             if( idTokens.length > 0 ) {
@@ -1182,7 +1187,8 @@ export function commandLineTaskPaymentS2S() {
             const chainIdSrc = isForward ? sc.chainId : tc.chainId;
             const joAccountSrc = isForward ? sc.joAccount : tc.joAccount;
             const joTokenManagerERC20Src: owaspUtils.ethersMod.ethers.Contract | null = isForward
-                ? imaState.joTokenManagerERC20 : imaState.joTokenManagerERC20Target;
+                ? imaState.joTokenManagerERC20
+                : imaState.joTokenManagerERC20Target;
             const joTokenManagerERC721Src: owaspUtils.ethersMod.ethers.Contract | null = isForward
                 ? ( imaState.isWithMetadata721
                     ? imaState.joTokenManagerERC721WithMetadata
@@ -1192,7 +1198,8 @@ export function commandLineTaskPaymentS2S() {
                     : imaState.joTokenManagerERC721Target );
 
             const joTokenManagerERC1155Src: owaspUtils.ethersMod.ethers.Contract | null = isForward
-                ? imaState.joTokenManagerERC1155 : imaState.joTokenManagerERC1155Target;
+                ? imaState.joTokenManagerERC1155
+                : imaState.joTokenManagerERC1155Target;
             const strChainNameDst = isForward ? tc.strChainName : sc.strChainName;
             const strCoinNameErc20Src = isForward ? sc.strCoinNameErc20 : tc.strCoinNameErc20;
             const strCoinNameErc721Src = isForward ? sc.strCoinNameErc721 : tc.strCoinNameErc721;
@@ -1220,11 +1227,14 @@ export function commandLineTaskPaymentS2S() {
             if( ( !strAddrErc1155ExplicitTarget ) && tc.joErc1155 && tc.strCoinNameErc1155 )
                 strAddrErc1155ExplicitTarget = tc.joErc1155[tc.strCoinNameErc1155 + "_address"];
             const strAddrErc20Dst = isForward
-                ? strAddrErc20ExplicitTarget : strAddrErc20Explicit;
+                ? strAddrErc20ExplicitTarget
+                : strAddrErc20Explicit;
             const strAddrErc721Dst = isForward
-                ? strAddrErc721ExplicitTarget : strAddrErc721Explicit;
+                ? strAddrErc721ExplicitTarget
+                : strAddrErc721Explicit;
             const strAddrErc1155Dst = isForward
-                ? strAddrErc1155ExplicitTarget : strAddrErc1155Explicit;
+                ? strAddrErc1155ExplicitTarget
+                : strAddrErc1155Explicit;
             const txCustomizer: imaTx.TransactionCustomizer =
                 isForward ? sc.transactionCustomizer : tc.transactionCustomizer;
             if( strCoinNameErc721Src.length > 0 ) {
