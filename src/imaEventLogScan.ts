@@ -336,7 +336,6 @@ export async function safeGetPastEvents(
             ret = await joContract.queryFilter( joFilter,
                 nBlockFrom.toHexString(), nBlockTo.toHexString() );
             return ret;
-
         } catch ( err ) {
             ret = retValOnFail;
             details.error(

@@ -90,7 +90,6 @@ export const generateSocketDataStatsJSON = function( jo: any ) {
     ) {
         for( const joMessage of jo.arrPackedMessages )
             updateSocketDataStatsForMessage( joMessage, joStats );
-
     } else
         updateSocketDataStatsForMessage( jo, joStats );
     return joStats;

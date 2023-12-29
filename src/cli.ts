@@ -2689,7 +2689,6 @@ export function imaInitEthersProviders() {
         log.warning( "No S<->S Target S-Chain URL specified in command line arguments" +
             "(needed for particular operations only)" );
     }
-
 } // imaInitEthersProviders
 
 function initContractsIMA() {

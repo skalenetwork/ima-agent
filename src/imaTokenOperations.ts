@@ -946,7 +946,6 @@ export async function doErc721PaymentFromSChain(
                 throw new Error( "Verification failed for the OutgoingMessage event of the " +
                     `MessageProxy${joMessageProxySChain.address} contract, no events found` );
             }
-
         }
     } catch ( err ) {
         details.critical( "{p}Payment error in {bright}: {err}, stack is:\n{stack}",

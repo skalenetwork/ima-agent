@@ -32,7 +32,6 @@ module.exports = {
         "curly": [ "error", "multi-or-nest" ],
         "nonblock-statement-body-position": [ "error", "below" ],
         "no-cond-assign": [ "error", "always" ],
-        "padded-blocks": "off",
         "lines-between-class-members": [ "error", "never" ],
         "multiline-ternary": "off",
         "max-len": [ "error", { "code": 100, "tabWidth": 4 } ],

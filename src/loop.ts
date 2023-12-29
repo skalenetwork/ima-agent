@@ -397,7 +397,6 @@ async function singleTransferLoopPartS2S( optsLoop: TLoopOptions, strLogPrefix: 
         }
         log.information( "{p}All S2S transfers done in {}: {}",
             strLogPrefix, threadInfo.threadDescription(), b3 );
-
     } else
         log.debug( "{p}Skipped S2S transfer in {}.", strLogPrefix, threadInfo.threadDescription() );
 
@@ -761,7 +760,6 @@ export async function spreadArrivedStateOfPendingWorkAnalysis( joMessage: any ) 
     const cntWorkers = gArrWorkers.length;
     for( let idxWorker = 0; idxWorker < cntWorkers; ++idxWorker )
         gArrClients[idxWorker].send( joMessage );
-
 }
 
 export async function spreadUpdatedSChainNetwork( isFinal: boolean ) {

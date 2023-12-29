@@ -226,7 +226,6 @@ function initMonitoringServer(): void {
                         for( const paramName of arrRuntimeParamNames ) {
                             if( paramName in imaState )
                                 joAnswer.runtime_params[paramName] = ( imaState as any )[paramName];
-
                         }
                     } break;
                 case "get_last_transfer_errors":
@@ -476,7 +475,6 @@ async function main() {
     // everything else is in async calls executed later,
     // skip exit here to avoid early termination while tasks ase still running
     }
-
 }
 
 main().then( function() {} ).catch( function() {} );

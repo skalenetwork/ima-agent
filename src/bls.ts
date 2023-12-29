@@ -949,7 +949,6 @@ async function checkCorrectnessOfMessagesToSign(
             strLogPrefix, cntBadMessages, cnt );
     } else
         details.success( "{p}Correctness validation passed for {} message(s)", strLogPrefix, cnt );
-
 }
 
 async function prepareSignMessagesImpl( optsSignOperation: TSignOperationOptions ) {
