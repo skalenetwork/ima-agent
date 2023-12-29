@@ -34,8 +34,6 @@ module.exports = {
         "nonblock-statement-body-position": [ "error", "below" ],
         "no-unneeded-ternary": "off",
         "no-cond-assign": [ "error", "always" ],
-        "no-useless-return": "off",
-        "no-new": "off",
         "no-fallthrough": "off",
         "padded-blocks": "off",
         "lines-between-class-members": [ "error", "never" ],

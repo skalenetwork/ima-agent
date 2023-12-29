@@ -40,8 +40,7 @@ let imaState: state.TIMAState = state.get();
 
 if( parentPort ) {
     parentPort.on( "message", jo => {
-        if( networkLayer.inWorkerAPIs.onMessage( jo ) )
-            return;
+        networkLayer.inWorkerAPIs.onMessage( jo );
     } );
 }
 

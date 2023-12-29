@@ -598,8 +598,7 @@ export async function ensureHaveWorkers( opts: TParallelLoopRunOptions ) {
             }
         ) );
         gArrWorkers[idxWorker].on( "message", function( jo: any ) {
-            if( networkLayer.outOfWorkerAPIs.onMessage( gArrWorkers[idxWorker], jo ) )
-                return;
+            networkLayer.outOfWorkerAPIs.onMessage( gArrWorkers[idxWorker], jo );
         } );
         const aClient = new networkLayer.OutOfWorkerSocketClientPipe(
             workerData.url, gArrWorkers[idxWorker] );

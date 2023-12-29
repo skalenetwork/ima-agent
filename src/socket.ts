@@ -350,6 +350,8 @@ export class BasicSocketPipe extends EventDispatcher {
     }
     reconnect() {
     }
+    checkItself() {
+    }
 };
 
 export class NullSocketPipe extends BasicSocketPipe {
@@ -587,7 +589,9 @@ export class InWorkerSocketServerAcceptor extends BasicServerAcceptor {
     performAccept( jo: any ) {
         if( jo.workerUUID in this.mapClients )
             return false; // TO-DO: send error answer and return true
-        new InWorkerServerPipe( this, "" + jo.workerUUID, this.fnSend );
+        const p: InWorkerServerPipe =
+            new InWorkerServerPipe( this, "" + jo.workerUUID, this.fnSend );
+        p.checkItself();
         return true;
     }
     performDisconnect( jo: any ) {
