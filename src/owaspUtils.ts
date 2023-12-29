@@ -739,12 +739,12 @@ export function toBNbasic( x?: any, optionalRadix?: number ): any {
 
 export function toBN( arg: any ): any {
     if( typeof arg === "string" || typeof arg === "number" ) {
-        let multiplier = toBNbasic( 1 ); // eslint-disable-line
+        let multiplier = toBNbasic( 1 );
         const formattedString = String( arg ).toLowerCase().trim()
         const isHexPrefixed =
             formattedString.substr( 0, 2 ) === "0x" ||
             formattedString.substr( 0, 3 ) === "-0x"
-        let stringArg = stripHexPrefix(formattedString); // eslint-disable-line
+        let stringArg = stripHexPrefix( formattedString );
         if( stringArg.substr( 0, 1 ) === "-" ) {
             stringArg = stripHexPrefix( stringArg.slice( 1 ) )
             multiplier = toBNbasic( -1, 10 );

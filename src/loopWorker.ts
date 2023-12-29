@@ -197,7 +197,6 @@ class ObserverServer extends SocketServer {
                     log.posNeg( joMessage.isFinal, "final", "partial" ) );
                 imaState.joSChainNetworkInfo = joMessage.joSChainNetworkInfo;
             };
-        // eslint-disable-next-line dot-notation
         self.mapApiHandlers.skale_imaNotifyLoopWork =
             function( joMessage: any, joAnswer: any, eventData: any, socket: any ) {
                 self.initLogMethods();
