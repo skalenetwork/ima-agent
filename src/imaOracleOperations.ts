@@ -230,7 +230,7 @@ async function handleOracleSigned(
         "setGasPrice", arrArgumentsSetGasPrice,
         optsGasPriceSetup.joAccountSC, optsGasPriceSetup.strActionName,
         gasPrice, estimatedGasSetGasPrice, weiHowMuch, opts );
-    if( joReceipt && typeof joReceipt == "object" ) {
+    if( joReceipt && typeof joReceipt === "object" ) {
         optsGasPriceSetup.jarrReceipts.push( {
             description: "doOracleGasPriceSetup/setGasPrice",
             receipt: joReceipt

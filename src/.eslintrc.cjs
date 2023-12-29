@@ -25,7 +25,6 @@ module.exports = {
         "eqeqeq": "off",
         "comma-dangle": [ "error", "never" ],
         "comma-style": [ "error", "last" ],
-        "comma-spacing": "off",
         "space-in-parens": [ "error", "always" ],
         "space-before-blocks": [ "error", "always" ],
         "array-bracket-spacing": [ "error", "always" ],

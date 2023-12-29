@@ -69,7 +69,7 @@ export function saveTransferSuccessAll(): void {
 }
 
 export function getLastTransferErrors( isIncludeTextLog: boolean ): any[] {
-    if( typeof isIncludeTextLog == "undefined" )
+    if( typeof isIncludeTextLog === "undefined" )
         isIncludeTextLog = true;
     const jarr = JSON.parse( JSON.stringify( gArrLastTransferErrors ) );
     if( !isIncludeTextLog ) {

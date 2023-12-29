@@ -195,7 +195,7 @@ export async function registerSChainInDepositBoxes( // step 1
             "Linker", joLinker, "connectSchain", arrArguments,
             joAccountMN, strActionName,
             gasPrice, estimatedGas, weiHowMuch );
-        if( joReceipt && typeof joReceipt == "object" ) {
+        if( joReceipt && typeof joReceipt === "object" ) {
             jarrReceipts.push( {
                 description: "registerSChainInDepositBoxes",
                 receipt: joReceipt

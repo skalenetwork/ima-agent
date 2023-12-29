@@ -134,7 +134,7 @@ export function checkTimeFraming(
                 log.fmtInformation( "{}", joRuntimeOpts.cntChainsKnownForS2S ), "\n"
             );
             if( "joExtraSignOpts" in joRuntimeOpts &&
-                typeof joRuntimeOpts.joExtraSignOpts == "object" ) {
+                typeof joRuntimeOpts.joExtraSignOpts === "object" ) {
                 strFrameInfo += log.fmtDebug( "    S-Chain source", ".............",
                     log.fmtInformation( "{}", joRuntimeOpts.joExtraSignOpts.chainNameSrc ),
                     "/", log.fmtInformation( "{}", joRuntimeOpts.joExtraSignOpts.chainIdSrc ),
@@ -754,7 +754,7 @@ export async function runParallelLoops( opts: TParallelLoopRunOptions ) {
 }
 
 export async function spreadArrivedStateOfPendingWorkAnalysis( joMessage: any ) {
-    if( !( joMessage && typeof joMessage == "object" &&
+    if( !( joMessage && typeof joMessage === "object" &&
         "method" in joMessage && joMessage.method == "skale_imaNotifyLoopWork" )
     )
         return;

@@ -112,7 +112,7 @@ export async function doEthPaymentFromMainNet(
             "DepositBox", joDepositBox, "deposit", arrArguments,
             joAccountSrc, strActionName,
             gasPrice, estimatedGas, weiHowMuch );
-        if( joReceipt && typeof joReceipt == "object" ) {
+        if( joReceipt && typeof joReceipt === "object" ) {
             jarrReceipts.push( {
                 description: "doEthPaymentFromMainNet",
                 receipt: joReceipt
@@ -209,7 +209,7 @@ export async function doEthPaymentFromSChain(
             "TokenManagerETH", joTokenManagerETH, "exitToMain", arrArguments,
             joAccountSrc, strActionName,
             gasPrice, estimatedGas, 0, opts );
-        if( joReceipt && typeof joReceipt == "object" ) {
+        if( joReceipt && typeof joReceipt === "object" ) {
             jarrReceipts.push( {
                 description: "doEthPaymentFromSChain",
                 receipt: joReceipt
@@ -293,7 +293,7 @@ export async function receiveEthPaymentFromSchainOnMainNet(
             "getMyEth", arrArguments,
             joAccountMN, strActionName,
             gasPrice, estimatedGas, weiHowMuch );
-        if( joReceipt && typeof joReceipt == "object" ) {
+        if( joReceipt && typeof joReceipt === "object" ) {
             jarrReceipts.push( {
                 description: "receiveEthPaymentFromSchainOnMainNet",
                 receipt: joReceipt

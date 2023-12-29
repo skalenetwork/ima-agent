@@ -134,7 +134,7 @@ export function formatBalanceInfo( bi: any, strAddress: string ): string {
     let s = "";
     s += log.fmtInformation( "{p}", bi.assetName );
     if( "assetAddress" in bi &&
-        typeof bi.assetAddress == "string" && bi.assetAddress.length > 0 )
+        typeof bi.assetAddress === "string" && bi.assetAddress.length > 0 )
         s += log.fmtDebug( "/{}", bi.assetAddress );
     if( "idToken" in bi )
         s += log.fmtDebug( " token ID {}", bi.idToken );
@@ -169,34 +169,34 @@ function getSChainNodesCount( joSChainNetworkInfo: TSChainNetworkInfo ): number 
 export function isSChainNodeFullyDiscovered( joNode: TSChainNode ): boolean {
     if( !joNode )
         return false;
-    if( joNode && "imaInfo" in joNode && typeof joNode.imaInfo == "object" &&
-        "t" in joNode.imaInfo && typeof joNode.imaInfo.t == "number" &&
+    if( joNode && "imaInfo" in joNode && typeof joNode.imaInfo === "object" &&
+        "t" in joNode.imaInfo && typeof joNode.imaInfo.t === "number" &&
         joNode.imaInfo.t > 0 &&
-        "n" in joNode.imaInfo && typeof joNode.imaInfo.n == "number" &&
+        "n" in joNode.imaInfo && typeof joNode.imaInfo.n === "number" &&
         joNode.imaInfo.n > 0 &&
         "BLSPublicKey0" in joNode.imaInfo &&
-        typeof joNode.imaInfo.BLSPublicKey0 == "string" &&
+        typeof joNode.imaInfo.BLSPublicKey0 === "string" &&
         joNode.imaInfo.BLSPublicKey0.length > 0 &&
         "BLSPublicKey1" in joNode.imaInfo &&
-        typeof joNode.imaInfo.BLSPublicKey1 == "string" &&
+        typeof joNode.imaInfo.BLSPublicKey1 === "string" &&
         joNode.imaInfo.BLSPublicKey1.length > 0 &&
         "BLSPublicKey2" in joNode.imaInfo &&
-        typeof joNode.imaInfo.BLSPublicKey2 == "string" &&
+        typeof joNode.imaInfo.BLSPublicKey2 === "string" &&
         joNode.imaInfo.BLSPublicKey2.length > 0 &&
         "BLSPublicKey3" in joNode.imaInfo &&
-        typeof joNode.imaInfo.BLSPublicKey3 == "string" &&
+        typeof joNode.imaInfo.BLSPublicKey3 === "string" &&
         joNode.imaInfo.BLSPublicKey3.length > 0 &&
         "commonBLSPublicKey0" in joNode.imaInfo &&
-        typeof joNode.imaInfo.commonBLSPublicKey0 == "string" &&
+        typeof joNode.imaInfo.commonBLSPublicKey0 === "string" &&
         joNode.imaInfo.commonBLSPublicKey0.length > 0 &&
         "commonBLSPublicKey1" in joNode.imaInfo &&
-        typeof joNode.imaInfo.commonBLSPublicKey1 == "string" &&
+        typeof joNode.imaInfo.commonBLSPublicKey1 === "string" &&
         joNode.imaInfo.commonBLSPublicKey1.length > 0 &&
         "commonBLSPublicKey2" in joNode.imaInfo &&
-        typeof joNode.imaInfo.commonBLSPublicKey2 == "string" &&
+        typeof joNode.imaInfo.commonBLSPublicKey2 === "string" &&
         joNode.imaInfo.commonBLSPublicKey2.length > 0 &&
         "commonBLSPublicKey3" in joNode.imaInfo &&
-        typeof joNode.imaInfo.commonBLSPublicKey3 == "string" &&
+        typeof joNode.imaInfo.commonBLSPublicKey3 === "string" &&
         joNode.imaInfo.commonBLSPublicKey3.length > 0
     )
         return true;
@@ -253,7 +253,7 @@ export async function waitUntilSChainStarted() {
                 log.critical( "S-Chain network discovery attempt failed: {err}", err );
                 isError = true;
             } );
-            if( ( !isError ) && joSChainNetworkInfo && typeof joSChainNetworkInfo == "object" ) {
+            if( ( !isError ) && joSChainNetworkInfo && typeof joSChainNetworkInfo === "object" ) {
                 imaState.joSChainNetworkInfo = joSChainNetworkInfo;
                 bSuccess = true;
             }

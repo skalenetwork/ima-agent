@@ -48,7 +48,7 @@ function doSendMessage( type: any, endpoint: any, workerUUID: any, data: any ) {
     const jo: any = networkLayer.socketReceivedDataReverseMarshall( data );
     const joSend: any = {
         workerMessageType:
-            ( type && typeof type == "string" && type.length > 0 )
+            ( type && typeof type === "string" && type.length > 0 )
                 ? type
                 : "inWorkerMessage",
         workerEndPoint: endpoint,
@@ -131,7 +131,7 @@ class ObserverServer extends SocketServer {
             self.opts.imaState.chainProperties.sc.joAccount.address =
                 function() { return owaspUtils.fnAddressImpl_( this ); };
             if( self.opts.imaState.chainProperties.mn.strURL &&
-                typeof self.opts.imaState.chainProperties.mn.strURL == "string" &&
+                typeof self.opts.imaState.chainProperties.mn.strURL === "string" &&
                 self.opts.imaState.chainProperties.mn.strURL.length > 0
             ) {
                 const u = self.opts.imaState.chainProperties.mn.strURL;
@@ -144,7 +144,7 @@ class ObserverServer extends SocketServer {
             }
 
             if( self.opts.imaState.chainProperties.sc.strURL &&
-                typeof self.opts.imaState.chainProperties.sc.strURL == "string" &&
+                typeof self.opts.imaState.chainProperties.sc.strURL === "string" &&
                 self.opts.imaState.chainProperties.sc.strURL.length > 0
             ) {
                 const u = self.opts.imaState.chainProperties.sc.strURL;
@@ -223,7 +223,7 @@ class ObserverServer extends SocketServer {
     }
     initLogMethods() {
         const self: any = this;
-        if( "fatal" in self && self.fatal && typeof self.fatal == "function" )
+        if( "fatal" in self && self.fatal && typeof self.fatal === "function" )
             return;
         self.fatal = function( ...args: any[] ) {
             if( log.verboseGet() >= log.verboseName2Number( "fatal" ) ) {

@@ -179,7 +179,7 @@ export async function doConnect(
                 async function( nStep: number ) { // work done handler
                 },
                 async function( nStep: number ) { // step handler
-                    if( strWsError && typeof strWsError == "string" && strWsError.length > 0 ) {
+                    if( strWsError && typeof strWsError === "string" && strWsError.length > 0 ) {
                         log.error( "{url} web socket wait error detected: {err}",
                             joCall.url, strWsError );
                         return false;
@@ -197,7 +197,7 @@ export async function doConnect(
                     }
                     return true; // continue waiting
                 } );
-            if( strWsError && typeof strWsError == "string" && strWsError.length > 0 ) {
+            if( strWsError && typeof strWsError === "string" && strWsError.length > 0 ) {
                 const err = new Error( strWsError );
                 if( fn )
                     await fn( joCall, err );
@@ -296,8 +296,8 @@ export async function doCall( joCall: TRPCCall, joIn: any, fn: TFunctionCallResu
         }
         const strBody = JSON.stringify( joIn );
         let errCall: string | null = null; let joOut: any | null = null;
-        if( joCall.joRpcOptions?.cert && typeof joCall.joRpcOptions.cert == "string" &&
-            joCall.joRpcOptions.key && typeof joCall.joRpcOptions.key == "string"
+        if( joCall.joRpcOptions?.cert && typeof joCall.joRpcOptions.cert === "string" &&
+            joCall.joRpcOptions.key && typeof joCall.joRpcOptions.key === "string"
         ) {
             const u = new URL( joCall.url );
             const options = {
@@ -309,13 +309,13 @@ export async function doCall( joCall: TRPCCall, joIn: any, fn: TFunctionCallResu
                     "Content-Type": "application/json"
                 },
                 ca: ( joCall.joRpcOptions?.ca &&
-                    typeof joCall.joRpcOptions.ca == "string" )
+                    typeof joCall.joRpcOptions.ca === "string" )
                     ? joCall.joRpcOptions.ca : null,
                 cert: ( joCall.joRpcOptions?.cert &&
-                    typeof joCall.joRpcOptions.cert == "string" )
+                    typeof joCall.joRpcOptions.cert === "string" )
                     ? joCall.joRpcOptions.cert : null,
                 key: ( joCall.joRpcOptions?.key &&
-                    typeof joCall.joRpcOptions.key == "string" )
+                    typeof joCall.joRpcOptions.key === "string" )
                     ? joCall.joRpcOptions.key : null
             };
             let accumulatedBody = "";
@@ -378,13 +378,13 @@ export async function doCall( joCall: TRPCCall, joIn: any, fn: TFunctionCallResu
                     agent: false,
                     httpsAgent: false,
                     ca: ( joCall.joRpcOptions?.ca &&
-                        typeof joCall.joRpcOptions.ca == "string" )
+                        typeof joCall.joRpcOptions.ca === "string" )
                         ? joCall.joRpcOptions.ca : null,
                     cert: ( joCall.joRpcOptions?.cert &&
-                        typeof joCall.joRpcOptions.cert == "string" )
+                        typeof joCall.joRpcOptions.cert === "string" )
                         ? joCall.joRpcOptions.cert : null,
                     key: ( joCall.joRpcOptions?.key &&
-                        typeof joCall.joRpcOptions.key == "string" )
+                        typeof joCall.joRpcOptions.key === "string" )
                         ? joCall.joRpcOptions.key : null
                 };
                 const response =
@@ -412,7 +412,7 @@ export async function doCall( joCall: TRPCCall, joIn: any, fn: TFunctionCallResu
 export async function rpcCallCreate( strURL: string, opts: TRPCCallOpts | null ) {
     if( !validateURL( strURL ) )
         throw new Error( `JSON RPC CALLER cannot create a call object invalid URL: ${strURL}` );
-    if( !( strURL && typeof strURL == "string" && strURL.length > 0 ) ) {
+    if( !( strURL && typeof strURL === "string" && strURL.length > 0 ) ) {
         throw new Error( "rpcCallCreate() was invoked with " +
             `bad parameters: ${JSON.stringify( arguments )}` );
     }

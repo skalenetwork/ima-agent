@@ -45,9 +45,9 @@ export const gMapLocalServers: any = { }; // used both for local and in-worker s
 
 export const socketSentDataMarshall = function( data?: any ): any {
     const s = data
-        ? ( ( typeof data == "string" )
+        ? ( ( typeof data === "string" )
             ? data
-            : ( ( typeof data == "object" ) ? JSON.stringify( data ) : data.toString() )
+            : ( ( typeof data === "object" ) ? JSON.stringify( data ) : data.toString() )
         )
         : "";
     return s;
@@ -55,9 +55,9 @@ export const socketSentDataMarshall = function( data?: any ): any {
 export const socketReceivedDataReverseMarshall = function( data?: any ): object {
     try {
         const jo: any = data
-            ? ( ( typeof data == "object" )
+            ? ( ( typeof data === "object" )
                 ? data
-                : ( ( typeof data == "string" ) ? JSON.parse( data ) : data )
+                : ( ( typeof data === "string" ) ? JSON.parse( data ) : data )
             )
             : { };
         return jo;
@@ -74,7 +74,7 @@ export const updateSocketDataStatsForMessage = function( joMessage: any, joStats
     let strMethod = "_N/A_";
     if( "method" in joMessage &&
         joMessage.method &&
-        typeof joMessage.method == "string"
+        typeof joMessage.method === "string"
     )
         strMethod = "" + joMessage.method;
     if( strMethod in joStats )
@@ -86,7 +86,7 @@ export const generateSocketDataStatsJSON = function( jo: any ) {
     const joStats: any = {};
     if( "arrPackedMessages" in jo &&
         jo.arrPackedMessages &&
-        typeof jo.arrPackedMessages == "object"
+        typeof jo.arrPackedMessages === "object"
     ) {
         for( const joMessage of jo.arrPackedMessages )
             updateSocketDataStatsForMessage( joMessage, joStats );
@@ -228,7 +228,7 @@ export class BasicSocketPipe extends EventDispatcher {
         for( const [ /* keyWalk */, entryWalk ] of Object.entries( this.mapImpersonatedEntries ) ) {
             const entry: any = entryWalk;
             try {
-                if( entry && "dispose" in entry && typeof entry.dispose == "function" )
+                if( entry && "dispose" in entry && typeof entry.dispose === "function" )
                     entry.dispose();
             } catch ( err ) {
             }
@@ -315,7 +315,7 @@ export class BasicSocketPipe extends EventDispatcher {
         const jo: any = socketReceivedDataReverseMarshall( data );
         if( "arrPackedMessages" in jo &&
             jo.arrPackedMessages &&
-            typeof jo.arrPackedMessages == "object"
+            typeof jo.arrPackedMessages === "object"
         ) {
             const cnt = jo.arrPackedMessages.length;
             if( settings.logging.net.socket.receiveCount )
@@ -393,14 +393,14 @@ export const outOfWorkerAPIs: any = {
     onMessage: function( worker: any, data: any ) {
         const jo: any = socketReceivedDataReverseMarshall( data );
         if( !( "workerMessageType" in jo ) ||
-            typeof jo.workerMessageType != "string" ||
+            typeof jo.workerMessageType !== "string" ||
             jo.workerMessageType.length == 0 )
             return false; // not a socket message
         if( !( "workerEndPoint" in jo ) ||
-        typeof jo.workerEndPoint != "string" ||
+        typeof jo.workerEndPoint !== "string" ||
         jo.workerEndPoint.length == 0 )
             return false; // TO-DO: send error answer and return true
-        if( !( "workerUUID" in jo ) || typeof jo.workerUUID != "string" ||
+        if( !( "workerUUID" in jo ) || typeof jo.workerUUID !== "string" ||
             jo.workerUUID.length == 0 )
             return false; // TO-DO: send error answer and return true
         switch ( jo.workerMessageType ) {
@@ -430,7 +430,7 @@ export const outOfWorkerAPIs: any = {
         const jo: any = socketReceivedDataReverseMarshall( data );
         const joSend: any = {
             workerMessageType:
-                ( type && typeof type == "string" && type.length > 0 )
+                ( type && typeof type === "string" && type.length > 0 )
                     ? type : "inWorkerMessage",
             workerEndPoint: endpoint,
             workerUUID,
@@ -444,15 +444,15 @@ export const inWorkerAPIs: any = {
     onMessage: function( data: any ) {
         const jo: any = socketReceivedDataReverseMarshall( data );
         if( !( "workerMessageType" in jo ) ||
-            typeof jo.workerMessageType != "string" ||
+            typeof jo.workerMessageType !== "string" ||
             jo.workerMessageType.length == 0 )
             return false; // not a socket message
         if( !( "workerEndPoint" in jo ) ||
-            typeof jo.workerEndPoint != "string" ||
+            typeof jo.workerEndPoint !== "string" ||
             jo.workerEndPoint.length == 0 )
             return false; // TO-DO: send error answer and return true
         if( !( "workerUUID" in jo ) ||
-            typeof jo.workerUUID != "string" ||
+            typeof jo.workerUUID !== "string" ||
             jo.workerUUID.length == 0 )
             return false; // TO-DO: send error answer and return true
         if( !( jo.workerEndPoint in gMapLocalServers ) )
@@ -473,7 +473,7 @@ export const inWorkerAPIs: any = {
         const jo: any = socketReceivedDataReverseMarshall( data );
         const joSend: any = {
             workerMessageType:
-                ( type && typeof type == "string" && type.length > 0 )
+                ( type && typeof type === "string" && type.length > 0 )
                     ? type : "inWorkerMessage",
             workerEndPoint: endpoint,
             workerUUID,
@@ -532,7 +532,7 @@ export class InWorkerServerPipe extends BasicSocketPipe {
         this.url = "";
     }
     implSend( data: any ) {
-        if( ( !this.isConnected ) || ( !this.fnSend ) || typeof this.fnSend != "function" ) {
+        if( ( !this.isConnected ) || ( !this.fnSend ) || typeof this.fnSend !== "function" ) {
             const s = "Cannot send messages to disconnected in-worker server pipe";
             this.dispatchEvent(
                 new UniversalDispatcherEvent( "error", { socket: this, message: "" + s } ) );
@@ -553,7 +553,7 @@ export class InWorkerSocketServerAcceptor extends BasicServerAcceptor {
         super();
         this.socketType = "InWorker";
         this.strEndPoint =
-            ( strEndPoint && typeof strEndPoint == "string" && strEndPoint.length > 0 )
+            ( strEndPoint && typeof strEndPoint === "string" && strEndPoint.length > 0 )
                 ? strEndPoint : "default_local_endpoint";
         if( this.strEndPoint in gMapLocalServers ) {
             const s =
@@ -578,7 +578,7 @@ export class InWorkerSocketServerAcceptor extends BasicServerAcceptor {
         this.isDisposing = true;
         this.disposeNotifyClients();
         if( this.strEndPoint &&
-            typeof this.strEndPoint == "string" &&
+            typeof this.strEndPoint === "string" &&
             this.strEndPoint.length > 0
         ) {
             if( this.strEndPoint in gMapLocalServers )
@@ -623,7 +623,7 @@ export class OutOfWorkerSocketClientPipe extends BasicSocketPipe {
         this.clientPort = utils.UUIDv4();
         this.strEndPoint =
             ( strEndPoint &&
-            typeof strEndPoint == "string" &&
+            typeof strEndPoint === "string" &&
             strEndPoint.length > 0
             )
                 ? strEndPoint
@@ -664,7 +664,7 @@ export class OutOfWorkerSocketClientPipe extends BasicSocketPipe {
         if( ( !this.isConnected ) ||
             ( !this.worker ) ||
             ( !this.fnSend ) ||
-            typeof this.fnSend != "function"
+            typeof this.fnSend !== "function"
         ) {
             const s = "Cannot send messages to disconnected in-worker client pipe";
             this.dispatchEvent(
@@ -697,7 +697,7 @@ export class OutOfWorkerRelay extends EventDispatcher {
         super();
         const self = this;
         self.strRelayName = ( strRelayName != null && strRelayName != undefined &&
-            typeof strRelayName == "string" && strRelayName.length > 0 )
+            typeof strRelayName === "string" && strRelayName.length > 0 )
             ? ( "" + strRelayName ) : "unnamed";
         self.isAutoFlushIncoming =
             ( isAutoFlushIncoming == null || isAutoFlushIncoming == undefined )
@@ -709,7 +709,7 @@ export class OutOfWorkerRelay extends EventDispatcher {
             throw new Error( `OutOfWorkerRelay ${self.strRelayName} needs acceptor ` +
                 "for normal functionality" );
         }
-        if( typeof fnCreateClient != "function" ) {
+        if( typeof fnCreateClient !== "function" ) {
             throw new Error( `OutOfWorkerRelay ${self.strRelayName} needs callback ` +
                 "to create connections to target server" );
         }
@@ -937,7 +937,7 @@ export class OneToOneRelay extends EventDispatcher {
         const self = this;
         self.strRelayName =
             ( strRelayName != null && strRelayName != undefined &&
-            typeof strRelayName == "string" && strRelayName.length > 0 )
+            typeof strRelayName === "string" && strRelayName.length > 0 )
                 ? ( "" + strRelayName ) : "unnamed";
         self.isAutoFlushIncoming =
             ( isAutoFlushIncoming == null || isAutoFlushIncoming == undefined )
@@ -1277,7 +1277,7 @@ export class LocalSocketServerAcceptor extends BasicServerAcceptor {
         this.socketType = "Local";
         this.nextClientPort = 1;
         this.strEndPoint =
-            ( strEndPoint && typeof strEndPoint == "string" && strEndPoint.length > 0 )
+            ( strEndPoint && typeof strEndPoint === "string" && strEndPoint.length > 0 )
                 ? strEndPoint : "default_local_endpoint";
         if( this.strEndPoint in gMapLocalServers ) {
             const s =
@@ -1302,7 +1302,7 @@ export class LocalSocketServerAcceptor extends BasicServerAcceptor {
         this.isDisposing = true;
         this.disposeNotifyClients();
         if( this.strEndPoint &&
-            typeof this.strEndPoint == "string" &&
+            typeof this.strEndPoint === "string" &&
             this.strEndPoint.length > 0
         ) {
             if( this.strEndPoint in gMapLocalServers )
@@ -1322,7 +1322,7 @@ export class LocalSocketClientPipe extends DirectPipe {
         this.acceptor = null;
         this.counterPipe = null;
         this.strEndPoint =
-            ( strEndPoint && typeof strEndPoint == "string" && strEndPoint.length > 0 )
+            ( strEndPoint && typeof strEndPoint === "string" && strEndPoint.length > 0 )
                 ? strEndPoint : "default_local_endpoint";
         if( !( this.strEndPoint in gMapLocalServers ) ) {
             const s =
@@ -1486,8 +1486,8 @@ export class WebSocketServerAcceptor extends BasicServerAcceptor {
         super();
         this.socketType = "WS";
         this.wsServer = null;
-        if( key != null && key != undefined && typeof key == "string" && key.length > 0 &&
-            cert != null && cert != undefined && typeof cert == "string" && cert.length > 0
+        if( key != null && key != undefined && typeof key === "string" && key.length > 0 &&
+            cert != null && cert != undefined && typeof cert === "string" && cert.length > 0
         ) {
             const server = httpsModule.createServer( {
                 key: "" + key,
@@ -1539,7 +1539,7 @@ export class WebSocketClientPipe extends BasicSocketPipe {
         this._onWsError = null;
         this._onWsMessage = null;
         this.urlWS =
-            "" + ( ( url != null && url != undefined && typeof url == "string" ) ? url : "" );
+            "" + ( ( url != null && url != undefined && typeof url === "string" ) ? url : "" );
         this.url = "ws_client_pipe-" + this.urlWS;
         this.reconnect();
     }
@@ -1706,7 +1706,7 @@ export class RTCConnection extends EventDispatcher {
         this.strSignalingServerURL = utils.makeValidSignalingServerURL( strSignalingServerURL );
         this.idRtcParticipant = "" +
             ( ( idRtcParticipant != null && idRtcParticipant != undefined &&
-                typeof idRtcParticipant == "string" && idRtcParticipant.length > 0 )
+                typeof idRtcParticipant === "string" && idRtcParticipant.length > 0 )
                 ? idRtcParticipant : utils.UUIDv4() );
         this.wasIdentified = false;
         this.iceComplete = false;
@@ -1728,10 +1728,10 @@ export class RTCConnection extends EventDispatcher {
     describe( strInstanceType?: string, arrAdditionalProps?: any[] ) {
         let strInstanceDescription =
             ( strInstanceType == null || strInstanceType == undefined ||
-                ( typeof strInstanceType != "string" ) || strInstanceType.length == 0 )
+                ( typeof strInstanceType !== "string" ) || strInstanceType.length == 0 )
                 ? "participant"
                 : ( "" + strInstanceType );
-        if( typeof this.idRtcParticipant == "string" && this.idRtcParticipant.length > 0 )
+        if( typeof this.idRtcParticipant === "string" && this.idRtcParticipant.length > 0 )
             strInstanceDescription += " " + this.idRtcParticipant;
         const arrProps: any[] = [];
         if( this.isDisposed )
@@ -2003,12 +2003,12 @@ export class RTCActor extends RTCConnection {
         };
         if( signalingOptions ) {
             if( "idCategory" in signalingOptions &&
-            typeof signalingOptions.idCategory == "string" &&
+            typeof signalingOptions.idCategory === "string" &&
             signalingOptions.idCategory.length > 0
             )
                 this.signalingOptions.idCategory = "" + signalingOptions.idCategory;
             if( "idSpace" in signalingOptions &&
-                typeof signalingOptions.idSpace == "string" &&
+                typeof signalingOptions.idSpace === "string" &&
                 signalingOptions.idSpace.length > 0
             )
                 this.signalingOptions.idSpace = "" + signalingOptions.idSpace;
@@ -2028,7 +2028,7 @@ export class RTCActor extends RTCConnection {
         strInstanceType =
             ( strInstanceType == null ||
                 strInstanceType == undefined ||
-                ( typeof strInstanceType != "string" ) ||
+                ( typeof strInstanceType !== "string" ) ||
                 strInstanceType.length == 0 )
                 ? ( this.isCreator ? "creator" : ( this.isJoiner ? "joiner" : "actor" ) )
                 : strInstanceType;
@@ -2247,14 +2247,14 @@ export class RTCServerPeer extends RTCConnection {
             ? timeToSignalingNegotiationMilliseconds
             : settings.net.rtc.timeToSignalingNegotiationMilliseconds;
         this.peerConfiguration =
-            ( peerConfiguration && typeof peerConfiguration == "object" )
+            ( peerConfiguration && typeof peerConfiguration === "object" )
                 ? peerConfiguration : settings.net.rtc.peerConfiguration;
         this.peerAdditionalOptions =
-            ( peerAdditionalOptions && typeof peerAdditionalOptions == "object" )
+            ( peerAdditionalOptions && typeof peerAdditionalOptions === "object" )
                 ? peerAdditionalOptions : settings.net.rtc.peerAdditionalOptions;
         this.localMediaStream =
             ( localMediaStream != null && localMediaStream != undefined &&
-                typeof localMediaStream == "object" )
+                typeof localMediaStream === "object" )
                 ? localMediaStream : null;
         this.isOfferPublishedOnSignalingServer = false;
         this.initPeer();
@@ -2288,7 +2288,7 @@ export class RTCServerPeer extends RTCConnection {
     describe( strInstanceType?: string, arrAdditionalProps?: any[] ) {
         strInstanceType =
             ( strInstanceType == null || strInstanceType == undefined ||
-                ( typeof strInstanceType != "string" ) || strInstanceType.length == 0 )
+                ( typeof strInstanceType !== "string" ) || strInstanceType.length == 0 )
                 ? "server-peer"
                 : strInstanceType;
         return super.describe( strInstanceType, arrAdditionalProps );
@@ -2590,7 +2590,7 @@ export class RTCCreator extends RTCActor {
     describe( strInstanceType?: string, arrAdditionalProps?: any[] ) {
         strInstanceType =
             ( strInstanceType == null || strInstanceType == undefined ||
-                ( typeof strInstanceType != "string" ) || strInstanceType.length == 0 )
+                ( typeof strInstanceType !== "string" ) || strInstanceType.length == 0 )
                 ? "rtc-creator"
                 : strInstanceType;
         return super.describe( strInstanceType, arrAdditionalProps );
@@ -2802,10 +2802,10 @@ export class RTCJoiner extends RTCActor {
         this.isAnswerPublishedOnSignalingServer = false;
         this.signalingPipeOpen();
         this.peerConfiguration =
-            ( peerConfiguration && typeof peerConfiguration == "object" )
+            ( peerConfiguration && typeof peerConfiguration === "object" )
                 ? peerConfiguration : settings.net.rtc.peerConfiguration;
         this.peerAdditionalOptions =
-            ( peerAdditionalOptions && typeof peerAdditionalOptions == "object" )
+            ( peerAdditionalOptions && typeof peerAdditionalOptions === "object" )
                 ? peerAdditionalOptions : settings.net.rtc.peerAdditionalOptions;
     }
     dispose() {
@@ -2822,7 +2822,7 @@ export class RTCJoiner extends RTCActor {
         strInstanceType =
             ( strInstanceType == null ||
                 strInstanceType == undefined ||
-                ( typeof strInstanceType != "string" ) ||
+                ( typeof strInstanceType !== "string" ) ||
                 strInstanceType.length == 0 )
                 ? "rtc-joiner"
                 : strInstanceType;
@@ -3220,15 +3220,15 @@ export class WebRTCServerAcceptor extends BasicServerAcceptor {
         this.strSignalingServerURL = utils.makeValidSignalingServerURL( strSignalingServerURL );
         this.idRtcParticipant = "" +
             ( ( idRtcParticipant != null && idRtcParticipant != undefined &&
-                typeof idRtcParticipant == "string" && idRtcParticipant.length > 0 )
+                typeof idRtcParticipant === "string" && idRtcParticipant.length > 0 )
                 ? idRtcParticipant : utils.UUIDv4() );
         this.offerOptions = offerOptions ? offerOptions : null;
         this.signalingOptions = signalingOptions ? signalingOptions : null;
         this.peerConfiguration =
-            ( peerConfiguration && typeof peerConfiguration == "object" )
+            ( peerConfiguration && typeof peerConfiguration === "object" )
                 ? peerConfiguration : settings.net.rtc.peerConfiguration;
         this.peerAdditionalOptions =
-            ( peerAdditionalOptions && typeof peerAdditionalOptions == "object" )
+            ( peerAdditionalOptions && typeof peerAdditionalOptions === "object" )
                 ? peerAdditionalOptions : settings.net.rtc.peerAdditionalOptions;
         this.socketType = "WebRTC";
         this.maxActiveOfferCount =
@@ -3413,15 +3413,15 @@ export class WebRTCClientPipe extends BasicSocketPipe {
         this.strSignalingServerURL = utils.makeValidSignalingServerURL( strSignalingServerURL );
         this.idRtcParticipant = "" +
             ( ( idRtcParticipant != null && idRtcParticipant != undefined &&
-                typeof idRtcParticipant == "string" && idRtcParticipant.length > 0 )
+                typeof idRtcParticipant === "string" && idRtcParticipant.length > 0 )
                 ? idRtcParticipant : utils.UUIDv4() );
         this.offerOptions = offerOptions ? offerOptions : null;
         this.signalingOptions = signalingOptions ? signalingOptions : null;
         this.peerConfiguration =
-            ( peerConfiguration && typeof peerConfiguration == "object" )
+            ( peerConfiguration && typeof peerConfiguration === "object" )
                 ? peerConfiguration : settings.net.rtc.peerConfiguration;
         this.peerAdditionalOptions =
-            ( peerAdditionalOptions && typeof peerAdditionalOptions == "object" )
+            ( peerAdditionalOptions && typeof peerAdditionalOptions === "object" )
                 ? peerAdditionalOptions : settings.net.rtc.peerAdditionalOptions;
         this.socketType = "WebRTC";
         this.socketSubtype = "client";

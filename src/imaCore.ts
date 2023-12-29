@@ -629,7 +629,7 @@ async function callbackAllMessagesSign(
         optsTransfer.joAccountDst, optsTransfer.strActionName,
         gasPrice, estimatedGasPostIncomingMessages,
         weiHowMuchPostIncomingMessages, opts );
-    if( joReceipt && typeof joReceipt == "object" ) {
+    if( joReceipt && typeof joReceipt === "object" ) {
         optsTransfer.jarrReceipts.push( {
             description: "doTransfer/postIncomingMessages()",
             "optsTransfer.detailsString":

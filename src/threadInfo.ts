@@ -45,7 +45,7 @@ export function isMainThread(): boolean {
 }
 
 export function threadDescription( isColorized?: boolean ): string {
-    if( typeof isColorized == "undefined" )
+    if( typeof isColorized === "undefined" )
         isColorized = true;
     const tid: number = getCurrentThreadID();
     const st: string = isMainThread() ? "main" : "worker";

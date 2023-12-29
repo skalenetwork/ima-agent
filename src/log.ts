@@ -121,7 +121,7 @@ export function n2s( n: any, sz: number ): string {
 
 export function generateTimestampString( ts?: any, isColorized?: boolean ): string {
     isColorized =
-        ( typeof isColorized == "undefined" )
+        ( typeof isColorized === "undefined" )
             ? true : ( !!isColorized );
     ts = ( ts instanceof Date ) ? ts : new Date();
     const ccDate = function( x?: any ): string { return isColorized ? cc.date( x ) : x; };
@@ -675,16 +675,16 @@ export function extractErrorMessage( jo?: any, strDefaultErrorText?: string ): s
         if( !isError( jo ) ) {
             if( "error" in jo ) {
                 jo = jo.error;
-                if( typeof jo == "string" )
+                if( typeof jo === "string" )
                     return jo;
-                if( typeof jo != "object" )
+                if( typeof jo !== "object" )
                     return strDefaultErrorText + "(" + jo.toString() + ")";
             }
-            if( typeof jo == "string" && jo )
+            if( typeof jo === "string" && jo )
                 return strDefaultErrorText + "(" + jo.toString() + ")";
             return strDefaultErrorText;
         }
-        if( typeof jo.message == "string" && jo.message.length > 0 )
+        if( typeof jo.message === "string" && jo.message.length > 0 )
             return jo.message;
         strDefaultErrorText += "(" + jo.toString() + ")";
     } catch ( err ) {
@@ -693,7 +693,7 @@ export function extractErrorMessage( jo?: any, strDefaultErrorText?: string ): s
 }
 
 function tryToSplitFormatString( strFormat?: string, cntArgsMax?: number ): any[] | null {
-    if( !( strFormat && typeof strFormat == "string" ) )
+    if( !( strFormat && typeof strFormat === "string" ) )
         return null;
     if( !cntArgsMax )
         cntArgsMax = 0;
@@ -752,7 +752,7 @@ export function fmtArgumentsArray( arrArgs: any[], fnFormatter?: any ): string {
             return arg;
         if( !isValueMode )
             return fnDefaultOneArgumentFormatter( arg, null );
-        if( fmt && typeof "fmt" == "string" ) {
+        if( fmt && typeof "fmt" === "string" ) {
             if( fmt == "raw" )
                 return arg;
             if( fmt == "p" )
@@ -816,7 +816,7 @@ export function outputStringToAllStreams( s: string ): void {
         for( let i = 0; i < gArrStreams.length; ++i ) {
             try {
                 const objEntry = gArrStreams[i];
-                if( objEntry && "write" in objEntry && typeof objEntry.write == "function" )
+                if( objEntry && "write" in objEntry && typeof objEntry.write === "function" )
                     objEntry.write( s );
             } catch ( err ) {
             }
@@ -1042,7 +1042,7 @@ export function verboseReversed(): Map < string, number > {
     return gMapReversedVerbose;
 }
 export function verboseLevelAsTextForLog( vl: any ): string {
-    if( typeof vl == "undefined" )
+    if( typeof vl === "undefined" )
         vl = verboseGet();
     if( vl in gMapVerbose ) {
         const tl = gMapVerbose.get( vl ) || 0;
@@ -1053,7 +1053,7 @@ export function verboseLevelAsTextForLog( vl: any ): string {
 export function verboseName2Number( s: string ): number {
     const mapReversedVerbose: Map < string, number > = verboseReversed();
     const n = mapReversedVerbose.get( s )
-    if( typeof n == "undefined" )
+    if( typeof n === "undefined" )
         return 9;
     return n;
 }

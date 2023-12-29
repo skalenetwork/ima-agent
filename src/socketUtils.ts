@@ -90,7 +90,7 @@ export const replaceAll = function( str: string, find: string, replace: string )
 };
 
 export const simpleEscapeString = function( s?: any ): string {
-    if( s == null || s == undefined || typeof s != "string" )
+    if( s == null || s == undefined || typeof s !== "string" )
         return s;
     s = replaceAll( s, "&", "&amp;" );
     s = replaceAll( s, "<", "&lt;" );
@@ -128,12 +128,12 @@ export const prepareAnswerJSON = function( joMessage: any ): any {
         id: "" +
             ( ( joMessage != null &&
                 joMessage != undefined &&
-                typeof joMessage.id == "string" )
+                typeof joMessage.id === "string" )
                 ? joMessage.id : randomCallID() ),
         method: "" +
             ( ( joMessage != null &&
                 joMessage != undefined &&
-                typeof joMessage.method == "string" )
+                typeof joMessage.method === "string" )
                 ? joMessage.method : "" ),
         error: null
     };
@@ -145,7 +145,7 @@ export const makeValidSignalingServerURL = function( strSignalingServerURL?: str
     return "" +
         ( ( strSignalingServerURL != null &&
             strSignalingServerURL != undefined &&
-            typeof strSignalingServerURL == "string" &&
+            typeof strSignalingServerURL === "string" &&
             strSignalingServerURL.length > 0 )
             ? "" + strSignalingServerURL
             : "" + proto + "://" + settings.net.hostname + ":" + settings.net.ports.signaling
@@ -172,7 +172,7 @@ export const zeroPaddingRight = function( val: any, cntCharsNeeded: number ): st
 export const parseDateTime = function( ts?: any ): Date | null {
     if( ts === null || ts === undefined )
         return ts;
-    if( typeof ts != "string" )
+    if( typeof ts !== "string" )
         return null;
     // example:
     //  0----|----1----|----2----|----
@@ -214,7 +214,7 @@ export const formatDateTime = function(
         return "";
     let s = "";
     if( isDate ) {
-        sepDate = ( sepDate == null || sepDate == undefined || ( typeof sepDate != "string" ) )
+        sepDate = ( sepDate == null || sepDate == undefined || ( typeof sepDate !== "string" ) )
             ? "/" : sepDate;
         const strDate = "" +
             zeroPaddingLeft( dt.getFullYear(), 4 ) +
@@ -225,13 +225,13 @@ export const formatDateTime = function(
         s += strDate;
     }
     if( isTime ) {
-        sepTime = ( sepTime == null || sepTime == undefined || ( typeof sepTime != "string" ) )
+        sepTime = ( sepTime == null || sepTime == undefined || ( typeof sepTime !== "string" ) )
             ? ":" : sepTime;
         if( isDate ) {
             sepBetween =
                 ( sepBetween == null ||
                     sepBetween == undefined ||
-                    ( typeof sepBetween != "string" ) )
+                    ( typeof sepBetween !== "string" ) )
                     ? "-" : sepBetween;
             s += sepBetween;
         }
@@ -247,7 +247,7 @@ export const formatDateTime = function(
             sepMilliseconds =
                 ( sepMilliseconds == null ||
                     sepMilliseconds == undefined ||
-                    ( typeof sepMilliseconds != "string" ) )
+                    ( typeof sepMilliseconds !== "string" ) )
                     ? "." : sepMilliseconds;
             strTime += sepMilliseconds + zeroPaddingRight( dt.getMilliseconds(), 3 );
         }

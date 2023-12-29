@@ -86,7 +86,7 @@ async function handleOracleCheckResultResult(
 ) {
     if( isVerboseTraceDetails )
         details.debug( "RPC call(oracle_checkResult) result is: {}", joOut );
-    if( !( "result" in joOut && typeof joOut.result == "string" &&
+    if( !( "result" in joOut && typeof joOut.result === "string" &&
         joOut.result.length > 0 ) ) {
         if( isVerboseTraceDetails )
             details.error( "Bad unexpected result in oracle_checkResult" );
@@ -118,7 +118,7 @@ async function handleOracleSubmitRequestResult(
         cntAttempts = 1;
     if( isVerboseTraceDetails )
         details.debug( "RPC call(oracle_submitRequest) result is: {}", joOut );
-    if( !( "result" in joOut && typeof joOut.result == "string" &&
+    if( !( "result" in joOut && typeof joOut.result === "string" &&
         joOut.result.length > 0 ) ) {
         await joCall.disconnect();
         details.error( "Bad unexpected result(oracle_submitRequest), malformed " +

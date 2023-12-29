@@ -196,8 +196,8 @@ async function payedCallTM( optsPayedCall: TRunTimePayedCallOptions ) {
     const arrNamesConvertToHex = [ "gas", "gasLimit", "optsPayedCall.gasPrice", "value" ];
     for( let idxName = 0; idxName < arrNamesConvertToHex.length; ++idxName ) {
         const strName = arrNamesConvertToHex[idxName];
-        if( strName in txAdjusted && typeof txAdjusted[strName] == "object" &&
-            typeof txAdjusted[strName].toHexString == "function" )
+        if( strName in txAdjusted && typeof txAdjusted[strName] === "object" &&
+            typeof txAdjusted[strName].toHexString === "function" )
             txAdjusted[strName] = owaspUtils.toHexStringSafe( txAdjusted[strName] );
     }
     if( "gasLimit" in txAdjusted )
@@ -233,7 +233,7 @@ async function payedCallTM( optsPayedCall: TRunTimePayedCallOptions ) {
 async function payedCallSGX( optsPayedCall: TRunTimePayedCallOptions ) {
     const tx = optsPayedCall.unsignedTx;
     let { chainId } = await optsPayedCall.ethersProvider.getNetwork();
-    if( typeof chainId == "string" && chainId )
+    if( typeof chainId === "string" && chainId )
         chainId = owaspUtils.parseIntOrHex( chainId );
     optsPayedCall.details.trace( "{p}Chain ID is: {}",
         optsPayedCall.strLogPrefix, chainId );
@@ -275,7 +275,7 @@ function postConvertBN( jo: any, name: any ) {
         return;
     if( !( name in jo ) )
         return;
-    if( typeof jo[name] == "object" )
+    if( typeof jo[name] === "object" )
         return;
     jo[name] = owaspUtils.toBN( jo[name] );
 }
@@ -285,7 +285,7 @@ async function payedCallDirect( optsPayedCall: TRunTimePayedCallOptions ) {
         owaspUtils.ensureStartsWith0x( optsPayedCall.joAccount.privateKey ),
         optsPayedCall.ethersProvider );
     let { chainId } = await optsPayedCall.ethersProvider.getNetwork();
-    if( typeof chainId == "string" && chainId )
+    if( typeof chainId === "string" && chainId )
         chainId = owaspUtils.parseIntOrHex( chainId );
     optsPayedCall.details.trace( "{p}Chain ID is: {}", optsPayedCall.strLogPrefix, chainId );
     if( ( !( chainId in optsPayedCall.unsignedTx ) ) ||
@@ -487,23 +487,23 @@ export function getAccountConnectivityInfo( joAccount: state.TAccount ) {
         isAutoSend: false
     };
     if( "strTransactionManagerURL" in joAccount &&
-        typeof joAccount.strTransactionManagerURL == "string" &&
+        typeof joAccount.strTransactionManagerURL === "string" &&
         joAccount.strTransactionManagerURL.length > 0
     ) {
         joACI.isBad = false;
         joACI.strType = "tm";
         joACI.isAutoSend = true;
     } else if( "strSgxURL" in joAccount &&
-        typeof joAccount.strSgxURL == "string" &&
+        typeof joAccount.strSgxURL === "string" &&
         joAccount.strSgxURL.length > 0 &&
         "strSgxKeyName" in joAccount &&
-        typeof joAccount.strSgxKeyName == "string" &&
+        typeof joAccount.strSgxKeyName === "string" &&
         joAccount.strSgxKeyName.length > 0
     ) {
         joACI.isBad = false;
         joACI.strType = "sgx";
     } else if( "privateKey" in joAccount &&
-        typeof joAccount.privateKey == "string" &&
+        typeof joAccount.privateKey === "string" &&
         joAccount.privateKey.length > 0
     ) {
         joACI.isBad = false;

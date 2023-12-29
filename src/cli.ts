@@ -113,7 +113,7 @@ export function ensureHaveCredentials(
     isExitIfEmpty: boolean, isPrintValue: boolean
 ) {
     strFriendlyChainName = strFriendlyChainName || "<UNKNOWN>";
-    if( !( typeof joAccount == "object" ) ) {
+    if( !( typeof joAccount === "object" ) ) {
         log.error( "ARGUMENTS VALIDATION WARNING: bad account specified for {} chain",
             strFriendlyChainName );
         if( isExitIfEmpty )
@@ -121,7 +121,7 @@ export function ensureHaveCredentials(
     }
     let cntAccountVariantsSpecified = 0;
     if( "strTransactionManagerURL" in joAccount &&
-        typeof joAccount.strTransactionManagerURL == "string" &&
+        typeof joAccount.strTransactionManagerURL === "string" &&
         joAccount.strTransactionManagerURL.length > 0
     ) {
         ++cntAccountVariantsSpecified;
@@ -131,7 +131,7 @@ export function ensureHaveCredentials(
         );
     }
     if( "strSgxURL" in joAccount &&
-        typeof joAccount.strSgxURL == "string" &&
+        typeof joAccount.strSgxURL === "string" &&
         joAccount.strSgxURL.length > 0
     ) {
         ++cntAccountVariantsSpecified;
@@ -140,7 +140,7 @@ export function ensureHaveCredentials(
             joAccount.strSgxURL, isExitIfEmpty, isPrintValue
         );
         if( "strPathSslKey" in joAccount &&
-            typeof joAccount.strPathSslKey == "string" &&
+            typeof joAccount.strPathSslKey === "string" &&
             joAccount.strPathSslKey.length > 0
         ) {
             ensureHaveValue(
@@ -149,7 +149,7 @@ export function ensureHaveCredentials(
             );
         }
         if( "strPathSslCert" in joAccount &&
-            typeof joAccount.strPathSslCert == "string" &&
+            typeof joAccount.strPathSslCert === "string" &&
             joAccount.strPathSslCert.length > 0
         ) {
             ensureHaveValue(
@@ -159,7 +159,7 @@ export function ensureHaveCredentials(
         }
     }
     if( "strSgxKeyName" in joAccount &&
-        typeof joAccount.strSgxKeyName == "string" &&
+        typeof joAccount.strSgxKeyName === "string" &&
         joAccount.strSgxKeyName.length > 0
     ) {
         ++cntAccountVariantsSpecified;
@@ -169,7 +169,7 @@ export function ensureHaveCredentials(
         );
     }
     if( "privateKey" in joAccount &&
-        typeof joAccount.privateKey == "string" &&
+        typeof joAccount.privateKey === "string" &&
         joAccount.privateKey.length > 0
     ) {
         ++cntAccountVariantsSpecified;
@@ -179,7 +179,7 @@ export function ensureHaveCredentials(
         );
     }
     if( "address_" in joAccount &&
-        typeof joAccount.address_ == "string" &&
+        typeof joAccount.address_ === "string" &&
         joAccount.address_.length > 0
     ) {
         ++cntAccountVariantsSpecified;
@@ -1363,7 +1363,7 @@ function commonInitPrintSysInfo() {
 function commonInitCheckAbiPaths() {
     const imaState: state.TIMAState = state.get();
     if( imaState.strPathAbiJsonSkaleManager &&
-        ( typeof imaState.strPathAbiJsonSkaleManager == "string" ) &&
+        ( typeof imaState.strPathAbiJsonSkaleManager === "string" ) &&
         imaState.strPathAbiJsonSkaleManager.length > 0
     ) {
         imaState.joAbiSkaleManager =
@@ -1376,7 +1376,7 @@ function commonInitCheckAbiPaths() {
     }
 
     if( imaState.chainProperties.mn.strPathAbiJson &&
-        typeof imaState.chainProperties.mn.strPathAbiJson == "string" &&
+        typeof imaState.chainProperties.mn.strPathAbiJson === "string" &&
         imaState.chainProperties.mn.strPathAbiJson.length > 0 ) {
         imaState.chainProperties.mn.joAbiIMA =
             imaUtils.jsonFileLoad( imaState.chainProperties.mn.strPathAbiJson, null );
@@ -1388,7 +1388,7 @@ function commonInitCheckAbiPaths() {
     }
 
     if( imaState.chainProperties.sc.strPathAbiJson &&
-        typeof imaState.chainProperties.sc.strPathAbiJson == "string" &&
+        typeof imaState.chainProperties.sc.strPathAbiJson === "string" &&
         imaState.chainProperties.sc.strPathAbiJson.length > 0
     ) {
         imaState.chainProperties.sc.joAbiIMA =
@@ -1401,7 +1401,7 @@ function commonInitCheckAbiPaths() {
     }
 
     if( imaState.chainProperties.tc.strPathAbiJson &&
-        typeof imaState.chainProperties.tc.strPathAbiJson == "string" &&
+        typeof imaState.chainProperties.tc.strPathAbiJson === "string" &&
         imaState.chainProperties.tc.strPathAbiJson.length > 0
     ) {
         imaState.chainProperties.tc.joAbiIMA =
@@ -2654,7 +2654,7 @@ export function commonInit() {
 export function imaInitEthersProviders() {
     const imaState: state.TIMAState = state.get();
     if( imaState.chainProperties.mn.strURL &&
-        typeof imaState.chainProperties.mn.strURL == "string" &&
+        typeof imaState.chainProperties.mn.strURL === "string" &&
         imaState.chainProperties.mn.strURL.length > 0
     ) {
         const u = imaState.chainProperties.mn.strURL;
@@ -2666,7 +2666,7 @@ export function imaInitEthersProviders() {
     }
 
     if( imaState.chainProperties.sc.strURL &&
-        typeof imaState.chainProperties.sc.strURL == "string" &&
+        typeof imaState.chainProperties.sc.strURL === "string" &&
         imaState.chainProperties.sc.strURL.length > 0
     ) {
         const u = imaState.chainProperties.sc.strURL;
@@ -2678,7 +2678,7 @@ export function imaInitEthersProviders() {
     }
 
     if( imaState.chainProperties.tc.strURL &&
-        typeof imaState.chainProperties.tc.strURL == "string" &&
+        typeof imaState.chainProperties.tc.strURL === "string" &&
         imaState.chainProperties.tc.strURL.length > 0
     ) {
         const u = imaState.chainProperties.tc.strURL;

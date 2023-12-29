@@ -194,7 +194,7 @@ export async function reimbursementWalletRecharge(
             details, ethersProviderMainNet,
             "CommunityPool", joCommunityPool, "rechargeUserWallet", arrArguments,
             joAccountMN, strActionName, gasPrice, estimatedGas, nReimbursementRecharge, null );
-        if( joReceipt && typeof joReceipt == "object" ) {
+        if( joReceipt && typeof joReceipt === "object" ) {
             jarrReceipts.push( {
                 description: "reimbursementWalletRecharge",
                 receipt: joReceipt
@@ -261,7 +261,7 @@ export async function reimbursementWalletWithdraw(
             "CommunityPool", joCommunityPool, "withdrawFunds", arrArguments,
             joAccountMN, strActionName,
             gasPrice, estimatedGas, weiHowMuch );
-        if( joReceipt && typeof joReceipt == "object" ) {
+        if( joReceipt && typeof joReceipt === "object" ) {
             jarrReceipts.push( {
                 description: "reimbursementWalletWithdraw",
                 receipt: joReceipt
@@ -326,7 +326,7 @@ export async function reimbursementSetRange(
             details, ethersProviderSChain,
             "CommunityLocker", joCommunityLocker, "setTimeLimitPerMessage", arrArguments,
             joAccountSC, strActionName, gasPrice, estimatedGas, weiHowMuch, opts );
-        if( joReceipt && typeof joReceipt == "object" ) {
+        if( joReceipt && typeof joReceipt === "object" ) {
             jarrReceipts.push( {
                 description: "reimbursementSetRange",
                 receipt: joReceipt

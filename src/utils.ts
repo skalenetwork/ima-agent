@@ -190,8 +190,8 @@ export async function waitForClonedTokenAppearErc20(
     sc: any, tokenERC20SC: state.TTokeInformation, joAccountSC: state.TAccount,
     tokensMN: TTokesABIHolder, strMainnetName: string
 ) {
-    if( "abi" in tokenERC20SC && typeof tokenERC20SC.abi == "object" &&
-        "address" in tokenERC20SC && typeof tokenERC20SC.address == "string"
+    if( "abi" in tokenERC20SC && typeof tokenERC20SC.abi === "object" &&
+        "address" in tokenERC20SC && typeof tokenERC20SC.address === "string"
     ) {
         log.warning( "Skipping automatic ERC20 instantiation discovery, already done before" );
         return;
@@ -207,8 +207,8 @@ export async function waitForClonedTokenAppearErc721(
     sc: any, tokenERC721SC: state.TTokeInformation, joAccountSC: state.TAccount,
     tokensMN: TTokesABIHolder, strMainnetName: string
 ) {
-    if( "abi" in tokenERC721SC && typeof tokenERC721SC.abi == "object" &&
-        "address" in tokenERC721SC && typeof tokenERC721SC.address == "string"
+    if( "abi" in tokenERC721SC && typeof tokenERC721SC.abi === "object" &&
+        "address" in tokenERC721SC && typeof tokenERC721SC.address === "string"
     ) {
         log.warning( "Skipping automatic ERC721instantiation discovery, already done before" );
         return;
@@ -225,8 +225,8 @@ export async function waitForClonedTokenAppearErc721WithMetadata(
     sc: any, tokenERC721SC: state.TTokeInformation, joAccountSC: state.TAccount,
     tokensMN: TTokesABIHolder, strMainnetName: string
 ) {
-    if( "abi" in tokenERC721SC && typeof tokenERC721SC.abi == "object" &&
-        "address" in tokenERC721SC && typeof tokenERC721SC.address == "string"
+    if( "abi" in tokenERC721SC && typeof tokenERC721SC.abi === "object" &&
+        "address" in tokenERC721SC && typeof tokenERC721SC.address === "string"
     ) {
         log.warning( "Skipping automatic ERC721_with_metadata instantiation discovery, " +
             "already done before" );
@@ -244,8 +244,8 @@ export async function waitForClonedTokenAppearErc1155(
     sc: any, tokenERC1155SC: state.TTokeInformation, joAccountSC: state.TAccount,
     tokensMN: TTokesABIHolder, strMainnetName: string
 ) {
-    if( "abi" in tokenERC1155SC && typeof tokenERC1155SC.abi == "object" &&
-        "address" in tokenERC1155SC && typeof tokenERC1155SC.address == "string"
+    if( "abi" in tokenERC1155SC && typeof tokenERC1155SC.abi === "object" &&
+        "address" in tokenERC1155SC && typeof tokenERC1155SC.address === "string"
     ) {
         log.warning( "Skipping automatic ERC1155 instantiation discovery, already done before" );
         return;
@@ -324,9 +324,9 @@ export function bytesAlignRightWithZeroes( arrBytes: Uint8Array, cntMin: number 
 
 export function concatUint8Arrays(
     a: Uint8Array, b: Uint8Array ): Uint8Array { // a, b TypedArray of same type
-    if( typeof a == "string" )
+    if( typeof a === "string" )
         a = hexToBytes( a );
-    if( typeof b == "string" )
+    if( typeof b === "string" )
         b = hexToBytes( b );
     const c = new Uint8Array( a.length + b.length );
     c.set( a, 0 );

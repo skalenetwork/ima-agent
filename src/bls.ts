@@ -435,7 +435,7 @@ function performBlsGlue(
         const cnt = arrSignResults.length;
         for( let i = 0; i < cnt; ++i ) {
             const jo: any = arrSignResults[i];
-            if( ( !jo ) || typeof jo != "object" )
+            if( ( !jo ) || typeof jo !== "object" )
                 throw new Error( `Failed to save BLS part ${i} because it's not JSON object` );
             const strPath = strActionDir + "/sign-result" + jo.index + ".json";
             details.trace( "{p}Saving {} file containing {}", strLogPrefix, strPath, jo );
@@ -525,7 +525,7 @@ function performBlsGlueU256( details: log.TLogger, u256: any, arrSignResults: an
         const cnt = arrSignResults.length;
         for( let i = 0; i < cnt; ++i ) {
             const jo: any = arrSignResults[i];
-            if( ( !jo ) || typeof jo != "object" )
+            if( ( !jo ) || typeof jo !== "object" )
                 throw new Error( `Failed to save BLS part ${i} because it's not JSON object` );
             const strPath = strActionDir + "/sign-result" + jo.index + ".json";
             details.trace( "{p}Saving {} file...", strLogPrefix, strPath );
@@ -962,9 +962,9 @@ async function prepareSignMessagesImpl( optsSignOperation: TSignOperationOptions
         ( optsSignOperation.imaState.bSignMessages &&
             "joSChainNetworkInfo" in optsSignOperation.imaState &&
             optsSignOperation.imaState.joSChainNetworkInfo &&
-            typeof optsSignOperation.imaState.joSChainNetworkInfo == "object" &&
+            typeof optsSignOperation.imaState.joSChainNetworkInfo === "object" &&
             "network" in optsSignOperation.imaState.joSChainNetworkInfo &&
-            typeof optsSignOperation.imaState.joSChainNetworkInfo.network == "object"
+            typeof optsSignOperation.imaState.joSChainNetworkInfo.network === "object"
         )
             ? optsSignOperation.imaState.joSChainNetworkInfo.network
             : [];
@@ -1267,8 +1267,9 @@ async function doSignProcessHandleCall(
         optsSignOperation.strLogPrefix, log.generateTimestampString( null, true ),
         "skale_imaVerifyAndSign", i, strNodeURL, optsSignOperation.fromChainName,
         optsSignOperation.targetChainName, joParams, joOut, optsSignOperation.sequenceId );
-    if( ( !joOut ) || typeof joOut != "object" || ( !( "result" in joOut ) ) || ( !joOut.result ) ||
-        typeof joOut.result != "object" || ( "error" in joOut && joOut.error ) ) {
+    if( ( !joOut ) || typeof joOut !== "object" || ( !( "result" in joOut ) ) ||
+        ( !joOut.result ) || typeof joOut.result !== "object" ||
+        ( "error" in joOut && joOut.error ) ) {
         ++optsSignOperation.joGatheringTracker.nCountErrors;
         optsSignOperation.details.critical(
             "{p}S-Chain node {} reported wallet error: {err}, sequence ID is ",
@@ -1599,9 +1600,9 @@ async function doSignU256OneImplHandleCallResult(
     ++optsSignU256.joGatheringTracker.nCountReceived;
     optsSignU256.details.trace( "{p}Did invoked {} for to sign value {}, answer is: {}",
         optsSignU256.strLogPrefix, "skale_imaBSU256", optsSignU256.u256.toString(), joOut );
-    if( ( !joOut ) || typeof joOut != "object" || ( !( "result" in joOut ) ) ||
+    if( ( !joOut ) || typeof joOut !== "object" || ( !( "result" in joOut ) ) ||
         ( "error" in joOut && joOut.error ) ||
-        ( !joOut.result ) || typeof joOut.result != "object" ||
+        ( !joOut.result ) || typeof joOut.result !== "object" ||
         ( !( "signature" in joOut.result ) ) || joOut.result.signature != "object"
     ) {
         ++optsSignU256.joGatheringTracker.nCountErrors;
@@ -1975,10 +1976,10 @@ async function doSignReadyHashHandleCallResult(
     details.trace( "{p}Call to ", "SGX done, answer is: {}", strLogPrefix, joOut );
     let joSignResult: TSignResult = joOut;
     if( joOut.result != null && joOut.result != undefined &&
-        typeof joOut.result == "object" )
+        typeof joOut.result === "object" )
         joSignResult = joOut.result;
     if( joOut.signResult != null && joOut.signResult != undefined &&
-        typeof joOut.signResult == "object" )
+        typeof joOut.signResult === "object" )
         joSignResult = joOut.signResult;
     if( !joSignResult ) {
         const strError = "No signature arrived";
@@ -1987,7 +1988,7 @@ async function doSignReadyHashHandleCallResult(
         throw new Error( strError );
     }
     if( "errorMessage" in joSignResult &&
-        typeof joSignResult.errorMessage == "string" &&
+        typeof joSignResult.errorMessage === "string" &&
         joSignResult.errorMessage.length > 0
     ) {
         const strError = `BLS-sign finished with error: ${joSignResult.errorMessage};`;
@@ -2029,9 +2030,9 @@ export async function doSignReadyHash( strMessageHash: string, isExposeOutput: a
                 throw new Error( "BLS keys name is unknown, cannot sign U256" );
         }
         let rpcCallOpts: rpcCall.TRPCCallOpts | null = null;
-        if( "strPathSslKey" in joAccount && typeof joAccount.strPathSslKey == "string" &&
+        if( "strPathSslKey" in joAccount && typeof joAccount.strPathSslKey === "string" &&
             joAccount.strPathSslKey.length > 0 && "strPathSslCert" in joAccount &&
-            typeof joAccount.strPathSslCert == "string" && joAccount.strPathSslCert.length > 0
+            typeof joAccount.strPathSslCert === "string" && joAccount.strPathSslCert.length > 0
         ) {
             rpcCallOpts = {
                 cert: fs.readFileSync( joAccount.strPathSslCert, "utf8" ),
@@ -2069,7 +2070,7 @@ export async function doSignReadyHash( strMessageHash: string, isExposeOutput: a
             await joCall.disconnect();
     }
     const isSuccess = (
-        joSignResult && typeof joSignResult == "object" && ( !joSignResult.error ) )
+        joSignResult && typeof joSignResult === "object" && ( !joSignResult.error ) )
         ? true : false;
     if( isExposeOutput || ( !isSuccess ) )
         details.exposeDetailsTo( log.globalStream(), "BLS-raw-signer", isSuccess );
@@ -2186,10 +2187,10 @@ async function handleBlsSignMessageHashResult(
     optsHandleVerifyAndSign.strDirection, joOut );
     let joSignResult: TSignResult = joOut;
     if( joOut.result != null && joOut.result != undefined &&
-        typeof joOut.result == "object" )
+        typeof joOut.result === "object" )
         joSignResult = joOut.result;
     if( joOut.signResult != null && joOut.signResult != undefined &&
-        typeof joOut.signResult == "object" )
+        typeof joOut.signResult === "object" )
         joSignResult = joOut.signResult;
     if( "qa" in optsHandleVerifyAndSign.joCallData )
         optsHandleVerifyAndSign.joRetVal.qa = optsHandleVerifyAndSign.joCallData.qa;
@@ -2203,7 +2204,7 @@ async function handleBlsSignMessageHashResult(
         throw new Error( strError );
     }
     if( "errorMessage" in joSignResult &&
-        typeof joSignResult.errorMessage == "string" &&
+        typeof joSignResult.errorMessage === "string" &&
         joSignResult.errorMessage.length > 0
     ) {
         optsHandleVerifyAndSign.isSuccess = false;
@@ -2268,9 +2269,9 @@ export async function handleSkaleImaVerifyAndSign( joCallData: THandleVerifyAndS
                 throw new Error( "BLS keys name is unknown, cannot sign IMA message(s)" );
         }
         let rpcCallOpts: rpcCall.TRPCCallOpts | null = null;
-        if( "strPathSslKey" in joAccount && typeof joAccount.strPathSslKey == "string" &&
+        if( "strPathSslKey" in joAccount && typeof joAccount.strPathSslKey === "string" &&
             joAccount.strPathSslKey.length > 0 && "strPathSslCert" in joAccount &&
-            typeof joAccount.strPathSslCert == "string" && joAccount.strPathSslCert.length > 0
+            typeof joAccount.strPathSslCert === "string" && joAccount.strPathSslCert.length > 0
         ) {
             rpcCallOpts = {
                 cert: fs.readFileSync( joAccount.strPathSslCert, "utf8" ),
@@ -2361,10 +2362,10 @@ async function handleBlsSignMessageHash256Result(
         optsBSU256.strLogPrefix, joOut );
     let joSignResult: TSignResult = joOut;
     if( joOut.result != null && joOut.result != undefined &&
-        typeof joOut.result == "object" )
+        typeof joOut.result === "object" )
         joSignResult = joOut.result;
     if( joOut.signResult != null && joOut.signResult != undefined &&
-        typeof joOut.signResult == "object" )
+        typeof joOut.signResult === "object" )
         joSignResult = joOut.signResult;
     if( !joSignResult ) {
         const strError = "No signature arrived";
@@ -2375,7 +2376,7 @@ async function handleBlsSignMessageHash256Result(
         throw new Error( strError );
     }
     if( "errorMessage" in joSignResult &&
-        typeof joSignResult.errorMessage == "string" &&
+        typeof joSignResult.errorMessage === "string" &&
         joSignResult.errorMessage.length > 0 ) {
         optsBSU256.isSuccess = false;
         const strError = "BLS-sign finished with " +
@@ -2416,10 +2417,10 @@ export async function handleSkaleImaBSU256( joCallData: TBSU256CallData ) {
             throw new Error( "No account to perform blsSignMessageHash for U256" )
         let rpcCallOpts: rpcCall.TRPCCallOpts | null = null;
         if( "strPathSslKey" in optsBSU256.joAccount &&
-            typeof optsBSU256.joAccount.strPathSslKey == "string" &&
+            typeof optsBSU256.joAccount.strPathSslKey === "string" &&
             optsBSU256.joAccount.strPathSslKey.length > 0 &&
             "strPathSslCert" in optsBSU256.joAccount &&
-            typeof optsBSU256.joAccount.strPathSslCert == "string" &&
+            typeof optsBSU256.joAccount.strPathSslCert === "string" &&
             optsBSU256.joAccount.strPathSslCert.length > 0
         ) {
             rpcCallOpts = {

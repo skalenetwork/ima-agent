@@ -118,7 +118,7 @@ export async function checkOnLoopStart(
             const walkNodeIndex = arrWalkNodeIndices[i];
             const joNode = jarrNodes[walkNodeIndex];
             const joProps: any = getNodeProgressAndTimestamp( joNode, strLoopWorkType, nIndexS2S );
-            if( joProps && typeof joProps == "object" &&
+            if( joProps && typeof joProps === "object" &&
                 "isInProgress" in joProps && joProps.isInProgress &&
                 joProps.ts != 0 && nUtcUnixTimeStamp >= joProps.ts
             ) {

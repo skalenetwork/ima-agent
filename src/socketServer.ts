@@ -38,7 +38,7 @@ export class SocketServer extends EventDispatcher {
     isLogSocketTrafficRaw?: boolean;
     constructor ( acceptor: any ) {
         super();
-        if( acceptor == null || acceptor == undefined || typeof acceptor != "object" )
+        if( acceptor == null || acceptor == undefined || typeof acceptor !== "object" )
             throw new Error( "Cannot create server on bad acceptor" );
         const self = this;
         self.log = console.log;
@@ -125,7 +125,7 @@ export class SocketServer extends EventDispatcher {
                 }
 
                 if( joAnswer != null && joAnswer != undefined ) {
-                    if( typeof joAnswer.error == "string" && joAnswer.error.length > 0 ) {
+                    if( typeof joAnswer.error === "string" && joAnswer.error.length > 0 ) {
                         if( self.isLogSocketErrors ) {
                             self.log( log.fmtError( "Socket {url} will send {sunny} {err}",
                                 socket.strSavedRemoteAddress, "error-answer", joAnswer ) );

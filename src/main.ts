@@ -155,7 +155,7 @@ function initMonitoringServer(): void {
     gServerMonitoringWS = new ws.WebSocketServer( { port: 0 + imaState.nMonitoringPort } );
     gServerMonitoringWS.on( "connection", function( wsPeer: any, req: any ) {
         let ip = req.socket.remoteAddress;
-        if( "headers" in req && req.headers && typeof req.headers == "object" &&
+        if( "headers" in req && req.headers && typeof req.headers === "object" &&
             "x-forwarded-for" in req.headers && req.headers["x-forwarded-for"] )
             ip = req.headers["x-forwarded-for"]; // better under NGINX
         if( ( !ip ) && "_socket" in req && req._socket && "remoteAddress" in req._socket )
@@ -331,7 +331,7 @@ function initJsonRpcServer(): void {
                 joAnswer.error = `Unknown method name ${joMessage.method} was specified`;
                 break
             } // switch( joMessage.method )
-            if( ( !joAnswer ) || typeof joAnswer != "object" ) {
+            if( ( !joAnswer ) || typeof joAnswer !== "object" ) {
                 joAnswer = {};
                 joAnswer.error = "internal error, null data returned";
             }
@@ -411,15 +411,15 @@ async function main() {
     const strTmpAddressFromEnvSChainTarget =
         owaspUtils.toEthPrivateKey( process.env.ACCOUNT_FOR_SCHAIN_TARGET );
     if( strTmpAddressFromEnvMainNet &&
-        typeof strTmpAddressFromEnvMainNet == "string" &&
+        typeof strTmpAddressFromEnvMainNet === "string" &&
         strTmpAddressFromEnvMainNet.length > 0 )
         imaState.chainProperties.mn.joAccount.address_ = "" + strTmpAddressFromEnvMainNet;
     if( strTmpAddressFromEnvSChain &&
-        typeof strTmpAddressFromEnvSChain == "string" &&
+        typeof strTmpAddressFromEnvSChain === "string" &&
         strTmpAddressFromEnvSChain.length > 0 )
         imaState.chainProperties.sc.joAccount.address_ = "" + strTmpAddressFromEnvSChain;
     if( strTmpAddressFromEnvSChainTarget &&
-        typeof strTmpAddressFromEnvSChainTarget == "string" &&
+        typeof strTmpAddressFromEnvSChainTarget === "string" &&
         strTmpAddressFromEnvSChainTarget.length > 0 )
         imaState.chainProperties.tc.joAccount.address_ = "" + strTmpAddressFromEnvSChainTarget;
     parseCommandLine();

@@ -37,7 +37,7 @@ export function enable( b?: boolean ): void {
 }
 
 export function isStringAlreadyColorized( s?: any ): boolean {
-    if( s && typeof s == "string" && s.length > 0 && s[0] == "\x1b" )
+    if( s && typeof s === "string" && s.length > 0 && s[0] == "\x1b" )
         return true;
     return false;
 }
@@ -197,7 +197,7 @@ export function rainbowPart( s: string, i: number ) {
 }
 
 export function rainbow( s?: any ): string {
-    if( ( !gFlagIsEnabled ) || ( !s ) || ( typeof s != "string" ) || s.length == 0 )
+    if( ( !gFlagIsEnabled ) || ( !s ) || ( typeof s !== "string" ) || s.length == 0 )
         return s ? s.toString() : JSON.stringify( s );
     let res = "";
     const cnt = s.length;
@@ -978,11 +978,11 @@ export function stack( err?: any ): string {
         return "";
     if( err && "stack" in err ) {
         const st = err.stack
-        if( st && typeof st == "string" )
+        if( st && typeof st === "string" )
             err = st;
     }
     try {
-        const arr = ( typeof err == "string" ) ? err.split( "\n" ) : err;
+        const arr = ( typeof err === "string" ) ? err.split( "\n" ) : err;
         const cnt = arr.length;
         let i;
         for( i = 0; i < cnt; ++i ) {

@@ -80,7 +80,7 @@ export function rxIsFloat( val: any ): boolean {
 }
 
 export function parseIntOrHex( s: any ): number {
-    if( typeof s != "string" )
+    if( typeof s !== "string" )
         return parseInt( s );
     s = s.trim();
     if( s.length > 2 && s[0] == "0" && ( s[1] == "x" || s[1] == "X" ) )
@@ -703,8 +703,8 @@ export function ethersProviderToUrl(
 ): string {
     let strURL: string | null = null;
     if( ethersProvider &&
-        "connection" in ethersProvider && typeof ethersProvider.connection == "object" &&
-        "url" in ethersProvider.connection && typeof ethersProvider.connection.url == "string"
+        "connection" in ethersProvider && typeof ethersProvider.connection === "object" &&
+        "url" in ethersProvider.connection && typeof ethersProvider.connection.url === "string"
     )
         strURL = "" + ethersProvider.connection.url;
     return strURL || "N/A-URL";
@@ -727,7 +727,7 @@ export function stripHexPrefix( s: any ): string {
 
 export function toBNbasic( x?: any, optionalRadix?: number ): any {
     try {
-        if( optionalRadix && typeof optionalRadix == "number" && optionalRadix == 16 )
+        if( optionalRadix && typeof optionalRadix === "number" && optionalRadix == 16 )
             x = ensureStartsWith0x( x );
         const bn = ethersMod.ethers.BigNumber.from( x );
         return bn;
@@ -776,11 +776,11 @@ export function isNumeric( s?: any ): boolean {
 export function toHexStringSafe( val?: any ): string {
     if( !val )
         return "0x0";
-    if( "toHexString" in val && typeof val.toHexString == "function" )
+    if( "toHexString" in val && typeof val.toHexString === "function" )
         return val.toHexString();
-    if( typeof val == "number" || typeof val == "bigint" )
+    if( typeof val === "number" || typeof val === "bigint" )
         return ensureStartsWith0x( val.toString( 16 ) );
-    if( "toString" in val && typeof val.toString == "function" )
+    if( "toString" in val && typeof val.toString === "function" )
         return val.toString();
     return "" + val;
 }
