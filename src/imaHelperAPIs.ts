@@ -93,11 +93,11 @@ export async function safeGetBlockNumber(
         retValOnFail = "";
     let ret = retValOnFail;
     let idxAttempt = 1;
-    for( ; idxAttempt <= cntAttempts; ++ idxAttempt ) {
+    for( ; idxAttempt <= cntAttempts; ++idxAttempt ) {
         const isOnLine = await rpcCall.checkUrl( u, nWaitStepMilliseconds );
-        if( ! isOnLine ) {
+        if( !isOnLine ) {
             ret = retValOnFail;
-            if( ! throwIfServerOffline )
+            if( !throwIfServerOffline )
                 return ret;
             details.error( "Cannot call {} via {url} because server is off-line",
                 strFnName + "()", u );
@@ -128,7 +128,7 @@ export function getBlocksCountInInIterativeStepOfEventsScan(): number {
     return gCountOfBlocksInIterativeStep;
 }
 export function setBlocksCountInInIterativeStepOfEventsScan( n?: number ): void {
-    if( ! n )
+    if( !n )
         gCountOfBlocksInIterativeStep = 0;
     else {
         gCountOfBlocksInIterativeStep = owaspUtils.parseIntOrHex( n );
@@ -141,7 +141,7 @@ export function getMaxIterationsInAllRangeEventsScan(): number {
     return gCountOfBlocksInIterativeStep;
 }
 export function setMaxIterationsInAllRangeEventsScan( n?: number ): void {
-    if( ! n )
+    if( !n )
         gMaxBlockScanIterationsInAllRange = 0;
     else {
         gMaxBlockScanIterationsInAllRange = owaspUtils.parseIntOrHex( n );

@@ -54,7 +54,7 @@ export function findPowNumber( strRequestPart: string, details: log.TLogger, isV
     let i = 0; let n = 0; let s = "";
     if( isVerbose )
         details.debug( "source t={}, this is UTC timestamp", t );
-    for( ; i < gConstMaxPowResultLimit; ++ i ) {
+    for( ; i < gConstMaxPowResultLimit; ++i ) {
         n = 0 + i;
         s = "{" + strRequestPart + ",\"time\":" + t + ",\"pow\":" + n + "}";
 
@@ -127,7 +127,7 @@ async function handleOracleSubmitRequestResult(
     }
     let gp = null;
     for( let idxAttempt = 0; idxAttempt < cntAttempts; ++idxAttempt ) {
-        const nMillisecondsToSleep = ( ! idxAttempt )
+        const nMillisecondsToSleep = ( !idxAttempt )
             ? nMillisecondsSleepBefore : nMillisecondsSleepPeriod;
         if( nMillisecondsToSleep > 0 )
             await threadInfo.sleep( nMillisecondsToSleep );
@@ -166,11 +166,11 @@ export async function oracleGetGasPrice( oracleOpts: any, details: log.TLogger )
         const isVerbose = "isVerbose" in oracleOpts ? oracleOpts.isVerbose : false;
         let isVerboseTraceDetails = "isVerboseTraceDetails" in oracleOpts
             ? oracleOpts.isVerboseTraceDetails : false;
-        if( ! ( log.verboseGet() >= log.verboseName2Number( "trace" ) ) )
+        if( !( log.verboseGet() >= log.verboseName2Number( "trace" ) ) )
             isVerboseTraceDetails = false;
         const callOpts = "callOpts" in oracleOpts ? oracleOpts.callOpts : { };
         joCall = await rpcCall.create( url, callOpts || { } );
-        if( ! joCall )
+        if( !joCall )
             throw new Error( `Failed to create JSON RPC call object to ${url}` );
         const s = findPowNumber(
             "\"cid\":1000,\"uri\":\"geth://\",\"jsps\":[\"/result\"]," +

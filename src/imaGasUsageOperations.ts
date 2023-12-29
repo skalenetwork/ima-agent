@@ -27,12 +27,12 @@ import * as log from "./log.js";
 import * as owaspUtils from "./owaspUtils.js";
 
 export function composeGasUsageReportFromArray( strName: string, jarrReceipts: any[] ): any {
-    if( ! ( strName && typeof strName == "string" && jarrReceipts ) )
+    if( !( strName && typeof strName == "string" && jarrReceipts ) )
         return { sumGasUsed: 0, strReport: "N/A" };
     let i; let sumGasUsed = owaspUtils.toBN( "0" );
     let s = "\n" + log.fmtInformation( "Gas usage report for " ) +
             log.fmtInformation( "{p}\n", strName );
-    for( i = 0; i < jarrReceipts.length; ++ i ) {
+    for( i = 0; i < jarrReceipts.length; ++i ) {
         try {
             sumGasUsed = sumGasUsed.add( owaspUtils.toBN( jarrReceipts[i].receipt.gasUsed ) );
             s += log.fmtInformation( "    {p}", jarrReceipts[i].description ) +

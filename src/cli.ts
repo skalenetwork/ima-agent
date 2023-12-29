@@ -94,7 +94,7 @@ export function ensureHaveValue(
     value = value ? value.toString() : "";
     if( value.length === 0 ) {
         retVal = false;
-        if( ! isPrintValue )
+        if( !isPrintValue )
             console.log( log.fmtError( "WARNING:, missing value for ", fnNameColorizer( name ) ) );
         if( isExitIfEmpty )
             process.exit( 126 );
@@ -113,7 +113,7 @@ export function ensureHaveCredentials(
     isExitIfEmpty: boolean, isPrintValue: boolean
 ) {
     strFriendlyChainName = strFriendlyChainName || "<UNKNOWN>";
-    if( ! ( typeof joAccount == "object" ) ) {
+    if( !( typeof joAccount == "object" ) ) {
         log.error( "ARGUMENTS VALIDATION WARNING: bad account specified for {} chain",
             strFriendlyChainName );
         if( isExitIfEmpty )
@@ -124,7 +124,7 @@ export function ensureHaveCredentials(
         typeof joAccount.strTransactionManagerURL == "string" &&
         joAccount.strTransactionManagerURL.length > 0
     ) {
-        ++ cntAccountVariantsSpecified;
+        ++cntAccountVariantsSpecified;
         ensureHaveValue(
             "" + strFriendlyChainName + "/TM/URL",
             joAccount.strTransactionManagerURL, isExitIfEmpty, isPrintValue
@@ -134,7 +134,7 @@ export function ensureHaveCredentials(
         typeof joAccount.strSgxURL == "string" &&
         joAccount.strSgxURL.length > 0
     ) {
-        ++ cntAccountVariantsSpecified;
+        ++cntAccountVariantsSpecified;
         ensureHaveValue(
             "" + strFriendlyChainName + "/SGX/URL",
             joAccount.strSgxURL, isExitIfEmpty, isPrintValue
@@ -162,7 +162,7 @@ export function ensureHaveCredentials(
         typeof joAccount.strSgxKeyName == "string" &&
         joAccount.strSgxKeyName.length > 0
     ) {
-        ++ cntAccountVariantsSpecified;
+        ++cntAccountVariantsSpecified;
         ensureHaveValue(
             "" + strFriendlyChainName + "/SGX/keyName",
             joAccount.strSgxKeyName, isExitIfEmpty, isPrintValue
@@ -172,7 +172,7 @@ export function ensureHaveCredentials(
         typeof joAccount.privateKey == "string" &&
         joAccount.privateKey.length > 0
     ) {
-        ++ cntAccountVariantsSpecified;
+        ++cntAccountVariantsSpecified;
         ensureHaveValue(
             "" + strFriendlyChainName + "/privateKey",
             joAccount.privateKey, isExitIfEmpty, isPrintValue
@@ -182,7 +182,7 @@ export function ensureHaveCredentials(
         typeof joAccount.address_ == "string" &&
         joAccount.address_.length > 0
     ) {
-        ++ cntAccountVariantsSpecified;
+        ++cntAccountVariantsSpecified;
         ensureHaveValue(
             "" + strFriendlyChainName + "/walletAddress",
             joAccount.address_, isExitIfEmpty, isPrintValue
@@ -1806,7 +1806,7 @@ function commonInitCheckErc721() {
             if( n2 > 0 )
                 n2 = imaState.chainProperties.sc.strCoinNameErc721.length;
             if( n1 > 0 ) {
-                if( ! imaState.bShowConfigMode ) {
+                if( !imaState.bShowConfigMode ) {
                     if( isPrintGathered ) {
                         log.information( "Loaded Main-net ERC721 ABI {}",
                             imaState.chainProperties.mn.strCoinNameErc721 );
@@ -1964,7 +1964,7 @@ function commonInitCheckErc1155() {
             if( n2 > 0 )
                 n2 = imaState.chainProperties.sc.strCoinNameErc1155.length;
             if( n1 > 0 ) {
-                if( ! imaState.bShowConfigMode ) {
+                if( !imaState.bShowConfigMode ) {
                     if( isPrintGathered ) {
                         log.information( "Loaded Main-net ERC1155 ABI {}",
                             imaState.chainProperties.mn.strCoinNameErc1155 );

@@ -72,8 +72,8 @@ export function getLastTransferErrors( isIncludeTextLog: boolean ): any[] {
     if( typeof isIncludeTextLog == "undefined" )
         isIncludeTextLog = true;
     const jarr = JSON.parse( JSON.stringify( gArrLastTransferErrors ) );
-    if( ! isIncludeTextLog ) {
-        for( let i = 0; i < jarr.length; ++ i ) {
+    if( !isIncludeTextLog ) {
+        for( let i = 0; i < jarr.length; ++i ) {
             const jo: any = jarr[i];
             if( "textLog" in jo )
                 delete jo.textLog;

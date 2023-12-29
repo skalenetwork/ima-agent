@@ -471,7 +471,7 @@ export function ipFromHex( hex?: any ): string {
 
 export function cloneObjectByRootKeys( joIn?: any ): any {
     const joOut: any = { }; const arrKeys = Object.keys( joIn );
-    for( let i = 0; i < arrKeys.length; ++ i ) {
+    for( let i = 0; i < arrKeys.length; ++i ) {
         const key = arrKeys[i];
         const value = joIn[key];
         joOut[key] = value;
@@ -750,7 +750,7 @@ export function toBN( arg: any ): any {
             multiplier = toBNbasic( -1, 10 );
         }
         stringArg = stringArg === "" ? "0" : stringArg;
-        if( ( ! stringArg.match( /^-?[0-9]+$/ ) && stringArg.match( /^[0-9A-Fa-f]+$/ ) ) ||
+        if( ( !stringArg.match( /^-?[0-9]+$/ ) && stringArg.match( /^[0-9A-Fa-f]+$/ ) ) ||
             stringArg.match( /^[a-fA-F]+$/ ) ||
             ( isHexPrefixed && stringArg.match( /^[0-9A-Fa-f]+$/ ) ) )
             return toBNbasic( stringArg, 16 ).mul( multiplier )
@@ -774,7 +774,7 @@ export function isNumeric( s?: any ): boolean {
 }
 
 export function toHexStringSafe( val?: any ): string {
-    if( ! val )
+    if( !val )
         return "0x0";
     if( "toHexString" in val && typeof val.toHexString == "function" )
         return val.toHexString();
@@ -803,11 +803,11 @@ export function setInterval2( fn: () => void, t: number, stepMilliSeconds?: numb
 }
 
 export function clearInterval2( iv: any ): void {
-    if( ! iv )
+    if( !iv )
         return;
-    if( ! ( "real_iv" in iv ) )
+    if( !( "real_iv" in iv ) )
         return;
-    if( ! iv.real_iv )
+    if( !iv.real_iv )
         return;
     clearInterval( iv.real_iv );
     iv.real_iv = null;

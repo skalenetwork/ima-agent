@@ -206,7 +206,7 @@ export const formatDateTime = function(
         return "null-date-time";
     if( dt === undefined )
         return "undefined-date-time";
-    if( ! ( dt instanceof Date ) )
+    if( !( dt instanceof Date ) )
         return "not-a-date-time";
     isDate = ( isDate == null || isDate == undefined ) ? true : ( !!isDate );
     isTime = ( isTime == null || isTime == undefined ) ? true : ( !!isTime );

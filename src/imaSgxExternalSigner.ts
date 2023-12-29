@@ -10,15 +10,15 @@ log.addStdout();
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 function finalizeOutput( jo: any ) {
-    if( ! jo )
+    if( !jo )
         return;
     process.stdout.write( log.fmtInformation( "{}", jo ) );
 }
 
 function postConvertBN( jo: any, name: any ) {
-    if( ! jo )
+    if( !jo )
         return;
-    if( ! ( name in jo ) )
+    if( !( name in jo ) )
         return;
     if( typeof jo[name] != "object" )
         return;
@@ -93,7 +93,7 @@ async function run() {
         };
 
         const joCall: rpcCall.TRPCCall = await rpcCall.create( strSgxWalletURL, rpcCallOpts );
-        if( ! joCall )
+        if( !joCall )
             throw new Error( `Failed to create JSON RPC call object to ${strSgxWalletURL}` );
         const joIn: any = {
             method: "ecdsaSignMessageHash",

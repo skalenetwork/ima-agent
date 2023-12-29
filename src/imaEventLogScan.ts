@@ -73,7 +73,7 @@ export function createProgressiveEventsScanPlan( details: log.TLogger, nLatestBl
     if( arrProgressiveEventsScanPlan.length > 0 ) {
         const joLastPlan =
         arrProgressiveEventsScanPlan[arrProgressiveEventsScanPlan.length - 1];
-        if( ! ( joLastPlan.nBlockFrom == 0 && joLastPlan.nBlockTo == "latest" ) ) {
+        if( !( joLastPlan.nBlockFrom == 0 && joLastPlan.nBlockTo == "latest" ) ) {
             arrProgressiveEventsScanPlan.push(
                 { nBlockFrom: 0, nBlockTo: "latest", type: "entire block range" } );
         }
@@ -93,7 +93,7 @@ export async function safeGetPastEventsProgressive(
     const strURL = owaspUtils.ethersProviderToUrl( ethersProvider );
     details.information( "{p}Will run progressive logs search for event {} via URL {url}, " +
         "from block {}, to block...", strLogPrefix, strEventName, strURL, nBlockFrom, nBlockTo );
-    if( ! imaTransferErrorHandling.getEnabledProgressiveEventsScan() ) {
+    if( !imaTransferErrorHandling.getEnabledProgressiveEventsScan() ) {
         details.warning(
             "{p}IMPORTANT NOTICE: Will skip progressive events scan in block range from {} to {} " +
             "because it's {}", strLogPrefix, nBlockFrom, nBlockTo, log.fmtError( "DISABLED" ) );
@@ -117,7 +117,7 @@ export async function safeGetPastEventsProgressive(
     nBlockFrom = owaspUtils.toBN( nBlockFrom );
     const nBlockZero = owaspUtils.toBN( 0 );
     const isFirstZero = ( nBlockFrom.eq( nBlockZero ) ) ? true : false;
-    if( ! ( isFirstZero && isLastLatest ) ) {
+    if( !( isFirstZero && isLastLatest ) ) {
         details.trace( "{p}Will skip progressive event log records scan and use scan in block " +
             "range from {} to {}", strLogPrefix, nBlockFrom.toHexString(), nBlockTo.toHexString() );
         return await safeGetPastEvents(
@@ -212,11 +212,11 @@ export async function safeGetTransactionCount(
         retValOnFail = "";
     let ret = retValOnFail;
     let idxAttempt = 1;
-    for( ; idxAttempt <= cntAttempts; ++ idxAttempt ) {
+    for( ; idxAttempt <= cntAttempts; ++idxAttempt ) {
         const isOnLine = await rpcCall.checkUrl( u, nWaitStepMilliseconds );
-        if( ! isOnLine ) {
+        if( !isOnLine ) {
             ret = retValOnFail;
-            if( ! throwIfServerOffline )
+            if( !throwIfServerOffline )
                 return ret;
             details.error( "Cannot call {} via {url} because server is off-line, attempt {} of {}",
                 strFnName + "()", u, idxAttempt, cntAttempts );
@@ -257,11 +257,11 @@ export async function safeGetTransactionReceipt(
         retValOnFail = "";
     let ret = retValOnFail;
     let idxAttempt = 1;
-    for( ; idxAttempt <= cntAttempts; ++ idxAttempt ) {
+    for( ; idxAttempt <= cntAttempts; ++idxAttempt ) {
         const isOnLine = await rpcCall.checkUrl( u, nWaitStepMilliseconds );
-        if( ! isOnLine ) {
+        if( !isOnLine ) {
             ret = retValOnFail;
-            if( ! throwIfServerOffline )
+            if( !throwIfServerOffline )
                 return ret;
             details.error( "Cannot call {} via {url} because server is off-line, attempt {} of {}",
                 strFnName + "()", u, idxAttempt, cntAttempts );
@@ -313,11 +313,11 @@ export async function safeGetPastEvents(
     } else
         nBlockTo = owaspUtils.toBN( nBlockTo );
     nBlockFrom = owaspUtils.toBN( nBlockFrom );
-    for( ; idxAttempt <= cntAttempts; ++ idxAttempt ) {
+    for( ; idxAttempt <= cntAttempts; ++idxAttempt ) {
         const isOnLine = await rpcCall.checkUrl( u, nWaitStepMilliseconds );
-        if( ! isOnLine ) {
+        if( !isOnLine ) {
             ret = retValOnFail;
-            if( ! throwIfServerOffline )
+            if( !throwIfServerOffline )
                 return ret;
             details.error(
                 "{p}Cannot do {} event filtering via {url} because server is off-line, " +

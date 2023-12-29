@@ -62,11 +62,11 @@ export async function waitForHasChain(
     cntWaitAttempts?: number,
     nSleepMilliseconds?: number
 ) {
-    if( ! cntWaitAttempts )
+    if( !cntWaitAttempts )
         cntWaitAttempts = 100;
-    if( ! nSleepMilliseconds )
+    if( !nSleepMilliseconds )
         nSleepMilliseconds = 5;
-    for( let idxWaitAttempts = 0; idxWaitAttempts < cntWaitAttempts; ++ idxWaitAttempts ) {
+    for( let idxWaitAttempts = 0; idxWaitAttempts < cntWaitAttempts; ++idxWaitAttempts ) {
         if( await invokeHasChain( details, ethersProvider, joLinker, joAccount, chainIdSChain ) )
             return true;
         details.trace( "Sleeping {} milliseconds...", nSleepMilliseconds );
@@ -96,7 +96,7 @@ export async function checkIsRegisteredSChainInDepositBoxes( // step 1
     try {
         strActionName = "checkIsRegisteredSChainInDepositBoxes(reg-step1)";
         const addressFrom = joAccountMN.address();
-        if( ! joLinker )
+        if( !joLinker )
             throw new Error( "No Linker contract" );
         const bIsRegistered =
             await joLinker.callStatic.hasSchain( chainIdSChain, { from: addressFrom } );
@@ -148,21 +148,21 @@ export async function registerSChainInDepositBoxes( // step 1
     try {
         strActionName = "Register S-chain in deposit boxes, step 1, connectSchain";
         details.debug( "{p}Will register S-Chain in lock_and_data on Main-net", strLogPrefix );
-        if( ! joTokenManagerLinker )
+        if( !joTokenManagerLinker )
             throw new Error( "No TokenManagerLinker contract" )
-        if( ! joCommunityLocker )
+        if( !joCommunityLocker )
             throw new Error( "No CommunityLocker contract" )
-        if( ! joTokenManagerETH )
+        if( !joTokenManagerETH )
             throw new Error( "No TokenManagerETH contract" )
-        if( ! joTokenManagerERC20 )
+        if( !joTokenManagerERC20 )
             throw new Error( "No TokenManagerERC20 contract" )
-        if( ! joTokenManagerERC721 )
+        if( !joTokenManagerERC721 )
             throw new Error( "No TokenManagerERC721 contract" )
-        if( ! joTokenManagerERC1155 )
+        if( !joTokenManagerERC1155 )
             throw new Error( "No TokenManagerERC1155 contract" )
-        if( ! joTokenManagerERC721WithMetadata )
+        if( !joTokenManagerERC721WithMetadata )
             throw new Error( "No TokenManagerERC721WithMetadata contract" )
-        if( ! joLinker )
+        if( !joLinker )
             throw new Error( "No Linker contract" )
         const arrArguments = [
             chainNameSChain, [
@@ -205,7 +205,7 @@ export async function registerSChainInDepositBoxes( // step 1
             details, ethersProviderMainNet,
             joLinker, joAccountMN, chainNameSChain,
             cntWaitAttempts, nSleepMilliseconds );
-        if( ! isSChainStatusOKay )
+        if( !isSChainStatusOKay )
             throw new Error( "S-Chain ownership status check timeout" );
     } catch ( err ) {
         details.critical( "{p}Error in registerSChainInDepositBoxes() during {bright}: {err}" +

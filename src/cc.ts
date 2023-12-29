@@ -201,7 +201,7 @@ export function rainbow( s?: any ): string {
         return s ? s.toString() : JSON.stringify( s );
     let res = "";
     const cnt = s.length;
-    for( let i = 0; i < cnt; ++ i )
+    for( let i = 0; i < cnt; ++i )
         res = res + rainbowPart( s[i], i );
     return res;
 }
@@ -533,7 +533,7 @@ export function syntaxHighlightJSON( jo?: any, strKeyNamePrefix?: string ): stri
     // eslint-disable-next-line max-len
         /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g,
         function( match: any ) {
-            if( ! gFlagIsEnabled )
+            if( !gFlagIsEnabled )
                 return match;
             let cls = "number";
             if( /^"/.test( match ) ) {
@@ -596,7 +596,7 @@ export function j1( x?: any, n?: number, strKeyNamePrefix?: string ): string {
         isDefaultKeyNamePrefix = true;
     }
     let s = safeStringifyJSON( x, n );
-    if( ! gFlagIsEnabled )
+    if( !gFlagIsEnabled )
         return s || "";
     s = "" + syntaxHighlightJSON( s, strKeyNamePrefix );
     if( isDefaultKeyNamePrefix && s.length > 9 && s[0] == " " )
@@ -923,10 +923,10 @@ export function getDurationString( tsFrom: number, tsTo: number ): string {
 }
 
 export function capitalizeFirstLetter( s?: any ): string {
-    if( ! s )
+    if( !s )
         return JSON.stringify( s );
     let s2 = s.toString();
-    if( ! s2 )
+    if( !s2 )
         return s.toString();
     s2 = s2.charAt( 0 ).toUpperCase() + s2.slice( 1 );
     return s2;
@@ -936,7 +936,7 @@ function errFnDottedName( s?: any ): string {
     const arr = s.split( "." );
     const cnt = arr.length;
     let i; let s2 = "";
-    for( i = 0; i < cnt; ++ i ) {
+    for( i = 0; i < cnt; ++i ) {
         if( i > 0 )
             s2 += bright( "." );
         s2 += sunny( arr[i] );
@@ -974,7 +974,7 @@ function errLocLn( s: string, isWithBraces?: boolean ): string {
 }
 
 export function stack( err?: any ): string {
-    if( ! err )
+    if( !err )
         return "";
     if( err && "stack" in err ) {
         const st = err.stack
@@ -985,7 +985,7 @@ export function stack( err?: any ): string {
         const arr = ( typeof err == "string" ) ? err.split( "\n" ) : err;
         const cnt = arr.length;
         let i;
-        for( i = 0; i < cnt; ++ i ) {
+        for( i = 0; i < cnt; ++i ) {
             let s = arr[i].replace( /\s+/g, " " ).trim();
             if( s.indexOf( "at " ) == 0 ) {
                 // stack entry

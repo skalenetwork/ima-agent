@@ -104,7 +104,7 @@ export async function dryRunCall(
     gasPrice: any, gasValue: any, weiHowMuch: any,
     opts?: any
 ) {
-    if( ! dryRunIsEnabled() )
+    if( !dryRunIsEnabled() )
         return null; // success
     isDryRunResultIgnore = ( isDryRunResultIgnore != null && isDryRunResultIgnore != undefined )
         ? ( !!isDryRunResultIgnore ) : false;
@@ -113,7 +113,7 @@ export async function dryRunCall(
     let strArgumentsDescription = "";
     if( arrArguments.length > 0 ) {
         strArgumentsDescription += log.fmtDebug( "( " );
-        for( let i = 0; i < arrArguments.length; ++ i ) {
+        for( let i = 0; i < arrArguments.length; ++i ) {
             if( i > 0 )
                 strArgumentsDescription += log.fmtDebug( ", " );
             strArgumentsDescription += log.fmtInformation( "{}", arrArguments[i] );
@@ -194,7 +194,7 @@ async function payedCallTM( optsPayedCall: TRunTimePayedCallOptions ) {
     const txAdjusted: any =
         optsPayedCall.unsignedTx; // JSON.parse( JSON.stringify( optsPayedCall.rawTx ) );
     const arrNamesConvertToHex = [ "gas", "gasLimit", "optsPayedCall.gasPrice", "value" ];
-    for( let idxName = 0; idxName < arrNamesConvertToHex.length; ++ idxName ) {
+    for( let idxName = 0; idxName < arrNamesConvertToHex.length; ++idxName ) {
         const strName = arrNamesConvertToHex[idxName];
         if( strName in txAdjusted && typeof txAdjusted[strName] == "object" &&
             typeof txAdjusted[strName].toHexString == "function" )
@@ -271,9 +271,9 @@ async function payedCallSGX( optsPayedCall: TRunTimePayedCallOptions ) {
 }
 
 function postConvertBN( jo: any, name: any ) {
-    if( ! jo )
+    if( !jo )
         return;
-    if( ! ( name in jo ) )
+    if( !( name in jo ) )
         return;
     if( typeof jo[name] == "object" )
         return;
@@ -345,7 +345,7 @@ export async function payedCall(
     let strArgumentsDescription = "";
     if( optsPayedCall.arrArguments.length > 0 ) {
         strArgumentsDescription += log.fmtDebug( "( " );
-        for( let i = 0; i < optsPayedCall.arrArguments.length; ++ i ) {
+        for( let i = 0; i < optsPayedCall.arrArguments.length; ++i ) {
             if( i > 0 )
                 strArgumentsDescription += log.fmtDebug( ", " );
             strArgumentsDescription += log.fmtInformation( "{}", optsPayedCall.arrArguments[i] );
@@ -438,7 +438,7 @@ export async function checkTransactionToSchain(
             powNumber = imaUtils.replaceAll( powNumber, "\t", "" );
             powNumber = powNumber.trim();
             details.trace( "{p}Trimmed PoW-mining number is {}", strLogPrefix, powNumber );
-            if( ! powNumber )
+            if( !powNumber )
                 throw new Error( "Failed to compute gas price with PoW-mining(1), got empty text" );
             powNumber = owaspUtils.toBN( owaspUtils.ensureStartsWith0x( powNumber ) );
             details.trace( "{p}BN PoW-mining number is {}", strLogPrefix, powNumber );
@@ -579,7 +579,7 @@ async function tmWait(
     details.debug( "{p}TM - will wait TX {} to complete for {} second(s) maximum",
         strLogPrefix, txId, nWaitSeconds );
     const startTs = imaHelperAPIs.currentTimestamp();
-    while( ! tmIsFinished( await tmGetRecord( txId ) ) &&
+    while( !tmIsFinished( await tmGetRecord( txId ) ) &&
                 ( imaHelperAPIs.currentTimestamp() - startTs ) < nWaitSeconds )
         await threadInfo.sleep( 500 );
     const r = await tmGetRecord( txId );
@@ -686,7 +686,7 @@ export class TransactionCustomizer {
         let strArgumentsDescription = "";
         if( arrArguments.length > 0 ) {
             strArgumentsDescription += log.fmtDebug( "( " );
-            for( let i = 0; i < arrArguments.length; ++ i ) {
+            for( let i = 0; i < arrArguments.length; ++i ) {
                 if( i > 0 )
                     strArgumentsDescription += log.fmtDebug( ", " );
                 strArgumentsDescription += log.fmtInformation( "{}", arrArguments[i] );

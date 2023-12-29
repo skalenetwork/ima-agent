@@ -161,7 +161,7 @@ export async function waitForClonedTokenToAppear(
         sc.joABI["token_manager_" + strTokenSuffixLC + "_address"],
         sc.joABI["token_manager_" + strTokenSuffixLC + "_abi"],
         sc.ethersProvider );
-    for( let idxAttempt = 0; idxAttempt < cntAttempts; ++ idxAttempt ) {
+    for( let idxAttempt = 0; idxAttempt < cntAttempts; ++idxAttempt ) {
         log.information( "Discovering {} step {}...", strTokenSuffixUC, idxAttempt );
         if( gMillisecondsToSleepStepWaitForClonedTokenToAppear > 0 )
             await threadInfo.sleep( gMillisecondsToSleepStepWaitForClonedTokenToAppear );
@@ -405,7 +405,7 @@ export function checkKeysExistInABI(
     const cnt = arrKeys.length;
     for( let i = 0; i < cnt; ++i ) {
         const strKey = arrKeys[i];
-        if( ! checkKeyExistInABI( strName, strFile, joABI, strKey, isExitOnError ) )
+        if( !checkKeyExistInABI( strName, strFile, joABI, strKey, isExitOnError ) )
             return false;
     }
     return true;

@@ -101,7 +101,7 @@ export function enableColorization( bIsEnable?: boolean ): void {
     cc.enable( !!bIsEnable );
 }
 export function isEnabledColorization(): boolean {
-    return ( !! ( cc.isEnabled() ) );
+    return ( !!( cc.isEnabled() ) );
 }
 
 export function getPrintTimestamps(): boolean {
@@ -180,7 +180,7 @@ export function getStreamWithFilePath( strFilePath: string ): TLogger | null {
 let gStreamGlobal: TLogger | null;
 
 export function globalStream(): TLogger {
-    if( ! gStreamGlobal ) {
+    if( !gStreamGlobal ) {
         gStreamGlobal = {
             id: 0,
             strPath: "global",
@@ -219,7 +219,7 @@ export function globalStream(): TLogger {
 export function createStandardOutputStream(): TLogger | null {
     try {
         const objEntry: TLogger = {
-            id: gIdentifierAllocatorCounter ++,
+            id: gIdentifierAllocatorCounter++,
             strPath: "stdout",
             nMaxSizeBeforeRotation: -1,
             nMaxFilesCount: -1,
@@ -330,7 +330,7 @@ export function insertStandardOutputStream(): boolean {
 export function createMemoryOutputStream(): TLogger {
     try {
         const objEntry: TLoggerMemory = {
-            id: gIdentifierAllocatorCounter ++,
+            id: gIdentifierAllocatorCounter++,
             strPath: "memory",
             nMaxSizeBeforeRotation: -1,
             nMaxFilesCount: -1,
@@ -349,7 +349,7 @@ export function createMemoryOutputStream(): TLogger {
                     return false;
                 const s = this.arrAccumulatedLogTextLines[
                     this.arrAccumulatedLogTextLines.length - 1];
-                if( ! s )
+                if( !s )
                     return false;
                 if( s[s.length - 1] == "\n" )
                     return true;
@@ -358,7 +358,7 @@ export function createMemoryOutputStream(): TLogger {
             write: function( ...args: any[] ): void {
                 const s = fmtArgumentsArray( args );
                 const arr = s.split( "\n" );
-                for( let i = 0; i < arr.length; ++ i ) {
+                for( let i = 0; i < arr.length; ++i ) {
                     const strLine = arr[i];
                     let strHeader = "";
                     if( this.isLastLineEndsWithCarriageReturn() ||
@@ -373,7 +373,7 @@ export function createMemoryOutputStream(): TLogger {
             writeRaw: function( ...args: any[] ): void {
                 const s = fmtArgumentsArray( args );
                 const arr = s.split( "\n" );
-                for( let i = 0; i < arr.length; ++ i ) {
+                for( let i = 0; i < arr.length; ++i ) {
                     const strLine = arr[i];
                     this.arrAccumulatedLogTextLines.push( strLine + "\n" );
                 }
@@ -386,13 +386,13 @@ export function createMemoryOutputStream(): TLogger {
             function( nBytesToWrite: number ) { this.arrAccumulatedLogTextLines = []; },
             toString: function(): string {
                 let s = "";
-                for( let i = 0; i < this.arrAccumulatedLogTextLines.length; ++ i )
+                for( let i = 0; i < this.arrAccumulatedLogTextLines.length; ++i )
                     s += this.arrAccumulatedLogTextLines[i];
                 return s;
             },
             exposeDetailsTo:
             function( otherStream: TLogger, strTitle: string, isSuccess: boolean ): void {
-                if( ! ( this.arrAccumulatedLogTextLines &&
+                if( !( this.arrAccumulatedLogTextLines &&
                     this.arrAccumulatedLogTextLines.length > 0 ) )
                     return;
                 let werePausedTimeStamps = false;
@@ -412,7 +412,7 @@ export function createMemoryOutputStream(): TLogger {
                         cc.sunny( strTitle ) + cc.bright( " action (" ) + cc.sunny( "BEGIN" ) +
                         cc.bright( ") --- --- ------ --- " ) );
                     otherStream.write( "\n" );
-                    for( let i = 0; i < this.arrAccumulatedLogTextLines.length; ++ i ) {
+                    for( let i = 0; i < this.arrAccumulatedLogTextLines.length; ++i ) {
                         try {
                             otherStream.writeRaw( this.arrAccumulatedLogTextLines[i] );
                         } catch ( err ) {
@@ -509,7 +509,7 @@ export function createFileOutput(
 ): TLogger | null {
     try {
         const objEntry: TLogger = {
-            id: gIdentifierAllocatorCounter ++,
+            id: gIdentifierAllocatorCounter++,
             strPath: "" + strFilePath,
             nMaxSizeBeforeRotation: 0 + ( nMaxSizeBeforeRotation || 0 ),
             nMaxFilesCount: 0 + ( nMaxFilesCount || 0 ),
@@ -666,13 +666,13 @@ export function insertFileOutput(
 
 export function extractErrorMessage( jo?: any, strDefaultErrorText?: string ): string {
     strDefaultErrorText = strDefaultErrorText || "unknown error or error without a description";
-    if( ! jo )
+    if( !jo )
         return strDefaultErrorText;
     try {
         const isError = function( err: Error | string ) {
             return err && err instanceof Error && err.stack && err.message;
         };
-        if( ! isError( jo ) ) {
+        if( !isError( jo ) ) {
             if( "error" in jo ) {
                 jo = jo.error;
                 if( typeof jo == "string" )
@@ -695,7 +695,7 @@ export function extractErrorMessage( jo?: any, strDefaultErrorText?: string ): s
 function tryToSplitFormatString( strFormat?: string, cntArgsMax?: number ): any[] | null {
     if( !( strFormat && typeof strFormat == "string" ) )
         return null;
-    if( ! cntArgsMax )
+    if( !cntArgsMax )
         cntArgsMax = 0;
     const arrParts: any[] = [];
     let s = strFormat; let cntFoundArgs = 0;
@@ -714,7 +714,7 @@ function tryToSplitFormatString( strFormat?: string, cntArgsMax?: number ): any[
         if( strPart.length > 0 )
             arrParts.push( { type: "text", text: strPart } );
         arrParts.push( { type: "arg", text: strArgDesc } );
-        ++ cntFoundArgs;
+        ++cntFoundArgs;
         if( s.length == 0 )
             break;
     }
@@ -731,14 +731,14 @@ export function fmtArgumentsArray( arrArgs: any[], fnFormatter?: any ): string {
         ? tryToSplitFormatString( arrArgs[0], arrArgs.length - 1 ) : null;
     let s = ""; let isValueMode = false;
     const fnDefaultOneArgumentFormatter = function( arg?: any, fnCustomFormatter?: any ): string {
-        if( ! fnCustomFormatter )
+        if( !fnCustomFormatter )
             fnCustomFormatter = fnFormatter;
         const t = typeof arg;
         if( t == "string" ) {
             if( arg.length > 0 ) {
                 if( arg == " " || arg == "\n" ) {
                     // skip
-                } else if( ! cc.isStringAlreadyColorized( arg ) )
+                } else if( !cc.isStringAlreadyColorized( arg ) )
                     return fnCustomFormatter( arg );
             }
         } else
@@ -746,11 +746,11 @@ export function fmtArgumentsArray( arrArgs: any[], fnFormatter?: any ): string {
         return arg;
     };
     const fnFormatOneArgument = function( arg: any, fmt?: any ): string {
-        if( ! arg )
+        if( !arg )
             return arg;
         if( arg == " " || arg == "\n" )
             return arg;
-        if( ! isValueMode )
+        if( !isValueMode )
             return fnDefaultOneArgumentFormatter( arg, null );
         if( fmt && typeof "fmt" == "string" ) {
             if( fmt == "raw" )
@@ -788,11 +788,11 @@ export function fmtArgumentsArray( arrArgs: any[], fnFormatter?: any ): string {
                     isValueMode = true;
                     if( idxArgNextPrinted < arrArgs.length )
                         s += fnFormatOneArgument( arrArgs[idxArgNextPrinted], joPart.text );
-                    ++ idxArgNextPrinted;
+                    ++idxArgNextPrinted;
                     continue;
                 }
                 // assume joPart.type == "text" always here, at this point
-                if( ! cc.isStringAlreadyColorized( joPart.text ) )
+                if( !cc.isStringAlreadyColorized( joPart.text ) )
                     s += fnFormatter( joPart.text );
                 else
                     s += joPart.text;
@@ -975,9 +975,9 @@ export function createMemoryStream(): TLogger {
 
 export function add(
     strFilePath: string, nMaxSizeBeforeRotation?: number, nMaxFilesCount?: number ): boolean {
-    if( ! nMaxSizeBeforeRotation )
+    if( !nMaxSizeBeforeRotation )
         nMaxSizeBeforeRotation = 0;
-    if( ! nMaxFilesCount )
+    if( !nMaxFilesCount )
         nMaxFilesCount = 0;
     return insertFileOutput(
         strFilePath,
@@ -1037,7 +1037,7 @@ let gMapReversedVerbose: Map < string, number > = new Map < string, number >();
 
 export function verbose(): any { return gMapVerbose; }
 export function verboseReversed(): Map < string, number > {
-    if( ! gMapReversedVerbose )
+    if( !gMapReversedVerbose )
         gMapReversedVerbose = computeVerboseAlias();
     return gMapReversedVerbose;
 }

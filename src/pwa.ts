@@ -43,7 +43,7 @@ function computeWalkNodeIndices( nNodeNumber: number, nNodesCount: number ): num
         if( i == nNodeNumber )
             break;
         arrWalkNodeIndices.push( i );
-        -- i;
+        --i;
         if( i < 0 )
             i = nNodesCount - 1;
     }
@@ -51,7 +51,7 @@ function computeWalkNodeIndices( nNodeNumber: number, nNodesCount: number ): num
 }
 
 export function checkLoopWorkTypeStringIsCorrect( strLoopWorkType: string ): boolean {
-    if( ! strLoopWorkType )
+    if( !strLoopWorkType )
         return false;
     switch ( strLoopWorkType.toString().toLowerCase() ) {
     case "oracle":
@@ -74,16 +74,16 @@ function composeEmptyStateForPendingWorkAnalysis(): any {
 
 function getNodeProgressAndTimestamp(
     joNode: discoveryTools.TSChainNode, strLoopWorkType: string, nIndexS2S: number ) {
-    if( ! ( "pwaState" in joNode ) )
+    if( !( "pwaState" in joNode ) )
         joNode.pwaState = composeEmptyStateForPendingWorkAnalysis();
     strLoopWorkType = strLoopWorkType.toLowerCase();
-    if( ( !joNode.pwaState ) || ( ! ( strLoopWorkType in joNode.pwaState ) ) ) {
+    if( ( !joNode.pwaState ) || ( !( strLoopWorkType in joNode.pwaState ) ) ) {
         throw new Error( `Specified value ${strLoopWorkType} is not a correct loop work type, ` +
             "cannot access info" );
     }
     if( strLoopWorkType != "s2s" )
         return ( joNode.pwaState as any )[strLoopWorkType];
-    if( ! ( nIndexS2S in joNode.pwaState[strLoopWorkType].mapS2S ) )
+    if( !( nIndexS2S in joNode.pwaState[strLoopWorkType].mapS2S ) )
         joNode.pwaState[strLoopWorkType].mapS2S[nIndexS2S] = { isInProgress: false, ts: 0 };
 
     return joNode.pwaState[strLoopWorkType].mapS2S[nIndexS2S];
@@ -93,18 +93,18 @@ export async function checkOnLoopStart(
     imaState: state.TIMAState, strLoopWorkType: string, nIndexS2S?: number ) {
     try {
         nIndexS2S = nIndexS2S || 0; // convert to number if undefined
-        if( ! checkLoopWorkTypeStringIsCorrect( strLoopWorkType ) )
+        if( !checkLoopWorkTypeStringIsCorrect( strLoopWorkType ) )
             throw new Error( `Specified value ${strLoopWorkType} is not a correct loop work type` );
-        if( ! imaState.isPWA )
+        if( !imaState.isPWA )
             return true; // PWA is N/A
         if( imaState.nNodesCount <= 1 )
             return true; // PWA is N/A
         if( !( imaState.nNodeNumber >= 0 && imaState.nNodeNumber < imaState.nNodesCount ) )
             return true; // PWA is N/A
-        if( ! imaState.joSChainNetworkInfo )
+        if( !imaState.joSChainNetworkInfo )
             return true; // PWA is N/A
         const jarrNodes = imaState.joSChainNetworkInfo.network;
-        if( ! jarrNodes )
+        if( !jarrNodes )
             throw new Error( "S-Chain network info is not available yet to PWA" );
         const arrBusyNodeIndices: number[] = [];
         const arrWalkNodeIndices: number[] =
@@ -163,18 +163,18 @@ export async function handleLoopStateArrived(
     let isSuccess = false;
     let joNode: any = null;
     try {
-        if( ! checkLoopWorkTypeStringIsCorrect( strLoopWorkType ) )
+        if( !checkLoopWorkTypeStringIsCorrect( strLoopWorkType ) )
             throw new Error( `Specified value ${strLoopWorkType} is not a correct loop work type` );
-        if( ! imaState.isPWA )
+        if( !imaState.isPWA )
             return true;
         if( imaState.nNodesCount <= 1 )
             return true; // PWA is N/A
         if( !( imaState.nNodeNumber >= 0 && imaState.nNodeNumber < imaState.nNodesCount ) )
             return true; // PWA is N/A
-        if( ! imaState.joSChainNetworkInfo )
+        if( !imaState.joSChainNetworkInfo )
             return true; // PWA is N/A
         const jarrNodes = imaState.joSChainNetworkInfo.network;
-        if( ! jarrNodes )
+        if( !jarrNodes )
             throw new Error( "S-Chain network info is not available yet to PWA" );
         joNode = jarrNodes[nNodeNumber];
         const joProps: any = getNodeProgressAndTimestamp( joNode, strLoopWorkType, nIndexS2S );
@@ -186,7 +186,7 @@ export async function handleLoopStateArrived(
             nNodeNumber, strLoopWorkType, isStart, 0 + ts );
         const isSignatureOK = await imaBLS.doVerifyReadyHash(
             strMessageHash, nNodeNumber, signature, imaState.isPrintPWA );
-        if( ! isSignatureOK )
+        if( !isSignatureOK )
             throw new Error( "BLS verification failed" );
         joProps.isInProgress = ( !!isStart );
         joProps.ts = 0 + ts;
@@ -212,18 +212,18 @@ async function notifyOnLoopImpl(
     const se = isStart ? "start" : "end";
     try {
         nIndexS2S = nIndexS2S || 0; // convert to number if undefined
-        if( ! checkLoopWorkTypeStringIsCorrect( strLoopWorkType ) )
+        if( !checkLoopWorkTypeStringIsCorrect( strLoopWorkType ) )
             throw new Error( `Specified value ${strLoopWorkType} is not a correct loop work type` );
-        if( ! imaState.isPWA )
+        if( !imaState.isPWA )
             return true;
         if( imaState.nNodesCount <= 1 )
             return true; // PWA is N/A
         if( !( imaState.nNodeNumber >= 0 && imaState.nNodeNumber < imaState.nNodesCount ) )
             return true; // PWA is N/A
-        if( ! imaState.joSChainNetworkInfo )
+        if( !imaState.joSChainNetworkInfo )
             return true; // PWA is N/A
         const jarrNodes = imaState.joSChainNetworkInfo.network;
-        if( ! jarrNodes )
+        if( !jarrNodes )
             throw new Error( "S-Chain network info is not available yet to PWA" );
         const nUtcUnixTimeStamp = Math.floor( ( new Date() ).getTime() / 1000 );
 
@@ -252,7 +252,7 @@ async function notifyOnLoopImpl(
                         if( joCall )
                             await joCall.disconnect();
                     } );
-            if( ! joCall )
+            if( !joCall )
                 return false;
             const joIn: any = {
                 method: "skale_imaNotifyLoopWork",

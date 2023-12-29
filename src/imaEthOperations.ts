@@ -41,7 +41,7 @@ export async function getBalanceEth(
 ) {
     const strLogPrefix = "getBalanceEth() call ";
     try {
-        if( ! ( ethersProvider && joAccount ) )
+        if( !( ethersProvider && joAccount ) )
             return "<no-data>";
         const strAddress = joAccount.address();
         if( ( !isMainNet ) && contractERC20 ) {
@@ -323,7 +323,7 @@ export async function viewEthPaymentFromSchainOnMainNet(
     const strActionName = "";
     const strLogPrefix = "S ETH View: ";
     try {
-        if( ! ( ethersProviderMainNet && joAccountMN && joDepositBoxETH ) )
+        if( !( ethersProviderMainNet && joAccountMN && joDepositBoxETH ) )
             return null;
         const addressFrom = joAccountMN.address();
         const xWei =

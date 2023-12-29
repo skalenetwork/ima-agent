@@ -88,7 +88,7 @@ export interface TSChainsInformation {
 
 export function findSChainIndexInArrayByName(
     arrSChains: TSChainInformation[], strSChainName: string ) {
-    for( let idxSChain = 0; idxSChain < arrSChains.length; ++ idxSChain ) {
+    for( let idxSChain = 0; idxSChain < arrSChains.length; ++idxSChain ) {
         const joSChain = arrSChains[idxSChain];
         if( joSChain.name.toString() == strSChainName.toString() )
             return idxSChain;
@@ -100,11 +100,11 @@ let gConnectedChainsData: TSChainsInformation | null = null;
 
 export function autoUpdateLastCachedSChains(): boolean {
     const imaState: state.TIMAState = state.get();
-    if( ! imaState.optsS2S.strNetworkBrowserPath )
+    if( !imaState.optsS2S.strNetworkBrowserPath )
         return false;
     const jo: TSChainsInformation =
         imaUtils.jsonFileLoad( imaState.optsS2S.strNetworkBrowserPath, null );
-    if( ! ( jo && "schains" in jo && "updatedAt" in jo ) ) {
+    if( !( jo && "schains" in jo && "updatedAt" in jo ) ) {
         log.error(
             "Connected S-chains cache in thread {} was not updated from file {}, bad data format",
             threadInfo.threadDescription(), imaState.optsS2S.strNetworkBrowserPath );
@@ -122,7 +122,7 @@ export function autoUpdateLastCachedSChains(): boolean {
 
 export function getLastCachedSChains(): TSChainInformation[] {
     autoUpdateLastCachedSChains();
-    if( ! gConnectedChainsData )
+    if( !gConnectedChainsData )
         return [];
     return JSON.parse( JSON.stringify( gConnectedChainsData.schains ) );
 }

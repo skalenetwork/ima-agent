@@ -177,7 +177,7 @@ const Keccak = sha3Module.Keccak;
 function discoverBlsThreshold( joSChainNetworkInfo: discoveryTools.TSChainNetworkInfo ): number {
     const imaState: state.TIMAState = state.get();
     joSChainNetworkInfo = joSChainNetworkInfo || imaState.joSChainNetworkInfo;
-    if( ! joSChainNetworkInfo )
+    if( !joSChainNetworkInfo )
         return -1;
     const jarrNodes = joSChainNetworkInfo.network;
     for( let i = 0; i < jarrNodes.length; ++i ) {
@@ -191,7 +191,7 @@ function discoverBlsThreshold( joSChainNetworkInfo: discoveryTools.TSChainNetwor
 function discoverBlsParticipants( joSChainNetworkInfo: discoveryTools.TSChainNetworkInfo ): number {
     const imaState: state.TIMAState = state.get();
     joSChainNetworkInfo = joSChainNetworkInfo || imaState.joSChainNetworkInfo;
-    if( ! joSChainNetworkInfo )
+    if( !joSChainNetworkInfo )
         return -1;
     const jarrNodes = joSChainNetworkInfo.network;
     for( let i = 0; i < jarrNodes.length; ++i ) {
@@ -398,7 +398,7 @@ function getBlsGlueTmpDir(): string {
 
 function allocBlsTmpActionDir(): string {
     const strActionDir = getBlsGlueTmpDir() + "/" + imaUtils.replaceAll( imaUtils.uuid(), "-", "" );
-    if( ! fs.existsSync( strActionDir ) )
+    if( !fs.existsSync( strActionDir ) )
         fs.mkdirSync( strActionDir, { recursive: true } );
     return strActionDir;
 }
@@ -408,7 +408,7 @@ function performBlsGlue(
     nIdxCurrentMsgBlockStart: number, strFromChainName: string, arrSignResults: any[]
 ): any {
     const imaState: state.TIMAState = state.get();
-    if( ! imaState.joSChainNetworkInfo )
+    if( !imaState.joSChainNetworkInfo )
         throw new Error( "No own S-Chain network information" );
     const strLogPrefix = `${strDirection}/BLS/Glue: `;
     let joGlueResult: any = null;
@@ -416,7 +416,7 @@ function performBlsGlue(
     const nParticipants = discoverBlsParticipants( imaState.joSChainNetworkInfo );
     details.debug( "{p}Discovered BLS threshold is {}.", strLogPrefix, nThreshold );
     details.debug( "{p}Discovered number of BLS participants is {}.", strLogPrefix, nParticipants );
-    if( ! checkBlsThresholdAndBlsParticipants( nThreshold, nParticipants, "BLS glue", details ) )
+    if( !checkBlsThresholdAndBlsParticipants( nThreshold, nParticipants, "BLS glue", details ) )
         return null;
     const strMessageHash =
         owaspUtils.removeStarting0x(
@@ -499,7 +499,7 @@ function performBlsGlue(
 
 function performBlsGlueU256( details: log.TLogger, u256: any, arrSignResults: any[] ): any {
     const imaState: state.TIMAState = state.get();
-    if( ! imaState.joSChainNetworkInfo )
+    if( !imaState.joSChainNetworkInfo )
         throw new Error( "No own S-Chain network information" );
     const strLogPrefix = "BLS/Glue: ";
     let joGlueResult: any = null;
@@ -507,7 +507,7 @@ function performBlsGlueU256( details: log.TLogger, u256: any, arrSignResults: an
     const nParticipants = discoverBlsParticipants( imaState.joSChainNetworkInfo );
     details.debug( "{p}Discovered BLS threshold is {}.", strLogPrefix, nThreshold );
     details.debug( "{p}Discovered number of BLS participants is {}.", strLogPrefix, nParticipants );
-    if( ! checkBlsThresholdAndBlsParticipants(
+    if( !checkBlsThresholdAndBlsParticipants(
         nThreshold, nParticipants, "BLS glue-256", details ) )
         return null;
     details.trace( "{p}Original long message is {}", strLogPrefix, keccak256U256( u256, false ) );
@@ -599,12 +599,12 @@ function performBlsVerifyI(
     if( !joResultFromNode )
         return true;
     const imaState: state.TIMAState = state.get();
-    if( ! imaState.joSChainNetworkInfo )
+    if( !imaState.joSChainNetworkInfo )
         throw new Error( "No own S-Chain network information" );
     const strLogPrefix = `${strDirection}/BLS/#${nZeroBasedNodeIndex}: `;
     const nThreshold = discoverBlsThreshold( imaState.joSChainNetworkInfo );
     const nParticipants = discoverBlsParticipants( imaState.joSChainNetworkInfo );
-    if( ! checkBlsThresholdAndBlsParticipants(
+    if( !checkBlsThresholdAndBlsParticipants(
         nThreshold, nParticipants, "BLS verify-I", details ) )
         return false;
     const strActionDir = allocBlsTmpActionDir();
@@ -664,15 +664,15 @@ function performBlsVerifyIU256(
     nZeroBasedNodeIndex: number, joResultFromNode: any, u256: any,
     joPublicKey: discoveryTools.TBLSPublicKey
 ): boolean {
-    if( ! joResultFromNode )
+    if( !joResultFromNode )
         return true;
     const imaState: state.TIMAState = state.get();
-    if( ! imaState.joSChainNetworkInfo )
+    if( !imaState.joSChainNetworkInfo )
         throw new Error( "No own S-Chain network information" );
     const strLogPrefix = `BLS/#${nZeroBasedNodeIndex}: `;
     const nThreshold = discoverBlsThreshold( imaState.joSChainNetworkInfo );
     const nParticipants = discoverBlsParticipants( imaState.joSChainNetworkInfo );
-    if( ! checkBlsThresholdAndBlsParticipants(
+    if( !checkBlsThresholdAndBlsParticipants(
         nThreshold, nParticipants, "BLS verify-I-U256", details ) )
         return false;
     const strActionDir = allocBlsTmpActionDir();
@@ -725,11 +725,11 @@ function performBlsVerify(
     if( !joGlueResult )
         return true;
     const imaState: state.TIMAState = state.get();
-    if( ! imaState.joSChainNetworkInfo )
+    if( !imaState.joSChainNetworkInfo )
         throw new Error( "No own S-Chain network information" );
     const nThreshold = discoverBlsThreshold( imaState.joSChainNetworkInfo );
     const nParticipants = discoverBlsParticipants( imaState.joSChainNetworkInfo );
-    if( ! checkBlsThresholdAndBlsParticipants(
+    if( !checkBlsThresholdAndBlsParticipants(
         nThreshold, nParticipants, "BLS verify", details ) )
         return false;
     const strActionDir = allocBlsTmpActionDir();
@@ -797,11 +797,11 @@ function performBlsVerifyU256(
     if( !joGlueResult )
         return true;
     const imaState: state.TIMAState = state.get();
-    if( ! imaState.joSChainNetworkInfo )
+    if( !imaState.joSChainNetworkInfo )
         throw new Error( "No own S-Chain network information" );
     const nThreshold = discoverBlsThreshold( imaState.joSChainNetworkInfo );
     const nParticipants = discoverBlsParticipants( imaState.joSChainNetworkInfo );
-    if( ! checkBlsThresholdAndBlsParticipants(
+    if( !checkBlsThresholdAndBlsParticipants(
         nThreshold, nParticipants, "BLS verify-U256", details ) )
         return false;
     const strActionDir = allocBlsTmpActionDir();
@@ -879,7 +879,7 @@ async function checkCorrectnessOfMessagesToSign(
             ( joExtraSignOpts && "ethersProviderSrc" in joExtraSignOpts &&
             joExtraSignOpts.ethersProviderSrc )
                 ? joExtraSignOpts.ethersProviderSrc : null;
-        if( ! ethersProvider ) {
+        if( !ethersProvider ) {
             throw new Error( "CRITICAL ERROR: No provider specified in extra signing options " +
                 `for checking messages of direction ${strDirection}` );
         }
@@ -921,14 +921,14 @@ async function checkCorrectnessOfMessagesToSign(
                     dstContract: joMessage.destinationContract,
                     data: joMessage.data
                 };
-                if( ! joMessageProxy )
+                if( !joMessageProxy )
                     throw new Error( "No message proxy available" );
                 const isValidMessage = await joMessageProxy.callStatic.verifyOutgoingMessageData(
                     outgoingMessageData, { from: strCallerAccountAddress } );
                 details.trace(
                     "{p}{bright} Got verification call result {}, real message index is: {}, " +
                     "saved msgCounter is: {}", strLogPrefix, strDirection,
-                    isValidMessage, + idxMessage, outgoingMessageData.msgCounter );
+                    isValidMessage, +idxMessage, outgoingMessageData.msgCounter );
                 if( !isValidMessage ) {
                     throw new Error( "Bad message detected, " +
                         `message is: ${JSON.stringify( joMessage )}` );
@@ -1013,7 +1013,7 @@ async function prepareSignMessagesImpl( optsSignOperation: TSignOperationOptions
         optsSignOperation.strLogPrefix, optsSignOperation.nThreshold );
     optsSignOperation.details.trace( "{p}Discovered number of BLS participants is {}.",
         optsSignOperation.strLogPrefix, optsSignOperation.nParticipants );
-    if( ! checkBlsThresholdAndBlsParticipants(
+    if( !checkBlsThresholdAndBlsParticipants(
         optsSignOperation.nThreshold,
         optsSignOperation.nParticipants,
         "prepare sign messages " + optsSignOperation.strDirection,
@@ -1062,11 +1062,11 @@ async function gatherSigningCheckFinish( optsSignOperation: TSignOperationOption
         optsSignOperation.details.success( "{p}Got BLS glue result: {}",
             optsSignOperation.strLogPrefixB, joGlueResult );
         if( optsSignOperation.imaState.strPathBlsVerify.length > 0 ) {
-            if( ! optsSignOperation.imaState.joSChainNetworkInfo )
+            if( !optsSignOperation.imaState.joSChainNetworkInfo )
                 throw new Error( "No own S-Chain network information" );
             const joCommonPublicKey = discoverCommonPublicKey(
                 optsSignOperation.details, optsSignOperation.imaState.joSChainNetworkInfo, false );
-            if( ! joCommonPublicKey ) {
+            if( !joCommonPublicKey ) {
                 strError = "No BLS common public key";
                 optsSignOperation.details.error( "{p}{err}",
                     optsSignOperation.strLogPrefixB, strError );
@@ -1133,7 +1133,7 @@ async function gatherSigningStartImpl( optsSignOperation: TSignOperationOptions 
         optsSignOperation.strLogPrefix );
     optsSignOperation.errGathering = null;
     for( let idxStep = 0; idxStep < optsSignOperation.joGatheringTracker.nWaitIntervalMaxSteps;
-        ++ idxStep ) {
+        ++idxStep ) {
         await threadInfo.sleep(
             optsSignOperation.joGatheringTracker.nWaitIntervalStepMilliseconds );
         if( await gatherSigningCheckFinish( optsSignOperation ) )
@@ -1164,7 +1164,7 @@ async function gatherSigningFinishImpl( optsSignOperation: TSignOperationOptions
     if( optsSignOperation.errGathering ) {
         optsSignOperation.details.error( "Failed BLS sign result awaiting(1): {err}",
             optsSignOperation.errGathering.toString() );
-        if( ! optsSignOperation.bHaveResultReportCalled ) {
+        if( !optsSignOperation.bHaveResultReportCalled ) {
             optsSignOperation.bHaveResultReportCalled = true;
             await optsSignOperation.fn(
                 `Failed to gather BLS signatures in ${optsSignOperation.jarrNodes.length} ` +
@@ -1186,7 +1186,7 @@ async function gatherSigningFinishImpl( optsSignOperation: TSignOperationOptions
         }
         return;
     }
-    if( ! optsSignOperation.bHaveResultReportCalled ) {
+    if( !optsSignOperation.bHaveResultReportCalled ) {
         optsSignOperation.details.error( "Failed BLS sign result awaiting(2): {err}",
             "No reports were arrived" );
         optsSignOperation.bHaveResultReportCalled = true;
@@ -1235,7 +1235,7 @@ async function doSignConfigureChainAccessParams( optsSignOperation: TSignOperati
         optsSignOperation.targetChainID = optsSignOperation.imaState.chainProperties.mn.chainId;
         optsSignOperation.fromChainID = optsSignOperation.imaState.chainProperties.sc.chainId;
     } else if( optsSignOperation.strDirection == "S2S" ) {
-        if( ! optsSignOperation.joExtraSignOpts )
+        if( !optsSignOperation.joExtraSignOpts )
             throw new Error( "No S2S signing options provided" );
         optsSignOperation.targetChainName =
             "" + optsSignOperation.joExtraSignOpts.chainNameDst;
@@ -1311,12 +1311,12 @@ async function doSignProcessHandleCall(
                 };
                 optsSignOperation.details.trace( "{p}Will verify sign result for node {}",
                     optsSignOperation.strLogPrefixA, nZeroBasedNodeIndex );
-                if( ! optsSignOperation.imaState.joSChainNetworkInfo )
+                if( !optsSignOperation.imaState.joSChainNetworkInfo )
                     throw new Error( "No own S-Chain network information" );
                 const joPublicKey = discoverPublicKeyByIndex( nZeroBasedNodeIndex,
                     optsSignOperation.imaState.joSChainNetworkInfo, optsSignOperation.details,
                     true );
-                if( ! joPublicKey )
+                if( !joPublicKey )
                     throw new Error( `No BLS public key for node ${nZeroBasedNodeIndex}` );
                 if( performBlsVerifyI(
                     optsSignOperation.details, optsSignOperation.strDirection,
@@ -1385,7 +1385,7 @@ async function doSignProcessOneImpl( i: number, optsSignOperation: TSignOperatio
             if( joCall )
                 joCall.disconnect().then( function() {} ).catch( function() {} );
         } );
-    if( ! joCall )
+    if( !joCall )
         return;
     await doSignConfigureChainAccessParams( optsSignOperation );
     const joParams: THandleVerifyAndSignCallDataParams = {
@@ -1473,7 +1473,7 @@ async function doSignMessagesImpl(
         "-" + optsSignOperation.strFromChainName + "-msg#" +
         optsSignOperation.nIdxCurrentMsgBlockStart;
     try {
-        if( ! ( await prepareSignMessagesImpl( optsSignOperation ) ) )
+        if( !( await prepareSignMessagesImpl( optsSignOperation ) ) )
             return;
         for( let i = 0; i < optsSignOperation.jarrNodes.length; ++i ) {
             const cntSuccess = optsSignOperation.arrSignResults.length;
@@ -1498,7 +1498,7 @@ async function doSignMessagesImpl(
             optsSignOperation.details.critical( "Failed BLS sign due to generic " +
                 "flow exception: {err}, stack is:\n{stack}", err, err );
         }
-        if( ! optsSignOperation.bHaveResultReportCalled ) {
+        if( !optsSignOperation.bHaveResultReportCalled ) {
             optsSignOperation.bHaveResultReportCalled = true;
             await optsSignOperation.fn( "Failed BLS sign due to exception: " +
                 `${owaspUtils.extractErrorMessage( err )}`, optsSignOperation.jarrMessages, null
@@ -1559,7 +1559,7 @@ async function prepareSignU256( optsSignU256: TSignU256Options ) {
         optsSignU256.strLogPrefix, optsSignU256.u256 );
     optsSignU256.details.trace( "{p}Will query to sign {} skaled node(s)...",
         optsSignU256.strLogPrefix, optsSignU256.jarrNodes.length );
-    if( ! optsSignU256.imaState.joSChainNetworkInfo )
+    if( !optsSignU256.imaState.joSChainNetworkInfo )
         throw new Error( "No own S-Chain network information" );
     optsSignU256.nThreshold = discoverBlsThreshold( optsSignU256.imaState.joSChainNetworkInfo );
     optsSignU256.nParticipants =
@@ -1568,7 +1568,7 @@ async function prepareSignU256( optsSignU256: TSignU256Options ) {
         optsSignU256.strLogPrefix, optsSignU256.nThreshold );
     optsSignU256.details.trace( "{p}Discovered number of BLS participants is {}.",
         optsSignU256.strLogPrefix, optsSignU256.nParticipants );
-    if( ! checkBlsThresholdAndBlsParticipants(
+    if( !checkBlsThresholdAndBlsParticipants(
         optsSignU256.nThreshold,
         optsSignU256.nParticipants,
         "prepare sign-U256",
@@ -1640,12 +1640,12 @@ async function doSignU256OneImplHandleCallResult(
                 };
                 optsSignU256.details.trace( "{p}Will verify sign result for node {}",
                     strLogPrefixA, nZeroBasedNodeIndex );
-                if( ! optsSignU256.imaState.joSChainNetworkInfo )
+                if( !optsSignU256.imaState.joSChainNetworkInfo )
                     throw new Error( "No own S-Chain network information" );
                 const joPublicKey = discoverPublicKeyByIndex( nZeroBasedNodeIndex,
                     optsSignU256.imaState.joSChainNetworkInfo, optsSignU256.details,
                     true );
-                if( ! joPublicKey )
+                if( !joPublicKey )
                     throw new Error( `No BLS public key for node ${nZeroBasedNodeIndex}` );
                 if( performBlsVerifyIU256(
                     optsSignU256.details, nZeroBasedNodeIndex, joResultFromNode,
@@ -1700,7 +1700,7 @@ async function doSignU256OneImpl( i: number, optsSignU256: TSignU256Options ) {
     let joCall: rpcCall.TRPCCall | null = null;
     try {
         joCall = await rpcCall.create( strNodeURL, rpcCallOpts );
-        if( ! joCall )
+        if( !joCall )
             throw new Error( `Failed to create JSON RPC call object to ${strNodeURL}` );
         optsSignU256.details.trace( "{p}Will invoke skale_imaBSU256 for to sign value {}",
             optsSignU256.strLogPrefix, optsSignU256.u256.toString() );
@@ -1748,12 +1748,12 @@ async function gatherSigningCheckFinish256( optsSignU256: TSignU256Options ) {
         optsSignU256.details.success( "{p}Got BLS glue u256 result: {}",
             strLogPrefixB, joGlueResult );
         if( optsSignU256.imaState.strPathBlsVerify.length > 0 ) {
-            if( ! optsSignU256.imaState.joSChainNetworkInfo )
+            if( !optsSignU256.imaState.joSChainNetworkInfo )
                 throw new Error( "No own S-Chain network information" );
             const joCommonPublicKey = discoverCommonPublicKey(
                 optsSignU256.details, optsSignU256.imaState.joSChainNetworkInfo, false );
-            if( ! joCommonPublicKey ) {
-                if( ! optsSignU256.imaState.joSChainNetworkInfo )
+            if( !joCommonPublicKey ) {
+                if( !optsSignU256.imaState.joSChainNetworkInfo )
                     throw new Error( "No own S-Chain network information" );
                 const strError = "No BLS common public key";
                 optsSignU256.details.error( "{p}{}", strLogPrefixB, strError );
@@ -1813,7 +1813,7 @@ async function doSignU256Gathering( optsSignU256: TSignU256Options ) {
     optsSignU256.details.debug( "{p}Waiting for BLS glue result ", optsSignU256.strLogPrefix );
     optsSignU256.errGathering = null;
     for( let idxStep = 0; idxStep < optsSignU256.joGatheringTracker.nWaitIntervalMaxSteps;
-        ++ idxStep ) {
+        ++idxStep ) {
         await threadInfo.sleep(
             optsSignU256.joGatheringTracker.nWaitIntervalStepMilliseconds );
         if( await gatherSigningCheckFinish256( optsSignU256 ) )
@@ -1862,7 +1862,7 @@ export async function doSignU256( u256: any, details: log.TLogger,
         nCountOfBlsPartsToCollect: 1,
         errGathering: null
     };
-    if( ! optsSignU256.imaState.joSChainNetworkInfo )
+    if( !optsSignU256.imaState.joSChainNetworkInfo )
         throw new Error( "No own S-Chain network information" );
     optsSignU256.jarrNodes = optsSignU256.imaState.joSChainNetworkInfo.network;
     optsSignU256.details.trace( "{p}Invoking signing u256 procedure...",
@@ -1877,7 +1877,7 @@ export async function doSignU256( u256: any, details: log.TLogger,
         await optsSignU256.fn( "BLS u256 signing is unavailable", optsSignU256.u256, null );
         return;
     }
-    if( ! ( await prepareSignU256( optsSignU256 ) ) )
+    if( !( await prepareSignU256( optsSignU256 ) ) )
         return;
     for( let i = 0; i < optsSignU256.jarrNodes.length; ++i )
         await doSignU256OneImpl( i, optsSignU256 );
@@ -1909,11 +1909,11 @@ export async function doVerifyReadyHash(
             Y: arrTmp[1]
         }
     };
-    if( ! imaState.joSChainNetworkInfo )
+    if( !imaState.joSChainNetworkInfo )
         throw new Error( "No own S-Chain network information" );
     const nThreshold = discoverBlsThreshold( imaState.joSChainNetworkInfo );
     const nParticipants = discoverBlsParticipants( imaState.joSChainNetworkInfo );
-    if( ! checkBlsThresholdAndBlsParticipants(
+    if( !checkBlsThresholdAndBlsParticipants(
         nThreshold, nParticipants, "verify ready hash", details ) )
         return false;
     const strActionDir = allocBlsTmpActionDir();
@@ -2008,7 +2008,7 @@ export async function doSignReadyHash( strMessageHash: string, isExposeOutput: a
     let joSignResult: TSignResult | null = null;
     let joCall: rpcCall.TRPCCall | null = null;
     try {
-        if( ! imaState.joSChainNetworkInfo )
+        if( !imaState.joSChainNetworkInfo )
             throw new Error( "No own S-Chain network information" );
         const nThreshold = discoverBlsThreshold( imaState.joSChainNetworkInfo );
         const nParticipants = discoverBlsParticipants( imaState.joSChainNetworkInfo );
@@ -2017,15 +2017,15 @@ export async function doSignReadyHash( strMessageHash: string, isExposeOutput: a
         details.trace( "{p}Discovered number of BLS participants is {}.",
             strLogPrefix, nParticipants );
         details.trace( "{p}hash value to sign is {}", strLogPrefix, strMessageHash );
-        if( ! checkBlsThresholdAndBlsParticipants(
+        if( !checkBlsThresholdAndBlsParticipants(
             nThreshold, nParticipants, "sign ready hash", details ) )
             return false;
         let joAccount: state.TAccount = imaState.chainProperties.sc.joAccount;
-        if( ! joAccount.strSgxURL ) {
+        if( !joAccount.strSgxURL ) {
             joAccount = imaState.chainProperties.mn.joAccount;
-            if( ! joAccount.strSgxURL )
+            if( !joAccount.strSgxURL )
                 throw new Error( "SGX URL is unknown, cannot sign U256" );
-            if( ! joAccount.strBlsKeyName )
+            if( !joAccount.strBlsKeyName )
                 throw new Error( "BLS keys name is unknown, cannot sign U256" );
         }
         let rpcCallOpts: rpcCall.TRPCCallOpts | null = null;
@@ -2041,7 +2041,7 @@ export async function doSignReadyHash( strMessageHash: string, isExposeOutput: a
             details.warning( "Will sign via SGX without SSL options" );
         const signerIndex = imaState.nNodeNumber;
         joCall = await rpcCall.create( joAccount.strSgxURL, rpcCallOpts );
-        if( ! joCall )
+        if( !joCall )
             throw new Error( `Failed to create JSON RPC call object to ${joAccount.strSgxURL}` );
         const joIn: any = {
             jsonrpc: "2.0",
@@ -2102,7 +2102,7 @@ async function prepareHandlingOfSkaleImaVerifyAndSign(
         optsHandleVerifyAndSign.strFromChainName, optsHandleVerifyAndSign.strFromChainID,
         optsHandleVerifyAndSign.strToChainName, optsHandleVerifyAndSign.strToChainID,
         optsHandleVerifyAndSign.jarrMessages );
-    if( ! optsHandleVerifyAndSign.imaState.joSChainNetworkInfo )
+    if( !optsHandleVerifyAndSign.imaState.joSChainNetworkInfo )
         throw new Error( "No own S-Chain network information" );
     optsHandleVerifyAndSign.nThreshold =
         discoverBlsThreshold( optsHandleVerifyAndSign.imaState.joSChainNetworkInfo );
@@ -2116,7 +2116,7 @@ async function prepareHandlingOfSkaleImaVerifyAndSign(
         "{p}{bright} verification algorithm discovered number of BLS participants is {}.",
         optsHandleVerifyAndSign.strLogPrefix, optsHandleVerifyAndSign.strDirection,
         optsHandleVerifyAndSign.nParticipants );
-    if( ! checkBlsThresholdAndBlsParticipants(
+    if( !checkBlsThresholdAndBlsParticipants(
         optsHandleVerifyAndSign.nThreshold,
         optsHandleVerifyAndSign.nParticipants,
         "prepare handling of skale_imaVerifyAndSign",
@@ -2150,7 +2150,7 @@ async function prepareS2sOfSkaleImaVerifyAndSign(
     }
 
     let joSChainSrc: any = null; let strUrlSrcSChain: string | null = null;
-    for( let idxSChain = 0; idxSChain < arrSChainsCached.length; ++ idxSChain ) {
+    for( let idxSChain = 0; idxSChain < arrSChainsCached.length; ++idxSChain ) {
         const joSChain = arrSChainsCached[idxSChain];
         if( joSChain.name.toString() == strSChainNameSrc.toString() ) {
             joSChainSrc = joSChain;
@@ -2245,7 +2245,7 @@ export async function handleSkaleImaVerifyAndSign( joCallData: THandleVerifyAndS
     };
     let joCall: rpcCall.TRPCCall | null = null;
     try {
-        if( ! ( await prepareHandlingOfSkaleImaVerifyAndSign( optsHandleVerifyAndSign ) ) )
+        if( !( await prepareHandlingOfSkaleImaVerifyAndSign( optsHandleVerifyAndSign ) ) )
             return null;
         optsHandleVerifyAndSign.joExtraSignOpts = null;
         if( optsHandleVerifyAndSign.strDirection == "S2S" )
@@ -2260,11 +2260,11 @@ export async function handleSkaleImaVerifyAndSign( joCallData: THandleVerifyAndS
         optsHandleVerifyAndSign.details.debug( "{p}Will BLS-sign verified messages.",
             optsHandleVerifyAndSign.strLogPrefix );
         let joAccount = optsHandleVerifyAndSign.imaState.chainProperties.sc.joAccount;
-        if( ! joAccount.strSgxURL ) {
+        if( !joAccount.strSgxURL ) {
             joAccount = optsHandleVerifyAndSign.imaState.chainProperties.mn.joAccount;
-            if( ! joAccount.strSgxURL )
+            if( !joAccount.strSgxURL )
                 throw new Error( "SGX URL is unknown, cannot sign(handle) IMA message(s)" );
-            if( ! joAccount.strBlsKeyName )
+            if( !joAccount.strBlsKeyName )
                 throw new Error( "BLS keys name is unknown, cannot sign IMA message(s)" );
         }
         let rpcCallOpts: rpcCall.TRPCCallOpts | null = null;
@@ -2280,7 +2280,7 @@ export async function handleSkaleImaVerifyAndSign( joCallData: THandleVerifyAndS
             optsHandleVerifyAndSign.details.warning( "Will sign via SGX without SSL options" );
         const signerIndex = optsHandleVerifyAndSign.imaState.nNodeNumber;
         joCall = await rpcCall.create( joAccount.strSgxURL, rpcCallOpts );
-        if( ! joCall )
+        if( !joCall )
             throw new Error( `Failed to create JSON RPC call object to ${joAccount.strSgxURL}` );
         const joIn = {
             jsonrpc: "2.0",
@@ -2319,7 +2319,7 @@ export async function handleSkaleImaVerifyAndSign( joCallData: THandleVerifyAndS
 async function handleSkaleImaBSU256Prepare( optsBSU256: TBSU256Options ) {
     optsBSU256.details.debug( "{p}Will U256-BLS-sign {}",
         optsBSU256.strLogPrefix, optsBSU256.joCallData );
-    if( ! optsBSU256.imaState.joSChainNetworkInfo )
+    if( !optsBSU256.imaState.joSChainNetworkInfo )
         throw new Error( "No own S-Chain network information" );
     optsBSU256.nThreshold = discoverBlsThreshold( optsBSU256.imaState.joSChainNetworkInfo );
     optsBSU256.nParticipants = discoverBlsParticipants( optsBSU256.imaState.joSChainNetworkInfo );
@@ -2327,7 +2327,7 @@ async function handleSkaleImaBSU256Prepare( optsBSU256: TBSU256Options ) {
         optsBSU256.strLogPrefix, optsBSU256.nThreshold );
     optsBSU256.details.trace( "{p}Discovered number of BLS participants is {}.",
         optsBSU256.strLogPrefix, optsBSU256.nParticipants );
-    if( ! checkBlsThresholdAndBlsParticipants(
+    if( !checkBlsThresholdAndBlsParticipants(
         optsBSU256.nThreshold,
         optsBSU256.nParticipants,
         "handle BSU256Prepare",
@@ -2340,14 +2340,14 @@ async function handleSkaleImaBSU256Prepare( optsBSU256: TBSU256Options ) {
     optsBSU256.details.trace( "{p}hash of U256 value to sign is {}",
         optsBSU256.strLogPrefix, optsBSU256.strMessageHash );
     optsBSU256.details.trace( "{p}Will BLS-sign U256.", optsBSU256.strLogPrefix );
-    if( ! optsBSU256.joAccount )
+    if( !optsBSU256.joAccount )
         throw new Error( "No account to perform blsSignMessageHash for U256" )
     optsBSU256.joAccount = optsBSU256.imaState.chainProperties.sc.joAccount;
-    if( ! optsBSU256.joAccount.strSgxURL ) {
+    if( !optsBSU256.joAccount.strSgxURL ) {
         optsBSU256.joAccount = optsBSU256.imaState.chainProperties.mn.joAccount;
-        if( ! optsBSU256.joAccount.strSgxURL )
+        if( !optsBSU256.joAccount.strSgxURL )
             throw new Error( "SGX URL is unknown, cannot sign U256" );
-        if( ! optsBSU256.joAccount.strBlsKeyName )
+        if( !optsBSU256.joAccount.strBlsKeyName )
             throw new Error( "BLS keys name is unknown, cannot sign U256" );
     }
     return true;
@@ -2410,9 +2410,9 @@ export async function handleSkaleImaBSU256( joCallData: TBSU256CallData ) {
     };
     let joCall: rpcCall.TRPCCall | null = null;
     try {
-        if( ! ( await handleSkaleImaBSU256Prepare( optsBSU256 ) ) )
+        if( !( await handleSkaleImaBSU256Prepare( optsBSU256 ) ) )
             return null;
-        if( ! optsBSU256.joAccount )
+        if( !optsBSU256.joAccount )
             throw new Error( "No account to perform blsSignMessageHash for U256" )
         let rpcCallOpts: rpcCall.TRPCCallOpts | null = null;
         if( "strPathSslKey" in optsBSU256.joAccount &&
@@ -2430,7 +2430,7 @@ export async function handleSkaleImaBSU256( joCallData: TBSU256CallData ) {
             optsBSU256.details.warning( "Will sign via SGX without SSL options" );
         const signerIndex = optsBSU256.imaState.nNodeNumber;
         joCall = await rpcCall.create( optsBSU256.joAccount.strSgxURL, rpcCallOpts );
-        if( ! joCall ) {
+        if( !joCall ) {
             throw new Error( "Failed to create JSON RPC call object " +
                 `to ${optsBSU256.joAccount.strSgxURL}` );
         }

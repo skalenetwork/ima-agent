@@ -171,13 +171,13 @@ async function handleOracleSigned(
     }
     optsGasPriceSetup.strActionName = "doOracleGasPriceSetup.formatSignature";
     let signature: owaspUtils.TXYSignature | null = joGlueResult ? joGlueResult.signature : null;
-    if( ! signature )
+    if( !signature )
         signature = { X: "0", Y: "0" };
     let hashPoint = joGlueResult ? joGlueResult.hashPoint : null;
-    if( ! hashPoint )
+    if( !hashPoint )
         hashPoint = { X: "0", Y: "0" };
     let hint = joGlueResult ? joGlueResult.hint : null;
-    if( ! hint )
+    if( !hint )
         hint = "0";
     const sign: owaspUtils.TBLSSignature = {
         blsSignature: [ signature.X, signature.Y ], // BLS glue of signatures
@@ -252,7 +252,7 @@ export async function doOracleGasPriceSetup(
     chainIdSChain: string,
     fnSignMsgOracle: TFunctionSignMsgOracle
 ) {
-    if( ! getEnabledOracle() )
+    if( !getEnabledOracle() )
         return true;
     const optsGasPriceSetup: TGasPriceSetupOptions = {
         ethersProviderMainNet,

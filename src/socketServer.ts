@@ -51,7 +51,7 @@ export class SocketServer extends EventDispatcher {
         self.isLogSocketTrafficRaw = false;
         acceptor.on( "connection", function( eventData: any ) {
             const socket = eventData.socket;
-            if( ( ! ( "remoteAddress" in eventData ) ) ||
+            if( ( !( "remoteAddress" in eventData ) ) ||
                 eventData.remoteAddress == null ||
                 eventData.remoteAddress == undefined )
                 socket.strSavedRemoteAddress = socket.constructor.name;

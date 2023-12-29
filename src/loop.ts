@@ -173,7 +173,7 @@ async function singleTransferLoopPartOracle( optsLoop: TLoopOptions, strLogPrefi
         log.notice( "{p}Will invoke Oracle gas price setup in {}...",
             strLogPrefix, threadInfo.threadDescription() );
         try {
-            if( ! await pwa.checkOnLoopStart( imaState, "oracle" ) ) {
+            if( !await pwa.checkOnLoopStart( imaState, "oracle" ) ) {
                 imaState.loopState.oracle.wasInProgress = false;
                 log.notice( "{p}Skipped(oracle) in {} due to cancel mode reported from PWA",
                     strLogPrefix, threadInfo.threadDescription() );
@@ -181,11 +181,11 @@ async function singleTransferLoopPartOracle( optsLoop: TLoopOptions, strLogPrefi
                 if( checkTimeFraming( null, "oracle", optsLoop.joRuntimeOpts ) ) {
                     imaState.loopState.oracle.isInProgress = true;
                     await pwa.notifyOnLoopStart( imaState, "oracle" );
-                    if( ! imaState.chainProperties.mn.ethersProvider )
+                    if( !imaState.chainProperties.mn.ethersProvider )
                         throw new Error( "No provider for MN" );
-                    if( ! imaState.chainProperties.sc.ethersProvider )
+                    if( !imaState.chainProperties.sc.ethersProvider )
                         throw new Error( "No provider for SC" );
-                    if( ! imaState.joCommunityLocker )
+                    if( !imaState.joCommunityLocker )
                         throw new Error( "No CommunityLocker contract" );
                     b0 = await imaOracleOperations.doOracleGasPriceSetup(
                         imaState.chainProperties.mn.ethersProvider,
@@ -224,7 +224,7 @@ async function singleTransferLoopPartM2S( optsLoop: TLoopOptions, strLogPrefix: 
         log.notice( "{p}Will invoke M2S transfer in {}...",
             strLogPrefix, threadInfo.threadDescription() );
         try {
-            if( ! await pwa.checkOnLoopStart( imaState, "m2s" ) ) {
+            if( !await pwa.checkOnLoopStart( imaState, "m2s" ) ) {
                 imaState.loopState.m2s.wasInProgress = false;
                 log.notice( "{p}Skipped(m2s) in {} due to cancel mode reported from PWA",
                     strLogPrefix, threadInfo.threadDescription() );
@@ -232,13 +232,13 @@ async function singleTransferLoopPartM2S( optsLoop: TLoopOptions, strLogPrefix: 
                 if( checkTimeFraming( null, "m2s", optsLoop.joRuntimeOpts ) ) {
                     imaState.loopState.m2s.isInProgress = true;
                     await pwa.notifyOnLoopStart( imaState, "m2s" );
-                    if( ! imaState.chainProperties.mn.ethersProvider )
+                    if( !imaState.chainProperties.mn.ethersProvider )
                         throw new Error( "No provider for MN" );
-                    if( ! imaState.chainProperties.sc.ethersProvider )
+                    if( !imaState.chainProperties.sc.ethersProvider )
                         throw new Error( "No provider for SC" );
-                    if( ! imaState.joMessageProxyMainNet )
+                    if( !imaState.joMessageProxyMainNet )
                         throw new Error( "No MessageProxyMainNet contract" );
-                    if( ! imaState.joMessageProxySChain )
+                    if( !imaState.joMessageProxySChain )
                         throw new Error( "No MessageProxySChain ) contract" );
                     b1 = await IMA.doTransfer( // main-net --> s-chain
                         "M2S",
@@ -293,7 +293,7 @@ async function singleTransferLoopPartS2M( optsLoop: TLoopOptions, strLogPrefix: 
         log.notice( "{p}Will invoke S2M transfer in {}...",
             strLogPrefix, threadInfo.threadDescription() );
         try {
-            if( ! await pwa.checkOnLoopStart( imaState, "s2m" ) ) {
+            if( !await pwa.checkOnLoopStart( imaState, "s2m" ) ) {
                 imaState.loopState.s2m.wasInProgress = false;
                 log.notice( "{p}Skipped(s2m) in {} due to cancel mode reported from PWA",
                     strLogPrefix, threadInfo.threadDescription() );
@@ -301,13 +301,13 @@ async function singleTransferLoopPartS2M( optsLoop: TLoopOptions, strLogPrefix: 
                 if( checkTimeFraming( null, "s2m", optsLoop.joRuntimeOpts ) ) {
                     imaState.loopState.s2m.isInProgress = true;
                     await pwa.notifyOnLoopStart( imaState, "s2m" );
-                    if( ! imaState.chainProperties.mn.ethersProvider )
+                    if( !imaState.chainProperties.mn.ethersProvider )
                         throw new Error( "No provider for MN" );
-                    if( ! imaState.chainProperties.sc.ethersProvider )
+                    if( !imaState.chainProperties.sc.ethersProvider )
                         throw new Error( "No provider for SC" );
-                    if( ! imaState.joMessageProxyMainNet )
+                    if( !imaState.joMessageProxyMainNet )
                         throw new Error( "No MessageProxyMainNet contract" );
-                    if( ! imaState.joMessageProxySChain )
+                    if( !imaState.joMessageProxySChain )
                         throw new Error( "No MessageProxySChain contract" );
                     b2 = await IMA.doTransfer( // s-chain --> main-net
                         "S2M",
@@ -366,11 +366,11 @@ async function singleTransferLoopPartS2S( optsLoop: TLoopOptions, strLogPrefix: 
     if( optsLoop.enableStepS2S && imaState.optsS2S.isEnabled ) {
         log.notice( "{p}Will invoke all S2S transfers...", strLogPrefix );
         try {
-            if( ! imaState.chainProperties.sc.ethersProvider )
+            if( !imaState.chainProperties.sc.ethersProvider )
                 throw new Error( "No provider for SC" );
-            if( ! imaState.joMessageProxySChain )
+            if( !imaState.joMessageProxySChain )
                 throw new Error( "No MessageProxySChain contract" );
-            if( ! imaState.joTokenManagerETH )
+            if( !imaState.joTokenManagerETH )
                 throw new Error( "No TokenManagerETH contract" );
             b3 = await IMA.doAllS2S( // s-chain --> s-chain
                 optsLoop.joRuntimeOpts,
@@ -586,7 +586,7 @@ export async function ensureHaveWorkers( opts: TParallelLoopRunOptions ) {
     const cntWorkers = 2;
     log.debug( "Loop module will create its ",
         cntWorkers, " worker(s) in ", threadInfo.threadDescription(), "..." );
-    for( let idxWorker = 0; idxWorker < cntWorkers; ++ idxWorker ) {
+    for( let idxWorker = 0; idxWorker < cntWorkers; ++idxWorker ) {
         const workerData: TWorkerData = {
             url: "ima_loop_server" + idxWorker,
             colorization: { isEnabled: log.isEnabledColorization() }
@@ -610,7 +610,7 @@ export async function ensureHaveWorkers( opts: TParallelLoopRunOptions ) {
             const joMessage = eventData.message;
             switch ( joMessage.method ) {
             case "init":
-                if( ! joMessage.error ) {
+                if( !joMessage.error ) {
                     aClient.logicalInitComplete = true;
                     break
                 }
@@ -736,7 +736,7 @@ export async function ensureHaveWorkers( opts: TParallelLoopRunOptions ) {
                 colorization: { isEnabled: log.isEnabledColorization() }
             }
         };
-        while( ! aClient.logicalInitComplete ) {
+        while( !aClient.logicalInitComplete ) {
             log.information( "LOOP server is not initialized yet..." );
             await threadInfo.sleep( 1000 );
             aClient.send( jo );
@@ -755,12 +755,12 @@ export async function runParallelLoops( opts: TParallelLoopRunOptions ) {
 }
 
 export async function spreadArrivedStateOfPendingWorkAnalysis( joMessage: any ) {
-    if( ! ( joMessage && typeof joMessage == "object" &&
+    if( !( joMessage && typeof joMessage == "object" &&
         "method" in joMessage && joMessage.method == "skale_imaNotifyLoopWork" )
     )
         return;
     const cntWorkers = gArrWorkers.length;
-    for( let idxWorker = 0; idxWorker < cntWorkers; ++ idxWorker )
+    for( let idxWorker = 0; idxWorker < cntWorkers; ++idxWorker )
         gArrClients[idxWorker].send( joMessage );
 
 }
@@ -773,6 +773,6 @@ export async function spreadUpdatedSChainNetwork( isFinal: boolean ) {
         joSChainNetworkInfo: imaState.joSChainNetworkInfo
     };
     const cntWorkers = gArrWorkers.length;
-    for( let idxWorker = 0; idxWorker < cntWorkers; ++ idxWorker )
+    for( let idxWorker = 0; idxWorker < cntWorkers; ++idxWorker )
         gArrClients[idxWorker].send( joMessage );
 }

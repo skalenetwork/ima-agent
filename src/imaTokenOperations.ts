@@ -42,7 +42,7 @@ export async function getBalanceErc20(
 ) {
     const strLogPrefix = "getBalanceErc20() call ";
     try {
-        if( ! ( ethersProvider && joAccount && strCoinName && joABI && ( strCoinName + "_abi" ) in
+        if( !( ethersProvider && joAccount && strCoinName && joABI && ( strCoinName + "_abi" ) in
                 joABI && ( strCoinName + "_address" ) in joABI ) )
             return "<no-data>";
         const strAddress = joAccount.address();
@@ -72,7 +72,7 @@ export async function getOwnerOfErc721(
 ) {
     const strLogPrefix = "getOwnerOfErc721() call ";
     try {
-        if( ! ( ethersProvider && joAccount && strCoinName && joABI && ( strCoinName + "_abi" ) in
+        if( !( ethersProvider && joAccount && strCoinName && joABI && ( strCoinName + "_abi" ) in
                 joABI && ( strCoinName + "_address" ) in joABI ) )
             return "<no-data>";
         const strAddress = joAccount.address();
@@ -101,7 +101,7 @@ export async function getBalanceErc1155(
 ) {
     const strLogPrefix = "getBalanceErc1155() call ";
     try {
-        if( ! ( ethersProvider && joAccount && strCoinName && joABI && ( strCoinName + "_abi" ) in
+        if( !( ethersProvider && joAccount && strCoinName && joABI && ( strCoinName + "_abi" ) in
                 joABI && ( strCoinName + "_address" ) in joABI ) )
             return "<no-data>";
         const strAddress = joAccount.address();
@@ -1277,21 +1277,21 @@ export async function doErc20PaymentS2S(
     const strLogPrefix = `S2S ERC20 Payment(${( isForward ? "forward" : "reverse" )}:): `;
     try {
         strActionName = `validateArgs/doErc20PaymentS2S/${( isForward ? "forward" : "reverse" )}`;
-        if( ! ethersProviderSrc )
+        if( !ethersProviderSrc )
             throw new Error( "No ethers provider specified for source of transfer" );
-        if( ! strChainNameDst )
+        if( !strChainNameDst )
             throw new Error( "No destination chain name provided" );
-        if( ! joAccountSrc )
+        if( !joAccountSrc )
             throw new Error( "No account or sign TX way provided" );
-        if( ! strCoinNameErc20Src )
+        if( !strCoinNameErc20Src )
             throw new Error( "Need full source ERC20 information, like ABI" );
-        if( ! joSrcErc20 )
+        if( !joSrcErc20 )
             throw new Error( "No source ERC20 ABI provided" );
         if( isReverse ) {
-            if( ! ercDstAddress20 )
+            if( !ercDstAddress20 )
                 throw new Error( "No destination ERC20 address provided" );
         }
-        if( ! tc )
+        if( !tc )
             throw new Error( "No transaction customizer provided" );
         const ercSrcAbi20 = joSrcErc20[strCoinNameErc20Src + "_abi"];
         const ercSrcAddress20 = joSrcErc20[strCoinNameErc20Src + "_address"];
@@ -1417,21 +1417,21 @@ export async function doErc721PaymentS2S(
     const strLogPrefix = `S2S ERC721 Payment(${( isForward ? "forward" : "reverse" )}: `;
     try {
         strActionName = `validateArgs/doErc721PaymentS2S/${( isForward ? "forward" : "reverse" )}`;
-        if( ! ethersProviderSrc )
+        if( !ethersProviderSrc )
             throw new Error( "No provider for source of transfer" );
-        if( ! strChainNameDst )
+        if( !strChainNameDst )
             throw new Error( "No destination chain name provided" );
-        if( ! joAccountSrc )
+        if( !joAccountSrc )
             throw new Error( "No account or sign TX way provided" );
-        if( ! strCoinNameErc721Src )
+        if( !strCoinNameErc721Src )
             throw new Error( "Need full source ERC721 information, like ABI" );
-        if( ! joSrcErc721 )
+        if( !joSrcErc721 )
             throw new Error( "No source ERC721 ABI provided" );
         if( isReverse ) {
-            if( ! ercDstAddress721 )
+            if( !ercDstAddress721 )
                 throw new Error( "No destination ERC721 address provided" );
         }
-        if( ! tc )
+        if( !tc )
             throw new Error( "No transaction customizer provided" );
         const ercSrcAbi721 = joSrcErc721[strCoinNameErc721Src + "_abi"];
         const ercSrcAddress721 = joSrcErc721[strCoinNameErc721Src + "_address"];
@@ -1562,21 +1562,21 @@ export async function doErc1155PaymentS2S(
     const strLogPrefix = `S2S ERC1155 Payment(${( isForward ? "forward" : "reverse" )}): `;
     try {
         strActionName = `validateArgs/doErc1155PaymentS2S/${( isForward ? "forward" : "reverse" )}`;
-        if( ! ethersProviderSrc )
+        if( !ethersProviderSrc )
             throw new Error( "No provider for source of transfer" );
-        if( ! strChainNameDst )
+        if( !strChainNameDst )
             throw new Error( "No destination chain name provided" );
-        if( ! joAccountSrc )
+        if( !joAccountSrc )
             throw new Error( "No account or sign TX way provided" );
-        if( ! strCoinNameErc1155Src )
+        if( !strCoinNameErc1155Src )
             throw new Error( "Need full source ERC1155 information, like ABI" );
-        if( ! joSrcErc1155 )
+        if( !joSrcErc1155 )
             throw new Error( "No source ERC1155 ABI provided" );
         if( isReverse ) {
-            if( ! ercDstAddress1155 )
+            if( !ercDstAddress1155 )
                 throw new Error( "No destination ERC1155 address provided" );
         }
-        if( ! tc )
+        if( !tc )
             throw new Error( "No transaction customizer provided" );
         const ercSrcAbi1155 = joSrcErc1155[strCoinNameErc1155Src + "_abi"];
         const ercSrcAddress1155 = joSrcErc1155[strCoinNameErc1155Src + "_address"];
@@ -1708,21 +1708,21 @@ export async function doErc1155BatchPaymentS2S(
     try {
         strActionName =
             `validateArgs/doErc1155BatchPaymentS2S/${( isForward ? "forward" : "reverse" )}`;
-        if( ! ethersProviderSrc )
+        if( !ethersProviderSrc )
             throw new Error( "No provider for source of transfer" );
-        if( ! strChainNameDst )
+        if( !strChainNameDst )
             throw new Error( "No destination chain name provided" );
-        if( ! joAccountSrc )
+        if( !joAccountSrc )
             throw new Error( "No account or sign TX way provided" );
-        if( ! strCoinNameErc1155Src )
+        if( !strCoinNameErc1155Src )
             throw new Error( "Need full source ERC1155 information, like ABI" );
-        if( ! joSrcErc1155 )
+        if( !joSrcErc1155 )
             throw new Error( "No source ERC1155 ABI provided" );
         if( isReverse ) {
-            if( ! ercDstAddress1155 )
+            if( !ercDstAddress1155 )
                 throw new Error( "No destination ERC1155 address provided" );
         }
-        if( ! tc )
+        if( !tc )
             throw new Error( "No transaction customizer provided" );
         const ercSrcAbi1155 = joSrcErc1155[strCoinNameErc1155Src + "_abi"];
         const ercSrcAddress1155 = joSrcErc1155[strCoinNameErc1155Src + "_address"];
@@ -1848,7 +1848,7 @@ export async function mintErc20(
     const details = log.createMemoryStream();
     try {
         details.debug( "{p}Mint ERC20 token amount {}", strLogPrefix, nAmount );
-        if( ! ( ethersProvider && joAccount && strAddressMintTo &&
+        if( !( ethersProvider && joAccount && strAddressMintTo &&
             typeof strAddressMintTo == "string" && strAddressMintTo.length > 0 &&
             strTokenContractAddress && typeof strTokenContractAddress == "string" &&
             strTokenContractAddress.length > 0 && joTokenContractABI
@@ -1918,7 +1918,7 @@ export async function mintErc721(
     const details = log.createMemoryStream();
     try {
         details.debug( "{p}Mint ERC721 token ID {}", strLogPrefix, idToken );
-        if( ! ( ethersProvider && joAccount && strAddressMintTo &&
+        if( !( ethersProvider && joAccount && strAddressMintTo &&
             typeof strAddressMintTo == "string" && strAddressMintTo.length > 0 &&
             strTokenContractAddress && typeof strTokenContractAddress == "string" &&
             strTokenContractAddress.length > 0 && joTokenContractABI
@@ -1990,7 +1990,7 @@ export async function mintErc1155(
     try {
         details.debug( "{p}Mint ERC1155 token ID {} token amount {}",
             strLogPrefix, idToken, nAmount );
-        if( ! ( ethersProvider && joAccount && strAddressMintTo &&
+        if( !( ethersProvider && joAccount && strAddressMintTo &&
             typeof strAddressMintTo == "string" && strAddressMintTo.length > 0 &&
             strTokenContractAddress && typeof strTokenContractAddress == "string" &&
             strTokenContractAddress.length > 0 && joTokenContractABI
@@ -2062,7 +2062,7 @@ export async function burnErc20(
     const details = log.createMemoryStream();
     try {
         details.debug( "{p}Burn ERC20 token amount {}", strLogPrefix, nAmount );
-        if( ! ( ethersProvider && joAccount && strAddressBurnFrom &&
+        if( !( ethersProvider && joAccount && strAddressBurnFrom &&
             typeof strAddressBurnFrom == "string" && strAddressBurnFrom.length > 0 &&
             strTokenContractAddress && typeof strTokenContractAddress == "string" &&
             strTokenContractAddress.length > 0 && joTokenContractABI
@@ -2131,7 +2131,7 @@ export async function burnErc721(
     const details = log.createMemoryStream();
     try {
         details.debug( "{p}Burn ERC721 token ID {}", strLogPrefix, idToken );
-        if( ! ( ethersProvider && joAccount &&
+        if( !( ethersProvider && joAccount &&
             strTokenContractAddress && typeof strTokenContractAddress == "string" &&
             strTokenContractAddress.length > 0 && joTokenContractABI
         ) )
@@ -2201,7 +2201,7 @@ export async function burnErc1155(
     try {
         details.debug( "{p}Burn ERC1155 token ID {} token amount {}",
             strLogPrefix, idToken, nAmount );
-        if( ! ( ethersProvider && joAccount && strAddressBurnFrom &&
+        if( !( ethersProvider && joAccount && strAddressBurnFrom &&
             typeof strAddressBurnFrom == "string" && strAddressBurnFrom.length > 0 &&
             strTokenContractAddress && typeof strTokenContractAddress == "string" &&
             strTokenContractAddress.length > 0 && joTokenContractABI

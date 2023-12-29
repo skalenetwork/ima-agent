@@ -92,7 +92,7 @@ export async function waitWebSocketIsOpen( socket: ws.WebSocket,
             if( isInsideAsyncHandler )
                 return;
             isInsideAsyncHandler = true;
-            ++ nStep;
+            ++nStep;
             if( socket.readyState === 1 ) {
                 // Notice, connection is made if we are here
                 clearInterval( iv );
@@ -102,7 +102,7 @@ export async function waitWebSocketIsOpen( socket: ws.WebSocket,
             } else {
                 if( fnStep ) {
                     const isContinue = await fnStep( nStep );
-                    if( ! isContinue ) {
+                    if( !isContinue ) {
                         clearInterval( iv );
                         reject( new Error( "web socket wait timeout by callback " +
                             `on step ${nStep}` ) );
@@ -236,7 +236,7 @@ export async function doConnectIfNeeded(
 
 async function doReconnectWsStep( joCall: TRPCCall, opts: TRPCCallOpts | null,
     fn?: TFunctionConnectionResultHandler ) {
-    if( ! joCall.isAutoReconnect )
+    if( !joCall.isAutoReconnect )
         return;
     if( joCall.isDisconnectMode )
         return;
@@ -361,7 +361,7 @@ export async function doCall( joCall: TRPCCall, joIn: any, fn: TFunctionCallResu
             } );
             await promiseComplete.catch( function( err: Error | string ) {
                 log.error( "{url} HTTP call error {err}", joCall.url, err );
-                if( ! errCall )
+                if( !errCall )
                     errCall = `HTTP(S)/RPC call(catch) error: ${err as any}`;
             } );
         } else {
@@ -492,7 +492,7 @@ export function enrichTopLevelFieldsInJSON( jo: any ) {
 }
 
 export function isValidUrl( s: any ) {
-    if( ! s )
+    if( !s )
         return false;
     try {
         const u = new URL( s.toString() );
@@ -504,7 +504,7 @@ export function isValidUrl( s: any ) {
 }
 
 export function getValidUrl( s: any ) {
-    if( ! s )
+    if( !s )
         return null;
     try {
         return new URL( s.toString() );
@@ -514,7 +514,7 @@ export function getValidUrl( s: any ) {
 }
 
 export function getDefaultPort( strProtocol: any ) {
-    if( ! strProtocol )
+    if( !strProtocol )
         return 80;
     switch ( strProtocol.toString().toLowerCase() ) {
     case "http:":
@@ -529,7 +529,7 @@ export function getDefaultPort( strProtocol: any ) {
 
 export function getValidHostAndPort( s: any ) {
     const u = getValidUrl( s );
-    if( ! u )
+    if( !u )
         return null;
     const jo = {
         strHost: u.hostname,
@@ -634,14 +634,14 @@ export async function checkTcp( strHost: string, nPort: number, nTimeoutMillisec
 }
 
 export async function checkUrl( u: URL | string, nTimeoutMilliseconds: number, isLog?: boolean ) {
-    if( ! u )
+    if( !u )
         return false;
     const jo = getValidHostAndPort( u );
     if( isLog ) {
         console.log( `${gStrTcpConnectionHeader}Extracted from URL ${u.toString()} data ` +
             `fields are: ${JSON.stringify( jo )}` );
     }
-    if( ! ( jo?.strHost && "nPort" in jo ) ) {
+    if( !( jo?.strHost && "nPort" in jo ) ) {
         console.log( `${gStrTcpConnectionHeader}Extracted from URL ${u.toString()} data ` +
             "fields are bad, returning \"false\" as result of TCP connection check" );
         return false;

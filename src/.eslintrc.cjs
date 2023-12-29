@@ -31,8 +31,6 @@ module.exports = {
         "space-before-blocks": [ "error", "always" ],
         "array-bracket-spacing": [ "error", "always" ],
         "object-curly-spacing": [ "error", "always" ],
-        "space-unary-ops": "off",
-        "spaced-comment": "off",
         "curly": [ "error", "multi-or-nest" ],
         "nonblock-statement-body-position": [ "error", "below" ],
         "no-unneeded-ternary": "off",

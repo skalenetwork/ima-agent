@@ -62,7 +62,7 @@ export class EventDispatcher {
         return this._listeners.some( item => item.type === type && item.listener === listener );
     }
     addEventListener( type: any, listener: any ) {
-        if( ! this.hasEventListener( type, listener ) ) {
+        if( !this.hasEventListener( type, listener ) ) {
             this._listeners.push( {
                 type,
                 listener,

@@ -175,10 +175,10 @@ function initMonitoringServer(): void {
                 if( imaState.bLogMonitoringServer )
                     log.trace( "{p}<<< message from {}: {}", strLogPrefix, ip, joMessage );
 
-                if( ! ( "method" in joMessage ) )
+                if( !( "method" in joMessage ) )
                     throw new Error( "\"method\" field was not specified" );
                 joAnswer.method = joMessage.method;
-                if( ! ( "id" in joMessage ) )
+                if( !( "id" in joMessage ) )
                     throw new Error( "\"id\" field was not specified" );
                 joAnswer.id = joMessage.id;
                 switch ( joMessage.method ) {
@@ -287,10 +287,10 @@ function initJsonRpcServer(): void {
         try {
             const joMessage: any = JSON.parse( message );
             log.trace( "{p}<<< Peer message from {}: ", strLogPrefix, ip, joMessage );
-            if( ! ( "method" in joMessage ) )
+            if( !( "method" in joMessage ) )
                 throw new Error( "\"method\" field was not specified" );
             joAnswer.method = joMessage.method;
-            if( ! ( "id" in joMessage ) )
+            if( !( "id" in joMessage ) )
                 throw new Error( "\"id\" field was not specified" );
             if( "id" in joMessage )
                 joAnswer.id = joMessage.id;
@@ -339,7 +339,7 @@ function initJsonRpcServer(): void {
             log.error( "{p}Bad message from {}: {}, error is: {err}, stack is:\n{stack}",
                 strLogPrefix, ip, message, err, err );
         }
-        if( ! isSkipMode )
+        if( !isSkipMode )
             fnSendAnswer( joAnswer );
     } );
     gExpressJsonRpcAppIMA.listen( imaState.nJsonRpcPort );
@@ -378,7 +378,7 @@ async function doTheJob() {
     log.information( "{p}{}{}", strLogPrefix, cntFalse, log.fmtError( " task(s) failed" ) );
     log.information( "{p}{p}", strLogPrefix, imaHelperAPIs.longSeparator );
     process.exitCode = ( cntFalse > 0 ) ? cntFalse : 0;
-    if( ! state.isPreventExitAfterLastAction() )
+    if( !state.isPreventExitAfterLastAction() )
         process.exit( process.exitCode );
 }
 
@@ -442,9 +442,9 @@ async function main() {
         log.information( "S-Chain network was discovery uses {} mode",
             ( isSilentReDiscovery
                 ? log.fmtWarning( "silent" ) : log.fmtSuccess( "exposed details" ) ) );
-        if( ! imaState.bNoWaitSChainStarted ) {
+        if( !imaState.bNoWaitSChainStarted ) {
             await discoveryTools.waitUntilSChainStarted();
-            if( ! isSilentReDiscovery ) {
+            if( !isSilentReDiscovery ) {
                 log.information(
                     "This S-Chain discovery will be done for command line task handler" );
             }

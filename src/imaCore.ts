@@ -124,7 +124,7 @@ async function findOutReferenceLogRecord(
         details.debug( "{p}Got {} log record(s) ({}) with data: {}",
             strLogPrefix, cntLogRecord, strEventName, arrLogRecords );
     }
-    for( let idxLogRecord = 0; idxLogRecord < cntLogRecord; ++ idxLogRecord ) {
+    for( let idxLogRecord = 0; idxLogRecord < cntLogRecord; ++idxLogRecord ) {
         const joEvent = arrLogRecords[idxLogRecord];
         const ev = {
             currentMessage: joEvent.args[0],
@@ -176,7 +176,7 @@ async function findOutAllReferenceLogRecords(
     }
     let nWalkMsgNumber = nOutMsgCnt - 1;
     let nWalkBlockId = bnBlockId;
-    for( ; nWalkMsgNumber >= nIncMsgCnt; -- nWalkMsgNumber ) {
+    for( ; nWalkMsgNumber >= nIncMsgCnt; --nWalkMsgNumber ) {
         const joReferenceLogRecord = await findOutReferenceLogRecord( details, strLogPrefix,
             ethersProvider, joMessageProxy, nWalkBlockId, nWalkMsgNumber, isVerbose );
         if( joReferenceLogRecord == null )
@@ -312,7 +312,7 @@ async function doQueryOutgoingMessageCounter( optsTransfer: TTransferOptions ) {
     const nBlockTo = "latest";
     for( let nWalkMsgNumber = optsTransfer.nIncMsgCnt;
         nWalkMsgNumber < optsTransfer.nOutMsgCnt;
-        ++ nWalkMsgNumber
+        ++nWalkMsgNumber
     ) {
         const joFilter = optsTransfer.joMessageProxySrc.filters[strEventName](
             owaspUtils.ethersMod.ethers.utils.id( optsTransfer.chainNameDst ),
@@ -538,7 +538,7 @@ async function preCheckAllMessagesSign(
             optsTransfer.strTransferErrorCategoryName, optsTransfer.details.toString() );
         return false;
     }
-    if( ! loop.checkTimeFraming( null, optsTransfer.strDirection, optsTransfer.joRuntimeOpts ) ) {
+    if( !loop.checkTimeFraming( null, optsTransfer.strDirection, optsTransfer.joRuntimeOpts ) ) {
         optsTransfer.details.warning( "{p}Time framing overflow (after signing messages)",
             optsTransfer.strLogPrefix );
         imaTransferErrorHandling.saveTransferSuccessAll();
@@ -550,7 +550,7 @@ async function preCheckAllMessagesSign(
 async function callbackAllMessagesSign(
     optsTransfer: TTransferOptions, err: Error | string | null,
     jarrMessages: any[], joGlueResult: any ) {
-    if( ! await preCheckAllMessagesSign( optsTransfer, err, jarrMessages, joGlueResult ) )
+    if( !await preCheckAllMessagesSign( optsTransfer, err, jarrMessages, joGlueResult ) )
         return;
     const nBlockSize = optsTransfer.arrMessageCounters.length;
     optsTransfer.strActionName = "dst-chain.MessageProxy.postIncomingMessages()";
@@ -724,7 +724,7 @@ async function handleAllMessagesSigning( optsTransfer: TTransferOptions ) {
 async function checkOutgoingMessageEventInOneNode(
     optsTransfer: TTransferOptions,
     optsOutgoingMessageAnalysis: TOutgoingMessageAnalysisOptions ) {
-    if( ! optsOutgoingMessageAnalysis.joNode ) {
+    if( !optsOutgoingMessageAnalysis.joNode ) {
         optsTransfer.details.error(
             "{p}{bright} no S-Chain node provided",
             optsTransfer.strLogPrefix, optsTransfer.strDirection );
@@ -760,7 +760,7 @@ async function checkOutgoingMessageEventInOneNode(
             "{p}Got {} event(s) ({}) on node {} with data: {}",
             optsTransfer.strLogPrefix, cntEvents, strEventName,
             optsOutgoingMessageAnalysis.joNode.name, nodeRV );
-        for( let idxEvent = 0; idxEvent < cntEvents; ++ idxEvent ) {
+        for( let idxEvent = 0; idxEvent < cntEvents; ++idxEvent ) {
             const joEvent = nodeRV[idxEvent];
             const eventValuesByName: any = {
                 dstChainHash: joEvent.args[0],
@@ -779,7 +779,7 @@ async function checkOutgoingMessageEventInOneNode(
             }
         }
     } catch ( err ) {
-        ++ optsOutgoingMessageAnalysis.cntFailedNodes;
+        ++optsOutgoingMessageAnalysis.cntFailedNodes;
         optsTransfer.details.error(
             "{p}{bright} message analysis error: Failed to scan events on node {}, " +
             "detailed node description is: {}, error is: {err}, stack is: ",
@@ -789,14 +789,14 @@ async function checkOutgoingMessageEventInOneNode(
         return true; // continue nodes analysis
     }
     if( bEventIsFound ) {
-        ++ optsOutgoingMessageAnalysis.cntPassedNodes;
+        ++optsOutgoingMessageAnalysis.cntPassedNodes;
         optsTransfer.details.success(
             "{p}{bright} message {} validation on node {} using URL {url} is passed",
             optsTransfer.strLogPrefix, optsTransfer.strDirection,
             optsOutgoingMessageAnalysis.idxMessage + 1,
             optsOutgoingMessageAnalysis.joNode.name, strUrlHttp );
     } else {
-        ++ optsOutgoingMessageAnalysis.cntFailedNodes;
+        ++optsOutgoingMessageAnalysis.cntFailedNodes;
         optsTransfer.details.error(
             "{p}{bright} message {} validation on node {} using URL {url} is failed",
             optsTransfer.strLogPrefix, optsTransfer.strDirection,
@@ -820,7 +820,7 @@ async function checkOutgoingMessageEvent(
     optsTransfer: TTransferOptions, joSChain: skaleObserver.TSChainInformation ) {
     const cntNodes = joSChain.nodes.length;
     const cntMessages = optsTransfer.jarrMessages.length;
-    for( let idxMessage = 0; idxMessage < cntMessages; ++ idxMessage ) {
+    for( let idxMessage = 0; idxMessage < cntMessages; ++idxMessage ) {
         const idxImaMessage = optsTransfer.arrMessageCounters[idxMessage];
         const joMessage = optsTransfer.jarrMessages[idxMessage];
         optsTransfer.details.trace(
@@ -840,13 +840,13 @@ async function checkOutgoingMessageEvent(
         try {
             for( optsOutgoingMessageAnalysis.idxNode = 0;
                 optsOutgoingMessageAnalysis.idxNode < cntNodes;
-                ++ optsOutgoingMessageAnalysis.idxNode
+                ++optsOutgoingMessageAnalysis.idxNode
             ) {
                 optsOutgoingMessageAnalysis.joNode = joSChain.nodes[
                     optsOutgoingMessageAnalysis.idxNode];
                 const isContinueNodesAnalysis = await checkOutgoingMessageEventInOneNode(
                     optsTransfer, optsOutgoingMessageAnalysis );
-                if( ! isContinueNodesAnalysis )
+                if( !isContinueNodesAnalysis )
                     break;
             }
         } catch ( err ) {
@@ -877,7 +877,7 @@ async function checkOutgoingMessageEvent(
             optsTransfer.details.close();
             return false;
         }
-        if( ! ( optsOutgoingMessageAnalysis.cntPassedNodes >= optsTransfer.cntNodesShouldPass ) ) {
+        if( !( optsOutgoingMessageAnalysis.cntPassedNodes >= optsTransfer.cntNodesShouldPass ) ) {
             optsTransfer.details.critical(
                 "{p}Error validating {bright} messages, passed node count {} is less then " +
                 "needed count {}", optsTransfer.strLogPrefix, optsTransfer.strDirection,
@@ -911,7 +911,7 @@ async function doMainTransferLoopActions( optsTransfer: TTransferOptions ) {
             "transfer step(s)", optsTransfer.strLogPrefix, optsTransfer.nIdxCurrentMsg,
             optsTransfer.nStepsDone, optsTransfer.nMaxTransactionsCount,
             optsTransfer.nTransferSteps );
-        if( ! loop.checkTimeFraming(
+        if( !loop.checkTimeFraming(
             null, optsTransfer.strDirection, optsTransfer.joRuntimeOpts ) ) {
             optsTransfer.details.warning( "{p}WARNING: Time framing overflow" +
                 "(after entering block former iteration loop)", optsTransfer.strLogPrefix );
@@ -922,7 +922,7 @@ async function doMainTransferLoopActions( optsTransfer: TTransferOptions ) {
         await gatherMessages( optsTransfer );
         if( optsTransfer.cntAccumulatedForBlock == 0 )
             break;
-        if( ! loop.checkTimeFraming(
+        if( !loop.checkTimeFraming(
             null, optsTransfer.strDirection, optsTransfer.joRuntimeOpts ) ) {
             optsTransfer.details.warning( "{p}Time framing overflow" +
                 "(after forming block of messages)", optsTransfer.strLogPrefix );
@@ -932,7 +932,7 @@ async function doMainTransferLoopActions( optsTransfer: TTransferOptions ) {
         }
         if( optsTransfer.strDirection == "S2S" ) {
             optsTransfer.strActionName = "S2S message analysis";
-            if( ! optsTransfer.joExtraSignOpts ) {
+            if( !optsTransfer.joExtraSignOpts ) {
                 throw new Error( "Could not validate S2S messages, " +
                     "no extra options provided to transfer algorithm" );
             }
@@ -960,7 +960,7 @@ async function doMainTransferLoopActions( optsTransfer: TTransferOptions ) {
                 "comparison, {} message(s) to check...", optsTransfer.strLogPrefix,
                 optsTransfer.strDirection, optsTransfer.chainNameSrc, cntNodes,
                 optsTransfer.cntNodesShouldPass, optsTransfer.cntNodesMayFail, cntMessages );
-            if( ! ( await checkOutgoingMessageEvent( optsTransfer, joSChain ) ) )
+            if( !( await checkOutgoingMessageEvent( optsTransfer, joSChain ) ) )
                 return false;
         }
 
@@ -985,7 +985,7 @@ async function doMainTransferLoopActions( optsTransfer: TTransferOptions ) {
             `${optsTransfer.nTransferLoopCounter}-doTransfer-B-${optsTransfer.chainNameSrc}` +
             `-->${optsTransfer.chainNameDst}`;
         try {
-            if( ! ( await handleAllMessagesSigning( optsTransfer ) ) )
+            if( !( await handleAllMessagesSigning( optsTransfer ) ) )
                 return false;
         } catch ( err ) {
             optsTransfer.details.critical(
@@ -994,7 +994,7 @@ async function doMainTransferLoopActions( optsTransfer: TTransferOptions ) {
         }
         if( optsTransfer.bErrorInSigningMessages )
             break;
-        ++ optsTransfer.nStepsDone;
+        ++optsTransfer.nStepsDone;
     }
     return true;
 }
@@ -1064,7 +1064,7 @@ export async function doTransfer(
         cntNodesShouldPass: 0,
         cntNodesMayFail: 0
     };
-    ++ gTransferLoopCounter;
+    ++gTransferLoopCounter;
     optsTransfer.strGatheredDetailsName =
         `${optsTransfer.strDirection}/#${optsTransfer.nTransferLoopCounter}-doTransfer-A-` +
         `${optsTransfer.chainNameSrc}-->${optsTransfer.chainNameDst}`;
@@ -1089,7 +1089,7 @@ export async function doTransfer(
         optsTransfer.details.debug( "{p}Message signing is {oo}",
             optsTransfer.strLogPrefix, optsTransfer.imaState.bSignMessages );
         if( optsTransfer.fnSignMessages == null || optsTransfer.fnSignMessages == undefined ||
-            ( ! optsTransfer.imaState.bSignMessages )
+            ( !optsTransfer.imaState.bSignMessages )
         ) {
             optsTransfer.details.debug( "{p}Using internal signing stub function",
                 optsTransfer.strLogPrefix );
@@ -1122,11 +1122,11 @@ export async function doTransfer(
         if( optsTransfer.nBlockAge < 0 )
             optsTransfer.nBlockAge = 0;
         try {
-            if( ! ( await doQueryOutgoingMessageCounter( optsTransfer ) ) ) {
+            if( !( await doQueryOutgoingMessageCounter( optsTransfer ) ) ) {
                 gIsOneTransferInProgressInThisThread = false;
                 return false;
             }
-            if( ! ( await doMainTransferLoopActions( optsTransfer ) ) ) {
+            if( !( await doMainTransferLoopActions( optsTransfer ) ) ) {
                 gIsOneTransferInProgressInThisThread = false;
                 return false;
             }
@@ -1151,7 +1151,7 @@ export async function doTransfer(
             }
             optsTransfer.details.close();
         }
-        if( ! optsTransfer.bErrorInSigningMessages ) {
+        if( !optsTransfer.bErrorInSigningMessages ) {
             imaTransferErrorHandling.saveTransferSuccess(
                 optsTransfer.strTransferErrorCategoryName );
         }
@@ -1196,7 +1196,7 @@ export async function doAllS2S( // s-chain --> s-chain
     const cntSChains = arrSChainsCached.length;
     log.information( "Have {} S-Chain(s) connected to this S-Chain for performing " +
         "S2S transfers in {}.", cntSChains, threadInfo.threadDescription() );
-    for( let idxSChain = 0; idxSChain < cntSChains; ++ idxSChain ) {
+    for( let idxSChain = 0; idxSChain < cntSChains; ++idxSChain ) {
         const joSChain = arrSChainsCached[idxSChain];
         const urlSrc = skaleObserver.pickRandomSChainUrl( joSChain );
         const ethersProviderSrc: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider =
@@ -1209,7 +1209,7 @@ export async function doAllS2S( // s-chain --> s-chain
         let bOK = false;
         try {
             nIndexS2S = idxSChain;
-            if( ! await pwa.checkOnLoopStart( imaState, "s2s", nIndexS2S ) ) {
+            if( !await pwa.checkOnLoopStart( imaState, "s2s", nIndexS2S ) ) {
                 imaState.loopState.s2s.wasInProgress = false;
                 log.notice( "Skipped(s2s) due to cancel mode reported from PWA in {}",
                     threadInfo.threadDescription() );
@@ -1283,9 +1283,9 @@ export async function doAllS2S( // s-chain --> s-chain
             await pwa.notifyOnLoopEnd( imaState, "s2s", nIndexS2S );
         }
         if( bOK )
-            ++ cntOK;
+            ++cntOK;
         else
-            ++ cntFail;
+            ++cntFail;
     }
     joRuntimeOpts.idxChainKnownForS2S = 0; // reset/clear
     joRuntimeOpts.cntChainsKnownForS2S = 0; // reset/clear
