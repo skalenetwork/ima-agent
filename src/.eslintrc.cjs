@@ -22,7 +22,6 @@ module.exports = {
         "linebreak-style": [ "error", "unix" ],
         "quotes": [ "error", "double" ],
         "semi": [ "error", "always" ],
-        "camelcase": "off",
         "eqeqeq": "off",
         "comma-dangle": [ "error", "never" ],
         "comma-style": [ "error", "last" ],
