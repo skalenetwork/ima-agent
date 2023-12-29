@@ -57,8 +57,6 @@ module.exports = {
         "@typescript-eslint/no-dynamic-delete": "off",
         "@typescript-eslint/no-this-alias": "off",
         "@typescript-eslint/lines-between-class-members": "off",
-        "handle-callback-err": "off",
-        "n/handle-callback-err": "off",
         "@typescript-eslint/prefer-optional-chain": "off"
     }
 };

@@ -1427,6 +1427,7 @@ async function doSignMessagesImpl(
         nIdxCurrentMsgBlockStart,
         strFromChainName,
         joExtraSignOpts,
+        // eslint-disable-next-line n/handle-callback-err
         fn: fn || async function(
             err: Error | string | null, jarrMessages: any[], joGlueResult: any | null ) {},
         bHaveResultReportCalled: false,

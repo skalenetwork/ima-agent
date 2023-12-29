@@ -3197,6 +3197,7 @@ export class WebRTCServerPipe extends BasicSocketPipe {
         const s = socketSentDataMarshall( data );
         this.rtcPeer.send( s );
     }
+    // eslint-disable-next-line n/handle-callback-err
     onError( err: any ) {
     }
     disconnect() {
