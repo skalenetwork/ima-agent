@@ -196,8 +196,12 @@ async function singleTransferLoopPartOracle(
                         imaState.chainProperties.sc.transactionCustomizer,
                         imaState.joCommunityLocker,
                         imaState.chainProperties.sc.joAccount,
-                        imaState.chainProperties.mn.chainId.toString(),
-                        imaState.chainProperties.sc.chainId.toString(),
+                        imaState.chainProperties.mn.chainId
+                            ? imaState.chainProperties.mn.chainId.toString()
+                            : "",
+                        imaState.chainProperties.sc.chainId
+                            ? imaState.chainProperties.sc.chainId.toString()
+                            : "",
                         imaBLS.doSignU256
                     );
                     imaState.loopState.oracle.isInProgress = false;
@@ -255,8 +259,12 @@ async function singleTransferLoopPartM2S(
                         imaState.chainProperties.sc.joAccount,
                         imaState.chainProperties.mn.strChainName,
                         imaState.chainProperties.sc.strChainName,
-                        imaState.chainProperties.mn.chainId.toString(),
-                        imaState.chainProperties.sc.chainId.toString(),
+                        imaState.chainProperties.mn.chainId
+                            ? imaState.chainProperties.mn.chainId.toString()
+                            : "",
+                        imaState.chainProperties.sc.chainId
+                            ? imaState.chainProperties.sc.chainId.toString()
+                            : "",
                         null,
                         imaState.joTokenManagerETH, // for logs validation on s-chain
                         imaState.nTransferBlockSizeM2S,
@@ -328,8 +336,12 @@ async function singleTransferLoopPartS2M(
 
                         imaState.chainProperties.sc.strChainName,
                         imaState.chainProperties.mn.strChainName,
-                        imaState.chainProperties.sc.chainId.toString(),
-                        imaState.chainProperties.mn.chainId.toString(),
+                        imaState.chainProperties.sc.chainId
+                            ? imaState.chainProperties.sc.chainId.toString()
+                            : "",
+                        imaState.chainProperties.mn.chainId
+                            ? imaState.chainProperties.mn.chainId.toString()
+                            : "",
 
                         imaState.joDepositBoxETH, // for logs validation on mainnet
                         null,
@@ -386,7 +398,9 @@ async function singleTransferLoopPartS2S(
                 imaState.joMessageProxySChain,
                 imaState.chainProperties.sc.joAccount,
                 imaState.chainProperties.sc.strChainName,
-                imaState.chainProperties.sc.chainId.toString(),
+                imaState.chainProperties.sc.chainId
+                    ? imaState.chainProperties.sc.chainId.toString()
+                    : "",
                 imaState.joTokenManagerETH, // for logs validation on s-chain
                 imaState.nTransferBlockSizeS2S,
                 imaState.nTransferStepsS2S,

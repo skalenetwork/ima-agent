@@ -219,7 +219,7 @@ async function handleOracleSigned(
         "CommunityLocker", optsGasPriceSetup.joCommunityLocker,
         "setGasPrice", arrArgumentsSetGasPrice,
         optsGasPriceSetup.joAccountSC, optsGasPriceSetup.strActionName,
-        isIgnoreSetGasPrice, gasPrice, estimatedGasSetGasPrice, weiHowMuch );
+        isIgnoreSetGasPrice, gasPrice, estimatedGasSetGasPrice );
     if( strErrorOfDryRun )
         throw new Error( strErrorOfDryRun );
     const opts: imaTx.TCustomPayedCallOptions = {
@@ -230,7 +230,7 @@ async function handleOracleSigned(
         "CommunityLocker", optsGasPriceSetup.joCommunityLocker,
         "setGasPrice", arrArgumentsSetGasPrice,
         optsGasPriceSetup.joAccountSC, optsGasPriceSetup.strActionName,
-        gasPrice, estimatedGasSetGasPrice, weiHowMuch, opts );
+        gasPrice, estimatedGasSetGasPrice, undefined, opts );
     if( joReceipt ) {
         optsGasPriceSetup.jarrReceipts.push( {
             description: "doOracleGasPriceSetup/setGasPrice",

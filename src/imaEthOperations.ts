@@ -96,14 +96,14 @@ export async function doEthPaymentFromMainNet(
             details, ethersProviderMainNet,
             "DepositBox", joDepositBox, "deposit", arrArguments,
             joAccountSrc, strActionName,
-            gasPrice, 3000000, weiHowMuch );
+            gasPrice, 3000000 );
         details.trace( "{p}Using estimated gas={}", strLogPrefix, estimatedGas );
         const isIgnore = false;
         const strErrorOfDryRun = await imaTx.dryRunCall(
             details, ethersProviderMainNet,
             "DepositBox", joDepositBox, "deposit", arrArguments,
             joAccountSrc, strActionName, isIgnore,
-            gasPrice, estimatedGas, weiHowMuch );
+            gasPrice, estimatedGas );
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
