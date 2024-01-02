@@ -93,7 +93,7 @@ export async function checkOnLoopStart(
     imaState: state.TIMAState, strLoopWorkType: string, nIndexS2S?: number
 ): Promise<boolean> {
     try {
-        nIndexS2S = nIndexS2S || 0; // convert to number if undefined
+        nIndexS2S = nIndexS2S ?? 0; // convert to number if undefined
         if( !checkLoopWorkTypeStringIsCorrect( strLoopWorkType ) )
             throw new Error( `Specified value ${strLoopWorkType} is not a correct loop work type` );
         if( !imaState.isPWA )
@@ -213,7 +213,7 @@ async function notifyOnLoopImpl(
 ): Promise<boolean> {
     const se = isStart ? "start" : "end";
     try {
-        nIndexS2S = nIndexS2S || 0; // convert to number if undefined
+        nIndexS2S = nIndexS2S ?? 0; // convert to number if undefined
         if( !checkLoopWorkTypeStringIsCorrect( strLoopWorkType ) )
             throw new Error( `Specified value ${strLoopWorkType} is not a correct loop work type` );
         if( !imaState.isPWA )

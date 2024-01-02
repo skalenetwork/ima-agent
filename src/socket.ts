@@ -1237,9 +1237,7 @@ export class DirectPipe extends BasicSocketPipe {
         this.socketSubtype = "direct.not.initialized.yet";
         this.isConnected = false;
         this.acceptor = null;
-        this.counterPipe = ( counterPipe != null && counterPipe != undefined )
-            ? counterPipe
-            : null; // set outside after this constructor call
+        this.counterPipe = counterPipe ?? null; // set outside after this constructor call
         this.strEndPoint = this.counterPipe
             ? ( "2-" + this.counterPipe.strEndPoint )
             : ( "1-" + utils.randomDirectPipeID() );
@@ -3252,7 +3250,7 @@ export class WebRTCServerPipe extends BasicSocketPipe {
         self.isConnected = true;
         self.acceptor = acceptor;
         self.clientNumber = 0 + acceptor.nextClientNumber;
-        self.clientPort = 0 + ( self.clientNumber || 0 );
+        self.clientPort = 0 + ( self.clientNumber ?? 0 );
         ++acceptor.nextClientNumber;
         self.rtcPeer = rtcPeer;
         self.strSignalingServerURL =
@@ -3388,16 +3386,13 @@ export class WebRTCServerAcceptor extends BasicServerAcceptor {
                 ? peerAdditionalOptions
                 : settings.net.rtc.peerAdditionalOptions;
         this.socketType = "WebRTC";
-        this.maxActiveOfferCount =
-            ( maxActiveOfferCount != null && maxActiveOfferCount != undefined )
-                ? maxActiveOfferCount
-                : settings.net.rtc.maxActiveOfferCount;
+        this.maxActiveOfferCount = maxActiveOfferCount ?? settings.net.rtc.maxActiveOfferCount;
         if( this.maxActiveOfferCount < 1 )
             this.maxActiveOfferCount = 1;
         this.mapPendingOffers = { }; // idOffer -> RTCServerPeer
-        this.timeToPublishMilliseconds = timeToPublishMilliseconds ||
+        this.timeToPublishMilliseconds = timeToPublishMilliseconds ??
             settings.net.rtc.timeToPublishMilliseconds;
-        this.timeToSignalingNegotiationMilliseconds = timeToSignalingNegotiationMilliseconds ||
+        this.timeToSignalingNegotiationMilliseconds = timeToSignalingNegotiationMilliseconds ??
             settings.net.rtc.timeToSignalingNegotiationMilliseconds;
         this.rtcCreator =
             new RTCCreator(

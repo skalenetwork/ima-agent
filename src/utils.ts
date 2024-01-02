@@ -72,7 +72,7 @@ export function fileExists( strPath: string ): boolean {
 }
 
 export function fileLoad( strPath: string, strDefault?: string | null ): string {
-    strDefault = strDefault || "";
+    strDefault = strDefault ?? "";
     if( !fileExists( strPath ) )
         return strDefault;
     try {
@@ -341,8 +341,8 @@ export function concatByte( ui8a: Uint8Array, byte: number ): Uint8Array {
 }
 
 export function bytesConcat( a1?: Uint8Array, a2?: Uint8Array ): Uint8Array {
-    a1 = a1 || new Uint8Array();
-    a2 = a2 || new Uint8Array();
+    a1 = a1 ?? new Uint8Array();
+    a2 = a2 ?? new Uint8Array();
     return concatUint8Arrays( a1, a2 );
 }
 

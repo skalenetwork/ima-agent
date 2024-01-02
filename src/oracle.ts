@@ -39,7 +39,7 @@ const gBigNum256: any = owaspUtils.toBN( 256 );
 const gBigNumUpperPart: any = gBigNum2.pow( gBigNum256 ).sub( gBigNum1 );
 
 function getUtcTimestampString( d?: Date ): string {
-    d = d || new Date(); // use now time if d is not specified
+    d = d ?? new Date(); // use now time if d is not specified
     const nUtcUnixTimeStampWithMilliseconds = d.getTime();
     const t = "" + nUtcUnixTimeStampWithMilliseconds;
     return t;

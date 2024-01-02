@@ -191,7 +191,7 @@ export function toURL( s: any ): URL | null {
 }
 
 export function toStringURL( s?: any, defValue?: string ): string {
-    defValue = defValue || "";
+    defValue = defValue ?? "";
     try {
         const url = toURL( s );
         if( url == null || url == undefined )
@@ -273,7 +273,7 @@ export function validateEthPrivateKey( value?: any ): boolean {
 export function toEthAddress( value?: any, defValue?: string ): string {
     try {
         value = "" + ( value ? ensureStartsWith0x( value.toString() ) : "" );
-        defValue = defValue || "";
+        defValue = defValue ?? "";
         if( !validateEthAddress( value ) )
             return defValue;
     } catch ( err ) {
@@ -284,7 +284,7 @@ export function toEthAddress( value?: any, defValue?: string ): string {
 export function toEthPrivateKey( value?: any, defValue?: string ): string {
     try {
         value = "" + ( value ? value.toString() : "" );
-        defValue = defValue || "";
+        defValue = defValue ?? "";
         if( !validateEthPrivateKey( value ) )
             return defValue;
     } catch ( err ) {
@@ -708,7 +708,7 @@ export function ethersProviderToUrl(
         "url" in ethersProvider.connection && typeof ethersProvider.connection.url === "string"
     )
         strURL = "" + ethersProvider.connection.url;
-    return strURL || "N/A-URL";
+    return strURL ?? "N/A-URL";
 }
 
 export function isHexPrefixed( s: any ): boolean {
@@ -751,10 +751,13 @@ export function toBN( arg: any ): any {
             multiplier = toBNbasic( -1, 10 );
         }
         stringArg = stringArg === "" ? "0" : stringArg;
+        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
         if( ( !stringArg.match( /^-?[0-9]+$/ ) && stringArg.match( /^[0-9A-Fa-f]+$/ ) ) ||
+            // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
             stringArg.match( /^[a-fA-F]+$/ ) ||
             ( isHexPrefixed && stringArg.match( /^[0-9A-Fa-f]+$/ ) ) )
             return toBNbasic( stringArg, 16 ).mul( multiplier );
+        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
         if( ( stringArg.match( /^-?[0-9]+$/ ) || stringArg === "" ) && !isHexPrefixed )
             return toBNbasic( stringArg, 10 ).mul( multiplier );
     } else if( typeof arg === "object" && arg.toString && ( !arg.pop && !arg.push ) ) {
@@ -789,7 +792,7 @@ export function toHexStringSafe( val?: any ): string {
 export function setInterval2( fn: () => void, t: number, stepMilliSeconds?: number ): any {
     const iv: any = {
         real_iv: null,
-        stepMilliSeconds: stepMilliSeconds || 1000,
+        stepMilliSeconds: stepMilliSeconds ?? 1000,
         maxMilliSeconds: t,
         accumulatedMilliSeconds: 0
     };

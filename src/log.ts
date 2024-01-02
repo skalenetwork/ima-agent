@@ -515,8 +515,8 @@ export function createFileOutput(
         const objEntry: TLogger = {
             id: gIdentifierAllocatorCounter++,
             strPath: "" + strFilePath,
-            nMaxSizeBeforeRotation: 0 + ( nMaxSizeBeforeRotation || 0 ),
-            nMaxFilesCount: 0 + ( nMaxFilesCount || 0 ),
+            nMaxSizeBeforeRotation: 0 + ( nMaxSizeBeforeRotation ?? 0 ),
+            nMaxFilesCount: 0 + ( nMaxFilesCount ?? 0 ),
             objStream: null,
             haveOwnTimestamps: false,
             isPausedTimeStamps: false,
@@ -670,7 +670,7 @@ export function insertFileOutput(
 }
 
 export function extractErrorMessage( jo?: any, strDefaultErrorText?: string ): string {
-    strDefaultErrorText = strDefaultErrorText || "unknown error or error without a description";
+    strDefaultErrorText = strDefaultErrorText ?? "unknown error or error without a description";
     if( !jo )
         return strDefaultErrorText;
     try {
@@ -1025,18 +1025,18 @@ function computeVerboseAlias(): Map < string, number > {
         if( name )
             m.set( name, key );
     }
-    m.set( "empty", m.get( "silent" ) || 0 ); // alias
-    m.set( "none", m.get( "silent" ) || 0 ); // alias
-    m.set( "stop", m.get( "fatal" ) || 0 ); // alias
-    m.set( "bad", m.get( "critical" ) || 0 ); // alias
-    m.set( "err", m.get( "error" ) || 0 ); // alias
-    m.set( "warn", m.get( "warning" ) || 0 ); // alias
-    m.set( "attn", m.get( "attention" ) || 0 ); // alias
-    m.set( "info", m.get( "information" ) || 0 ); // alias
-    m.set( "note", m.get( "notice" ) || 0 ); // alias
-    m.set( "dbg", m.get( "debug" ) || 0 ); // alias
-    m.set( "crazy", m.get( "trace" ) || 0 ); // alias
-    m.set( "detailed", m.get( "trace" ) || 0 ); // alias
+    m.set( "empty", m.get( "silent" ) ?? 0 ); // alias
+    m.set( "none", m.get( "silent" ) ?? 0 ); // alias
+    m.set( "stop", m.get( "fatal" ) ?? 0 ); // alias
+    m.set( "bad", m.get( "critical" ) ?? 0 ); // alias
+    m.set( "err", m.get( "error" ) ?? 0 ); // alias
+    m.set( "warn", m.get( "warning" ) ?? 0 ); // alias
+    m.set( "attn", m.get( "attention" ) ?? 0 ); // alias
+    m.set( "info", m.get( "information" ) ?? 0 ); // alias
+    m.set( "note", m.get( "notice" ) ?? 0 ); // alias
+    m.set( "dbg", m.get( "debug" ) ?? 0 ); // alias
+    m.set( "crazy", m.get( "trace" ) ?? 0 ); // alias
+    m.set( "detailed", m.get( "trace" ) ?? 0 ); // alias
     return m;
 }
 let gMapReversedVerbose: Map < string, number > = new Map < string, number >();
@@ -1051,7 +1051,7 @@ export function verboseLevelAsTextForLog( vl: any ): string {
     if( typeof vl === "undefined" )
         vl = verboseGet();
     if( vl in gMapVerbose ) {
-        const tl = gMapVerbose.get( vl ) || 0;
+        const tl = gMapVerbose.get( vl ) ?? 0;
         return "" + tl;
     }
     return "unknown(" + JSON.stringify( vl ) + ")";

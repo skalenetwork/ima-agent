@@ -46,7 +46,7 @@ const gStrVersion =
 function att( ...args: any[] ): string { return log.fmtAttention( ...args ); };
 
 export function printAbout( isLog?: boolean ): boolean {
-    isLog = isLog || false;
+    isLog = isLog ?? false;
     const strMsg = log.fmtTrace( att( gStrAppName ), " version ", log.fmtNotice( gStrVersion ) );
     if( isLog )
         log.information( strMsg );
@@ -1205,7 +1205,7 @@ function parseOtherArgs( imaState: state.TIMAState, joArg: any ): boolean {
 
 export function parse( joExternalHandlers: any, argv?: any[] ): number {
     const imaState: state.TIMAState = state.get();
-    argv = argv || process.argv;
+    argv = argv ?? process.argv;
     const cntArgs = argv.length;
     for( let idxArg = 2; idxArg < cntArgs; ++idxArg ) {
         const joArg = parseCommandLineArgument( argv[idxArg] );

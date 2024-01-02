@@ -1441,7 +1441,7 @@ async function doSignMessagesImpl(
         strFromChainName,
         joExtraSignOpts,
         // eslint-disable-next-line n/handle-callback-err
-        fn: fn || async function(
+        fn: fn ?? async function(
             err: Error | string | null, jarrMessages: any[], joGlueResult: any | null ) {},
         bHaveResultReportCalled: false,
         strLogPrefix: "",
@@ -2026,7 +2026,7 @@ async function doSignReadyHashHandleCallResult(
 }
 
 export async function doSignReadyHash(
-    strMessageHash: string, isExposeOutput: any ): Promise < boolean > {
+    strMessageHash: string, isExposeOutput: any ): Promise < TSignResult | null > {
     const imaState: state.TIMAState = state.get();
     const strLogPrefix = "";
     const details: log.TLogger = log.createMemoryStream();
@@ -2044,7 +2044,7 @@ export async function doSignReadyHash(
         details.trace( "{p}hash value to sign is {}", strLogPrefix, strMessageHash );
         if( !checkBlsThresholdAndBlsParticipants(
             nThreshold, nParticipants, "sign ready hash", details ) )
-            return false;
+            return null;
         let joAccount: state.TAccount = imaState.chainProperties.sc.joAccount;
         if( !joAccount.strSgxURL ) {
             joAccount = imaState.chainProperties.mn.joAccount;
@@ -2204,7 +2204,7 @@ async function prepareS2sOfSkaleImaVerifyAndSign(
 async function handleBlsSignMessageHashResult(
     optsHandleVerifyAndSign: THandleVerifyAndSignOptions, joCallData: THandleVerifyAndSignCallData,
     joAccount: state.TAccount, joCall: rpcCall.TRPCCall, joIn: any, joOut: any
-): Promise < void > {
+): Promise < TSignResult > {
     optsHandleVerifyAndSign.details.trace( "{p}{bright} Call to SGX done, " +
         "answer is: {}", optsHandleVerifyAndSign.strLogPrefix,
     optsHandleVerifyAndSign.strDirection, joOut );

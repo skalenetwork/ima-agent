@@ -39,8 +39,6 @@ module.exports = {
                 "while": { "before": false, "after": false }
             }
         } ],
-        "@typescript-eslint/no-non-null-asserted-nullish-coalescing": "off",
-        "@typescript-eslint/prefer-nullish-coalescing": "off",
         "@typescript-eslint/strict-boolean-expressions": "off",
         "@typescript-eslint/no-this-alias": "off"
     }

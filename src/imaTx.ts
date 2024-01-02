@@ -616,8 +616,8 @@ async function tmEnsureTransaction(
     priority: any, txAdjusted: any,
     cntAttempts?: number, sleepMilliseconds?: number
 ): Promise<any> {
-    cntAttempts = cntAttempts || 1;
-    sleepMilliseconds = sleepMilliseconds || ( 30 * 1000 );
+    cntAttempts = cntAttempts ?? 1;
+    sleepMilliseconds = sleepMilliseconds ?? ( 30 * 1000 );
     let txId = "";
     let joReceipt = null;
     let idxAttempt = 0;

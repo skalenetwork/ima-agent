@@ -528,7 +528,7 @@ export const jsonColorizer: any = { // see http://jsfiddle.net/unLSJ/
 // http://jsfiddle.net/KJQ9K/554
 // https://qastack.ru/programming/4810841/pretty-print-json-using-javascript
 export function syntaxHighlightJSON( jo?: any, strKeyNamePrefix?: string ): string {
-    strKeyNamePrefix = strKeyNamePrefix || "";
+    strKeyNamePrefix = strKeyNamePrefix ?? "";
     jo = jo.replace( /&/g, "&amp;" ).replace( /</g, "&lt;" ).replace( />/g, "&gt;" );
     return jo.replace(
     // eslint-disable-next-line max-len
@@ -598,7 +598,7 @@ export function j1( x?: any, n?: number, strKeyNamePrefix?: string ): string {
     }
     let s = safeStringifyJSON( x, n );
     if( !gFlagIsEnabled )
-        return s || "";
+        return s ?? "";
     s = "" + syntaxHighlightJSON( s, strKeyNamePrefix );
     if( isDefaultKeyNamePrefix && s.length > 9 && s[0] == " " )
         s = s.substring( 1, s.length );

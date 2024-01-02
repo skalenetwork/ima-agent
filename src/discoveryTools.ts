@@ -316,7 +316,7 @@ async function handlePeriodicDiscoveryAttemptActions(
     const imaState: state.TIMAState = state.get();
     if( !imaState.joSChainNetworkInfo )
         throw new Error( "No own S-Chain network information" );
-    fnAfter = fnAfter || function(): void {};
+    fnAfter = fnAfter ?? function(): void {};
     gFlagIsInSChainDiscovery = true;
     const cntNodesOnChain = getSChainNodesCount( imaState.joSChainNetworkInfo );
     try {
@@ -398,7 +398,7 @@ export async function continueSChainDiscoveryInBackgroundIfNeeded(
 ): Promise<void> {
     if( gTimerSChainDiscovery != null )
         return;
-    fnAfter = fnAfter || function(): void {};
+    fnAfter = fnAfter ?? function(): void {};
     const imaState: state.TIMAState = state.get();
     if( imaState.joSChainDiscovery.repeatIntervalMilliseconds <= 0 ) {
         if( !isSilentReDiscovery )
@@ -756,7 +756,7 @@ export async function doPeriodicSChainNetworkDiscoveryIfNeeded(
         log.debug( "Periodic S-Chain re-discovery will be done with {} interval...",
             periodicDiscoveryInterval );
     }
-    fnAfterRediscover = fnAfterRediscover || function( status: boolean ) { };
+    fnAfterRediscover = fnAfterRediscover ?? function( status: boolean ) { };
     gIntervalPeriodicDiscovery = setInterval( function(): void {
         let nCountToWait = ( cntNodesOnChain > 2 )
             ? Math.ceil( cntNodesOnChain * 2 / 3 )

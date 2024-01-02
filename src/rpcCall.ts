@@ -84,8 +84,8 @@ export type TFunctionWsDone = ( nStep: number ) => Promise < void >;
 export async function waitWebSocketIsOpen(
     socket: ws.WebSocket, fnDone?: TFunctionWsDone, fnStep?: TFunctionWsStep
 ): Promise<void> {
-    fnDone = fnDone || async function( nStep: number ) { };
-    fnStep = fnStep || async function( nStep: number ) { return true; };
+    fnDone = fnDone ?? async function( nStep: number ) { };
+    fnStep = fnStep ?? async function( nStep: number ) { return true; };
     let nStep = 0;
     const promiseComplete = new Promise( function( resolve, reject ) {
         let isInsideAsyncHandler = false;
@@ -432,7 +432,7 @@ export async function rpcCallCreate(
     }
     const joCall: TRPCCall = {
         url: "" + strURL,
-        joRpcOptions: opts || null,
+        joRpcOptions: opts ?? null,
         mapPendingByCallID: new Map < TCallID, TCallHandlerEntry >(),
         wsConn: null,
         isAutoReconnect:
