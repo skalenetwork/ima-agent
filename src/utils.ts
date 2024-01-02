@@ -55,7 +55,7 @@ export function normalizePath( strPath: string ): string {
 
 export function getRandomFileName(): string {
     const timestamp = new Date().toISOString().replace( /[-:.]/g, "" );
-    const random = ( "" + Math.random() ).substring( 2, 8 );
+    const random = Math.random().toString().substring( 2, 8 );
     const randomNumber = timestamp + random;
     return randomNumber;
 }
@@ -200,7 +200,7 @@ export async function waitForClonedTokenAppearErc20(
     const addressOnSChain = await waitForClonedTokenToAppear(
         sc, "erc20", addressCallFrom, 40, tokensMN, strMainnetName );
     tokenERC20SC.abi = JSON.parse( JSON.stringify( ( tokensMN.joABI as any ).ERC20_abi ) );
-    tokenERC20SC.address = "" + addressOnSChain;
+    tokenERC20SC.address = addressOnSChain ? addressOnSChain.toString() : "";
 }
 
 export async function waitForClonedTokenAppearErc721(
@@ -218,7 +218,7 @@ export async function waitForClonedTokenAppearErc721(
         await waitForClonedTokenToAppear(
             sc, "erc721", addressCallFrom, 40, tokensMN, strMainnetName );
     tokenERC721SC.abi = JSON.parse( JSON.stringify( ( tokensMN.joABI as any ).ERC721_abi ) );
-    tokenERC721SC.address = "" + addressOnSChain;
+    tokenERC721SC.address = addressOnSChain ? addressOnSChain.toString() : "";
 }
 
 export async function waitForClonedTokenAppearErc721WithMetadata(
@@ -237,7 +237,7 @@ export async function waitForClonedTokenAppearErc721WithMetadata(
         sc, "erc721_with_metadata", addressCallFrom, 40, tokensMN, strMainnetName );
     tokenERC721SC.abi =
         JSON.parse( JSON.stringify( ( tokensMN.joABI as any ).ERC721_with_metadata_abi ) );
-    tokenERC721SC.address = "" + addressOnSChain;
+    tokenERC721SC.address = addressOnSChain ? addressOnSChain.toString() : "";
 }
 
 export async function waitForClonedTokenAppearErc1155(
@@ -254,7 +254,7 @@ export async function waitForClonedTokenAppearErc1155(
     const addressOnSChain = await waitForClonedTokenToAppear(
         sc, "erc1155", addressCallFrom, 40, tokensMN, strMainnetName );
     tokenERC1155SC.abi = JSON.parse( JSON.stringify( ( tokensMN.joABI as any ).ERC1155_abi ) );
-    tokenERC1155SC.address = "" + addressOnSChain;
+    tokenERC1155SC.address = addressOnSChain ? addressOnSChain.toString() : "";
 }
 
 export function hexToBytes(
@@ -263,8 +263,8 @@ export function hexToBytes(
     isInversiveOrder = !!(
         ( isInversiveOrder != null && isInversiveOrder != undefined && isInversiveOrder )
     );
-    strHex = strHex || "";
-    strHex = "" + strHex;
+    strHex = strHex ?? "";
+    strHex = strHex.toString();
     strHex = strHex.trim().toLowerCase();
     if( strHex.length > 1 && strHex[0] == "0" && ( strHex[1] == "x" || strHex[1] == "X" ) )
         strHex = strHex.substr( 2, strHex.length - 2 );

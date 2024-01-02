@@ -238,21 +238,20 @@ export async function reimbursementWalletWithdraw(
             owaspUtils.ensureStartsWith0x(
                 owaspUtils.toBN( nReimbursementWithdraw ).toHexString() )
         ];
-        const weiHowMuch = undefined;
         const gasPrice = await transactionCustomizerMainNet.computeGasPrice(
             ethersProviderMainNet, 200000000000 );
         details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const estimatedGas = await transactionCustomizerMainNet.computeGas(
             details, ethersProviderMainNet,
             "CommunityPool", joCommunityPool, "withdrawFunds", arrArguments,
-            joAccountMN, strActionName, gasPrice, 3000000, weiHowMuch );
+            joAccountMN, strActionName, gasPrice, 3000000 );
         details.trace( "{p}Using estimated gas={}", strLogPrefix, estimatedGas );
         const isIgnore = false;
         const strErrorOfDryRun = await imaTx.dryRunCall(
             details, ethersProviderMainNet,
             "CommunityPool", joCommunityPool, "withdrawFunds", arrArguments,
             joAccountMN, strActionName, isIgnore,
-            gasPrice, estimatedGas, weiHowMuch );
+            gasPrice, estimatedGas );
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
@@ -260,7 +259,7 @@ export async function reimbursementWalletWithdraw(
             details, ethersProviderMainNet,
             "CommunityPool", joCommunityPool, "withdrawFunds", arrArguments,
             joAccountMN, strActionName,
-            gasPrice, estimatedGas, weiHowMuch );
+            gasPrice, estimatedGas );
         if( joReceipt ) {
             jarrReceipts.push( {
                 description: "reimbursementWalletWithdraw",
@@ -304,20 +303,19 @@ export async function reimbursementSetRange(
             strChainNameOriginChain,
             owaspUtils.ensureStartsWith0x( owaspUtils.toBN( nReimbursementRange ).toHexString() )
         ];
-        const weiHowMuch = undefined;
         const gasPrice = await transactionCustomizerSChain.computeGasPrice(
             ethersProviderSChain, 200000000000 );
         details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const estimatedGas = await transactionCustomizerSChain.computeGas(
             details, ethersProviderSChain,
             "CommunityLocker", joCommunityLocker, "setTimeLimitPerMessage", arrArguments,
-            joAccountSC, strActionName, gasPrice, 3000000, weiHowMuch );
+            joAccountSC, strActionName, gasPrice, 3000000 );
         details.trace( "{p}Using estimated gas={}", strLogPrefix, estimatedGas );
         const isIgnore = false;
         const strErrorOfDryRun = await imaTx.dryRunCall(
             details, ethersProviderSChain,
             "CommunityLocker", joCommunityLocker, "setTimeLimitPerMessage", arrArguments,
-            joAccountSC, strActionName, isIgnore, gasPrice, estimatedGas, weiHowMuch );
+            joAccountSC, strActionName, isIgnore, gasPrice, estimatedGas );
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
@@ -325,7 +323,7 @@ export async function reimbursementSetRange(
         const joReceipt = await imaTx.payedCall(
             details, ethersProviderSChain,
             "CommunityLocker", joCommunityLocker, "setTimeLimitPerMessage", arrArguments,
-            joAccountSC, strActionName, gasPrice, estimatedGas, weiHowMuch, opts );
+            joAccountSC, strActionName, gasPrice, estimatedGas, undefined, opts );
         if( joReceipt ) {
             jarrReceipts.push( {
                 description: "reimbursementSetRange",

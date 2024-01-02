@@ -75,7 +75,7 @@ class ObserverServer extends SocketServer {
         self.mapApiHandlers.init =
         function( joMessage: any, joAnswer: any, eventData: any, socket: any ) {
             joAnswer.message = {
-                method: "" + joMessage.method,
+                method: joMessage.method.toString(),
                 error: null
             };
             if( self.initComplete )

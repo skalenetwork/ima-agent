@@ -27,7 +27,7 @@ import { UniversalDispatcherEvent, EventDispatcher }
     from "./eventDispatcher.js";
 
 export function verifyTransferErrorCategoryName( strCategory: string ): string {
-    return "" + ( strCategory || "default" );
+    return ( strCategory ?? "default" );
 }
 
 const gMaxLastTransferErrors: number = 20;
@@ -38,16 +38,16 @@ export const saveTransferEvents = new EventDispatcher();
 
 export function saveTransferError( strCategory: string, textLog: any, ts?: any ): void {
     ts = ts || Math.round( ( new Date() ).getTime() / 1000 );
-    const c = verifyTransferErrorCategoryName( strCategory );
+    const catName = verifyTransferErrorCategoryName( strCategory );
     const joTransferEventError: any = {
         ts,
-        category: "" + c,
-        textLog: "" + textLog.toString()
+        category: catName.toString(),
+        textLog: textLog.toString()
     };
     gArrLastTransferErrors.push( joTransferEventError );
     while( gArrLastTransferErrors.length > gMaxLastTransferErrors )
         gArrLastTransferErrors.shift();
-    gMapTransferErrorCategories["" + c] = true;
+    gMapTransferErrorCategories[catName] = true;
     saveTransferEvents.dispatchEvent(
         new UniversalDispatcherEvent(
             "error",
@@ -55,9 +55,9 @@ export function saveTransferError( strCategory: string, textLog: any, ts?: any )
 }
 
 export function saveTransferSuccess( strCategory: string ): void {
-    const c = verifyTransferErrorCategoryName( strCategory );
+    const catName = verifyTransferErrorCategoryName( strCategory );
     // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-    try { delete gMapTransferErrorCategories["" + c]; } catch ( err ) { }
+    try { delete gMapTransferErrorCategories[catName]; } catch ( err ) { }
     saveTransferEvents.dispatchEvent(
         new UniversalDispatcherEvent(
             "success",

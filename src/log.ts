@@ -113,7 +113,7 @@ export function setPrintTimestamps( b?: boolean ): void {
 }
 
 export function n2s( n: any, sz: number ): string {
-    let s: string = "" + n;
+    let s: string = n ?? "";
     while( s.length < sz )
         s = "0" + s;
     return s;
@@ -131,7 +131,7 @@ export function generateTimestampString( ts?: any, isColorized?: boolean ): stri
         function( x?: any ): string { return isColorized ? cc.fracTime( x ) : x; };
     const ccBright = function( x?: any ): string { return isColorized ? cc.bright( x ) : x; };
     const s =
-        "" + ccDate( n2s( ts.getUTCFullYear(), 4 ) ) +
+        ccDate( n2s( ts.getUTCFullYear(), 4 ) ) +
         ccBright( "-" ) + ccDate( n2s( ts.getUTCMonth() + 1, 2 ) ) +
         ccBright( "-" ) + ccDate( n2s( ts.getUTCDate(), 2 ) ) +
         " " + ccTime( n2s( ts.getUTCHours(), 2 ) ) +
@@ -250,7 +250,7 @@ export function createStandardOutputStream(): TLogger | null {
             open: function(): void { try { this.objStream = process.stdout; } catch ( err ) { } },
             size: function(): number { return 0; },
             rotate: function( nBytesToWrite: number ) { },
-            toString: function(): string { return "" + this.strPath; },
+            toString: function(): string { return this.strPath.toString(); },
             exposeDetailsTo:
                 function( otherStream: TLogger, strTitle: string, isSuccess: boolean ): void { },
             // high-level formatters
@@ -514,7 +514,7 @@ export function createFileOutput(
     try {
         const objEntry: TLogger = {
             id: gIdentifierAllocatorCounter++,
-            strPath: "" + strFilePath,
+            strPath: strFilePath.toString(),
             nMaxSizeBeforeRotation: 0 + ( nMaxSizeBeforeRotation ?? 0 ),
             nMaxFilesCount: 0 + ( nMaxFilesCount ?? 0 ),
             objStream: null,
@@ -570,12 +570,14 @@ export function createFileOutput(
                     let i = 0; const cnt = 0 + this.nMaxFilesCount;
                     for( i = 0; i < cnt; ++i ) {
                         const j = this.nMaxFilesCount - i - 1;
-                        const strPath = "" + this.strPath + ( ( j === 0 ) ? "" : ( "." + j ) );
+                        const strPath =
+                            this.strPath.toString() + ( ( j === 0 ) ? "" : ( "." + j ) );
                         if( j == ( cnt - 1 ) ) {
                             try { fs.unlinkSync( strPath ); } catch ( err ) { }
                             continue;
                         }
-                        const strPathPrev = "" + this.strPath + "." + ( j + 1 );
+                        const strPathPrev =
+                            this.strPath.toString() + "." + ( j + 1 );
                         try { fs.unlinkSync( strPathPrev ); } catch ( err ) { }
                         try { fs.renameSync( strPath, strPathPrev ); } catch ( err ) { }
                     }
@@ -586,7 +588,7 @@ export function createFileOutput(
                 } catch ( err ) {
                 }
             },
-            toString: function(): string { return "" + strFilePath; },
+            toString: function(): string { return strFilePath.toString(); },
             exposeDetailsTo:
                 function( otherStream: TLogger, strTitle: string, isSuccess: boolean ): void { },
             // high-level formatters
@@ -659,7 +661,7 @@ export function createFileOutput(
 }
 export function insertFileOutput(
     strFilePath: string, nMaxSizeBeforeRotation?: number, nMaxFilesCount?: number ): boolean {
-    let objEntry = getStreamWithFilePath( "" + strFilePath );
+    let objEntry = getStreamWithFilePath( strFilePath.toString() );
     if( objEntry !== null )
         return true;
     objEntry = createFileOutput( strFilePath, nMaxSizeBeforeRotation, nMaxFilesCount );
@@ -1052,7 +1054,7 @@ export function verboseLevelAsTextForLog( vl: any ): string {
         vl = verboseGet();
     if( vl in gMapVerbose ) {
         const tl = gMapVerbose.get( vl ) ?? 0;
-        return "" + tl;
+        return tl.toString();
     }
     return "unknown(" + JSON.stringify( vl ) + ")";
 }
@@ -1065,7 +1067,7 @@ export function verboseName2Number( s: string ): number {
 }
 
 let gFlagIsExposeDetails = false;
-let gVerboseLevel = 0 + verboseName2Number( "information" );
+let gVerboseLevel = verboseName2Number( "information" );
 
 export function exposeDetailsGet(): boolean {
     return ( !!gFlagIsExposeDetails );

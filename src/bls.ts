@@ -435,7 +435,7 @@ function performBlsGlue(
         const cnt = arrSignResults.length;
         for( let i = 0; i < cnt; ++i ) {
             const jo: any = arrSignResults[i];
-            if( ( !jo ) || typeof jo !== "object" )
+            if( !jo )
                 throw new Error( `Failed to save BLS part ${i} because it's not JSON object` );
             const strPath = strActionDir + "/sign-result" + jo.index + ".json";
             details.trace( "{p}Saving {} file containing {}", strLogPrefix, strPath, jo );
@@ -525,7 +525,7 @@ function performBlsGlueU256( details: log.TLogger, u256: any, arrSignResults: an
         const cnt = arrSignResults.length;
         for( let i = 0; i < cnt; ++i ) {
             const jo: any = arrSignResults[i];
-            if( ( !jo ) || typeof jo !== "object" )
+            if( !jo )
                 throw new Error( `Failed to save BLS part ${i} because it's not JSON object` );
             const strPath = strActionDir + "/sign-result" + jo.index + ".json";
             details.trace( "{p}Saving {} file...", strLogPrefix, strPath );
@@ -632,7 +632,7 @@ function performBlsVerifyI(
         imaUtils.jsonFileSave( strActionDir + "/hash.json", joMsg );
         imaUtils.jsonFileSave(
             strActionDir + "/BLS_keys" + nZeroBasedNodeIndex + ".json", joPublicKey );
-        const strVerifyCommand = "" +
+        const strVerifyCommand =
             imaState.strPathBlsVerify +
             " --t " + nThreshold +
             " --n " + nParticipants +
@@ -690,7 +690,7 @@ function performBlsVerifyIU256(
         imaUtils.jsonFileSave( strActionDir + "/hash.json", joMsg );
         imaUtils.jsonFileSave(
             strActionDir + "/BLS_keys" + nZeroBasedNodeIndex + ".json", joPublicKey );
-        const strVerifyCommand = "" +
+        const strVerifyCommand =
             imaState.strPathBlsVerify +
             " --t " + nThreshold +
             " --n " + nParticipants +
@@ -765,7 +765,7 @@ function performBlsVerify(
         imaUtils.jsonFileSave( strActionDir + "/common_public_key.json", joCommonPublicKeyToSave );
         details.trace( "{p}BLS common public key for verification is:\n{}",
             strLogPrefix, joCommonPublicKey );
-        const strVerifyCommand = "" +
+        const strVerifyCommand =
             imaState.strPathBlsVerify +
             " --t " + nThreshold +
             " --n " + nParticipants +
@@ -827,7 +827,7 @@ function performBlsVerifyU256(
         imaUtils.jsonFileSave( strActionDir + "/common_public_key.json", joCommonPublicKeyToSave );
         details.trace( "{p}BLS u256 common public key for verification is:\n{}",
             strLogPrefix, joCommonPublicKey );
-        const strVerifyCommand = "" +
+        const strVerifyCommand =
             imaState.strPathBlsVerify +
             " --t " + nThreshold +
             " --n " + nParticipants +
@@ -917,7 +917,7 @@ async function checkCorrectnessOfMessagesToSign(
                     joMessage.destinationContract, joMessage.data );
                 const outgoingMessageData: any = {
                     dstChainHash: owaspUtils.ethersMod.ethers.utils.id( joChainName ),
-                    msgCounter: 0 + idxMessage,
+                    msgCounter: idxMessage,
                     srcContract: joMessage.sender,
                     dstContract: joMessage.destinationContract,
                     data: joMessage.data
@@ -998,7 +998,7 @@ async function prepareSignMessagesImpl(
             optsSignOperation.jarrMessages,
             optsSignOperation.nIdxCurrentMsgBlockStart,
             optsSignOperation.joExtraSignOpts );
-        await optsSignOperation.fn( null, optsSignOperation.jarrMessages, null );
+        await optsSignOperation.fn( null, optsSignOperation.jarrMessages );
         return true;
     }
     await checkCorrectnessOfMessagesToSign(
@@ -1225,22 +1225,22 @@ async function doSignConfigureChainAccessParams(
     optsSignOperation.targetChainID = -4;
     optsSignOperation.fromChainID = -4;
     if( optsSignOperation.strDirection == "M2S" ) {
-        optsSignOperation.targetChainName = "" +
+        optsSignOperation.targetChainName =
             ( optsSignOperation.imaState.chainProperties.sc.strChainName
                 ? optsSignOperation.imaState.chainProperties.sc.strChainName
                 : "" );
-        optsSignOperation.fromChainName = "" +
+        optsSignOperation.fromChainName =
             ( optsSignOperation.imaState.chainProperties.mn.strChainName
                 ? optsSignOperation.imaState.chainProperties.mn.strChainName
                 : "" );
         optsSignOperation.targetChainID = optsSignOperation.imaState.chainProperties.sc.chainId;
         optsSignOperation.fromChainID = optsSignOperation.imaState.chainProperties.mn.chainId;
     } else if( optsSignOperation.strDirection == "S2M" ) {
-        optsSignOperation.targetChainName = "" +
+        optsSignOperation.targetChainName =
             ( optsSignOperation.imaState.chainProperties.mn.strChainName
                 ? optsSignOperation.imaState.chainProperties.mn.strChainName
                 : "" );
-        optsSignOperation.fromChainName = "" +
+        optsSignOperation.fromChainName =
             ( optsSignOperation.imaState.chainProperties.sc.strChainName
                 ? optsSignOperation.imaState.chainProperties.sc.strChainName
                 : "" );
@@ -1249,9 +1249,8 @@ async function doSignConfigureChainAccessParams(
     } else if( optsSignOperation.strDirection == "S2S" ) {
         if( !optsSignOperation.joExtraSignOpts )
             throw new Error( "No S2S signing options provided" );
-        optsSignOperation.targetChainName =
-            "" + optsSignOperation.joExtraSignOpts.chainNameDst;
-        optsSignOperation.fromChainName = "" + optsSignOperation.joExtraSignOpts.chainNameSrc;
+        optsSignOperation.targetChainName = optsSignOperation.joExtraSignOpts.chainNameDst;
+        optsSignOperation.fromChainName = optsSignOperation.joExtraSignOpts.chainNameSrc;
         optsSignOperation.targetChainID = optsSignOperation.joExtraSignOpts.chainIdDst;
         optsSignOperation.fromChainID = optsSignOperation.joExtraSignOpts.chainIdSrc;
     } else {
@@ -1316,7 +1315,7 @@ async function doSignProcessHandleCall(
                 }
                 const arrTmp = joOut.result.signResult.signatureShare.split( ":" );
                 const joResultFromNode: any = {
-                    index: "" + nZeroBasedNodeIndex,
+                    index: nZeroBasedNodeIndex.toString(),
                     signature: {
                         X: arrTmp[0],
                         Y: arrTmp[1]
@@ -1356,7 +1355,7 @@ async function doSignProcessHandleCall(
             }
             if( bNodeSignatureOKay ) {
                 optsSignOperation.arrSignResults.push( {
-                    index: "" + nZeroBasedNodeIndex,
+                    index: nZeroBasedNodeIndex.toString(),
                     signature: splitSignatureShare( joOut.result.signResult.signatureShare ),
                     fromNode: joNode, // extra, not needed for bls_glue
                     signResult: joOut.result.signResult
@@ -1403,7 +1402,7 @@ async function doSignProcessOneImpl(
         return;
     await doSignConfigureChainAccessParams( optsSignOperation );
     const joParams: THandleVerifyAndSignCallDataParams = {
-        direction: "" + optsSignOperation.strDirection,
+        direction: optsSignOperation.strDirection,
         startMessageIdx: optsSignOperation.nIdxCurrentMsgBlockStart,
         dstChainName: optsSignOperation.targetChainName,
         srcChainName: optsSignOperation.fromChainName,
@@ -1412,8 +1411,8 @@ async function doSignProcessOneImpl(
         messages: optsSignOperation.jarrMessages,
         qa: {
             skaledNumber: 0 + i,
-            "optsSignOperation.sequenceId": "" + optsSignOperation.sequenceId,
-            ts: "" + log.generateTimestampString( null, false )
+            "optsSignOperation.sequenceId": optsSignOperation.sequenceId,
+            ts: log.generateTimestampString( null, false )
         }
     };
     optsSignOperation.details.trace(
@@ -1655,7 +1654,7 @@ async function doSignU256OneImplHandleCallResult(
                 }
                 const arrTmp = joOut.result.signResult.signatureShare.split( ":" );
                 const joResultFromNode: any = {
-                    index: "" + nZeroBasedNodeIndex,
+                    index: nZeroBasedNodeIndex.toString(),
                     signature: { X: arrTmp[0], Y: arrTmp[1] }
                 };
                 optsSignU256.details.trace( "{p}Will verify sign result for node {}",
@@ -1688,7 +1687,7 @@ async function doSignU256OneImplHandleCallResult(
             }
             if( bNodeSignatureOKay ) {
                 optsSignU256.arrSignResults.push( {
-                    index: "" + nZeroBasedNodeIndex,
+                    index: nZeroBasedNodeIndex.toString(),
                     signature:
                         splitSignatureShare( joOut.result.signResult.signatureShare ),
                     fromNode: joNode, // extra, not needed for bls_glue
@@ -1927,7 +1926,7 @@ export async function doVerifyReadyHash(
     let isSuccess = false;
     const arrTmp = signature.signatureShare.split( ":" );
     const joResultFromNode: any = {
-        index: "" + nZeroBasedNodeIndex,
+        index: nZeroBasedNodeIndex.toString(),
         signature: {
             X: arrTmp[0],
             Y: arrTmp[1]
@@ -1960,7 +1959,7 @@ export async function doVerifyReadyHash(
         imaUtils.jsonFileSave( strActionDir + "/hash.json", joMsg );
         imaUtils.jsonFileSave(
             strActionDir + "/BLS_keys" + nZeroBasedNodeIndex + ".json", joPublicKey );
-        const strVerifyCommand = "" +
+        const strVerifyCommand =
             imaState.strPathBlsVerify +
             " --t " + nThreshold +
             " --n " + nParticipants +

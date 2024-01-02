@@ -174,19 +174,18 @@ export async function registerSChainInDepositBoxes( // step 1
                 joTokenManagerERC1155.address, // call params
                 joTokenManagerERC721WithMetadata.address // call params
             ] ];
-        const weiHowMuch = undefined;
         const gasPrice = await transactionCustomizerMainNet.computeGasPrice(
             ethersProviderMainNet, 200000000000 );
         details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const estimatedGas = await transactionCustomizerMainNet.computeGas( details,
             ethersProviderMainNet, "Linker", joLinker, "connectSchain", arrArguments,
-            joAccountMN, strActionName, gasPrice, 3000000, weiHowMuch );
+            joAccountMN, strActionName, gasPrice, 3000000 );
         details.trace( "{p}Using estimated gas={}", strLogPrefix, estimatedGas );
         const isIgnore = false;
         const strErrorOfDryRun = await imaTx.dryRunCall( details, ethersProviderMainNet,
             "Linker", joLinker, "connectSchain", arrArguments,
             joAccountMN, strActionName, isIgnore,
-            gasPrice, estimatedGas, weiHowMuch );
+            gasPrice, estimatedGas );
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
@@ -194,7 +193,7 @@ export async function registerSChainInDepositBoxes( // step 1
             details, ethersProviderMainNet,
             "Linker", joLinker, "connectSchain", arrArguments,
             joAccountMN, strActionName,
-            gasPrice, estimatedGas, weiHowMuch );
+            gasPrice, estimatedGas );
         if( joReceipt ) {
             jarrReceipts.push( {
                 description: "registerSChainInDepositBoxes",

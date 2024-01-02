@@ -41,7 +41,7 @@ const gBigNumUpperPart: any = gBigNum2.pow( gBigNum256 ).sub( gBigNum1 );
 function getUtcTimestampString( d?: Date ): string {
     d = d ?? new Date(); // use now time if d is not specified
     const nUtcUnixTimeStampWithMilliseconds = d.getTime();
-    const t = "" + nUtcUnixTimeStampWithMilliseconds;
+    const t = nUtcUnixTimeStampWithMilliseconds.toString();
     return t;
 }
 

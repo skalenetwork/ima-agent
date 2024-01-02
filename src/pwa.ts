@@ -260,7 +260,7 @@ async function notifyOnLoopImpl(
                 method: "skale_imaNotifyLoopWork",
                 params: {
                     nNodeNumber: 0 + imaState.nNodeNumber,
-                    strLoopWorkType: "" + strLoopWorkType,
+                    strLoopWorkType: strLoopWorkType.toString(),
                     nIndexS2S: 0 + nIndexS2S,
                     isStart: ( !!isStart ),
                     ts: nUtcUnixTimeStamp,

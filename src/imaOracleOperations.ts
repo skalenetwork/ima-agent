@@ -202,7 +202,6 @@ async function handleOracleSigned(
     ];
     optsGasPriceSetup.details.debug( "{p}....debug args for : {}",
         optsGasPriceSetup.strLogPrefix, joDebugArgs );
-    const weiHowMuch = undefined;
     const gasPrice = await optsGasPriceSetup.transactionCustomizerSChain.computeGasPrice(
         optsGasPriceSetup.ethersProviderSChain, 200000000000 );
     optsGasPriceSetup.details.trace( "{p}Using computed gasPrice={}",
@@ -211,7 +210,7 @@ async function handleOracleSigned(
         optsGasPriceSetup.details, optsGasPriceSetup.ethersProviderSChain,
         "CommunityLocker", optsGasPriceSetup.joCommunityLocker,
         "setGasPrice", arrArgumentsSetGasPrice, optsGasPriceSetup.joAccountSC,
-        optsGasPriceSetup.strActionName, gasPrice, 10000000, weiHowMuch );
+        optsGasPriceSetup.strActionName, gasPrice, 10000000 );
     optsGasPriceSetup.details.trace( "{p}Using estimated gas={}",
         optsGasPriceSetup.strLogPrefix, estimatedGasSetGasPrice );
     const isIgnoreSetGasPrice = false;

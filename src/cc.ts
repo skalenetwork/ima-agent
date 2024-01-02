@@ -50,7 +50,7 @@ export function replaceAll( str: string, find: string, replace: string ): string
 }
 
 export function validateRadix( value?: any, radix?: any ): number {
-    value = "" + ( value ? value.toString() : "10" );
+    value = ( value ? value.toString() : "10" );
     value = value.trim();
     radix = ( radix == null || radix == undefined )
         ? ( ( value.length > 2 && value[0] == "0" && ( value[1] == "x" || value[1] == "X" ) )
@@ -62,7 +62,6 @@ export function validateRadix( value?: any, radix?: any ): number {
 
 export function validateInteger( value?: any, radix?: any ): boolean {
     try {
-        value = "" + value;
         value = value.trim();
         if( value.length < 1 )
             return false;
@@ -225,22 +224,22 @@ function urlObjColorized( objURL?: any ): string {
     if( !objURL )
         return strURL;
     if( objURL.protocol && objURL.protocol !== null && objURL.protocol !== undefined )
-        strURL += "" + yellow( objURL.protocol ) + normal( "//" );
+        strURL += yellow( objURL.protocol ) + normal( "//" );
     if( objURL.username && objURL.username !== null && objURL.username !== undefined ) {
-        strURL += "" + magenta( objURL.username );
+        strURL += magenta( objURL.username );
         if( objURL.password && objURL.password !== null && objURL.password !== undefined )
             strURL += normal( ":" ) + yellow( objURL.password );
         strURL += normal( "@" );
     }
     if( objURL.hostname )
-        strURL += "" + magenta( logArgToStringAsIpv4( objURL.hostname ) );
+        strURL += magenta( logArgToStringAsIpv4( objURL.hostname ) );
     if( objURL.port && objURL.port !== null && objURL.port !== undefined )
         strURL += normal( ":" ) + logArgToString( objURL.port );
     if( objURL.pathname && objURL.pathname !== null &&
         objURL.pathname !== undefined && objURL.pathname !== "/" )
-        strURL += "" + yellow( replaceAll( objURL.pathname, "/", normal( "/" ) ) );
+        strURL += yellow( replaceAll( objURL.pathname, "/", normal( "/" ) ) );
     if( objURL.search && objURL.search !== null && objURL.search !== undefined )
-        strURL += "" + magenta( objURL.search );
+        strURL += magenta( objURL.search );
     return strURL;
 }
 
@@ -326,31 +325,31 @@ export function logArgToString( ...args: any[] ): string {
     for( i = 0; i < cnt; ++i ) {
         const arg = arguments[i];
         if( arg === undefined ) {
-            s += "" + undefval( arg );
+            s += undefval( arg );
             continue;
         }
         if( arg === null ) {
-            s += "" + nullval( arg );
+            s += nullval( arg );
             continue;
         }
         if( isNaN( arg ) ) {
-            s += "" + nanval( arg );
+            s += nanval( arg );
             continue;
         }
         if( typeof arg === "boolean" ) {
-            s += "" + tf( arg );
+            s += tf( arg );
             continue;
         }
         if( typeof arg === "object" && typeof arg.valueOf() === "boolean" )
-            s += "" + tf( arg.valueOf() );
+            s += tf( arg.valueOf() );
 
         if( typeof arg === "number" || typeof arg === "bigint" ) {
-            s += "" + number( arg );
+            s += number( arg );
             continue;
         }
         if( typeof arg === "object" &&
             ( typeof arg.valueOf() === "number" || typeof arg.valueOf() === "bigint" ) ) {
-            s += "" + number( arg.valueOf() );
+            s += number( arg.valueOf() );
             continue;
         }
         if( typeof arg === "string" || arg instanceof String ) {
@@ -362,26 +361,26 @@ export function logArgToString( ...args: any[] ): string {
                     strURL += normal( anyURL.strStrippedStringComma );
 
                 if( objURL.protocol )
-                    strURL += "" + yellow( objURL.protocol ) + normal( "//" );
+                    strURL += yellow( objURL.protocol ) + normal( "//" );
 
                 if( objURL.username ) {
-                    strURL += "" + magenta( objURL.username );
+                    strURL += magenta( objURL.username );
                     if( objURL.password )
                         strURL += normal( ":" ) + yellow( objURL.password );
 
                     strURL += normal( "@" );
                 }
                 if( objURL.hostname )
-                    strURL += "" + magenta( logArgToStringAsIpv4( objURL.hostname ) );
+                    strURL += magenta( logArgToStringAsIpv4( objURL.hostname ) );
 
                 if( objURL.port )
                     strURL += normal( ":" ) + logArgToString( objURL.port );
 
                 if( objURL.pathname )
-                    strURL += "" + yellow( replaceAll( objURL.pathname, "/", normal( "/" ) ) );
+                    strURL += yellow( replaceAll( objURL.pathname, "/", normal( "/" ) ) );
 
                 if( objURL.search )
-                    strURL += "" + magenta( objURL.search );
+                    strURL += magenta( objURL.search );
 
                 if( anyURL.strStrippedStringComma )
                     strURL += normal( anyURL.strStrippedStringComma );
@@ -392,19 +391,19 @@ export function logArgToString( ...args: any[] ): string {
             if( ( arg.length > 1 && arg[0] == "-" && arg[1] != "-" ) ||
                 ( arg.length > 2 && arg[0] == "-" && arg[1] == "-" && arg[2] != "-" )
             ) {
-                s += "" + cla( arg );
+                s += cla( arg );
                 continue;
             }
             if( arg.length > 0 && ( arg[0] == "\"" || arg[0] == "'" ) ) {
-                s += "" + strval( arg );
+                s += strval( arg );
                 continue;
             }
             if( isFloat2( arg ) ) {
-                s += "" + real( arg );
+                s += real( arg );
                 continue;
             }
             if( isInt2( arg ) ) {
-                s += "" + number( arg );
+                s += number( arg );
                 continue;
             }
         }
@@ -412,7 +411,7 @@ export function logArgToString( ...args: any[] ): string {
             s += jsonColorizer.prettyPrintConsole( arg );
             continue;
         }
-        s += "" + kk( arg );
+        s += kk( arg );
     }
     return s;
 }
@@ -510,7 +509,9 @@ export const jsonColorizer: any = { // see http://jsfiddle.net/unLSJ/
                 ( jsonColorizer.cntCensoredMax > 0 ) ? jsonColorizer.censor( obj ) : null,
                 cntSpaces
             );
-            const s = tmp ? tmp.replace( jsonLine, jsonColorizer.replacerConsole ) : ( "" + tmp );
+            const s = tmp
+                ? tmp.replace( jsonLine, jsonColorizer.replacerConsole )
+                : ( tmp.toString() );
             return s;
         } catch ( err ) { }
         obj = JSON.parse( JSON.stringify( obj, getCircularReplacerForJsonStringify() ) );
@@ -519,7 +520,7 @@ export const jsonColorizer: any = { // see http://jsfiddle.net/unLSJ/
             ( jsonColorizer.cntCensoredMax > 0 ) ? jsonColorizer.censor( obj ) : null,
             cntSpaces
         );
-        const s = tmp ? tmp.replace( jsonLine, jsonColorizer.replacerConsole ) : ( "" + tmp );
+        const s = tmp ? tmp.replace( jsonLine, jsonColorizer.replacerConsole ) : ( tmp.toString() );
         return s;
     }
 };
@@ -557,21 +558,20 @@ export function syntaxHighlightJSON( jo?: any, strKeyNamePrefix?: string ): stri
             )
                 cls = "string";
             switch ( cls ) {
-            case "key":
-                return "" +
-                    strKeyNamePrefix + logArgToString( match.replace( /[": ]/g, "" ) ) + ": ";
+            case "key": return strKeyNamePrefix +
+                logArgToString( match.replace( /[": ]/g, "" ) ) + ": ";
             case "boolean":
                 return tf( match );
             case "null":
-                return "" + nullval( match );
+                return nullval( match );
             case "undefined":
-                return "" + undefval( match );
+                return undefval( match );
             case "nan":
-                return "" + nanval( match );
+                return nanval( match );
             case "string":
-                return "" + strval( match );
+                return strval( match );
             case "number":
-                return "" + number( match );
+                return number( match );
             }
             return logArgToString( match );
         } );
@@ -579,7 +579,7 @@ export function syntaxHighlightJSON( jo?: any, strKeyNamePrefix?: string ): stri
 
 export function safeStringifyJSON( jo?: any, n?: number ): string | undefined {
     try {
-        const s = "" + JSON.stringify( jo, getCircularReplacerForJsonStringify(), n );
+        const s = JSON.stringify( jo, getCircularReplacerForJsonStringify(), n );
         return s;
     } catch ( err ) {
     }
@@ -587,7 +587,7 @@ export function safeStringifyJSON( jo?: any, n?: number ): string | undefined {
 }
 
 export function jn( x?: any ): string {
-    return "" + jsonColorizer.prettyPrintConsole( x );
+    return jsonColorizer.prettyPrintConsole( x );
 }
 
 export function j1( x?: any, n?: number, strKeyNamePrefix?: string ): string {
@@ -599,7 +599,7 @@ export function j1( x?: any, n?: number, strKeyNamePrefix?: string ): string {
     let s = safeStringifyJSON( x, n );
     if( !gFlagIsEnabled )
         return s ?? "";
-    s = "" + syntaxHighlightJSON( s, strKeyNamePrefix );
+    s = syntaxHighlightJSON( s, strKeyNamePrefix );
     if( isDefaultKeyNamePrefix && s.length > 9 && s[0] == " " )
         s = s.substring( 1, s.length );
     return s;
@@ -661,222 +661,222 @@ export {
 export function normal( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
-    return "" + fgWhite + s + reset;
+    return fgWhite + s + reset;
 }
 
 export function trace( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
-    return "" + fgWhite + s + reset;
+    return fgWhite + s + reset;
 }
 
 export function debug( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
-    return "" + fgWhite + s + reset;
+    return fgWhite + s + reset;
 }
 export function debugDark( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
-    return "" + fgBlack + enlight + s + reset;
+    return fgBlack + enlight + s + reset;
 }
 
 export function note( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
-    return "" + fgBlue + s + reset;
+    return fgBlue + s + reset;
 }
 
 export function notice( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
-    return "" + fgMagenta + s + reset;
+    return fgMagenta + s + reset;
 }
 
 export function info( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
-    return "" + fgBlue + enlight + s + reset;
+    return fgBlue + enlight + s + reset;
 }
 
 export function warning( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
-    return "" + fgYellow + s + reset;
+    return fgYellow + s + reset;
 }
 
 export function warn( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
-    return "" + fgYellow + s + reset;
+    return fgYellow + s + reset;
 }
 
 export function error( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
-    return "" + fgRed + s + reset;
+    return fgRed + s + reset;
 }
 
 export function fatal( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
-    return "" + bgRed + fgYellow + enlight + s + reset;
+    return bgRed + fgYellow + enlight + s + reset;
 }
 
 export function success( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
-    return "" + fgGreen + enlight + s + reset;
+    return fgGreen + enlight + s + reset;
 }
 
 export function attention( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
-    return "" + fgCyan + s + reset;
+    return fgCyan + s + reset;
 }
 
 export function bright( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
-    return "" + fgWhite + enlight + s + reset;
+    return fgWhite + enlight + s + reset;
 }
 
 export function sunny( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
-    return "" + fgYellow + enlight + s + reset;
+    return fgYellow + enlight + s + reset;
 }
 
 export function rx( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
-    return "" + fgMagenta + s + reset;
+    return fgMagenta + s + reset;
 }
 
 export function rxa( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
-    return "" + fgMagenta + enlight + s + reset;
+    return fgMagenta + enlight + s + reset;
 }
 
 export function tx( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
-    return "" + fgGreen + s + reset;
+    return fgGreen + s + reset;
 }
 
 export function txa( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
-    return "" + fgGreen + enlight + s + reset;
+    return fgGreen + enlight + s + reset;
 }
 
 export function date( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
-    return "" + fgYellow + s + reset;
+    return fgYellow + s + reset;
 }
 
 export function time( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
-    return "" + fgMagenta + enlight + s + reset;
+    return fgMagenta + enlight + s + reset;
 }
 
 export function fracTime( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
-    return "" + fgMagenta + s + reset;
+    return fgMagenta + s + reset;
 }
 
 export function yes( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
-    return "" + fgGreen + enlight + s + reset;
+    return fgGreen + enlight + s + reset;
 }
 
 export function no( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
-    return "" + fgRed + s + reset;
+    return fgRed + s + reset;
 }
 
 export function number( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
-    return "" + fgBlue + enlight + s + reset;
+    return fgBlue + enlight + s + reset;
 }
 
 export function real( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
-    return "" + fgMagenta + s + reset;
+    return fgMagenta + s + reset;
 }
 
 export function undefval( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
-    return "" + fgGreen + enlight + s + reset;
+    return fgGreen + enlight + s + reset;
 }
 
 export function nullval( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
-    return "" + fgGreen + enlight + s + reset;
+    return fgGreen + enlight + s + reset;
 }
 
 export function nanval( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
-    return "" + fgGreen + enlight + s + reset;
+    return fgGreen + enlight + s + reset;
 }
 
 export function yellow( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
-    return "" + fgYellow + s + reset;
+    return fgYellow + s + reset;
 }
 
 export function magenta( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
-    return "" + fgMagenta + s + reset;
+    return fgMagenta + s + reset;
 }
 
 export function cla( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
-    return "" + fgBlue + dim + s + reset;
+    return fgBlue + dim + s + reset;
 }
 
 export function kk( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
-    return "" + fgYellow + enlight + s + reset;
+    return fgYellow + enlight + s + reset;
 }
 
 export function strval( s?: any ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
-    return "" + fgYellow + s + reset;
+    return fgYellow + s + reset;
 }
 
 export function n2s( n: any, sz: number ): string {
-    let s = "" + n;
+    let s = n ? n.toString() : "";
     while( s.length < sz )
         s = "0" + s;
     return s;
 }
 
 export function timestampHR(): number {
-    const d = new Date();
-    const ts = Math.floor( ( d ).getTime() );
+    const newDateTime = new Date();
+    const ts = Math.floor( ( newDateTime ).getTime() );
     return ts;
 }
 
 export function timestampUnix(): number {
-    const d = new Date();
-    const ts = Math.floor( ( d ).getTime() / 1000 );
+    const newDateTime = new Date();
+    const ts = Math.floor( ( newDateTime ).getTime() / 1000 );
     return ts;
 }
 
@@ -902,25 +902,25 @@ export function getDurationString( tsFrom: number, tsTo: number ): string {
 
     const secs = n % 60;
     n = Math.floor( n / 60 );
-    s = "" + n2s( secs, 2 ) + s;
+    s = n2s( secs, 2 ) + s;
     if( n == 0 )
         return trimLeftUnneededTimestampZeros( s );
     s = ":" + s;
 
     const mins = n % 60;
     n = Math.floor( n / 60 );
-    s = "" + n2s( mins, 2 ) + s;
+    s = n2s( mins, 2 ) + s;
     if( n == 0 )
         return trimLeftUnneededTimestampZeros( s );
     s = ":" + s;
 
     const hours = n % 24;
     n = Math.floor( n / 24 );
-    s = "" + n2s( hours, 2 ) + s;
+    s = n2s( hours, 2 ) + s;
     if( n == 0 )
         return trimLeftUnneededTimestampZeros( s );
 
-    return "" + n + " " + ( ( n > 1 ) ? "days" : "day" ) + "," + s;
+    return ( n ? n.toString() : "" ) + " " + ( ( n > 1 ) ? "days" : "day" ) + "," + s;
 }
 
 export function capitalizeFirstLetter( s?: any ): string {

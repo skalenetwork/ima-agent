@@ -182,7 +182,7 @@ export async function doErc721PaymentFromMainNet(
             details, ethersProviderMainNet,
             "ERC721", contractERC721, "approve", arrArgumentsApprove,
             joAccountSrc, strActionName, gasPrice, estimatedGasApprove, weiHowMuchApprove, null );
-        if( joReceiptApprove && typeof joReceiptApprove === "object" ) {
+        if( joReceiptApprove ) {
             jarrReceipts.push( {
                 description: "doErc721PaymentFromMainNet/approve",
                 receipt: joReceiptApprove
@@ -214,7 +214,7 @@ export async function doErc721PaymentFromMainNet(
             "DepositBoxERC721", joDepositBoxERC721, "depositERC721", arrArgumentsDepositERC721,
             joAccountSrc, strActionName, gasPrice, estimatedGasDeposit,
             weiHowMuchDepositERC721, null );
-        if( joReceiptDeposit && typeof joReceiptDeposit === "object" ) {
+        if( joReceiptDeposit ) {
             jarrReceipts.push( {
                 description: "doErc721PaymentFromMainNet/deposit",
                 receipt: joReceiptDeposit
@@ -320,7 +320,7 @@ export async function doErc20PaymentFromMainNet(
             details, ethersProviderMainNet,
             "ERC20", contractERC20, "approve", arrArgumentsApprove,
             joAccountSrc, strActionName, gasPrice, estimatedGasApprove, weiHowMuchApprove, null );
-        if( joReceiptApprove && typeof joReceiptApprove === "object" ) {
+        if( joReceiptApprove ) {
             jarrReceipts.push( {
                 description: "doErc20PaymentFromMainNet/approve",
                 receipt: joReceiptApprove
@@ -351,7 +351,7 @@ export async function doErc20PaymentFromMainNet(
             "DepositBoxERC20", joDepositBoxERC20, "depositERC20", arrArgumentsDepositERC20,
             joAccountSrc, strActionName, gasPrice, estimatedGasDeposit,
             weiHowMuchDepositERC20, null );
-        if( joReceiptDeposit && typeof joReceiptDeposit === "object" ) {
+        if( joReceiptDeposit ) {
             jarrReceipts.push( {
                 description: "doErc20PaymentFromMainNet/deposit",
                 receipt: joReceiptDeposit
@@ -463,7 +463,7 @@ export async function doErc1155PaymentFromMainNet(
                 "ERC1155", contractERC1155, "setApprovalForAll", arrArgumentsApprove,
                 joAccountSrc, strActionName, gasPrice, estimatedGasApprove, weiHowMuchApprove,
                 null );
-        if( joReceiptApprove && typeof joReceiptApprove === "object" ) {
+        if( joReceiptApprove ) {
             jarrReceipts.push( {
                 description: "doErc1155PaymentFromMainNet/approve",
                 receipt: joReceiptApprove
@@ -499,7 +499,7 @@ export async function doErc1155PaymentFromMainNet(
                 "depositERC1155", arrArgumentsDepositERC1155,
                 joAccountSrc, strActionName,
                 gasPrice, estimatedGasDeposit, weiHowMuchDepositERC1155, null );
-        if( joReceiptDeposit && typeof joReceiptDeposit === "object" ) {
+        if( joReceiptDeposit ) {
             jarrReceipts.push( {
                 description: "doErc1155PaymentFromMainNet/deposit",
                 receipt: joReceiptDeposit
@@ -596,7 +596,7 @@ export async function doErc1155BatchPaymentFromMainNet(
             details, ethersProviderMainNet,
             "ERC1155", contractERC1155, "setApprovalForAll", arrArgumentsApprove,
             joAccountSrc, strActionName, gasPrice, estimatedGasApprove, weiHowMuchApprove, null );
-        if( joReceiptApprove && typeof joReceiptApprove === "object" ) {
+        if( joReceiptApprove ) {
             jarrReceipts.push( {
                 description: "doErc1155BatchPaymentFromMainNet/approve",
                 receipt: joReceiptApprove
@@ -628,7 +628,7 @@ export async function doErc1155BatchPaymentFromMainNet(
             "depositERC1155Batch", arrArgumentsDepositERC1155Batch,
             joAccountSrc, strActionName,
             gasPrice, estimatedGasDeposit, weiHowMuchDepositERC1155Batch, null );
-        if( joReceiptDeposit && typeof joReceiptDeposit === "object" ) {
+        if( joReceiptDeposit ) {
             jarrReceipts.push( {
                 description: "doErc1155BatchPaymentFromMainNet/deposit",
                 receipt: joReceiptDeposit
@@ -731,7 +731,7 @@ export async function doErc20PaymentFromSChain(
             details, ethersProviderSChain,
             "ERC20", contractERC20, "approve", arrArgumentsApprove,
             joAccountSrc, strActionName, gasPrice, estimatedGasApprove, weiHowMuchApprove, opts );
-        if( joReceiptApprove && typeof joReceiptApprove === "object" ) {
+        if( joReceiptApprove ) {
             jarrReceipts.push( {
                 description: "doErc20PaymentFromSChain/approve",
                 receipt: joReceiptApprove
@@ -772,7 +772,7 @@ export async function doErc20PaymentFromSChain(
             "exitToMainERC20", arrArgumentsExitToMainERC20,
             joAccountSrc, strActionName, gasPrice,
             estimatedGasExitToMainERC20, weiHowMuchExitToMainERC20, opts );
-        if( joReceiptExitToMainERC20 && typeof joReceiptExitToMainERC20 === "object" ) {
+        if( joReceiptExitToMainERC20 ) {
             jarrReceipts.push( {
                 description: "doErc20PaymentFromSChain/exit-to-main",
                 receipt: joReceiptExitToMainERC20
@@ -877,7 +877,7 @@ export async function doErc721PaymentFromSChain(
             details, ethersProviderSChain,
             "ERC721", contractERC721, "approve", arrArgumentsApprove,
             joAccountSrc, strActionName, gasPrice, estimatedGasApprove, weiHowMuchApprove, opts );
-        if( joReceiptApprove && typeof joReceiptApprove === "object" ) {
+        if( joReceiptApprove ) {
             jarrReceipts.push( {
                 description: "doErc721PaymentFromSChain/transfer-from",
                 receipt: joReceiptApprove
@@ -918,7 +918,7 @@ export async function doErc721PaymentFromSChain(
             "exitToMainERC721", arrArgumentsExitToMainERC721,
             joAccountSrc, strActionName, gasPrice,
             estimatedGasExitToMainERC721, weiHowMuchExitToMainERC721, opts );
-        if( joReceiptExitToMainERC721 && typeof joReceiptExitToMainERC721 === "object" ) {
+        if( joReceiptExitToMainERC721 ) {
             jarrReceipts.push( {
                 description: "doErc721PaymentFromSChain/exit-to-main",
                 receipt: joReceiptExitToMainERC721
@@ -1024,7 +1024,7 @@ export async function doErc1155PaymentFromSChain(
             details, ethersProviderSChain,
             "ERC1155", contractERC1155, "setApprovalForAll", arrArgumentsApprove,
             joAccountSrc, strActionName, gasPrice, estimatedGasApprove, weiHowMuchApprove, opts );
-        if( joReceiptApprove && typeof joReceiptApprove === "object" ) {
+        if( joReceiptApprove ) {
             jarrReceipts.push( {
                 description: "doErc1155PaymentFromSChain/transfer-from",
                 receipt: joReceiptApprove
@@ -1065,7 +1065,7 @@ export async function doErc1155PaymentFromSChain(
             "exitToMainERC1155", arrArgumentsExitToMainERC1155,
             joAccountSrc, strActionName, gasPrice,
             estimatedGasExitToMainERC1155, weiHowMuchExitToMainERC1155, opts );
-        if( joReceiptExitToMainERC1155 && typeof joReceiptExitToMainERC1155 === "object" ) {
+        if( joReceiptExitToMainERC1155 ) {
             jarrReceipts.push( {
                 description: "doErc1155PaymentFromSChain/exit-to-main",
                 receipt: joReceiptExitToMainERC1155
@@ -1167,7 +1167,7 @@ export async function doErc1155BatchPaymentFromSChain(
             details, ethersProviderSChain,
             "ERC1155", contractERC1155, "setApprovalForAll", arrArgumentsApprove,
             joAccountSrc, strActionName, gasPrice, estimatedGasApprove, weiHowMuchApprove, opts );
-        if( joReceiptApprove && typeof joReceiptApprove === "object" ) {
+        if( joReceiptApprove ) {
             jarrReceipts.push( {
                 description: "doErc1155BatchPaymentFromSChain/transfer-from",
                 receipt: joReceiptApprove
@@ -1209,9 +1209,7 @@ export async function doErc1155BatchPaymentFromSChain(
             "exitToMainERC1155Batch", arrArgumentsExitToMainERC1155Batch,
             joAccountSrc, strActionName, gasPrice,
             estimatedGasExitToMainERC1155Batch, weiHowMuchExitToMainERC1155Batch, opts );
-        if( joReceiptExitToMainERC1155Batch &&
-            typeof joReceiptExitToMainERC1155Batch === "object"
-        ) {
+        if( joReceiptExitToMainERC1155Batch ) {
             jarrReceipts.push( {
                 description: "doErc1155BatchPaymentFromSChain/exit-to-main",
                 receipt: joReceiptExitToMainERC1155Batch
@@ -1340,7 +1338,7 @@ export async function doErc20PaymentS2S(
             details, ethersProviderSrc,
             "ERC20", contractERC20, "approve", arrArgumentsApprove,
             joAccountSrc, strActionName, gasPrice, estimatedGasApprove, weiHowMuchApprove, null );
-        if( joReceiptApprove && typeof joReceiptApprove === "object" ) {
+        if( joReceiptApprove ) {
             jarrReceipts.push( {
                 description: `doErc20PaymentS2S/approve/${( isForward ? "forward" : "reverse" )}`,
                 receipt: joReceiptApprove
@@ -1371,7 +1369,7 @@ export async function doErc20PaymentS2S(
             "transferToSchainERC20", arrArgumentsTransfer,
             joAccountSrc, strActionName, gasPrice,
             estimatedGasTransfer, weiHowMuchTransferERC20, null );
-        if( joReceiptTransfer && typeof joReceiptTransfer === "object" ) {
+        if( joReceiptTransfer ) {
             jarrReceipts.push( {
                 description: "doErc20PaymentS2S/transfer",
                 receipt: joReceiptTransfer
@@ -1480,7 +1478,7 @@ export async function doErc721PaymentS2S(
             details, ethersProviderSrc,
             "ERC721", contractERC721, "approve", arrArgumentsApprove,
             joAccountSrc, strActionName, gasPrice, estimatedGasApprove, weiHowMuchApprove, null );
-        if( joReceiptApprove && typeof joReceiptApprove === "object" ) {
+        if( joReceiptApprove ) {
             jarrReceipts.push( {
                 description:
                 `doErc721PaymentS2S/approve/${( isForward ? "forward" : "reverse" )}`,
@@ -1514,7 +1512,7 @@ export async function doErc721PaymentS2S(
             "transferToSchainERC721", arrArgumentsTransfer,
             joAccountSrc, strActionName,
             gasPrice, estimatedGasTransfer, weiHowMuchTransferERC721, null );
-        if( joReceiptTransfer && typeof joReceiptTransfer === "object" ) {
+        if( joReceiptTransfer ) {
             jarrReceipts.push( {
                 description: "doErc721PaymentS2S/transfer",
                 receipt: joReceiptTransfer
@@ -1626,7 +1624,7 @@ export async function doErc1155PaymentS2S(
             "ERC1155", contractERC1155, "setApprovalForAll", arrArgumentsApprove,
             joAccountSrc, strActionName, gasPrice,
             estimatedGasApprove, weiHowMuchApprove, null );
-        if( joReceiptApprove && typeof joReceiptApprove === "object" ) {
+        if( joReceiptApprove ) {
             jarrReceipts.push( {
                 description:
                     `doErc1155PaymentS2S/approve/${( isForward ? "forward" : "reverse" )}`,
@@ -1659,7 +1657,7 @@ export async function doErc1155PaymentS2S(
             "transferToSchainERC1155", arrArgumentsTransfer,
             joAccountSrc, strActionName, gasPrice, estimatedGasTransfer,
             weiHowMuchTransferERC1155, null );
-        if( joReceiptTransfer && typeof joReceiptTransfer === "object" ) {
+        if( joReceiptTransfer ) {
             jarrReceipts.push( {
                 description: "doErc1155PaymentS2S/transfer",
                 receipt: joReceiptTransfer
@@ -1772,7 +1770,7 @@ export async function doErc1155BatchPaymentS2S(
             details, ethersProviderSrc,
             "ERC1155", contractERC1155, "setApprovalForAll", arrArgumentsApprove,
             joAccountSrc, strActionName, gasPrice, estimatedGasApprove, weiHowMuchApprove, null );
-        if( joReceiptApprove && typeof joReceiptApprove === "object" ) {
+        if( joReceiptApprove ) {
             jarrReceipts.push( {
                 description:
                     `doErc1155BatchPaymentS2S/approve/${( isForward ? "forward" : "reverse" )}`,
@@ -1806,7 +1804,7 @@ export async function doErc1155BatchPaymentS2S(
             "transferToSchainERC1155Batch", arrArgumentsTransfer,
             joAccountSrc, strActionName,
             gasPrice, estimatedGasTransfer, weiHowMuchTransferERC1155, null );
-        if( joReceiptTransfer && typeof joReceiptTransfer === "object" ) {
+        if( joReceiptTransfer ) {
             jarrReceipts.push( {
                 description: "doErc1155PaymentS2S/transfer",
                 receipt: joReceiptTransfer
@@ -1847,11 +1845,8 @@ export async function mintErc20(
     const details = log.createMemoryStream();
     try {
         details.debug( "{p}Mint ERC20 token amount {}", strLogPrefix, nAmount );
-        if( !( ethersProvider && joAccount && strAddressMintTo &&
-            typeof strAddressMintTo === "string" && strAddressMintTo.length > 0 &&
-            strTokenContractAddress && typeof strTokenContractAddress === "string" &&
-            strTokenContractAddress.length > 0 && joTokenContractABI
-        ) )
+        if( !( strAddressMintTo.length > 0 && strTokenContractAddress.length > 0 &&
+            joTokenContractABI ) )
             throw new Error( "Missing valid arguments" );
         strActionName = "mintErc20() instantiate token contract";
         const contract = new owaspUtils.ethersMod.ethers.Contract(

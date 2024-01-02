@@ -77,20 +77,20 @@ export interface TParallelLoopRunOptions {
 // Run transfer loop
 
 export function checkTimeFraming(
-    d: Date | null, strDirection: string, joRuntimeOpts: TRuntimeOpts ): boolean {
+    aDateTime: Date | null, strDirection: string, joRuntimeOpts: TRuntimeOpts ): boolean {
     try {
         const imaState: state.TIMAState = state.get();
         if( imaState.nTimeFrameSeconds <= 0 || imaState.nNodesCount <= 1 )
             return true; // time framing is disabled
 
-        if( d == null || d == undefined )
-            d = new Date(); // now
+        if( aDateTime == null || aDateTime == undefined )
+            aDateTime = new Date(); // now
 
         const nFrameShift = 0;
 
         // Unix UTC timestamp, see:
         // https://stackoverflow.com/questions/9756120/how-do-i-get-a-utc-timestamp-in-javascript
-        const nUtcUnixTimeStamp = Math.floor( ( d ).getTime() / 1000 );
+        const nUtcUnixTimeStamp = Math.floor( ( aDateTime ).getTime() / 1000 );
 
         const nSecondsRangeForAllSChains = imaState.nTimeFrameSeconds * imaState.nNodesCount;
         const nMod = Math.floor( nUtcUnixTimeStamp % nSecondsRangeForAllSChains );

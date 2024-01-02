@@ -103,7 +103,7 @@ export async function dryRunCall(
     strContractName: string, joContract: owaspUtils.ethersMod.ethers.Contract,
     strMethodName: string, arrArguments: any[],
     joAccount: state.TAccount, strActionName: string, isDryRunResultIgnore: boolean,
-    gasPrice: any, gasValue: any, weiHowMuch: any,
+    gasPrice: any, gasValue: any, weiHowMuch?: any,
     opts?: any
 ): Promise<string | null> {
     if( !dryRunIsEnabled() )
@@ -221,7 +221,7 @@ async function payedCallTM( optsPayedCall: TRunTimePayedCallOptions ): Promise<a
         optsPayedCall.joReceipt = joReceiptFromTM;
         optsPayedCall.details.trace( "{p}ID of TM-transaction: {}",
             optsPayedCall.strLogPrefix, idTransaction );
-        const txHashSent = "" + optsPayedCall.joReceipt.transactionHash;
+        const txHashSent = optsPayedCall.joReceipt.transactionHash;
         optsPayedCall.details.trace( "{p}Hash of sent TM-transaction: {}",
             optsPayedCall.strLogPrefix, txHashSent );
         return optsPayedCall.joReceipt;
@@ -240,7 +240,7 @@ async function payedCallSGX( optsPayedCall: TRunTimePayedCallOptions ): Promise<
         chainId = owaspUtils.parseIntOrHex( chainId );
     optsPayedCall.details.trace( "{p}Chain ID is: {}",
         optsPayedCall.strLogPrefix, chainId );
-    const strCmd = "" + process.argv[0] + " --no-warnings ./imaSgxExternalSigner.js " +
+    const strCmd = process.argv[0] + " --no-warnings ./imaSgxExternalSigner.js " +
         ( log.isEnabledColorization() ? "true" : "false" ) + " " +
         "\"" + optsPayedCall.joAccount.strSgxURL + "\" " +
         "\"" + optsPayedCall.joAccount.strSgxKeyName + "\" " +
@@ -318,7 +318,7 @@ export async function payedCall(
     strContractName: string, joContract: owaspUtils.ethersMod.ethers.Contract,
     strMethodName: any, arrArguments: any[],
     joAccount: state.TAccount, strActionName: string,
-    gasPrice: any, estimatedGas: any, weiHowMuch: any,
+    gasPrice: any, estimatedGas: any, weiHowMuch?: any,
     opts?: any
 ): Promise<any> {
     const optsPayedCall: TRunTimePayedCallOptions = {
@@ -685,7 +685,7 @@ export class TransactionCustomizer {
         strContractName: string, joContract: owaspUtils.ethersMod.ethers.Contract,
         strMethodName: string, arrArguments: any[],
         joAccount: state.TAccount, strActionName: string,
-        gasPrice: any, gasValueRecommended: any, weiHowMuch: any,
+        gasPrice: any, gasValueRecommended: any, weiHowMuch?: any,
         opts?: any
     ): Promise<any> {
         let estimatedGas: any = 0;

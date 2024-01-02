@@ -89,7 +89,7 @@ export function parseIntOrHex( s: any ): number {
 }
 
 export function validateRadix( value: any, radix?: any ): boolean {
-    value = "" + ( value ? value.toString() : "10" );
+    value = value ? value.toString() : "10";
     value = value.trim();
     radix = ( radix == null || radix == undefined )
         ? ( ( value.length > 2 && value[0] == "0" && ( value[1] == "x" || value[1] == "X" ) )
@@ -101,7 +101,6 @@ export function validateRadix( value: any, radix?: any ): boolean {
 
 export function validateInteger( value: any, radix?: any ): boolean {
     try {
-        value = "" + value;
         value = value.trim();
         if( value.length < 1 )
             return false;
@@ -272,7 +271,7 @@ export function validateEthPrivateKey( value?: any ): boolean {
 
 export function toEthAddress( value?: any, defValue?: string ): string {
     try {
-        value = "" + ( value ? ensureStartsWith0x( value.toString() ) : "" );
+        value = value ? ensureStartsWith0x( value.toString() ) : "";
         defValue = defValue ?? "";
         if( !validateEthAddress( value ) )
             return defValue;
@@ -283,7 +282,7 @@ export function toEthAddress( value?: any, defValue?: string ): string {
 
 export function toEthPrivateKey( value?: any, defValue?: string ): string {
     try {
-        value = "" + ( value ? value.toString() : "" );
+        value = value ? value.toString() : "";
         defValue = defValue ?? "";
         if( !validateEthPrivateKey( value ) )
             return defValue;
@@ -669,7 +668,7 @@ export function privateKeyToAccountAddress( keyPrivate: string ): string {
 export function fnAddressImpl_( anyThis: any ): string {
     if( anyThis.address_ == undefined || anyThis.address_ == null || anyThis.address_ == "" ) {
         if( anyThis.privateKey )
-            anyThis.address_ = "" + privateKeyToAccountAddress( anyThis.privateKey );
+            anyThis.address_ = privateKeyToAccountAddress( anyThis.privateKey ).toString();
     }
     return anyThis.address_;
 }
@@ -707,7 +706,7 @@ export function ethersProviderToUrl(
         "connection" in ethersProvider && typeof ethersProvider.connection === "object" &&
         "url" in ethersProvider.connection && typeof ethersProvider.connection.url === "string"
     )
-        strURL = "" + ethersProvider.connection.url;
+        strURL = ethersProvider.connection.url.toString();
     return strURL ?? "N/A-URL";
 }
 
@@ -786,7 +785,7 @@ export function toHexStringSafe( val?: any ): string {
         return ensureStartsWith0x( val.toString( 16 ) );
     if( "toString" in val && typeof val.toString === "function" )
         return val.toString();
-    return "" + val;
+    return val.toString();
 }
 
 export function setInterval2( fn: () => void, t: number, stepMilliSeconds?: number ): any {

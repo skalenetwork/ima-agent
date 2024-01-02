@@ -431,7 +431,7 @@ export async function rpcCallCreate(
             `bad parameters: ${JSON.stringify( arguments )}` );
     }
     const joCall: TRPCCall = {
-        url: "" + strURL,
+        url: strURL.toString(),
         joRpcOptions: opts ?? null,
         mapPendingByCallID: new Map < TCallID, TCallHandlerEntry >(),
         wsConn: null,

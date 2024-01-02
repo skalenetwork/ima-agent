@@ -55,8 +55,10 @@ export class SocketServer extends EventDispatcher {
                 eventData.remoteAddress == null ||
                 eventData.remoteAddress == undefined )
                 socket.strSavedRemoteAddress = socket.constructor.name;
-            else
-                socket.strSavedRemoteAddress = "" + eventData.remoteAddress;
+            else {
+                socket.strSavedRemoteAddress =
+                    eventData.remoteAddress ? eventData.remoteAddress.toString() : "";
+            }
             if( self.isLogAcceptedSocket ) {
                 self.log( log.fmtInformation( "New socket {url} was {bright}",
                     socket.strSavedRemoteAddress, "accepted" ) );
@@ -123,7 +125,7 @@ export class SocketServer extends EventDispatcher {
                             joMessage.method, err, err ) );
                     }
                     joAnswer = utils.prepareAnswerJSON( joMessage );
-                    joAnswer.error = "" + err.toString();
+                    joAnswer.error = err ? err.toString() : "N/A error";
                 }
 
                 if( joAnswer != null && joAnswer != undefined ) {

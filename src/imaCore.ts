@@ -37,7 +37,7 @@ import * as skaleObserver from "./observer.js";
 import * as threadInfo from "./threadInfo.js";
 
 export type TFunctionAfterSigningMessages =
-    ( err: Error | string | null, jarrMessages: any[], joGlueResult: any | null
+    ( err: Error | string | null, jarrMessages: any[], joGlueResult?: any | null
     ) => Promise < void >;
 export type TFunctionDoSignMessages =
     ( nTransferLoopCounter: number, jarrMessages: any[], nIdxCurrentMsgBlockStart: number,
@@ -411,7 +411,7 @@ async function gatherMessages( optsTransfer: TTransferOptions ): Promise<boolean
             return false;
         if( optsTransfer.nBlockAwaitDepth > 0 ) {
             let bSecurityCheckPassed = true;
-            const strActionNameOld = "" + optsTransfer.strActionName;
+            const strActionNameOld = optsTransfer.strActionName;
             optsTransfer.strActionName = "security check: evaluate block depth";
             try {
                 const transactionHash = r[0].transactionHash;
@@ -443,7 +443,7 @@ async function gatherMessages( optsTransfer: TTransferOptions ): Promise<boolean
                 optsTransfer.details.close();
                 return false;
             }
-            optsTransfer.strActionName = "" + strActionNameOld;
+            optsTransfer.strActionName = strActionNameOld.toString();
             if( !bSecurityCheckPassed ) {
                 optsTransfer.details.warning( "{p}Block depth check was not passed, canceling " +
                     "search for transfer events", optsTransfer.strLogPrefix );
@@ -452,7 +452,7 @@ async function gatherMessages( optsTransfer: TTransferOptions ): Promise<boolean
         }
         if( optsTransfer.nBlockAge > 0 ) {
             let bSecurityCheckPassed = true;
-            const strActionNameOld = "" + optsTransfer.strActionName;
+            const strActionNameOld = optsTransfer.strActionName;
             optsTransfer.strActionName = "security check: evaluate block age";
             try {
                 const transactionHash = r[0].transactionHash;
@@ -495,7 +495,7 @@ async function gatherMessages( optsTransfer: TTransferOptions ): Promise<boolean
                 optsTransfer.details.close();
                 return false;
             }
-            optsTransfer.strActionName = "" + strActionNameOld;
+            optsTransfer.strActionName = strActionNameOld.toString();
             if( !bSecurityCheckPassed ) {
                 optsTransfer.details.warning( "{p}Block age check was not passed, " +
                     "canceling search for transfer events", optsTransfer.strLogPrefix );
@@ -633,8 +633,7 @@ async function callbackAllMessagesSign(
     if( joReceipt ) {
         optsTransfer.jarrReceipts.push( {
             description: "doTransfer/postIncomingMessages()",
-            "optsTransfer.detailsString":
-                "" + optsTransfer.strGatheredDetailsName,
+            "optsTransfer.detailsString": optsTransfer.strGatheredDetailsName,
             receipt: joReceipt
         } );
         imaGasUsage.printGasUsageReportFromArray( "(intermediate result) TRANSFER " +
@@ -649,8 +648,7 @@ async function callbackAllMessagesSign(
         optsTransfer.details.debug( "{p}Validating transfer to Main Net via MessageProxy error " +
             "absence on Main Net...", optsTransfer.strLogPrefix );
         if( optsTransfer.joDepositBoxMainNet ) {
-            if( joReceipt && "blockNumber" in joReceipt &&
-                "transactionHash" in joReceipt ) {
+            if( joReceipt && "blockNumber" in joReceipt && "transactionHash" in joReceipt ) {
                 const strEventName = "PostMessageError";
                 optsTransfer.details.debug(
                     "{p}Verifying the {} event of the MessageProxy/{} contract...",
@@ -1207,8 +1205,8 @@ export async function doAllS2S( // s-chain --> s-chain
         const ethersProviderSrc: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider =
             owaspUtils.getEthersProviderFromURL( urlSrc );
         const joAccountSrc = joAccountDst; // ???
-        const chainNameSrc = "" + joSChain.name;
-        const chainIdSrc = "" + joSChain.chainId;
+        const chainNameSrc = joSChain.name;
+        const chainIdSrc = joSChain.chainId;
         log.information( "S2S transfer walk trough {}/{} S-Chain in {}...",
             chainNameSrc, chainIdSrc, threadInfo.threadDescription() );
         let bOK = false;

@@ -63,7 +63,6 @@ export function parseCommandLineArgument( s: string ): any {
     try {
         if( !s )
             return joArg;
-        s = "" + s;
         while( s.length > 0 && s[0] == "-" )
             s = s.substring( 1 );
         const n = s.indexOf( "=" );
@@ -126,9 +125,8 @@ export function ensureHaveCredentials(
     ) {
         ++cntAccountVariantsSpecified;
         ensureHaveValue(
-            "" + strFriendlyChainName + "/TM/URL",
-            joAccount.strTransactionManagerURL, isExitIfEmpty, isPrintValue
-        );
+            strFriendlyChainName + "/TM/URL",
+            joAccount.strTransactionManagerURL, isExitIfEmpty, isPrintValue );
     }
     if( "strSgxURL" in joAccount &&
         typeof joAccount.strSgxURL === "string" &&
@@ -136,26 +134,23 @@ export function ensureHaveCredentials(
     ) {
         ++cntAccountVariantsSpecified;
         ensureHaveValue(
-            "" + strFriendlyChainName + "/SGX/URL",
-            joAccount.strSgxURL, isExitIfEmpty, isPrintValue
-        );
+            strFriendlyChainName + "/SGX/URL",
+            joAccount.strSgxURL, isExitIfEmpty, isPrintValue );
         if( "strPathSslKey" in joAccount &&
             typeof joAccount.strPathSslKey === "string" &&
             joAccount.strPathSslKey.length > 0
         ) {
             ensureHaveValue(
-                "" + strFriendlyChainName + "/SGX/SSL/keyPath",
-                joAccount.strPathSslKey, isExitIfEmpty, isPrintValue
-            );
+                strFriendlyChainName + "/SGX/SSL/keyPath",
+                joAccount.strPathSslKey, isExitIfEmpty, isPrintValue );
         }
         if( "strPathSslCert" in joAccount &&
             typeof joAccount.strPathSslCert === "string" &&
             joAccount.strPathSslCert.length > 0
         ) {
             ensureHaveValue(
-                "" + strFriendlyChainName + "/SGX/SSL/certPath",
-                joAccount.strPathSslCert, isExitIfEmpty, isPrintValue
-            );
+                strFriendlyChainName + "/SGX/SSL/certPath",
+                joAccount.strPathSslCert, isExitIfEmpty, isPrintValue );
         }
     }
     if( "strSgxKeyName" in joAccount &&
@@ -164,9 +159,8 @@ export function ensureHaveCredentials(
     ) {
         ++cntAccountVariantsSpecified;
         ensureHaveValue(
-            "" + strFriendlyChainName + "/SGX/keyName",
-            joAccount.strSgxKeyName, isExitIfEmpty, isPrintValue
-        );
+            strFriendlyChainName + "/SGX/keyName",
+            joAccount.strSgxKeyName, isExitIfEmpty, isPrintValue );
     }
     if( "privateKey" in joAccount &&
         typeof joAccount.privateKey === "string" &&
@@ -174,19 +168,15 @@ export function ensureHaveCredentials(
     ) {
         ++cntAccountVariantsSpecified;
         ensureHaveValue(
-            "" + strFriendlyChainName + "/privateKey",
-            joAccount.privateKey, isExitIfEmpty, isPrintValue
-        );
+            strFriendlyChainName + "/privateKey",
+            joAccount.privateKey, isExitIfEmpty, isPrintValue );
     }
     if( "address_" in joAccount &&
-        typeof joAccount.address_ === "string" &&
-        joAccount.address_.length > 0
-    ) {
+        typeof joAccount.address_ === "string" && joAccount.address_.length > 0 ) {
         ++cntAccountVariantsSpecified;
         ensureHaveValue(
-            "" + strFriendlyChainName + "/walletAddress",
-            joAccount.address_, isExitIfEmpty, isPrintValue
-        );
+            strFriendlyChainName + "/walletAddress",
+            joAccount.address_, isExitIfEmpty, isPrintValue );
     }
     if( cntAccountVariantsSpecified == 0 ) {
         log.error( "ARGUMENTS VALIDATION WARNING: bad credentials information " +
@@ -315,19 +305,19 @@ function parseChainAccessArgs( imaState: state.TIMAState, joArg: any ): boolean 
 function parseTransactionManagerArgs( imaState: state.TIMAState, joArg: any ): boolean {
     if( joArg.name == "tm-url-main-net" ) {
         owaspUtils.verifyArgumentIsURL( joArg );
-        const strURL = "" + joArg.value;
+        const strURL = joArg.value.toString();
         imaState.chainProperties.mn.joAccount.strTransactionManagerURL = strURL;
         return true;
     }
     if( joArg.name == "tm-url-s-chain" ) {
         owaspUtils.verifyArgumentIsURL( joArg );
-        const strURL = "" + joArg.value;
+        const strURL = joArg.value.toString();
         imaState.chainProperties.sc.joAccount.strTransactionManagerURL = strURL;
         return true;
     }
     if( joArg.name == "tm-url-t-chain" ) {
         owaspUtils.verifyArgumentIsURL( joArg );
-        const strURL = "" + joArg.value;
+        const strURL = joArg.value.toString();
         imaState.chainProperties.tc.joAccount.strTransactionManagerURL = strURL;
         return true;
     }
@@ -726,49 +716,49 @@ function parseTransactionArgs( imaState: state.TIMAState, joArg: any ): boolean 
 function parsePaymentAmountArgs( imaState: state.TIMAState, joArg: any ): boolean {
     if( joArg.name == "value" ) {
         owaspUtils.verifyArgumentWithNonEmptyValue( joArg );
-        imaState.nAmountOfWei = owaspUtils.parseMoneySpecToWei( "" + joArg.value, true );
+        imaState.nAmountOfWei = owaspUtils.parseMoneySpecToWei( joArg.value.toString(), true );
         return true;
     }
     if( joArg.name == "wei" ) {
         owaspUtils.verifyArgumentWithNonEmptyValue( joArg );
         imaState.nAmountOfWei =
-            owaspUtils.parseMoneySpecToWei( "" + joArg.value + "wei", true );
+            owaspUtils.parseMoneySpecToWei( joArg.value.toString() + "wei", true );
         return true;
     }
     if( joArg.name == "babbage" ) {
         owaspUtils.verifyArgumentWithNonEmptyValue( joArg );
         imaState.nAmountOfWei =
-            owaspUtils.parseMoneySpecToWei( "" + joArg.value + "babbage", true );
+            owaspUtils.parseMoneySpecToWei( joArg.value.toString() + "babbage", true );
         return true;
     }
     if( joArg.name == "lovelace" ) {
         owaspUtils.verifyArgumentWithNonEmptyValue( joArg );
         imaState.nAmountOfWei =
-            owaspUtils.parseMoneySpecToWei( "" + joArg.value + "lovelace", true );
+            owaspUtils.parseMoneySpecToWei( joArg.value.toString() + "lovelace", true );
         return true;
     }
     if( joArg.name == "shannon" ) {
         owaspUtils.verifyArgumentWithNonEmptyValue( joArg );
         imaState.nAmountOfWei =
-            owaspUtils.parseMoneySpecToWei( "" + joArg.value + "shannon", true );
+            owaspUtils.parseMoneySpecToWei( joArg.value.toString() + "shannon", true );
         return true;
     }
     if( joArg.name == "szabo" ) {
         owaspUtils.verifyArgumentWithNonEmptyValue( joArg );
         imaState.nAmountOfWei =
-            owaspUtils.parseMoneySpecToWei( "" + joArg.value + "szabo", true );
+            owaspUtils.parseMoneySpecToWei( joArg.value.toString() + "szabo", true );
         return true;
     }
     if( joArg.name == "finney" ) {
         owaspUtils.verifyArgumentWithNonEmptyValue( joArg );
         imaState.nAmountOfWei =
-            owaspUtils.parseMoneySpecToWei( "" + joArg.value + "finney", true );
+            owaspUtils.parseMoneySpecToWei( joArg.value.toString() + "finney", true );
         return true;
     }
     if( joArg.name == "ether" ) {
         owaspUtils.verifyArgumentWithNonEmptyValue( joArg );
         imaState.nAmountOfWei =
-            owaspUtils.parseMoneySpecToWei( "" + joArg.value + "ether", true );
+            owaspUtils.parseMoneySpecToWei( joArg.value.toString() + "ether", true );
         return true;
     }
     if( joArg.name == "amount" ) {
@@ -1044,7 +1034,7 @@ function parseLoggingArgs( imaState: state.TIMAState, joArg: any ): boolean {
     }
     if( joArg.name == "log" ) {
         owaspUtils.verifyArgumentWithNonEmptyValue( joArg );
-        imaState.strLogFilePath = "" + joArg.value;
+        imaState.strLogFilePath = joArg.value.toString();
         return true;
     }
     return false;
@@ -1057,17 +1047,17 @@ function parseBlsArgs( imaState: state.TIMAState, joArg: any ): boolean {
     }
     if( joArg.name == "bls-glue" ) {
         owaspUtils.verifyArgumentIsPathToExistingFile( joArg );
-        imaState.strPathBlsGlue = "" + joArg.value;
+        imaState.strPathBlsGlue = joArg.value.toString();
         return true;
     }
     if( joArg.name == "hash-g1" ) {
         owaspUtils.verifyArgumentIsPathToExistingFile( joArg );
-        imaState.strPathHashG1 = "" + joArg.value;
+        imaState.strPathHashG1 = joArg.value.toString();
         return true;
     }
     if( joArg.name == "bls-verify" ) {
         owaspUtils.verifyArgumentIsPathToExistingFile( joArg );
-        imaState.strPathBlsVerify = "" + joArg.value;
+        imaState.strPathBlsVerify = joArg.value.toString();
         return true;
     }
     return false;
@@ -1096,13 +1086,13 @@ function parseReimbursementArgs( imaState: state.TIMAState, joArg: any ): boolea
     if( joArg.name == "reimbursement-recharge" ) {
         owaspUtils.verifyArgumentWithNonEmptyValue( joArg );
         imaState.nReimbursementRecharge =
-            owaspUtils.parseMoneySpecToWei( "" + joArg.value, true );
+            owaspUtils.parseMoneySpecToWei( joArg.value.toString(), true );
         return true;
     }
     if( joArg.name == "reimbursement-withdraw" ) {
         owaspUtils.verifyArgumentWithNonEmptyValue( joArg );
         imaState.nReimbursementWithdraw =
-            owaspUtils.parseMoneySpecToWei( "" + joArg.value, true );
+            owaspUtils.parseMoneySpecToWei( joArg.value.toString(), true );
         return true;
     }
     if( joArg.name == "reimbursement-balance" ) {
@@ -1136,7 +1126,7 @@ function parseOracleArgs( imaState: state.TIMAState, joArg: any ): boolean {
 function parseNetworkDiscoveryArgs( imaState: state.TIMAState, joArg: any ): boolean {
     if( joArg.name == "network-browser-path" ) {
         owaspUtils.verifyArgumentWithNonEmptyValue( joArg );
-        imaState.optsS2S.strNetworkBrowserPath = "" + joArg.value;
+        imaState.optsS2S.strNetworkBrowserPath = joArg.value.toString();
         return true;
     }
     return false;
@@ -1728,12 +1718,12 @@ function commonInitCheckErc20(): void {
             if( isPrintGathered )
                 log.attention( "IMPORTANT NOTICE: S-Chain ERC20 ABI will be auto-generated" );
             imaState.chainProperties.sc.strCoinNameErc20 =
-                "" + imaState.chainProperties.tc.strCoinNameErc20; // assume same
+                imaState.chainProperties.tc.strCoinNameErc20 ?? ""; // assume same
             imaState.chainProperties.sc.joErc20 =
                 JSON.parse( JSON.stringify( imaState.chainProperties.mn.joErc20 ) ); // clone
             imaState.chainProperties.sc.joErc20[
                 imaState.chainProperties.sc.strCoinNameErc20 + "_address"] =
-                    "" + imaState.strAddrErc20Explicit; // set explicit address
+                    imaState.strAddrErc20Explicit; // set explicit address
         }
     }
 
@@ -1885,12 +1875,12 @@ function commonInitCheckErc721(): void {
             if( isPrintGathered )
                 log.attention( "IMPORTANT NOTICE: S-Chain ERC721 ABI will be auto-generated" );
             imaState.chainProperties.sc.strCoinNameErc721 =
-                "" + imaState.chainProperties.mn.strCoinNameErc721; // assume same
+                imaState.chainProperties.mn.strCoinNameErc721 ?? ""; // assume same
             imaState.chainProperties.sc.joErc721 =
                 JSON.parse( JSON.stringify( imaState.chainProperties.mn.joErc721 ) ); // clone
             imaState.chainProperties.sc.joErc721[
                 imaState.chainProperties.sc.strCoinNameErc721 + "_address"] =
-                    "" + imaState.strAddrErc721Explicit; // set explicit address
+                    imaState.strAddrErc721Explicit; // set explicit address
         }
     }
 
@@ -2042,12 +2032,12 @@ function commonInitCheckErc1155(): void {
             if( isPrintGathered )
                 log.attention( "IMPORTANT NOTICE: S-Chain ERC1155 ABI will be auto-generated" );
             imaState.chainProperties.sc.strCoinNameErc1155 =
-                "" + imaState.chainProperties.mn.strCoinNameErc1155; // assume same
+                imaState.chainProperties.mn.strCoinNameErc1155 ?? ""; // assume same
             imaState.chainProperties.sc.joErc1155 =
                 JSON.parse( JSON.stringify( imaState.chainProperties.mn.joErc1155 ) ); // clone
             imaState.chainProperties.sc.joErc1155[
                 imaState.chainProperties.sc.strCoinNameErc1155 + "_address"] =
-                    "" + imaState.strAddrErc1155Explicit; // set explicit address
+                    imaState.strAddrErc1155Explicit; // set explicit address
         }
     }
 
@@ -2706,48 +2696,25 @@ function initContractsIMA(): void {
         if( cp.ethersProvider ) {
             const ep: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider = cp.ethersProvider;
             const joABI = cp.joAbiIMA;
-            imaState.joDepositBoxETH =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    joABI.deposit_box_eth_address,
-                    joABI.deposit_box_eth_abi,
-                    ep
-                ); // only main net
-            imaState.joDepositBoxERC20 =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    joABI.deposit_box_erc20_address,
-                    joABI.deposit_box_erc20_abi,
-                    ep
-                ); // only main net
-            imaState.joDepositBoxERC721 =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    joABI.deposit_box_erc721_address,
-                    joABI.deposit_box_erc721_abi,
-                    ep
-                ); // only main net
-            imaState.joDepositBoxERC1155 =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    joABI.deposit_box_erc1155_address,
-                    joABI.deposit_box_erc1155_abi,
-                    ep );
+            imaState.joDepositBoxETH = new owaspUtils.ethersMod.ethers.Contract(
+                joABI.deposit_box_eth_address, joABI.deposit_box_eth_abi, ep ); // only main net
+            imaState.joDepositBoxERC20 = new owaspUtils.ethersMod.ethers.Contract(
+                joABI.deposit_box_erc20_address, joABI.deposit_box_erc20_abi, ep ); // only main net
+            imaState.joDepositBoxERC721 = new owaspUtils.ethersMod.ethers.Contract(
+                joABI.deposit_box_erc721_address, joABI.deposit_box_erc721_abi, ep
+            ); // only main net
+            imaState.joDepositBoxERC1155 = new owaspUtils.ethersMod.ethers.Contract(
+                joABI.deposit_box_erc1155_address, joABI.deposit_box_erc1155_abi, ep );
             // only main net
-            imaState.joDepositBoxERC721WithMetadata =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    joABI.deposit_box_erc721_with_metadata_address,
-                    joABI.deposit_box_erc721_with_metadata_abi,
-                    ep
-                ); // only main net
-            imaState.joCommunityPool =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    joABI.community_pool_address,
-                    joABI.community_pool_abi,
-                    ep
-                ); // only main net
-            imaState.joLinker =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    joABI.linker_address, joABI.linker_abi, ep ); // only main net
-            imaState.joMessageProxyMainNet =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    joABI.message_proxy_mainnet_address, joABI.message_proxy_mainnet_abi, ep );
+            imaState.joDepositBoxERC721WithMetadata = new owaspUtils.ethersMod.ethers.Contract(
+                joABI.deposit_box_erc721_with_metadata_address,
+                joABI.deposit_box_erc721_with_metadata_abi, ep ); // only main net
+            imaState.joCommunityPool = new owaspUtils.ethersMod.ethers.Contract(
+                joABI.community_pool_address, joABI.community_pool_abi, ep ); // only main net
+            imaState.joLinker = new owaspUtils.ethersMod.ethers.Contract(
+                joABI.linker_address, joABI.linker_abi, ep ); // only main net
+            imaState.joMessageProxyMainNet = new owaspUtils.ethersMod.ethers.Contract(
+                joABI.message_proxy_mainnet_address, joABI.message_proxy_mainnet_abi, ep );
         }
     }
     if( imaState.chainProperties.sc.bHaveAbiIMA ) {
@@ -2756,51 +2723,28 @@ function initContractsIMA(): void {
             const ep: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider | null =
                 cp.ethersProvider;
             const joABI = cp.joAbiIMA;
-            imaState.joTokenManagerETH =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    joABI.token_manager_eth_address,
-                    joABI.token_manager_eth_abi,
-                    ep ); // only s-chain
-            imaState.joTokenManagerERC20 =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    joABI.token_manager_erc20_address,
-                    joABI.token_manager_erc20_abi,
-                    ep ); // only s-chain
-            imaState.joTokenManagerERC721 =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    joABI.token_manager_erc721_address,
-                    joABI.token_manager_erc721_abi,
-                    ep ); // only s-chain
-            imaState.joTokenManagerERC1155 =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    joABI.token_manager_erc1155_address,
-                    joABI.token_manager_erc1155_abi,
-                    ep ); // only s-chain
-            imaState.joTokenManagerERC721WithMetadata =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    joABI.token_manager_erc721_with_metadata_address,
-                    joABI.token_manager_erc721_with_metadata_abi,
-                    ep ); // only s-chain
-            imaState.joCommunityLocker =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    joABI.community_locker_address,
-                    joABI.community_locker_abi,
-                    ep ); // only s-chain
-            imaState.joMessageProxySChain =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    joABI.message_proxy_chain_address,
-                    joABI.message_proxy_chain_abi,
-                    ep );
-            imaState.joTokenManagerLinker =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    joABI.token_manager_linker_address,
-                    joABI.token_manager_linker_abi,
-                    ep );
-            imaState.joEthErc20 =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    joABI.eth_erc20_address,
-                    joABI.eth_erc20_abi,
-                    ep ); // only s-chain
+            imaState.joTokenManagerETH = new owaspUtils.ethersMod.ethers.Contract(
+                joABI.token_manager_eth_address, joABI.token_manager_eth_abi, ep ); // only s-chain
+            imaState.joTokenManagerERC20 = new owaspUtils.ethersMod.ethers.Contract(
+                joABI.token_manager_erc20_address, joABI.token_manager_erc20_abi,
+                ep ); // only s-chain
+            imaState.joTokenManagerERC721 = new owaspUtils.ethersMod.ethers.Contract(
+                joABI.token_manager_erc721_address, joABI.token_manager_erc721_abi,
+                ep ); // only s-chain
+            imaState.joTokenManagerERC1155 = new owaspUtils.ethersMod.ethers.Contract(
+                joABI.token_manager_erc1155_address, joABI.token_manager_erc1155_abi,
+                ep ); // only s-chain
+            imaState.joTokenManagerERC721WithMetadata = new owaspUtils.ethersMod.ethers.Contract(
+                joABI.token_manager_erc721_with_metadata_address,
+                joABI.token_manager_erc721_with_metadata_abi, ep ); // only s-chain
+            imaState.joCommunityLocker = new owaspUtils.ethersMod.ethers.Contract(
+                joABI.community_locker_address, joABI.community_locker_abi, ep ); // only s-chain
+            imaState.joMessageProxySChain = new owaspUtils.ethersMod.ethers.Contract(
+                joABI.message_proxy_chain_address, joABI.message_proxy_chain_abi, ep );
+            imaState.joTokenManagerLinker = new owaspUtils.ethersMod.ethers.Contract(
+                joABI.token_manager_linker_address, joABI.token_manager_linker_abi, ep );
+            imaState.joEthErc20 = new owaspUtils.ethersMod.ethers.Contract(
+                joABI.eth_erc20_address, joABI.eth_erc20_abi, ep ); // only s-chain
         }
     }
     if( imaState.chainProperties.tc.bHaveAbiIMA ) {
@@ -2808,51 +2752,29 @@ function initContractsIMA(): void {
         if( cp.ethersProvider ) {
             const ep: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider = cp.ethersProvider;
             const joABI = cp.joAbiIMA;
-            imaState.joTokenManagerETHTarget =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    joABI.token_manager_eth_address,
-                    joABI.token_manager_eth_abi,
-                    ep ); // only s-chain
-            imaState.joTokenManagerERC20Target =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    joABI.token_manager_erc20_address,
-                    joABI.token_manager_erc20_abi,
-                    ep ); // only s-chain
-            imaState.joTokenManagerERC721Target =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    joABI.token_manager_erc721_address,
-                    joABI.token_manager_erc721_abi,
-                    ep ); // only s-chain
-            imaState.joTokenManagerERC1155Target =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    joABI.token_manager_erc1155_address,
-                    joABI.token_manager_erc1155_abi,
-                    ep ); // only s-chain
+            imaState.joTokenManagerETHTarget = new owaspUtils.ethersMod.ethers.Contract(
+                joABI.token_manager_eth_address, joABI.token_manager_eth_abi, ep ); // only s-chain
+            imaState.joTokenManagerERC20Target = new owaspUtils.ethersMod.ethers.Contract(
+                joABI.token_manager_erc20_address, joABI.token_manager_erc20_abi,
+                ep ); // only s-chain
+            imaState.joTokenManagerERC721Target = new owaspUtils.ethersMod.ethers.Contract(
+                joABI.token_manager_erc721_address, joABI.token_manager_erc721_abi,
+                ep ); // only s-chain
+            imaState.joTokenManagerERC1155Target = new owaspUtils.ethersMod.ethers.Contract(
+                joABI.token_manager_erc1155_address, joABI.token_manager_erc1155_abi,
+                ep ); // only s-chain
             imaState.joTokenManagerERC721WithMetadataTarget =
                 new owaspUtils.ethersMod.ethers.Contract(
                     joABI.token_manager_erc721_with_metadata_address,
-                    joABI.token_manager_erc721_with_metadata_abi,
-                    ep ); // only s-chain
-            imaState.joCommunityLockerTarget =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    joABI.community_locker_address,
-                    joABI.community_locker_abi,
-                    ep ); // only s-chain
-            imaState.joMessageProxySChainTarget =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    joABI.message_proxy_chain_address,
-                    joABI.message_proxy_chain_abi,
-                    ep );
-            imaState.joTokenManagerLinkerTarget =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    joABI.token_manager_linker_address,
-                    joABI.token_manager_linker_abi,
-                    ep );
-            imaState.joEthErc20Target =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    joABI.eth_erc20_address,
-                    joABI.eth_erc20_abi,
-                    ep ); // only s-chain
+                    joABI.token_manager_erc721_with_metadata_abi, ep ); // only s-chain
+            imaState.joCommunityLockerTarget = new owaspUtils.ethersMod.ethers.Contract(
+                joABI.community_locker_address, joABI.community_locker_abi, ep ); // only s-chain
+            imaState.joMessageProxySChainTarget = new owaspUtils.ethersMod.ethers.Contract(
+                joABI.message_proxy_chain_address, joABI.message_proxy_chain_abi, ep );
+            imaState.joTokenManagerLinkerTarget = new owaspUtils.ethersMod.ethers.Contract(
+                joABI.token_manager_linker_address, joABI.token_manager_linker_abi, ep );
+            imaState.joEthErc20Target = new owaspUtils.ethersMod.ethers.Contract(
+                joABI.eth_erc20_address, joABI.eth_erc20_abi, ep ); // only s-chain
         }
     }
 }
@@ -2864,56 +2786,26 @@ function initContractsSkaleManager(): void {
         if( cp.ethersProvider ) {
             const ep: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider = cp.ethersProvider;
             const joABI = imaState.joAbiSkaleManager;
-            imaState.joConstantsHolder =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    joABI.constants_holder_address,
-                    joABI.constants_holder_abi,
-                    ep );
-            imaState.joNodes =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    joABI.nodes_address,
-                    joABI.nodes_abi,
-                    ep );
-            imaState.joKeyStorage =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    joABI.key_storage_address,
-                    joABI.key_storage_abi,
-                    ep );
-            imaState.joSChains =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    joABI.schains_address,
-                    joABI.schains_abi,
-                    ep );
-            imaState.joSChainsInternal =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    joABI.schains_internal_address,
-                    joABI.schains_internal_abi,
-                    ep );
-            imaState.joSkaleDKG =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    joABI.skale_d_k_g_address,
-                    joABI.skale_d_k_g_abi,
-                    ep );
-            imaState.joSkaleManager =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    joABI.skale_manager_address,
-                    joABI.skale_manager_abi,
-                    ep );
-            imaState.joSkaleToken =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    joABI.skale_token_address,
-                    joABI.skale_token_abi,
-                    ep );
-            imaState.joValidatorService =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    joABI.validator_service_address,
-                    joABI.validator_service_abi,
-                    ep );
-            imaState.joWallets =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    joABI.wallets_address,
-                    joABI.wallets_abi,
-                    ep );
+            imaState.joConstantsHolder = new owaspUtils.ethersMod.ethers.Contract(
+                joABI.constants_holder_address, joABI.constants_holder_abi, ep );
+            imaState.joNodes = new owaspUtils.ethersMod.ethers.Contract(
+                joABI.nodes_address, joABI.nodes_abi, ep );
+            imaState.joKeyStorage = new owaspUtils.ethersMod.ethers.Contract(
+                joABI.key_storage_address, joABI.key_storage_abi, ep );
+            imaState.joSChains = new owaspUtils.ethersMod.ethers.Contract(
+                joABI.schains_address, joABI.schains_abi, ep );
+            imaState.joSChainsInternal = new owaspUtils.ethersMod.ethers.Contract(
+                joABI.schains_internal_address, joABI.schains_internal_abi, ep );
+            imaState.joSkaleDKG = new owaspUtils.ethersMod.ethers.Contract(
+                joABI.skale_d_k_g_address, joABI.skale_d_k_g_abi, ep );
+            imaState.joSkaleManager = new owaspUtils.ethersMod.ethers.Contract(
+                joABI.skale_manager_address, joABI.skale_manager_abi, ep );
+            imaState.joSkaleToken = new owaspUtils.ethersMod.ethers.Contract(
+                joABI.skale_token_address, joABI.skale_token_abi, ep );
+            imaState.joValidatorService = new owaspUtils.ethersMod.ethers.Contract(
+                joABI.validator_service_address, joABI.validator_service_abi, ep );
+            imaState.joWallets = new owaspUtils.ethersMod.ethers.Contract(
+                joABI.wallets_address, joABI.wallets_abi, ep );
         }
     }
 }

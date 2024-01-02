@@ -129,18 +129,8 @@ export const randomDirectPipeID = function(): string {
 
 export const prepareAnswerJSON = function( joMessage: any ): any {
     const joAnswer: any = {
-        id: "" +
-            ( ( joMessage != null &&
-                joMessage != undefined &&
-                typeof joMessage.id === "string" )
-                ? joMessage.id
-                : randomCallID() ),
-        method: "" +
-            ( ( joMessage != null &&
-                joMessage != undefined &&
-                typeof joMessage.method === "string" )
-                ? joMessage.method
-                : "" ),
+        id: joMessage?.id ? joMessage.id.toString() : randomCallID(),
+        method: joMessage?.method ? joMessage.method.toString() : "",
         error: null
     };
     return joAnswer;
@@ -148,20 +138,15 @@ export const prepareAnswerJSON = function( joMessage: any ): any {
 
 export const makeValidSignalingServerURL = function( strSignalingServerURL?: string ): string {
     const proto = settings.net.secure ? "wss" : "ws";
-    return "" +
-        ( ( strSignalingServerURL != null &&
-            strSignalingServerURL != undefined &&
-            typeof strSignalingServerURL === "string" &&
-            strSignalingServerURL.length > 0 )
-            ? "" + strSignalingServerURL
-            : "" + proto + "://" + settings.net.hostname + ":" + settings.net.ports.signaling
-        );
+    return strSignalingServerURL
+        ? strSignalingServerURL.toString()
+        : proto + "://" + settings.net.hostname + ":" + settings.net.ports.signaling;
 };
 
 export const zeroPaddingLeft = function( val: any, cntCharsNeeded: number ): string {
     if( val == null || val == undefined )
         return val;
-    let s = "" + val;
+    let s = val.toString();
     while( s.length < cntCharsNeeded )
         s = "0" + s;
     return s;
@@ -169,7 +154,7 @@ export const zeroPaddingLeft = function( val: any, cntCharsNeeded: number ): str
 export const zeroPaddingRight = function( val: any, cntCharsNeeded: number ): string {
     if( val == null || val == undefined )
         return val;
-    let s = "" + val;
+    let s = val.toString();
     while( s.length < cntCharsNeeded )
         s = s + "0";
     return s;
@@ -223,7 +208,7 @@ export const formatDateTime = function(
         sepDate = ( sepDate == null || sepDate == undefined || ( typeof sepDate !== "string" ) )
             ? "/"
             : sepDate;
-        const strDate = "" +
+        const strDate =
             zeroPaddingLeft( dt.getFullYear(), 4 ) +
             sepDate +
             zeroPaddingLeft( dt.getMonth() + 1, 2 ) +
@@ -236,15 +221,10 @@ export const formatDateTime = function(
             ? ":"
             : sepTime;
         if( isDate ) {
-            sepBetween =
-                ( sepBetween == null ||
-                    sepBetween == undefined ||
-                    ( typeof sepBetween !== "string" ) )
-                    ? "-"
-                    : sepBetween;
+            sepBetween = sepBetween ?? "-";
             s += sepBetween;
         }
-        let strTime = "" +
+        let strTime =
             zeroPaddingLeft( dt.getHours(), 2 ) +
             sepDate +
             zeroPaddingLeft( dt.getMinutes(), 2 ) +

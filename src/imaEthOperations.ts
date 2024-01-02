@@ -267,7 +267,6 @@ export async function receiveEthPaymentFromSchainOnMainNet(
     try {
         strActionName = "Receive ETH payment from S-Chain on Main Met, getMyEth";
         const arrArguments: any = [];
-        const weiHowMuch = undefined;
         const gasPrice = await transactionCustomizerMainNet.computeGasPrice(
             ethersProviderMainNet, 200000000000 );
         details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
@@ -275,7 +274,7 @@ export async function receiveEthPaymentFromSchainOnMainNet(
             details, ethersProviderMainNet,
             "DepositBoxETH", joDepositBoxETH, "getMyEth", arrArguments,
             joAccountMN, strActionName,
-            gasPrice, 3000000, weiHowMuch );
+            gasPrice, 3000000 );
         details.trace( "{p}Using estimated gas={}", strLogPrefix, estimatedGas );
         const isIgnore = false;
         const strErrorOfDryRun = await imaTx.dryRunCall(
@@ -283,7 +282,7 @@ export async function receiveEthPaymentFromSchainOnMainNet(
             "DepositBoxETH", joDepositBoxETH,
             "getMyEth", arrArguments,
             joAccountMN, strActionName, isIgnore,
-            gasPrice, estimatedGas, weiHowMuch );
+            gasPrice, estimatedGas );
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
@@ -292,7 +291,7 @@ export async function receiveEthPaymentFromSchainOnMainNet(
             "DepositBoxETH", joDepositBoxETH,
             "getMyEth", arrArguments,
             joAccountMN, strActionName,
-            gasPrice, estimatedGas, weiHowMuch );
+            gasPrice, estimatedGas );
         if( joReceipt ) {
             jarrReceipts.push( {
                 description: "receiveEthPaymentFromSchainOnMainNet",

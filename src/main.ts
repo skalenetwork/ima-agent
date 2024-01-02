@@ -294,7 +294,7 @@ function initJsonRpcServer(): void {
             if( "id" in joMessage )
                 joAnswer.id = joMessage.id;
             if( "method" in joMessage )
-                joAnswer.method = "" + joMessage.method;
+                joAnswer.method = joMessage.method.toString();
             switch ( joMessage.method ) {
             case "echo":
                 joAnswer.result = "echo";
@@ -412,15 +412,17 @@ async function main(): Promise<void> {
     if( strTmpAddressFromEnvMainNet &&
         typeof strTmpAddressFromEnvMainNet === "string" &&
         strTmpAddressFromEnvMainNet.length > 0 )
-        imaState.chainProperties.mn.joAccount.address_ = "" + strTmpAddressFromEnvMainNet;
+        imaState.chainProperties.mn.joAccount.address_ = strTmpAddressFromEnvMainNet.toString();
     if( strTmpAddressFromEnvSChain &&
         typeof strTmpAddressFromEnvSChain === "string" &&
         strTmpAddressFromEnvSChain.length > 0 )
-        imaState.chainProperties.sc.joAccount.address_ = "" + strTmpAddressFromEnvSChain;
+        imaState.chainProperties.sc.joAccount.address_ = strTmpAddressFromEnvSChain.toString();
     if( strTmpAddressFromEnvSChainTarget &&
         typeof strTmpAddressFromEnvSChainTarget === "string" &&
-        strTmpAddressFromEnvSChainTarget.length > 0 )
-        imaState.chainProperties.tc.joAccount.address_ = "" + strTmpAddressFromEnvSChainTarget;
+        strTmpAddressFromEnvSChainTarget.length > 0 ) {
+        imaState.chainProperties.tc.joAccount.address_ =
+            strTmpAddressFromEnvSChainTarget.toString();
+    }
     parseCommandLine();
     initMonitoringServer();
     initJsonRpcServer();

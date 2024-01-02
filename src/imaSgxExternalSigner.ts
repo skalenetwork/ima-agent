@@ -98,7 +98,7 @@ async function run(): Promise<void> {
         const joIn: any = {
             method: "ecdsaSignMessageHash",
             params: {
-                keyName: "" + strSgxKeyName,
+                keyName: strSgxKeyName.toString(),
                 messageHash: txHash,
                 base: 16
             }

@@ -128,9 +128,7 @@ export function getLastCachedSChains(): TSChainInformation[] {
 }
 
 export function pickRandomSChainNodeIndex( joSChain: TSChainInformation ): number {
-    let min = 0; let max = joSChain.nodes.length - 1;
-    min = Math.ceil( min );
-    max = Math.floor( max );
+    const min = 0; const max = joSChain.nodes.length - 1;
     const idxNode = Math.floor( Math.random() * ( max - min + 1 ) ) + min;
     return idxNode;
 }
@@ -141,5 +139,5 @@ export function pickRandomSChainNode( joSChain: TSChainInformation ): TSChainNod
 
 export function pickRandomSChainUrl( joSChain: TSChainInformation ): string {
     const joNode: TSChainNode = pickRandomSChainNode( joSChain );
-    return "" + joNode.endpoints.ip.http;
+    return joNode.endpoints.ip.http.toString();
 }
