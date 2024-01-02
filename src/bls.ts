@@ -872,7 +872,7 @@ async function checkCorrectnessOfMessagesToSign(
         joChainName = imaState.chainProperties.mn.strChainName;
     } else if( strDirection == "S2S" ) {
         joAccount = imaState.chainProperties.sc.joAccount;
-        if( ( !joExtraSignOpts ) || ( !( joExtraSignOpts.chainNameDst ) ) )
+        if( ( !joExtraSignOpts?.chainNameDst ) )
             throw new Error( "Missing destination chain name for BLS signing" );
         joChainName = joExtraSignOpts.chainNameDst;
         const ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider | null =

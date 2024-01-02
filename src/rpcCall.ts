@@ -403,7 +403,7 @@ export async function doCall(
                 const response =
                     await urllib.request( joCall.url, requestOpts as urllib.RequestOptions );
                 const body = response.data.toString( "utf8" );
-                if( response && response.statusCode && response.statusCode !== 200 )
+                if( response?.statusCode !== 200 )
                     log.warning( "REST call status code is {}", response.statusCode );
 
                 joOut = JSON.parse( body );
