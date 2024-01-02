@@ -62,7 +62,7 @@ export function validateRadix( value?: any, radix?: any ): number {
 
 export function validateInteger( value?: any, radix?: any ): boolean {
     try {
-        value = value.trim();
+        value = value ? value.toString().trim() : "";
         if( value.length < 1 )
             return false;
         radix = validateRadix( value, radix );

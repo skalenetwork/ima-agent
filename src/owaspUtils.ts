@@ -90,7 +90,7 @@ export function parseIntOrHex( s: any ): number {
 
 export function validateRadix( value: any, radix?: any ): boolean {
     value = value ? value.toString() : "10";
-    value = value.trim();
+    value = value ? value.toString().trim() : "";
     radix = ( radix == null || radix == undefined )
         ? ( ( value.length > 2 && value[0] == "0" && ( value[1] == "x" || value[1] == "X" ) )
             ? 16
@@ -101,7 +101,7 @@ export function validateRadix( value: any, radix?: any ): boolean {
 
 export function validateInteger( value: any, radix?: any ): boolean {
     try {
-        value = value.trim();
+        value = value ? value.toString().trim() : "";
         if( value.length < 1 )
             return false;
         radix = validateRadix( value, radix );
@@ -228,6 +228,8 @@ export function isUrlWS( strURL?: any ): boolean {
 export function toBoolean( value?: any ): boolean {
     let b = false;
     try {
+        if( value === null || value === undefined )
+            return false;
         if( typeof value === "boolean" )
             return value;
         if( typeof value === "string" ) {

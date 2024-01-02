@@ -31,6 +31,9 @@ import type * as state from "./state.js";
 import type * as discoveryTools from "./discoveryTools.js";
 
 function computeWalkNodeIndices( nNodeNumber: number, nNodesCount: number ): number[] {
+    if( nNodeNumber === null || nNodeNumber === undefined ||
+        nNodesCount === undefined )
+        return [];
     if( nNodesCount <= 1 )
         return []; // PWA is N/A
     if( !( nNodeNumber >= 0 && nNodeNumber < nNodesCount ) )

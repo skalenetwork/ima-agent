@@ -152,8 +152,13 @@ function initMonitoringServer(): void {
         log.trace( "{p}Will start monitoring WS server on port {}",
             strLogPrefix, imaState.nMonitoringPort );
     }
-    gServerMonitoringWS = new ws.WebSocketServer( { port: 0 + imaState.nMonitoringPort } );
-    gServerMonitoringWS.on( "connection", function( wsPeer: any, req: any ) {
+    try {
+        gServerMonitoringWS = new ws.WebSocketServer( { port: imaState.nMonitoringPort } );
+    } catch ( err ) {
+        log.error( "Failed start monitoring WS server on port {}, error is: {err}",
+            imaState.nMonitoringPort, err );
+    }
+    gServerMonitoringWS.on( "connection", function( wsPeer: any, req: any ): void {
         let ip = req.socket.remoteAddress;
         if( "headers" in req && req.headers && typeof req.headers === "object" &&
             "x-forwarded-for" in req.headers && req.headers["x-forwarded-for"] )

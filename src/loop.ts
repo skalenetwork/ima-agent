@@ -294,7 +294,6 @@ async function singleTransferLoopPartM2S(
             strLogPrefix, threadInfo.threadDescription(), b1 );
     } else
         log.debug( "{p}Skipped M2S transfer in {}.", strLogPrefix, threadInfo.threadDescription() );
-
     return b1;
 }
 

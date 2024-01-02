@@ -209,8 +209,9 @@ class ObserverServer extends SocketServer {
                     joMessage.params.signature
                 ).then( function(): void {} ).catch( function(): void {} );
             };
-        console.log( "Initialized in-worker IMA loop {} server in {}",
-            workerData.url, threadInfo.threadDescription() );
+        console.log(
+            `Initialized in-worker IMA loop ${workerData.url} server ` +
+            `in ${threadInfo.threadDescription()}` );
     }
 
     dispose(): void {
