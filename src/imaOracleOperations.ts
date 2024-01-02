@@ -65,7 +65,9 @@ export function setEnabledOracle( isEnabled: boolean ): void {
     gFlagIsEnabledOracle = ( !!isEnabled );
 }
 
-async function prepareOracleGasPriceSetup( optsGasPriceSetup: TGasPriceSetupOptions ) {
+async function prepareOracleGasPriceSetup(
+    optsGasPriceSetup: TGasPriceSetupOptions
+): Promise<void> {
     optsGasPriceSetup.strActionName =
         "prepareOracleGasPriceSetup.optsGasPriceSetup.latestBlockNumber()";
     optsGasPriceSetup.latestBlockNumber =
@@ -157,7 +159,7 @@ async function prepareOracleGasPriceSetup( optsGasPriceSetup: TGasPriceSetupOpti
 
 async function handleOracleSigned(
     optsGasPriceSetup: TGasPriceSetupOptions, strError: Error | string | null,
-    u256: any, joGlueResult: any | null ) {
+    u256: any, joGlueResult: any | null ): Promise<void> {
     if( strError ) {
         optsGasPriceSetup.details.critical(
             "{p}Error in doOracleGasPriceSetup() during {bright}: {err}",
@@ -230,7 +232,7 @@ async function handleOracleSigned(
         "setGasPrice", arrArgumentsSetGasPrice,
         optsGasPriceSetup.joAccountSC, optsGasPriceSetup.strActionName,
         gasPrice, estimatedGasSetGasPrice, weiHowMuch, opts );
-    if( joReceipt && typeof joReceipt === "object" ) {
+    if( joReceipt ) {
         optsGasPriceSetup.jarrReceipts.push( {
             description: "doOracleGasPriceSetup/setGasPrice",
             receipt: joReceipt
@@ -251,7 +253,7 @@ export async function doOracleGasPriceSetup(
     chainIdMainNet: string,
     chainIdSChain: string,
     fnSignMsgOracle: TFunctionSignMsgOracle
-) {
+): Promise<boolean> {
     if( !getEnabledOracle() )
         return true;
     const optsGasPriceSetup: TGasPriceSetupOptions = {

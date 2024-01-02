@@ -36,7 +36,7 @@ export async function invokeHasChain(
     joLinker: owaspUtils.ethersMod.Contract, // Main-Net or S-Chin
     joAccount: state.TAccount, // Main-Net or S-Chin
     chainIdSChain: string
-) {
+): Promise<boolean> {
     const strLogPrefix = "Wait for added chain status: ";
     const strActionName = "invokeHasChain(hasSchain): joLinker.hasSchain";
     try {
@@ -61,7 +61,7 @@ export async function waitForHasChain(
     chainIdSChain: string,
     cntWaitAttempts?: number,
     nSleepMilliseconds?: number
-) {
+): Promise<boolean> {
     if( !cntWaitAttempts )
         cntWaitAttempts = 100;
     if( !nSleepMilliseconds )
@@ -84,7 +84,7 @@ export async function checkIsRegisteredSChainInDepositBoxes( // step 1
     joLinker: owaspUtils.ethersMod.Contract | null,
     joAccountMN: state.TAccount,
     chainIdSChain: string
-) {
+): Promise<boolean> {
     const details = log.createMemoryStream();
     details.debug( "Main-net Linker address is...........{}", joLinker ? joLinker.address : "N/A" );
     details.debug( "S-Chain  ID is.......................{}", chainIdSChain );
@@ -135,7 +135,7 @@ export async function registerSChainInDepositBoxes( // step 1
     transactionCustomizerMainNet: imaTx.TransactionCustomizer,
     cntWaitAttempts?: number,
     nSleepMilliseconds?: number
-) {
+): Promise<any> {
     const details = log.createMemoryStream();
     const jarrReceipts: any[] = [];
     details.debug( "Main-net Linker address is..........{}", joLinker ? joLinker.address : "N/A" );
@@ -195,7 +195,7 @@ export async function registerSChainInDepositBoxes( // step 1
             "Linker", joLinker, "connectSchain", arrArguments,
             joAccountMN, strActionName,
             gasPrice, estimatedGas, weiHowMuch );
-        if( joReceipt && typeof joReceipt === "object" ) {
+        if( joReceipt ) {
             jarrReceipts.push( {
                 description: "registerSChainInDepositBoxes",
                 receipt: joReceipt

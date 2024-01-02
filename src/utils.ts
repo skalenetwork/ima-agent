@@ -145,7 +145,7 @@ export async function waitForClonedTokenToAppear(
     cntAttempts: number,
     tokensMN: TTokesABIHolder,
     strMainnetName: string
-) {
+): Promise <string> {
     const strTokenSuffixLC = strTokenSuffix.toLowerCase();
     const strTokenSuffixUC =
         owaspUtils.replaceAll( strTokenSuffix.toUpperCase(), "_WITH_METADATA", "_with_metadata" );
@@ -189,7 +189,7 @@ export async function waitForClonedTokenToAppear(
 export async function waitForClonedTokenAppearErc20(
     sc: any, tokenERC20SC: state.TTokeInformation, joAccountSC: state.TAccount,
     tokensMN: TTokesABIHolder, strMainnetName: string
-) {
+): Promise <void> {
     if( "abi" in tokenERC20SC && typeof tokenERC20SC.abi === "object" &&
         "address" in tokenERC20SC && typeof tokenERC20SC.address === "string"
     ) {
@@ -206,7 +206,7 @@ export async function waitForClonedTokenAppearErc20(
 export async function waitForClonedTokenAppearErc721(
     sc: any, tokenERC721SC: state.TTokeInformation, joAccountSC: state.TAccount,
     tokensMN: TTokesABIHolder, strMainnetName: string
-) {
+): Promise <void> {
     if( "abi" in tokenERC721SC && typeof tokenERC721SC.abi === "object" &&
         "address" in tokenERC721SC && typeof tokenERC721SC.address === "string"
     ) {
@@ -224,7 +224,7 @@ export async function waitForClonedTokenAppearErc721(
 export async function waitForClonedTokenAppearErc721WithMetadata(
     sc: any, tokenERC721SC: state.TTokeInformation, joAccountSC: state.TAccount,
     tokensMN: TTokesABIHolder, strMainnetName: string
-) {
+): Promise <void> {
     if( "abi" in tokenERC721SC && typeof tokenERC721SC.abi === "object" &&
         "address" in tokenERC721SC && typeof tokenERC721SC.address === "string"
     ) {
@@ -243,7 +243,7 @@ export async function waitForClonedTokenAppearErc721WithMetadata(
 export async function waitForClonedTokenAppearErc1155(
     sc: any, tokenERC1155SC: state.TTokeInformation, joAccountSC: state.TAccount,
     tokensMN: TTokesABIHolder, strMainnetName: string
-) {
+): Promise <void> {
     if( "abi" in tokenERC1155SC && typeof tokenERC1155SC.abi === "object" &&
         "address" in tokenERC1155SC && typeof tokenERC1155SC.address === "string"
     ) {

@@ -193,9 +193,9 @@ export function globalStream(): TLogger {
             strOwnIndent: "",
             write,
             writeRaw,
-            close: function() { },
-            open: function() { },
-            size: function() { return 0; },
+            close: function(): void { },
+            open: function(): void { },
+            size: function(): number { return 0; },
             rotate: function( nBytesToWrite: number ) { },
             toString: function(): string { return ""; },
             exposeDetailsTo,
@@ -246,9 +246,9 @@ export function createStandardOutputStream(): TLogger | null {
                         this.objStream.write( s );
                 } catch ( err ) { }
             },
-            close: function() { this.objStream = null; },
-            open: function() { try { this.objStream = process.stdout; } catch ( err ) { } },
-            size: function() { return 0; },
+            close: function(): void { this.objStream = null; },
+            open: function(): void { try { this.objStream = process.stdout; } catch ( err ) { } },
+            size: function(): number { return 0; },
             rotate: function( nBytesToWrite: number ) { },
             toString: function(): string { return "" + this.strPath; },
             exposeDetailsTo:
@@ -341,12 +341,12 @@ export function createMemoryOutputStream(): TLogger {
             haveOwnTimestamps: true,
             isPausedTimeStamps: false,
             strOwnIndent: "    ",
-            isBeginningOfAccumulatedLog: function() {
+            isBeginningOfAccumulatedLog: function(): boolean {
                 if( this.arrAccumulatedLogTextLines.length == 0 )
                     return true;
                 return false;
             },
-            isLastLineEndsWithCarriageReturn: function() {
+            isLastLineEndsWithCarriageReturn: function(): boolean {
                 if( this.arrAccumulatedLogTextLines.length == 0 )
                     return false;
                 const s = this.arrAccumulatedLogTextLines[
@@ -380,10 +380,10 @@ export function createMemoryOutputStream(): TLogger {
                     this.arrAccumulatedLogTextLines.push( strLine + "\n" );
                 }
             },
-            clear: function() { this.arrAccumulatedLogTextLines = []; },
-            close: function() { this.clear(); },
-            open: function() { this.clear(); },
-            size: function() { return 0; },
+            clear: function(): void { this.arrAccumulatedLogTextLines = []; },
+            close: function(): void { this.clear(); },
+            open: function(): void { this.clear(); },
+            size: function(): number { return 0; },
             rotate:
             function( nBytesToWrite: number ) { this.arrAccumulatedLogTextLines = []; },
             toString: function(): string {
@@ -543,17 +543,17 @@ export function createFileOutput(
                     }
                 } catch ( err ) { }
             },
-            close: function() {
+            close: function(): void {
                 if( !this.objStream )
                     return;
                 fs.closeSync( this.objStream );
                 this.objStream = null;
             },
-            open: function() {
+            open: function(): void {
                 this.objStream =
                     fs.openSync( this.strPath, "a", fs.constants.O_NONBLOCK | fs.constants.O_RDWR );
             },
-            size: function() {
+            size: function(): number {
                 try { return fs.lstatSync( this.strPath ).size; } catch ( err ) { return 0; }
             },
             rotate: function( nBytesToWrite: number ) {
@@ -674,7 +674,7 @@ export function extractErrorMessage( jo?: any, strDefaultErrorText?: string ): s
     if( !jo )
         return strDefaultErrorText;
     try {
-        const isError = function( err: Error | string ) {
+        const isError = function( err: Error | string ): boolean {
             return err && err instanceof Error && err.stack && err.message;
         };
         if( !isError( jo ) ) {
@@ -1018,7 +1018,7 @@ gMapVerbose.set( 7, "notice" );
 gMapVerbose.set( 8, "debug" );
 gMapVerbose.set( 9, "trace" );
 
-function computeVerboseAlias() {
+function computeVerboseAlias(): Map < string, number > {
     const m: Map < string, number > = new Map < string, number >();
     for( const [ key, val ] of gMapVerbose ) {
         const name = val;
@@ -1067,10 +1067,10 @@ export function verboseName2Number( s: string ): number {
 let gFlagIsExposeDetails = false;
 let gVerboseLevel = 0 + verboseName2Number( "information" );
 
-export function exposeDetailsGet() {
+export function exposeDetailsGet(): boolean {
     return ( !!gFlagIsExposeDetails );
 }
-export function exposeDetailsSet( isExpose: any ) {
+export function exposeDetailsSet( isExpose: any ): void {
     gFlagIsExposeDetails = ( !!isExpose );
 }
 

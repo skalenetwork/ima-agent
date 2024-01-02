@@ -43,7 +43,7 @@ import * as state from "./state.js";
 // allow self-signed wss and https
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
-process.on( "unhandledRejection", function( reason: any, p: any ) {
+process.on( "unhandledRejection", function( reason: any, p: any ): void {
     log.fatal(
         "CRITICAL ERROR: unhandled rejection with reason {} and promise {}",
         reason, p );
@@ -54,7 +54,7 @@ process.on( "unhandledRejection", function( reason: any, p: any ) {
     process.exit( 1 );
 } );
 
-function parseCommandLine() {
+function parseCommandLine(): void {
     const imaState: state.TIMAState = state.get();
     log.autoEnableColorizationFromCommandLineArgs();
     const strPrintedArguments = process.argv.join( " " );
@@ -116,7 +116,7 @@ function parseCommandLine() {
     if( imaState.nAutoExitAfterSeconds > 0 ) {
         log.warning( "Automatic exit after {} second(s) is requested.",
             imaState.nAutoExitAfterSeconds );
-        const iv = owaspUtils.setInterval2( function() {
+        const iv = owaspUtils.setInterval2( function(): void {
             log.warning( "Performing automatic exit after {} second(s)...",
                 imaState.nAutoExitAfterSeconds );
             owaspUtils.clearInterval2( iv );
@@ -344,7 +344,7 @@ function initJsonRpcServer(): void {
     gExpressJsonRpcAppIMA.listen( imaState.nJsonRpcPort );
 }
 
-async function doTheJob() {
+async function doTheJob(): Promise<void> {
     const imaState: state.TIMAState = state.get();
     const strLogPrefix = "Job 1: ";
     let idxAction = 0;
@@ -392,15 +392,15 @@ function handleFirstSChainDiscoveryAttemptDone(
     const imaState: state.TIMAState = state.get();
     imaState.joSChainNetworkInfo = joSChainNetworkInfo;
     discoveryTools.continueSChainDiscoveryInBackgroundIfNeeded(
-        isSilentReDiscovery, function() {
+        isSilentReDiscovery, function(): void {
             discoveryTools.doPeriodicSChainNetworkDiscoveryIfNeeded(
                 isSilentReDiscovery, fnOnPeriodicDiscoveryResultAvailable )
-                .then( function() {} ).catch( function() {} );
-        } ).then( function() {} ).catch( function() {} );
+                .then( function(): void {} ).catch( function(): void {} );
+        } ).then( function(): void {} ).catch( function(): void {} );
     imaState.joSChainNetworkInfo = joSChainNetworkInfo;
 }
 
-async function main() {
+async function main(): Promise<void> {
     log.autoEnableColorizationFromCommandLineArgs();
     const imaState: state.TIMAState = state.get();
     const strTmpAddressFromEnvMainNet =
@@ -427,8 +427,9 @@ async function main() {
     const isSilentReDiscovery = imaState.isPrintSecurityValues
         ? false
         : imaState.joSChainDiscovery.isSilentReDiscovery;
-    const fnOnPeriodicDiscoveryResultAvailable = function( isFinal: boolean ) {
-        loop.spreadUpdatedSChainNetwork( isFinal ).then( function() {} ).catch( function() {} );
+    const fnOnPeriodicDiscoveryResultAvailable = function( isFinal: boolean ): void {
+        loop.spreadUpdatedSChainNetwork( isFinal )
+            .then( function(): void {} ).catch( function(): void {} );
     };
     if( imaState.bSignMessages ) {
         if( imaState.strPathBlsGlue.length == 0 ) {
@@ -458,25 +459,25 @@ async function main() {
                             err, joSChainNetworkInfo, isSilentReDiscovery,
                             fnOnPeriodicDiscoveryResultAvailable );
                     }
-                    doTheJob().then( function() {} ).catch( function() {} );
+                    doTheJob().then( function(): void {} ).catch( function(): void {} );
                     // Finish of IMA Agent startup,
                     // everything else is in async calls executed later
                 }, isSilentReDiscovery, imaState.joSChainNetworkInfo, nCountToWait
             ).catch( function( err: Error | string ) {
                 const strError = owaspUtils.extractErrorMessage( err );
                 log.critical( "S-Chain network discovery failed: {err}", strError );
-                doTheJob().then( function() {} ).catch( function() {} );
+                doTheJob().then( function(): void {} ).catch( function(): void {} );
             } );
         }
     } else {
         discoveryTools.doPeriodicSChainNetworkDiscoveryIfNeeded(
             isSilentReDiscovery, fnOnPeriodicDiscoveryResultAvailable )
-            .then( function() {} ).catch( function() {} );
-        doTheJob().then( function() {} ).catch( function() {} );
+            .then( function(): void {} ).catch( function(): void {} );
+        doTheJob().then( function(): void {} ).catch( function(): void {} );
     // Finish of IMA Agent startup,
     // everything else is in async calls executed later,
     // skip exit here to avoid early termination while tasks ase still running
     }
 }
 
-main().then( function() {} ).catch( function() {} );
+main().then( function(): void {} ).catch( function(): void {} );

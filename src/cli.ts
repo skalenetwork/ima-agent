@@ -45,7 +45,7 @@ const gStrVersion =
 
 function att( ...args: any[] ): string { return log.fmtAttention( ...args ); };
 
-export function printAbout( isLog?: boolean ) {
+export function printAbout( isLog?: boolean ): boolean {
     isLog = isLog || false;
     const strMsg = log.fmtTrace( att( gStrAppName ), " version ", log.fmtNotice( gStrVersion ) );
     if( isLog )
@@ -55,7 +55,7 @@ export function printAbout( isLog?: boolean ) {
     return true;
 }
 
-export function parseCommandLineArgument( s: string ) {
+export function parseCommandLineArgument( s: string ): any {
     const joArg = {
         name: "",
         value: ""
@@ -81,7 +81,7 @@ export function parseCommandLineArgument( s: string ) {
 export function ensureHaveValue(
     name: string, value: any, isExitIfEmpty: boolean,
     isPrintValue: boolean, fnNameColorizer?: any, fnValueColorizer?: any
-) {
+): boolean {
     isExitIfEmpty = isExitIfEmpty || false;
     isPrintValue = isPrintValue || false;
     fnNameColorizer = fnNameColorizer || ( ( x: any ) => {
@@ -111,7 +111,7 @@ export function ensureHaveValue(
 export function ensureHaveCredentials(
     strFriendlyChainName: string, joAccount: state.TAccount,
     isExitIfEmpty: boolean, isPrintValue: boolean
-) {
+): boolean {
     strFriendlyChainName = strFriendlyChainName || "<UNKNOWN>";
     if( !( typeof joAccount === "object" ) ) {
         log.error( "ARGUMENTS VALIDATION WARNING: bad account specified for {} chain",
@@ -198,7 +198,7 @@ export function ensureHaveCredentials(
     return true;
 }
 
-export function findNodeIndex( joSChainNodeConfiguration: any ) {
+export function findNodeIndex( joSChainNodeConfiguration: any ): number {
     try {
         const searchID = joSChainNodeConfiguration.skaleConfig.nodeInfo.nodeID;
         const cnt = joSChainNodeConfiguration.skaleConfig.sChain.nodes.length;
@@ -211,7 +211,7 @@ export function findNodeIndex( joSChainNodeConfiguration: any ) {
     return 0;
 }
 
-function parseHelp( imaState: state.TIMAState, joArg: any ) { // exits process on "--help"
+function parseHelp( imaState: state.TIMAState, joArg: any ): boolean { // exits process on "--help"
     if( joArg.name != "help" )
         return false;
     printAbout();
@@ -222,14 +222,15 @@ function parseHelp( imaState: state.TIMAState, joArg: any ) { // exits process o
     process.exit( 0 );
 }
 
-function parseVersion( imaState: state.TIMAState, joArg: any ) { // exits process on "--version"
+function parseVersion( imaState: state.TIMAState, joArg: any ): boolean {
+    // exits process on "--version"
     if( joArg.name != "version" )
         return false;
     printAbout();
     process.exit( 0 );
 }
 
-function parseBasicArgs( imaState: state.TIMAState, joArg: any ) {
+function parseBasicArgs( imaState: state.TIMAState, joArg: any ): boolean {
     if( joArg.name == "colors" ) {
         log.enableColorization( true );
         return true;
@@ -257,7 +258,7 @@ function parseBasicArgs( imaState: state.TIMAState, joArg: any ) {
     return false;
 }
 
-function parseChainAccessArgs( imaState: state.TIMAState, joArg: any ) {
+function parseChainAccessArgs( imaState: state.TIMAState, joArg: any ): boolean {
     if( joArg.name == "url-main-net" ) {
         owaspUtils.verifyArgumentIsURL( joArg );
         imaState.chainProperties.mn.strURL = joArg.value;
@@ -311,7 +312,7 @@ function parseChainAccessArgs( imaState: state.TIMAState, joArg: any ) {
     return false;
 }
 
-function parseTransactionManagerArgs( imaState: state.TIMAState, joArg: any ) {
+function parseTransactionManagerArgs( imaState: state.TIMAState, joArg: any ): boolean {
     if( joArg.name == "tm-url-main-net" ) {
         owaspUtils.verifyArgumentIsURL( joArg );
         const strURL = "" + joArg.value;
@@ -351,7 +352,7 @@ function parseTransactionManagerArgs( imaState: state.TIMAState, joArg: any ) {
     return false;
 }
 
-function parseSgxArgs( imaState: state.TIMAState, joArg: any ) {
+function parseSgxArgs( imaState: state.TIMAState, joArg: any ): boolean {
     if( joArg.name == "sgx-url-main-net" ) {
         owaspUtils.verifyArgumentIsURL( joArg );
         imaState.chainProperties.mn.joAccount.strSgxURL = joArg.value;
@@ -476,7 +477,7 @@ function parseSgxArgs( imaState: state.TIMAState, joArg: any ) {
     return false;
 }
 
-function parseCredentialsArgs( imaState: state.TIMAState, joArg: any ) {
+function parseCredentialsArgs( imaState: state.TIMAState, joArg: any ): boolean {
     if( joArg.name == "address-main-net" ) {
         owaspUtils.verifyArgumentWithNonEmptyValue( joArg );
         imaState.chainProperties.mn.joAccount.address_ = joArg.value;
@@ -515,7 +516,7 @@ function parseCredentialsArgs( imaState: state.TIMAState, joArg: any ) {
     return false;
 }
 
-function parseAbiArgs( imaState: state.TIMAState, joArg: any ) {
+function parseAbiArgs( imaState: state.TIMAState, joArg: any ): boolean {
     if( joArg.name == "abi-skale-manager" ) {
         owaspUtils.verifyArgumentIsPathToExistingFile( joArg );
         imaState.strPathAbiJsonSkaleManager = imaUtils.normalizePath( joArg.value );
@@ -539,7 +540,7 @@ function parseAbiArgs( imaState: state.TIMAState, joArg: any ) {
     return false;
 }
 
-function parseErcArgs( imaState: state.TIMAState, joArg: any ) {
+function parseErcArgs( imaState: state.TIMAState, joArg: any ): boolean {
     if( joArg.name == "erc20-main-net" ) {
         owaspUtils.verifyArgumentIsPathToExistingFile( joArg );
         imaState.chainProperties.mn.strPathJsonErc20 = imaUtils.normalizePath( joArg.value );
@@ -624,7 +625,7 @@ function parseErcArgs( imaState: state.TIMAState, joArg: any ) {
     return false;
 }
 
-function parseTransactionArgs( imaState: state.TIMAState, joArg: any ) {
+function parseTransactionArgs( imaState: state.TIMAState, joArg: any ): boolean {
     if( joArg.name == "sleep-between-tx" ) {
         owaspUtils.verifyArgumentIsInteger( joArg );
         imaHelperAPIs.setSleepBetweenTransactionsOnSChainMilliseconds( joArg.value );
@@ -722,7 +723,7 @@ function parseTransactionArgs( imaState: state.TIMAState, joArg: any ) {
     return false;
 }
 
-function parsePaymentAmountArgs( imaState: state.TIMAState, joArg: any ) {
+function parsePaymentAmountArgs( imaState: state.TIMAState, joArg: any ): boolean {
     if( joArg.name == "value" ) {
         owaspUtils.verifyArgumentWithNonEmptyValue( joArg );
         imaState.nAmountOfWei = owaspUtils.parseMoneySpecToWei( "" + joArg.value, true );
@@ -793,7 +794,7 @@ function parsePaymentAmountArgs( imaState: state.TIMAState, joArg: any ) {
     return false;
 }
 
-function parseTransferArgs( imaState: state.TIMAState, joArg: any ) {
+function parseTransferArgs( imaState: state.TIMAState, joArg: any ): boolean {
     if( joArg.name == "s2s-forward" ) {
         imaHelperAPIs.setForwardS2S();
         return true;
@@ -961,7 +962,7 @@ function parseTransferArgs( imaState: state.TIMAState, joArg: any ) {
     return false;
 }
 
-function parseMulticallArgs( imaState: state.TIMAState, joArg: any ) {
+function parseMulticallArgs( imaState: state.TIMAState, joArg: any ): boolean {
     if( joArg.name == "enable-multicall" ) {
         imaState.isEnabledMultiCall = true;
         return true;
@@ -973,7 +974,7 @@ function parseMulticallArgs( imaState: state.TIMAState, joArg: any ) {
     return false;
 }
 
-function parsePendingWorkAnalysisArgs( imaState: state.TIMAState, joArg: any ) {
+function parsePendingWorkAnalysisArgs( imaState: state.TIMAState, joArg: any ): boolean {
     if( joArg.name == "pwa" ) {
         imaState.isPWA = true;
         return true;
@@ -998,7 +999,7 @@ function parsePendingWorkAnalysisArgs( imaState: state.TIMAState, joArg: any ) {
     return false;
 }
 
-function parseLoggingArgs( imaState: state.TIMAState, joArg: any ) {
+function parseLoggingArgs( imaState: state.TIMAState, joArg: any ): boolean {
     if( joArg.name == "gathered" ) {
         imaState.isPrintGathered = true;
         return true;
@@ -1049,7 +1050,7 @@ function parseLoggingArgs( imaState: state.TIMAState, joArg: any ) {
     return false;
 }
 
-function parseBlsArgs( imaState: state.TIMAState, joArg: any ) {
+function parseBlsArgs( imaState: state.TIMAState, joArg: any ): boolean {
     if( joArg.name == "sign-messages" ) {
         imaState.bSignMessages = true;
         return true;
@@ -1072,7 +1073,7 @@ function parseBlsArgs( imaState: state.TIMAState, joArg: any ) {
     return false;
 }
 
-function parseMonitoringArgs( imaState: state.TIMAState, joArg: any ) {
+function parseMonitoringArgs( imaState: state.TIMAState, joArg: any ): boolean {
     if( joArg.name == "monitoring-port" ) {
         owaspUtils.verifyArgumentIsIntegerIpPortNumber( joArg );
         imaState.nMonitoringPort = owaspUtils.toInteger( joArg.value );
@@ -1086,7 +1087,7 @@ function parseMonitoringArgs( imaState: state.TIMAState, joArg: any ) {
     return false;
 }
 
-function parseReimbursementArgs( imaState: state.TIMAState, joArg: any ) {
+function parseReimbursementArgs( imaState: state.TIMAState, joArg: any ): boolean {
     if( joArg.name == "reimbursement-chain" ) {
         owaspUtils.verifyArgumentWithNonEmptyValue( joArg );
         imaState.strReimbursementChain = joArg.value.trim();
@@ -1120,7 +1121,7 @@ function parseReimbursementArgs( imaState: state.TIMAState, joArg: any ) {
     return false;
 }
 
-function parseOracleArgs( imaState: state.TIMAState, joArg: any ) {
+function parseOracleArgs( imaState: state.TIMAState, joArg: any ): boolean {
     if( joArg.name == "enable-oracle" ) {
         imaOracleOperations.setEnabledOracle( true );
         return true;
@@ -1132,7 +1133,7 @@ function parseOracleArgs( imaState: state.TIMAState, joArg: any ) {
     return false;
 }
 
-function parseNetworkDiscoveryArgs( imaState: state.TIMAState, joArg: any ) {
+function parseNetworkDiscoveryArgs( imaState: state.TIMAState, joArg: any ): boolean {
     if( joArg.name == "network-browser-path" ) {
         owaspUtils.verifyArgumentWithNonEmptyValue( joArg );
         imaState.optsS2S.strNetworkBrowserPath = "" + joArg.value;
@@ -1141,7 +1142,7 @@ function parseNetworkDiscoveryArgs( imaState: state.TIMAState, joArg: any ) {
     return false;
 }
 
-function parseBlockScannerArgs( imaState: state.TIMAState, joArg: any ) {
+function parseBlockScannerArgs( imaState: state.TIMAState, joArg: any ): boolean {
     if( joArg.name == "bs-step-size" ) {
         owaspUtils.verifyArgumentIsInteger( joArg );
         imaHelperAPIs.setBlocksCountInInIterativeStepOfEventsScan(
@@ -1164,7 +1165,7 @@ function parseBlockScannerArgs( imaState: state.TIMAState, joArg: any ) {
     return false;
 }
 
-function parseJsonRpcServerArgs( imaState: state.TIMAState, joArg: any ) {
+function parseJsonRpcServerArgs( imaState: state.TIMAState, joArg: any ): boolean {
     if( joArg.name == "json-rpc-port" ) {
         owaspUtils.verifyArgumentIsIntegerIpPortNumber( joArg );
         imaState.nJsonRpcPort = owaspUtils.toInteger( joArg.value );
@@ -1173,7 +1174,7 @@ function parseJsonRpcServerArgs( imaState: state.TIMAState, joArg: any ) {
     return false;
 }
 
-function parseCrossImaCommunicationArgs( imaState: state.TIMAState, joArg: any ) {
+function parseCrossImaCommunicationArgs( imaState: state.TIMAState, joArg: any ): boolean {
     if( joArg.name == "cross-ima" ) {
         imaState.isCrossImaBlsMode = true;
         return true;
@@ -1185,7 +1186,7 @@ function parseCrossImaCommunicationArgs( imaState: state.TIMAState, joArg: any )
     return false;
 }
 
-function parseShowConfigArgs( imaState: state.TIMAState, joArg: any ) {
+function parseShowConfigArgs( imaState: state.TIMAState, joArg: any ): boolean {
     if( joArg.name == "show-config" ) {
         imaState.bShowConfigMode = true;
         return true;
@@ -1193,7 +1194,7 @@ function parseShowConfigArgs( imaState: state.TIMAState, joArg: any ) {
     return false;
 }
 
-function parseOtherArgs( imaState: state.TIMAState, joArg: any ) {
+function parseOtherArgs( imaState: state.TIMAState, joArg: any ): boolean {
     if( joArg.name == "auto-exit" ) {
         owaspUtils.verifyArgumentIsInteger( joArg );
         imaState.nAutoExitAfterSeconds = owaspUtils.toInteger( joArg.value );
@@ -1202,7 +1203,7 @@ function parseOtherArgs( imaState: state.TIMAState, joArg: any ) {
     return false;
 }
 
-export function parse( joExternalHandlers: any, argv?: any[] ) {
+export function parse( joExternalHandlers: any, argv?: any[] ): number {
     const imaState: state.TIMAState = state.get();
     argv = argv || process.argv;
     const cntArgs = argv.length;
@@ -1293,7 +1294,7 @@ export function parse( joExternalHandlers: any, argv?: any[] ) {
     return 0;
 }
 
-async function asyncCheckUrlAtStartup( u: URL | string, name: string ) {
+async function asyncCheckUrlAtStartup( u: URL | string, name: string ): Promise < boolean > {
     const details = log.createMemoryStream();
     const nTimeoutMilliseconds = 10 * 1000;
     try {
@@ -1315,7 +1316,7 @@ async function asyncCheckUrlAtStartup( u: URL | string, name: string ) {
     return false;
 }
 
-function commonInitPrintSysInfo() {
+function commonInitPrintSysInfo(): void {
     const imaState: state.TIMAState = state.get();
     const isPrintGathered = ( !!( imaState.isPrintGathered ) );
     if( isPrintGathered ) {
@@ -1360,7 +1361,7 @@ function commonInitPrintSysInfo() {
     }
 }
 
-function commonInitCheckAbiPaths() {
+function commonInitCheckAbiPaths(): void {
     const imaState: state.TIMAState = state.get();
     if( imaState.strPathAbiJsonSkaleManager &&
         ( typeof imaState.strPathAbiJsonSkaleManager === "string" ) &&
@@ -1414,7 +1415,7 @@ function commonInitCheckAbiPaths() {
     }
 }
 
-function commonInitCheckContractPresences() {
+function commonInitCheckContractPresences(): void {
     const imaState: state.TIMAState = state.get();
     if( imaState.bHaveSkaleManagerABI ) {
         imaUtils.checkKeysExistInABI( "skale-manager",
@@ -1513,7 +1514,7 @@ function commonInitCheckContractPresences() {
     }
 }
 
-function commonInitPrintFoundContracts() {
+function commonInitPrintFoundContracts(): void {
     const imaState: state.TIMAState = state.get();
     const isPrintGathered = ( !!( imaState.isPrintGathered ) );
     // deposit_box_eth_address                    --> deposit_box_eth_abi
@@ -1532,7 +1533,8 @@ function commonInitPrintFoundContracts() {
     // message_proxy_chain_address                --> message_proxy_chain_abi
 
     const oct = function(
-        joContract?: owaspUtils.ethersMod.ethers.Contract | null ) { // optional contract address
+        joContract?: owaspUtils.ethersMod.ethers.Contract | null ): string {
+        // optional contract address
         if( joContract && "address" in joContract && joContract.address )
             return log.fmtInformation( "{}", joContract.address );
         return log.fmtError( "contract is not available" );
@@ -1617,7 +1619,7 @@ function commonInitPrintFoundContracts() {
     }
 }
 
-function commonInitCheckErc20() {
+function commonInitCheckErc20(): void {
     const imaState: state.TIMAState = state.get();
     const isPrintGathered = ( !!( imaState.isPrintGathered ) );
     let n1 = 0;
@@ -1773,7 +1775,7 @@ function commonInitCheckErc20() {
     }
 }
 
-function commonInitCheckErc721() {
+function commonInitCheckErc721(): void {
     const imaState: state.TIMAState = state.get();
     const isPrintGathered = ( !!( imaState.isPrintGathered ) );
     let n1 = 0;
@@ -1931,7 +1933,7 @@ function commonInitCheckErc721() {
     }
 }
 
-function commonInitCheckErc1155() {
+function commonInitCheckErc1155(): void {
     const imaState: state.TIMAState = state.get();
     const isPrintGathered = ( !!( imaState.isPrintGathered ) );
     let n1 = 0;
@@ -2090,7 +2092,7 @@ function commonInitCheckErc1155() {
     }
 }
 
-function commonInitCheckGeneralArgs() {
+function commonInitCheckGeneralArgs(): void {
     const imaState: state.TIMAState = state.get();
     const isPrintGathered = ( !!( imaState.isPrintGathered ) );
     const isPrintSecurityValues = ( !!( imaState.isPrintSecurityValues ) );
@@ -2209,7 +2211,7 @@ function commonInitCheckGeneralArgs() {
     } catch ( err ) {}
 }
 
-function commonInitCheckCredentialsArgs() {
+function commonInitCheckCredentialsArgs(): void {
     const imaState: state.TIMAState = state.get();
     const isPrintGathered = ( !!( imaState.isPrintGathered ) );
     const isPrintSecurityValues = ( !!( imaState.isPrintSecurityValues ) );
@@ -2260,7 +2262,7 @@ function commonInitCheckCredentialsArgs() {
     }
 }
 
-function commonInitCheckTransferAmountArgs() {
+function commonInitCheckTransferAmountArgs(): void {
     const imaState: state.TIMAState = state.get();
     const isPrintGathered = ( !!( imaState.isPrintGathered ) );
     ensureHaveValue(
@@ -2270,7 +2272,7 @@ function commonInitCheckTransferAmountArgs() {
         } );
 }
 
-function commonInitTransferringArgs() {
+function commonInitTransferringArgs(): void {
     const imaState: state.TIMAState = state.get();
     const isPrintGathered = ( !!( imaState.isPrintGathered ) );
     ensureHaveValue(
@@ -2378,7 +2380,7 @@ function commonInitTransferringArgs() {
     }
 }
 
-function commonInitCheckAccessArgs() {
+function commonInitCheckAccessArgs(): void {
     const imaState: state.TIMAState = state.get();
     const isPrintGathered = ( !!( imaState.isPrintGathered ) );
     ensureHaveValue(
@@ -2393,7 +2395,7 @@ function commonInitCheckAccessArgs() {
         } );
 }
 
-function commonInitErcTokensArgs() {
+function commonInitErcTokensArgs(): void {
     const imaState: state.TIMAState = state.get();
     const isPrintGathered = ( !!( imaState.isPrintGathered ) );
     if( imaState.chainProperties.tc.strCoinNameErc20.length > 0 ) {
@@ -2516,7 +2518,7 @@ function commonInitErcTokensArgs() {
     }
 }
 
-function commonInitGasMultipliersAndTransactionArgs() {
+function commonInitGasMultipliersAndTransactionArgs(): void {
     const imaState: state.TIMAState = state.get();
     const isPrintGathered = ( !!( imaState.isPrintGathered ) );
     if( isPrintGathered ) {
@@ -2599,7 +2601,7 @@ function commonInitGasMultipliersAndTransactionArgs() {
     }
 }
 
-function commonInitLoggingArgs() {
+function commonInitLoggingArgs(): void {
     const imaState: state.TIMAState = state.get();
     const isPrintGathered = ( !!( imaState.isPrintGathered ) );
     if( imaState.strLogFilePath.length > 0 ) {
@@ -2624,7 +2626,7 @@ function commonInitLoggingArgs() {
     }
 }
 
-function commonInitAutomaticExitArgs() {
+function commonInitAutomaticExitArgs(): void {
     const imaState: state.TIMAState = state.get();
     const isPrintGathered = ( !!( imaState.isPrintGathered ) );
     const isPrintSecurityValues = ( !!( imaState.isPrintSecurityValues ) );
@@ -2634,7 +2636,7 @@ function commonInitAutomaticExitArgs() {
         isPrintGathered && isPrintSecurityValues );
 }
 
-export function commonInit() {
+export function commonInit(): void {
     const imaState: state.TIMAState = state.get();
     commonInitPrintSysInfo();
     commonInitCheckAbiPaths();
@@ -2655,14 +2657,15 @@ export function commonInit() {
     }
 } // commonInit
 
-export function imaInitEthersProviders() {
+export function imaInitEthersProviders(): void {
     const imaState: state.TIMAState = state.get();
     if( imaState.chainProperties.mn.strURL &&
         typeof imaState.chainProperties.mn.strURL === "string" &&
         imaState.chainProperties.mn.strURL.length > 0
     ) {
         const u = imaState.chainProperties.mn.strURL;
-        asyncCheckUrlAtStartup( u, "Main-net" ).then( function() {} ).catch( function() {} );
+        asyncCheckUrlAtStartup( u, "Main-net" )
+            .then( function(): void {} ).catch( function(): void {} );
         imaState.chainProperties.mn.ethersProvider = owaspUtils.getEthersProviderFromURL( u );
     } else {
         log.warning( "No Main-net URL specified in command line arguments" +
@@ -2674,7 +2677,8 @@ export function imaInitEthersProviders() {
         imaState.chainProperties.sc.strURL.length > 0
     ) {
         const u = imaState.chainProperties.sc.strURL;
-        asyncCheckUrlAtStartup( u, "S-Chain" ).then( function() {} ).catch( function() {} );
+        asyncCheckUrlAtStartup( u, "S-Chain" )
+            .then( function(): void {} ).catch( function(): void {} );
         imaState.chainProperties.sc.ethersProvider = owaspUtils.getEthersProviderFromURL( u );
     } else {
         log.warning( "No S-Chain URL specified in command line arguments" +
@@ -2687,7 +2691,7 @@ export function imaInitEthersProviders() {
     ) {
         const u = imaState.chainProperties.tc.strURL;
         asyncCheckUrlAtStartup( u, "S<->S Target S-Chain" )
-            .then( function() {} ).catch( function() {} );
+            .then( function(): void {} ).catch( function(): void {} );
         imaState.chainProperties.tc.ethersProvider = owaspUtils.getEthersProviderFromURL( u );
     } else {
         log.warning( "No S<->S Target S-Chain URL specified in command line arguments" +
@@ -2695,7 +2699,7 @@ export function imaInitEthersProviders() {
     }
 } // imaInitEthersProviders
 
-function initContractsIMA() {
+function initContractsIMA(): void {
     const imaState: state.TIMAState = state.get();
     if( imaState.chainProperties.mn.bHaveAbiIMA ) {
         const cp = imaState.chainProperties.mn;
@@ -2853,7 +2857,7 @@ function initContractsIMA() {
     }
 }
 
-function initContractsSkaleManager() {
+function initContractsSkaleManager(): void {
     const imaState: state.TIMAState = state.get();
     if( imaState.bHaveSkaleManagerABI ) {
         const cp = imaState.chainProperties.mn;
@@ -2914,7 +2918,7 @@ function initContractsSkaleManager() {
     }
 }
 
-export function initContracts() {
+export function initContracts(): void {
     imaInitEthersProviders();
     initContractsIMA();
     initContractsSkaleManager();

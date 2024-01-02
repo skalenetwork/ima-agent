@@ -38,7 +38,7 @@ export async function reimbursementShowBalance(
     transactionCustomizerMainNet: imaTx.TransactionCustomizer,
     strReimbursementChain: string,
     isForcePrintOut: boolean
-) {
+): Promise<any> {
     const details = log.createMemoryStream();
     let s = "";
     const strLogPrefix = "Gas Reimbursement - Show Balance ";
@@ -79,7 +79,7 @@ export async function reimbursementEstimateAmount(
     transactionCustomizerMainNet: imaTx.TransactionCustomizer,
     strReimbursementChain: string,
     isForcePrintOut: boolean
-) {
+): Promise<any> {
     const details = log.createMemoryStream();
     let s = "";
     const strLogPrefix = "Gas Reimbursement - Estimate Amount To Recharge ";
@@ -162,7 +162,7 @@ export async function reimbursementWalletRecharge(
     transactionCustomizerMainNet: imaTx.TransactionCustomizer,
     strReimbursementChain: string,
     nReimbursementRecharge: string | number | null
-) {
+): Promise<any> {
     const details = log.createMemoryStream();
     const jarrReceipts: any = [];
     let strActionName = "";
@@ -194,7 +194,7 @@ export async function reimbursementWalletRecharge(
             details, ethersProviderMainNet,
             "CommunityPool", joCommunityPool, "rechargeUserWallet", arrArguments,
             joAccountMN, strActionName, gasPrice, estimatedGas, nReimbursementRecharge, null );
-        if( joReceipt && typeof joReceipt === "object" ) {
+        if( joReceipt ) {
             jarrReceipts.push( {
                 description: "reimbursementWalletRecharge",
                 receipt: joReceipt
@@ -224,7 +224,7 @@ export async function reimbursementWalletWithdraw(
     transactionCustomizerMainNet: imaTx.TransactionCustomizer,
     strReimbursementChain: string,
     nReimbursementWithdraw: string | number | null
-) {
+): Promise<any> {
     const details = log.createMemoryStream();
     const jarrReceipts: any = [];
     let strActionName = "";
@@ -261,7 +261,7 @@ export async function reimbursementWalletWithdraw(
             "CommunityPool", joCommunityPool, "withdrawFunds", arrArguments,
             joAccountMN, strActionName,
             gasPrice, estimatedGas, weiHowMuch );
-        if( joReceipt && typeof joReceipt === "object" ) {
+        if( joReceipt ) {
             jarrReceipts.push( {
                 description: "reimbursementWalletWithdraw",
                 receipt: joReceipt
@@ -291,7 +291,7 @@ export async function reimbursementSetRange(
     transactionCustomizerSChain: imaTx.TransactionCustomizer,
     strChainNameOriginChain: string,
     nReimbursementRange: any
-) {
+): Promise<any> {
     const details = log.createMemoryStream();
     const jarrReceipts: any = [];
     let strActionName = "";
@@ -326,7 +326,7 @@ export async function reimbursementSetRange(
             details, ethersProviderSChain,
             "CommunityLocker", joCommunityLocker, "setTimeLimitPerMessage", arrArguments,
             joAccountSC, strActionName, gasPrice, estimatedGas, weiHowMuch, opts );
-        if( joReceipt && typeof joReceipt === "object" ) {
+        if( joReceipt ) {
             jarrReceipts.push( {
                 description: "reimbursementSetRange",
                 receipt: joReceipt

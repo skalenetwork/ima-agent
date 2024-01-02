@@ -49,7 +49,7 @@ export function replaceAll( str: string, find: string, replace: string ): string
     return str.replace( new RegExp( find, "g" ), replace );
 }
 
-export function validateRadix( value?: any, radix?: any ) {
+export function validateRadix( value?: any, radix?: any ): number {
     value = "" + ( value ? value.toString() : "10" );
     value = value.trim();
     radix = ( radix == null || radix == undefined )
@@ -189,7 +189,7 @@ const gArrRainbowParts: any[] = [
     gMapColorDefinitions.fgMagenta
 ];
 
-export function rainbowPart( s: string, i: number ) {
+export function rainbowPart( s: string, i: number ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     const j = i % gArrRainbowParts.length;
@@ -861,7 +861,7 @@ export function strval( s?: any ): string {
     return "" + fgYellow + s + reset;
 }
 
-export function n2s( n: any, sz: number ) {
+export function n2s( n: any, sz: number ): string {
     let s = "" + n;
     while( s.length < sz )
         s = "0" + s;

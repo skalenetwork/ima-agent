@@ -105,7 +105,7 @@ export async function dryRunCall(
     joAccount: state.TAccount, strActionName: string, isDryRunResultIgnore: boolean,
     gasPrice: any, gasValue: any, weiHowMuch: any,
     opts?: any
-) {
+): Promise<string | null> {
     if( !dryRunIsEnabled() )
         return null; // success
     isDryRunResultIgnore = ( isDryRunResultIgnore != null && isDryRunResultIgnore != undefined )
@@ -152,7 +152,7 @@ export async function dryRunCall(
     }
 }
 
-async function payedCallPrepare( optsPayedCall: TRunTimePayedCallOptions ) {
+async function payedCallPrepare( optsPayedCall: TRunTimePayedCallOptions ): Promise<void> {
     optsPayedCall.joACI = getAccountConnectivityInfo( optsPayedCall.joAccount );
     if( optsPayedCall.gasPrice ) {
         optsPayedCall.callOpts.gasPrice =
@@ -193,7 +193,7 @@ async function payedCallPrepare( optsPayedCall: TRunTimePayedCallOptions ) {
         optsPayedCall.txHash );
 }
 
-async function payedCallTM( optsPayedCall: TRunTimePayedCallOptions ) {
+async function payedCallTM( optsPayedCall: TRunTimePayedCallOptions ): Promise<any> {
     const txAdjusted: any =
         optsPayedCall.unsignedTx; // JSON.parse( JSON.stringify( optsPayedCall.rawTx ) );
     const arrNamesConvertToHex = [ "gas", "gasLimit", "optsPayedCall.gasPrice", "value" ];
@@ -233,7 +233,7 @@ async function payedCallTM( optsPayedCall: TRunTimePayedCallOptions ) {
     }
 }
 
-async function payedCallSGX( optsPayedCall: TRunTimePayedCallOptions ) {
+async function payedCallSGX( optsPayedCall: TRunTimePayedCallOptions ): Promise<void> {
     const tx = optsPayedCall.unsignedTx;
     let { chainId } = await optsPayedCall.ethersProvider.getNetwork();
     if( typeof chainId === "string" && chainId )
@@ -275,7 +275,7 @@ async function payedCallSGX( optsPayedCall: TRunTimePayedCallOptions ) {
     postConvertBN( optsPayedCall.joReceipt, "effectiveGasPrice" );
 }
 
-function postConvertBN( jo: any, name: any ) {
+function postConvertBN( jo: any, name: any ): void {
     if( !jo )
         return;
     if( !( name in jo ) )
@@ -285,7 +285,7 @@ function postConvertBN( jo: any, name: any ) {
     jo[name] = owaspUtils.toBN( jo[name] );
 }
 
-async function payedCallDirect( optsPayedCall: TRunTimePayedCallOptions ) {
+async function payedCallDirect( optsPayedCall: TRunTimePayedCallOptions ): Promise<void> {
     const ethersWallet = new owaspUtils.ethersMod.ethers.Wallet(
         owaspUtils.ensureStartsWith0x( optsPayedCall.joAccount.privateKey ),
         optsPayedCall.ethersProvider );
@@ -320,7 +320,7 @@ export async function payedCall(
     joAccount: state.TAccount, strActionName: string,
     gasPrice: any, estimatedGas: any, weiHowMuch: any,
     opts?: any
-) {
+): Promise<any> {
     const optsPayedCall: TRunTimePayedCallOptions = {
         details,
         ethersProvider,
@@ -417,7 +417,7 @@ export async function checkTransactionToSchain(
     details: log.TLogger,
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     joAccount: state.TAccount
-) {
+): Promise<any> {
     const strLogPrefix = "PoW-mining: ";
     try {
         const strFromAddress = joAccount.address(); // unsignedTx.from;
@@ -465,7 +465,8 @@ export async function checkTransactionToSchain(
 }
 
 export async function calculatePowNumber(
-    address: string, nonce: any, gas: any, details: log.TLogger, strLogPrefix: string ) {
+    address: string, nonce: any, gas: any, details: log.TLogger, strLogPrefix: string
+): Promise<any> {
     try {
         let _address = owaspUtils.ensureStartsWith0x( address );
         _address = ethereumJsUtilModule.toChecksumAddress( _address );
@@ -485,7 +486,7 @@ export async function calculatePowNumber(
     }
 }
 
-export function getAccountConnectivityInfo( joAccount: state.TAccount ) {
+export function getAccountConnectivityInfo( joAccount: state.TAccount ): object {
     const joACI: any = {
         isBad: true,
         strType: "bad",
@@ -526,7 +527,7 @@ function tmGenerateRandomHex( size: number ): string {
         .map( () => Math.floor( Math.random() * 16 ).toString( 16 ) ).join( "" )
 }
 
-function tmMakeId( details: log.TLogger ) {
+function tmMakeId( details: log.TLogger ): string {
     const prefix = "tx-";
     const unique = tmGenerateRandomHex( 16 );
     const id = prefix + unique + "js";
@@ -534,7 +535,7 @@ function tmMakeId( details: log.TLogger ) {
     return id;
 }
 
-function tmMakeRecord( tx: any = {}, score: any ) {
+function tmMakeRecord( tx: any = {}, score: any ): any {
     const status = "PROPOSED";
     return JSON.stringify( {
         score,
@@ -543,12 +544,12 @@ function tmMakeRecord( tx: any = {}, score: any ) {
     } );
 }
 
-function tmMakeScore( priority: number ) {
+function tmMakeScore( priority: number ): number {
     const ts = imaHelperAPIs.currentTimestamp();
     return priority * Math.pow( 10, ts.toString().length ) + ts;
 }
 
-async function tmSend( details: log.TLogger, tx: any, priority: number = 5 ) {
+async function tmSend( details: log.TLogger, tx: any, priority: number = 5 ): Promise<string> {
     details.trace( "TM - sending tx {} ts: {}", tx, imaHelperAPIs.currentTimestamp() );
     const id = tmMakeId( details );
     const score = tmMakeScore( priority );
@@ -562,13 +563,13 @@ async function tmSend( details: log.TLogger, tx: any, priority: number = 5 ) {
     return id;
 }
 
-function tmIsFinished( record: any ) {
+function tmIsFinished( record: any ): boolean {
     if( record == null )
         return null;
     return [ "SUCCESS", "FAILED", "DROPPED" ].includes( record.status );
 }
 
-async function tmGetRecord( txId: any ) {
+async function tmGetRecord( txId: any ): Promise<any | null> {
     const r = await redis.get( txId );
     if( r != null )
         return JSON.parse( r );
@@ -579,7 +580,7 @@ async function tmWait(
     details: log.TLogger,
     txId: any,
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
-    nWaitSeconds: number = 36000 ) {
+    nWaitSeconds: number = 36000 ): Promise<any | null> {
     const strLogPrefix = log.fmtDebug( "(gathered details)" ) + " ";
     details.debug( "{p}TM - will wait TX {} to complete for {} second(s) maximum",
         strLogPrefix, txId, nWaitSeconds );
@@ -614,7 +615,7 @@ async function tmEnsureTransaction(
     details: log.TLogger, ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     priority: any, txAdjusted: any,
     cntAttempts?: number, sleepMilliseconds?: number
-) {
+): Promise<any> {
     cntAttempts = cntAttempts || 1;
     sleepMilliseconds = sleepMilliseconds || ( 30 * 1000 );
     let txId = "";
@@ -651,7 +652,7 @@ export class TransactionCustomizer {
     }
     async computeGasPrice(
         ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
-        maxGasPrice: any ) {
+        maxGasPrice: any ): Promise<any> {
         const gasPrice =
             owaspUtils.parseIntOrHex(
                 owaspUtils.toBN(
@@ -684,7 +685,7 @@ export class TransactionCustomizer {
         joAccount: state.TAccount, strActionName: string,
         gasPrice: any, gasValueRecommended: any, weiHowMuch: any,
         opts?: any
-    ) {
+    ): Promise<any> {
         let estimatedGas: any = 0;
         const strContractMethodDescription = log.fmtDebug( "{p}({}).{sunny}",
             strContractName, joContract.address, strMethodName );

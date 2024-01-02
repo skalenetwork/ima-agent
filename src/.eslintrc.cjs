@@ -50,7 +50,6 @@ module.exports = {
                 "while": { "before": false, "after": false }
             }
         } ],
-        "@typescript-eslint/explicit-function-return-type": "off",
         "@typescript-eslint/no-non-null-asserted-nullish-coalescing": "off",
         "@typescript-eslint/prefer-nullish-coalescing": "off",
         "@typescript-eslint/strict-boolean-expressions": "off",

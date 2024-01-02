@@ -42,7 +42,7 @@ import * as imaUtils from "./utils.js";
 import * as imaBLS from "./bls.js";
 import type * as imaTx from "./imaTx.js";
 
-export async function registerAll( isPrintSummaryRegistrationCosts: boolean ) {
+export async function registerAll( isPrintSummaryRegistrationCosts: boolean ): Promise < boolean > {
     if( !await registerStep1( false ) )
         return false;
     if( isPrintSummaryRegistrationCosts )
@@ -50,7 +50,7 @@ export async function registerAll( isPrintSummaryRegistrationCosts: boolean ) {
     return true;
 }
 
-export async function checkRegistrationAll() {
+export async function checkRegistrationAll(): Promise<boolean> {
     const b1 = await checkRegistrationStep1();
     return b1;
 }
@@ -65,7 +65,7 @@ const gInfoRegistrationCost: TRegistrationCostInformation = {
     sc: []
 };
 
-export async function registerStep1( isPrintSummaryRegistrationCosts: boolean ) {
+export async function registerStep1( isPrintSummaryRegistrationCosts: boolean ): Promise<boolean> {
     const imaState: state.TIMAState = state.get();
     imaCLI.initContracts();
     const strLogPrefix = "Reg 1: ";
@@ -116,7 +116,7 @@ export async function registerStep1( isPrintSummaryRegistrationCosts: boolean ) 
     return true;
 }
 
-export async function checkRegistrationStep1() {
+export async function checkRegistrationStep1(): Promise<boolean> {
     const imaState: state.TIMAState = state.get();
     imaCLI.initContracts();
     if( !imaState.chainProperties.mn.ethersProvider )
@@ -130,7 +130,7 @@ export async function checkRegistrationStep1() {
     return bRetVal;
 }
 
-export function printSummaryRegistrationCosts( details?: any ) {
+export function printSummaryRegistrationCosts( details?: any ): void {
     if( !details )
         details = log;
     imaGasUsage.printGasUsageReportFromArray(
@@ -139,11 +139,11 @@ export function printSummaryRegistrationCosts( details?: any ) {
         "S-Chain REGISTRATION", gInfoRegistrationCost.sc, details );
 }
 
-export function commandLineTaskRegister() {
+export function commandLineTaskRegister(): void {
     const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "Full registration(all steps)",
-        fn: async function() {
+        fn: async function(): Promise < boolean > {
             if( !imaState.bNoWaitSChainStarted )
                 await discoveryTools.waitUntilSChainStarted(); // registerAll
             return await registerAll( true );
@@ -151,11 +151,11 @@ export function commandLineTaskRegister() {
     } );
 }
 
-export function commandLineTaskRegister1() {
+export function commandLineTaskRegister1(): void {
     const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "Registration step 1, register S-Chain in deposit box",
-        fn: async function() {
+        fn: async function(): Promise < boolean > {
             if( !imaState.bNoWaitSChainStarted )
                 await discoveryTools.waitUntilSChainStarted(); // registerStep1
             return await registerStep1( true );
@@ -163,11 +163,11 @@ export function commandLineTaskRegister1() {
     } );
 }
 
-export function commandLineTaskCheckRegistration() {
+export function commandLineTaskCheckRegistration(): void {
     const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "Full registration status check(all steps)",
-        fn: async function() {
+        fn: async function(): Promise < boolean > {
             if( !imaState.bNoWaitSChainStarted )
                 await discoveryTools.waitUntilSChainStarted(); // checkRegistrationAll
             const b = await checkRegistrationAll();
@@ -179,11 +179,11 @@ export function commandLineTaskCheckRegistration() {
     } );
 }
 
-export function commandLineTaskCheckRegistration1() {
+export function commandLineTaskCheckRegistration1(): void {
     const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "Registration status check step 1, register S-Chain in deposit box",
-        fn: async function() {
+        fn: async function(): Promise < boolean > {
             if( !imaState.bNoWaitSChainStarted )
                 await discoveryTools.waitUntilSChainStarted(); // checkRegistrationStep1
             const b = await checkRegistrationStep1();
@@ -195,11 +195,11 @@ export function commandLineTaskCheckRegistration1() {
     } );
 }
 
-export function commandLineTaskMintErc20() {
+export function commandLineTaskMintErc20(): void {
     const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "mint ERC20",
-        fn: async function() {
+        fn: async function(): Promise < boolean > {
             let bMintIsOK = false;
             if( imaState.chainProperties.tc.strCoinNameErc20.length > 0 ) {
                 try {
@@ -230,11 +230,11 @@ export function commandLineTaskMintErc20() {
     } );
 }
 
-export function commandLineTaskMintErc721() {
+export function commandLineTaskMintErc721(): void {
     const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "mint ERC721",
-        fn: async function() {
+        fn: async function(): Promise < boolean > {
             let bMintIsOK = false;
             if( imaState.chainProperties.tc.strCoinNameErc721.length > 0 ) {
                 try {
@@ -276,11 +276,11 @@ export function commandLineTaskMintErc721() {
     } );
 }
 
-export function commandLineTaskMintErc1155() {
+export function commandLineTaskMintErc1155(): void {
     const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "mint ERC1155",
-        fn: async function() {
+        fn: async function(): Promise < boolean > {
             let bMintIsOK = false;
             if( imaState.chainProperties.tc.strCoinNameErc1155.length > 0 ) {
                 try {
@@ -325,11 +325,11 @@ export function commandLineTaskMintErc1155() {
     } );
 }
 
-export function commandLineTaskBurnErc20() {
+export function commandLineTaskBurnErc20(): void {
     const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "burn ERC20",
-        fn: async function() {
+        fn: async function(): Promise < boolean > {
             let bBurnIsOK = false;
             if( imaState.chainProperties.tc.strCoinNameErc20.length > 0 ) {
                 try {
@@ -362,11 +362,11 @@ export function commandLineTaskBurnErc20() {
     } );
 }
 
-export function commandLineTaskBurnErc721() {
+export function commandLineTaskBurnErc721(): void {
     const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "burn ERC721",
-        fn: async function() {
+        fn: async function(): Promise < boolean > {
             let bBurnIsOK = false;
             if( imaState.chainProperties.tc.strCoinNameErc721.length > 0 ) {
                 try {
@@ -407,11 +407,11 @@ export function commandLineTaskBurnErc721() {
     } );
 }
 
-export function commandLineTaskBurnErc1155() {
+export function commandLineTaskBurnErc1155(): void {
     const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "burn ERC1155",
-        fn: async function() {
+        fn: async function(): Promise < boolean > {
             let bBurnIsOK = false;
             if( imaState.chainProperties.tc.strCoinNameErc1155.length > 0 ) {
                 try {
@@ -458,7 +458,7 @@ export function commandLineTaskBurnErc1155() {
 
 export async function commandLineTaskShowBalanceEth(
     arrBalancesMN: any[], arrBalancesSC: any[], arrBalancesTC: any[]
-) {
+): Promise<void> {
     const imaState: state.TIMAState = state.get();
     let assetAddress: string | null = null;
     if( imaState.chainProperties.mn.ethersProvider ) {
@@ -521,7 +521,7 @@ export async function commandLineTaskShowBalanceEth(
 
 export async function commandLineTaskShowBalanceErc20(
     arrBalancesMN: any[], arrBalancesSC: any[], arrBalancesTC: any[]
-) {
+): Promise<void> {
     const imaState: state.TIMAState = state.get();
     let assetAddress = null;
     if( imaState.chainProperties.mn.ethersProvider &&
@@ -582,7 +582,7 @@ export async function commandLineTaskShowBalanceErc20(
 
 export async function commandLineTaskShowBalanceErc721(
     arrBalancesMN: any[], arrBalancesSC: any[], arrBalancesTC: any[], idTokens: any[]
-) {
+): Promise<void> {
     const imaState: state.TIMAState = state.get();
     let assetAddress = null;
     if( imaState.chainProperties.mn.ethersProvider &&
@@ -655,7 +655,7 @@ export async function commandLineTaskShowBalanceErc721(
 
 export async function commandLineTaskShowBalanceErc1155(
     arrBalancesMN: any[], arrBalancesSC: any[], arrBalancesTC: any[], idTokens: any[]
-) {
+): Promise<void> {
     const imaState: state.TIMAState = state.get();
     let assetAddress = null;
     if( imaState.chainProperties.mn.ethersProvider &&
@@ -726,11 +726,11 @@ export async function commandLineTaskShowBalanceErc1155(
     }
 }
 
-export function commandLineTaskShowBalance() {
+export function commandLineTaskShowBalance(): void {
     const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "show balance",
-        fn: async function() {
+        fn: async function(): Promise < boolean > {
             const arrBalancesMN: any = [];
             const arrBalancesSC: any = []; const arrBalancesTC: any = [];
             await commandLineTaskShowBalanceEth(
@@ -787,11 +787,11 @@ export function commandLineTaskShowBalance() {
     } );
 }
 
-export function commandLineTaskPaymentM2S() {
+export function commandLineTaskPaymentM2S(): void {
     const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "one M->S single payment",
-        fn: async function() {
+        fn: async function(): Promise < boolean > {
             if( imaState.chainProperties.mn.strCoinNameErc721.length > 0 ) {
                 // ERC721 payment
                 log.information( "one M->S single ERC721 payment: {}", imaState.idToken );
@@ -980,11 +980,11 @@ export function commandLineTaskPaymentM2S() {
     } );
 }
 
-export function commandLineTaskPaymentS2M() {
+export function commandLineTaskPaymentS2M(): void {
     const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "one S->M single payment",
-        fn: async function() {
+        fn: async function(): Promise < boolean > {
             if( imaState.chainProperties.sc.strCoinNameErc721.length > 0 ) {
                 // ERC721 payment
                 log.information( "one S->M single ERC721 payment: {}", imaState.idToken );
@@ -1175,11 +1175,11 @@ export function commandLineTaskPaymentS2M() {
     } );
 }
 
-export function commandLineTaskPaymentS2S() {
+export function commandLineTaskPaymentS2S(): void {
     const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "one S->S single payment",
-        fn: async function() {
+        fn: async function(): Promise < boolean > {
             const isForward = imaHelperAPIs.isForwardS2S();
             const sc = imaState.chainProperties.sc; const tc = imaState.chainProperties.tc;
             const ethersProviderSrc: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider | null =
@@ -1365,11 +1365,11 @@ export function commandLineTaskPaymentS2S() {
     } );
 }
 
-export function commandLineTaskReceiveS2M() {
+export function commandLineTaskReceiveS2M(): void {
     const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "receive one S->M single ETH payment",
-        fn: async function() {
+        fn: async function(): Promise < boolean > {
             log.information( "receive one S->M single ETH payment:" );
             if( !imaState.chainProperties.mn.ethersProvider )
                 throw new Error( "No provider for MN" );
@@ -1386,11 +1386,11 @@ export function commandLineTaskReceiveS2M() {
     } );
 }
 
-export function commandLineTaskViewS2M() {
+export function commandLineTaskViewS2M(): void {
     const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "view one S->M single ETH payment",
-        fn: async function() {
+        fn: async function(): Promise < boolean > {
             log.information( "view one S->M single ETH payment:" );
             log.information( "receive one S->M single ETH payment:" );
             if( !imaState.chainProperties.mn.ethersProvider )
@@ -1412,11 +1412,11 @@ export function commandLineTaskViewS2M() {
     } );
 }
 
-export function commandLineTaskTransferM2S() {
+export function commandLineTaskTransferM2S(): void {
     const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "single M->S transfer loop",
-        fn: async function() {
+        fn: async function(): Promise < boolean > {
             if( !imaState.bNoWaitSChainStarted )
                 await discoveryTools.waitUntilSChainStarted(); // main-net --> s-chain transfer
             const joRuntimeOpts: loop.TRuntimeOpts = {
@@ -1460,11 +1460,11 @@ export function commandLineTaskTransferM2S() {
     } );
 }
 
-export function commandLineTaskTransferS2M() {
+export function commandLineTaskTransferS2M(): void {
     const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "single S->M transfer loop",
-        fn: async function() {
+        fn: async function(): Promise < boolean > {
             if( !imaState.bNoWaitSChainStarted )
                 await discoveryTools.waitUntilSChainStarted(); // s-chain --> main-net transfer
             const joRuntimeOpts: loop.TRuntimeOpts = {
@@ -1508,11 +1508,11 @@ export function commandLineTaskTransferS2M() {
     } );
 }
 
-export function commandLineTaskTransferS2S() {
+export function commandLineTaskTransferS2S(): void {
     const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "single S->S transfer loop",
-        fn: async function() {
+        fn: async function(): Promise < boolean > {
             if( !imaState.optsS2S.isEnabled )
                 return true;
             if( !imaState.bNoWaitSChainStarted )
@@ -1550,11 +1550,11 @@ export function commandLineTaskTransferS2S() {
     } );
 }
 
-export function commandLineTaskTransfer() {
+export function commandLineTaskTransfer(): void {
     const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "Single M<->S transfer loop iteration",
-        fn: async function() {
+        fn: async function(): Promise < boolean > {
             if( !imaState.bNoWaitSChainStarted )
                 await discoveryTools.waitUntilSChainStarted();
             const joRuntimeOpts: loop.TRuntimeOpts = {
@@ -1575,11 +1575,11 @@ export function commandLineTaskTransfer() {
     } );
 }
 
-export function commandLineTaskLoop() {
+export function commandLineTaskLoop(): void {
     const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "M<->S and S->S transfer loop, startup in parallel mode",
-        fn: async function() {
+        fn: async function(): Promise < boolean > {
             state.setPreventExitAfterLastAction( true );
             if( !imaState.bNoWaitSChainStarted )
                 await discoveryTools.waitUntilSChainStarted(); // M<->S transfer loop
@@ -1600,11 +1600,11 @@ export function commandLineTaskLoop() {
     } );
 }
 
-export function commandLineTaskLoopSimple() {
+export function commandLineTaskLoopSimple(): void {
     const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "M<->S and S->S transfer loop, startup simple mode",
-        fn: async function() {
+        fn: async function(): Promise < boolean > {
             state.setPreventExitAfterLastAction( true );
             if( !imaState.bNoWaitSChainStarted )
                 await discoveryTools.waitUntilSChainStarted(); // M<->S transfer loop
@@ -1635,7 +1635,8 @@ export function commandLineTaskLoopSimple() {
 }
 
 async function handleBrowseSkaleModesRpcInfoResult(
-    strLogPrefix: string, joCall: rpcCall.TRPCCall, joIn: any, joOut: any ) {
+    strLogPrefix: string, joCall: rpcCall.TRPCCall, joIn: any, joOut: any
+): Promise<void> {
     const imaState: state.TIMAState = state.get();
     log.information( "{p}S-Chain network information: {}",
         strLogPrefix, joOut.result );
@@ -1670,7 +1671,7 @@ async function handleBrowseSkaleModesRpcInfoResult(
             process.exit( 159 );
         }
     }
-    const iv = setInterval( function() {
+    const iv = setInterval( function(): void {
         if( nCountReceivedImaDescriptions == jarrNodes.length ) {
             clearInterval( iv );
             process.exit( 0 );
@@ -1679,12 +1680,12 @@ async function handleBrowseSkaleModesRpcInfoResult(
     await joCall.disconnect();
 }
 
-export function commandLineTaskBrowseSChain() {
+export function commandLineTaskBrowseSChain(): void {
     const imaState: state.TIMAState = state.get();
     imaState.bIsNeededCommonInit = false;
     imaState.arrActions.push( {
         name: "Browse S-Chain network",
-        fn: async function() {
+        fn: async function(): Promise < boolean > {
             const strLogPrefix = "S-Chain Browse: ";
             if( imaState.chainProperties.sc.strURL.length === 0 ) {
                 log.fatal( "Missing S-Chain URL, please specify {}", "--url-s-chain" );
@@ -1715,11 +1716,11 @@ export function commandLineTaskBrowseSChain() {
     } );
 }
 
-export function commandLineTaskReimbursementShowBalance() {
+export function commandLineTaskReimbursementShowBalance(): void {
     const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "Gas Reimbursement - Show Balance",
-        fn: async function() {
+        fn: async function(): Promise < boolean > {
             if( !imaState.chainProperties.mn.ethersProvider )
                 throw new Error( "No provider for MN" );
             if( !imaState.joCommunityPool )
@@ -1739,11 +1740,11 @@ export function commandLineTaskReimbursementShowBalance() {
     } );
 }
 
-export function commandLineTaskReimbursementEstimateAmount() {
+export function commandLineTaskReimbursementEstimateAmount(): void {
     const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "Gas Reimbursement - Estimate Amount",
-        fn: async function() {
+        fn: async function(): Promise < boolean > {
             if( !imaState.chainProperties.mn.ethersProvider )
                 throw new Error( "No provider for MN" );
             if( !imaState.joCommunityPool )
@@ -1763,11 +1764,11 @@ export function commandLineTaskReimbursementEstimateAmount() {
     } );
 }
 
-export function commandLineTaskReimbursementRecharge() {
+export function commandLineTaskReimbursementRecharge(): void {
     const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "Gas Reimbursement - Recharge User Wallet",
-        fn: async function() {
+        fn: async function(): Promise < boolean > {
             if( !imaState.chainProperties.mn.ethersProvider )
                 throw new Error( "No provider for MN" );
             if( !imaState.joCommunityPool )
@@ -1787,11 +1788,11 @@ export function commandLineTaskReimbursementRecharge() {
     } );
 }
 
-export function commandLineTaskReimbursementWithdraw() {
+export function commandLineTaskReimbursementWithdraw(): void {
     const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "Gas Reimbursement - Withdraw User Wallet",
-        fn: async function() {
+        fn: async function(): Promise < boolean > {
             if( !imaState.chainProperties.mn.ethersProvider )
                 throw new Error( "No provider for MN" );
             if( !imaState.joCommunityPool )
@@ -1811,11 +1812,11 @@ export function commandLineTaskReimbursementWithdraw() {
     } );
 }
 
-export function commandLineTaskReimbursementSetRange() {
+export function commandLineTaskReimbursementSetRange(): void {
     const imaState: state.TIMAState = state.get();
     imaState.arrActions.push( {
         name: "Gas Reimbursement - Set Minimal time interval from S2M and S2S transfers",
-        fn: async function() {
+        fn: async function(): Promise < boolean > {
             if( !imaState.chainProperties.sc.ethersProvider )
                 throw new Error( "No provider for SC" );
             if( !imaState.joCommunityLocker )

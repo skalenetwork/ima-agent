@@ -168,7 +168,8 @@ export function checkTimeFraming(
     return true;
 };
 
-async function singleTransferLoopPartOracle( optsLoop: TLoopOptions, strLogPrefix: string ) {
+async function singleTransferLoopPartOracle(
+    optsLoop: TLoopOptions, strLogPrefix: string ): Promise<boolean> {
     const imaState: state.TIMAState = state.get();
     let b0 = true;
     if( optsLoop.enableStepOracle && imaOracleOperations.getEnabledOracle() ) {
@@ -219,7 +220,8 @@ async function singleTransferLoopPartOracle( optsLoop: TLoopOptions, strLogPrefi
     return b0;
 }
 
-async function singleTransferLoopPartM2S( optsLoop: TLoopOptions, strLogPrefix: string ) {
+async function singleTransferLoopPartM2S(
+    optsLoop: TLoopOptions, strLogPrefix: string ): Promise<boolean> {
     const imaState: state.TIMAState = state.get();
     let b1 = true;
     if( optsLoop.enableStepM2S ) {
@@ -288,7 +290,8 @@ async function singleTransferLoopPartM2S( optsLoop: TLoopOptions, strLogPrefix: 
     return b1;
 }
 
-async function singleTransferLoopPartS2M( optsLoop: TLoopOptions, strLogPrefix: string ) {
+async function singleTransferLoopPartS2M(
+    optsLoop: TLoopOptions, strLogPrefix: string ): Promise<boolean> {
     const imaState: state.TIMAState = state.get();
     let b2 = true;
     if( optsLoop.enableStepS2M ) {
@@ -362,7 +365,8 @@ async function singleTransferLoopPartS2M( optsLoop: TLoopOptions, strLogPrefix: 
     return b2;
 }
 
-async function singleTransferLoopPartS2S( optsLoop: TLoopOptions, strLogPrefix: string ) {
+async function singleTransferLoopPartS2S(
+    optsLoop: TLoopOptions, strLogPrefix: string ): Promise<boolean> {
     const imaState: state.TIMAState = state.get();
     let b3 = true;
     if( optsLoop.enableStepS2S && imaState.optsS2S.isEnabled ) {
@@ -405,12 +409,13 @@ async function singleTransferLoopPartS2S( optsLoop: TLoopOptions, strLogPrefix: 
     return b3;
 }
 
-function printLoopPartSkippedWarning( strLoopPartName: string ) {
+function printLoopPartSkippedWarning( strLoopPartName: string ): void {
     log.warning( "Skipped {} transfer loop part due to other single transfer loop is in " +
         "progress right now", strLoopPartName );
 }
 
-export async function singleTransferLoop( optsLoop: TLoopOptions ) {
+export async function singleTransferLoop(
+    optsLoop: TLoopOptions ): Promise<boolean> {
     const imaState: state.TIMAState = state.get();
     const strLogPrefix = `Single Loop in ${threadInfo.threadDescription( false )} `;
     try {
@@ -471,19 +476,22 @@ export async function singleTransferLoop( optsLoop: TLoopOptions ) {
     imaState.loopState.s2s.isInProgress = false;
     return false;
 }
-export async function singleTransferLoopWithRepeat( optsLoop: TLoopOptions ) {
+export async function singleTransferLoopWithRepeat(
+    optsLoop: TLoopOptions ): Promise<void> {
     const imaState: state.TIMAState = state.get();
     await singleTransferLoop( optsLoop );
-    setTimeout( function() {
-        singleTransferLoopWithRepeat( optsLoop ).then( function() {} ).catch( function() {} );
+    setTimeout( function(): void {
+        singleTransferLoopWithRepeat( optsLoop )
+            .then( function(): void {} ).catch( function(): void {} );
     }, imaState.nLoopPeriodSeconds * 1000 );
 };
-export async function runTransferLoop( optsLoop: TLoopOptions ) {
+export async function runTransferLoop( optsLoop: TLoopOptions ): Promise<boolean> {
     const imaState: state.TIMAState = state.get();
     const isDelayFirstRun = owaspUtils.toBoolean( optsLoop.isDelayFirstRun );
     if( isDelayFirstRun ) {
-        setTimeout( function() {
-            singleTransferLoopWithRepeat( optsLoop ).then( function() {} ).catch( function() {} );
+        setTimeout( function(): void {
+            singleTransferLoopWithRepeat( optsLoop )
+                .then( function(): void {} ).catch( function(): void {} );
         }, imaState.nLoopPeriodSeconds * 1000 );
     } else
         await singleTransferLoopWithRepeat( optsLoop );
@@ -495,7 +503,7 @@ export async function runTransferLoop( optsLoop: TLoopOptions ) {
 const gArrWorkers: worker_threads.Worker[] = [];
 const gArrClients: networkLayer.OutOfWorkerSocketClientPipe[] = [];
 
-function constructChainProperties( opts: TParallelLoopRunOptions ) {
+function constructChainProperties( opts: TParallelLoopRunOptions ): any {
     return {
         mn: {
             joAccount: {
@@ -581,7 +589,7 @@ interface TWorkerData {
     }
 }
 
-export async function ensureHaveWorkers( opts: TParallelLoopRunOptions ) {
+export async function ensureHaveWorkers( opts: TParallelLoopRunOptions ): Promise<any> {
     if( gArrWorkers.length > 0 )
         return gArrWorkers;
     const cntWorkers = 2;
@@ -746,7 +754,7 @@ export async function ensureHaveWorkers( opts: TParallelLoopRunOptions ) {
         gArrWorkers.length, " worker(s) in ", threadInfo.threadDescription() );
 }
 
-export async function runParallelLoops( opts: TParallelLoopRunOptions ) {
+export async function runParallelLoops( opts: TParallelLoopRunOptions ): Promise<boolean> {
     log.notice( "Will start parallel IMA transfer loops in {}...", threadInfo.threadDescription() );
     await ensureHaveWorkers( opts );
     log.success( "Done, did started parallel IMA transfer loops in {}, have {} worker(s) and {} " +
@@ -754,7 +762,7 @@ export async function runParallelLoops( opts: TParallelLoopRunOptions ) {
     return true;
 }
 
-export async function spreadArrivedStateOfPendingWorkAnalysis( joMessage: any ) {
+export async function spreadArrivedStateOfPendingWorkAnalysis( joMessage: any ): Promise<void> {
     if( !( joMessage && typeof joMessage === "object" &&
         "method" in joMessage && joMessage.method == "skale_imaNotifyLoopWork" )
     )
@@ -764,7 +772,7 @@ export async function spreadArrivedStateOfPendingWorkAnalysis( joMessage: any ) 
         gArrClients[idxWorker].send( joMessage );
 }
 
-export async function spreadUpdatedSChainNetwork( isFinal: boolean ) {
+export async function spreadUpdatedSChainNetwork( isFinal: boolean ): Promise<void> {
     const imaState: state.TIMAState = state.get();
     const joMessage: any = {
         method: "spreadUpdatedSChainNetwork",

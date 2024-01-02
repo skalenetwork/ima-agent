@@ -81,14 +81,15 @@ const gSecondsConnectionTimeout = 60;
 export type TFunctionWsStep = ( nStep: number ) => Promise < boolean >;
 export type TFunctionWsDone = ( nStep: number ) => Promise < void >;
 
-export async function waitWebSocketIsOpen( socket: ws.WebSocket,
-    fnDone?: TFunctionWsDone, fnStep?: TFunctionWsStep ) {
+export async function waitWebSocketIsOpen(
+    socket: ws.WebSocket, fnDone?: TFunctionWsDone, fnStep?: TFunctionWsStep
+): Promise<void> {
     fnDone = fnDone || async function( nStep: number ) { };
     fnStep = fnStep || async function( nStep: number ) { return true; };
     let nStep = 0;
     const promiseComplete = new Promise( function( resolve, reject ) {
         let isInsideAsyncHandler = false;
-        const fnAsyncHandler = async function() {
+        const fnAsyncHandler = async function(): Promise < void > {
             if( isInsideAsyncHandler )
                 return;
             isInsideAsyncHandler = true;
@@ -111,7 +112,7 @@ export async function waitWebSocketIsOpen( socket: ws.WebSocket,
             }
             isInsideAsyncHandler = false;
         };
-        const iv = setInterval( function() {
+        const iv = setInterval( function(): void {
             if( isInsideAsyncHandler )
                 return;
             fnAsyncHandler().then( () => { } ).catch( () => { } );
@@ -121,7 +122,8 @@ export async function waitWebSocketIsOpen( socket: ws.WebSocket,
 }
 
 export async function doConnect(
-    joCall: TRPCCall, opts: TRPCCallOpts | null, fn?: TFunctionConnectionResultHandler ) {
+    joCall: TRPCCall, opts: TRPCCallOpts | null, fn?: TFunctionConnectionResultHandler
+): Promise<TRPCCall> {
     try {
         if( !validateURL( joCall.url ) ) {
             throw new Error( "JSON RPC CALLER cannot connect web socket " +
@@ -130,11 +132,11 @@ export async function doConnect(
         if( isUrlWS( joCall.url ) ) {
             let strWsError: string = "";
             joCall.wsConn = new ws.WebSocket( joCall.url );
-            joCall.wsConn.on( "open", function() {
+            joCall.wsConn.on( "open", function(): void {
                 if( fn )
-                    fn( joCall, null ).then( function() {} ).catch( function() {} );
+                    fn( joCall, null ).then( function(): void {} ).catch( function(): void {} );
             } );
-            joCall.wsConn.on( "close", function() {
+            joCall.wsConn.on( "close", function(): void {
                 strWsError =
                     "web socket was closed, please check provided URL is valid and accessible";
                 joCall.wsConn = null;
@@ -146,7 +148,8 @@ export async function doConnect(
                 joCall.wsConn = null;
                 if( wsConn )
                     wsConn.close();
-                doReconnectWsStep( joCall, opts ).then( function() {} ).catch( function() {} );
+                doReconnectWsStep( joCall, opts )
+                    .then( function(): void {} ).catch( function(): void {} );
             } );
             joCall.wsConn.on( "fail", function( err: Error | string ) {
                 strWsError = err.toString() || "internal web socket failure";
@@ -155,7 +158,8 @@ export async function doConnect(
                 joCall.wsConn = null;
                 if( wsConn )
                     wsConn.close();
-                doReconnectWsStep( joCall, opts ).then( function() {} ).catch( function() {} );
+                doReconnectWsStep( joCall, opts )
+                    .then( function(): void {} ).catch( function(): void {} );
             } );
             joCall.wsConn.on( "message", function incoming( data: any ) {
                 const joOut = JSON.parse( data );
@@ -170,7 +174,7 @@ export async function doConnect(
                         clearTimeout( entry.out );
                         if( entry.fn ) {
                             entry.fn( entry.joIn, joOut, null )
-                                .then( function() {} ).catch( function() {} );
+                                .then( function(): void {} ).catch( function(): void {} );
                         }
                     }
                 }
@@ -192,7 +196,7 @@ export async function doConnect(
                         if( wsConn )
                             wsConn.close();
                         doReconnectWsStep( joCall, opts )
-                            .then( function() {} ).catch( function() {} );
+                            .then( function(): void {} ).catch( function(): void {} );
                         return false; // stop waiting
                     }
                     return true; // continue waiting
@@ -201,7 +205,7 @@ export async function doConnect(
                 const err = new Error( strWsError );
                 if( fn )
                     await fn( joCall, err );
-                return;
+                return joCall;
             }
         }
         if( fn )
@@ -215,7 +219,8 @@ export async function doConnect(
 }
 
 export async function doConnectIfNeeded(
-    joCall: TRPCCall, opts: TRPCCallOpts | null, fn: TFunctionConnectionResultHandler ) {
+    joCall: TRPCCall, opts: TRPCCallOpts | null, fn: TFunctionConnectionResultHandler
+): Promise<TRPCCall> {
     try {
         if( !validateURL( joCall.url ) ) {
             throw new Error( "JSON RPC CALLER cannot connect web socket " +
@@ -223,7 +228,7 @@ export async function doConnectIfNeeded(
         }
         if( isUrlWS( joCall.url ) && ( !joCall.wsConn ) ) {
             await joCall.reconnect( fn );
-            return;
+            return joCall;
         }
         if( fn )
             await fn( joCall, null );
@@ -235,7 +240,7 @@ export async function doConnectIfNeeded(
 }
 
 async function doReconnectWsStep( joCall: TRPCCall, opts: TRPCCallOpts | null,
-    fn?: TFunctionConnectionResultHandler ) {
+    fn?: TFunctionConnectionResultHandler ): Promise<void> {
     if( !joCall.isAutoReconnect )
         return;
     if( joCall.isDisconnectMode )
@@ -243,15 +248,16 @@ async function doReconnectWsStep( joCall: TRPCCall, opts: TRPCCallOpts | null,
     doConnect( joCall, opts, async function( joCall: TRPCCall, err: Error | string | null ) {
         if( err ) {
             doReconnectWsStep( joCall, opts )
-                .then( function() {} ).catch( function() {} );
+                .then( function(): void {} ).catch( function(): void {} );
             return;
         }
         if( fn )
             await fn( joCall, null );
-    } ).then( function() {} ).catch( function() {} );
+    } ).then( function(): void {} ).catch( function(): void {} );
 }
 
-async function doDisconnect( joCall: TRPCCall, fn?: TFunctionConnectionResultHandler ) {
+async function doDisconnect(
+    joCall: TRPCCall, fn?: TFunctionConnectionResultHandler ): Promise<void> {
     try {
         joCall.isDisconnectMode = true;
         const wsConn = joCall.wsConn ? joCall.wsConn : null;
@@ -270,7 +276,8 @@ async function doDisconnect( joCall: TRPCCall, fn?: TFunctionConnectionResultHan
     }
 }
 
-export async function doCall( joCall: TRPCCall, joIn: any, fn: TFunctionCallResultHandler ) {
+export async function doCall(
+    joCall: TRPCCall, joIn: any, fn: TFunctionCallResultHandler ): Promise <void> {
     joIn = enrichTopLevelFieldsInJSON( joIn );
     if( joCall.wsConn ) {
         const entry: TCallHandlerEntry = {
@@ -279,7 +286,7 @@ export async function doCall( joCall: TRPCCall, joIn: any, fn: TFunctionCallResu
             out: null
         };
         joCall.mapPendingByCallID.set( joIn.id, entry );
-        entry.iv = setTimeout( function() {
+        entry.iv = setTimeout( function(): void {
             if( entry.iv )
                 clearTimeout( entry.iv );
             entry.iv = null;
@@ -329,7 +336,7 @@ export async function doCall( joCall: TRPCCall, joIn: any, fn: TFunctionCallResu
                         res.on( "data", function( body: any ) {
                             accumulatedBody += body;
                         } );
-                        res.on( "end", function() {
+                        res.on( "end", function(): void {
                             if( res.statusCode !== 200 ) {
                                 joOut = null;
                                 errCall = "Response ends with bad status code: " +
@@ -415,7 +422,8 @@ export async function doCall( joCall: TRPCCall, joIn: any, fn: TFunctionCallResu
     }
 }
 
-export async function rpcCallCreate( strURL: string, opts: TRPCCallOpts | null ) {
+export async function rpcCallCreate(
+    strURL: string, opts: TRPCCallOpts | null ): Promise <TRPCCall> {
     if( !validateURL( strURL ) )
         throw new Error( `JSON RPC CALLER cannot create a call object invalid URL: ${strURL}` );
     if( !( strURL && typeof strURL === "string" && strURL.length > 0 ) ) {
@@ -459,7 +467,7 @@ export async function rpcCallCreate( strURL: string, opts: TRPCCallOpts | null )
                             log.error(
                                 "{url} JSON RPC call(performer) error: {err}", strURL, err );
                         } );
-                    } ).then( function() {} ).catch( function() {} ); ;
+                    } ).then( function(): void {} ).catch( function(): void {} ); ;
             } );
             return await promiseComplete.catch( function( err: Error | string ) {
                 log.error(
@@ -476,17 +484,17 @@ export async function rpcCallCreate( strURL: string, opts: TRPCCallOpts | null )
 
 export { rpcCallCreate as create };
 
-export function generateRandomIntegerInRange( min: any, max: any ) {
+export function generateRandomIntegerInRange( min: any, max: any ): number {
     min = Math.ceil( min );
     max = Math.floor( max );
     return Math.floor( Math.random() * ( max - min + 1 ) ) + min;
 }
 
-export function generateRandomRpcCallId() {
+export function generateRandomRpcCallId(): number {
     return generateRandomIntegerInRange( 1, Number.MAX_SAFE_INTEGER );
 }
 
-export function enrichTopLevelFieldsInJSON( jo: any ) {
+export function enrichTopLevelFieldsInJSON( jo: any ): any {
     if( ( !( "jsonrpc" in jo ) ) ||
         ( typeof jo.jsonrpc !== "string" ) ||
         jo.jsonrpc.length === 0
@@ -497,7 +505,7 @@ export function enrichTopLevelFieldsInJSON( jo: any ) {
     return jo;
 }
 
-export function isValidUrl( s: any ) {
+export function isValidUrl( s: any ): boolean {
     if( !s )
         return false;
     try {
@@ -509,7 +517,7 @@ export function isValidUrl( s: any ) {
     return false;
 }
 
-export function getValidUrl( s: any ) {
+export function getValidUrl( s: any ): URL | null {
     if( !s )
         return null;
     try {
@@ -519,7 +527,7 @@ export function getValidUrl( s: any ) {
     return null;
 }
 
-export function getDefaultPort( strProtocol: any ) {
+export function getDefaultPort( strProtocol: any ): number {
     if( !strProtocol )
         return 80;
     switch ( strProtocol.toString().toLowerCase() ) {
@@ -533,7 +541,7 @@ export function getDefaultPort( strProtocol: any ) {
     return 80;
 }
 
-export function getValidHostAndPort( s: any ) {
+export function getValidHostAndPort( s: any ): any {
     const u = getValidUrl( s );
     if( !u )
         return null;
@@ -546,9 +554,10 @@ export function getValidHostAndPort( s: any ) {
 
 const gStrTcpConnectionHeader: string = "TCP connection checker: ";
 
-export async function checkTcpPromise( strHost: string, nPort: number, nTimeoutMilliseconds: number,
-    isLog?: boolean ) {
-    return await new Promise( ( resolve, reject ) => {
+export async function checkTcpPromise(
+    strHost: string, nPort: number, nTimeoutMilliseconds: number, isLog?: boolean
+): Promise <boolean> {
+    return await new Promise<boolean>( ( resolve, reject ) => {
         if( isLog ) {
             console.log(
                 `${gStrTcpConnectionHeader}Will establish ` +
@@ -610,21 +619,22 @@ export async function checkTcpPromise( strHost: string, nPort: number, nTimeoutM
     } );
 }
 
-export async function checkTcp( strHost: string, nPort: number, nTimeoutMilliseconds: number,
-    isLog?: boolean ) {
+export async function checkTcp(
+    strHost: string, nPort: number, nTimeoutMilliseconds: number, isLog?: boolean
+): Promise <boolean> {
     let isOnline = false;
     try {
         const promiseCompleteTcpCheck = checkTcpPromise(
             strHost, nPort, nTimeoutMilliseconds, isLog )
-            .then( function() { isOnline = true; } )
-            .catch( function() { isOnline = false; } );
+            .then( function(): void { isOnline = true; } )
+            .catch( function(): void { isOnline = false; } );
 
         if( isLog ) {
             console.log(
                 `${gStrTcpConnectionHeader}Waiting for ` +
                 `TCP connection to ${strHost}:${nPort} check done...` );
         }
-        await promiseCompleteTcpCheck.catch( function() { isOnline = false; } );
+        await promiseCompleteTcpCheck.catch( function(): void { isOnline = false; } );
         if( isLog ) {
             console.log(
                 `${gStrTcpConnectionHeader}TCP connection ` +
@@ -639,7 +649,8 @@ export async function checkTcp( strHost: string, nPort: number, nTimeoutMillisec
     return isOnline;
 }
 
-export async function checkUrl( u: URL | string, nTimeoutMilliseconds: number, isLog?: boolean ) {
+export async function checkUrl(
+    u: URL | string, nTimeoutMilliseconds: number, isLog?: boolean ): Promise <boolean> {
     if( !u )
         return false;
     const jo = getValidHostAndPort( u );

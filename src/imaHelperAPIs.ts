@@ -53,7 +53,7 @@ export function setSleepBetweenTransactionsOnSChainMilliseconds( val?: number ):
 export function getWaitForNextBlockOnSChain(): boolean {
     return ( !!gFlagWaitForNextBlockOnSChain );
 }
-export function setWaitForNextBlockOnSChain( val: any ) {
+export function setWaitForNextBlockOnSChain( val: any ): void {
     gFlagWaitForNextBlockOnSChain = ( !!val );
 }
 
@@ -62,7 +62,8 @@ export const currentTimestamp = (): number => {
 };
 
 export async function safeWaitForNextBlockToAppear(
-    details: log.TLogger, ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider ) {
+    details: log.TLogger, ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider
+): Promise<void> {
     const nBlockNumber: any =
         owaspUtils.toBN( await safeGetBlockNumber( details, 10, ethersProvider ) );
     details.trace( "Waiting for next block to appear..." );
@@ -81,7 +82,7 @@ export async function safeGetBlockNumber(
     details: log.TLogger, cntAttempts: number,
     ethersProvider: owaspUtils.ethersMod.providers.JsonRpcProvider,
     retValOnFail?: any, throwIfServerOffline?: boolean
-) {
+): Promise<any> {
     const strFnName: string = "getBlockNumber";
     const u: string = owaspUtils.ethersProviderToUrl( ethersProvider );
     const nWaitStepMilliseconds = 10 * 1000;

@@ -85,7 +85,7 @@ function constructChainProperties(): TPropertiesOfChains {
                 privateKey:
                     owaspUtils.toEthPrivateKey( process.env.PRIVATE_KEY_FOR_ETHEREUM ),
                 address:
-                    function() { return owaspUtils.fnAddressImpl_( this ); },
+                    function(): string { return owaspUtils.fnAddressImpl_( this ); },
                 strTransactionManagerURL:
                     owaspUtils.toStringURL(
                         process.env.TRANSACTION_MANAGER_URL_ETHEREUM ),
@@ -124,7 +124,7 @@ function constructChainProperties(): TPropertiesOfChains {
                 privateKey:
                     owaspUtils.toEthPrivateKey( process.env.PRIVATE_KEY_FOR_SCHAIN ),
                 address:
-                    function() { return owaspUtils.fnAddressImpl_( this ); },
+                    function(): string { return owaspUtils.fnAddressImpl_( this ); },
                 strTransactionManagerURL:
                     owaspUtils.toStringURL( process.env.TRANSACTION_MANAGER_URL_S_CHAIN ),
                 nTmPriority:
@@ -162,7 +162,7 @@ function constructChainProperties(): TPropertiesOfChains {
                 privateKey:
                     owaspUtils.toEthPrivateKey( process.env.PRIVATE_KEY_FOR_SCHAIN_TARGET ),
                 address:
-                    function() { return owaspUtils.fnAddressImpl_( this ); },
+                    function(): string { return owaspUtils.fnAddressImpl_( this ); },
                 strTransactionManagerURL:
                     owaspUtils.toStringURL(
                         process.env.TRANSACTION_MANAGER_URL_S_CHAIN_TARGET ),
@@ -516,17 +516,17 @@ export function get(): TIMAState {
     return imaState;
 }
 
-export function set( imaStateNew: TIMAState ) {
+export function set( imaStateNew: TIMAState ): void {
     imaState = imaStateNew;
     return imaState;
 }
 
 let gFlagIsPreventExitAfterLastAction = false;
 
-export function isPreventExitAfterLastAction() {
+export function isPreventExitAfterLastAction(): boolean {
     return gFlagIsPreventExitAfterLastAction;
 }
 
-export function setPreventExitAfterLastAction( isPrevent: any ) {
+export function setPreventExitAfterLastAction( isPrevent: any ): void {
     gFlagIsPreventExitAfterLastAction = ( !!isPrevent )
 }

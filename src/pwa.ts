@@ -73,7 +73,7 @@ function composeEmptyStateForPendingWorkAnalysis(): any {
 }
 
 function getNodeProgressAndTimestamp(
-    joNode: discoveryTools.TSChainNode, strLoopWorkType: string, nIndexS2S: number ) {
+    joNode: discoveryTools.TSChainNode, strLoopWorkType: string, nIndexS2S: number ): any {
     if( !( "pwaState" in joNode ) )
         joNode.pwaState = composeEmptyStateForPendingWorkAnalysis();
     strLoopWorkType = strLoopWorkType.toLowerCase();
@@ -90,7 +90,8 @@ function getNodeProgressAndTimestamp(
 }
 
 export async function checkOnLoopStart(
-    imaState: state.TIMAState, strLoopWorkType: string, nIndexS2S?: number ) {
+    imaState: state.TIMAState, strLoopWorkType: string, nIndexS2S?: number
+): Promise<boolean> {
     try {
         nIndexS2S = nIndexS2S || 0; // convert to number if undefined
         if( !checkLoopWorkTypeStringIsCorrect( strLoopWorkType ) )
@@ -158,7 +159,7 @@ export async function checkOnLoopStart(
 export async function handleLoopStateArrived(
     imaState: state.TIMAState, nNodeNumber: number, strLoopWorkType: string, nIndexS2S: number,
     isStart: boolean, ts: any, signature: any
-) {
+): Promise<boolean> {
     const se = isStart ? "start" : "end";
     let isSuccess = false;
     let joNode: any = null;
@@ -208,7 +209,8 @@ export async function handleLoopStateArrived(
 }
 
 async function notifyOnLoopImpl(
-    imaState: state.TIMAState, strLoopWorkType: string, isStart: boolean, nIndexS2S?: number ) {
+    imaState: state.TIMAState, strLoopWorkType: string, isStart: boolean, nIndexS2S?: number
+): Promise<boolean> {
     const se = isStart ? "start" : "end";
     try {
         nIndexS2S = nIndexS2S || 0; // convert to number if undefined
@@ -280,11 +282,13 @@ async function notifyOnLoopImpl(
 }
 
 export async function notifyOnLoopStart(
-    imaState: state.TIMAState, strLoopWorkType: string, nIndexS2S?: number ) {
+    imaState: state.TIMAState, strLoopWorkType: string, nIndexS2S?: number
+): Promise<boolean> {
     return await notifyOnLoopImpl( imaState, strLoopWorkType, true, nIndexS2S );
 }
 
 export async function notifyOnLoopEnd(
-    imaState: state.TIMAState, strLoopWorkType: string, nIndexS2S?: number ) {
+    imaState: state.TIMAState, strLoopWorkType: string, nIndexS2S?: number
+): Promise<boolean> {
     return await notifyOnLoopImpl( imaState, strLoopWorkType, false, nIndexS2S );
 }

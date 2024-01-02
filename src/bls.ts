@@ -426,7 +426,7 @@ function performBlsGlue(
     const strActionDir = allocBlsTmpActionDir();
     details.trace( "{p}{sunny} will work in {} director with {} sign results...",
         strLogPrefix, "performBlsGlue", strActionDir, arrSignResults.length );
-    const fnShellRestore = function() {
+    const fnShellRestore = function(): void {
         shell.rm( "-rf", strActionDir );
     };
     const strOutput = ""
@@ -516,7 +516,7 @@ function performBlsGlueU256( details: log.TLogger, u256: any, arrSignResults: an
     const strActionDir = allocBlsTmpActionDir();
     details.trace( "{p}performBlsGlueU256 will work in {} director with {} sign results...",
         strLogPrefix, strActionDir, arrSignResults.length );
-    const fnShellRestore = function() {
+    const fnShellRestore = function(): void {
         shell.rm( "-rf", strActionDir );
     };
     let strOutput = "";
@@ -608,7 +608,7 @@ function performBlsVerifyI(
         nThreshold, nParticipants, "BLS verify-I", details ) )
         return false;
     const strActionDir = allocBlsTmpActionDir();
-    const fnShellRestore = function() {
+    const fnShellRestore = function(): void {
         shell.rm( "-rf", strActionDir );
     };
     let strOutput = "";
@@ -676,7 +676,7 @@ function performBlsVerifyIU256(
         nThreshold, nParticipants, "BLS verify-I-U256", details ) )
         return false;
     const strActionDir = allocBlsTmpActionDir();
-    const fnShellRestore = function() {
+    const fnShellRestore = function(): void {
         shell.rm( "-rf", strActionDir );
     };
     let strOutput = "";
@@ -733,7 +733,7 @@ function performBlsVerify(
         nThreshold, nParticipants, "BLS verify", details ) )
         return false;
     const strActionDir = allocBlsTmpActionDir();
-    const fnShellRestore = function() {
+    const fnShellRestore = function(): void {
         shell.rm( "-rf", strActionDir );
     };
     let strOutput = "";
@@ -805,7 +805,7 @@ function performBlsVerifyU256(
         nThreshold, nParticipants, "BLS verify-U256", details ) )
         return false;
     const strActionDir = allocBlsTmpActionDir();
-    const fnShellRestore = function() {
+    const fnShellRestore = function(): void {
         shell.rm( "-rf", strActionDir );
     };
     let strOutput = "";
@@ -857,7 +857,7 @@ async function checkCorrectnessOfMessagesToSign(
     details: log.TLogger, strLogPrefix: string, strDirection: string,
     jarrMessages: any[], nIdxCurrentMsgBlockStart: number,
     joExtraSignOpts?: loop.TExtraSignOpts | null
-) {
+): Promise < void > {
     const imaState: state.TIMAState = state.get();
     let joMessageProxy: owaspUtils.ethersMod.ethers.Contract | null = null;
     let joAccount: state.TAccount | null = null;
@@ -952,8 +952,15 @@ async function checkCorrectnessOfMessagesToSign(
         details.success( "{p}Correctness validation passed for {} message(s)", strLogPrefix, cnt );
 }
 
-async function prepareSignMessagesImpl( optsSignOperation: TSignOperationOptions ) {
-    optsSignOperation.fn = optsSignOperation.fn || function() {};
+async function prepareSignMessagesImpl(
+    optsSignOperation: TSignOperationOptions ): Promise < boolean > {
+    optsSignOperation.fn = optsSignOperation.fn ||
+        // eslint-disable-next-line n/handle-callback-err
+        async function(
+            err: Error | string | null,
+            jarrMessages: any[],
+            joGlueResult: any | null
+        ): Promise < void > {};
     optsSignOperation.sequenceId =
         owaspUtils.removeStarting0x(
             owaspUtils.ethersMod.ethers.utils.id( log.generateTimestampString( null, false ) )
@@ -1035,7 +1042,8 @@ async function prepareSignMessagesImpl( optsSignOperation: TSignOperationOptions
     return true;
 }
 
-async function gatherSigningCheckFinish( optsSignOperation: TSignOperationOptions ) {
+async function gatherSigningCheckFinish(
+    optsSignOperation: TSignOperationOptions ): Promise < boolean > {
     const cntSuccess = optsSignOperation.arrSignResults.length;
     if( optsSignOperation.joGatheringTracker.nCountReceivedPrevious !=
         optsSignOperation.joGatheringTracker.nCountReceived ) {
@@ -1108,7 +1116,8 @@ async function gatherSigningCheckFinish( optsSignOperation: TSignOperationOption
     return true;
 }
 
-async function gatherSigningCheckOverflow( optsSignOperation: TSignOperationOptions ) {
+async function gatherSigningCheckOverflow(
+    optsSignOperation: TSignOperationOptions ): Promise < boolean > {
     if( optsSignOperation.joGatheringTracker.nCountReceived < optsSignOperation.jarrNodes.length )
         return false;
     optsSignOperation.fn(
@@ -1128,7 +1137,8 @@ async function gatherSigningCheckOverflow( optsSignOperation: TSignOperationOpti
     return true;
 }
 
-async function gatherSigningStartImpl( optsSignOperation: TSignOperationOptions ) {
+async function gatherSigningStartImpl(
+    optsSignOperation: TSignOperationOptions ): Promise < void > {
     optsSignOperation.details.debug( "{p}Waiting for BLS glue result...",
         optsSignOperation.strLogPrefix );
     optsSignOperation.errGathering = null;
@@ -1158,7 +1168,8 @@ async function gatherSigningStartImpl( optsSignOperation: TSignOperationOptions 
     optsSignOperation.bHaveResultReportCalled = true;
 }
 
-async function gatherSigningFinishImpl( optsSignOperation: TSignOperationOptions ) {
+async function gatherSigningFinishImpl(
+    optsSignOperation: TSignOperationOptions ): Promise < void > {
     optsSignOperation.details.trace( "{p}Will await for message BLS verification and sending...",
         optsSignOperation.strLogPrefix );
     if( optsSignOperation.errGathering ) {
@@ -1207,7 +1218,8 @@ async function gatherSigningFinishImpl( optsSignOperation: TSignOperationOptions
     }
 }
 
-async function doSignConfigureChainAccessParams( optsSignOperation: TSignOperationOptions ) {
+async function doSignConfigureChainAccessParams(
+    optsSignOperation: TSignOperationOptions ): Promise < void > {
     optsSignOperation.targetChainName = "";
     optsSignOperation.fromChainName = "";
     optsSignOperation.targetChainID = -4;
@@ -1250,7 +1262,7 @@ async function doSignConfigureChainAccessParams( optsSignOperation: TSignOperati
 
 async function doSignProcessHandleCall(
     optsSignOperation: TSignOperationOptions, joParams: any, joCall: rpcCall.TRPCCall,
-    joIn: any, joOut: any, i: number ) {
+    joIn: any, joOut: any, i: number ): Promise < void > {
     const imaState: state.TIMAState = state.get();
     const isThisNode = ( i == imaState.nNodeNumber );
     const joNode = optsSignOperation.jarrNodes[i];
@@ -1363,7 +1375,8 @@ async function doSignProcessHandleCall(
     await joCall.disconnect();
 }
 
-async function doSignProcessOneImpl( i: number, optsSignOperation: TSignOperationOptions ) {
+async function doSignProcessOneImpl(
+    i: number, optsSignOperation: TSignOperationOptions ): Promise < void > {
     const imaState: state.TIMAState = state.get();
     const isThisNode = ( i == imaState.nNodeNumber );
     const joNode = optsSignOperation.jarrNodes[i];
@@ -1384,7 +1397,7 @@ async function doSignProcessOneImpl( i: number, optsSignOperation: TSignOperatio
                 optsSignOperation.strLogPrefix, strNodeDescColorized,
                 err, optsSignOperation.sequenceId );
             if( joCall )
-                joCall.disconnect().then( function() {} ).catch( function() {} );
+                joCall.disconnect().then( function(): void {} ).catch( function(): void {} );
         } );
     if( !joCall )
         return;
@@ -1418,7 +1431,7 @@ async function doSignMessagesImpl(
     nTransferLoopCounter: number, strDirection: string,
     jarrMessages: any[], nIdxCurrentMsgBlockStart: number, strFromChainName: string,
     joExtraSignOpts?: loop.TExtraSignOpts | null, fn?: IMA.TFunctionAfterSigningMessages
-) {
+): Promise < void > {
     const optsSignOperation: TSignOperationOptions = {
         imaState: state.get(),
         nTransferLoopCounter,
@@ -1489,7 +1502,7 @@ async function doSignMessagesImpl(
                 break;
             }
             doSignProcessOneImpl( i, optsSignOperation )
-                .then( function() {} ).catch( function( err ) {
+                .then( function(): void {} ).catch( function( err ): void {
                     log.error(
                         "Failed single BLS sign processing, reported error is: {err}", err );
                 } );
@@ -1530,7 +1543,8 @@ async function doSignMessagesImpl(
 export async function doSignMessagesM2S(
     nTransferLoopCounter: number,
     jarrMessages: any[], nIdxCurrentMsgBlockStart: number, strFromChainName: string,
-    joExtraSignOpts?: loop.TExtraSignOpts | null, fn?: IMA.TFunctionAfterSigningMessages ) {
+    joExtraSignOpts?: loop.TExtraSignOpts | null, fn?: IMA.TFunctionAfterSigningMessages
+): Promise < void > {
     await doSignMessagesImpl(
         nTransferLoopCounter, "M2S",
         jarrMessages, nIdxCurrentMsgBlockStart, strFromChainName,
@@ -1540,7 +1554,8 @@ export async function doSignMessagesM2S(
 export async function doSignMessagesS2M(
     nTransferLoopCounter: number,
     jarrMessages: any[], nIdxCurrentMsgBlockStart: number, strFromChainName: string,
-    joExtraSignOpts?: loop.TExtraSignOpts | null, fn?: IMA.TFunctionAfterSigningMessages ) {
+    joExtraSignOpts?: loop.TExtraSignOpts | null, fn?: IMA.TFunctionAfterSigningMessages
+): Promise < void > {
     await doSignMessagesImpl(
         nTransferLoopCounter, "S2M",
         jarrMessages, nIdxCurrentMsgBlockStart, strFromChainName,
@@ -1550,14 +1565,15 @@ export async function doSignMessagesS2M(
 export async function doSignMessagesS2S(
     nTransferLoopCounter: number,
     jarrMessages: any[], nIdxCurrentMsgBlockStart: number, strFromChainName: string,
-    joExtraSignOpts?: loop.TExtraSignOpts | null, fn?: IMA.TFunctionAfterSigningMessages ) {
+    joExtraSignOpts?: loop.TExtraSignOpts | null, fn?: IMA.TFunctionAfterSigningMessages
+): Promise < void > {
     await doSignMessagesImpl(
         nTransferLoopCounter, "S2S",
         jarrMessages, nIdxCurrentMsgBlockStart, strFromChainName,
         joExtraSignOpts, fn )
 }
 
-async function prepareSignU256( optsSignU256: TSignU256Options ) {
+async function prepareSignU256( optsSignU256: TSignU256Options ): Promise < boolean > {
     optsSignU256.details.debug( "{p}Will sign {} value...",
         optsSignU256.strLogPrefix, optsSignU256.u256 );
     optsSignU256.details.trace( "{p}Will query to sign {} skaled node(s)...",
@@ -1590,7 +1606,8 @@ async function prepareSignU256( optsSignU256: TSignU256Options ) {
 }
 
 async function doSignU256OneImplHandleCallResult(
-    i: number, optsSignU256: TSignU256Options, joCall: rpcCall.TRPCCall, joIn: any, joOut: any ) {
+    i: number, optsSignU256: TSignU256Options, joCall: rpcCall.TRPCCall, joIn: any, joOut: any
+): Promise < void > {
     const imaState: state.TIMAState = state.get();
     const isThisNode = ( i == imaState.nNodeNumber );
     const joNode = optsSignU256.jarrNodes[i];
@@ -1690,7 +1707,8 @@ async function doSignU256OneImplHandleCallResult(
     await joCall.disconnect();
 }
 
-async function doSignU256OneImpl( i: number, optsSignU256: TSignU256Options ) {
+async function doSignU256OneImpl(
+    i: number, optsSignU256: TSignU256Options ): Promise < boolean> {
     const imaState: state.TIMAState = state.get();
     const isThisNode = ( i == imaState.nNodeNumber );
     const joNode = optsSignU256.jarrNodes[i];
@@ -1715,6 +1733,7 @@ async function doSignU256OneImpl( i: number, optsSignU256: TSignU256Options ) {
         };
         const joOut = await joCall.call( joIn );
         await doSignU256OneImplHandleCallResult( i, optsSignU256, joCall, joIn, joOut );
+        return true;
     } catch ( err ) {
         ++optsSignU256.joGatheringTracker.nCountReceived;
         ++optsSignU256.joGatheringTracker.nCountErrors;
@@ -1728,7 +1747,8 @@ async function doSignU256OneImpl( i: number, optsSignU256: TSignU256Options ) {
     }
 }
 
-async function gatherSigningCheckFinish256( optsSignU256: TSignU256Options ) {
+async function gatherSigningCheckFinish256(
+    optsSignU256: TSignU256Options ): Promise < boolean > {
     const cntSuccess = optsSignU256.arrSignResults.length;
     if( optsSignU256.joGatheringTracker.nCountReceivedPrevious !=
         optsSignU256.joGatheringTracker.nCountReceived ) {
@@ -1792,7 +1812,8 @@ async function gatherSigningCheckFinish256( optsSignU256: TSignU256Options ) {
     return true;
 }
 
-async function gatherSigningCheckOverflow256( optsSignU256: TSignU256Options ) {
+async function gatherSigningCheckOverflow256(
+    optsSignU256: TSignU256Options ): Promise < boolean > {
     if( optsSignU256.joGatheringTracker.nCountReceived < optsSignU256.jarrNodes.length )
         return false;
     optsSignU256.fn(
@@ -1812,7 +1833,7 @@ async function gatherSigningCheckOverflow256( optsSignU256: TSignU256Options ) {
     return true;
 }
 
-async function doSignU256Gathering( optsSignU256: TSignU256Options ) {
+async function doSignU256Gathering( optsSignU256: TSignU256Options ): Promise < void > {
     optsSignU256.details.debug( "{p}Waiting for BLS glue result ", optsSignU256.strLogPrefix );
     optsSignU256.errGathering = null;
     for( let idxStep = 0; idxStep < optsSignU256.joGatheringTracker.nWaitIntervalMaxSteps;
@@ -1843,7 +1864,7 @@ async function doSignU256Gathering( optsSignU256: TSignU256Options ) {
 }
 
 export async function doSignU256( u256: any, details: log.TLogger,
-    fn: IMA.TFunctionAfterSigningMessages ) {
+    fn: IMA.TFunctionAfterSigningMessages ): Promise < void > {
     const optsSignU256: TSignU256Options = {
         u256,
         fn,
@@ -1870,7 +1891,7 @@ export async function doSignU256( u256: any, details: log.TLogger,
     optsSignU256.jarrNodes = optsSignU256.imaState.joSChainNetworkInfo.network;
     optsSignU256.details.trace( "{p}Invoking signing u256 procedure...",
         optsSignU256.strLogPrefix );
-    optsSignU256.fn = optsSignU256.fn || function() {};
+    optsSignU256.fn = optsSignU256.fn || function(): void {};
     if( !(
         optsSignU256.imaState.strPathBlsGlue.length > 0 &&
         optsSignU256.imaState.joSChainNetworkInfo
@@ -1898,7 +1919,7 @@ export async function doSignU256( u256: any, details: log.TLogger,
 export async function doVerifyReadyHash(
     strMessageHash: string, nZeroBasedNodeIndex: number,
     signature: any, isExposeOutput: boolean
-) {
+): Promise < boolean > {
     const imaState: state.TIMAState = state.get();
     const strDirection = "RAW";
     const strLogPrefix = `${strDirection}/BLS/#${nZeroBasedNodeIndex}: `;
@@ -1920,7 +1941,7 @@ export async function doVerifyReadyHash(
         nThreshold, nParticipants, "verify ready hash", details ) )
         return false;
     const strActionDir = allocBlsTmpActionDir();
-    const fnShellRestore = function() {
+    const fnShellRestore = function(): void {
         shell.rm( "-rf", strActionDir );
     };
     let strOutput = "";
@@ -1974,7 +1995,7 @@ async function doSignReadyHashHandleCallResult(
     strLogPrefix: string, details: log.TLogger,
     strMessageHash: string, isExposeOutput: boolean, joCall: rpcCall.TRPCCall,
     joIn: any, joOut: any
-) {
+): Promise < object > {
     details.trace( "{p}Call to ", "SGX done, answer is: {}", strLogPrefix, joOut );
     let joSignResult: TSignResult = joOut;
     if( joOut.result != null && joOut.result != undefined &&
@@ -2004,7 +2025,8 @@ async function doSignReadyHashHandleCallResult(
     return joSignResult;
 }
 
-export async function doSignReadyHash( strMessageHash: string, isExposeOutput: any ) {
+export async function doSignReadyHash(
+    strMessageHash: string, isExposeOutput: any ): Promise < boolean > {
     const imaState: state.TIMAState = state.get();
     const strLogPrefix = "";
     const details: log.TLogger = log.createMemoryStream();
@@ -2080,7 +2102,7 @@ export async function doSignReadyHash( strMessageHash: string, isExposeOutput: a
 }
 
 async function prepareHandlingOfSkaleImaVerifyAndSign(
-    optsHandleVerifyAndSign: THandleVerifyAndSignOptions ) {
+    optsHandleVerifyAndSign: THandleVerifyAndSignOptions ): Promise < boolean > {
     optsHandleVerifyAndSign.details.debug( "{p}Will verify and sign {}",
         optsHandleVerifyAndSign.strLogPrefix, optsHandleVerifyAndSign.joCallData );
     optsHandleVerifyAndSign.nIdxCurrentMsgBlockStart =
@@ -2137,7 +2159,7 @@ async function prepareHandlingOfSkaleImaVerifyAndSign(
 }
 
 async function prepareS2sOfSkaleImaVerifyAndSign(
-    optsHandleVerifyAndSign: THandleVerifyAndSignOptions ) {
+    optsHandleVerifyAndSign: THandleVerifyAndSignOptions ): Promise < void > {
     const strSChainNameSrc = optsHandleVerifyAndSign.joCallData.params.srcChainName;
     const strSChainNameDst = optsHandleVerifyAndSign.joCallData.params.dstChainName;
     optsHandleVerifyAndSign.details.trace(
@@ -2182,7 +2204,7 @@ async function prepareS2sOfSkaleImaVerifyAndSign(
 async function handleBlsSignMessageHashResult(
     optsHandleVerifyAndSign: THandleVerifyAndSignOptions, joCallData: THandleVerifyAndSignCallData,
     joAccount: state.TAccount, joCall: rpcCall.TRPCCall, joIn: any, joOut: any
-) {
+): Promise < void > {
     optsHandleVerifyAndSign.details.trace( "{p}{bright} Call to SGX done, " +
         "answer is: {}", optsHandleVerifyAndSign.strLogPrefix,
     optsHandleVerifyAndSign.strDirection, joOut );
@@ -2225,7 +2247,8 @@ async function handleBlsSignMessageHashResult(
     return joSignResult;
 }
 
-export async function handleSkaleImaVerifyAndSign( joCallData: THandleVerifyAndSignCallData ) {
+export async function handleSkaleImaVerifyAndSign(
+    joCallData: THandleVerifyAndSignCallData ): Promise < object | null > {
     const optsHandleVerifyAndSign: THandleVerifyAndSignOptions = {
         joCallData,
         imaState: state.get(),
@@ -2318,7 +2341,7 @@ export async function handleSkaleImaVerifyAndSign( joCallData: THandleVerifyAndS
     return optsHandleVerifyAndSign.joRetVal;
 }
 
-async function handleSkaleImaBSU256Prepare( optsBSU256: TBSU256Options ) {
+async function handleSkaleImaBSU256Prepare( optsBSU256: TBSU256Options ): Promise < boolean > {
     optsBSU256.details.debug( "{p}Will U256-BLS-sign {}",
         optsBSU256.strLogPrefix, optsBSU256.joCallData );
     if( !optsBSU256.imaState.joSChainNetworkInfo )
@@ -2358,7 +2381,7 @@ async function handleSkaleImaBSU256Prepare( optsBSU256: TBSU256Options ) {
 async function handleBlsSignMessageHash256Result(
     optsBSU256: TBSU256Options, joCallData: TBSU256CallData,
     joCall: rpcCall.TRPCCall, joIn: any, joOut: any
-) {
+): Promise < object > {
     optsBSU256.details.trace( "{p}Call to SGX done, answer is: {}",
         optsBSU256.strLogPrefix, joOut );
     let joSignResult: TSignResult = joOut;
@@ -2396,7 +2419,8 @@ async function handleBlsSignMessageHash256Result(
     return joSignResult;
 }
 
-export async function handleSkaleImaBSU256( joCallData: TBSU256CallData ) {
+export async function handleSkaleImaBSU256(
+    joCallData: TBSU256CallData ): Promise < object | null > {
     const optsBSU256: TBSU256Options = {
         joCallData,
         imaState: state.get(),

@@ -87,7 +87,7 @@ export interface TSChainsInformation {
 }
 
 export function findSChainIndexInArrayByName(
-    arrSChains: TSChainInformation[], strSChainName: string ) {
+    arrSChains: TSChainInformation[], strSChainName: string ): number {
     for( let idxSChain = 0; idxSChain < arrSChains.length; ++idxSChain ) {
         const joSChain = arrSChains[idxSChain];
         if( joSChain.name.toString() == strSChainName.toString() )

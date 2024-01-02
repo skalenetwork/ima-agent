@@ -39,7 +39,7 @@ export async function getBalanceErc20(
     joAccount: state.TAccount,
     strCoinName: string,
     joABI: any
-) {
+): Promise<any> {
     const strLogPrefix = "getBalanceErc20() call ";
     try {
         if( !( ethersProvider && joAccount && strCoinName && joABI && ( strCoinName + "_abi" ) in
@@ -69,7 +69,7 @@ export async function getOwnerOfErc721(
     strCoinName: string,
     joABI: any,
     idToken: any
-) {
+): Promise<any> {
     const strLogPrefix = "getOwnerOfErc721() call ";
     try {
         if( !( ethersProvider && joAccount && strCoinName && joABI && ( strCoinName + "_abi" ) in
@@ -98,7 +98,7 @@ export async function getBalanceErc1155(
     strCoinName: string,
     joABI: any,
     idToken: any
-) {
+): Promise<any> {
     const strLogPrefix = "getBalanceErc1155() call ";
     try {
         if( !( ethersProvider && joAccount && strCoinName && joABI && ( strCoinName + "_abi" ) in
@@ -138,7 +138,7 @@ export async function doErc721PaymentFromMainNet(
     strCoinNameErc721SChain: string,
     erc721PrivateTestnetJsonSChain: any,
     transactionCustomizerMainNet: imaTx.TransactionCustomizer
-) {
+): Promise<boolean> {
     const details = log.createMemoryStream();
     const jarrReceipts: any = [];
     let strActionName = "";
@@ -276,7 +276,7 @@ export async function doErc20PaymentFromMainNet(
     strCoinNameErc20SChain: string,
     erc20SChain: any,
     transactionCustomizerMainNet: imaTx.TransactionCustomizer
-) {
+): Promise<boolean> {
     const details = log.createMemoryStream();
     const jarrReceipts: any = [];
     let strActionName = "";
@@ -414,7 +414,7 @@ export async function doErc1155PaymentFromMainNet(
     strCoinNameErc1155SChain: string,
     erc1155PrivateTestnetJsonSChain: any,
     transactionCustomizerMainNet: imaTx.TransactionCustomizer
-) {
+): Promise<boolean> {
     const details = log.createMemoryStream();
     const jarrReceipts: any = [];
     let strActionName = "";
@@ -558,7 +558,7 @@ export async function doErc1155BatchPaymentFromMainNet(
     erc1155PrivateTestnetJsonMainNet: any, strCoinNameErc1155SChain: string,
     erc1155PrivateTestnetJsonSChain: any,
     transactionCustomizerMainNet: imaTx.TransactionCustomizer
-) {
+): Promise<boolean> {
     const details = log.createMemoryStream();
     const jarrReceipts: any = [];
     let strActionName = "";
@@ -688,7 +688,7 @@ export async function doErc20PaymentFromSChain(
     strCoinNameErc20SChain: string,
     joErc20SChain: any,
     transactionCustomizerSChain: imaTx.TransactionCustomizer
-) {
+): Promise<boolean> {
     const details = log.createMemoryStream();
     const jarrReceipts: any = [];
     let strActionName = "";
@@ -832,7 +832,7 @@ export async function doErc721PaymentFromSChain(
     strCoinNameErc721SChain: string,
     joErc721SChain: any,
     transactionCustomizerSChain: imaTx.TransactionCustomizer
-) {
+): Promise<boolean> {
     const details = log.createMemoryStream();
     const jarrReceipts: any = [];
     let strActionName = "";
@@ -980,7 +980,7 @@ export async function doErc1155PaymentFromSChain(
     strCoinNameErc1155SChain: string,
     joErc1155Chain: any,
     transactionCustomizerSChain: imaTx.TransactionCustomizer
-) {
+): Promise<boolean> {
     const details = log.createMemoryStream();
     const jarrReceipts: any = [];
     let strActionName = "";
@@ -1127,7 +1127,7 @@ export async function doErc1155BatchPaymentFromSChain(
     strCoinNameErc1155SChain: string,
     joErc1155Chain: any,
     transactionCustomizerSChain: imaTx.TransactionCustomizer
-) {
+): Promise<boolean> {
     const details = log.createMemoryStream();
     const jarrReceipts: any = [];
     let strActionName = "";
@@ -1268,7 +1268,7 @@ export async function doErc20PaymentS2S(
     joSrcErc20: any,
     ercDstAddress20: any, // only reverse payment needs it
     tc: imaTx.TransactionCustomizer
-) {
+): Promise<boolean> {
     const isReverse = !isForward;
     const details = log.createMemoryStream();
     const jarrReceipts: any = [];
@@ -1408,7 +1408,7 @@ export async function doErc721PaymentS2S(
     joSrcErc721: any,
     ercDstAddress721: any, // only reverse payment needs it
     tc: imaTx.TransactionCustomizer
-) {
+): Promise<boolean> {
     const isReverse = !isForward;
     const details = log.createMemoryStream();
     const jarrReceipts: any = [];
@@ -1553,7 +1553,7 @@ export async function doErc1155PaymentS2S(
     joSrcErc1155: any,
     ercDstAddress1155: any, // only reverse payment needs it
     tc: imaTx.TransactionCustomizer
-) {
+): Promise<boolean> {
     const isReverse = !isForward;
     const details = log.createMemoryStream();
     const jarrReceipts: any = [];
@@ -1698,7 +1698,7 @@ export async function doErc1155BatchPaymentS2S(
     joSrcErc1155: any,
     ercDstAddress1155: any, // only reverse payment needs it
     tc: imaTx.TransactionCustomizer
-) {
+): Promise<boolean> {
     const isReverse = !isForward;
     const details = log.createMemoryStream();
     const jarrReceipts: any = [];
@@ -1841,7 +1841,7 @@ export async function mintErc20(
     strTokenContractAddress: string,
     joTokenContractABI: any,
     tc: imaTx.TransactionCustomizer
-) {
+): Promise<boolean> {
     let strActionName = "mintErc20() init";
     const strLogPrefix = "mintErc20() call ";
     const details = log.createMemoryStream();
@@ -1911,7 +1911,7 @@ export async function mintErc721(
     strTokenContractAddress: string,
     joTokenContractABI: any,
     tc: imaTx.TransactionCustomizer
-) {
+): Promise<boolean> {
     let strActionName = "mintErc721() init";
     const strLogPrefix = "mintErc721() call ";
     const details = log.createMemoryStream();
@@ -1982,7 +1982,7 @@ export async function mintErc1155(
     strTokenContractAddress: string,
     joTokenContractABI: any,
     tc: imaTx.TransactionCustomizer
-) {
+): Promise<boolean> {
     let strActionName = "mintErc1155() init";
     const strLogPrefix = "mintErc1155() call ";
     const details = log.createMemoryStream();
@@ -2055,7 +2055,7 @@ export async function burnErc20(
     strTokenContractAddress: string,
     joTokenContractABI: any,
     tc: imaTx.TransactionCustomizer
-) {
+): Promise<boolean> {
     let strActionName = "burnErc20() init";
     const strLogPrefix = "burnErc20() call ";
     const details = log.createMemoryStream();
@@ -2124,7 +2124,7 @@ export async function burnErc721(
     strTokenContractAddress: string,
     joTokenContractABI: any,
     tc: imaTx.TransactionCustomizer
-) {
+): Promise<boolean> {
     let strActionName = "burnErc721() init";
     const strLogPrefix = "burnErc721() call ";
     const details = log.createMemoryStream();
@@ -2193,7 +2193,7 @@ export async function burnErc1155(
     strTokenContractAddress: string,
     joTokenContractABI: any,
     tc: imaTx.TransactionCustomizer
-) {
+): Promise<boolean> {
     let strActionName = "burnErc1155() init";
     const strLogPrefix = "burnErc1155() call ";
     const details = log.createMemoryStream();

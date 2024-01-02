@@ -63,7 +63,7 @@ export class SocketServer extends EventDispatcher {
             }
             self.mapAcceptedPipes[socket] = { };
             let _offAllPipeEventListeners: any = null;
-            let _onPipeClose: any = function() {
+            let _onPipeClose: any = function(): void {
                 if( self.isLogAcceptedSocket ) {
                     self.log( log.fmtInformation( "Socket {url} was {bright}",
                         socket.strSavedRemoteAddress, "closed" ) );
@@ -141,7 +141,7 @@ export class SocketServer extends EventDispatcher {
                     socket.send( joAnswer, isFlush );
                 }
             };
-            _offAllPipeEventListeners = function() {
+            _offAllPipeEventListeners = function(): void {
                 if( _onPipeClose ) {
                     socket.off( "close", _onPipeClose );
                     _onPipeClose = null;

@@ -29,7 +29,9 @@ import * as rpcCall from "./rpcCall.js";
 import * as imaHelperAPIs from "./imaHelperAPIs.js";
 import * as imaTransferErrorHandling from "./imaTransferErrorHandling.js";
 
-export function createProgressiveEventsScanPlan( details: log.TLogger, nLatestBlockNumber: any ) {
+export function createProgressiveEventsScanPlan(
+    details: log.TLogger, nLatestBlockNumber: any
+): any[] {
     // assume Main Net mines 6 blocks per minute
     const blocksInOneMinute = 6;
     const blocksInOneHour = blocksInOneMinute * 60;
@@ -89,7 +91,7 @@ export async function safeGetPastEventsProgressive(
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     attempts: number, joContract: owaspUtils.ethersMod.ethers.Contract, strEventName: string,
     nBlockFrom: any, nBlockTo: any, joFilter: any
-) {
+): Promise<any[]> {
     const strURL = owaspUtils.ethersProviderToUrl( ethersProvider );
     details.information( "{p}Will run progressive logs search for event {} via URL {url}, " +
         "from block {}, to block...", strLogPrefix, strEventName, strURL, nBlockFrom, nBlockTo );
@@ -169,7 +171,7 @@ export async function getContractCallEvents(
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     joContract: owaspUtils.ethersMod.ethers.Contract, strEventName: string,
     nBlockNumber: any, strTxHash: string, joFilter: any
-) {
+): Promise<any[]> {
     joFilter = joFilter || {};
     nBlockNumber = owaspUtils.toBN( nBlockNumber );
     const n10 = owaspUtils.toBN( 10 );
@@ -200,7 +202,7 @@ export async function safeGetTransactionCount(
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     address: string, param: any,
     retValOnFail: any, throwIfServerOffline: boolean
-) {
+): Promise<any> {
     const strFnName = "getTransactionCount";
     const u = owaspUtils.ethersProviderToUrl( ethersProvider );
     const nWaitStepMilliseconds = 10 * 1000;
@@ -246,7 +248,7 @@ export async function safeGetTransactionReceipt(
     details: log.TLogger, cntAttempts: number,
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     txHash: string, retValOnFail?: any, throwIfServerOffline?: boolean
-) {
+): Promise<any> {
     const strFnName = "getTransactionReceipt";
     const u = owaspUtils.ethersProviderToUrl( ethersProvider );
     const nWaitStepMilliseconds = 10 * 1000;
@@ -294,7 +296,7 @@ export async function safeGetPastEvents(
     cntAttempts: number, joContract: owaspUtils.ethersMod.ethers.Contract, strEventName: string,
     nBlockFrom: any, nBlockTo: any, joFilter: any,
     retValOnFail?: any, throwIfServerOffline?: boolean
-) {
+): Promise<any> {
     const u = owaspUtils.ethersProviderToUrl( ethersProvider );
     const nWaitStepMilliseconds = 10 * 1000;
     if( throwIfServerOffline == null || throwIfServerOffline == undefined )
@@ -372,7 +374,7 @@ export async function safeGetPastEventsIterative(
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     attempts: number, joContract: owaspUtils.ethersMod.ethers.Contract, strEventName: string,
     nBlockFrom: any, nBlockTo: any, joFilter: any
-) {
+): Promise<any> {
     if( imaHelperAPIs.getBlocksCountInInIterativeStepOfEventsScan() <= 0 ||
         imaHelperAPIs.getMaxIterationsInAllRangeEventsScan() <= 0 ) {
         details.warning(

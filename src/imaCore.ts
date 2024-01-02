@@ -113,7 +113,7 @@ async function findOutReferenceLogRecord(
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     joMessageProxy: owaspUtils.ethersMod.ethers.Contract,
     bnBlockId: any, nMessageNumberToFind: number, isVerbose?: boolean
-) {
+): Promise<any | null> {
     const bnMessageNumberToFind = owaspUtils.toBN( nMessageNumberToFind.toString() );
     const strEventName = "PreviousMessageReference";
     const arrLogRecords = await imaEventLogScan.safeGetPastEventsProgressive(
@@ -157,7 +157,7 @@ async function findOutAllReferenceLogRecords(
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     joMessageProxy: owaspUtils.ethersMod.ethers.Contract,
     bnBlockId: any, nIncMsgCnt: number, nOutMsgCnt: number, isVerbose?: boolean
-) {
+): Promise<any[]> {
     if( isVerbose ) {
         details.debug(
             "{p}Optimized IMA message search algorithm will start at block {}" +
@@ -220,7 +220,7 @@ let gTransferLoopCounter = 0;
 //            [to]           // address[] memory to
 //            [amount]       // uint256[] memory amount / *uint256[2] memory blsSignature* /
 //            )
-async function doQueryOutgoingMessageCounter( optsTransfer: TTransferOptions ) {
+async function doQueryOutgoingMessageCounter( optsTransfer: TTransferOptions ): Promise<any> {
     let nPossibleIntegerValue = 0;
     optsTransfer.details.debug( "{p}SRC MessageProxy address is.....{}",
         optsTransfer.strLogPrefixShort, optsTransfer.joMessageProxySrc.address );
@@ -328,7 +328,7 @@ async function doQueryOutgoingMessageCounter( optsTransfer: TTransferOptions ) {
     return true;
 }
 
-async function analyzeGatheredRecords( optsTransfer: TTransferOptions, r: any ) {
+async function analyzeGatheredRecords( optsTransfer: TTransferOptions, r: any ): Promise<any> {
     let joValues: any = null;
     const strChainHashWeAreLookingFor =
         owaspUtils.ethersMod.ethers.utils.id( optsTransfer.chainNameDst );
@@ -373,7 +373,7 @@ async function analyzeGatheredRecords( optsTransfer: TTransferOptions, r: any ) 
     return joValues;
 }
 
-async function gatherMessages( optsTransfer: TTransferOptions ) {
+async function gatherMessages( optsTransfer: TTransferOptions ): Promise<void> {
     optsTransfer.arrMessageCounters = [];
     optsTransfer.jarrMessages = [];
     optsTransfer.nIdxCurrentMsgBlockStart = 0 + optsTransfer.nIdxCurrentMsg;
@@ -523,7 +523,7 @@ async function gatherMessages( optsTransfer: TTransferOptions ) {
 
 async function preCheckAllMessagesSign(
     optsTransfer: TTransferOptions, err: Error | string | null,
-    jarrMessages: any[], joGlueResult: any ) {
+    jarrMessages: any[], joGlueResult: any ): Promise<boolean> {
     const strDidInvokedSigningCallbackMessage = log.fmtDebug(
         "{p}Did invoked message signing callback, first real message index is: {}, have {} " +
         "message(s) to process {}", optsTransfer.strLogPrefix,
@@ -549,7 +549,7 @@ async function preCheckAllMessagesSign(
 
 async function callbackAllMessagesSign(
     optsTransfer: TTransferOptions, err: Error | string | null,
-    jarrMessages: any[], joGlueResult: any ) {
+    jarrMessages: any[], joGlueResult: any ): Promise<void> {
     if( !await preCheckAllMessagesSign( optsTransfer, err, jarrMessages, joGlueResult ) )
         return;
     const nBlockSize = optsTransfer.arrMessageCounters.length;
@@ -629,7 +629,7 @@ async function callbackAllMessagesSign(
         optsTransfer.joAccountDst, optsTransfer.strActionName,
         gasPrice, estimatedGasPostIncomingMessages,
         weiHowMuchPostIncomingMessages, opts );
-    if( joReceipt && typeof joReceipt === "object" ) {
+    if( joReceipt ) {
         optsTransfer.jarrReceipts.push( {
             description: "doTransfer/postIncomingMessages()",
             "optsTransfer.detailsString":
@@ -692,7 +692,7 @@ async function callbackAllMessagesSign(
     }
 }
 
-async function handleAllMessagesSigning( optsTransfer: TTransferOptions ) {
+async function handleAllMessagesSigning( optsTransfer: TTransferOptions ): Promise<boolean> {
     try {
         let strErrFinal: string = "";
         await optsTransfer.fnSignMessages( optsTransfer.nTransferLoopCounter,
@@ -723,7 +723,8 @@ async function handleAllMessagesSigning( optsTransfer: TTransferOptions ) {
 
 async function checkOutgoingMessageEventInOneNode(
     optsTransfer: TTransferOptions,
-    optsOutgoingMessageAnalysis: TOutgoingMessageAnalysisOptions ) {
+    optsOutgoingMessageAnalysis: TOutgoingMessageAnalysisOptions
+): Promise<boolean> {
     if( !optsOutgoingMessageAnalysis.joNode ) {
         optsTransfer.details.error(
             "{p}{bright} no S-Chain node provided",
@@ -817,7 +818,7 @@ async function checkOutgoingMessageEventInOneNode(
 }
 
 async function checkOutgoingMessageEvent(
-    optsTransfer: TTransferOptions, joSChain: skaleObserver.TSChainInformation ) {
+    optsTransfer: TTransferOptions, joSChain: skaleObserver.TSChainInformation ): Promise<boolean> {
     const cntNodes = joSChain.nodes.length;
     const cntMessages = optsTransfer.jarrMessages.length;
     for( let idxMessage = 0; idxMessage < cntMessages; ++idxMessage ) {
@@ -894,7 +895,7 @@ async function checkOutgoingMessageEvent(
     return true;
 }
 
-async function doMainTransferLoopActions( optsTransfer: TTransferOptions ) {
+async function doMainTransferLoopActions( optsTransfer: TTransferOptions ): Promise<boolean> {
     // classic scanner with optional usage of optimized IMA messages search algorithm
     // outer loop is block former/creator, then transfer
     optsTransfer.nIdxCurrentMsg = optsTransfer.nIncMsgCnt;
@@ -1019,7 +1020,7 @@ export async function doTransfer(
     nBlockAwaitDepth: number, nBlockAge: number,
     fnSignMessages: TFunctionDoSignMessages, joExtraSignOpts: loop.TExtraSignOpts | null,
     transactionCustomizerDst: imaTx.TransactionCustomizer
-) {
+): Promise<boolean> {
     const optsTransfer: TTransferOptions = {
         strDirection,
         joRuntimeOpts,
@@ -1191,7 +1192,7 @@ export async function doAllS2S( // s-chain --> s-chain
     nBlockAge: number,
     fnSignMessages: TFunctionDoSignMessages,
     transactionCustomizerDst: imaTx.TransactionCustomizer
-) {
+): Promise<boolean> {
     let cntOK = 0; let cntFail = 0; let nIndexS2S = 0;
     const sc = imaState.chainProperties.sc;
     const strDirection = "S2S";

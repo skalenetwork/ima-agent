@@ -38,7 +38,7 @@ export async function getBalanceEth(
     chainId: string,
     joAccount: state.TAccount | null,
     contractERC20: owaspUtils.ethersMod.Contract | null
-) {
+): Promise<string | object> {
     const strLogPrefix = "getBalanceEth() call ";
     try {
         if( !( ethersProvider && joAccount ) )
@@ -77,7 +77,7 @@ export async function doEthPaymentFromMainNet(
     chainIdSChain: string,
     weiHowMuch: any, // how much WEI money to send
     transactionCustomizerMainNet: imaTx.TransactionCustomizer
-) {
+): Promise<boolean> {
     const details = log.createMemoryStream();
     const jarrReceipts: any[] = [];
     let strActionName = "";
@@ -112,7 +112,7 @@ export async function doEthPaymentFromMainNet(
             "DepositBox", joDepositBox, "deposit", arrArguments,
             joAccountSrc, strActionName,
             gasPrice, estimatedGas, weiHowMuch );
-        if( joReceipt && typeof joReceipt === "object" ) {
+        if( joReceipt ) {
             jarrReceipts.push( {
                 description: "doEthPaymentFromMainNet",
                 receipt: joReceipt
@@ -173,7 +173,7 @@ export async function doEthPaymentFromSChain(
     joMessageProxySChain: owaspUtils.ethersMod.ethers.Contract, // for checking logs
     weiHowMuch: any, // how much WEI money to send
     transactionCustomizerSChain: imaTx.TransactionCustomizer
-) {
+): Promise<boolean> {
     const details = log.createMemoryStream();
     const jarrReceipts: any = [];
     let strActionName = "";
@@ -209,7 +209,7 @@ export async function doEthPaymentFromSChain(
             "TokenManagerETH", joTokenManagerETH, "exitToMain", arrArguments,
             joAccountSrc, strActionName,
             gasPrice, estimatedGas, 0, opts );
-        if( joReceipt && typeof joReceipt === "object" ) {
+        if( joReceipt ) {
             jarrReceipts.push( {
                 description: "doEthPaymentFromSChain",
                 receipt: joReceipt
@@ -259,7 +259,7 @@ export async function receiveEthPaymentFromSchainOnMainNet(
     joAccountMN: state.TAccount,
     joDepositBoxETH: owaspUtils.ethersMod.ethers.Contract,
     transactionCustomizerMainNet: imaTx.TransactionCustomizer
-) {
+): Promise<boolean> {
     const details = log.createMemoryStream();
     const jarrReceipts: any = [];
     let strActionName = "";
@@ -293,7 +293,7 @@ export async function receiveEthPaymentFromSchainOnMainNet(
             "getMyEth", arrArguments,
             joAccountMN, strActionName,
             gasPrice, estimatedGas, weiHowMuch );
-        if( joReceipt && typeof joReceipt === "object" ) {
+        if( joReceipt ) {
             jarrReceipts.push( {
                 description: "receiveEthPaymentFromSchainOnMainNet",
                 receipt: joReceipt
@@ -318,7 +318,7 @@ export async function viewEthPaymentFromSchainOnMainNet(
     ethersProviderMainNet: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     joAccountMN: state.TAccount,
     joDepositBoxETH: owaspUtils.ethersMod.ethers.Contract
-) {
+): Promise<object | string | null> {
     const details = log.createMemoryStream();
     const strActionName = "";
     const strLogPrefix = "S ETH View: ";

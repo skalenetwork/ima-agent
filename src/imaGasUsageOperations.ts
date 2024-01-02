@@ -46,7 +46,7 @@ export function composeGasUsageReportFromArray( strName: string, jarrReceipts: a
 }
 
 export function printGasUsageReportFromArray(
-    strName: string, jarrReceipts: any[], details?: any ) {
+    strName: string, jarrReceipts: any[], details?: any ): void {
     details = details || log;
     const jo: any = composeGasUsageReportFromArray( strName, jarrReceipts );
     if( jo.strReport && typeof jo.strReport === "string" && jo.strReport.length > 0 &&

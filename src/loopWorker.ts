@@ -44,7 +44,7 @@ if( parentPort ) {
     } );
 }
 
-function doSendMessage( type: any, endpoint: any, workerUUID: any, data: any ) {
+function doSendMessage( type: any, endpoint: any, workerUUID: any, data: any ): void {
     const jo: any = networkLayer.socketReceivedDataReverseMarshall( data );
     const joSend: any = {
         workerMessageType:
@@ -80,7 +80,7 @@ class ObserverServer extends SocketServer {
             };
             if( self.initComplete )
                 return joAnswer;
-            self.log = function() {
+            self.log = function(): void {
                 const args = Array.prototype.slice.call( arguments );
                 const jo: any = {
                     method: "log",
@@ -127,9 +127,9 @@ class ObserverServer extends SocketServer {
                 socket.send( jo, isFlush );
             } );
             self.opts.imaState.chainProperties.mn.joAccount.address =
-                function() { return owaspUtils.fnAddressImpl_( this ); };
+                function(): string { return owaspUtils.fnAddressImpl_( this ); };
             self.opts.imaState.chainProperties.sc.joAccount.address =
-                function() { return owaspUtils.fnAddressImpl_( this ); };
+                function(): string { return owaspUtils.fnAddressImpl_( this ); };
             if( self.opts.imaState.chainProperties.mn.strURL &&
                 typeof self.opts.imaState.chainProperties.mn.strURL === "string" &&
                 self.opts.imaState.chainProperties.mn.strURL.length > 0
@@ -181,7 +181,7 @@ class ObserverServer extends SocketServer {
                 log.yn( self.opts.imaState.optsLoop.enableStepS2S ) );
             /* await */
             loop.runTransferLoop( self.opts.imaState.optsLoop )
-                .then( function() {} ).catch( function() {} );
+                .then( function(): void {} ).catch( function(): void {} );
             self.information( "Full init compete for in-worker IMA loop {} in {}",
                 workerData.url, threadInfo.threadDescription() );
             return joAnswer;
@@ -207,12 +207,12 @@ class ObserverServer extends SocketServer {
                     ( !!( joMessage.params.isStart ) ),
                     owaspUtils.toInteger( joMessage.params.ts ),
                     joMessage.params.signature
-                ).then( function() {} ).catch( function() {} );
+                ).then( function(): void {} ).catch( function(): void {} );
             }
         console.log( "Initialized in-worker IMA loop {} server in {}",
             workerData.url, threadInfo.threadDescription() );
     }
-    dispose() {
+    dispose(): void {
         const self: any = this;
         self.isDisposing = true;
         if( self.intervalPeriodicSchainsCaching ) {
@@ -221,7 +221,7 @@ class ObserverServer extends SocketServer {
         }
         super.dispose();
     }
-    initLogMethods() {
+    initLogMethods(): void {
         const self: any = this;
         if( "fatal" in self && self.fatal && typeof self.fatal === "function" )
             return;
@@ -302,7 +302,7 @@ class ObserverServer extends SocketServer {
 
 const acceptor = new networkLayer.InWorkerSocketServerAcceptor( workerData.url, doSendMessage );
 const server = new ObserverServer( acceptor );
-server.on( "dispose", function() {
+server.on( "dispose", function(): void {
     const self: any = server;
     self.debug( "Disposed in-worker in {} IMA loop {}",
         threadInfo.threadDescription(), workerData.url );

@@ -9,13 +9,13 @@ log.addStdout();
 // allow self-signed wss and https
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
-function finalizeOutput( jo: any ) {
+function finalizeOutput( jo: any ): void {
     if( !jo )
         return;
     process.stdout.write( log.fmtInformation( "{}", jo ) );
 }
 
-function postConvertBN( jo: any, name: any ) {
+function postConvertBN( jo: any, name: any ): void {
     if( !jo )
         return;
     if( !( name in jo ) )
@@ -25,7 +25,7 @@ function postConvertBN( jo: any, name: any ) {
     jo[name] = owaspUtils.toHexStringSafe( jo[name] );
 }
 
-async function run() {
+async function run(): Promise<void> {
     try {
         if( gIsDebugLogging )
             log.debug( "Process startup arguments array is {}", process.argv );
@@ -155,4 +155,4 @@ async function run() {
         process.exit( 1 );
     }
 }
-run().then( function() {} ).catch( function() {} );
+run().then( function(): void {} ).catch( function(): void {} );

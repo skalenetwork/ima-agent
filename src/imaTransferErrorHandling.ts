@@ -26,7 +26,7 @@
 import { UniversalDispatcherEvent, EventDispatcher }
     from "./eventDispatcher.js";
 
-export function verifyTransferErrorCategoryName( strCategory: string ) {
+export function verifyTransferErrorCategoryName( strCategory: string ): string {
     return "" + ( strCategory || "default" );
 }
 
