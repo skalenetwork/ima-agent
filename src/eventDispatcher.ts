@@ -32,7 +32,7 @@ export class UniversalDispatcherEvent {
                 console.warn( "UniversalDispatcherEvent will skip", key, "data field" );
                 continue;
             }
-            const anyThis: any = this
+            const anyThis: any = this;
             anyThis[key] = value;
         }
     }

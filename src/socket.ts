@@ -99,7 +99,7 @@ export class BasicServerAcceptor extends EventDispatcher {
     socketType: string;
     socketSubtype: string;
     isListening: boolean;
-    strEndPoint: string | null
+    strEndPoint: string | null;
     nextClientNumber: number;
     mapClients: any;
     url?: string;
@@ -407,7 +407,7 @@ export const outOfWorkerAPIs: any = {
         case "inWorkerConnect": {
             if( !( jo.workerUUID in gMapAwaitingInWorkerClients ) )
                 return false;
-            const pipe: any = gMapAwaitingInWorkerClients["" + jo.workerUUID]
+            const pipe: any = gMapAwaitingInWorkerClients["" + jo.workerUUID];
             pipe.performSuccessfulConnection();
         } return true;
         case "inWorkerDisconnect": {
@@ -1545,7 +1545,7 @@ export class WebSocketClientPipe extends BasicSocketPipe {
     _onWsClose: any;
     _onWsError: any;
     _onWsMessage: any;
-    urlWS: string | null
+    urlWS: string | null;
     _removeWsEventListeners: any;
     constructor ( url: string | URL | null ) {
         super();
@@ -1714,8 +1714,8 @@ export class WebSocketClientPipe extends BasicSocketPipe {
 };
 
 export class RTCConnection extends EventDispatcher {
-    strSignalingServerURL: string | null
-    idRtcParticipant: string | null
+    strSignalingServerURL: string | null;
+    idRtcParticipant: string | null;
     wasIdentified: boolean;
     iceComplete: any;
     pc: any;
@@ -1905,7 +1905,7 @@ export class RTCConnection extends EventDispatcher {
                 "WARNING: Participant \"" + this.idRtcParticipant +
                 "\" ICE gathering state changed event with no pc\", event is:", event
             );
-            return
+            return;
         }
         if( settings.logging.net.rtc.iceGatheringStateChange ) {
             console.log(
@@ -1976,7 +1976,7 @@ export class RTCConnection extends EventDispatcher {
 };
 
 export class RTCActor extends RTCConnection {
-    idSomebodyCreator: string | null
+    idSomebodyCreator: string | null;
     bWasImpersonated: boolean;
     isCreator: boolean;
     isJoiner: boolean;
@@ -2221,7 +2221,7 @@ export class RTCActor extends RTCConnection {
 
 export class RTCServerPeer extends RTCConnection {
     rtcCreator: any;
-    idSomebodyOtherSide: string | null
+    idSomebodyOtherSide: string | null;
     idOffer: number;
     tsOfferCreated: any;
     isPublishing: boolean;
@@ -2695,7 +2695,7 @@ export class RTCCreator extends RTCActor {
                         );
                     }
                     this.onError( strError );
-                    return
+                    return;
                 }
                 const rtcPeer = this.mapServerOffers[idOffer];
                 // OKay, finally got answer from candida
@@ -2772,7 +2772,7 @@ export class RTCCreator extends RTCActor {
             break;
         default:
             super.signalingPipeOnMessage( joMessage );
-            break
+            break;
         } // switch( joMessage.method )
     }
     send( data: any ): void { // implementation in RTCCreator does send to all
@@ -3115,7 +3115,7 @@ export class RTCJoiner extends RTCActor {
             break;
         default:
             super.signalingPipeOnMessage( joMessage );
-            break
+            break;
         } // switch( joMessage.method )
     }
 };
@@ -3428,7 +3428,7 @@ export class WebRTCServerAcceptor extends BasicServerAcceptor {
 };
 
 export class WebRTCClientPipe extends BasicSocketPipe {
-    strSignalingServerURL: string | null
+    strSignalingServerURL: string | null;
     idRtcParticipant: string;
     offerOptions: any;
     signalingOptions: any;

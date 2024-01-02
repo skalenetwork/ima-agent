@@ -382,7 +382,7 @@ async function handlePeriodicDiscoveryAttemptActions(
             .then( function(): void {} ).catch( function( err ): void {
                 log.error(
                     "Failed to continue S-chain discovery, reported error is: {err}", err );
-            } )
+            } );
     } catch ( err ) { }
     gFlagIsInSChainDiscovery = false;
     // fnAfter() will be called here inside async call at beginning

@@ -170,7 +170,7 @@ export interface TSignU256Options {
 }
 
 const anyShellMod: any = shellMod as any;
-const shell = anyShellMod.default
+const shell = anyShellMod.default;
 
 const Keccak = sha3Module.Keccak;
 
@@ -429,7 +429,7 @@ function performBlsGlue(
     const fnShellRestore = function(): void {
         shell.rm( "-rf", strActionDir );
     };
-    const strOutput = ""
+    const strOutput = "";
     try {
         let strInput = "";
         const cnt = arrSignResults.length;
@@ -1548,7 +1548,7 @@ export async function doSignMessagesM2S(
     await doSignMessagesImpl(
         nTransferLoopCounter, "M2S",
         jarrMessages, nIdxCurrentMsgBlockStart, strFromChainName,
-        joExtraSignOpts, fn )
+        joExtraSignOpts, fn );
 }
 
 export async function doSignMessagesS2M(
@@ -1559,7 +1559,7 @@ export async function doSignMessagesS2M(
     await doSignMessagesImpl(
         nTransferLoopCounter, "S2M",
         jarrMessages, nIdxCurrentMsgBlockStart, strFromChainName,
-        joExtraSignOpts, fn )
+        joExtraSignOpts, fn );
 }
 
 export async function doSignMessagesS2S(
@@ -1570,7 +1570,7 @@ export async function doSignMessagesS2S(
     await doSignMessagesImpl(
         nTransferLoopCounter, "S2S",
         jarrMessages, nIdxCurrentMsgBlockStart, strFromChainName,
-        joExtraSignOpts, fn )
+        joExtraSignOpts, fn );
 }
 
 async function prepareSignU256( optsSignU256: TSignU256Options ): Promise < boolean > {
@@ -2366,7 +2366,7 @@ async function handleSkaleImaBSU256Prepare( optsBSU256: TBSU256Options ): Promis
         optsBSU256.strLogPrefix, optsBSU256.strMessageHash );
     optsBSU256.details.trace( "{p}Will BLS-sign U256.", optsBSU256.strLogPrefix );
     if( !optsBSU256.joAccount )
-        throw new Error( "No account to perform blsSignMessageHash for U256" )
+        throw new Error( "No account to perform blsSignMessageHash for U256" );
     optsBSU256.joAccount = optsBSU256.imaState.chainProperties.sc.joAccount;
     if( !optsBSU256.joAccount.strSgxURL ) {
         optsBSU256.joAccount = optsBSU256.imaState.chainProperties.mn.joAccount;
@@ -2439,7 +2439,7 @@ export async function handleSkaleImaBSU256(
         if( !( await handleSkaleImaBSU256Prepare( optsBSU256 ) ) )
             return null;
         if( !optsBSU256.joAccount )
-            throw new Error( "No account to perform blsSignMessageHash for U256" )
+            throw new Error( "No account to perform blsSignMessageHash for U256" );
         let rpcCallOpts: rpcCall.TRPCCallOpts | null = null;
         if( "strPathSslKey" in optsBSU256.joAccount &&
             typeof optsBSU256.joAccount.strPathSslKey === "string" &&

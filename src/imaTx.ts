@@ -366,13 +366,13 @@ export async function payedCall(
         switch ( optsPayedCall.joACI.strType ) {
         case "tm":
             await payedCallTM( optsPayedCall );
-            break
+            break;
         case "sgx":
             await payedCallSGX( optsPayedCall );
-            break
+            break;
         case "direct":
             await payedCallDirect( optsPayedCall );
-            break
+            break;
         default: {
             const strErrorPrefix = "Transaction sign and send error(INNER FLOW): ";
             optsPayedCall.details.critical(
@@ -435,7 +435,7 @@ export async function checkTransactionToSchain(
                 strLogPrefix, strFromAddress, owaspUtils.toHexStringSafe( unsignedTx.gasLimit ) );
             const powNumberBuffer = await calculatePowNumber(
                 strFromAddress, owaspUtils.toBN( unsignedTx.nonce ).toHexString(),
-                owaspUtils.toHexStringSafe( unsignedTx.gasLimit ), details, strLogPrefix )
+                owaspUtils.toHexStringSafe( unsignedTx.gasLimit ), details, strLogPrefix );
             details.debug( "{p}Returned PoW-mining number {}", strLogPrefix, powNumberBuffer );
             let powNumber: string = powNumberBuffer.toString( "utf8" ).trim();
             powNumber = imaUtils.replaceAll( powNumber, "\r", "" );
@@ -524,7 +524,7 @@ const gTransactionManagerPool = "transactions";
 
 function tmGenerateRandomHex( size: number ): string {
     return [ ...Array( size ) ]
-        .map( () => Math.floor( Math.random() * 16 ).toString( 16 ) ).join( "" )
+        .map( () => Math.floor( Math.random() * 16 ).toString( 16 ) ).join( "" );
 }
 
 function tmMakeId( details: log.TLogger ): string {

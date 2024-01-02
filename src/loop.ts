@@ -143,11 +143,11 @@ export function checkTimeFraming(
                 const s1: string = log.fmtInformation( "{}",
                     joRuntimeOpts.joExtraSignOpts
                         ? joRuntimeOpts.joExtraSignOpts.chainNameDst
-                        : "N/A" )
+                        : "N/A" );
                 const s2: string = log.fmtInformation( "{}",
                     joRuntimeOpts.joExtraSignOpts
                         ? joRuntimeOpts.joExtraSignOpts.chainIdDst
-                        : "N/A" )
+                        : "N/A" );
                 strFrameInfo += log.fmtDebug( "    S-Chain destination", "........",
                     s1, "/", s2, "\n" );
             }
@@ -620,23 +620,23 @@ export async function ensureHaveWorkers( opts: TParallelLoopRunOptions ): Promis
             case "init":
                 if( !joMessage.error ) {
                     aClient.logicalInitComplete = true;
-                    break
+                    break;
                 }
                 aClient.errorLogicalInit = joMessage.error;
                 opts.details.critical(
                     " Loop worker thread {} reported/returned init error: {err}",
                     idxWorker, joMessage.error );
-                break
+                break;
             case "log":
                 log.information( "LOOP WORKER {} {}", workerData.url, joMessage.message );
-                break
+                break;
             case "saveTransferError":
                 imaTransferErrorHandling.saveTransferError(
                     joMessage.message.category, joMessage.message.textLog, joMessage.message.ts );
-                break
+                break;
             case "saveTransferSuccess":
                 imaTransferErrorHandling.saveTransferSuccess( joMessage.message.category );
-                break
+                break;
             } // switch ( joMessage.method )
         } );
         const jo: any = {

@@ -741,27 +741,27 @@ export function toBNbasic( x?: any, optionalRadix?: number ): any {
 export function toBN( arg: any ): any {
     if( typeof arg === "string" || typeof arg === "number" ) {
         let multiplier = toBNbasic( 1 );
-        const formattedString = String( arg ).toLowerCase().trim()
+        const formattedString = String( arg ).toLowerCase().trim();
         const isHexPrefixed =
             formattedString.substr( 0, 2 ) === "0x" ||
-            formattedString.substr( 0, 3 ) === "-0x"
+            formattedString.substr( 0, 3 ) === "-0x";
         let stringArg = stripHexPrefix( formattedString );
         if( stringArg.substr( 0, 1 ) === "-" ) {
-            stringArg = stripHexPrefix( stringArg.slice( 1 ) )
+            stringArg = stripHexPrefix( stringArg.slice( 1 ) );
             multiplier = toBNbasic( -1, 10 );
         }
         stringArg = stringArg === "" ? "0" : stringArg;
         if( ( !stringArg.match( /^-?[0-9]+$/ ) && stringArg.match( /^[0-9A-Fa-f]+$/ ) ) ||
             stringArg.match( /^[a-fA-F]+$/ ) ||
             ( isHexPrefixed && stringArg.match( /^[0-9A-Fa-f]+$/ ) ) )
-            return toBNbasic( stringArg, 16 ).mul( multiplier )
+            return toBNbasic( stringArg, 16 ).mul( multiplier );
         if( ( stringArg.match( /^-?[0-9]+$/ ) || stringArg === "" ) && !isHexPrefixed )
             return toBNbasic( stringArg, 10 ).mul( multiplier );
     } else if( typeof arg === "object" && arg.toString && ( !arg.pop && !arg.push ) ) {
         if( arg.toString().match( /^-?[0-9]+$/ ) && ( arg.mul || arg.dividedToIntegerBy ) )
             return toBNbasic( arg.toString(), 10 );
     } else if( arg )
-        return toBNbasic( arg ) // try to convert as is
+        return toBNbasic( arg ); // try to convert as is
 
     throw new Error(
         "Error in owaspUtils.toBN() while converting " +

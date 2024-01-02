@@ -14,14 +14,7 @@ module.exports = {
         "sourceType": "module"
     },
     "rules": {
-        "indent": [ "error", 4, {
-            "CallExpression": {
-                "arguments": 1
-            }
-        } ],
         "linebreak-style": [ "error", "unix" ],
-        "quotes": [ "error", "double" ],
-        "semi": [ "error", "always" ],
         "eqeqeq": "off",
         "comma-dangle": [ "error", "never" ],
         "comma-style": [ "error", "last" ],
@@ -32,16 +25,12 @@ module.exports = {
         "curly": [ "error", "multi-or-nest" ],
         "nonblock-statement-body-position": [ "error", "below" ],
         "no-cond-assign": [ "error", "always" ],
-        "lines-between-class-members": [ "error", "never" ],
         "max-len": [ "error", { "code": 100, "tabWidth": 4 } ],
         "max-lines-per-function": [ "error", { "max": 200, "skipBlankLines": false } ],
         "@typescript-eslint/indent": [ "error", 4,  { "ignoredNodes": [ "SwitchCase" ] } ],
         "@typescript-eslint/quotes": [ "error", "double" ],
-        "semi": "off",
-        "@typescript-eslint/semi": "off",
-        "space-before-function-paren": "off",
+        "@typescript-eslint/semi": [ "error", "always" ],
         "@typescript-eslint/space-before-function-paren": "off",
-        "keyword-spacing": "off",
         "@typescript-eslint/keyword-spacing": [ "error", {
             "overrides": {
                 "if": { "before": false, "after": false },
@@ -54,7 +43,7 @@ module.exports = {
         "@typescript-eslint/prefer-nullish-coalescing": "off",
         "@typescript-eslint/strict-boolean-expressions": "off",
         "@typescript-eslint/no-this-alias": "off",
-        "@typescript-eslint/lines-between-class-members": "off",
+        "@typescript-eslint/lines-between-class-members": [ "error", "never" ],
         "@typescript-eslint/prefer-optional-chain": "off"
     }
 };

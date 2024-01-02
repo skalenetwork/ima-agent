@@ -95,7 +95,7 @@ const getDurationString = cc.getDurationString;
 export { safeURL, replaceAll, timestampHR, capitalizeFirstLetter, getDurationString };
 
 export function autoEnableColorizationFromCommandLineArgs(): void {
-    cc.autoEnableFromCommandLineArgs()
+    cc.autoEnableFromCommandLineArgs();
 }
 export function enableColorization( bIsEnable?: boolean ): void {
     cc.enable( !!bIsEnable );
@@ -1058,7 +1058,7 @@ export function verboseLevelAsTextForLog( vl: any ): string {
 }
 export function verboseName2Number( s: string ): number {
     const mapReversedVerbose: Map < string, number > = verboseReversed();
-    const n = mapReversedVerbose.get( s )
+    const n = mapReversedVerbose.get( s );
     if( typeof n === "undefined" )
         return 9;
     return n;

@@ -149,21 +149,21 @@ export async function registerSChainInDepositBoxes( // step 1
         strActionName = "Register S-chain in deposit boxes, step 1, connectSchain";
         details.debug( "{p}Will register S-Chain in lock_and_data on Main-net", strLogPrefix );
         if( !joTokenManagerLinker )
-            throw new Error( "No TokenManagerLinker contract" )
+            throw new Error( "No TokenManagerLinker contract" );
         if( !joCommunityLocker )
-            throw new Error( "No CommunityLocker contract" )
+            throw new Error( "No CommunityLocker contract" );
         if( !joTokenManagerETH )
-            throw new Error( "No TokenManagerETH contract" )
+            throw new Error( "No TokenManagerETH contract" );
         if( !joTokenManagerERC20 )
-            throw new Error( "No TokenManagerERC20 contract" )
+            throw new Error( "No TokenManagerERC20 contract" );
         if( !joTokenManagerERC721 )
-            throw new Error( "No TokenManagerERC721 contract" )
+            throw new Error( "No TokenManagerERC721 contract" );
         if( !joTokenManagerERC1155 )
-            throw new Error( "No TokenManagerERC1155 contract" )
+            throw new Error( "No TokenManagerERC1155 contract" );
         if( !joTokenManagerERC721WithMetadata )
-            throw new Error( "No TokenManagerERC721WithMetadata contract" )
+            throw new Error( "No TokenManagerERC721WithMetadata contract" );
         if( !joLinker )
-            throw new Error( "No Linker contract" )
+            throw new Error( "No Linker contract" );
         const arrArguments = [
             chainNameSChain, [
                 joTokenManagerLinker.address, // call params

@@ -427,7 +427,7 @@ export const getCircularReplacerForJsonStringify = (): any => {
         }
         return value;
     };
-}
+};
 
 export const jsonColorizer: any = { // see http://jsfiddle.net/unLSJ/
     cntCensoredMax: 30000, // zero to disable censoring
@@ -442,7 +442,7 @@ export const jsonColorizer: any = { // see http://jsfiddle.net/unLSJ/
             if( i >= jsonColorizer.cntCensoredMax )
                 return "[Unknown]";
 
-            ++i // so we know we aren't using the original object anymore
+            ++i; // so we know we aren't using the original object anymore
             return value;
         };
     },
@@ -978,7 +978,7 @@ export function stack( err?: any ): string {
     if( !err )
         return "";
     if( err && "stack" in err ) {
-        const st = err.stack
+        const st = err.stack;
         if( st && typeof st === "string" )
             err = st;
     }

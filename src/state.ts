@@ -528,5 +528,5 @@ export function isPreventExitAfterLastAction(): boolean {
 }
 
 export function setPreventExitAfterLastAction( isPrevent: any ): void {
-    gFlagIsPreventExitAfterLastAction = ( !!isPrevent )
+    gFlagIsPreventExitAfterLastAction = ( !!isPrevent );
 }

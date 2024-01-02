@@ -62,7 +62,7 @@ function doSendMessage( type: any, endpoint: any, workerUUID: any, data: any ): 
 class ObserverServer extends SocketServer {
     initComplete?: boolean;
     opts: loop.TParallelLoopRunOptions | null;
-    intervalPeriodicSchainsCaching?: number | null
+    intervalPeriodicSchainsCaching?: number | null;
     bIsPeriodicCachingStepInProgress?: boolean;
     constructor ( acceptor: any ) {
         super( acceptor );
@@ -208,7 +208,7 @@ class ObserverServer extends SocketServer {
                     owaspUtils.toInteger( joMessage.params.ts ),
                     joMessage.params.signature
                 ).then( function(): void {} ).catch( function(): void {} );
-            }
+            };
         console.log( "Initialized in-worker IMA loop {} server in {}",
             workerData.url, threadInfo.threadDescription() );
     }
