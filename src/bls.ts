@@ -94,6 +94,7 @@ export interface TSignOperationOptions {
 export interface TBSU256CallData {
     params: {
         valueToSign: string
+        qa?: TQAInformation
     }
 }
 
@@ -2214,8 +2215,8 @@ async function handleBlsSignMessageHashResult(
     if( joOut.signResult != null && joOut.signResult != undefined &&
         typeof joOut.signResult === "object" )
         joSignResult = joOut.signResult;
-    if( "qa" in optsHandleVerifyAndSign.joCallData )
-        optsHandleVerifyAndSign.joRetVal.qa = optsHandleVerifyAndSign.joCallData.qa;
+    if( "qa" in optsHandleVerifyAndSign.joCallData.params )
+        optsHandleVerifyAndSign.joRetVal.qa = optsHandleVerifyAndSign.joCallData.params.qa;
     if( !joSignResult ) {
         const strError = "No signature arrived";
         optsHandleVerifyAndSign.joRetVal.error = strError;
@@ -2240,8 +2241,8 @@ async function handleBlsSignMessageHashResult(
     }
     optsHandleVerifyAndSign.isSuccess = true;
     optsHandleVerifyAndSign.joRetVal.result = { signResult: joSignResult };
-    if( "qa" in optsHandleVerifyAndSign.joCallData )
-        optsHandleVerifyAndSign.joRetVal.qa = optsHandleVerifyAndSign.joCallData.qa;
+    if( "qa" in optsHandleVerifyAndSign.joCallData.params )
+        optsHandleVerifyAndSign.joRetVal.qa = optsHandleVerifyAndSign.joCallData.params.qa;
     await joCall.disconnect();
     return joSignResult;
 }
@@ -2412,8 +2413,8 @@ async function handleBlsSignMessageHash256Result(
     }
     optsBSU256.isSuccess = true;
     optsBSU256.joRetVal.result = { signResult: joSignResult };
-    if( "qa" in optsBSU256.joCallData )
-        optsBSU256.joRetVal.qa = optsBSU256.joCallData.qa;
+    if( "qa" in optsBSU256.joCallData.params )
+        optsBSU256.joRetVal.qa = optsBSU256.joCallData.params.qa;
     await joCall.disconnect();
     return joSignResult;
 }
