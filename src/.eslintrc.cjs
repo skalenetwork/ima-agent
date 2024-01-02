@@ -54,7 +54,6 @@ module.exports = {
         "@typescript-eslint/no-non-null-asserted-nullish-coalescing": "off",
         "@typescript-eslint/prefer-nullish-coalescing": "off",
         "@typescript-eslint/strict-boolean-expressions": "off",
-        "@typescript-eslint/no-dynamic-delete": "off",
         "@typescript-eslint/no-this-alias": "off",
         "@typescript-eslint/lines-between-class-members": "off",
         "@typescript-eslint/prefer-optional-chain": "off"
