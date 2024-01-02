@@ -564,8 +564,8 @@ async function tmSend( details: log.TLogger, tx: any, priority: number = 5 ): Pr
 }
 
 function tmIsFinished( record: any ): boolean {
-    if( record == null )
-        return null;
+    if( !record )
+        return false;
     return [ "SUCCESS", "FAILED", "DROPPED" ].includes( record.status );
 }
 

@@ -675,7 +675,7 @@ export function extractErrorMessage( jo?: any, strDefaultErrorText?: string ): s
         return strDefaultErrorText;
     try {
         const isError = function( err: Error | string ): boolean {
-            return err && err instanceof Error && err.stack && err.message;
+            return !!( ( err && err instanceof Error && err.stack && err.message ) );
         };
         if( !isError( jo ) ) {
             if( "error" in jo ) {

@@ -373,7 +373,7 @@ async function analyzeGatheredRecords( optsTransfer: TTransferOptions, r: any ):
     return joValues;
 }
 
-async function gatherMessages( optsTransfer: TTransferOptions ): Promise<void> {
+async function gatherMessages( optsTransfer: TTransferOptions ): Promise<boolean> {
     optsTransfer.arrMessageCounters = [];
     optsTransfer.jarrMessages = [];
     optsTransfer.nIdxCurrentMsgBlockStart = 0 + optsTransfer.nIdxCurrentMsg;
@@ -519,6 +519,7 @@ async function gatherMessages( optsTransfer: TTransferOptions ): Promise<void> {
         };
         optsTransfer.jarrMessages.push( joMessage );
     }
+    return true;
 }
 
 async function preCheckAllMessagesSign(

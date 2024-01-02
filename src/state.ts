@@ -516,7 +516,7 @@ export function get(): TIMAState {
     return imaState;
 }
 
-export function set( imaStateNew: TIMAState ): void {
+export function set( imaStateNew: TIMAState ): TIMAState {
     imaState = imaStateNew;
     return imaState;
 }
