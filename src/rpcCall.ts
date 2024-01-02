@@ -34,6 +34,7 @@ export interface TRPCCallOpts {
     cert?: string
     key?: string
     ca?: string
+    isAutoReconnect?: boolean
 }
 
 export type TFunctionConnectionResultHandler =

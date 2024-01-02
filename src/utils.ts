@@ -412,41 +412,24 @@ export function checkKeysExistInABI(
 }
 
 export function composeSChainNodeUrl( joNode: discoveryTools.TSChainNode ): string {
-    if( "ip" in joNode && typeof joNode.ip === "string" && joNode.ip.length > 0 ) {
-        if( "httpRpcPort" in joNode &&
-            typeof joNode.httpRpcPort === "number" &&
-            joNode.httpRpcPort > 0 )
+    if( "ip" in joNode && joNode?.ip && joNode.ip.length > 0 ) {
+        if( "httpRpcPort" in joNode && joNode?.httpRpcPort && joNode.httpRpcPort > 0 )
             return "http://" + joNode.ip + ":" + joNode.httpRpcPort;
-        if( "wsRpcPort" in joNode &&
-            typeof joNode.wsRpcPort === "number" &&
-            joNode.wsRpcPort > 0 )
+        if( "wsRpcPort" in joNode && joNode?.wsRpcPort && joNode.wsRpcPort > 0 )
             return "ws://" + joNode.ip + ":" + joNode.wsRpcPort;
-        if( "httpsRpcPort" in joNode &&
-            typeof joNode.httpsRpcPort === "number" &&
-            joNode.httpsRpcPort > 0 )
+        if( "httpsRpcPort" in joNode && joNode?.httpsRpcPort && joNode.httpsRpcPort > 0 )
             return "https://" + joNode.ip + ":" + joNode.httpsRpcPort;
-        if( "wssRpcPort" in joNode &&
-            typeof joNode.wssRpcPort === "number" &&
-            joNode.wssRpcPort > 0 )
+        if( "wssRpcPort" in joNode && joNode?.wssRpcPort && joNode.wssRpcPort > 0 )
             return "wss://" + joNode.ip + ":" + joNode.wssRpcPort;
     }
-    if( "ip6" in joNode && typeof joNode.ip6 === "string" &&
-    joNode.ip6.length > 0 ) {
-        if( "httpRpcPort6" in joNode &&
-            typeof joNode.httpRpcPort6 === "number" &&
-            joNode.httpRpcPort6 > 0 )
+    if( "ip6" in joNode && joNode?.ip6 && joNode.ip6.length > 0 ) {
+        if( "httpRpcPort6" in joNode && joNode?.httpRpcPort6 && joNode.httpRpcPort6 > 0 )
             return "http://[" + joNode.ip6 + "]:" + joNode.httpRpcPort6;
-        if( "wsRpcPort6" in joNode &&
-            typeof joNode.wsRpcPort6 === "number" &&
-            joNode.wsRpcPort6 > 0 )
+        if( "wsRpcPort6" in joNode && joNode?.wsRpcPort6 && joNode.wsRpcPort6 > 0 )
             return "ws://[" + joNode.ip6 + "]:" + joNode.wsRpcPort6;
-        if( "httpsRpcPort6" in joNode &&
-            typeof joNode.httpsRpcPort6 === "number" &&
-            joNode.httpsRpcPort6 > 0 )
+        if( "httpsRpcPort6" in joNode && joNode?.httpsRpcPort6 && joNode.httpsRpcPort6 > 0 )
             return "https://[" + joNode.ip6 + "]:" + joNode.httpsRpcPort6;
-        if( "wssRpcPort6" in joNode &&
-            typeof joNode.wssRpcPort6 === "number" &&
-            joNode.wssRpcPort6 > 0 )
+        if( "wssRpcPort6" in joNode && joNode?.wssRpcPort6 && joNode.wssRpcPort6 > 0 )
             return "wss://[" + joNode.ip6 + "]:" + joNode.wssRpcPort6;
     }
     return "";
@@ -455,10 +438,7 @@ export function composeSChainNodeUrl( joNode: discoveryTools.TSChainNode ): stri
 export function composeImaAgentNodeUrl(
     joNode: discoveryTools.TSChainNode, isThisNode: boolean ): string {
     let nPort = -1;
-    if( "imaAgentRpcPort" in joNode &&
-        typeof joNode.imaAgentRpcPort === "number" &&
-        joNode.imaAgentRpcPort > 0
-    )
+    if( "imaAgentRpcPort" in joNode && joNode?.imaAgentRpcPort && joNode.imaAgentRpcPort > 0 )
         nPort = joNode.imaAgentRpcPort;
     // PROPOSAL = 0
     // CATCHUP = 1
@@ -471,29 +451,13 @@ export function composeImaAgentNodeUrl(
     // HTTPS_JSON = 8
     // INFO_HTTP_JSON = 9
     // IMA_AGENT_JSON = 10
-    if( nPort < 0 &&
-        "httpRpcPort" in joNode &&
-        typeof joNode.httpRpcPort === "number" &&
-        joNode.httpRpcPort > 0
-    )
+    if( nPort < 0 && joNode?.httpRpcPort && joNode.httpRpcPort > 0 )
         nPort = joNode.httpRpcPort - 3 + 10;
-    if( nPort < 0 &&
-        "wsRpcPort" in joNode &&
-        typeof joNode.wsRpcPort === "number" &&
-        joNode.wsRpcPort > 0
-    )
+    if( nPort < 0 && joNode?.wsRpcPort && joNode.wsRpcPort > 0 )
         nPort = joNode.wsRpcPort - 2 + 10;
-    if( nPort < 0 &&
-        "httpsRpcPort" in joNode &&
-        typeof joNode.httpsRpcPort === "number" &&
-        joNode.httpsRpcPort > 0
-    )
+    if( nPort < 0 && joNode?.httpsRpcPort && joNode.httpsRpcPort > 0 )
         nPort = joNode.httpsRpcPort - 8 + 10;
-    if( nPort < 0 &&
-        "wssRpcPort" in joNode &&
-        typeof joNode.wssRpcPort === "number" &&
-        joNode.wssRpcPort > 0
-    )
+    if( nPort < 0 && joNode?.wssRpcPort && joNode.wssRpcPort > 0 )
         nPort = joNode.wssRpcPort - 7 + 10;
     if( nPort > 0 ) {
         const strNodeIP = isThisNode ? "127.0.0.1" : joNode.ip;

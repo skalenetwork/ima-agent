@@ -75,6 +75,7 @@ export interface TSChainNode {
     httpRpcPort6?: number
     httpsRpcPort?: number
     httpsRpcPort6?: number
+    imaAgentRpcPort?: number
     ip?: string
     ip6?: string
     nodeID: number
@@ -170,34 +171,24 @@ function getSChainNodesCount( joSChainNetworkInfo: TSChainNetworkInfo ): number 
 export function isSChainNodeFullyDiscovered( joNode: TSChainNode ): boolean {
     if( !joNode )
         return false;
-    if( joNode && "imaInfo" in joNode && typeof joNode.imaInfo === "object" &&
-        "t" in joNode.imaInfo && typeof joNode.imaInfo.t === "number" &&
-        joNode.imaInfo.t > 0 &&
-        "n" in joNode.imaInfo && typeof joNode.imaInfo.n === "number" &&
-        joNode.imaInfo.n > 0 &&
-        "BLSPublicKey0" in joNode.imaInfo &&
-        typeof joNode.imaInfo.BLSPublicKey0 === "string" &&
+    if( joNode && "imaInfo" in joNode && joNode?.imaInfo &&
+        "t" in joNode.imaInfo && joNode.imaInfo?.t && joNode.imaInfo.t > 0 &&
+        "n" in joNode.imaInfo && joNode.imaInfo?.n && joNode.imaInfo.n > 0 &&
+        "BLSPublicKey0" in joNode.imaInfo && joNode.imaInfo?.BLSPublicKey0 &&
         joNode.imaInfo.BLSPublicKey0.length > 0 &&
-        "BLSPublicKey1" in joNode.imaInfo &&
-        typeof joNode.imaInfo.BLSPublicKey1 === "string" &&
+        "BLSPublicKey1" in joNode.imaInfo && joNode.imaInfo?.BLSPublicKey1 &&
         joNode.imaInfo.BLSPublicKey1.length > 0 &&
-        "BLSPublicKey2" in joNode.imaInfo &&
-        typeof joNode.imaInfo.BLSPublicKey2 === "string" &&
+        "BLSPublicKey2" in joNode.imaInfo && joNode.imaInfo?.BLSPublicKey2 &&
         joNode.imaInfo.BLSPublicKey2.length > 0 &&
-        "BLSPublicKey3" in joNode.imaInfo &&
-        typeof joNode.imaInfo.BLSPublicKey3 === "string" &&
+        "BLSPublicKey3" in joNode.imaInfo && joNode.imaInfo?.BLSPublicKey3 &&
         joNode.imaInfo.BLSPublicKey3.length > 0 &&
-        "commonBLSPublicKey0" in joNode.imaInfo &&
-        typeof joNode.imaInfo.commonBLSPublicKey0 === "string" &&
+        "commonBLSPublicKey0" in joNode.imaInfo && joNode.imaInfo?.commonBLSPublicKey0 &&
         joNode.imaInfo.commonBLSPublicKey0.length > 0 &&
-        "commonBLSPublicKey1" in joNode.imaInfo &&
-        typeof joNode.imaInfo.commonBLSPublicKey1 === "string" &&
+        "commonBLSPublicKey1" in joNode.imaInfo && joNode.imaInfo?.commonBLSPublicKey1 &&
         joNode.imaInfo.commonBLSPublicKey1.length > 0 &&
-        "commonBLSPublicKey2" in joNode.imaInfo &&
-        typeof joNode.imaInfo.commonBLSPublicKey2 === "string" &&
+        "commonBLSPublicKey2" in joNode.imaInfo && joNode.imaInfo?.commonBLSPublicKey2 &&
         joNode.imaInfo.commonBLSPublicKey2.length > 0 &&
-        "commonBLSPublicKey3" in joNode.imaInfo &&
-        typeof joNode.imaInfo.commonBLSPublicKey3 === "string" &&
+        "commonBLSPublicKey3" in joNode.imaInfo && joNode.imaInfo?.commonBLSPublicKey3 &&
         joNode.imaInfo.commonBLSPublicKey3.length > 0
     )
         return true;
