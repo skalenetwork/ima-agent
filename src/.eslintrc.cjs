@@ -43,7 +43,6 @@ module.exports = {
         "@typescript-eslint/prefer-nullish-coalescing": "off",
         "@typescript-eslint/strict-boolean-expressions": "off",
         "@typescript-eslint/no-this-alias": "off",
-        "@typescript-eslint/lines-between-class-members": [ "error", "never" ],
         "@typescript-eslint/prefer-optional-chain": "off"
     }
 };

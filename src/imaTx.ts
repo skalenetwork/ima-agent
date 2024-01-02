@@ -650,6 +650,7 @@ export class TransactionCustomizer {
             : null; // null means use current gasPrice or recommendedGasPrice
         this.gasMultiplier = gasMultiplier ? ( 0.0 + gasMultiplier ) : 1.25;
     }
+
     async computeGasPrice(
         ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
         maxGasPrice: any ): Promise<any> {
@@ -677,6 +678,7 @@ export class TransactionCustomizer {
         } else
             return gasPrice;
     }
+
     async computeGas(
         details: log.TLogger,
         ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,

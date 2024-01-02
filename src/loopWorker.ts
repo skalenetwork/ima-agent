@@ -212,6 +212,7 @@ class ObserverServer extends SocketServer {
         console.log( "Initialized in-worker IMA loop {} server in {}",
             workerData.url, threadInfo.threadDescription() );
     }
+
     dispose(): void {
         const self: any = this;
         self.isDisposing = true;
@@ -221,6 +222,7 @@ class ObserverServer extends SocketServer {
         }
         super.dispose();
     }
+
     initLogMethods(): void {
         const self: any = this;
         if( "fatal" in self && self.fatal && typeof self.fatal === "function" )

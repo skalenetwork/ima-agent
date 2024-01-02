@@ -48,6 +48,7 @@ export class EventDispatcher {
         this.isDisposed = false;
         this.isDisposing = false;
     }
+
     dispose(): void {
         if( this.isDisposed )
             return;
@@ -58,9 +59,11 @@ export class EventDispatcher {
         );
         this.removeAllEventListeners();
     }
+
     hasEventListener( type: any, listener: any ): boolean {
         return this._listeners.some( item => item.type === type && item.listener === listener );
     }
+
     addEventListener( type: any, listener: any ): EventDispatcher {
         if( !this.hasEventListener( type, listener ) ) {
             this._listeners.push( {
@@ -71,6 +74,7 @@ export class EventDispatcher {
         }
         return this;
     }
+
     removeEventListener( type: any, listener: any ): EventDispatcher {
         while( true ) {
             const index = ( listener != undefined )
@@ -86,19 +90,24 @@ export class EventDispatcher {
         }
         return this;
     }
+
     removeAllEventListeners(): EventDispatcher {
         this._listeners = [];
         return this;
     }
+
     on( type: any, listener: any ): EventDispatcher {
         return this.addEventListener( type, listener );
     }
+
     off( type: any, listener: any ): EventDispatcher {
         return this.removeEventListener( type, listener );
     }
+
     offAll(): EventDispatcher {
         return this.removeAllEventListeners();
     }
+
     dispatchEvent( evt: any ): EventDispatcher {
         const a = this._listeners.filter( item => item.type === evt.type );
         for( const item of a ) {

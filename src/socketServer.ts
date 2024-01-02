@@ -163,6 +163,7 @@ export class SocketServer extends EventDispatcher {
         this.dispatchEvent(
             new UniversalDispatcherEvent( "initialized", { detail: { ref: this } } ) );
     }
+
     dispose(): void {
         this.isDisposing = true;
         super.dispose();
