@@ -181,9 +181,9 @@ export async function doConnect(
                 }
             } );
             await waitWebSocketIsOpen( joCall.wsConn,
-                async function( nStep: number ) { // work done handler
+                async function( nStep: number ): Promise<void> { // work done handler
                 },
-                async function( nStep: number ) { // step handler
+                async function( nStep: number ): Promise<boolean> { // step handler
                     if( strWsError && typeof strWsError === "string" && strWsError.length > 0 ) {
                         log.error( "{url} web socket wait error detected: {err}",
                             joCall.url, strWsError );
@@ -246,15 +246,16 @@ async function doReconnectWsStep( joCall: TRPCCall, opts: TRPCCallOpts | null,
         return;
     if( joCall.isDisconnectMode )
         return;
-    doConnect( joCall, opts, async function( joCall: TRPCCall, err: Error | string | null ) {
-        if( err ) {
-            doReconnectWsStep( joCall, opts )
-                .then( function(): void {} ).catch( function(): void {} );
-            return;
-        }
-        if( fn )
-            await fn( joCall, null );
-    } ).then( function(): void {} ).catch( function(): void {} );
+    doConnect( joCall, opts,
+        async function( joCall: TRPCCall, err: Error | string | null ): Promise<void> {
+            if( err ) {
+                doReconnectWsStep( joCall, opts )
+                    .then( function(): void {} ).catch( function(): void {} );
+                return;
+            }
+            if( fn )
+                await fn( joCall, null );
+        } ).then( function(): void {} ).catch( function(): void {} );
 }
 
 async function doDisconnect(
@@ -334,7 +335,7 @@ export async function doCall(
                 try {
                     const req = https.request( options as https.RequestOptions, ( res: any ) => {
                         res.setEncoding( "utf8" );
-                        res.on( "data", function( body: any ) {
+                        res.on( "data", function( body: any ): void {
                             accumulatedBody += body;
                         } );
                         res.on( "end", function(): void {
@@ -355,7 +356,7 @@ export async function doCall(
                             }
                         } );
                     } );
-                    req.on( "error", function( err ) {
+                    req.on( "error", function( err ): void {
                         log.error( "{url} REST error {err}", joCall.url, err as any );
                         joOut = null;
                         errCall = `HTTP(S)/RPC call(event) error: ${err as any}`;
@@ -370,7 +371,7 @@ export async function doCall(
                     reject( errCall );
                 }
             } );
-            await promiseComplete.catch( function( err: Error | string ) {
+            await promiseComplete.catch( function( err: Error | string ): void {
                 log.error( "{url} HTTP call error {err}", joCall.url, err );
                 if( !errCall )
                     errCall = `HTTP(S)/RPC call(catch) error: ${err as any}`;
@@ -439,17 +440,20 @@ export async function rpcCallCreate(
         isAutoReconnect:
             !!( ( opts && "isAutoReconnect" in opts && opts.isAutoReconnect ) ),
         isDisconnectMode: false,
-        reconnect: async function( fnAfter: TFunctionConnectionResultHandler ) {
+        reconnect:
+        async function( fnAfter: TFunctionConnectionResultHandler ): Promise<void> {
             await doConnect( joCall, opts, fnAfter );
         },
-        reconnectIfNeeded: async function( fnAfter: TFunctionConnectionResultHandler ) {
+        reconnectIfNeeded:
+        async function( fnAfter: TFunctionConnectionResultHandler ): Promise<void> {
             await doConnectIfNeeded( joCall, opts, fnAfter );
         },
-        call: async function( joIn: any, fnAfter?: TFunctionCallResultHandler ) {
+        call:
+        async function( joIn: any, fnAfter?: TFunctionCallResultHandler ): Promise<void> {
             const self = this;
-            const promiseComplete = new Promise < any >( function( resolve, reject ) {
+            const promiseComplete = new Promise < any >( function( resolve, reject ): void {
                 self.reconnectIfNeeded(
-                    async function( joCall: TRPCCall, err: Error | string | null ) {
+                    async function( joCall: TRPCCall, err: Error | string | null ): Promise<void> {
                         if( err ) {
                             if( fnAfter )
                                 await fnAfter( joIn, null, err );
@@ -457,7 +461,9 @@ export async function rpcCallCreate(
                             return;
                         }
                         await doCall( joCall, joIn,
-                            async function( joIn: any, joOut: any, err: Error | string | null ) {
+                            async function(
+                                joIn: any, joOut: any, err: Error | string | null
+                            ): Promise<void> {
                                 if( fnAfter )
                                     await fnAfter( joIn, joOut, err );
                                 if( err )
@@ -475,7 +481,8 @@ export async function rpcCallCreate(
                     "{url} JSON RPC call(awaiter) error: {err}", strURL, err );
             } );
         },
-        disconnect: async function( fnAfter?: TFunctionConnectionResultHandler ) {
+        disconnect:
+        async function( fnAfter?: TFunctionConnectionResultHandler ): Promise<void> {
             await doDisconnect( joCall, fnAfter );
         }
     };
@@ -595,16 +602,17 @@ export async function checkTcpPromise(
                     `default TCP connection to ${strHost}:${nPort} timeout...` );
             }
         }
-        conn.on( "timeout", function( err: Error | string | null ) {
-            if( isLog ) {
-                console.log(
-                    `${gStrTcpConnectionHeader}TCP connection ` +
+        conn.on( "timeout",
+            function( err: Error | string | null ): void {
+                if( isLog ) {
+                    console.log(
+                        `${gStrTcpConnectionHeader}TCP connection ` +
                     `to ${strHost}:${nPort} timed out` );
-            }
-            conn.destroy();
-            reject( err );
-        } );
-        conn.on( "error", function( err: Error | string ) {
+                }
+                conn.destroy();
+                reject( err );
+            } );
+        conn.on( "error", function( err: Error | string ): void {
             if( isLog ) {
                 console.log(
                     `${gStrTcpConnectionHeader}TCP connection ` +

@@ -280,7 +280,7 @@ export async function doOracleGasPriceSetup(
             optsGasPriceSetup.strLogPrefix );
         optsGasPriceSetup.fnSignMsgOracle =
             async function( u256: any, details: log.TLogger,
-                fnAfter: IMA.TFunctionAfterSigningMessages ) {
+                fnAfter: IMA.TFunctionAfterSigningMessages ): Promise<void> {
                 details.trace( "{p}u256 signing callback was not provided",
                     optsGasPriceSetup.strLogPrefix );
                 await fnAfter( null, u256, null ); // null - no error, null - no signatures
@@ -296,7 +296,8 @@ export async function doOracleGasPriceSetup(
         await optsGasPriceSetup.fnSignMsgOracle(
             optsGasPriceSetup.gasPriceOnMainNet, optsGasPriceSetup.details,
             async function(
-                strError: Error | string | null, u256: any, joGlueResult: any | null ) {
+                strError: Error | string | null, u256: any, joGlueResult: any | null
+            ): Promise<void> {
                 await handleOracleSigned( optsGasPriceSetup, strError, u256, joGlueResult );
             } );
     } catch ( err ) {

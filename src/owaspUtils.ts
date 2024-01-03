@@ -89,9 +89,8 @@ export function parseIntOrHex( s: any ): number {
 }
 
 export function validateRadix( value: any, radix?: any ): boolean {
-    value = value ? value.toString() : "10";
-    value = value ? value.toString().trim() : "";
-    radix = ( radix == null || radix == undefined )
+    value = ( value ? value.toString() : "10" ).trim();
+    radix = ( radix === null || radix === undefined )
         ? ( ( value.length > 2 && value[0] == "0" && ( value[1] == "x" || value[1] == "X" ) )
             ? 16
             : 10 )
@@ -101,8 +100,10 @@ export function validateRadix( value: any, radix?: any ): boolean {
 
 export function validateInteger( value: any, radix?: any ): boolean {
     try {
-        value = value ? value.toString().trim() : "";
-        if( value.length < 1 )
+        if( value === 0 || value === 0.0 )
+            return true;
+        const s = value ? value.toString().trim() : "";
+        if( s.length < 1 )
             return false;
         radix = validateRadix( value, radix );
         if( ( !isNaN( value ) ) &&
@@ -117,6 +118,9 @@ export function validateInteger( value: any, radix?: any ): boolean {
 
 export function toInteger( value: any, radix?: any ): number {
     try {
+        if( value === 0 || value === 0.0 || value === null || value === undefined )
+            return 0;
+        value = ( value ? value.toString().trim() : "" ).trim();
         radix = validateRadix( value, radix );
         if( !validateInteger( value, radix ) )
             return NaN;
@@ -128,6 +132,8 @@ export function toInteger( value: any, radix?: any ): number {
 
 export function validateFloat( value: any ): boolean {
     try {
+        if( value === 0 || value === 0.0 )
+            return true;
         const f = parseFloat( value );
         if( isNaN( f ) )
             return false;
@@ -139,6 +145,8 @@ export function validateFloat( value: any ): boolean {
 
 export function toFloat( value: any ): number {
     try {
+        if( value === 0 || value === 0.0 || value === null || value === undefined )
+            return 0.0;
         const f = parseFloat( value );
         return f;
     } catch ( err ) {

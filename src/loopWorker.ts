@@ -73,7 +73,7 @@ class ObserverServer extends SocketServer {
         self.intervalPeriodicSchainsCaching = null;
         self.bIsPeriodicCachingStepInProgress = false;
         self.mapApiHandlers.init =
-        function( joMessage: any, joAnswer: any, eventData: any, socket: any ) {
+        function( joMessage: any, joAnswer: any, eventData: any, socket: any ): any {
             joAnswer.message = {
                 method: joMessage.method.toString(),
                 error: null
@@ -110,22 +110,24 @@ class ObserverServer extends SocketServer {
             log.enableColorization( joMessage.message.colorization.isEnabled );
             log.verboseSet( self.opts.imaState.verbose_ );
             log.exposeDetailsSet( self.opts.imaState.expose_details_ );
-            imaTransferErrorHandling.saveTransferEvents.on( "error", function( eventData: any ) {
-                const jo: any = {
-                    method: "saveTransferError",
-                    message: eventData.detail
-                };
-                const isFlush = true;
-                socket.send( jo, isFlush );
-            } );
-            imaTransferErrorHandling.saveTransferEvents.on( "success", function( eventData: any ) {
-                const jo: any = {
-                    method: "saveTransferSuccess",
-                    message: eventData.detail
-                };
-                const isFlush = true;
-                socket.send( jo, isFlush );
-            } );
+            imaTransferErrorHandling.saveTransferEvents.on( "error",
+                function( eventData: any ): void {
+                    const jo: any = {
+                        method: "saveTransferError",
+                        message: eventData.detail
+                    };
+                    const isFlush = true;
+                    socket.send( jo, isFlush );
+                } );
+            imaTransferErrorHandling.saveTransferEvents.on( "success",
+                function( eventData: any ): void {
+                    const jo: any = {
+                        method: "saveTransferSuccess",
+                        message: eventData.detail
+                    };
+                    const isFlush = true;
+                    socket.send( jo, isFlush );
+                } );
             self.opts.imaState.chainProperties.mn.joAccount.address =
                 function(): string { return owaspUtils.fnAddressImpl_( this ); };
             self.opts.imaState.chainProperties.sc.joAccount.address =
@@ -187,7 +189,7 @@ class ObserverServer extends SocketServer {
             return joAnswer;
         };
         self.mapApiHandlers.spreadUpdatedSChainNetwork =
-            function( joMessage: any, joAnswer: any, eventData: any, socket: any ) {
+            function( joMessage: any, joAnswer: any, eventData: any, socket: any ): void {
                 self.initLogMethods();
                 self.debug(
                     "New own S-Chains network information is arrived to {} loop worker " +
@@ -197,7 +199,7 @@ class ObserverServer extends SocketServer {
                 imaState.joSChainNetworkInfo = joMessage.joSChainNetworkInfo;
             };
         self.mapApiHandlers.skale_imaNotifyLoopWork =
-            function( joMessage: any, joAnswer: any, eventData: any, socket: any ) {
+            function( joMessage: any, joAnswer: any, eventData: any, socket: any ): void {
                 self.initLogMethods();
                 pwa.handleLoopStateArrived( // NOTICE: no await here, executed async
                     imaState,

@@ -49,7 +49,7 @@ export class SocketServer extends EventDispatcher {
         self.isLogSocketErrors = true;
         self.isLogSocketTraffic = false;
         self.isLogSocketTrafficRaw = false;
-        acceptor.on( "connection", function( eventData: any ) {
+        acceptor.on( "connection", function( eventData: any ): void {
             const socket = eventData.socket;
             if( ( !( "remoteAddress" in eventData ) ) ||
                 eventData.remoteAddress == null ||
@@ -77,7 +77,7 @@ export class SocketServer extends EventDispatcher {
                 // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                 delete self.mapAcceptedPipes[socket];
             };
-            let _onPipeError: any = function( eventData: any ) {
+            let _onPipeError: any = function( eventData: any ): void {
                 if( self.isLogSocketErrors ) {
                     self.log( log.fmtError( "Socket {url} error {err}",
                         socket.strSavedRemoteAddress, eventData ) );
@@ -89,7 +89,7 @@ export class SocketServer extends EventDispatcher {
                 // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                 delete self.mapAcceptedPipes[socket];
             };
-            let _onPipeMessage: any = function( eventData: any ) {
+            let _onPipeMessage: any = function( eventData: any ): void {
                 if( self.isLogSocketTrafficRaw ) {
                     self.log( log.fmtInformation( "Socket {url} did received {sunny} {}",
                         socket.strSavedRemoteAddress, "raw-message", eventData ) );

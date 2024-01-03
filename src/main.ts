@@ -47,7 +47,7 @@ process.on( "unhandledRejection", function( reason: any, p: any ): void {
     log.fatal(
         "CRITICAL ERROR: unhandled rejection with reason {} and promise {}",
         reason, p );
-} ).on( "uncaughtException", function( err: any ) {
+} ).on( "uncaughtException", function( err: any ): void {
     log.fatal(
         "CRITICAL ERROR: uncaught exception: {err}, stack is:\n{stack}",
         err, err );
@@ -169,7 +169,7 @@ function initMonitoringServer(): void {
             ip = "N/A";
         if( imaState.bLogMonitoringServer )
             log.debug( "{p}New connection from {}", strLogPrefix, ip );
-        wsPeer.on( "message", function( message: any ) {
+        wsPeer.on( "message", function( message: any ): void {
             const joAnswer: any = {
                 method: null,
                 id: null,
@@ -269,11 +269,11 @@ function initJsonRpcServer(): void {
     gExpressJsonRpcAppIMA = express();
     gExpressJsonRpcAppIMA.use( bodyParser.urlencoded( { extended: true } ) );
     gExpressJsonRpcAppIMA.use( bodyParser.json() );
-    gExpressJsonRpcAppIMA.post( "/", async function( req: any, res: any ) {
+    gExpressJsonRpcAppIMA.post( "/", async function( req: any, res: any ): Promise<void> {
         const isSkipMode = false;
         const message = JSON.stringify( req.body );
         const ip = req.connection.remoteAddress.split( ":" ).pop();
-        const fnSendAnswer: any = function( joAnswer: any ) {
+        const fnSendAnswer: any = function( joAnswer: any ): void {
             try {
                 res.header( "Content-Type", "application/json" );
                 res.status( 200 ).send( JSON.stringify( joAnswer ) );
@@ -460,7 +460,7 @@ async function main(): Promise<void> {
             const nCountToWait = -1;
             discoveryTools.discoverSChainNetwork(
                 function( err?: Error | string | null,
-                    joSChainNetworkInfo?: discoveryTools.TSChainNetworkInfo | null ) {
+                    joSChainNetworkInfo?: discoveryTools.TSChainNetworkInfo | null ): void {
                     if( joSChainNetworkInfo ) {
                         handleFirstSChainDiscoveryAttemptDone(
                             err, joSChainNetworkInfo, isSilentReDiscovery,
@@ -470,7 +470,7 @@ async function main(): Promise<void> {
                     // Finish of IMA Agent startup,
                     // everything else is in async calls executed later
                 }, isSilentReDiscovery, imaState.joSChainNetworkInfo, nCountToWait
-            ).catch( function( err: Error | string ) {
+            ).catch( function( err: Error | string ): void {
                 const strError = owaspUtils.extractErrorMessage( err );
                 log.critical( "S-Chain network discovery failed: {err}", strError );
                 doTheJob().then( function(): void {} ).catch( function(): void {} );

@@ -733,7 +733,7 @@ function tryToSplitFormatString( strFormat?: string, cntArgsMax?: number ): any[
 }
 
 export function fmtArgumentsArray( arrArgs: any[], fnFormatter?: any ): string {
-    fnFormatter = fnFormatter || function( arg: any ) { return arg; };
+    fnFormatter = fnFormatter || function( arg: any ): any { return arg; };
     const arrParts = ( arrArgs && arrArgs.length > 0 )
         ? tryToSplitFormatString( arrArgs[0], arrArgs.length - 1 )
         : null;

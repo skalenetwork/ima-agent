@@ -699,7 +699,7 @@ async function handleAllMessagesSigning( optsTransfer: TTransferOptions ): Promi
             optsTransfer.chainNameSrc, optsTransfer.joExtraSignOpts,
             async function( err: Error | string | null, jarrMessages: any[], joGlueResult: any ) {
                 await callbackAllMessagesSign( optsTransfer, err, jarrMessages, joGlueResult );
-            } ).catch( function( err: Error | string ) {
+            } ).catch( function( err: Error | string ): void {
             // callback fn as argument of optsTransfer.fnSignMessages
             optsTransfer.bErrorInSigningMessages = true;
             optsTransfer.details.error( "{p}Problem in transfer handler(in signer): {err}",

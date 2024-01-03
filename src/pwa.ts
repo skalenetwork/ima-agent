@@ -249,7 +249,7 @@ async function notifyOnLoopImpl(
             const rpcCallOpts: rpcCall.TRPCCallOpts | null = null;
             const joCall =
                 await rpcCall.create( strNodeURL, rpcCallOpts )
-                    .catch( async function( err: Error | string ) {
+                    .catch( async function( err: Error | string ): Promise<void> {
                         log.error(
                             "PWA failed to perform] loop-{} notification RPC call to node " +
                             "#{} with URL {url}, error is: {err}",

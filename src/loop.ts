@@ -619,7 +619,7 @@ export async function ensureHaveWorkers( opts: TParallelLoopRunOptions ): Promis
                 workerData
             }
         ) );
-        gArrWorkers[idxWorker].on( "message", function( jo: any ) {
+        gArrWorkers[idxWorker].on( "message", function( jo: any ): void {
             networkLayer.outOfWorkerAPIs.onMessage( gArrWorkers[idxWorker], jo );
         } );
         const aClient = new networkLayer.OutOfWorkerSocketClientPipe(
@@ -627,7 +627,7 @@ export async function ensureHaveWorkers( opts: TParallelLoopRunOptions ): Promis
         gArrClients.push( aClient );
         aClient.logicalInitComplete = false;
         aClient.errorLogicalInit = null;
-        aClient.on( "message", async function( eventData: any ) {
+        aClient.on( "message", async function( eventData: any ): Promise<void> {
             const joMessage = eventData.message;
             switch ( joMessage.method ) {
             case "init":

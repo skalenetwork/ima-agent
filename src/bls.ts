@@ -1107,7 +1107,7 @@ async function gatherSigningCheckFinish(
         optsSignOperation.jarrMessages, joGlueResult );
     optsSignOperation.fn(
         strError, optsSignOperation.jarrMessages, joGlueResult )
-        .catch( function( err: Error | string ) {
+        .catch( function( err: Error | string ): void {
             optsSignOperation.details.critical(
                 "Problem(2) in BLS sign result handler: {err}", err );
             optsSignOperation.errGathering = "Problem(2) in BLS sign " +
@@ -1125,7 +1125,7 @@ async function gatherSigningCheckOverflow(
         `signature error(2), got ${optsSignOperation.joGatheringTracker.nCountErrors}` +
         ` errors(s) for ${optsSignOperation.jarrNodes.length} node(s)`,
         optsSignOperation.jarrMessages, null
-    ).catch( function( err: Error | string ) {
+    ).catch( function( err: Error | string ): void {
         const cntSuccess = optsSignOperation.arrSignResults.length;
         optsSignOperation.details.error(
             "Problem(3) in BLS sign result handler, not enough successful BLS signature " +
@@ -1157,7 +1157,7 @@ async function gatherSigningStartImpl(
         `signature error(3), got ${optsSignOperation.joGatheringTracker.nCountErrors}` +
         ` errors(s) for ${optsSignOperation.jarrNodes.length} node(s)`,
         optsSignOperation.jarrMessages, null
-    ).catch( function( err: Error | string ) {
+    ).catch( function( err: Error | string ): void {
         const cntSuccess = optsSignOperation.arrSignResults.length;
         optsSignOperation.details.critical(
             "Problem(4) in BLS sign result handler, not enough successful BLS signature " +
@@ -1184,7 +1184,7 @@ async function gatherSigningFinishImpl(
                 `${JSON.stringify( optsSignOperation.joGatheringTracker )} , ` +
                 `error is: ${optsSignOperation.errGathering.toString()}`,
                 optsSignOperation.jarrMessages, null
-            ).catch( function( err: Error | string ) {
+            ).catch( function( err: Error | string ): void {
                 const cntSuccess = optsSignOperation.arrSignResults.length;
                 optsSignOperation.details.error(
                     "Problem(5) in BLS sign result handler, not enough successful BLS " +
@@ -1206,7 +1206,7 @@ async function gatherSigningFinishImpl(
             `Failed to gather BLS signatures in ${optsSignOperation.jarrNodes.length}  node(s), ` +
             `tracker data is: ${JSON.stringify( optsSignOperation.joGatheringTracker )}`,
             optsSignOperation.jarrMessages, null
-        ).catch( function( err: Error | string ) {
+        ).catch( function( err: Error | string ): void {
             const cntSuccess = optsSignOperation.arrSignResults.length;
             optsSignOperation.details.error(
                 "Problem(6) in BLS sign result handler, not enough successful BLS signature " +
@@ -1388,7 +1388,8 @@ async function doSignProcessOneImpl(
         optsSignOperation.sequenceId );
     const rpcCallOpts: rpcCall.TRPCCallOpts | null = null;
     const joCall =
-        await rpcCall.create( strNodeURL, rpcCallOpts ).catch( function( err: Error | string ) {
+        await rpcCall.create( strNodeURL, rpcCallOpts
+        ).catch( function( err: Error | string ): void {
             ++optsSignOperation.joGatheringTracker.nCountReceived;
             ++optsSignOperation.joGatheringTracker.nCountErrors;
             optsSignOperation.details.error(
@@ -1442,7 +1443,8 @@ async function doSignMessagesImpl(
         joExtraSignOpts,
         // eslint-disable-next-line n/handle-callback-err
         fn: fn ?? async function(
-            err: Error | string | null, jarrMessages: any[], joGlueResult: any | null ) {},
+            err: Error | string | null, jarrMessages: any[], joGlueResult: any | null
+        ): Promise < void > {},
         bHaveResultReportCalled: false,
         strLogPrefix: "",
         strLogPrefixA: "",
@@ -1518,7 +1520,7 @@ async function doSignMessagesImpl(
             optsSignOperation.bHaveResultReportCalled = true;
             await optsSignOperation.fn( "Failed BLS sign due to exception: " +
                 `${owaspUtils.extractErrorMessage( err )}`, optsSignOperation.jarrMessages, null
-            ).catch( function( err: Error | string ) {
+            ).catch( function( err: Error | string ): void {
                 log.critical( "Failed BLS sign due to error-reporting callback exception: {err}",
                     err );
                 if( optsSignOperation.details ) {
@@ -1803,7 +1805,7 @@ async function gatherSigningCheckFinish256(
         "glue result is {}", strError ? ( " with error " + log.fmtError( "{err}", strError ) ) : "",
         optsSignU256.u256, joGlueResult );
     optsSignU256.fn( strError, optsSignU256.u256, joGlueResult )
-        .catch( function( err: Error | string ) {
+        .catch( function( err: Error | string ): void {
             optsSignU256.details.critical(
                 "Problem(2) in BLS u256 sign result handler: {err}", err );
             optsSignU256.errGathering = "Problem(2) in BLS u256 sign result " +
@@ -1820,7 +1822,7 @@ async function gatherSigningCheckOverflow256(
         "signature error(2, u256), got " +
         `${optsSignU256.joGatheringTracker.nCountErrors} errors(s) for ` +
         `${optsSignU256.jarrNodes.length}  node(s)`, optsSignU256.u256, null
-    ).catch( function( err: Error | string ) {
+    ).catch( function( err: Error | string ): void {
         const cntSuccess = optsSignU256.arrSignResults.length;
         optsSignU256.details.critical(
             "Problem(3) in BLS u256 sign result handler, not enough successful BLS " +
@@ -1851,7 +1853,7 @@ async function doSignU256Gathering( optsSignU256: TSignU256Options ): Promise < 
         `${optsSignU256.joGatheringTracker.nCountErrors}  errors(s) for ` +
         `${optsSignU256.jarrNodes.length} node(s)`,
         optsSignU256.u256, null
-    ).catch( function( err: Error | string ) {
+    ).catch( function( err: Error | string ): void {
         const cntSuccess = optsSignU256.arrSignResults.length;
         optsSignU256.details.error(
             "Problem(4) in BLS u256 sign result handler, not enough successful BLS " +

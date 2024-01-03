@@ -241,7 +241,7 @@ export async function waitUntilSChainStarted(): Promise<void> {
             let isError = false;
             const joSChainNetworkInfo = await discoverSChainNetwork(
                 null, isSilentReDiscovery, null, nCountToWait
-            ).catch( function( err: Error | string ) {
+            ).catch( function( err: Error | string ): void {
                 log.critical( "S-Chain network discovery attempt failed: {err}", err );
                 isError = true;
             } );
@@ -347,7 +347,7 @@ async function handlePeriodicDiscoveryAttemptActions(
         let isError = false;
         const joSChainNetworkInfo: TSChainNetworkInfo = await discoverSChainNetwork(
             null, isSilentReDiscovery, imaState.joSChainNetworkInfo, nCountToWait
-        ).catch( function( err: Error | string ) {
+        ).catch( function( err: Error | string ): void {
             isError = true;
             log.critical( "S-Chain network re-discovery failed: {err}", err );
         } ) as TSChainNetworkInfo;
@@ -630,7 +630,7 @@ async function handleDiscoverSkaleNodesRpcInfoResult(
         if( optsDiscover.fnAfter )
             optsDiscover.fnAfter( null, optsDiscover.joSChainNetworkInfo );
         rv = true;
-    } ).catch( function( err: Error | string ) {
+    } ).catch( function( err: Error | string ): void {
         log.error(
             "Failed to wait until S-chain discovery complete, reported error is: {err}", err );
         if( optsDiscover.fnAfter )
@@ -676,7 +676,7 @@ export async function discoverSChainNetwork(
         const joOut = await joCall.call( joIn );
         await handleDiscoverSkaleNodesRpcInfoResult(
             optsDiscover, scURL, joCall, joIn, joOut
-        ).catch( function( err: Error | string ) {
+        ).catch( function( err: Error | string ): void {
             log.critical(
                 "{p}JSON RPC call(in discoverSChainNetwork) error: {err}, stack is:\n{stack}",
                 optsDiscover.strLogPrefix, err, err );

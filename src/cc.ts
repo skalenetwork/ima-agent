@@ -534,7 +534,7 @@ export function syntaxHighlightJSON( jo?: any, strKeyNamePrefix?: string ): stri
     return jo.replace(
     // eslint-disable-next-line max-len
         /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g,
-        function( match: any ) {
+        function( match: any ): string {
             if( !gFlagIsEnabled )
                 return match;
             let cls = "number";
