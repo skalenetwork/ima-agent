@@ -257,12 +257,8 @@ export class BasicSocketPipe extends EventDispatcher {
     }
 
     socketDescription(): string {
-        return "" +
-            // + this.socketType
-            // + " "
-            // + this.socketSubtype
-            // + " "
-            this.url;
+        // return this.socketType + " " + this.socketSubtype + " " + this.url.toString();
+        return this.url.toString();
     }
 
     socketLoggingTextPrefix( strLogEventName: string ): string {
@@ -762,7 +758,7 @@ export class OutOfWorkerRelay extends EventDispatcher {
                 eventData.remoteAddress == null || eventData.remoteAddress == undefined )
                 pipeIncoming.strSavedRemoteAddress = pipeIncoming.constructor.name;
             else
-                pipeIncoming.strSavedRemoteAddress = "" + eventData.remoteAddress;
+                pipeIncoming.strSavedRemoteAddress = eventData.remoteAddress.toString();
             if( settings.logging.net.relay.connect ) {
                 console.log( "Relay \"" + self.strRelayName +
                     "\" got new external-client connection \"" +
@@ -1429,7 +1425,7 @@ export class WebSocketServerPipe extends BasicSocketPipe {
         this.clientPort = cc.toInteger( this.clientNumber );
         ++acceptor.nextClientNumber;
         this.wsConnection = wsConnection;
-        this.remoteAddress = "" + remoteAddress;
+        this.remoteAddress = remoteAddress.toString();
         this.url = "ws_server_pipe(" + this.clientNumber + ")://" + remoteAddress;
         this._onWsClose = function(): void {
             self.dispatchEvent(
