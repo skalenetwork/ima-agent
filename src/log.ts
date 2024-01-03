@@ -94,6 +94,50 @@ const getDurationString = cc.getDurationString;
 
 export { safeURL, replaceAll, timestampHR, capitalizeFirstLetter, getDurationString };
 
+export function validateRadix( value: any, radix?: any ): boolean {
+    value = ( value ? value.toString() : "10" ).trim();
+    radix = ( radix === null || radix === undefined )
+        ? ( ( value.length > 2 && value[0] == "0" && ( value[1] == "x" || value[1] == "X" ) )
+            ? 16
+            : 10 )
+        : parseInt( radix, 10 );
+    return radix;
+}
+
+export function validateInteger( value: any, radix?: any ): boolean {
+    try {
+        if( value === null || value === undefined )
+            return false;
+        if( value === 0 || value === 0.0 )
+            return true;
+        const s = value ? value.toString().trim() : "";
+        if( s.length < 1 )
+            return false;
+        radix = validateRadix( value, radix );
+        if( ( !isNaN( value ) ) &&
+            ( parseInt( value, radix ) == value || radix !== 10 ) &&
+            ( !isNaN( parseInt( value, radix ) ) )
+        )
+            return true;
+    } catch ( err ) {
+    }
+    return false;
+}
+
+export function toInteger( value: any, radix?: any ): number {
+    try {
+        if( value === 0 || value === 0.0 || value === null || value === undefined )
+            return 0;
+        value = ( value ? value.toString().trim() : "" ).trim();
+        radix = validateRadix( value, radix );
+        if( !validateInteger( value, radix ) )
+            return NaN;
+        return parseInt( value.toString().trim(), radix );
+    } catch ( err ) {
+    }
+    return 0;
+}
+
 export function autoEnableColorizationFromCommandLineArgs(): void {
     cc.autoEnableFromCommandLineArgs();
 }
@@ -515,8 +559,8 @@ export function createFileOutput(
         const objEntry: TLogger = {
             id: gIdentifierAllocatorCounter++,
             strPath: strFilePath.toString(),
-            nMaxSizeBeforeRotation: 0 + ( nMaxSizeBeforeRotation ?? 0 ),
-            nMaxFilesCount: 0 + ( nMaxFilesCount ?? 0 ),
+            nMaxSizeBeforeRotation: cc.toInteger( nMaxSizeBeforeRotation ?? 0 ),
+            nMaxFilesCount: cc.toInteger( nMaxFilesCount ?? 0 ),
             objStream: null,
             haveOwnTimestamps: false,
             isPausedTimeStamps: false,
@@ -567,7 +611,7 @@ export function createFileOutput(
                         this.open();
                         return;
                     }
-                    let i = 0; const cnt = 0 + this.nMaxFilesCount;
+                    let i = 0; const cnt = cc.toInteger( this.nMaxFilesCount );
                     for( i = 0; i < cnt; ++i ) {
                         const j = this.nMaxFilesCount - i - 1;
                         const strPath =
@@ -1077,7 +1121,7 @@ export function exposeDetailsSet( isExpose: any ): void {
 }
 
 export function verboseGet(): number {
-    return 0 + gVerboseLevel;
+    return cc.toInteger( gVerboseLevel );
 }
 export function verboseSet( vl?: any ): void {
     gVerboseLevel = parseInt( vl );

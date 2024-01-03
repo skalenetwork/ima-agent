@@ -29,6 +29,7 @@ import * as imaBLS from "./bls.js";
 import * as imaUtils from "./utils.js";
 import type * as state from "./state.js";
 import type * as discoveryTools from "./discoveryTools.js";
+import * as owaspUtils from "./owaspUtils.js";
 
 function computeWalkNodeIndices( nNodeNumber: number, nNodesCount: number ): number[] {
     if( nNodeNumber === null || nNodeNumber === undefined ||
@@ -187,13 +188,13 @@ export async function handleLoopStateArrived(
                 "signature is {}", se, nNodeNumber, joNode.pwaState, signature );
         }
         const strMessageHash = imaBLS.keccak256ForPendingWorkAnalysis(
-            nNodeNumber, strLoopWorkType, isStart, 0 + ts );
+            nNodeNumber, strLoopWorkType, isStart, owaspUtils.toInteger( ts ) );
         const isSignatureOK = await imaBLS.doVerifyReadyHash(
             strMessageHash, nNodeNumber, signature, imaState.isPrintPWA );
         if( !isSignatureOK )
             throw new Error( "BLS verification failed" );
         joProps.isInProgress = ( !!isStart );
-        joProps.ts = 0 + ts;
+        joProps.ts = owaspUtils.toInteger( ts );
         if( imaState.isPrintPWA ) {
             log.success(
                 "PWA loop-{} state successfully verified for node {}, now have PWA state {}, " +
@@ -232,9 +233,9 @@ async function notifyOnLoopImpl(
             throw new Error( "S-Chain network info is not available yet to PWA" );
         const nUtcUnixTimeStamp = Math.floor( ( new Date() ).getTime() / 1000 );
 
-        const strMessageHash =
-            imaBLS.keccak256ForPendingWorkAnalysis(
-                0 + imaState.nNodeNumber, strLoopWorkType, isStart, nUtcUnixTimeStamp );
+        const strMessageHash = imaBLS.keccak256ForPendingWorkAnalysis(
+            owaspUtils.toInteger( imaState.nNodeNumber ),
+            strLoopWorkType, isStart, nUtcUnixTimeStamp );
         const signature = await imaBLS.doSignReadyHash( strMessageHash, imaState.isPrintPWA );
         await handleLoopStateArrived(
             imaState, imaState.nNodeNumber, strLoopWorkType,
@@ -262,9 +263,9 @@ async function notifyOnLoopImpl(
             const joIn: any = {
                 method: "skale_imaNotifyLoopWork",
                 params: {
-                    nNodeNumber: 0 + imaState.nNodeNumber,
+                    nNodeNumber: owaspUtils.toInteger( imaState.nNodeNumber ),
                     strLoopWorkType: strLoopWorkType.toString(),
-                    nIndexS2S: 0 + nIndexS2S,
+                    nIndexS2S: owaspUtils.toInteger( nIndexS2S ),
                     isStart: ( !!isStart ),
                     ts: nUtcUnixTimeStamp,
                     signature

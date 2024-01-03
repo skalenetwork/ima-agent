@@ -100,6 +100,8 @@ export function validateRadix( value: any, radix?: any ): boolean {
 
 export function validateInteger( value: any, radix?: any ): boolean {
     try {
+        if( value === null || value === undefined )
+            return false;
         if( value === 0 || value === 0.0 )
             return true;
         const s = value ? value.toString().trim() : "";
@@ -124,7 +126,7 @@ export function toInteger( value: any, radix?: any ): number {
         radix = validateRadix( value, radix );
         if( !validateInteger( value, radix ) )
             return NaN;
-        return parseInt( value, radix );
+        return parseInt( value.toString().trim(), radix );
     } catch ( err ) {
     }
     return 0;
@@ -132,9 +134,11 @@ export function toInteger( value: any, radix?: any ): number {
 
 export function validateFloat( value: any ): boolean {
     try {
+        if( value === null || value === undefined )
+            return false;
         if( value === 0 || value === 0.0 )
             return true;
-        const f = parseFloat( value );
+        const f = parseFloat( value.toString().trim() );
         if( isNaN( f ) )
             return false;
         return true;
@@ -147,7 +151,7 @@ export function toFloat( value: any ): number {
     try {
         if( value === 0 || value === 0.0 || value === null || value === undefined )
             return 0.0;
-        const f = parseFloat( value );
+        const f = parseFloat( value.toString().trim() );
         return f;
     } catch ( err ) {
     }

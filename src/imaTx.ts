@@ -646,9 +646,9 @@ export class TransactionCustomizer {
     gasMultiplier: any;
     constructor ( gasPriceMultiplier: any, gasMultiplier: any ) {
         this.gasPriceMultiplier = gasPriceMultiplier
-            ? ( 0.0 + gasPriceMultiplier )
+            ? owaspUtils.toFloat( gasPriceMultiplier )
             : null; // null means use current gasPrice or recommendedGasPrice
-        this.gasMultiplier = gasMultiplier ? ( 0.0 + gasMultiplier ) : 1.25;
+        this.gasMultiplier = gasMultiplier ? owaspUtils.toFloat( gasMultiplier ) : 1.25;
     }
 
     async computeGasPrice(

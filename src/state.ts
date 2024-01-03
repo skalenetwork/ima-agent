@@ -399,7 +399,7 @@ export function get(): TIMAState {
         isEnabledMultiCall: true,
 
         bNoWaitSChainStarted: false,
-        nMaxWaitSChainAttempts: 0 + Number.MAX_SAFE_INTEGER, // 20
+        nMaxWaitSChainAttempts: Number.MAX_SAFE_INTEGER, // 20
 
         nAmountOfWei: 0,
         nAmountOfToken: 0,

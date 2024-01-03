@@ -28,6 +28,7 @@ import * as rpcCall from "./rpcCall.js";
 import * as state from "./state.js";
 import * as imaUtils from "./utils.js";
 import * as threadInfo from "./threadInfo.js";
+import * as owaspUtils from "./owaspUtils.js";
 
 export type TFunctionAfterDiscovery = (
     err?: Error | string | null,
@@ -450,7 +451,7 @@ function handleDiscoverSkaleImaInfoResult(
 async function discoverSChainWalkNodes( optsDiscover: TDiscoveryOptions ): Promise<void> {
     optsDiscover.cntFailed = 0;
     for( let i = 0; i < optsDiscover.cntNodes; ++i ) {
-        const nCurrentNodeIdx = 0 + i;
+        const nCurrentNodeIdx = owaspUtils.toInteger( i );
         const joNode = optsDiscover.jarrNodes[nCurrentNodeIdx];
         const strNodeURL = imaUtils.composeSChainNodeUrl( joNode );
         const strNodeDescColorized = log.fmtAttention( "#{}({url})", nCurrentNodeIdx, strNodeURL );

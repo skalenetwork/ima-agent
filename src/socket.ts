@@ -26,6 +26,7 @@
 import { UniversalDispatcherEvent, EventDispatcher } from "./eventDispatcher.js";
 import { settings } from "./socketSettings.js";
 import * as utils from "./socketUtils.js";
+import * as cc from "./cc.js";
 
 export let httpsModule: any = null; // server side only
 export let wsModule: any = null; // server side only
@@ -212,7 +213,8 @@ export class BasicSocketPipe extends EventDispatcher {
         this.url = "N/A";
         this.isConnected = true;
         this.arrAccumulatedMessages = [];
-        this.maxAccumulatedMessagesCount = 0 + settings.net.pipe.maxAccumulatedMessagesCount;
+        this.maxAccumulatedMessagesCount =
+            cc.toInteger( settings.net.pipe.maxAccumulatedMessagesCount );
         this.relayClientSocket = null; // for relay only
         this.mapImpersonatedEntries = { }; // for external in-app usage only
     }
@@ -1295,7 +1297,7 @@ export class LocalSocketServerPipe extends DirectPipe {
         this.socketSubtype = "server";
         this.isConnected = true;
         this.acceptor = acceptor;
-        this.clientPort = 0 + clientPort;
+        this.clientPort = cc.toInteger( clientPort );
         this.url = "local_server_pipe://" + acceptor.strEndPoint + ":" + clientPort;
         this.acceptor.mapClients[clientPort.toString()] = this;
         const self = this;
@@ -1379,11 +1381,12 @@ export class LocalSocketClientPipe extends DirectPipe {
             throw new Error( s );
         }
         this.acceptor = gMapLocalServers[this.strEndPoint];
-        this.clientPort = 0 + this.acceptor.nextClientPort;
+        this.clientPort = cc.toInteger( this.acceptor.nextClientPort );
         ++this.acceptor.nextClientPort;
         this.url = "local_client_pipe://" + this.strEndPoint + ":" + this.clientPort;
         this.isConnected = true;
-        const serverPipe = new LocalSocketServerPipe( this, this.acceptor, 0 + this.clientPort );
+        const serverPipe =
+            new LocalSocketServerPipe( this, this.acceptor, cc.toInteger( this.clientPort ) );
         serverPipe.counterPipe = this;
         this.counterPipe = serverPipe;
         this.acceptor.mapClients[this.clientPort.toString()] = {
@@ -1422,8 +1425,8 @@ export class WebSocketServerPipe extends BasicSocketPipe {
         const self = this;
         this.isConnected = true;
         this.acceptor = acceptor;
-        this.clientNumber = 0 + acceptor.nextClientNumber;
-        this.clientPort = 0 + this.clientNumber;
+        this.clientNumber = cc.toInteger( acceptor.nextClientNumber );
+        this.clientPort = cc.toInteger( this.clientNumber );
         ++acceptor.nextClientNumber;
         this.wsConnection = wsConnection;
         this.remoteAddress = "" + remoteAddress;
@@ -2319,7 +2322,7 @@ export class RTCServerPeer extends RTCConnection {
         this.tsOfferCreated = null;
         if( settings.logging.net.signaling.offerRegister )
             console.log( "Register offer", this.idOffer, "(RTCServerPeer constructor)" );
-        this.rtcCreator.mapServerOffers[0 + this.idOffer] = this;
+        this.rtcCreator.mapServerOffers[cc.toInteger( this.idOffer )] = this;
         this.isPublishing = false;
         this.isSignalingNegotiation = false;
         this.isPublishTimeout = false;
@@ -2584,7 +2587,7 @@ export class RTCServerPeer extends RTCConnection {
                 method: "signalingPublishOffer",
                 offer: self.pc.localDescription,
                 idSomebodyCreator: self.rtcCreator.idRtcParticipant.toString(),
-                idOffer: 0 + ( self.idOffer || 0 )
+                idOffer: cc.toInteger( self.idOffer ?? 0 )
             };
             if( settings.logging.net.signaling.message ) {
                 console.log(
@@ -2769,7 +2772,7 @@ export class RTCCreator extends RTCActor {
         case "signalingPublishAnswer": // server peer got result
             if( joMessage.error == null ) {
                 const idSomebodyOtherSide = joMessage.idSomebody_joiner.toString();
-                const idOffer = 0 + joMessage.idOffer;
+                const idOffer = cc.toInteger( joMessage.idOffer );
                 if( !( idOffer in this.mapServerOffers ) ) {
                     const strError = "not a registered pending offer(signalingPublishAnswer)";
                     if( settings.logging.net.signaling.error ) {
@@ -3113,7 +3116,7 @@ export class RTCJoiner extends RTCActor {
                 this.delayedInitPeer();
                 this.idSomebodyCreator = joMessage.idSomebodyCreator.toString();
                 const idSomebodyOtherSide = joMessage.idSomebodyCreator.toString();
-                const idOffer = 0 + joMessage.idOffer;
+                const idOffer = cc.toInteger( joMessage.idOffer );
                 if( settings.logging.net.signaling.generic ) {
                     console.log(
                         "Success, " + this.describe() + " fetched offer from creator (step 2)"
@@ -3230,8 +3233,8 @@ export class WebRTCServerPipe extends BasicSocketPipe {
         self.socketSubtype = "server";
         self.isConnected = true;
         self.acceptor = acceptor;
-        self.clientNumber = 0 + acceptor.nextClientNumber;
-        self.clientPort = 0 + ( self.clientNumber ?? 0 );
+        self.clientNumber = cc.toInteger( acceptor.nextClientNumber );
+        self.clientPort = cc.toInteger( self.clientNumber ?? 0 );
         ++acceptor.nextClientNumber;
         self.rtcPeer = rtcPeer;
         self.strSignalingServerURL =

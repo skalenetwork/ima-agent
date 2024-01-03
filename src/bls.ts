@@ -1036,7 +1036,7 @@ async function prepareSignMessagesImpl(
             optsSignOperation.jarrMessages, null );
         return false;
     }
-    optsSignOperation.nCountOfBlsPartsToCollect = 0 + optsSignOperation.nThreshold;
+    optsSignOperation.nCountOfBlsPartsToCollect = optsSignOperation.nThreshold;
     optsSignOperation.details.trace( "{p}Will BLS-collect {} from {} nodes, sequence ID is {}",
         optsSignOperation.strLogPrefix, optsSignOperation.nCountOfBlsPartsToCollect,
         optsSignOperation.jarrNodes.length, optsSignOperation.sequenceId );
@@ -1056,7 +1056,7 @@ async function gatherSigningCheckFinish(
             optsSignOperation.nCountOfBlsPartsToCollect, cntSuccess,
             optsSignOperation.joGatheringTracker.nCountErrors );
         optsSignOperation.joGatheringTracker.nCountReceivedPrevious =
-            0 + optsSignOperation.joGatheringTracker.nCountReceived;
+            owaspUtils.toInteger( optsSignOperation.joGatheringTracker.nCountReceived );
     }
     if( cntSuccess < optsSignOperation.nCountOfBlsPartsToCollect )
         return false;
@@ -1412,7 +1412,7 @@ async function doSignProcessOneImpl(
         srcChainID: optsSignOperation.fromChainID.toString(),
         messages: optsSignOperation.jarrMessages,
         qa: {
-            skaledNumber: 0 + i,
+            skaledNumber: owaspUtils.toInteger( i ),
             "optsSignOperation.sequenceId": optsSignOperation.sequenceId,
             ts: log.generateTimestampString( null, false )
         }
@@ -1600,7 +1600,7 @@ async function prepareSignU256( optsSignU256: TSignU256Options ): Promise < bool
             optsSignU256.u256, null );
         return false;
     }
-    optsSignU256.nCountOfBlsPartsToCollect = 0 + optsSignU256.nThreshold;
+    optsSignU256.nCountOfBlsPartsToCollect = optsSignU256.nThreshold;
     optsSignU256.details.trace( "{p}Will(optsSignU256.u256) collect {} from {} nodes",
         optsSignU256.strLogPrefix, optsSignU256.nCountOfBlsPartsToCollect,
         optsSignU256.jarrNodes.length );
@@ -1761,7 +1761,7 @@ async function gatherSigningCheckFinish256(
             optsSignU256.nCountOfBlsPartsToCollect, cntSuccess,
             optsSignU256.joGatheringTracker.nCountErrors );
         optsSignU256.joGatheringTracker.nCountReceivedPrevious =
-            0 + optsSignU256.joGatheringTracker.nCountReceived;
+            owaspUtils.toInteger( optsSignU256.joGatheringTracker.nCountReceived );
     }
     if( cntSuccess < optsSignU256.nCountOfBlsPartsToCollect )
         return false;

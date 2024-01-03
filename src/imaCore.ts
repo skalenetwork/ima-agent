@@ -376,7 +376,7 @@ async function analyzeGatheredRecords( optsTransfer: TTransferOptions, r: any ):
 async function gatherMessages( optsTransfer: TTransferOptions ): Promise<boolean> {
     optsTransfer.arrMessageCounters = [];
     optsTransfer.jarrMessages = [];
-    optsTransfer.nIdxCurrentMsgBlockStart = 0 + optsTransfer.nIdxCurrentMsg;
+    optsTransfer.nIdxCurrentMsgBlockStart = owaspUtils.toInteger( optsTransfer.nIdxCurrentMsg );
     let r;
     optsTransfer.cntAccumulatedForBlock = 0;
     for( let idxInBlock = 0; // inner loop wil create block of transactions
@@ -1044,7 +1044,7 @@ export async function doTransfer(
         joExtraSignOpts,
         transactionCustomizerDst,
         imaState: state.get(),
-        nTransferLoopCounter: 0 + gTransferLoopCounter,
+        nTransferLoopCounter: owaspUtils.toInteger( gTransferLoopCounter ),
         strTransferErrorCategoryName: "loop-" + strDirection,
         strGatheredDetailsName: "",
         details: log.globalStream(),

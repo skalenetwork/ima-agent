@@ -56,7 +56,7 @@ export function findPowNumber(
     if( isVerbose )
         details.debug( "source t={}, this is UTC timestamp", t );
     for( ; i < gConstMaxPowResultLimit; ++i ) {
-        n = 0 + i;
+        n = owaspUtils.toInteger( i );
         s = "{" + strRequestPart + ",\"time\":" + t + ",\"pow\":" + n + "}";
 
         const hash = new Keccak( 256 );
