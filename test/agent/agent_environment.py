@@ -36,3 +36,4 @@ class AgentEnvironment(Environment):
         chdir(self.config.agent_src)
         execute('rm -rf node_modules')
         execute('yarn install')
+        execute('yarn rebuild')

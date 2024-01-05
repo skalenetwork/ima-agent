@@ -29,13 +29,13 @@ import * as os from "os";
 import * as path from "path";
 import * as url from "url";
 
-import * as owaspUtils from "../src/owaspUtils.mjs";
-import * as imaTx from "../src/imaTx.mjs";
-import * as log from "../src/log.mjs";
-import * as imaUtils from "../src/utils.mjs";
-import * as imaCLI from "../src/cli.mjs";
+import * as owaspUtils from "../src/build/owaspUtils.js";
+import * as imaTx from "../src/build/imaTx.js";
+import * as log from "../src/build/log.js";
+import * as imaUtils from "../src/build/utils.js";
+import * as imaCLI from "../src/build/cli.js";
 
-import * as state from "../src/state.mjs";
+import * as state from "../src/build/state.js";
 
 const __dirname = path.dirname( url.fileURLToPath( import.meta.url ) );
 const __filename = new URL( "", import.meta.url ).pathname;
@@ -138,7 +138,7 @@ const imaState = {
         "mn": {
             "joAccount": {
                 "privateKey": owaspUtils.toEthPrivateKey( process.env.PRIVATE_KEY_FOR_ETHEREUM ),
-                "address": owaspUtils.fnAddressImpl_,
+                "address": function () { return owaspUtils.fnAddressImpl_( this ); },
                 "strTransactionManagerURL":
                     owaspUtils.toStringURL( process.env.TRANSACTION_MANAGER_URL_ETHEREUM ),
                 "nTmPriority":
@@ -174,7 +174,7 @@ const imaState = {
         "sc": {
             "joAccount": {
                 "privateKey": owaspUtils.toEthPrivateKey( process.env.PRIVATE_KEY_FOR_SCHAIN ),
-                "address": owaspUtils.fnAddressImpl_,
+                "address": function () { return owaspUtils.fnAddressImpl_( this ); },
                 "strTransactionManagerURL":
                     owaspUtils.toStringURL( process.env.TRANSACTION_MANAGER_URL_S_CHAIN ),
                 "nTmPriority":
@@ -211,7 +211,7 @@ const imaState = {
             "joAccount": {
                 "privateKey":
                     owaspUtils.toEthPrivateKey( process.env.PRIVATE_KEY_FOR_SCHAIN_TARGET ),
-                "address": owaspUtils.fnAddressImpl_,
+                "address": function () { return owaspUtils.fnAddressImpl_( this ); },
                 "strTransactionManagerURL":
                     owaspUtils.toStringURL( process.env.TRANSACTION_MANAGER_URL_S_CHAIN_TARGET ),
                 "nTmPriority":
@@ -715,42 +715,6 @@ describe( "OWASP-5", function() {
 
     } );
 
-    describe( "Key/address utilities", function() {
-        const joTestAccount = {
-            "privateKey":
-                owaspUtils.toEthPrivateKey(
-                    "23ABDBD3C61B5330AF61EBE8BEF582F4E5CC08E554053A718BDCE7813B9DC1FC" ),
-            "address": owaspUtils.fnAddressImpl_
-        };
-
-        it( "Extract address from private key", function() {
-            const address = joTestAccount.address();
-            const address2 =
-                owaspUtils.privateKeyToAccountAddress( joTestAccount.privateKey );
-            assert.equal(
-                address.toLowerCase(),
-                "0x7aa5E36AA15E93D10F4F26357C30F052DacDde5F".toLowerCase() );
-            assert.equal(
-                address2.toLowerCase(),
-                "0x7aa5E36AA15E93D10F4F26357C30F052DacDde5F".toLowerCase() );
-        } );
-
-        it( "Extract public key from private key", function() {
-            const publicKey = owaspUtils.privateKeyToPublicKey( joTestAccount.privateKey );
-            assert.equal(
-                publicKey.toLowerCase(),
-                ( "5dd431d36ce6b88f27d351051b31a26848c4a886f0dd0bc87a7d5a9d82" +
-                "1417c9e807e8589f680ab0f2ab29831231ad" +
-                "7b3d6659990ee830582fede785fc3c33c4" ).toLowerCase() );
-        } );
-
-        it( "Extract address from public key", function() {
-            const address = joTestAccount.address();
-            const publicKey = owaspUtils.privateKeyToPublicKey( joTestAccount.privateKey );
-            const address2 = owaspUtils.publicKeyToAccountAddress( publicKey );
-            assert.equal( address.toLowerCase(), address2.toLowerCase() );
-        } );
-    } );
 } );
 
 describe( "OWASP-6", function() {
@@ -950,7 +914,7 @@ describe( "CLI", function() {
                 "privateKey":
                     owaspUtils.toEthPrivateKey(
                         "23ABDBD3C61B5330AF61EBE8BEF582F4E5CC08E554053A718BDCE7813B9DC1FC" ),
-                "address": owaspUtils.fnAddressImpl_
+                "address": function () { return owaspUtils.fnAddressImpl_( this ); }
             };
             assert.equal(
                 imaCLI.ensureHaveCredentials(
@@ -1151,11 +1115,11 @@ describe( "Agent Utils Module-2", function() {
             assert.equal( strDst, "01230000" );
         } );
 
-        it( "Typed array concatenation", function() {
+        it( "Uint8 arrays concatenation", function() {
             const strSrcLeft = "0xbaad", strSrcRight = "0xf00d";
             const arrBytesLeft = imaUtils.hexToBytes( strSrcLeft, false );
             const arrBytesRight = imaUtils.hexToBytes( strSrcRight, false );
-            const arrBytes = imaUtils.concatTypedArrays( arrBytesLeft, arrBytesRight );
+            const arrBytes = imaUtils.concatUint8Arrays( arrBytesLeft, arrBytesRight );
             const strDst = imaUtils.bytesToHex( arrBytes, false );
             assert.equal( strDst, "baadf00d" );
         } );

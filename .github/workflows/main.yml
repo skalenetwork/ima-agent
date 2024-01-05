@@ -239,6 +239,11 @@ jobs:
       run: |
         yarn install
 
+    - name: INIT - build IMA
+      working-directory: ./src
+      run: |
+        yarn rebuild
+
     - name: Compile contracts
       working-directory: ./IMA/proxy
       run: |

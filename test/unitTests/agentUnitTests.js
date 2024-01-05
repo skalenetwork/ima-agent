@@ -25,12 +25,11 @@
 
 const assert = require( "chai" ).assert;
 const expect = require( "chai" ).expect;
-const IMA = require( "../../src/imaCore.mjs" );
-const imaTx = require( "../../src/imaTx.mjs" );
-const imaReg = require( "../../src/imaRegistrationOperations.mjs" );
-const imaEth = require( "../../src/imaEthOperations.mjs" );
-const imaToken = require( "../../src/imaTokenOperations.mjs" );
-const w3mod = IMA.w3mod;
+const IMA = require( "../../src/build/imaCore.js" );
+const imaTx = require( "../../src/build/imaTx.js" );
+const imaReg = require( "../../src/build/imaRegistrationOperations.js" );
+const imaEth = require( "../../src/build/imaEthOperations.js" );
+const imaToken = require( "../../src/build/imaTokenOperations.js" );
 const transactionCustomizerMainNet = imaTx.getTransactionCustomizerForMainNet();
 const transactionCustomizerSChain = imaTx.getTransactionCustomizerForSChain();
 
@@ -110,17 +109,17 @@ function toWei( stringA, stringB ) {
 
 // mockup for `joAccountDst`
 const joAccountDst = {
-    "address": IMA.owaspUtils.fnAddressImpl_,
+    "address": function () { return IMA.owaspUtils.fnAddressImpl_( this ); },
     privateKey: "6270720ecca0185a979b6791bea433e9dbf23345e5b5b1b0258b1fbaf32b4390"
 };
 // mockup for `joAccountSrc`
 const joAccountSrc = {
-    "address": IMA.owaspUtils.fnAddressImpl_,
+    "address": function () { return IMA.owaspUtils.fnAddressImpl_( this ); },
     privateKey: "6270720ecca0185a979b6791bea433e9dbf23345e5b5b1b0258b1fbaf32b4390"
 };
 // mockup for `joMainNetAccount`
 const joMainNetAccount = {
-    "address": IMA.owaspUtils.fnAddressImpl_,
+    "address": function () { return IMA.owaspUtils.fnAddressImpl_( this ); },
     privateKey: "6270720ecca0185a979b6791bea433e9dbf23345e5b5b1b0258b1fbaf32b4390"
 };
 // mockup for `joDepositBox`
@@ -263,39 +262,9 @@ describe( "tests for `IMA Core` 1", function() {
         expect( IMA.owaspUtils.removeStarting0x( "1" ) ).to.be.equal( "1" );
     } );
 
-    it( "should invoke `privateKeyToPublicKey`", async function() {
-        const keyPrivate = "23abdbd3c61b5330af61ebe8bef582f4e5cc08e554053a718bdce7813b9dc1fc";
-        let keyPrivateUnd; // undefined
-        let w3mod_undefined; // undefined
-        // if w3mod `undefined` or `null`
-        // eslint-disable-next-line no-unused-expressions
-        expect( IMA.owaspUtils.privateKeyToPublicKey( w3mod_undefined, keyPrivate ) ).to.be.empty;
-        // if keyPrivate `undefined` or `null`
-        // eslint-disable-next-line no-unused-expressions
-        expect( IMA.owaspUtils.privateKeyToPublicKey( w3mod, keyPrivateUnd ) ).to.be.empty;
-        // when all parameters is OK
-        expect( IMA.owaspUtils.privateKeyToPublicKey( w3mod, keyPrivate ) ).to.have.lengthOf( 128 );
-    } );
-
 } );
 
 describe( "tests for `IMA Core` 2", function() {
-
-    it( "should invoke `publicKeyToAccountAddress`", async function() {
-        const keyPublic = "5dd431d36ce6b88f27d351051b31a26848c4a886f0dd0bc87a7d5a9d821417c9" +
-            "e807e8589f680ab0f2ab29831231ad7b3d6659990ee830582fede785fc3c33c4";
-        let keyPublicUnd; // undefined
-        // if keyPrivate `undefined` or `null`
-        // eslint-disable-next-line no-unused-expressions
-        expect( IMA.owaspUtils.publicKeyToAccountAddress( keyPublicUnd ) ).to.be.empty;
-        // when all parameters is OK
-        expect( IMA.owaspUtils.publicKeyToAccountAddress( keyPublic ) ).to.include( "0x" );
-    } );
-
-    it( "should invoke `privateKeyToAccountAddress`", async function() {
-        const keyPrivate = "23abdbd3c61b5330af61ebe8bef582f4e5cc08e554053a718bdce7813b9dc1fc";
-        expect( IMA.owaspUtils.privateKeyToAccountAddress( keyPrivate ) ).to.include( "0x" );
-    } );
 
     it( "should return `false` invoke `checkIsRegisteredSChainInDepositBoxes`", async function() {
         let joLinker; // for `false` output

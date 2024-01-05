@@ -23,7 +23,7 @@
  * @copyright SKALE Labs 2019-Present
  */
 
-import * as networkLayer from "../../src/socket.mjs";
+import * as networkLayer from "../../src/build/socket.js";
 import { TestSocketServer } from "./testSocketServer.mjs";
 import {
     parentPort

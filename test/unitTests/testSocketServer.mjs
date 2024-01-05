@@ -23,7 +23,7 @@
  * @copyright SKALE Labs 2019-Present
  */
 
-import { SocketServer } from "../../src/socketServer.mjs";
+import { SocketServer } from "../../src/build/socketServer.js";
 
 export class TestSocketServer extends SocketServer {
     constructor( acceptor ) {

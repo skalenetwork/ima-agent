@@ -19,7 +19,7 @@
  */
 
 /**
- * @file testSocketSignalingServer.mjs.mjs
+ * @file testSocketSignalingServer.mjs
  * @copyright SKALE Labs 2019-Present
  */
 
@@ -29,10 +29,10 @@ import * as httpsModuleLoaded from "https";
 import * as wsModuleLoaded from "ws";
 import * as webRtcModuleLoaded from "wrtc";
 
-import * as networkLayer from "../../src/socket.mjs";
-import { settings } from "../../src/socketSettings.mjs";
-import { UniversalDispatcherEvent, EventDispatcher } from "../../src/eventDispatcher.mjs";
-import * as utils from "../../src/socketUtils.mjs";
+import * as networkLayer from "../../src/build/socket.js";
+import { settings } from "../../src/build/socketSettings.js";
+import { UniversalDispatcherEvent, EventDispatcher } from "../../src/build/eventDispatcher.js";
+import * as utils from "../../src/build/socketUtils.js";
 
 const httpsModule = httpsModuleLoaded; // .default;
 const wsModule = wsModuleLoaded; // .default;
