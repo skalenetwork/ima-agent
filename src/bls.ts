@@ -42,7 +42,7 @@ import type * as IMA from "./imaCore.js";
 
 export interface TQAInformation {
     skaledNumber: number
-    "optsSignOperation.sequenceId": string
+    sequenceId: string
     ts: string
 }
 
@@ -1413,7 +1413,7 @@ async function doSignProcessOneImpl(
         messages: optsSignOperation.jarrMessages,
         qa: {
             skaledNumber: owaspUtils.toInteger( i ),
-            "optsSignOperation.sequenceId": optsSignOperation.sequenceId,
+            sequenceId: optsSignOperation.sequenceId,
             ts: log.generateTimestampString( null, false )
         }
     };

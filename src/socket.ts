@@ -257,7 +257,6 @@ export class BasicSocketPipe extends EventDispatcher {
     }
 
     socketDescription(): string {
-        // return this.socketType + " " + this.socketSubtype + " " + this.url.toString();
         return this.url.toString();
     }
 
@@ -739,7 +738,7 @@ export class OutOfWorkerRelay extends EventDispatcher {
         const self = this;
         self.strRelayName = strRelayName ? strRelayName.toString() : "unnamed";
         self.isAutoFlushIncoming = isAutoFlushIncoming ? true : ( !!isAutoFlushIncoming );
-        self.isAutoFlushOutgoing = isAutoFlushOutgoing ? true : ( !!( isAutoFlushOutgoing ) );
+        self.isAutoFlushOutgoing = isAutoFlushOutgoing ? true : ( !!isAutoFlushOutgoing );
         if( !acceptor ) {
             throw new Error( `OutOfWorkerRelay ${self.strRelayName} needs acceptor ` +
                 "for normal functionality" );

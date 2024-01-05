@@ -931,9 +931,7 @@ function parseTransferArgs( imaState: state.TIMAState, joArg: any ): boolean {
     }
     if( joArg.name == "node-number" ) {
         owaspUtils.verifyArgumentIsInteger( joArg );
-        console.log( "------------------------ joArg.value ---", joArg.value );
         imaState.nNodeNumber = owaspUtils.toInteger( joArg.value );
-        console.log( "------------------------ imaState.nNodeNumber ---", imaState.nNodeNumber );
         return true;
     }
     if( joArg.name == "nodes-count" ) {
