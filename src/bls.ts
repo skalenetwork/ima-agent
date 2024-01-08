@@ -316,17 +316,13 @@ function keccak256Message(
     const cnt = jarrMessages.length;
     for( let i = 0; i < cnt; ++i ) {
         const joMessage = jarrMessages[i];
-
         let bytesSender = imaUtils.hexToBytes( joMessage.sender.toString() );
         bytesSender = imaUtils.bytesAlignLeftWithZeroes( bytesSender, 32 );
         arrBytes = imaUtils.bytesConcat( arrBytes, bytesSender );
-
-        let bytesDestinationContract =
-            imaUtils.hexToBytes( joMessage.destinationContract );
+        let bytesDestinationContract = imaUtils.hexToBytes( joMessage.destinationContract );
         bytesDestinationContract =
             imaUtils.bytesAlignLeftWithZeroes( bytesDestinationContract, 32 );
         arrBytes = imaUtils.bytesConcat( arrBytes, bytesDestinationContract );
-
         const bytesData = imaUtils.hexToBytes( joMessage.data );
         arrBytes = imaUtils.bytesConcat( arrBytes, bytesData );
         arrBytes = arrayToKeccak256( arrBytes );
@@ -336,13 +332,11 @@ function keccak256Message(
 
 export function keccak256U256( u256: any, isHash: boolean ): string {
     let arrBytes = new Uint8Array();
-
     let bytesU256 = imaUtils.hexToBytes( u256 );
     bytesU256 = bytesU256.reverse();
     bytesU256 = imaUtils.bytesAlignLeftWithZeroes( bytesU256, 32 );
     bytesU256 = bytesU256.reverse();
     arrBytes = imaUtils.bytesConcat( arrBytes, bytesU256 );
-
     let strMessageHash = "";
     if( isHash ) {
         const hash = new Keccak( 256 );
@@ -419,17 +413,13 @@ function performBlsGlue(
     details.debug( "{p}Discovered number of BLS participants is {}.", strLogPrefix, nParticipants );
     if( !checkBlsThresholdAndBlsParticipants( nThreshold, nParticipants, "BLS glue", details ) )
         return null;
-    const strMessageHash =
-        owaspUtils.removeStarting0x(
-            keccak256Message( jarrMessages, nIdxCurrentMsgBlockStart, strFromChainName )
-        );
+    const strMessageHash = owaspUtils.removeStarting0x(
+        keccak256Message( jarrMessages, nIdxCurrentMsgBlockStart, strFromChainName ) );
     details.debug( "{p}Message hash to sign is {}", strLogPrefix, strMessageHash );
     const strActionDir = allocBlsTmpActionDir();
     details.trace( "{p}{sunny} will work in {} director with {} sign results...",
         strLogPrefix, "performBlsGlue", strActionDir, arrSignResults.length );
-    const fnShellRestore = function(): void {
-        shell.rm( "-rf", strActionDir );
-    };
+    const fnShellRestore = function(): void { shell.rm( "-rf", strActionDir ); };
     const strOutput = "";
     try {
         let strInput = "";
@@ -508,8 +498,7 @@ function performBlsGlueU256( details: log.TLogger, u256: any, arrSignResults: an
     const nParticipants = discoverBlsParticipants( imaState.joSChainNetworkInfo );
     details.debug( "{p}Discovered BLS threshold is {}.", strLogPrefix, nThreshold );
     details.debug( "{p}Discovered number of BLS participants is {}.", strLogPrefix, nParticipants );
-    if( !checkBlsThresholdAndBlsParticipants(
-        nThreshold, nParticipants, "BLS glue-256", details ) )
+    if( !checkBlsThresholdAndBlsParticipants( nThreshold, nParticipants, "BLS glue-256", details ) )
         return null;
     details.trace( "{p}Original long message is {}", strLogPrefix, keccak256U256( u256, false ) );
     const strMessageHash = keccak256U256( u256, true );
@@ -517,9 +506,7 @@ function performBlsGlueU256( details: log.TLogger, u256: any, arrSignResults: an
     const strActionDir = allocBlsTmpActionDir();
     details.trace( "{p}performBlsGlueU256 will work in {} director with {} sign results...",
         strLogPrefix, strActionDir, arrSignResults.length );
-    const fnShellRestore = function(): void {
-        shell.rm( "-rf", strActionDir );
-    };
+    const fnShellRestore = function(): void { shell.rm( "-rf", strActionDir ); };
     let strOutput = "";
     try {
         let strInput = "";
@@ -557,9 +544,8 @@ function performBlsGlueU256( details: log.TLogger, u256: any, arrSignResults: an
                 " --t " + nThreshold +
                 " --n " + nParticipants;
             details.trace( "{p}Will execute HashG1 command: {}", strLogPrefix, strHasG1Command );
-            strOutput =
-                childProcessModule.execSync( strHasG1Command, { cwd: strActionDir } )
-                    .toString( "utf8" );
+            strOutput = childProcessModule.execSync( strHasG1Command, { cwd: strActionDir } )
+                .toString( "utf8" );
             details.trace( "{p}HashG1 output is:\n{raw}", strLogPrefix, strOutput || "<<EMPTY>>" );
             const joResultHashG1 = imaUtils.jsonFileLoad( path.join( strActionDir, "g1.json" ) );
             details.trace( "{p}HashG1 result is: {}", strLogPrefix, joResultHashG1 );
@@ -605,13 +591,10 @@ function performBlsVerifyI(
     const strLogPrefix = `${strDirection}/BLS/#${nZeroBasedNodeIndex}: `;
     const nThreshold = discoverBlsThreshold( imaState.joSChainNetworkInfo );
     const nParticipants = discoverBlsParticipants( imaState.joSChainNetworkInfo );
-    if( !checkBlsThresholdAndBlsParticipants(
-        nThreshold, nParticipants, "BLS verify-I", details ) )
+    if( !checkBlsThresholdAndBlsParticipants( nThreshold, nParticipants, "BLS verify-I", details ) )
         return false;
     const strActionDir = allocBlsTmpActionDir();
-    const fnShellRestore = function(): void {
-        shell.rm( "-rf", strActionDir );
-    };
+    const fnShellRestore = function(): void { shell.rm( "-rf", strActionDir ); };
     let strOutput = "";
     try {
         details.trace( "{p}BLS node #{} - first message nonce is {}",
@@ -639,12 +622,10 @@ function performBlsVerifyI(
             " --n " + nParticipants +
             " --j " + nZeroBasedNodeIndex +
             " --input " + strSignResultFileName;
-
         details.trace( "{p}Will execute node #{} BLS verify command: {}", strLogPrefix,
             nZeroBasedNodeIndex, strVerifyCommand );
-        strOutput =
-            childProcessModule.execSync( strVerifyCommand, { cwd: strActionDir } )
-                .toString( "utf8" );
+        strOutput = childProcessModule.execSync( strVerifyCommand, { cwd: strActionDir } )
+            .toString( "utf8" );
         details.trace( "{p}BLS node #{} verify output is:\n{raw}", strLogPrefix,
             nZeroBasedNodeIndex, strOutput || "<<EMPTY>>" );
         details.success( "{p}BLS node #{} verify success", strLogPrefix, nZeroBasedNodeIndex );
@@ -677,9 +658,7 @@ function performBlsVerifyIU256(
         nThreshold, nParticipants, "BLS verify-I-U256", details ) )
         return false;
     const strActionDir = allocBlsTmpActionDir();
-    const fnShellRestore = function(): void {
-        shell.rm( "-rf", strActionDir );
-    };
+    const fnShellRestore = function(): void { shell.rm( "-rf", strActionDir ); };
     let strOutput = "";
     try {
         const joMsg = { message: keccak256U256( u256, true ) };
@@ -697,12 +676,10 @@ function performBlsVerifyIU256(
             " --n " + nParticipants +
             " --j " + nZeroBasedNodeIndex +
             " --input " + strSignResultFileName;
-
         details.trace( "{p}Will execute node #{} BLS u256 verify command: {}",
             strLogPrefix, nZeroBasedNodeIndex, strVerifyCommand );
-        strOutput =
-            childProcessModule.execSync( strVerifyCommand, { cwd: strActionDir } )
-                .toString( "utf8" );
+        strOutput = childProcessModule.execSync( strVerifyCommand, { cwd: strActionDir } )
+            .toString( "utf8" );
         details.trace( "{p}BLS u256 node #{} verify output is:\n{raw}", strLogPrefix,
             nZeroBasedNodeIndex, strOutput || "<<EMPTY>>" );
         details.success( "{p}BLS u256 node #{} verify success", strLogPrefix, nZeroBasedNodeIndex );
@@ -730,13 +707,10 @@ function performBlsVerify(
         throw new Error( "No own S-Chain network information" );
     const nThreshold = discoverBlsThreshold( imaState.joSChainNetworkInfo );
     const nParticipants = discoverBlsParticipants( imaState.joSChainNetworkInfo );
-    if( !checkBlsThresholdAndBlsParticipants(
-        nThreshold, nParticipants, "BLS verify", details ) )
+    if( !checkBlsThresholdAndBlsParticipants( nThreshold, nParticipants, "BLS verify", details ) )
         return false;
     const strActionDir = allocBlsTmpActionDir();
-    const fnShellRestore = function(): void {
-        shell.rm( "-rf", strActionDir );
-    };
+    const fnShellRestore = function(): void { shell.rm( "-rf", strActionDir ); };
     let strOutput = "";
     const strLogPrefix = `${strDirection}/BLS/Summary: "`;
     try {
@@ -771,12 +745,10 @@ function performBlsVerify(
             " --t " + nThreshold +
             " --n " + nParticipants +
             " --input " + "./glue-result.json";
-
         details.trace( "{p}Will execute BLS/summary verify command: {}",
             strLogPrefix, strVerifyCommand );
-        strOutput =
-            childProcessModule.execSync( strVerifyCommand, { cwd: strActionDir } )
-                .toString( "utf8" );
+        strOutput = childProcessModule.execSync( strVerifyCommand, { cwd: strActionDir } )
+            .toString( "utf8" );
         details.trace( "{p}BLS/summary verify output is:\n{raw}", strLogPrefix,
             strOutput || "<<EMPTY>>" );
         details.success( "{p}BLS/summary verify success", strLogPrefix );
@@ -806,9 +778,7 @@ function performBlsVerifyU256(
         nThreshold, nParticipants, "BLS verify-U256", details ) )
         return false;
     const strActionDir = allocBlsTmpActionDir();
-    const fnShellRestore = function(): void {
-        shell.rm( "-rf", strActionDir );
-    };
+    const fnShellRestore = function(): void { shell.rm( "-rf", strActionDir ); };
     let strOutput = "";
     const strLogPrefix = "BLS u256/Summary: ";
     try {
@@ -833,12 +803,10 @@ function performBlsVerifyU256(
             " --t " + nThreshold +
             " --n " + nParticipants +
             " --input " + "./glue-result.json";
-
         details.trace( "{p}Will execute BLS u256/summary verify command: {}",
             strLogPrefix, strVerifyCommand );
-        strOutput =
-            childProcessModule.execSync( strVerifyCommand, { cwd: strActionDir } )
-                .toString( "utf8" );
+        strOutput = childProcessModule.execSync( strVerifyCommand, { cwd: strActionDir } )
+            .toString( "utf8" );
         details.trace( "{p}BLS u256/summary verify output is:\n{raw}", strLogPrefix,
             strOutput || "<<EMPTY>>" );
         details.success( "{p}BLS u256/summary verify success", strLogPrefix );
@@ -1085,8 +1053,7 @@ async function gatherSigningCheckFinish(
                 optsSignOperation.nIdxCurrentMsgBlockStart,
                 optsSignOperation.strFromChainName, joCommonPublicKey
             ) ) {
-                strSuccessfulResultDescription =
-                    "Got successful summary BLS verification result";
+                strSuccessfulResultDescription = "Got successful summary BLS verification result";
                 optsSignOperation.details.success( "{p}{bright}",
                     optsSignOperation.strLogPrefixB, strSuccessfulResultDescription );
             } else {
@@ -1482,10 +1449,9 @@ async function doSignMessagesImpl(
         nWaitIntervalStepMilliseconds: 500,
         nWaitIntervalMaxSteps: 10 * 60 * 3 // 10 is 1 second
     };
-    optsSignOperation.details =
-        optsSignOperation.imaState.isDynamicLogInBlsSigner
-            ? log.globalStream()
-            : log.createMemoryStream();
+    optsSignOperation.details = optsSignOperation.imaState.isDynamicLogInBlsSigner
+        ? log.globalStream()
+        : log.createMemoryStream();
     optsSignOperation.strGatheredDetailsName = optsSignOperation.strDirection + "-" +
         "doSignMessagesImpl-#" + optsSignOperation.nTransferLoopCounter +
         "-" + optsSignOperation.strFromChainName + "-msg#" +
@@ -1943,9 +1909,7 @@ export async function doVerifyReadyHash(
         nThreshold, nParticipants, "verify ready hash", details ) )
         return false;
     const strActionDir = allocBlsTmpActionDir();
-    const fnShellRestore = function(): void {
-        shell.rm( "-rf", strActionDir );
-    };
+    const fnShellRestore = function(): void { shell.rm( "-rf", strActionDir ); };
     let strOutput = "";
     try {
         const joPublicKey = discoverPublicKeyByIndex(
@@ -1968,12 +1932,10 @@ export async function doVerifyReadyHash(
             " --n " + nParticipants +
             " --j " + nZeroBasedNodeIndex +
             " --input " + strSignResultFileName;
-
         details.trace( "{p}Will execute node #{} BLS verify command: {}",
             strLogPrefix, nZeroBasedNodeIndex, strVerifyCommand );
-        strOutput =
-            childProcessModule.execSync( strVerifyCommand, { cwd: strActionDir } )
-                .toString( "utf8" );
+        strOutput = childProcessModule.execSync( strVerifyCommand, { cwd: strActionDir } )
+            .toString( "utf8" );
         details.trace( "{p}BLS node #{} verify output is:\n{raw}", strLogPrefix,
             nZeroBasedNodeIndex, strOutput || "<<EMPTY>>" );
         details.success( "{p}BLS node #{} verify success", strLogPrefix, nZeroBasedNodeIndex );
@@ -2066,7 +2028,6 @@ export async function doSignReadyHash(
             };
         } else
             details.warning( "Will sign via SGX without SSL options" );
-        const signerIndex = imaState.nNodeNumber;
         joCall = await rpcCall.create( joAccount.strSgxURL, rpcCallOpts );
         if( !joCall )
             throw new Error( `Failed to create JSON RPC call object to ${joAccount.strSgxURL}` );
@@ -2078,8 +2039,7 @@ export async function doSignReadyHash(
                 keyShareName: joAccount.strBlsKeyName,
                 messageHash: strMessageHash,
                 n: nParticipants,
-                t: nThreshold,
-                signerIndex // 1-based
+                t: nThreshold
             }
         };
         details.trace( "{p}Will invoke SGX with call data {}", strLogPrefix, joIn );
@@ -2305,7 +2265,6 @@ export async function handleSkaleImaVerifyAndSign(
             };
         } else
             optsHandleVerifyAndSign.details.warning( "Will sign via SGX without SSL options" );
-        const signerIndex = optsHandleVerifyAndSign.imaState.nNodeNumber;
         joCall = await rpcCall.create( joAccount.strSgxURL, rpcCallOpts );
         if( !joCall )
             throw new Error( `Failed to create JSON RPC call object to ${joAccount.strSgxURL}` );
@@ -2317,8 +2276,7 @@ export async function handleSkaleImaVerifyAndSign(
                 keyShareName: joAccount.strBlsKeyName,
                 messageHash: optsHandleVerifyAndSign.strMessageHash,
                 n: optsHandleVerifyAndSign.nParticipants,
-                t: optsHandleVerifyAndSign.nThreshold,
-                signerIndex // 1-based
+                t: optsHandleVerifyAndSign.nThreshold
             }
         };
         optsHandleVerifyAndSign.details.trace(
@@ -2456,7 +2414,6 @@ export async function handleSkaleImaBSU256(
             };
         } else
             optsBSU256.details.warning( "Will sign via SGX without SSL options" );
-        const signerIndex = optsBSU256.imaState.nNodeNumber;
         joCall = await rpcCall.create( optsBSU256.joAccount.strSgxURL, rpcCallOpts );
         if( !joCall ) {
             throw new Error( "Failed to create JSON RPC call object " +
@@ -2470,8 +2427,7 @@ export async function handleSkaleImaBSU256(
                 keyShareName: optsBSU256.joAccount.strBlsKeyName,
                 messageHash: optsBSU256.strMessageHash,
                 n: optsBSU256.nParticipants,
-                t: optsBSU256.nThreshold,
-                signerIndex // 1-based
+                t: optsBSU256.nThreshold
             }
         };
         optsBSU256.details.trace( "{p}Will invoke SGX with call data {}",
