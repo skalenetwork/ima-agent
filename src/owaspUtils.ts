@@ -764,14 +764,12 @@ export function toBN( arg: any ): any {
             multiplier = toBNbasic( -1, 10 );
         }
         stringArg = stringArg === "" ? "0" : stringArg;
-        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-        if( ( !stringArg.match( /^-?[0-9]+$/ ) && stringArg.match( /^[0-9A-Fa-f]+$/ ) ) ||
-            // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-            stringArg.match( /^[a-fA-F]+$/ ) ||
-            ( isHexPrefixed && stringArg.match( /^[0-9A-Fa-f]+$/ ) ) )
+        const isMatchN: boolean = !!stringArg.match( /^-?[0-9]+$/ );
+        const isMatchX: boolean = !!stringArg.match( /^[0-9A-Fa-f]+$/ );
+        const isMatchA: boolean = !!stringArg.match( /^[a-fA-F]+$/ );
+        if( ( ( !isMatchN ) && isMatchX ) || isMatchA || ( isHexPrefixed && isMatchX ) )
             return toBNbasic( stringArg, 16 ).mul( multiplier );
-        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-        if( ( stringArg.match( /^-?[0-9]+$/ ) || stringArg === "" ) && !isHexPrefixed )
+        if( ( isMatchN || stringArg === "" ) && ( !isHexPrefixed ) )
             return toBNbasic( stringArg, 10 ).mul( multiplier );
     } else if( typeof arg === "object" && arg.toString && ( !arg.pop && !arg.push ) ) {
         if( arg.toString().match( /^-?[0-9]+$/ ) && ( arg.mul || arg.dividedToIntegerBy ) )
