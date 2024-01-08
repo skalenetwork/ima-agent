@@ -96,7 +96,7 @@ PAYMENT TRANSACTION options:
     --gas-price-multiplier-tc ..............Sets Gas Price Multiplier for S<->S Target S-Chain transactions, Default value is 0.0.
     --gas-price-multiplier .................Sets Gas Price Multiplier for both Main Net and S-Chain(s).
     --gas-multiplier-mn ....................Sets Gas Value Multiplier for Main Net transactions, Default value is 1.25. Specify value 0.0 to disable Gas Price Customization for Main Net.
-    --gas-multiplier-sc ....................Sets Gas Value Multiplierfor S-Chain transactions, Default value is 1.25.
+    --gas-multiplier-sc ....................Sets Gas Value Multiplier S-Chain transactions, Default value is 1.25.
     --gas-multiplier-tc ....................Sets Gas Value Multiplier for S<->S Target S-Chain transactions, Default value is 1.25.
     --gas-multiplier .......................Sets Gas Value Multiplier for both Main Net and S-Chain(s).
 REGISTRATION commands:
@@ -194,9 +194,6 @@ IMA JSON RPC SERVER options:
     --no-cross-ima .........................Disable calls to IMA JSON RPC servers to  compute BLS signature parts and operation state inside time frames. Use calls to skaled. Default mode.
 TEST options:
     --browse-s-chain .......................Download own S-Chain's network information.
-OPTIMIZATION options:
-    --enable-multicall .....................Enable optimizations via multi-call. Default mode.
-    --disable-multicall ....................Disable optimizations via multi-call.
 LOGGING options:
     --expose ...............................Expose low-level log details after successful operations. By default details exposed only on errors.
     --no-expose ............................Expose low-level log details only after errors. Default expose mode.

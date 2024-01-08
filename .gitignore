@@ -73,5 +73,7 @@ venv
 # network-browser
 
 network-browser/test*.json
+
+src/build
 network-browser/build/*
 network-browser.js

@@ -38,6 +38,7 @@ RUN which python3
 
 RUN mkdir /ima
 WORKDIR /ima
+
 COPY package.json package.json
 
 COPY runner runner
@@ -66,5 +67,6 @@ RUN node-gyp --version
 
 WORKDIR /ima
 RUN yarn install
+RUN yarn rebuild
 
 CMD ["bash", "/ima/runner/run.sh"]
