@@ -1,0 +1,9 @@
+[submodule "IMA"]
+	path = IMA
+	url = https://github.com/skalenetwork/IMA.git
+[submodule "hardhat-node"]
+	path = hardhat-node
+	url = https://github.com/skalenetwork/hardhat-node.git
+[submodule "helper-scripts"]
+	path = helper-scripts
+	url = https://github.com/skalenetwork/helper-scripts.git

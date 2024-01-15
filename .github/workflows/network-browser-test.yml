@@ -1,0 +1,28 @@
+name: network-browser test
+on: [push, pull_request]
+env:
+  ETH_PRIVATE_KEY: ${{ secrets.ETH_PRIVATE_KEY }}
+  MANAGER_TAG: "1.9.3-beta.0"
+jobs:
+  test_network_browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: oven-sh/setup-bun@v1
+      - name: Launch hardhat node
+        working-directory: hardhat-node
+        run: docker-compose up -d
+      - name: Deploy manager contracts
+        run: |
+          bash ./helper-scripts/deploy_test_manager.sh
+          docker rmi -f skalenetwork/skale-manager:${{ env.MANAGER_TAG }}
+
+      - name: Install network-browser dependencies
+        working-directory: network-browser
+        run: bun i
+
+      - name: Run network-browser tests
+        working-directory: network-browser
+        run: bash run_tests.sh
