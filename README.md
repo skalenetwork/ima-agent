@@ -18,9 +18,10 @@ A module implementing core IMA functionality.
 
 Data validity verifier module. See [OWASP document](https://www.gitbook.com/download/pdf/book/checkmarx/JS-SCP).
 
-#### SKALE Observer
+#### SKALE Network Browser
 
-[SKALE Network Browser](src/SNB.md). Responsible for providing description of all SKALE chains.
+Component responsible for providing description of all SKALE chains. See detailed spec:
+[SKALE Network Browser](docs/SNB.md)
 
 #### IMA Log
 
