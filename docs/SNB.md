@@ -55,7 +55,7 @@ See Diagram 3 for more details.
 ### Diagram 1. High-Level Architecture
 This diagram shows how IMA container is structured and how SNB is integrated into it:
 
-![IMA Container Structure](./ima-container-strucure.png)
+![IMA Container Structure](./ima-container-structure.png)
 
 ### Diagram 2. SNB Loop
 This diagram shows SNB’s browse loop:
