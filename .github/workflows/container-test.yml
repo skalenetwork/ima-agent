@@ -148,11 +148,12 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: 18
-        # - name: INIT - install Node utilities
-        #   run: |
-        #     npm install --global yarn
-        #     npm install --global node-gyp
-        #     npm install --global color-support
+
+    - name: INIT - install Node utilities
+      run: |
+        npm install --global yarn
+        npm install --global node-gyp
+        npm install --global color-support
 
     - name: INIT - version checks of Node JS and its utilities
       run: |
