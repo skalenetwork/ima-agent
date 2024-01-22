@@ -186,6 +186,7 @@ jobs:
       run: |
         cd comprehensive-test
         pwd
+        export PATH=$PATH:$(dirname $(which npx))
         cd cli-hh
         ./clean.sh
         ./init.sh
@@ -257,6 +258,7 @@ jobs:
     - name: INIT - generate configuration files for S-Chain nodes
       working-directory: ${{env.working-directory}}
       run: |
+        export PATH=$PATH:$(dirname $(which npx))
         cd comprehensive-test
         cd s_chain_gen
         ./init.sh
