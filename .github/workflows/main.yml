@@ -98,7 +98,6 @@ jobs:
         npm install --global npx || true
         npm install --global yarn
         npm install --global node-gyp
-        npm install --global color-support
 
     - name: INIT - version checks of Node JS and its utilities
       run: |
@@ -207,7 +206,6 @@ jobs:
         npm install --global npx || true
         npm install --global yarn
         npm install --global node-gyp
-        npm install --global color-support
 
     - name: INIT - version checks of Node JS and its utilities
       run: |

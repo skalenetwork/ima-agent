@@ -154,7 +154,6 @@ jobs:
         npm install --global npx || true
         npm install --global yarn
         npm install --global node-gyp
-        npm install --global color-support
 
     - name: INIT - version checks of Node JS and its utilities
       run: |
@@ -470,6 +469,7 @@ jobs:
         echo "Docker image(will run) name for IMA Agent is:" $IMAGE_NAME
         #
         export SEPARATED_IMA_AGENT_MODE=1
+        export PATH=$PATH:$(dirname $(which npx))
         node ./index.js
         cd ../..
 

@@ -151,7 +151,6 @@ jobs:
         npm install --global npx || true
         npm install --global yarn
         npm install --global node-gyp
-        npm install --global color-support
 
     - name: INIT - version checks of Node JS and its utilities
       run: |
@@ -422,6 +421,7 @@ jobs:
         cd comprehensive-test/engine
         export ALL_SKALE_TEST_CLOUD_RUN=1
         export SEPARATED_IMA_AGENT_MODE=1
+        export PATH=$PATH:$(dirname $(which npx))
         node ./index.js
         cd ../..
 
