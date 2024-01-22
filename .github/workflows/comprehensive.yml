@@ -184,7 +184,8 @@ jobs:
         pwd
         cd cli-hh
         export PATH=$PATH:$(dirname $(which npx))
-        ./clean.sh
+        yarn install
+        ./clean.sh || true
         ./init.sh
         cd ../..
 

@@ -261,6 +261,8 @@ jobs:
         export PATH=$PATH:$(dirname $(which npx))
         cd comprehensive-test
         cd s_chain_gen
+        yarn install
+        ./clean.sh || true
         ./init.sh
         cd ../..
 
