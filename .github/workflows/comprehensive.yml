@@ -142,17 +142,15 @@ jobs:
         sudo rm -rf /usr/local/bin/node* || true &> /dev/null
 
     - name: INIT - install Node JS
-      run: |
-        curl -sL https://deb.nodesource.com/setup_18.x | sudo bash -
-        sudo apt-get install -y nodejs
-        sudo ln -s /usr/bin/node /usr/local/bin/node || true
-        
-    - name: INIT - install Node utilities
-      run: |
-        sudo npm install --global npm
-        sudo npm install --global color-support
-        sudo npm install --global yarn
-        sudo npm install --global node-gyp
+      uses: actions/setup-node@v2
+      with:
+        node-version: 18
+        # - name: INIT - install Node utilities
+        #   run: |
+        #     sudo npm install --global npm
+        #     sudo npm install --global color-support
+        #     sudo npm install --global yarn
+        #     sudo npm install --global node-gyp
 
     - name: INIT - version checks of Node JS and its utilities
       run: |
