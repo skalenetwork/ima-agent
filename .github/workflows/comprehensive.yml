@@ -149,10 +149,8 @@ jobs:
     - name: INIT - install Node utilities
       run: |
         sudo npm install --global yarn
-        #     sudo npm install --global npm
-        #     sudo npm install --global color-support
-        #     
-        #     sudo npm install --global node-gyp
+        sudo npm install --global node-gyp
+        sudo npm install --global color-support
 
     - name: INIT - version checks of Node JS and its utilities
       run: |
