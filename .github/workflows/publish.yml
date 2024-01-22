@@ -45,6 +45,7 @@ jobs:
 
     - name: INIT - install Node utilities
       run: |
+        npm install --global npx
         npm install --global yarn
         npm install --global node-gyp
         npm install --global color-support
