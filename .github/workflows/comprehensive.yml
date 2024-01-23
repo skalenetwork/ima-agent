@@ -7,18 +7,9 @@ on:
       - 'docs-v*'
   
 jobs:
-  cancel-runs:
-    name: Cancel Previous Runs
-    runs-on: ubuntu-latest
-    steps:
-      - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.9.1
-        with:
-          access_token: ${{ github.token }}
+
   test-comprehensive:
-
     runs-on: ubuntu-latest
-
     steps:
 
     - uses: actions/checkout@v2
@@ -27,6 +18,10 @@ jobs:
 
     - uses: oven-sh/setup-bun@v1
 
+    - name: Cancel Previous Runs
+      uses: styfle/cancel-workflow-action@0.9.1
+      with:
+        access_token: ${{ github.token }}
 
     - name: UPDATE - system deps and install libc6, net-tools, btrfs-progs, zip, unzip, bash, procps, curl
       run: |
