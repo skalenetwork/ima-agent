@@ -76,58 +76,6 @@ jobs:
       run: |
         yarn run lint-nb
 
-  test-integration:
-    runs-on: ubuntu-latest
-
-    env:
-      working-directory: ./test
-
-    steps:
-    - uses: actions/checkout@v2
-      with:
-          submodules: recursive
-    
-    - uses: oven-sh/setup-bun@v1
-
-    - name: Get yarn cache directory path
-      id: yarn-cache-dir-path
-      run: echo "::set-output name=dir::$(yarn cache dir)"
-
-    - uses: actions/cache@v2
-      id: yarn-cache
-      with:
-        path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-yarn-
-
-    - uses: actions/cache@v2
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
-
-    - name: INIT - install Node JS
-      uses: actions/setup-node@v4
-      with:
-        node-version: 18
-
-    - name: INIT - install Node utilities
-      run: |
-        npm install --global npx || true
-        npm install --global node-gyp
-
-    - name: INIT - version checks of Bun SH
-      run: |
-        which bun
-        bun --version
-
-    - name: Install Python 3.8
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
-
     - name: Install all NPMs in src
       working-directory: ./src
       run: |
@@ -156,6 +104,16 @@ jobs:
         echo "Content of \"accounts.json\" is:"
         cat ../../test/accounts.json | jq
 
+    - name: Run test (JS part)
+      working-directory: ./test
+      run: |
+        yarn test
+
+    - name: Install Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
     - name: Prepare test (PY part)
       working-directory: ./test
       run: |
@@ -174,9 +132,3 @@ jobs:
         export URL_W3_ETHEREUM="http://127.0.0.1:8545"
         export URL_W3_S_CHAIN="http://127.0.0.1:8545"
         python3 test.py
-
-
-    - name: Run test (JS part)
-      working-directory: ./test
-      run: |
-        yarn test
