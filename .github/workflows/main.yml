@@ -15,17 +15,16 @@ jobs:
       with:
           submodules: recursive
 
-    - name: INIT - install needed utilities
-      run: |
-        sudo apt-get install -y jq sed
-
     - name: INIT - install Node JS
       uses: actions/setup-node@v4
       with:
         node-version: 18
 
-    - name: INIT - install Node utilities
+    - uses: oven-sh/setup-bun@v1
+    
+    - name: INIT - install utilities
       run: |
+        apt-get install -y jq sed
         npm install --global npx || true
         npm install --global node-gyp
         npm install -g eslint
