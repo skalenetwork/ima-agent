@@ -28,7 +28,6 @@ jobs:
     - name: INIT - install utilities
       run: |
         sudo apt-get install -y jq sed
-        npm install -g npx || true
         npm install -g eslint
         eslint --version
 
