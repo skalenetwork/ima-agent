@@ -76,24 +76,6 @@ jobs:
       run: |
         yarn run lint-nb
 
-    - name: Python Version Checks
-      run: |
-        echo ------------ python version check
-        which python || echo "----> Looks like python was not installed, next command will fail"
-        python --version
-        echo ------------ python3 version check
-        which python3 || echo "----> Looks like python3 was not installed, next command will fail"
-        python3 --version
-
-    - name: Install Python Prerequisites
-      run: |
-        echo ------------ py3 installs
-        sudo apt-get install -y python3-pip python3-setuptools python3-dev
-        echo ------------ py3 wheel - apt
-        sudo apt-get install -y python3-wheel
-        echo ------------ py3 wheel - pip
-        pip3 install wheel
-
   test-integration:
     runs-on: ubuntu-latest
 
@@ -134,21 +116,7 @@ jobs:
     - name: INIT - install Node utilities
       run: |
         npm install --global npx || true
-        npm install --global yarn
         npm install --global node-gyp
-
-    - name: INIT - version checks of Node JS and its utilities
-      run: |
-        which node
-        node --version
-        which npx
-        npx --version
-        which npm
-        npm --version
-        which yarn
-        yarn --version
-        which node-gyp
-        node-gyp --version
 
     - name: INIT - version checks of Bun SH
       run: |
@@ -207,10 +175,6 @@ jobs:
         export URL_W3_S_CHAIN="http://127.0.0.1:8545"
         python3 test.py
 
-    - name: Prepare test (JS part)
-      working-directory: ./test
-      run: |
-        yarn install
 
     - name: Run test (JS part)
       working-directory: ./test
