@@ -5,9 +5,6 @@ on:
   push:
     branches-ignore:
       - 'docs-v*'
-  pull_request:
-    branches-ignore:
-      - 'docs-v*'
   
 jobs:
   cancel-runs:
@@ -46,73 +43,6 @@ jobs:
           submodules: recursive
     
     - uses: oven-sh/setup-bun@v1
-
-    - name: INFO - github environment variable checks
-      run: |
-        echo ------------ GIT_CURRENT_BRANCH
-        export GIT_CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-        echo $GIT_CURRENT_BRANCH
-        echo ------------ GIT_SYMBOLIC_BRANCH
-        export GIT_SYMBOLIC_BRANCH=$(git symbolic-ref --short HEAD)
-        echo $GIT_SYMBOLIC_BRANCH
-        echo ------------ GITHUB_WORKFLOW
-        echo $GITHUB_WORKFLOW
-        echo ------------ GITHUB_RUN_ID
-        echo $GITHUB_RUN_ID
-        echo ------------ GITHUB_RUN_NUMBER
-        echo $GITHUB_RUN_NUMBER
-        echo ------------ GITHUB_ACTION
-        echo $GITHUB_ACTION
-        echo ------------ GITHUB_ACTIONS
-        echo $GITHUB_ACTIONS
-        echo ------------ GITHUB_ACTOR
-        echo $GITHUB_ACTOR
-        echo ------------ GITHUB_REPOSITORY
-        echo $GITHUB_REPOSITORY
-        echo ------------ GITHUB_EVENT_NAME
-        echo $GITHUB_EVENT_NAME
-        echo ------------ GITHUB_EVENT_PATH
-        echo $GITHUB_EVENT_PATH
-        echo ------------ GITHUB_WORKSPACE
-        echo $GITHUB_WORKSPACE
-        echo ------------ GITHUB_SHA
-        echo $GITHUB_SHA
-        echo ------------ GITHUB_REF
-        echo $GITHUB_REF
-        echo ------------ GITHUB_HEAD_REF
-        echo $GITHUB_HEAD_REF
-        echo ------------ GITHUB_BASE_REF
-        echo $GITHUB_BASE_REF
-
-    - name: INFO - user information checks
-      run: |
-        echo ------------ user
-        echo $USER
-        echo ------------ home
-        echo $HOME
-        echo ------------ path
-        echo $PATH
-
-    - name: INFO - system information checks
-      run: |
-        echo ------------ pwd
-        pwd
-        echo ------------ unix name - a
-        uname -a || true
-        echo ------------ unix name - r
-        uname -r || true
-        echo ------------ lsb_release - cat
-        cat /etc/lsb-release
-        echo ------------ lsb_release - a
-        lsb_release -a || true
-        echo ------------ hostnamectl
-        hostnamectl || true
-        echo ------------ /etc/os-release
-        cat /etc/os-release || true
-        echo ------------ /proc/version
-        cat /proc/version || true
-        echo ------------ lscpu
-        lscpu || true
 
     - name: UPDATE - system deps and install libc6, net-tools, btrfs-progs, zip, unzip, bash, procps, curl, jq
       run: |
@@ -154,24 +84,6 @@ jobs:
         npm install --global npx || true
         npm install --global yarn
         npm install --global node-gyp
-
-    - name: INIT - version checks of Node JS and its utilities
-      run: |
-        which node
-        node --version
-        which npx
-        npx --version
-        which npm
-        npm --version
-        which yarn
-        yarn --version
-        which node-gyp
-        node-gyp --version
-
-    - name: INIT - version checks of Bun SH
-      run: |
-        which bun
-        bun --version
 
     - name: INIT - Download comprehensive-test
       working-directory: ${{env.working-directory}}

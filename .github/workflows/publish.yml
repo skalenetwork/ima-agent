@@ -49,19 +49,6 @@ jobs:
         npm install --global yarn
         npm install --global node-gyp
 
-    - name: INIT - version checks of Node JS and its utilities
-      run: |
-        which node
-        node --version
-        which npx
-        npx --version
-        which npm
-        npm --version
-        which yarn
-        yarn --version
-        which node-gyp
-        node-gyp --version
-
     - name: Set up Python 3.8
       uses: actions/setup-python@v2
       with:
