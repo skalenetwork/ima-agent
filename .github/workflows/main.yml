@@ -25,65 +25,6 @@ jobs:
 
     - uses: oven-sh/setup-bun@v1
 
-    - name: System Version Checks
-      run: |
-        echo ------------ GIT_CURRENT_BRANCH
-        export GIT_CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-        echo $GIT_CURRENT_BRANCH
-        echo ------------ GIT_SYMBOLIC_BRANCH
-        export GIT_SYMBOLIC_BRANCH=$(git symbolic-ref --short HEAD)
-        echo $GIT_SYMBOLIC_BRANCH
-        echo ------------ GITHUB_WORKFLOW
-        echo $GITHUB_WORKFLOW
-        echo ------------ GITHUB_RUN_ID
-        echo $GITHUB_RUN_ID
-        echo ------------ GITHUB_RUN_NUMBER
-        echo $GITHUB_RUN_NUMBER
-        echo ------------ GITHUB_ACTION
-        echo $GITHUB_ACTION
-        echo ------------ GITHUB_ACTIONS
-        echo $GITHUB_ACTIONS
-        echo ------------ GITHUB_ACTOR
-        echo $GITHUB_ACTOR
-        echo ------------ GITHUB_REPOSITORY
-        echo $GITHUB_REPOSITORY
-        echo ------------ GITHUB_EVENT_NAME
-        echo $GITHUB_EVENT_NAME
-        echo ------------ GITHUB_EVENT_PATH
-        echo $GITHUB_EVENT_PATH
-        echo ------------ GITHUB_WORKSPACE
-        echo $GITHUB_WORKSPACE
-        echo ------------ GITHUB_SHA
-        echo $GITHUB_SHA
-        echo ------------ GITHUB_REF
-        echo $GITHUB_REF
-        echo ------------ GITHUB_HEAD_REF
-        echo $GITHUB_HEAD_REF
-        echo ------------ GITHUB_BASE_REF
-        echo $GITHUB_BASE_REF
-        echo ------------ user
-        echo $USER
-        echo ------------ home
-        echo $HOME
-        echo ------------ path
-        echo $PATH
-        echo ------------ pwd
-        pwd
-        echo ------------ unix name - a
-        uname -a || true
-        echo ------------ unix name - r
-        uname -r || true
-        echo ------------ lsb
-        lsb_release -a || true
-        echo ------------ hostnamectl
-        hostnamectl || true
-        echo ------------ /etc/os-release
-        cat /etc/os-release || true
-        echo ------------ /proc/version
-        cat /proc/version || true
-        echo ------------ lscpu
-        lscpu || true
-
     - name: INIT - install needed utilities
       run: |
         sudo apt-get install -y jq sed
@@ -96,7 +37,6 @@ jobs:
     - name: INIT - install Node utilities
       run: |
         npm install --global npx || true
-        npm install --global yarn
         npm install --global node-gyp
 
     - name: INIT - version checks of Node JS and its utilities
@@ -153,16 +93,6 @@ jobs:
         sudo apt-get install -y python3-wheel
         echo ------------ py3 wheel - pip
         pip3 install wheel
-        # echo ------------ slither analyzer install
-        # #pip3 install slither-analyzer==0.8.3
-        # pip3 install -r IMA/proxy/scripts/requirements.txt
-        # echo ------------ slither search attempt
-        # sudo find / -name slither || true
-        # echo ------------ slither location detection - after install
-        # export PATH=$PATH:/home/$USER/.local/bin
-        # which slither || echo "----> Looks like slither was not installed, next command will fail"
-        # echo ------------ slither version check - after install
-        # slither --version || true
 
   test-integration:
     runs-on: ubuntu-latest
