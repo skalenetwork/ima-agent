@@ -6,7 +6,7 @@ on:
       - 'docs-v*'
 
 jobs:
-  test-agent:
+  main:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -18,6 +18,11 @@ jobs:
       with:
         node-version: 18
 
+    - name: Install Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    
     - uses: oven-sh/setup-bun@v1
     
     - name: INIT - install utilities
@@ -73,11 +78,6 @@ jobs:
       working-directory: ./test
       run: |
         yarn test
-
-    - name: Install Python 3.8
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
 
     - name: Prepare test (PY part)
       working-directory: ./test
