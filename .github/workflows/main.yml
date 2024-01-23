@@ -6,24 +6,14 @@ on:
   push:
     branches-ignore:
       - 'docs-v*'
-  pull_request:
-    branches-ignore:
-      - 'docs-v*'
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   test-agent:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
       with:
           submodules: recursive
-
-    - uses: oven-sh/setup-bun@v1
 
     - name: INIT - install needed utilities
       run: |
@@ -38,28 +28,7 @@ jobs:
       run: |
         npm install --global npx || true
         npm install --global node-gyp
-
-    - name: INIT - version checks of Node JS and its utilities
-      run: |
-        which node
-        node --version
-        which npx
-        npx --version
-        which npm
-        npm --version
-        which yarn
-        yarn --version
-        which node-gyp
-        node-gyp --version
-
-    - name: INIT - version checks of Bun SH
-      run: |
-        which bun
-        bun --version
-
-    - name: Install ESLINT
-      run: |
-        sudo npm install -g eslint
+        npm install -g eslint
         eslint --version
 
     - name: Install all NPMs at root
