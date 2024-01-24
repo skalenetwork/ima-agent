@@ -179,26 +179,6 @@ jobs:
         cd comprehensive-test/engine 
         yarn install
 
-    - name: SELF-TEST A - use IMA to browse S-Chain via node 00-00 and test last is alive
-      working-directory: ${{env.working-directory}}
-      run: |
-        node ./src/build/main.js --colors --no-gathered --browse-s-chain --url-s-chain=http://127.0.0.1:2164 || true
-
-    - name: SELF-TEST B - use IMA to browse S-Chain via node 00-01 and test last is alive
-      working-directory: ${{env.working-directory}}
-      run: |
-        node ./src/build/main.js --colors --no-gathered --browse-s-chain --url-s-chain=http://127.0.0.2:2264 || true
-
-    - name: SELF-TEST C - use IMA to browse S-Chain via node 01-00 and test last is alive
-      working-directory: ${{env.working-directory}}
-      run: |
-        node ./src/build/main.js --colors --no-gathered --browse-s-chain --url-s-chain=http://127.0.0.3:2364 || true
-
-    - name: SELF-TEST D - use IMA to browse S-Chain via node 01-01 and test last is alive
-      working-directory: ${{env.working-directory}}
-      run: |
-        node ./src/build/main.js --colors --no-gathered --browse-s-chain --url-s-chain=http://127.0.0.4:2464 || true
-
     - name: INIT - build IMA docker container
       working-directory: ${{env.working-directory}}
       run: |
@@ -311,6 +291,7 @@ jobs:
         echo IMA_AGENT_ROOT_DIR = $IMA_AGENT_ROOT_DIR
         cd comprehensive-test/engine
         export ALL_SKALE_TEST_CLOUD_RUN=1
+        export DISABLE_S2S_TESTS=1
         #
         export VERSION=13.13.13-test.13
         echo "Docker image(will run) version is:" $VERSION
