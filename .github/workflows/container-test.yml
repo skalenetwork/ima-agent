@@ -256,33 +256,7 @@ jobs:
         cd comprehensive-test
         cd sgxwallet/run_sgx_sim
         rm -rf ../../local_sgxwallet_output_log.txt &> /dev/null
-        echo " --------------------------- stopping sgx wallet ------------------------------------------------------------------------------------------------------ "
         docker-compose down
-        echo " --------------------------- fixing sgx wallets docker config ----------------------------------------------------------------------------------------- "
-        mv docker-compose.yml docker-compose.yml.old-previous || true
-        echo "version: '3'"                                 > docker-compose.yml
-        echo 'services:'                                   >> docker-compose.yml
-        echo '  sgxwallet:'                                >> docker-compose.yml
-        echo '    image: skalenetwork/sgxwallet_sim:1.9.0-develop.11'                          >> docker-compose.yml
-        echo '    restart: unless-stopped'                 >> docker-compose.yml
-        echo '    network_mode: "host"'                    >> docker-compose.yml
-        # echo '    ports:'                                  >> docker-compose.yml
-        # echo '      - "1026:1026"'                         >> docker-compose.yml
-        # echo '      - "1027:1027"'                         >> docker-compose.yml
-        # echo '      - "1028:1028"'                         >> docker-compose.yml
-        # echo '      - "1029:1029"'                         >> docker-compose.yml
-        # echo '      - "1030:1030"'                         >> docker-compose.yml
-        # echo '      - "1031:1031"'                         >> docker-compose.yml
-        echo '    volumes:'                                >> docker-compose.yml
-        echo '      - ./sgx_data:/usr/src/sdk/sgx_data'    >> docker-compose.yml
-        echo '      -  /dev/urandom:/dev/random'           >> docker-compose.yml
-        echo '    logging:'                                >> docker-compose.yml
-        echo '      driver: json-file'                     >> docker-compose.yml
-        echo '      options:'                              >> docker-compose.yml
-        echo '        max-size: "10m"'                     >> docker-compose.yml
-        echo '        max-file: "4"'                       >> docker-compose.yml
-        echo '    command: -s -y -V -d'                    >> docker-compose.yml
-        echo " --------------------------- pulling sgx wallet ------------------------------------------------------------------------------------------------------- "
         docker-compose pull
         cd ../..
         cd ..
