@@ -128,12 +128,6 @@ jobs:
         cd comprehensive-test/s_chain_gen
         yarn install
 
-    - name: INIT - initialize S-Chain configuration creator
-      working-directory: ${{env.working-directory}}
-      run: |
-        cd comprehensive-test/s_chain_gen
-        yarn install
-
     - name: INIT - check skaled can run
       working-directory: ${{env.working-directory}}
       run: |
