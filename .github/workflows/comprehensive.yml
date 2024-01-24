@@ -221,33 +221,6 @@ jobs:
         sudo netstat -tulpn | grep 1027
         echo "...Done"
 
-    - name: INIT - download transaction manager
-      working-directory: ${{env.working-directory}}
-      run: |
-        cd comprehensive-test
-        rm -rf transaction-manager || true
-        git clone https://github.com/skalenetwork/transaction-manager --recursive
-
-    - name: INIT - start transaction manager and redis
-      working-directory: ${{env.working-directory}}
-      run: |
-        cd comprehensive-test/transaction-manager
-        export SGX_SERVER_URL=http://127.0.0.1:1027
-        export ENDPOINT=http://127.0.0.1:8545
-        export ETH_PRIVATE_KEY=23ABDBD3C61B5330AF61EBE8BEF582F4E5CC08E554053A718BDCE7813B9DC1FC
-        ./scripts/run-test-containers.sh
-        cd ..
-        echo "------------------------------------------------------------------------------------"
-        docker ps
-        echo "------------------------------------------------------------------------------------"
-        export TM_CONTAINER_ID=$(docker ps | grep transaction-manager | awk '{print $1;}')
-        echo "Transaction manager docker container ID:" $TM_CONTAINER_ID
-        docker logs $TM_CONTAINER_ID -f &> engine/tm.log &
-        echo "------------------------------------------------------------------------------------"
-        export REDIS_CONTAINER_ID=$(docker ps | grep redis | awk '{print $1;}')
-        echo "Redis container ID:" $REDIS_CONTAINER_ID
-        docker logs $REDIS_CONTAINER_ID -f &> engine/redis.log &
-
     - name: INIT - prepare ulimit
       working-directory: ${{env.working-directory}}
       run: |
@@ -276,11 +249,6 @@ jobs:
       run: |
         cd comprehensive-test/sgxwallet/run_sgx_sim
         docker-compose down
-
-    - name: SHUTDOWN - stop transaction manager and redis
-      run: |
-        docker stop $TM_CONTAINER_ID $REDIS_CONTAINER_ID || true
-        docker rm $TM_CONTAINER_ID $REDIS_CONTAINER_ID || true
 
     - name: SHUTDOWN - zombie cleanup, if any
       run: |
