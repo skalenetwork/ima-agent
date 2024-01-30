@@ -69,12 +69,12 @@ async function safeNetworkBrowserLoop() {
             await delay(NETWORK_BROWSER_DELAY)
         } catch (error) {
             if (error instanceof BrowserTimeoutError) {
-                console.error(
+                log.error(
                     `A timeout (${NETWORK_BROWSER_TIMEOUT} ms) error occurred:`,
                     error.message
                 )
             } else {
-                console.error('An error occurred in browse:', error)
+                log.error('An error occurred in browse:', error)
             }
             await delay(POST_ERROR_DELAY)
         }
