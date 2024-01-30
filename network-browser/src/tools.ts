@@ -25,9 +25,24 @@ import { Logger, type ILogObj } from 'tslog'
 
 import { readFileSync, writeFileSync, renameSync } from 'fs'
 import { BrowserTimeoutError } from './errors'
-import { DEFAULT_PING_DELAY, DEFAULT_PING_ITERATIONS, LOG_LEVEL, LOG_PRETTY } from './constants'
+import {
+    DEFAULT_PING_DELAY,
+    DEFAULT_PING_ITERATIONS,
+    LOG_FORMAT,
+    LOG_LEVEL,
+    LOG_PRETTY
+} from './constants'
 
-const log = new Logger<ILogObj>({ minLevel: LOG_LEVEL, stylePrettyLogs: LOG_PRETTY })
+const log = new Logger<ILogObj>(getLoggerConfig('tools'))
+
+export function getLoggerConfig(moduleName: string): any {
+    return {
+        prettyLogTemplate: LOG_FORMAT,
+        minLevel: LOG_LEVEL,
+        stylePrettyLogs: LOG_PRETTY,
+        name: `snb::${moduleName}`
+    }
+}
 
 export function stringifyBigInt(obj: any): string {
     return JSON.stringify(
