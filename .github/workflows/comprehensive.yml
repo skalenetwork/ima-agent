@@ -213,7 +213,7 @@ jobs:
         cd comprehensive-test/engine/create_pems
         ./create_pems.sh
 
-    - name: RUN - main engine steps
+    - name: RUN - full test - everything up and running
       working-directory: ${{env.working-directory}}
       run: |
         export IMA_AGENT_ROOT_DIR=$(pwd)
@@ -223,6 +223,64 @@ jobs:
         export DISABLE_S2S_TESTS=0
         export SEPARATED_IMA_AGENT_MODE=1
         export PATH=$PATH:$(dirname $(which npx))
+        export COUNT_OF_SKALED_INSTANCES_TO_SKIP_START=0
+        export COUNT_OF_IMA_AGENT_INSTANCES_TO_SKIP_START=0
+        node ./index.js
+
+    - name: RUN - full test - one SKALED is down
+      working-directory: ${{env.working-directory}}
+      run: |
+        export IMA_AGENT_ROOT_DIR=$(pwd)
+        echo IMA_AGENT_ROOT_DIR = $IMA_AGENT_ROOT_DIR
+        cd comprehensive-test/engine
+        export ALL_SKALE_TEST_CLOUD_RUN=1
+        export DISABLE_S2S_TESTS=0
+        export SEPARATED_IMA_AGENT_MODE=1
+        export PATH=$PATH:$(dirname $(which npx))
+        export COUNT_OF_SKALED_INSTANCES_TO_SKIP_START=1
+        export COUNT_OF_IMA_AGENT_INSTANCES_TO_SKIP_START=0
+        node ./index.js
+
+    - name: RUN - full test - one IMA Agent is down
+      working-directory: ${{env.working-directory}}
+      run: |
+        export IMA_AGENT_ROOT_DIR=$(pwd)
+        echo IMA_AGENT_ROOT_DIR = $IMA_AGENT_ROOT_DIR
+        cd comprehensive-test/engine
+        export ALL_SKALE_TEST_CLOUD_RUN=1
+        export DISABLE_S2S_TESTS=0
+        export SEPARATED_IMA_AGENT_MODE=1
+        export PATH=$PATH:$(dirname $(which npx))
+        export COUNT_OF_SKALED_INSTANCES_TO_SKIP_START=0
+        export COUNT_OF_IMA_AGENT_INSTANCES_TO_SKIP_START=1
+        node ./index.js
+
+    - name: RUN - full test - one SKALED and one IMA Agent are down
+      working-directory: ${{env.working-directory}}
+      run: |
+        export IMA_AGENT_ROOT_DIR=$(pwd)
+        echo IMA_AGENT_ROOT_DIR = $IMA_AGENT_ROOT_DIR
+        cd comprehensive-test/engine
+        export ALL_SKALE_TEST_CLOUD_RUN=1
+        export DISABLE_S2S_TESTS=0
+        export SEPARATED_IMA_AGENT_MODE=1
+        export PATH=$PATH:$(dirname $(which npx))
+        export COUNT_OF_SKALED_INSTANCES_TO_SKIP_START=1
+        export COUNT_OF_IMA_AGENT_INSTANCES_TO_SKIP_START=1
+        node ./index.js
+
+    - name: RUN - full test - Main Net connectivity problems testing
+      working-directory: ${{env.working-directory}}
+      run: |
+        export IMA_AGENT_ROOT_DIR=$(pwd)
+        echo IMA_AGENT_ROOT_DIR = $IMA_AGENT_ROOT_DIR
+        cd comprehensive-test/engine
+        export ALL_SKALE_TEST_CLOUD_RUN=1
+        export DISABLE_S2S_TESTS=0
+        export SEPARATED_IMA_AGENT_MODE=1
+        export PATH=$PATH:$(dirname $(which npx))
+        export ENABLED_IMA_MAIN_NET_TUNNELLING=true
+        export ENABLED_IMA_MAIN_NET_CONNECTION_PROBLEMS=true
         node ./index.js
 
     - name: SHUTDOWN - stop SGX Wallet
