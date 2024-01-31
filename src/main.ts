@@ -129,9 +129,10 @@ function parseCommandLine(): void {
         log.add( imaState.strLogFilePath, imaState.nLogMaxSizeBeforeRotation,
             imaState.nLogMaxFilesCount );
     }
-    if( imaState.isPrintSecurityValues )
+    if( imaState.isPrintSecurityValues ) {
         log.information( "Agent was started with {} command line argument(s) as: {}",
-        process.argv.length, strPrintedArguments );
+            process.argv.length, strPrintedArguments );
+    }
     if( imaState.bIsNeededCommonInit ) {
         imaCLI.commonInit();
         imaCLI.initContracts();
