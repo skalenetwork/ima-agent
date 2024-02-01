@@ -43,6 +43,7 @@ COPY package.json package.json
 
 COPY runner runner
 COPY src src
+COPY src/pow src/build/pow
 RUN mkdir IMA
 COPY IMA/proxy IMA/proxy
 COPY IMA/package.json IMA/package.json
