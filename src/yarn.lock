@@ -3271,10 +3271,10 @@ undici-types@~5.25.1:
   resolved "https://registry.yarnpkg.com/undici-types/-/undici-types-5.25.3.tgz#e044115914c85f0bcbb229f346ab739f064998c3"
   integrity sha512-Ga1jfYwRn7+cP9v8auvEXN1rX3sWqlayd4HP7OKk4mZWylEmu3KzXDUGrQUN6Ol7qo1gPvB2e5gX6udnyEPgdA==
 
-undici@^5.22.1:
-  version "5.26.3"
-  resolved "https://registry.yarnpkg.com/undici/-/undici-5.26.3.tgz#ab3527b3d5bb25b12f898dfd22165d472dd71b79"
-  integrity sha512-H7n2zmKEWgOllKkIUkLvFmsJQj062lSm3uA4EYApG8gLuiOM0/go9bIoC3HVaSnfg4xunowDE2i9p8drkXuvDw==
+undici@^5.28.2:
+  version "5.28.2"
+  resolved "https://registry.yarnpkg.com/undici/-/undici-5.28.2.tgz#fea200eac65fc7ecaff80a023d1a0543423b4c91"
+  integrity sha512-wh1pHJHnUeQV5Xa8/kyQhO7WFa8M34l026L5P/+2TYiakvGy5Rdc8jWZVyG7ieht/0WgJLEd3kcU5gKx+6GC8w==
   dependencies:
     "@fastify/busboy" "^2.0.0"
 
@@ -3290,10 +3290,10 @@ uri-js@^4.2.2:
   dependencies:
     punycode "^2.1.0"
 
-urllib@^3.21.0:
-  version "3.21.0"
-  resolved "https://registry.yarnpkg.com/urllib/-/urllib-3.21.0.tgz#1a81541d00121bf0c4a2c463cf4d8218d01a3a49"
-  integrity sha512-xtgaQ4G2emUssoz3jZjMTL2g32rEL75PggNHg3EUYf1h0sdkLSaRGAFgxe5UtNdFNoxJtjWk9hwNrY5Ja9fGNA==
+urllib@^3.22.2:
+  version "3.22.2"
+  resolved "https://registry.yarnpkg.com/urllib/-/urllib-3.22.2.tgz#2c2e10a93b246fef6f89fe870a8056aac0904d8d"
+  integrity sha512-2mKMxflIsWXwAsPbanZ7sDEJF8UZL4QoAEaVviIxQBhsbJsftuTzaT/5MdbghBlL0/MU2iiky/a7mhB+LEjrRQ==
   dependencies:
     default-user-agent "^1.0.0"
     digest-header "^1.0.0"
@@ -3304,7 +3304,7 @@ urllib@^3.21.0:
     pump "^3.0.0"
     qs "^6.11.2"
     type-fest "^4.3.1"
-    undici "^5.22.1"
+    undici "^5.28.2"
     ylru "^1.3.2"
 
 utf8@^3.0.0:
