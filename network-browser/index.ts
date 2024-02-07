@@ -26,7 +26,7 @@ import {
     getMainnetManagerAbi,
     getMainnetProvider
 } from './src/contracts'
-import { delay, getLoggerConfig, pingUrl, withTimeout } from './src/tools'
+import { delay, getLoggerConfig, checkEndpoint, withTimeout } from './src/tools'
 import { BrowserTimeoutError } from './src/errors'
 import { browse } from './src/browser'
 import {
@@ -54,9 +54,9 @@ async function safeNetworkBrowserLoop() {
     log.info(`NETWORK_BROWSER_DELAY: ${NETWORK_BROWSER_DELAY}`)
 
     log.info(`Trying to connect to the sChain RPC: ${SCHAIN_RPC_URL}`)
-    await pingUrl(SCHAIN_RPC_URL)
-    log.info(`Trying to connect to the mainnet RPC: ${MAINNET_RPC_URL}`)
-    await pingUrl(MAINNET_RPC_URL)
+    await checkEndpoint(SCHAIN_RPC_URL)
+    log.info(`Trying to connect to the mainnet RPC`)
+    await checkEndpoint(MAINNET_RPC_URL)
 
     const provider = await getMainnetProvider(MAINNET_RPC_URL, MULTICALL)
     const managerAbi = getMainnetManagerAbi()
