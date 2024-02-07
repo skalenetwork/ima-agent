@@ -21,14 +21,18 @@ function terminateProcessGroup( processToKill ) {
     }
 }
 
-function onChildExit( otherChild, code, signal ) {
+function onChildExit( exitedChild, otherChild, code, signal ) {
+    console.log( "!!!IMA DOCKER CONTAINER WILL EXIT!!!" )
+    console.log( "Exited child:", exitedChild );
+    console.log( "Exit code:", code );
+    console.log( "Exit signal:", signal );
     terminateProcessGroup( otherChild );
     // Exit with the code or signal of the process that ended first
     process.exit( code || signal );
 }
 
-child1.on( "exit", ( code, signal ) => onChildExit( child2, code, signal ) );
-child2.on( "exit", ( code, signal ) => onChildExit( child1, code, signal ) );
+child1.on( "exit", function( code, signal ) { onChildExit( process.argv[2], child2, code, signal ); } );
+child2.on( "exit", function( code, signal ) { onChildExit( process.argv[3], child1, code, signal ); } );
 
 process.on( "SIGINT", () => {
     console.log( "Received SIGINT. Exiting..." );

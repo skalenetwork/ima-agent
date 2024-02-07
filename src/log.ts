@@ -184,7 +184,6 @@ export function generateTimestampString( ts?: any, isColorized?: boolean ): stri
         ccBright( ":" ) + ccTime( n2s( ts.getUTCMinutes(), 2 ) ) +
         ccBright( ":" ) + ccTime( n2s( ts.getUTCSeconds(), 2 ) ) +
         ccBright( "." ) + ccFractionPartOfTime( n2s( ts.getUTCMilliseconds(), 3 ) );
-
     return s;
 }
 
