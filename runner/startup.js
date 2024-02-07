@@ -21,18 +21,35 @@ function terminateProcessGroup( processToKill ) {
     }
 }
 
-function onChildExit( exitedChild, otherChild, code, signal ) {
-    console.log( "!!!IMA DOCKER CONTAINER WILL EXIT!!!" )
-    console.log( "Exited child:", exitedChild );
-    console.log( "Exit code:", code );
-    console.log( "Exit signal:", signal );
+function getShortExitedChildDescription( exitedChild ) {
+    if( ! exitedChild )
+        return "N/A";
+    const arrParts = exitedChild.split( " " );
+    if( arrParts.length <= 1 )
+        return exitedChild;
+    for( let i = 0; i < arrParts.length; ++ i ) {
+        const part = arrParts[ i ];
+        if( part.indexOf( ".js" ) >= 0 )
+            return part;
+    }
+    let s = arrParts[ 0 ];
+    if( arrParts.length >= 2 )
+        s += " " + arrParts[ 1 ];
+    return s;
+}
+
+function onChildExit( exitedIndex, exitedChild, otherChild, code, signal ) {
+    console.log(
+        "IMPORTANT NOTICE: IMA docker container will exit, exited child",
+        exitedIndex, "is", getShortExitedChildDescription( exitedChild ),
+        ", exit code is", code, "exit signal is", signal );
     terminateProcessGroup( otherChild );
     // Exit with the code or signal of the process that ended first
     process.exit( code || signal );
 }
 
-child1.on( "exit", function( code, signal ) { onChildExit( process.argv[2], child2, code, signal ); } );
-child2.on( "exit", function( code, signal ) { onChildExit( process.argv[3], child1, code, signal ); } );
+child1.on( "exit", function( code, signal ) { onChildExit( 1, process.argv[2], child2, code, signal ); } );
+child2.on( "exit", function( code, signal ) { onChildExit( 2, process.argv[3], child1, code, signal ); } );
 
 process.on( "SIGINT", () => {
     console.log( "Received SIGINT. Exiting..." );
