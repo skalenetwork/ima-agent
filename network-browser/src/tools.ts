@@ -20,7 +20,7 @@
  * @copyright SKALE Labs 2023-Present
  */
 
-import { id, toBeHex } from 'ethers'
+import { JsonRpcProvider, id, toBeHex } from 'ethers'
 import { Logger, type ILogObj } from 'tslog'
 
 import { readFileSync, writeFileSync, renameSync } from 'fs'
@@ -97,24 +97,25 @@ function moveFile(source: string, destination: string): void {
     log.info(`Successfully moved the file from ${source} to ${destination}`)
 }
 
-export async function pingUrl(
+export async function checkEndpoint(
     url: string,
     maxAttempts: number = DEFAULT_PING_ITERATIONS,
     delay: number = DEFAULT_PING_DELAY
 ): Promise<void> {
     let attempt = 0
+    const provider = new JsonRpcProvider(url)
     while (attempt < maxAttempts) {
         try {
-            const response = await fetch(url)
-            if (response.ok) {
-                log.info(`URL is available: ${url}`)
+            const bn = await provider.getBlockNumber()
+            if (bn > 0) {
+                log.info(`URL is available, block number: ${bn}`)
                 return
             } else {
-                log.info(`Attempt ${attempt + 1} failed with status: ${response.status}`)
+                log.error(`Attempt ${attempt + 1} to connect failed`)
             }
         } catch (error) {
-            log.info(
-                `${url} connection failed - ${attempt + 1}/${maxAttempts}, retrying in ${
+            log.error(
+                `Connection failed - ${attempt + 1}/${maxAttempts}, retrying in ${
                     delay / 1000
                 } seconds...`
             )
@@ -122,7 +123,7 @@ export async function pingUrl(
         await new Promise((resolve) => setTimeout(resolve, delay))
         attempt++
     }
-    log.info('Max attempts reached, URL is not available.')
+    log.error('Max attempts reached, URL is not available.')
 }
 
 export function chainIdHex(schainName: string): string {
