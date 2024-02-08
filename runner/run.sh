@@ -113,7 +113,7 @@ BASE_OPTIONS="--gas-price-multiplier=$GAS_PRICE_MULTIPLIER \
 --network-browser-path=$IMA_NETWORK_BROWSER_DATA_PATH \
 --pwa \
 --no-expose-pwa \
---auto-exit=86400"
+--auto-exit=3600"
 
 IMA_LOOP_CMD="node $DIR/../src/build/main.js --loop $BASE_OPTIONS"
 NETWORK_BROWSER_CMD="node $DIR/../network-browser/build/index.js"
