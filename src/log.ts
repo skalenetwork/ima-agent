@@ -157,7 +157,7 @@ export function setPrintTimestamps( b?: boolean ): void {
 }
 
 export function n2s( n: any, sz: number ): string {
-    let s: string = n ?? "";
+    let s: string = n ? n.toString() : "";
     while( s.length < sz )
         s = "0" + s;
     return s;
@@ -168,6 +168,8 @@ export function generateTimestampString( ts?: any, isColorized?: boolean ): stri
         ( typeof isColorized === "undefined" )
             ? true
             : ( !!isColorized );
+    if( isColorized )
+        isColorized = cc.isEnabled();
     ts = ( ts instanceof Date ) ? ts : new Date();
     const ccDate = function( x?: any ): string { return isColorized ? cc.date( x ) : x; };
     const ccTime = function( x?: any ): string { return isColorized ? cc.time( x ) : x; };
@@ -182,7 +184,6 @@ export function generateTimestampString( ts?: any, isColorized?: boolean ): stri
         ccBright( ":" ) + ccTime( n2s( ts.getUTCMinutes(), 2 ) ) +
         ccBright( ":" ) + ccTime( n2s( ts.getUTCSeconds(), 2 ) ) +
         ccBright( "." ) + ccFractionPartOfTime( n2s( ts.getUTCMilliseconds(), 3 ) );
-
     return s;
 }
 
