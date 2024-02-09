@@ -92,6 +92,7 @@ jobs:
         cd cli-hh
         export PATH=$PATH:$(dirname $(which npx))
         yarn install
+        export NO_ANSI_COLORS=1
         ./clean.sh || true
         ./init.sh
 
@@ -134,7 +135,7 @@ jobs:
         cd comprehensive-test
         export DETECTED_UBUNTU_VERSION=$(lsb_release -r | cut -f2)
         export TRYING_SKALED_AT_PATH=./app_cache/bin_$DETECTED_UBUNTU_VERSION/skaled
-        $TRYING_SKALED_AT_PATH --colors --version
+        $TRYING_SKALED_AT_PATH --version
         $TRYING_SKALED_AT_PATH --help
 
     - name: INIT - generate configuration files for S-Chain nodes
@@ -142,6 +143,7 @@ jobs:
       run: |
         export PATH=$PATH:$(dirname $(which npx))
         cd comprehensive-test/s_chain_gen
+        export NO_ANSI_COLORS=1
         ./init.sh
 
     - name: INIT - download Skale Manager
@@ -211,6 +213,7 @@ jobs:
       working-directory: ${{env.working-directory}}
       run: |
         cd comprehensive-test/engine/create_pems
+        export NO_ANSI_COLORS=1
         ./create_pems.sh
 
     - name: RUN - full test - everything up and running
@@ -225,6 +228,7 @@ jobs:
         export PATH=$PATH:$(dirname $(which npx))
         export COUNT_OF_SKALED_INSTANCES_TO_SKIP_START=0
         export COUNT_OF_IMA_AGENT_INSTANCES_TO_SKIP_START=0
+        export NO_ANSI_COLORS=1
         node ./index.js
 
     - name: RUN - full test - one SKALED is down
@@ -239,6 +243,7 @@ jobs:
         export PATH=$PATH:$(dirname $(which npx))
         export COUNT_OF_SKALED_INSTANCES_TO_SKIP_START=1
         export COUNT_OF_IMA_AGENT_INSTANCES_TO_SKIP_START=0
+        export NO_ANSI_COLORS=1
         node ./index.js
 
     - name: RUN - full test - one IMA Agent is down
@@ -253,6 +258,7 @@ jobs:
         export PATH=$PATH:$(dirname $(which npx))
         export COUNT_OF_SKALED_INSTANCES_TO_SKIP_START=0
         export COUNT_OF_IMA_AGENT_INSTANCES_TO_SKIP_START=1
+        export NO_ANSI_COLORS=1
         node ./index.js
 
     - name: RUN - full test - one SKALED and one IMA Agent are down
@@ -267,6 +273,7 @@ jobs:
         export PATH=$PATH:$(dirname $(which npx))
         export COUNT_OF_SKALED_INSTANCES_TO_SKIP_START=1
         export COUNT_OF_IMA_AGENT_INSTANCES_TO_SKIP_START=1
+        export NO_ANSI_COLORS=1
         node ./index.js
 
     - name: RUN - full test - Main Net connectivity problems testing
@@ -281,6 +288,7 @@ jobs:
         export PATH=$PATH:$(dirname $(which npx))
         export ENABLED_IMA_MAIN_NET_TUNNELLING=true
         export ENABLED_IMA_MAIN_NET_CONNECTION_PROBLEMS=true
+        export NO_ANSI_COLORS=1
         node ./index.js
 
     - name: SHUTDOWN - stop SGX Wallet

@@ -4,7 +4,7 @@
     "author": "SKALE Labs and contributors",
     "type": "module",
     "scripts": {
-        "build": "./node_modules/typescript/bin/tsc",
+        "build": "./node_modules/typescript/bin/tsc && cp -f ./pow ./build/pow",
         "rebuild": "yarn clean-build && yarn build",
         "clean-build": "rm -rf ./src/build/* || true",
         "lint-check": "eslint -c .eslintrc.cjs ./*.ts",

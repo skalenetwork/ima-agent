@@ -54,6 +54,11 @@ jobs:
       with:
         python-version: 3.8
 
+    - name: Ensure deps are latest and build everything
+      run: |
+        yarn install
+        yarn rebuild
+
     - name: Build and publish container
       run: |
         export BRANCH=${GITHUB_REF##*/}

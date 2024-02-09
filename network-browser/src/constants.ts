@@ -56,3 +56,6 @@ export const NETWORK_BROWSER_TIMEOUT = secondsEnv(process.env.NETWORK_BROWSER_TI
 
 export const LOG_LEVEL = optionalEnvNumber('NETWORK_BROWSER_LOG_LEVEL', 1)
 export const LOG_PRETTY = booleanEnv('NETWORK_BROWSER_LOG_PRETTY', false)
+export const LOG_FORMAT =
+    '{{yyyy}}.{{mm}}.{{dd}} {{hh}}:{{MM}}:{{ss}}:{{ms}}\t{{logLevelName}}\t{{name}}\t'
+export const LOG_PREFIX = 'snb::'

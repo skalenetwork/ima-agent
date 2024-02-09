@@ -95,6 +95,7 @@ jobs:
         pwd
         export PATH=$PATH:$(dirname $(which npx))
         cd cli-hh
+        export NO_ANSI_COLORS=1
         ./clean.sh
         ./init.sh
 
@@ -148,7 +149,7 @@ jobs:
         cd comprehensive-test
         export DETECTED_UBUNTU_VERSION=$(lsb_release -r | cut -f2)
         export TRYING_SKALED_AT_PATH=./app_cache/bin_$DETECTED_UBUNTU_VERSION/skaled
-        $TRYING_SKALED_AT_PATH --colors --version
+        $TRYING_SKALED_AT_PATH --version
         $TRYING_SKALED_AT_PATH --help
 
     - name: INIT - generate configuration files for S-Chain nodes
@@ -157,6 +158,7 @@ jobs:
         export PATH=$PATH:$(dirname $(which npx))
         cd comprehensive-test/s_chain_gen
         yarn install
+        export NO_ANSI_COLORS=1
         ./clean.sh || true
         ./init.sh
 
@@ -282,6 +284,7 @@ jobs:
         sudo rm -rf ./client.key || true
         sudo rm -rf ./client.pem || true
         sudo rm -rf ./client.crt || true
+        export NO_ANSI_COLORS=1
         ./create_pems.sh
 
     - name: RUN - full test - everything up and running
@@ -292,7 +295,6 @@ jobs:
         cd comprehensive-test/engine
         export ALL_SKALE_TEST_CLOUD_RUN=1
         export DISABLE_S2S_TESTS=1
-        #
         export VERSION=13.13.13-test.13
         echo "Docker image(will run) version is:" $VERSION
         export NAME=ima
@@ -301,11 +303,11 @@ jobs:
         export IMAGE_NAME=$REPO_NAME:$VERSION
         export LATEST_IMAGE_NAME=$REPO_NAME:latest
         echo "Docker image(will run) name for IMA Agent is:" $IMAGE_NAME
-        #
         export SEPARATED_IMA_AGENT_MODE=1
         export PATH=$PATH:$(dirname $(which npx))
         export COUNT_OF_SKALED_INSTANCES_TO_SKIP_START=0
         export COUNT_OF_IMA_AGENT_INSTANCES_TO_SKIP_START=0
+        export NO_ANSI_COLORS=1
         node ./index.js
 
     - name: RUN - full test - one SKALED is down
@@ -316,7 +318,6 @@ jobs:
         cd comprehensive-test/engine
         export ALL_SKALE_TEST_CLOUD_RUN=1
         export DISABLE_S2S_TESTS=1
-        #
         export VERSION=13.13.13-test.13
         echo "Docker image(will run) version is:" $VERSION
         export NAME=ima
@@ -325,11 +326,11 @@ jobs:
         export IMAGE_NAME=$REPO_NAME:$VERSION
         export LATEST_IMAGE_NAME=$REPO_NAME:latest
         echo "Docker image(will run) name for IMA Agent is:" $IMAGE_NAME
-        #
         export SEPARATED_IMA_AGENT_MODE=1
         export PATH=$PATH:$(dirname $(which npx))
         export COUNT_OF_SKALED_INSTANCES_TO_SKIP_START=1
         export COUNT_OF_IMA_AGENT_INSTANCES_TO_SKIP_START=0
+        export NO_ANSI_COLORS=1
         node ./index.js
 
     - name: RUN - full test - one IMA Agent is down
@@ -340,7 +341,6 @@ jobs:
         cd comprehensive-test/engine
         export ALL_SKALE_TEST_CLOUD_RUN=1
         export DISABLE_S2S_TESTS=1
-        #
         export VERSION=13.13.13-test.13
         echo "Docker image(will run) version is:" $VERSION
         export NAME=ima
@@ -349,11 +349,11 @@ jobs:
         export IMAGE_NAME=$REPO_NAME:$VERSION
         export LATEST_IMAGE_NAME=$REPO_NAME:latest
         echo "Docker image(will run) name for IMA Agent is:" $IMAGE_NAME
-        #
         export SEPARATED_IMA_AGENT_MODE=1
         export PATH=$PATH:$(dirname $(which npx))
         export COUNT_OF_SKALED_INSTANCES_TO_SKIP_START=0
         export COUNT_OF_IMA_AGENT_INSTANCES_TO_SKIP_START=1
+        export NO_ANSI_COLORS=1
         node ./index.js
 
     - name: RUN - full test - one SKALED and one IMA Agent are down
@@ -364,7 +364,6 @@ jobs:
         cd comprehensive-test/engine
         export ALL_SKALE_TEST_CLOUD_RUN=1
         export DISABLE_S2S_TESTS=1
-        #
         export VERSION=13.13.13-test.13
         echo "Docker image(will run) version is:" $VERSION
         export NAME=ima
@@ -373,11 +372,11 @@ jobs:
         export IMAGE_NAME=$REPO_NAME:$VERSION
         export LATEST_IMAGE_NAME=$REPO_NAME:latest
         echo "Docker image(will run) name for IMA Agent is:" $IMAGE_NAME
-        #
         export SEPARATED_IMA_AGENT_MODE=1
         export PATH=$PATH:$(dirname $(which npx))
         export COUNT_OF_SKALED_INSTANCES_TO_SKIP_START=1
         export COUNT_OF_IMA_AGENT_INSTANCES_TO_SKIP_START=1
+        export NO_ANSI_COLORS=1
         node ./index.js
 
     - name: RUN - full test - one SKALED and one IMA Agent are down
@@ -388,7 +387,6 @@ jobs:
         cd comprehensive-test/engine
         export ALL_SKALE_TEST_CLOUD_RUN=1
         export DISABLE_S2S_TESTS=1
-        #
         export VERSION=13.13.13-test.13
         echo "Docker image(will run) version is:" $VERSION
         export NAME=ima
@@ -397,11 +395,11 @@ jobs:
         export IMAGE_NAME=$REPO_NAME:$VERSION
         export LATEST_IMAGE_NAME=$REPO_NAME:latest
         echo "Docker image(will run) name for IMA Agent is:" $IMAGE_NAME
-        #
         export SEPARATED_IMA_AGENT_MODE=1
         export PATH=$PATH:$(dirname $(which npx))
         export ENABLED_IMA_MAIN_NET_TUNNELLING=true
         export ENABLED_IMA_MAIN_NET_CONNECTION_PROBLEMS=true
+        export NO_ANSI_COLORS=1
         node ./index.js
 
     - name: SHUTDOWN - stop SGX Wallet
