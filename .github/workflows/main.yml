@@ -76,6 +76,7 @@ jobs:
     - name: Run test (JS part)
       working-directory: ./test
       run: |
+        export NO_ANSI_COLORS=1
         yarn test
 
     - name: Prepare test (PY part)
@@ -95,4 +96,5 @@ jobs:
       run: |
         export URL_W3_ETHEREUM="http://127.0.0.1:8545"
         export URL_W3_S_CHAIN="http://127.0.0.1:8545"
+        export NO_ANSI_COLORS=1
         python3 test.py
