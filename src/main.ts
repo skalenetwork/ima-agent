@@ -23,7 +23,7 @@
  * @copyright SKALE Labs 2019-Present
  */
 
-import express from "express";
+import express, { type Express, type NextFunction, type Request, type Response } from "express";
 import bodyParser from "body-parser";
 import * as ws from "ws";
 import * as owaspUtils from "./owaspUtils.js";
@@ -129,8 +129,10 @@ function parseCommandLine(): void {
         log.add( imaState.strLogFilePath, imaState.nLogMaxSizeBeforeRotation,
             imaState.nLogMaxFilesCount );
     }
-    log.information( "Agent was started with {} command line argument(s) as: {}",
-        process.argv.length, strPrintedArguments );
+    if( imaState.isPrintSecurityValues ) {
+        log.information( "Agent was started with {} command line argument(s) as: {}",
+            process.argv.length, strPrintedArguments );
+    }
     if( imaState.bIsNeededCommonInit ) {
         imaCLI.commonInit();
         imaCLI.initContracts();
@@ -259,9 +261,11 @@ function initMonitoringServer(): void {
     } );
 }
 
-let gExpressJsonRpcAppIMA: any = null;
+let gExpressJsonRpcAppIMA: Express | null = null;
 
 function initJsonRpcServer(): void {
+    if( gExpressJsonRpcAppIMA )
+        return;
     const imaState: state.TIMAState = state.get();
     if( imaState.nJsonRpcPort <= 0 )
         return;
@@ -269,10 +273,29 @@ function initJsonRpcServer(): void {
     gExpressJsonRpcAppIMA = express();
     gExpressJsonRpcAppIMA.use( bodyParser.urlencoded( { extended: true } ) );
     gExpressJsonRpcAppIMA.use( bodyParser.json() );
-    gExpressJsonRpcAppIMA.post( "/", async function( req: any, res: any ): Promise<void> {
+    const errorHandler = function(
+        err: Error, req: Request, res: Response, next: NextFunction ): void {
+        if( err ) {
+            log.error(
+                "IMA-to-IMA network error, error is {err}, request is {}, response is {}",
+                err, req, res );
+            if( next )
+                next( err );
+        }
+    };
+    gExpressJsonRpcAppIMA.use( errorHandler );
+    const postHandler = async function( req: Request, res: Response ): Promise<void> {
         const isSkipMode = false;
         const message = JSON.stringify( req.body );
-        const ip = req.connection.remoteAddress.split( ":" ).pop();
+        const ip = req.socket.remoteAddress
+            ? req.socket.remoteAddress.split( ":" ).pop()
+            : "N/A-network-address";
+        req.on( "error", function() {
+            log.error( "IMA-to-IMA peer {} connection error, cannot process request", ip );
+        } );
+        res.on( "error", function() {
+            log.error( "IMA-to-IMA peer {} connection error, cannot send responses", ip );
+        } );
         const fnSendAnswer: any = function( joAnswer: any ): void {
             try {
                 res.header( "Content-Type", "application/json" );
@@ -323,10 +346,8 @@ function initJsonRpcServer(): void {
                     joMessage.params.nIndexS2S,
                     ( !!( joMessage.params.isStart ) ),
                     owaspUtils.toInteger( joMessage.params.ts ),
-                    joMessage.params.signature
-                ) )
+                    joMessage.params.signature ) )
                     await loop.spreadArrivedStateOfPendingWorkAnalysis( joMessage );
-
                 break;
             case "skale_getCachedSNB":
                 joAnswer.arrSChainsCached = skaleObserver.getLastCachedSChains();
@@ -345,6 +366,9 @@ function initJsonRpcServer(): void {
         }
         if( !isSkipMode )
             fnSendAnswer( joAnswer );
+    };
+    gExpressJsonRpcAppIMA.post( "/", function( req: Request, res: Response ): void {
+        postHandler( req, res ).then( function(): void {} ).catch( function(): void {} );
     } );
     gExpressJsonRpcAppIMA.listen( imaState.nJsonRpcPort );
 }
