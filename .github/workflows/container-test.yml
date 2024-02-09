@@ -149,7 +149,7 @@ jobs:
         cd comprehensive-test
         export DETECTED_UBUNTU_VERSION=$(lsb_release -r | cut -f2)
         export TRYING_SKALED_AT_PATH=./app_cache/bin_$DETECTED_UBUNTU_VERSION/skaled
-        $TRYING_SKALED_AT_PATH --colors --version
+        $TRYING_SKALED_AT_PATH --version
         $TRYING_SKALED_AT_PATH --help
 
     - name: INIT - generate configuration files for S-Chain nodes
