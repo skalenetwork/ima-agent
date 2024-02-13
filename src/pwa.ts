@@ -30,6 +30,7 @@ import * as imaUtils from "./utils.js";
 import type * as state from "./state.js";
 import type * as discoveryTools from "./discoveryTools.js";
 import * as owaspUtils from "./owaspUtils.js";
+import * as threadInfo from "./threadInfo.js";
 
 function computeWalkNodeIndices( nNodeNumber: number, nNodesCount: number ): number[] {
     if( nNodeNumber === null || nNodeNumber === undefined ||
@@ -146,7 +147,7 @@ export async function checkOnLoopStart(
         }
         if( arrBusyNodeIndices.length > 0 ) {
             if( imaState.isPrintPWA ) {
-                log.error( "PWA loop start condition check failed, busy node(s): {}",
+                log.warning( "PWA loop start condition check not passed, busy node(s): {}",
                     arrBusyNodeIndices );
             }
             return false;
@@ -164,50 +165,79 @@ export async function handleLoopStateArrived(
     imaState: state.TIMAState, nNodeNumber: number, strLoopWorkType: string, nIndexS2S: number,
     isStart: boolean, ts: any, signature: any
 ): Promise<boolean> {
+    // returns flag indicating whether PWA stat should be spread into worker threads
+    // (i.e. returned flag is not boolean success status)
     const se = isStart ? "start" : "end";
     let isSuccess = false;
     let joNode: any = null;
     try {
-        if( !checkLoopWorkTypeStringIsCorrect( strLoopWorkType ) )
-            throw new Error( `Specified value ${strLoopWorkType} is not a correct loop work type` );
+        if( !checkLoopWorkTypeStringIsCorrect( strLoopWorkType ) ) {
+            throw new Error( `Specified value ${strLoopWorkType} is not a correct ` +
+                `loop work type in ${threadInfo.threadDescription( false )}` );
+        }
         if( !imaState.isPWA )
-            return true;
+            return false; // PWA is turned off
         if( imaState.nNodesCount <= 1 )
-            return true; // PWA is N/A
-        if( !( imaState.nNodeNumber >= 0 && imaState.nNodeNumber < imaState.nNodesCount ) )
-            return true; // PWA is N/A
-        if( !imaState.joSChainNetworkInfo )
-            return true; // PWA is N/A
+            return false; // PWA is N/A and senseless in single node environment
+        if( !( imaState.nNodeNumber >= 0 && imaState.nNodeNumber < imaState.nNodesCount ) ) {
+            if( imaState.isPrintPWA ) {
+                log.critical(
+                    "PWA loop-{} bad malformed state arrived for node {}, PWA state is {}, " +
+                    "arrived signature is {}, handling PWA state change in {}, " +
+                    "PWA state is malformed because node number is not valid",
+                    se, nNodeNumber, joNode.pwaState, signature, threadInfo.threadDescription() );
+            }
+            return false;
+        }
+        if( !imaState.joSChainNetworkInfo ) {
+            if( imaState.isPrintPWA ) {
+                log.warning(
+                    "PWA loop-{} state arrived for node {}, PWA state is {}, " +
+                    "arrived signature is {}, handling PWA state change in {}. but no S-Chain " +
+                    "information is available, so PWA state will be ignored in this case",
+                    se, nNodeNumber, joNode.pwaState, signature, threadInfo.threadDescription() );
+            }
+            return true; // PWA is N/A, but still need to deliver into worker threads
+        }
         const jarrNodes = imaState.joSChainNetworkInfo.network;
-        if( !jarrNodes )
-            throw new Error( "S-Chain network info is not available yet to PWA" );
+        if( !jarrNodes ) {
+            throw new Error( "S-Chain network info is not available yet to PWA in " +
+                threadInfo.threadDescription( false ) );
+        }
         joNode = jarrNodes[nNodeNumber];
         const joProps: any = getNodeProgressAndTimestamp( joNode, strLoopWorkType, nIndexS2S );
         if( imaState.isPrintPWA ) {
-            log.trace( "PWA loop-{} state arrived for node {}, PWA state {}, arrived " +
-                "signature is {}", se, nNodeNumber, joNode.pwaState, signature );
+            log.trace(
+                "PWA loop-{} state arrived for node {}, PWA state is {}, arrived signature " +
+                "is {}, handling PWA state change in {}",
+                se, nNodeNumber, joNode.pwaState, signature,
+                threadInfo.threadDescription() );
         }
         const strMessageHash = imaBLS.keccak256ForPendingWorkAnalysis(
             nNodeNumber, strLoopWorkType, isStart, owaspUtils.toInteger( ts ) );
         const isSignatureOK = await imaBLS.doVerifyReadyHash(
             strMessageHash, nNodeNumber, signature, imaState.isPrintPWA );
-        if( !isSignatureOK )
-            throw new Error( "BLS verification failed" );
+        if( !isSignatureOK ) {
+            throw new Error(
+                `BLS verification failed in ${threadInfo.threadDescription( false )}` );
+        }
         joProps.isInProgress = ( !!isStart );
         joProps.ts = owaspUtils.toInteger( ts );
         if( imaState.isPrintPWA ) {
             log.success(
                 "PWA loop-{} state successfully verified for node {}, now have PWA state {}, " +
-                "arrived signature is {}", se, nNodeNumber, joNode.pwaState, signature );
+                "arrived signature is {}, handling PWA state change in {}",
+                se, nNodeNumber, joNode.pwaState, signature, threadInfo.threadDescription() );
         }
         isSuccess = true;
     } catch ( err ) {
         isSuccess = false;
         log.critical(
             "Exception in PWA handler for loop-{} for node {}, PWA state {}, arrived signature " +
-            "is {}, error is: {err}, stack is:\n{stack}", se, nNodeNumber,
+            "is {}, handling PWA state change in {}, error is: {err}, stack is:\n{stack}",
+            se, nNodeNumber,
             ( joNode && "pwaState" in joNode ) ? joNode.pwaState : "N/A", signature,
-            err, err );
+            threadInfo.threadDescription(), err, err );
     }
     return isSuccess;
 }
