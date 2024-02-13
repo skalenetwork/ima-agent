@@ -218,6 +218,8 @@ async function payedCallTM( optsPayedCall: TRunTimePayedCallOptions ): Promise<a
     try {
         const [ idTransaction, joReceiptFromTM ] = await tmEnsureTransaction(
             optsPayedCall.details, optsPayedCall.ethersProvider, priority, txAdjusted );
+        if( !( idTransaction && joReceiptFromTM ) )
+            throw new Error( `TM unsuccessful transaction(${idTransaction}) wait attempt` );
         optsPayedCall.joReceipt = joReceiptFromTM;
         optsPayedCall.details.trace( "{p}ID of TM-transaction: {}",
             optsPayedCall.strLogPrefix, idTransaction );
@@ -615,11 +617,11 @@ async function tmEnsureTransaction(
     details: log.TLogger, ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     priority: any, txAdjusted: any,
     cntAttempts?: number, sleepMilliseconds?: number
-): Promise<any> {
+): Promise< [ string, any ] > {
     cntAttempts = cntAttempts ?? 1;
     sleepMilliseconds = sleepMilliseconds ?? ( 30 * 1000 );
-    let txId = "";
-    let joReceipt = null;
+    let txId: string = "";
+    let joReceipt: any | null = null;
     let idxAttempt = 0;
     const strLogPrefix = log.fmtDebug( "(gathered details)" ) + " ";
     for( ; idxAttempt < cntAttempts; ++idxAttempt ) {

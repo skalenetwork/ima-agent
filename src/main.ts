@@ -37,6 +37,7 @@ import * as pwa from "./pwa.js";
 import * as clpTools from "./clpTools.js";
 import * as discoveryTools from "./discoveryTools.js";
 import * as skaleObserver from "./observer.js";
+import * as threadInfo from "./threadInfo.js";
 
 import * as state from "./state.js";
 
@@ -338,17 +339,26 @@ function initJsonRpcServer(): void {
             case "skale_imaBSU256":
                 joAnswer = await imaBLS.handleSkaleImaBSU256( joMessage );
                 break;
-            case "skale_imaNotifyLoopWork":
-                if( await pwa.handleLoopStateArrived(
+            case "skale_imaNotifyLoopWork": {
+                const isNeedToSpreadPwaState = await pwa.handleLoopStateArrived(
                     imaState,
                     owaspUtils.toInteger( joMessage.params.nNodeNumber ),
                     joMessage.params.strLoopWorkType,
                     joMessage.params.nIndexS2S,
                     ( !!( joMessage.params.isStart ) ),
                     owaspUtils.toInteger( joMessage.params.ts ),
-                    joMessage.params.signature ) )
+                    joMessage.params.signature );
+                if( isNeedToSpreadPwaState )
                     await loop.spreadArrivedStateOfPendingWorkAnalysis( joMessage );
-                break;
+                else {
+                    if( imaState.isPrintPWA ) {
+                        log.warning(
+                            "PWA state message {} will not be delivered into worker threads, " +
+                            "handling PWA message arrival in {}",
+                            joMessage, threadInfo.threadDescription() );
+                    }
+                }
+            } break;
             case "skale_getCachedSNB":
                 joAnswer.arrSChainsCached = skaleObserver.getLastCachedSChains();
                 break;
