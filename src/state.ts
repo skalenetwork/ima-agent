@@ -241,11 +241,11 @@ export interface TIMAState {
     bNoWaitSChainStarted: boolean
     nMaxWaitSChainAttempts: number // 20
 
-    nAmountOfWei: any
-    nAmountOfToken: any
-    arrAmountsOfTokens: any[] | null
-    idToken: any
-    idTokens: any[] | null
+    nAmountOfWei: TBalance
+    nAmountOfToken: TBalance
+    arrAmountsOfTokens: TBalance[] | null
+    idToken: TTokenID
+    idTokens: TTokenID[] | null
 
     nTransferBlockSizeM2S: number
     nTransferBlockSizeS2M: number
@@ -337,8 +337,8 @@ export interface TIMAState {
 
     strReimbursementChain: string
     isShowReimbursementBalance: boolean
-    nReimbursementRecharge: string | number | null
-    nReimbursementWithdraw: string | number | null
+    nReimbursementRecharge: TBalance | null
+    nReimbursementWithdraw: TBalance | null
     nReimbursementRange: number // < 0 - do not change anything
     isReimbursementEstimate?: boolean
 
@@ -405,10 +405,10 @@ export function get(): TIMAState {
         bNoWaitSChainStarted: false,
         nMaxWaitSChainAttempts: Number.MAX_SAFE_INTEGER, // 20
 
-        nAmountOfWei: 0,
-        nAmountOfToken: 0,
+        nAmountOfWei: owaspUtils.toBN( 0 ),
+        nAmountOfToken: owaspUtils.toBN( 0 ),
         arrAmountsOfTokens: null,
-        idToken: 0,
+        idToken: "0",
         idTokens: null,
 
         nTransferBlockSizeM2S: 4,
@@ -491,8 +491,8 @@ export function get(): TIMAState {
 
         strReimbursementChain: "",
         isShowReimbursementBalance: false,
-        nReimbursementRecharge: 0,
-        nReimbursementWithdraw: 0,
+        nReimbursementRecharge: owaspUtils.toBN( 0 ),
+        nReimbursementWithdraw: owaspUtils.toBN( 0 ),
         nReimbursementRange: -1, // < 0 - do not change anything
 
         joSChainDiscovery: {

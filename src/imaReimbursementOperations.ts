@@ -161,7 +161,7 @@ export async function reimbursementWalletRecharge(
     chainIdMainNet: string,
     transactionCustomizerMainNet: imaTx.TransactionCustomizer,
     strReimbursementChain: string,
-    nReimbursementRecharge: string | number | null
+    nReimbursementRecharge: state.TBalance | null
 ): Promise<any> {
     const details = log.createMemoryStream();
     const jarrReceipts: any = [];
@@ -223,7 +223,7 @@ export async function reimbursementWalletWithdraw(
     chainIdMainNet: string,
     transactionCustomizerMainNet: imaTx.TransactionCustomizer,
     strReimbursementChain: string,
-    nReimbursementWithdraw: string | number | null
+    nReimbursementWithdraw: state.TBalance | null
 ): Promise<any> {
     const details = log.createMemoryStream();
     const jarrReceipts: any = [];

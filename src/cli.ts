@@ -764,8 +764,8 @@ function parsePaymentAmountArgs( imaState: state.TIMAState, joArg: TCliArgument 
         return true;
     }
     if( joArg.name == "amount" ) {
-        owaspUtils.verifyArgumentWithNonEmptyValue( joArg );
-        imaState.nAmountOfToken = joArg.value;
+        owaspUtils.verifyArgumentIsInteger( joArg );
+        imaState.nAmountOfToken = owaspUtils.toBN( joArg.value );
         return true;
     }
     if( joArg.name == "tid" ) {

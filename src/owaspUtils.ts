@@ -618,13 +618,13 @@ function moneyUnitNameToPostMultiplier( s: string ): string | null {
     return null;
 }
 
-export function parseMoneySpecToWei( s?: any, isThrowException?: boolean ): string {
+export function parseMoneySpecToWei( s?: any, isThrowException?: boolean ): ethersMod.BigNumber {
     try {
         isThrowException = ( !!isThrowException );
         if( s == null || s == undefined ) {
             if( isThrowException )
                 throw new Error( "no parse-able value provided" );
-            return "0";
+            return toBN( "0" );
         }
         s = s.toString().trim();
         let strNumber = "";
@@ -655,14 +655,14 @@ export function parseMoneySpecToWei( s?: any, isThrowException?: boolean ): stri
         if( mlr != null )
             s = s.mul( toBN( mlr ) );
         s = s.toString();
-        return s;
+        return toBN( s );
     } catch ( err: any ) {
         if( isThrowException ) {
             throw new Error( `Parse error in parseMoneySpecToWei( ${s} ), ` +
                 `error is: ${err}` );
         }
     }
-    return "0";
+    return toBN( "0" );
 }
 
 export function computeChainIdFromSChainName( strName: string ): string {
