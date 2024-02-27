@@ -37,21 +37,10 @@ export type TFunctionToString = () => string;
 export type TFunctionExposeDetailsTo =
     ( otherStream: TLogger, strTitle: string, isSuccess: boolean ) => void;
 
-export interface TLogger {
-    id: number
-    strPath: string
-    nMaxSizeBeforeRotation: number
-    nMaxFilesCount: number
-    objStream: any | null
-    haveOwnTimestamps: boolean
-    isPausedTimeStamps: boolean
-    strOwnIndent: string
+export interface TLoggerBase {
     write: TFunctionWrite
     writeRaw: TFunctionWrite
     close: TFunctionClose
-    open: TFunctionOpen
-    size: TFunctionSize
-    rotate: TFunctionRotate
     toString: TFunctionToString
     exposeDetailsTo: TFunctionExposeDetailsTo
     // high-level formatters
@@ -67,6 +56,20 @@ export interface TLogger {
     debug: TFunctionWrite
     trace: TFunctionWrite
     success: TFunctionWrite
+}
+
+export interface TLogger extends TLoggerBase {
+    id: number
+    strPath: string
+    nMaxSizeBeforeRotation: number
+    nMaxFilesCount: number
+    objStream: any | null
+    haveOwnTimestamps: boolean
+    isPausedTimeStamps: boolean
+    strOwnIndent: string
+    open: TFunctionOpen
+    size: TFunctionSize
+    rotate: TFunctionRotate
 }
 
 export type TFunctionIsBeginningOfAccumulatedLog = () => boolean;

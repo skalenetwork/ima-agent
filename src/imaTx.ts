@@ -445,7 +445,8 @@ export async function checkTransactionToSchain(
             details.trace( "{p}Trimmed PoW-mining number is {}", strLogPrefix, powNumber );
             if( !powNumber )
                 throw new Error( "Failed to compute gas price with PoW-mining(1), got empty text" );
-            powNumber = owaspUtils.toBN( owaspUtils.ensureStartsWith0x( powNumber ) );
+            powNumber = owaspUtils.ensureStartsWith0x(
+                owaspUtils.toBN( owaspUtils.ensureStartsWith0x( powNumber ) ).toHexString() );
             details.trace( "{p}BN PoW-mining number is {}", strLogPrefix, powNumber );
             const powNumberBN = owaspUtils.toBN( powNumber );
             if( powNumberBN.eq( owaspUtils.toBN( "0" ) ) )

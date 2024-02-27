@@ -70,7 +70,7 @@ export function findPowNumber(
             if( isVerbose ) {
                 details.debug( "computed n={}, this is resulting PoW number", i );
                 details.debug( "computed f={}={}", f.toString(),
-                    owaspUtils.ensureStartsWith0x( f.toString( 16 ) ) );
+                    owaspUtils.ensureStartsWith0x( f.toHexString() ) );
                 details.debug( "computed r={}={}={}", "(2**256-1)/f", r.toString(),
                     owaspUtils.ensureStartsWith0x( r.toString( 16 ) ) );
                 details.debug( "computed s={}", s );
@@ -100,7 +100,7 @@ async function handleOracleCheckResultResult(
     const gp = owaspUtils.toBN( joResult.rslts[0] );
     if( isVerboseTraceDetails ) {
         details.success( "success, computed Gas Price={}={}",
-            gp.toString(), owaspUtils.ensureStartsWith0x( gp.toString( 16 ) ) );
+            gp.toString(), owaspUtils.ensureStartsWith0x( gp.toHexString() ) );
     }
     await joCall.disconnect();
     return gp;

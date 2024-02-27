@@ -751,7 +751,7 @@ export function toBNbasic( x?: any, optionalRadix?: number ): any {
     }
 }
 
-export function toBN( arg: any ): any {
+export function toBN( arg: any ): ethersMod.BigNumber {
     if( typeof arg === "string" || typeof arg === "number" ) {
         let multiplier = toBNbasic( 1 );
         const formattedString = String( arg ).toLowerCase().trim();

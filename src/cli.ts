@@ -43,7 +43,9 @@ const gStrAppName = "IMA AGENT";
 const gStrVersion =
     imaUtils.fileLoad( path.join( __dirname, "../VERSION" ), "N/A" ).toString().trim();
 
-function att( ...args: any[] ): string { return log.fmtAttention( ...args ); };
+type TCVAtom = string | number | boolean | object | null | undefined;
+type TCV = TCVAtom | TCVAtom[]; // colorize-able value type
+function att( ...args: TCV[] ): string { return log.fmtAttention( ...args ); };
 
 export function printAbout( isLog?: boolean ): boolean {
     isLog = isLog ?? false;
@@ -55,8 +57,13 @@ export function printAbout( isLog?: boolean ): boolean {
     return true;
 }
 
-export function parseCommandLineArgument( s: string ): any {
-    const joArg = {
+export interface TCliArgument {
+    name: string
+    value: string
+}
+
+export function parseCommandLineArgument( s: string ): TCliArgument {
+    const joArg: TCliArgument = {
         name: "",
         value: ""
     };
@@ -76,21 +83,27 @@ export function parseCommandLineArgument( s: string ): any {
     return joArg;
 }
 
+type TColorizationFunction = ( ( x: TCV ) => string ) | null | undefined;
+
 // check correctness of command line arguments
 export function ensureHaveValue(
-    name: string, value: any, isExitIfEmpty: boolean,
-    isPrintValue: boolean, fnNameColorizer?: any, fnValueColorizer?: any
+    name: string, value: TCV, isExitIfEmpty: boolean,
+    isPrintValue: boolean,
+    fnNameColorizer?: TColorizationFunction,
+    fnValueColorizer?: TColorizationFunction
 ): boolean {
     isExitIfEmpty = isExitIfEmpty || false;
     isPrintValue = isPrintValue || false;
-    fnNameColorizer = fnNameColorizer || ( ( x: any ) => {
+    fnNameColorizer = fnNameColorizer ?? ( ( x: TCV ) => {
         return log.fmtInformation( x );
     } );
-    fnValueColorizer = fnValueColorizer || ( ( x: any ) => {
+    fnValueColorizer = fnValueColorizer ?? ( ( x: TCV ) => {
         return log.fmtNotice( x );
     } );
     let retVal = true;
-    value = value ? value.toString() : "";
+    value = value
+        ? ( ( typeof value == "object" ) ? JSON.stringify( value ) : value.toString() )
+        : "";
     if( value.length === 0 ) {
         retVal = false;
         if( !isPrintValue )
@@ -188,20 +201,8 @@ export function ensureHaveCredentials(
     return true;
 }
 
-export function findNodeIndex( joSChainNodeConfiguration: any ): number {
-    try {
-        const searchID = joSChainNodeConfiguration.skaleConfig.nodeInfo.nodeID;
-        const cnt = joSChainNodeConfiguration.skaleConfig.sChain.nodes.length;
-        for( let i = 0; i < cnt; ++i ) {
-            const joNodeDescription = joSChainNodeConfiguration.skaleConfig.sChain.nodes[i];
-            if( joNodeDescription.nodeID == searchID )
-                return i;
-        }
-    } catch ( err ) {}
-    return 0;
-}
-
-function parseHelp( imaState: state.TIMAState, joArg: any ): boolean { // exits process on "--help"
+function parseHelp( imaState: state.TIMAState, joArg: TCliArgument ): boolean {
+    // this function exits running process, it's invoked on "--help"
     if( joArg.name != "help" )
         return false;
     printAbout();
@@ -212,15 +213,15 @@ function parseHelp( imaState: state.TIMAState, joArg: any ): boolean { // exits 
     process.exit( 0 );
 }
 
-function parseVersion( imaState: state.TIMAState, joArg: any ): boolean {
-    // exits process on "--version"
+function parseVersion( imaState: state.TIMAState, joArg: TCliArgument ): boolean {
+    // this function exits running process, it's invoked on "--version"
     if( joArg.name != "version" )
         return false;
     printAbout();
     process.exit( 0 );
 }
 
-function parseBasicArgs( imaState: state.TIMAState, joArg: any ): boolean {
+function parseBasicArgs( imaState: state.TIMAState, joArg: TCliArgument ): boolean {
     if( joArg.name == "colors" ) {
         log.enableColorization( true );
         return true;
@@ -248,7 +249,7 @@ function parseBasicArgs( imaState: state.TIMAState, joArg: any ): boolean {
     return false;
 }
 
-function parseChainAccessArgs( imaState: state.TIMAState, joArg: any ): boolean {
+function parseChainAccessArgs( imaState: state.TIMAState, joArg: TCliArgument ): boolean {
     if( joArg.name == "url-main-net" ) {
         owaspUtils.verifyArgumentIsURL( joArg );
         imaState.chainProperties.mn.strURL = joArg.value;
@@ -302,7 +303,7 @@ function parseChainAccessArgs( imaState: state.TIMAState, joArg: any ): boolean 
     return false;
 }
 
-function parseTransactionManagerArgs( imaState: state.TIMAState, joArg: any ): boolean {
+function parseTransactionManagerArgs( imaState: state.TIMAState, joArg: TCliArgument ): boolean {
     if( joArg.name == "tm-url-main-net" ) {
         owaspUtils.verifyArgumentIsURL( joArg );
         const strURL = joArg.value.toString();
@@ -342,7 +343,7 @@ function parseTransactionManagerArgs( imaState: state.TIMAState, joArg: any ): b
     return false;
 }
 
-function parseSgxArgs( imaState: state.TIMAState, joArg: any ): boolean {
+function parseSgxArgs( imaState: state.TIMAState, joArg: TCliArgument ): boolean {
     if( joArg.name == "sgx-url-main-net" ) {
         owaspUtils.verifyArgumentIsURL( joArg );
         imaState.chainProperties.mn.joAccount.strSgxURL = joArg.value;
@@ -467,7 +468,7 @@ function parseSgxArgs( imaState: state.TIMAState, joArg: any ): boolean {
     return false;
 }
 
-function parseCredentialsArgs( imaState: state.TIMAState, joArg: any ): boolean {
+function parseCredentialsArgs( imaState: state.TIMAState, joArg: TCliArgument ): boolean {
     if( joArg.name == "address-main-net" ) {
         owaspUtils.verifyArgumentWithNonEmptyValue( joArg );
         imaState.chainProperties.mn.joAccount.address_ = joArg.value;
@@ -506,7 +507,7 @@ function parseCredentialsArgs( imaState: state.TIMAState, joArg: any ): boolean 
     return false;
 }
 
-function parseAbiArgs( imaState: state.TIMAState, joArg: any ): boolean {
+function parseAbiArgs( imaState: state.TIMAState, joArg: TCliArgument ): boolean {
     if( joArg.name == "abi-skale-manager" ) {
         owaspUtils.verifyArgumentIsPathToExistingFile( joArg );
         imaState.strPathAbiJsonSkaleManager = imaUtils.normalizePath( joArg.value );
@@ -530,7 +531,7 @@ function parseAbiArgs( imaState: state.TIMAState, joArg: any ): boolean {
     return false;
 }
 
-function parseErcArgs( imaState: state.TIMAState, joArg: any ): boolean {
+function parseErcArgs( imaState: state.TIMAState, joArg: TCliArgument ): boolean {
     if( joArg.name == "erc20-main-net" ) {
         owaspUtils.verifyArgumentIsPathToExistingFile( joArg );
         imaState.chainProperties.mn.strPathJsonErc20 = imaUtils.normalizePath( joArg.value );
@@ -615,10 +616,11 @@ function parseErcArgs( imaState: state.TIMAState, joArg: any ): boolean {
     return false;
 }
 
-function parseTransactionArgs( imaState: state.TIMAState, joArg: any ): boolean {
+function parseTransactionArgs( imaState: state.TIMAState, joArg: TCliArgument ): boolean {
     if( joArg.name == "sleep-between-tx" ) {
         owaspUtils.verifyArgumentIsInteger( joArg );
-        imaHelperAPIs.setSleepBetweenTransactionsOnSChainMilliseconds( joArg.value );
+        imaHelperAPIs.setSleepBetweenTransactionsOnSChainMilliseconds(
+            owaspUtils.toInteger( joArg.value ) );
         return true;
     }
     if( joArg.name == "wait-next-block" ) {
@@ -713,7 +715,7 @@ function parseTransactionArgs( imaState: state.TIMAState, joArg: any ): boolean 
     return false;
 }
 
-function parsePaymentAmountArgs( imaState: state.TIMAState, joArg: any ): boolean {
+function parsePaymentAmountArgs( imaState: state.TIMAState, joArg: TCliArgument ): boolean {
     if( joArg.name == "value" ) {
         owaspUtils.verifyArgumentWithNonEmptyValue( joArg );
         imaState.nAmountOfWei = owaspUtils.parseMoneySpecToWei( joArg.value.toString(), true );
@@ -784,7 +786,7 @@ function parsePaymentAmountArgs( imaState: state.TIMAState, joArg: any ): boolea
     return false;
 }
 
-function parseTransferArgs( imaState: state.TIMAState, joArg: any ): boolean {
+function parseTransferArgs( imaState: state.TIMAState, joArg: TCliArgument ): boolean {
     if( joArg.name == "s2s-forward" ) {
         imaHelperAPIs.setForwardS2S();
         return true;
@@ -952,7 +954,7 @@ function parseTransferArgs( imaState: state.TIMAState, joArg: any ): boolean {
     return false;
 }
 
-function parseMulticallArgs( imaState: state.TIMAState, joArg: any ): boolean {
+function parseMulticallArgs( imaState: state.TIMAState, joArg: TCliArgument ): boolean {
     if( joArg.name == "enable-multicall" ) {
         imaState.isEnabledMultiCall = true;
         return true;
@@ -964,7 +966,7 @@ function parseMulticallArgs( imaState: state.TIMAState, joArg: any ): boolean {
     return false;
 }
 
-function parsePendingWorkAnalysisArgs( imaState: state.TIMAState, joArg: any ): boolean {
+function parsePendingWorkAnalysisArgs( imaState: state.TIMAState, joArg: TCliArgument ): boolean {
     if( joArg.name == "pwa" ) {
         imaState.isPWA = true;
         return true;
@@ -989,7 +991,7 @@ function parsePendingWorkAnalysisArgs( imaState: state.TIMAState, joArg: any ): 
     return false;
 }
 
-function parseLoggingArgs( imaState: state.TIMAState, joArg: any ): boolean {
+function parseLoggingArgs( imaState: state.TIMAState, joArg: TCliArgument ): boolean {
     if( joArg.name == "gathered" ) {
         imaState.isPrintGathered = true;
         return true;
@@ -1040,7 +1042,7 @@ function parseLoggingArgs( imaState: state.TIMAState, joArg: any ): boolean {
     return false;
 }
 
-function parseBlsArgs( imaState: state.TIMAState, joArg: any ): boolean {
+function parseBlsArgs( imaState: state.TIMAState, joArg: TCliArgument ): boolean {
     if( joArg.name == "sign-messages" ) {
         imaState.bSignMessages = true;
         return true;
@@ -1063,7 +1065,7 @@ function parseBlsArgs( imaState: state.TIMAState, joArg: any ): boolean {
     return false;
 }
 
-function parseMonitoringArgs( imaState: state.TIMAState, joArg: any ): boolean {
+function parseMonitoringArgs( imaState: state.TIMAState, joArg: TCliArgument ): boolean {
     if( joArg.name == "monitoring-port" ) {
         owaspUtils.verifyArgumentIsIntegerIpPortNumber( joArg );
         imaState.nMonitoringPort = owaspUtils.toInteger( joArg.value );
@@ -1077,7 +1079,7 @@ function parseMonitoringArgs( imaState: state.TIMAState, joArg: any ): boolean {
     return false;
 }
 
-function parseReimbursementArgs( imaState: state.TIMAState, joArg: any ): boolean {
+function parseReimbursementArgs( imaState: state.TIMAState, joArg: TCliArgument ): boolean {
     if( joArg.name == "reimbursement-chain" ) {
         owaspUtils.verifyArgumentWithNonEmptyValue( joArg );
         imaState.strReimbursementChain = joArg.value.trim();
@@ -1111,7 +1113,7 @@ function parseReimbursementArgs( imaState: state.TIMAState, joArg: any ): boolea
     return false;
 }
 
-function parseOracleArgs( imaState: state.TIMAState, joArg: any ): boolean {
+function parseOracleArgs( imaState: state.TIMAState, joArg: TCliArgument ): boolean {
     if( joArg.name == "enable-oracle" ) {
         imaOracleOperations.setEnabledOracle( true );
         return true;
@@ -1123,7 +1125,7 @@ function parseOracleArgs( imaState: state.TIMAState, joArg: any ): boolean {
     return false;
 }
 
-function parseNetworkDiscoveryArgs( imaState: state.TIMAState, joArg: any ): boolean {
+function parseNetworkDiscoveryArgs( imaState: state.TIMAState, joArg: TCliArgument ): boolean {
     if( joArg.name == "network-browser-path" ) {
         owaspUtils.verifyArgumentWithNonEmptyValue( joArg );
         imaState.optsS2S.strNetworkBrowserPath = joArg.value.toString();
@@ -1132,7 +1134,7 @@ function parseNetworkDiscoveryArgs( imaState: state.TIMAState, joArg: any ): boo
     return false;
 }
 
-function parseBlockScannerArgs( imaState: state.TIMAState, joArg: any ): boolean {
+function parseBlockScannerArgs( imaState: state.TIMAState, joArg: TCliArgument ): boolean {
     if( joArg.name == "bs-step-size" ) {
         owaspUtils.verifyArgumentIsInteger( joArg );
         imaHelperAPIs.setBlocksCountInInIterativeStepOfEventsScan(
@@ -1155,7 +1157,7 @@ function parseBlockScannerArgs( imaState: state.TIMAState, joArg: any ): boolean
     return false;
 }
 
-function parseJsonRpcServerArgs( imaState: state.TIMAState, joArg: any ): boolean {
+function parseJsonRpcServerArgs( imaState: state.TIMAState, joArg: TCliArgument ): boolean {
     if( joArg.name == "json-rpc-port" ) {
         owaspUtils.verifyArgumentIsIntegerIpPortNumber( joArg );
         imaState.nJsonRpcPort = owaspUtils.toInteger( joArg.value );
@@ -1164,7 +1166,7 @@ function parseJsonRpcServerArgs( imaState: state.TIMAState, joArg: any ): boolea
     return false;
 }
 
-function parseCrossImaCommunicationArgs( imaState: state.TIMAState, joArg: any ): boolean {
+function parseCrossImaCommunicationArgs( imaState: state.TIMAState, joArg: TCliArgument ): boolean {
     if( joArg.name == "cross-ima" ) {
         imaState.isCrossImaBlsMode = true;
         return true;
@@ -1176,7 +1178,7 @@ function parseCrossImaCommunicationArgs( imaState: state.TIMAState, joArg: any )
     return false;
 }
 
-function parseShowConfigArgs( imaState: state.TIMAState, joArg: any ): boolean {
+function parseShowConfigArgs( imaState: state.TIMAState, joArg: TCliArgument ): boolean {
     if( joArg.name == "show-config" ) {
         imaState.bShowConfigMode = true;
         return true;
@@ -1184,7 +1186,7 @@ function parseShowConfigArgs( imaState: state.TIMAState, joArg: any ): boolean {
     return false;
 }
 
-function parseOtherArgs( imaState: state.TIMAState, joArg: any ): boolean {
+function parseOtherArgs( imaState: state.TIMAState, joArg: TCliArgument ): boolean {
     if( joArg.name == "auto-exit" ) {
         owaspUtils.verifyArgumentIsInteger( joArg );
         imaState.nAutoExitAfterSeconds = owaspUtils.toInteger( joArg.value );
@@ -1193,12 +1195,18 @@ function parseOtherArgs( imaState: state.TIMAState, joArg: any ): boolean {
     return false;
 }
 
-export function parse( joExternalHandlers: any, argv?: any[] ): number {
+export type TExternalHandlersForCommandLineParser =
+    Record<string, ( imaState: state.TIMAState, joArg: TCliArgument ) => void>;
+
+export function parse(
+    joExternalHandlers: TExternalHandlersForCommandLineParser,
+    argv?: string[]
+): number {
     const imaState: state.TIMAState = state.get();
     argv = argv ?? process.argv;
     const cntArgs = argv.length;
     for( let idxArg = 2; idxArg < cntArgs; ++idxArg ) {
-        const joArg = parseCommandLineArgument( argv[idxArg] );
+        const joArg: TCliArgument = parseCommandLineArgument( argv[idxArg] );
         parseHelp( imaState, joArg ); // exits process on "--help"
         parseVersion( imaState, joArg ); // exits process on "--version"
         if( parseBasicArgs( imaState, joArg ) )
@@ -1274,7 +1282,7 @@ export function parse( joExternalHandlers: any, argv?: any[] ): number {
             joArg.name == "simple-loop" ||
             joArg.name == "browse-s-chain"
         ) {
-            joExternalHandlers[joArg.name]();
+            joExternalHandlers[joArg.name]( imaState, joArg );
             continue;
         }
         console.log( log.fmtFatal( "COMMAND LINE PARSER ERROR: unknown command line argument {}",
@@ -1304,6 +1312,12 @@ async function asyncCheckUrlAtStartup( u: URL | string, name: string ): Promise 
             "error is: {err}, stack is:\n{stack}", u, name, err, err );
     }
     return false;
+}
+
+interface TMemoryInformation {
+    total: number
+    free: number
+    freePercent: number
 }
 
 function commonInitPrintSysInfo(): void {
@@ -1343,7 +1357,11 @@ function commonInitPrintSysInfo(): void {
         log.debug( "OS {sunny} is {}", "tmp dir", os.tmpdir() );
         log.debug( "OS {sunny} is {}", "uptime", os.uptime() );
         log.debug( "OS {sunny} is {}", "user", os.userInfo() );
-        const joMemory: any = { total: os.totalmem(), free: os.freemem() };
+        const joMemory: TMemoryInformation = {
+            total: os.totalmem(),
+            free: os.freemem(),
+            freePercent: 0
+        };
         joMemory.freePercent = ( joMemory.free / joMemory.total ) * 100.0;
         log.debug( "OS {sunny} is {}", "memory", joMemory );
         const joLA = os.loadavg();
@@ -2094,92 +2112,92 @@ function commonInitCheckGeneralArgs(): void {
     }
     ensureHaveValue(
         "App path",
-        path.join( __dirname, "main.js" ), false, isPrintGathered, null, ( x: any ) => {
+        path.join( __dirname, "main.js" ), false, isPrintGathered, null, ( x: TCV ) => {
             return att( x );
         } );
     ensureHaveValue(
         "Verbose level",
         log.verboseLevelAsTextForLog( log.verboseGet() ),
-        false, isPrintGathered, null, ( x: any ) => {
+        false, isPrintGathered, null, ( x: TCV ) => {
             return att( x );
         } );
     ensureHaveValue(
         "Multi-call optimizations",
-        imaState.isEnabledMultiCall, false, isPrintGathered, null, ( x: any ) => {
+        imaState.isEnabledMultiCall, false, isPrintGathered, null, ( x: TCV ) => {
             return log.yn( x );
         } );
     ensureHaveValue(
         "Main-net URL",
         imaState.chainProperties.mn.strURL, false,
-        isPrintGathered && isPrintSecurityValues, null, ( x: any ) => {
+        isPrintGathered && isPrintSecurityValues, null, ( x: TCV ) => {
             return log.u( x );
         } );
     ensureHaveValue(
         "S-chain URL",
         imaState.chainProperties.sc.strURL, false,
-        isPrintGathered && isPrintSecurityValues, null, ( x: any ) => {
+        isPrintGathered && isPrintSecurityValues, null, ( x: TCV ) => {
             return log.u( x );
         } );
     ensureHaveValue(
         "S<->S Target S-chain URL",
         imaState.chainProperties.tc.strURL, false,
-        isPrintGathered && isPrintSecurityValues, null, ( x: any ) => {
+        isPrintGathered && isPrintSecurityValues, null, ( x: TCV ) => {
             return log.u( x );
         } );
     ensureHaveValue(
         "Main-net Ethereum network name",
         imaState.chainProperties.mn.strChainName, false,
-        isPrintGathered && isPrintSecurityValues, null, ( x: any ) => {
+        isPrintGathered && isPrintSecurityValues, null, ( x: TCV ) => {
             return log.fmtNote( x );
         } );
     ensureHaveValue(
         "S-Chain Ethereum network name",
         imaState.chainProperties.sc.strChainName, false,
-        isPrintGathered && isPrintSecurityValues, null, ( x: any ) => {
+        isPrintGathered && isPrintSecurityValues, null, ( x: TCV ) => {
             return log.fmtNote( x );
         } );
     ensureHaveValue(
         "S<->S Target S-Chain Ethereum network name",
         imaState.chainProperties.tc.strChainName, false,
-        isPrintGathered && isPrintSecurityValues, null, ( x: any ) => {
+        isPrintGathered && isPrintSecurityValues, null, ( x: TCV ) => {
             return log.fmtNote( x );
         } );
     ensureHaveValue(
         "Main-net Ethereum chain ID",
         imaState.chainProperties.mn.chainId, false,
-        isPrintGathered && isPrintSecurityValues, null, ( x: any ) => {
+        isPrintGathered && isPrintSecurityValues, null, ( x: TCV ) => {
             return log.fmtNote( x );
         } );
     ensureHaveValue(
         "S-Chain Ethereum chain ID",
         imaState.chainProperties.sc.chainId, false,
-        isPrintGathered && isPrintSecurityValues, null, ( x: any ) => {
+        isPrintGathered && isPrintSecurityValues, null, ( x: TCV ) => {
             return log.fmtNote( x );
         } );
     ensureHaveValue(
         "S<->S Target S-Chain Ethereum chain ID",
         imaState.chainProperties.tc.chainId, false,
-        isPrintGathered && isPrintSecurityValues, null, ( x: any ) => {
+        isPrintGathered && isPrintSecurityValues, null, ( x: TCV ) => {
             return log.fmtNote( x );
         } );
     ensureHaveValue(
         "Skale Manager ABI JSON file path",
-        imaState.strPathAbiJsonSkaleManager, false, isPrintGathered, null, ( x: any ) => {
+        imaState.strPathAbiJsonSkaleManager, false, isPrintGathered, null, ( x: TCV ) => {
             return log.fmtWarning( x );
         } );
     ensureHaveValue(
         "Main-net ABI JSON file path",
-        imaState.chainProperties.mn.strPathAbiJson, false, isPrintGathered, null, ( x: any ) => {
+        imaState.chainProperties.mn.strPathAbiJson, false, isPrintGathered, null, ( x: TCV ) => {
             return log.fmtWarning( x );
         } );
     ensureHaveValue(
         "S-Chain ABI JSON file path",
-        imaState.chainProperties.sc.strPathAbiJson, false, isPrintGathered, null, ( x: any ) => {
+        imaState.chainProperties.sc.strPathAbiJson, false, isPrintGathered, null, ( x: TCV ) => {
             return log.fmtWarning( x );
         } );
     ensureHaveValue(
         "S<->S Target S-Chain ABI JSON file path",
-        imaState.chainProperties.tc.strPathAbiJson, false, isPrintGathered, null, ( x: any ) => {
+        imaState.chainProperties.tc.strPathAbiJson, false, isPrintGathered, null, ( x: TCV ) => {
             return log.fmtWarning( x );
         } );
 
@@ -2229,7 +2247,7 @@ function commonInitCheckCredentialsArgs(): void {
             ensureHaveValue(
                 "BLS/Main Net key name",
                 imaState.chainProperties.mn.joAccount.strBlsKeyName,
-                false, isPrintGathered, null, ( x: any ) => {
+                false, isPrintGathered, null, ( x: TCV ) => {
                     return att( x );
                 } );
         }
@@ -2237,7 +2255,7 @@ function commonInitCheckCredentialsArgs(): void {
             ensureHaveValue(
                 "BLS/S-Chain key name",
                 imaState.chainProperties.sc.joAccount.strBlsKeyName,
-                false, isPrintGathered, null, ( x: any ) => {
+                false, isPrintGathered, null, ( x: TCV ) => {
                     return att( x );
                 } );
         }
@@ -2245,7 +2263,7 @@ function commonInitCheckCredentialsArgs(): void {
             ensureHaveValue(
                 "BLS/Target S-Chain key name",
                 imaState.chainProperties.tc.joAccount.strBlsKeyName,
-                false, isPrintGathered, null, ( x: any ) => {
+                false, isPrintGathered, null, ( x: TCV ) => {
                     return att( x );
                 } );
         }
@@ -2257,7 +2275,7 @@ function commonInitCheckTransferAmountArgs(): void {
     const isPrintGathered = ( !!( imaState.isPrintGathered ) );
     ensureHaveValue(
         "Amount of wei to transfer", imaState.nAmountOfWei,
-        false, isPrintGathered, null, ( x: any ) => {
+        false, isPrintGathered, null, ( x: TCV ) => {
             return log.fmtInformation( x );
         } );
 }
@@ -2267,92 +2285,92 @@ function commonInitTransferringArgs(): void {
     const isPrintGathered = ( !!( imaState.isPrintGathered ) );
     ensureHaveValue(
         "M->S transfer block size", imaState.nTransferBlockSizeM2S,
-        false, isPrintGathered, null, ( x: any ) => {
+        false, isPrintGathered, null, ( x: TCV ) => {
             return log.fmtNote( x );
         } );
     ensureHaveValue(
         "S->M transfer block size", imaState.nTransferBlockSizeS2M,
-        false, isPrintGathered, null, ( x: any ) => {
+        false, isPrintGathered, null, ( x: TCV ) => {
             return log.fmtNote( x );
         } );
     if( imaState.bHaveSkaleManagerABI ) {
         ensureHaveValue(
             "S->S transfer block size", imaState.nTransferBlockSizeS2S,
-            false, isPrintGathered, null, ( x: any ) => {
+            false, isPrintGathered, null, ( x: TCV ) => {
                 return log.fmtNote( x );
             } );
     }
     ensureHaveValue(
         "M->S transfer job steps", imaState.nTransferStepsM2S,
-        false, isPrintGathered, null, ( x: any ) => {
+        false, isPrintGathered, null, ( x: TCV ) => {
             return log.fmtNote( x );
         } );
     ensureHaveValue(
         "S->M transfer job steps", imaState.nTransferStepsS2M,
-        false, isPrintGathered, null, ( x: any ) => {
+        false, isPrintGathered, null, ( x: TCV ) => {
             return log.fmtNote( x );
         } );
     if( imaState.bHaveSkaleManagerABI ) {
         ensureHaveValue(
             "S->S transfer job steps", imaState.nTransferStepsS2S,
-            false, isPrintGathered, null, ( x: any ) => {
+            false, isPrintGathered, null, ( x: TCV ) => {
                 return log.fmtNote( x );
             } );
     }
     ensureHaveValue(
         "M->S transactions limit", imaState.nMaxTransactionsM2S,
-        false, isPrintGathered, null, ( x: any ) => {
+        false, isPrintGathered, null, ( x: TCV ) => {
             return log.fmtNote( x );
         } );
     ensureHaveValue(
         "S->M transactions limit", imaState.nMaxTransactionsS2M,
-        false, isPrintGathered, null, ( x: any ) => {
+        false, isPrintGathered, null, ( x: TCV ) => {
             return log.fmtNote( x );
         } );
     if( imaState.bHaveSkaleManagerABI ) {
         ensureHaveValue(
             "S->S transactions limit", imaState.nMaxTransactionsS2S,
-            false, isPrintGathered, null, ( x: any ) => {
+            false, isPrintGathered, null, ( x: TCV ) => {
                 return log.fmtNote( x );
             } );
     }
     ensureHaveValue(
         "M->S await blocks", imaState.nBlockAwaitDepthM2S, false,
-        isPrintGathered, null, ( x: any ) => {
+        isPrintGathered, null, ( x: TCV ) => {
             return log.fmtNote( x );
         } );
     ensureHaveValue(
         "S->M await blocks", imaState.nBlockAwaitDepthS2M, false,
-        isPrintGathered, null, ( x: any ) => {
+        isPrintGathered, null, ( x: TCV ) => {
             return log.fmtNote( x );
         } );
     if( imaState.bHaveSkaleManagerABI ) {
         ensureHaveValue(
             "S->S await blocks", imaState.nBlockAwaitDepthS2S, false,
-            isPrintGathered, null, ( x: any ) => {
+            isPrintGathered, null, ( x: TCV ) => {
                 return log.fmtNote( x );
             } );
     }
     ensureHaveValue(
         "M->S minimal block age", imaState.nBlockAgeM2S,
-        false, isPrintGathered, null, ( x: any ) => {
+        false, isPrintGathered, null, ( x: TCV ) => {
             return log.fmtNote( x );
         } );
     ensureHaveValue(
         "S->M minimal block age", imaState.nBlockAgeS2M,
-        false, isPrintGathered, null, ( x: any ) => {
+        false, isPrintGathered, null, ( x: TCV ) => {
             return log.fmtNote( x );
         } );
     if( imaState.bHaveSkaleManagerABI ) {
         ensureHaveValue(
             "S->S minimal block age", imaState.nBlockAgeS2S,
-            false, isPrintGathered, null, ( x: any ) => {
+            false, isPrintGathered, null, ( x: TCV ) => {
                 return log.fmtNote( x );
             } );
     }
     ensureHaveValue(
         "Transfer loop period(seconds)", imaState.nLoopPeriodSeconds,
-        false, isPrintGathered, null, ( x: any ) => {
+        false, isPrintGathered, null, ( x: TCV ) => {
             return log.fmtSuccess( x );
         } );
     if( imaState.nTimeFrameSeconds > 0 ) {
@@ -2375,12 +2393,12 @@ function commonInitCheckAccessArgs(): void {
     const isPrintGathered = ( !!( imaState.isPrintGathered ) );
     ensureHaveValue(
         "S-Chain node number(zero based)",
-        imaState.nNodeNumber, false, isPrintGathered, null, ( x: any ) => {
+        imaState.nNodeNumber, false, isPrintGathered, null, ( x: TCV ) => {
             return log.fmtInformation( x );
         } );
     ensureHaveValue(
         "S-Chain nodes count",
-        imaState.nNodesCount, false, isPrintGathered, null, ( x: any ) => {
+        imaState.nNodesCount, false, isPrintGathered, null, ( x: TCV ) => {
             return log.fmtInformation( x );
         } );
 }
@@ -2392,19 +2410,19 @@ function commonInitErcTokensArgs(): void {
         ensureHaveValue(
             "Loaded Main-net ERC20 ABI ",
             imaState.chainProperties.tc.strCoinNameErc20,
-            false, isPrintGathered, null, ( x: any ) => {
+            false, isPrintGathered, null, ( x: TCV ) => {
                 return att( x );
             } );
         ensureHaveValue(
             "Loaded S-Chain ERC20 ABI ",
             imaState.chainProperties.sc.strCoinNameErc20,
-            false, isPrintGathered, null, ( x: any ) => {
+            false, isPrintGathered, null, ( x: TCV ) => {
                 return att( x );
             } );
         ensureHaveValue(
             "Amount of tokens to transfer",
             imaState.nAmountOfToken,
-            false, isPrintGathered, null, ( x: any ) => {
+            false, isPrintGathered, null, ( x: TCV ) => {
                 return log.fmtInformation( x );
             } );
         if( isPrintGathered ) {
@@ -2416,7 +2434,7 @@ function commonInitErcTokensArgs(): void {
         ensureHaveValue(
             "Loaded S<->S Target S-Chain ERC20 ABI ",
             imaState.chainProperties.tc.strCoinNameErc20,
-            false, isPrintGathered, null, ( x: any ) => {
+            false, isPrintGathered, null, ( x: TCV ) => {
                 return att( x );
             } );
     }
@@ -2424,19 +2442,19 @@ function commonInitErcTokensArgs(): void {
         ensureHaveValue(
             "Loaded Main-net ERC721 ABI ",
             imaState.chainProperties.mn.strCoinNameErc721,
-            false, isPrintGathered, null, ( x: any ) => {
+            false, isPrintGathered, null, ( x: TCV ) => {
                 return att( x );
             } );
         ensureHaveValue(
             "Loaded S-Chain ERC721 ABI ",
             imaState.chainProperties.sc.strCoinNameErc721,
-            false, isPrintGathered, null, ( x: any ) => {
+            false, isPrintGathered, null, ( x: TCV ) => {
                 return att( x );
             } );
         ensureHaveValue(
             "ERC721 token id ",
             imaState.idToken, false,
-            isPrintGathered, null, ( x: any ) => {
+            isPrintGathered, null, ( x: TCV ) => {
                 return log.fmtInformation( x );
             } );
         if( isPrintGathered ) {
@@ -2448,28 +2466,28 @@ function commonInitErcTokensArgs(): void {
         ensureHaveValue(
             "Loaded S<->S Target S-Chain ERC721 ABI ",
             imaState.chainProperties.tc.strCoinNameErc721,
-            false, isPrintGathered, null, ( x: any ) => {
+            false, isPrintGathered, null, ( x: TCV ) => {
                 return att( x );
             } );
     }
     if( imaState.chainProperties.mn.strCoinNameErc1155.length > 0 ) {
         ensureHaveValue( "Loaded Main-net ERC1155 ABI ",
             imaState.chainProperties.mn.strCoinNameErc1155,
-            false, isPrintGathered, null, ( x: any ) => {
+            false, isPrintGathered, null, ( x: TCV ) => {
                 return att( x );
             } );
         ensureHaveValue( "Loaded S-Chain ERC1155 ABI ",
             imaState.chainProperties.sc.strCoinNameErc1155,
-            false, isPrintGathered, null, ( x: any ) => {
+            false, isPrintGathered, null, ( x: TCV ) => {
                 return att( x );
             } );
         try {
             ensureHaveValue( "ERC1155 token id ",
-                imaState.idToken, false, isPrintGathered, null, ( x: any ) => {
+                imaState.idToken, false, isPrintGathered, null, ( x: TCV ) => {
                     return log.fmtInformation( x );
                 } );
             ensureHaveValue( "ERC1155 token amount ",
-                imaState.nAmountOfToken, false, isPrintGathered, null, ( x: any ) => {
+                imaState.nAmountOfToken, false, isPrintGathered, null, ( x: TCV ) => {
                     return log.fmtInformation( x );
                 } );
         } catch ( e1 ) {
@@ -2477,13 +2495,13 @@ function commonInitErcTokensArgs(): void {
                 ensureHaveValue(
                     "ERC1155 batch of token ids ",
                     imaState.idTokens, false,
-                    isPrintGathered, null, ( x: any ) => {
+                    isPrintGathered, null, ( x: TCV ) => {
                         return log.fmtInformation( x );
                     } );
                 ensureHaveValue(
                     "ERC1155 batch of token amounts ",
                     imaState.arrAmountsOfTokens, false,
-                    isPrintGathered, null, ( x: any ) => {
+                    isPrintGathered, null, ( x: TCV ) => {
                         return log.fmtInformation( x );
                     } );
             } catch ( e2 ) {
@@ -2502,7 +2520,7 @@ function commonInitErcTokensArgs(): void {
         ensureHaveValue(
             "Loaded S<->S Target S-Chain ERC1155 ABI ",
             imaState.chainProperties.tc.strCoinNameErc1155,
-            false, isPrintGathered, null, ( x: any ) => {
+            false, isPrintGathered, null, ( x: TCV ) => {
                 return att( x );
             } );
     }
@@ -2598,20 +2616,24 @@ function commonInitLoggingArgs(): void {
         ensureHaveValue(
             "Log file path",
             imaState.strLogFilePath, false,
-            isPrintGathered, null, ( x: any ) => {
+            isPrintGathered, null, ( x: TCV ) => {
                 return log.fmtInformation( x );
             } );
         ensureHaveValue(
             "Max size of log file path",
             imaState.nLogMaxSizeBeforeRotation, false,
-            isPrintGathered, null, ( x: any ) => {
-                return ( x <= 0 ) ? log.fmtWarning( "unlimited" ) : log.fmtNote( x );
+            isPrintGathered, null, ( x: TCV ) => {
+                return ( ( !x ) && owaspUtils.toInteger( x ) <= 0 )
+                    ? log.fmtWarning( "unlimited" )
+                    : log.fmtNote( x );
             } );
         ensureHaveValue(
             "Max rotated count of log files",
             imaState.nLogMaxFilesCount,
-            false, isPrintGathered, null, ( x: any ) => {
-                return ( x <= 1 ) ? log.fmtWarning( "not set" ) : log.fmtNote( x );
+            false, isPrintGathered, null, ( x: TCV ) => {
+                return ( ( !x ) && owaspUtils.toInteger( x ) <= 1 )
+                    ? log.fmtWarning( "not set" )
+                    : log.fmtNote( x );
             } );
     }
 }

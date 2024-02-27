@@ -119,6 +119,11 @@ export async function checkIsRegisteredSChainInDepositBoxes( // step 1
     return false;
 }
 
+export interface TReceipt {
+    description: string
+    receipt: any
+}
+
 export async function registerSChainInDepositBoxes( // step 1
     ethersProviderMainNet: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     joLinker: owaspUtils.ethersMod.ethers.Contract | null,
@@ -135,9 +140,9 @@ export async function registerSChainInDepositBoxes( // step 1
     transactionCustomizerMainNet: imaTx.TransactionCustomizer,
     cntWaitAttempts?: number,
     nSleepMilliseconds?: number
-): Promise<any> {
+): Promise<TReceipt[]> {
     const details = log.createMemoryStream();
-    const jarrReceipts: any[] = [];
+    const jarrReceipts: TReceipt[] = [];
     details.debug( "Main-net Linker address is..........{}", joLinker ? joLinker.address : "N/A" );
     details.debug( "S-Chain ID is.......................{}", chainNameSChain );
     const strLogPrefix = "Reg S in depositBoxes: ";
@@ -212,7 +217,7 @@ export async function registerSChainInDepositBoxes( // step 1
         details.exposeDetailsTo(
             log.globalStream(), "registerSChainInDepositBoxes", false );
         details.close();
-        return null;
+        return [];
     }
     if( log.exposeDetailsGet() ) {
         details.exposeDetailsTo(

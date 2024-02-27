@@ -46,7 +46,7 @@ export async function registerAll( isPrintSummaryRegistrationCosts: boolean ): P
     if( !await registerStep1( false ) )
         return false;
     if( isPrintSummaryRegistrationCosts )
-        printSummaryRegistrationCosts( log );
+        printSummaryRegistrationCosts();
     return true;
 }
 
@@ -56,8 +56,8 @@ export async function checkRegistrationAll(): Promise<boolean> {
 }
 
 export interface TRegistrationCostInformation {
-    mn: any[]
-    sc: any[]
+    mn: imaReg.TReceipt[]
+    sc: imaReg.TReceipt[]
 }
 
 const gInfoRegistrationCost: TRegistrationCostInformation = {
@@ -82,7 +82,7 @@ export async function registerStep1( isPrintSummaryRegistrationCosts: boolean ):
         log.posNeg( bSuccess, "already registered", "not registered yet" ) );
     if( bSuccess )
         return true;
-    const jarrReceipts: any =
+    const jarrReceipts: imaReg.TReceipt[] =
         await imaReg.registerSChainInDepositBoxes( // step 1
             imaState.chainProperties.mn.ethersProvider,
             imaState.joLinker,
@@ -130,7 +130,7 @@ export async function checkRegistrationStep1(): Promise<boolean> {
     return bRetVal;
 }
 
-export function printSummaryRegistrationCosts( details?: any ): void {
+export function printSummaryRegistrationCosts( details?: log.TLoggerBase ): void {
     if( !details )
         details = log;
     imaGasUsage.printGasUsageReportFromArray(
@@ -240,7 +240,7 @@ export function commandLineTaskMintErc721(): void {
                 try {
                     const strAddressMintTo = // same as caller/transaction signer
                         imaState.chainProperties.tc.joAccount.address();
-                    const idTokens: any[] =
+                    const idTokens: state.TTokenID[] =
                         ( imaState.haveArrayOfTokenIdentifiers && imaState.idTokens )
                             ? imaState.idTokens
                             : [];
@@ -286,7 +286,7 @@ export function commandLineTaskMintErc1155(): void {
                 try {
                     const strAddressMintTo = // same as caller/transaction signer
                         imaState.chainProperties.tc.joAccount.address();
-                    const idTokens: any[] =
+                    const idTokens: state.TTokenID[] =
                         ( imaState.haveArrayOfTokenIdentifiers && imaState.idTokens )
                             ? imaState.idTokens
                             : [];
@@ -370,7 +370,7 @@ export function commandLineTaskBurnErc721(): void {
             let bBurnIsOK = false;
             if( imaState.chainProperties.tc.strCoinNameErc721.length > 0 ) {
                 try {
-                    const idTokens: any[] =
+                    const idTokens: state.TTokenID[] =
                         ( imaState.haveArrayOfTokenIdentifiers && imaState.idTokens )
                             ? imaState.idTokens
                             : [];
@@ -417,7 +417,7 @@ export function commandLineTaskBurnErc1155(): void {
                 try {
                     const strAddressBurnFrom = // same as caller/transaction signer
                         imaState.chainProperties.tc.joAccount.address();
-                    const idTokens: any[] =
+                    const idTokens: state.TTokenID[] =
                         ( imaState.haveArrayOfTokenIdentifiers && imaState.idTokens )
                             ? imaState.idTokens
                             : [];
@@ -456,8 +456,18 @@ export function commandLineTaskBurnErc1155(): void {
     } );
 }
 
+export interface TBalanceDescription {
+    assetName: string
+    assetAddress?: state.TAddress | null
+    idToken?: state.TTokenID | null
+    owner?: state.TAddress | null
+    balance?: state.TBalance | null
+}
+
 export async function commandLineTaskShowBalanceEth(
-    arrBalancesMN: any[], arrBalancesSC: any[], arrBalancesTC: any[]
+    arrBalancesMN: TBalanceDescription[],
+    arrBalancesSC: TBalanceDescription[],
+    arrBalancesTC: TBalanceDescription[]
 ): Promise<void> {
     const imaState: state.TIMAState = state.get();
     let assetAddress: string | null = null;
@@ -520,7 +530,9 @@ export async function commandLineTaskShowBalanceEth(
 }
 
 export async function commandLineTaskShowBalanceErc20(
-    arrBalancesMN: any[], arrBalancesSC: any[], arrBalancesTC: any[]
+    arrBalancesMN: TBalanceDescription[],
+    arrBalancesSC: TBalanceDescription[],
+    arrBalancesTC: TBalanceDescription[]
 ): Promise<void> {
     const imaState: state.TIMAState = state.get();
     let assetAddress = null;
@@ -581,7 +593,10 @@ export async function commandLineTaskShowBalanceErc20(
 }
 
 export async function commandLineTaskShowBalanceErc721(
-    arrBalancesMN: any[], arrBalancesSC: any[], arrBalancesTC: any[], idTokens: any[]
+    arrBalancesMN: TBalanceDescription[],
+    arrBalancesSC: TBalanceDescription[],
+    arrBalancesTC: TBalanceDescription[],
+    idTokens: state.TTokenID[]
 ): Promise<void> {
     const imaState: state.TIMAState = state.get();
     let assetAddress = null;
@@ -654,7 +669,10 @@ export async function commandLineTaskShowBalanceErc721(
 }
 
 export async function commandLineTaskShowBalanceErc1155(
-    arrBalancesMN: any[], arrBalancesSC: any[], arrBalancesTC: any[], idTokens: any[]
+    arrBalancesMN: TBalanceDescription[],
+    arrBalancesSC: TBalanceDescription[],
+    arrBalancesTC: TBalanceDescription[],
+    idTokens: state.TTokenID[]
 ): Promise<void> {
     const imaState: state.TIMAState = state.get();
     let assetAddress = null;
@@ -731,13 +749,14 @@ export function commandLineTaskShowBalance(): void {
     imaState.arrActions.push( {
         name: "show balance",
         fn: async function(): Promise < boolean > {
-            const arrBalancesMN: any = [];
-            const arrBalancesSC: any = []; const arrBalancesTC: any = [];
+            const arrBalancesMN: TBalanceDescription[] = [];
+            const arrBalancesSC: TBalanceDescription[] = [];
+            const arrBalancesTC: TBalanceDescription[] = [];
             await commandLineTaskShowBalanceEth(
                 arrBalancesMN, arrBalancesSC, arrBalancesTC );
             await commandLineTaskShowBalanceErc20(
                 arrBalancesMN, arrBalancesSC, arrBalancesTC );
-            const idTokens: any[] =
+            const idTokens: state.TTokenID[] =
                 ( imaState.haveArrayOfTokenIdentifiers && imaState.idTokens )
                     ? imaState.idTokens
                     : [];

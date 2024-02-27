@@ -38,24 +38,24 @@ export async function getBalanceEth(
     chainId: string,
     joAccount: state.TAccount | null,
     contractERC20: owaspUtils.ethersMod.Contract | null
-): Promise<string | object> {
+): Promise<state.TBalance> {
     const strLogPrefix = "getBalanceEth() call ";
     try {
         if( !( ethersProvider && joAccount ) )
-            return "<no-data>";
+            return owaspUtils.toBN( 0 );
         const strAddress = joAccount.address();
         if( ( !isMainNet ) && contractERC20 ) {
             const balance =
                 await contractERC20.callStatic.balanceOf( strAddress, { from: strAddress } );
             return balance;
         }
-        const balance = await ethersProvider.getBalance( strAddress );
+        const balance: state.TBalance = await ethersProvider.getBalance( strAddress );
         return balance;
     } catch ( err ) {
         log.error( "{p}balance fetching error details: {err}, stack is:\n{stack}",
             strLogPrefix, err, err );
     }
-    return "<no-data-or-error>";
+    return owaspUtils.toBN( 0 );
 }
 
 // transfer money from main-net to S-chain
@@ -317,13 +317,13 @@ export async function viewEthPaymentFromSchainOnMainNet(
     ethersProviderMainNet: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     joAccountMN: state.TAccount,
     joDepositBoxETH: owaspUtils.ethersMod.ethers.Contract
-): Promise<object | string | null> {
+): Promise<state.TBalance> {
     const details = log.createMemoryStream();
     const strActionName = "";
     const strLogPrefix = "S ETH View: ";
     try {
         if( !( ethersProviderMainNet && joAccountMN && joDepositBoxETH ) )
-            return null;
+            return owaspUtils.toBN( 0 );
         const addressFrom = joAccountMN.address();
         const xWei =
             await joDepositBoxETH.callStatic.approveTransfers(
@@ -343,6 +343,6 @@ export async function viewEthPaymentFromSchainOnMainNet(
             strLogPrefix, strActionName, err, err );
         details.exposeDetailsTo( log.globalStream(), "viewEthPaymentFromSchainOnMainNet", false );
         details.close();
-        return null;
+        return owaspUtils.toBN( 0 );
     }
 }

@@ -29,6 +29,7 @@ import * as state from "./state.js";
 import * as imaUtils from "./utils.js";
 import * as threadInfo from "./threadInfo.js";
 import * as owaspUtils from "./owaspUtils.js";
+import type * as clpTools from "./clpTools.js";
 
 export type TFunctionAfterDiscovery = (
     err?: Error | string | null,
@@ -64,11 +65,18 @@ export interface TPWAStateItem {
     ts: number
 }
 
+export interface TMapValueItemS2S {
+    isInProgress: boolean
+    ts: number
+}
+
+export type TMapS2S = Record<number, TMapValueItemS2S>;
+
 export interface TPWAState {
     oracle: TPWAStateItem
     m2s: TPWAStateItem
     s2m: TPWAStateItem
-    s2s: { mapS2S: any }
+    s2s: { mapS2S: TMapS2S }
 }
 
 export interface TSChainNode {
@@ -132,7 +140,10 @@ export interface TDiscoveryOptions {
     nCountAvailable: number
 }
 
-export function formatBalanceInfo( bi: any, strAddress: string ): string {
+export function formatBalanceInfo(
+    bi: clpTools.TBalanceDescription,
+    strAddress: state.TAddress
+): string {
     let s = "";
     s += log.fmtInformation( "{p}", bi.assetName );
     if( "assetAddress" in bi &&
@@ -145,8 +156,8 @@ export function formatBalanceInfo( bi: any, strAddress: string ): string {
         ? log.fmtInformation( "{p}", bi.owner )
         : log.fmtInformation( "{p}", bi.balance );
     if( bi.assetName == "ERC721" ) {
-        const isSame =
-            ( bi.owner.trim().toLowerCase() == strAddress.trim().toLowerCase() );
+        const isSame = ( bi.owner && strAddress &&
+            bi.owner.trim().toLowerCase() == strAddress.trim().toLowerCase() );
         s += " " + ( isSame
             ? log.fmtSuccess( "same (as account {} specified in the command line arguments)",
                 strAddress )

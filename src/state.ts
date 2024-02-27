@@ -2,6 +2,10 @@ import * as owaspUtils from "./owaspUtils.js";
 import * as imaTx from "./imaTx.js";
 import type * as discoveryTools from "./discoveryTools.js";
 
+export type TAddress = string;
+export type TBalance = owaspUtils.ethersMod.BigNumber;
+export type TTokenID = string;
+
 export interface TLoopStateSubPart {
     isInProgress: boolean
     wasInProgress: boolean

@@ -69,7 +69,7 @@ export async function getOwnerOfErc721(
     strCoinName: string,
     joABI: any,
     idToken: any
-): Promise<any> {
+): Promise<state.TAddress> {
     const strLogPrefix = "getOwnerOfErc721() call ";
     try {
         if( !( ethersProvider && joAccount && strCoinName && joABI && ( strCoinName + "_abi" ) in
@@ -87,7 +87,7 @@ export async function getOwnerOfErc721(
         log.error( "{p}ERC721 owner fetching error: {err}, stack is:\n{stack}",
             strLogPrefix, err, err );
     }
-    return "<no-data-or-error>";
+    return ""; // no data, or error
 }
 
 export async function getBalanceErc1155(
