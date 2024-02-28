@@ -43,7 +43,9 @@ const gStrAppName = "IMA AGENT";
 const gStrVersion =
     imaUtils.fileLoad( path.join( __dirname, "../VERSION" ), "N/A" ).toString().trim();
 
-type TCVAtom = string | number | boolean | object | null | undefined;
+type TCVAtom =
+    string | number | boolean | object | null | undefined
+    | state.TAddress | state.TBalance | state.TTokenID;
 type TCV = TCVAtom | TCVAtom[]; // colorize-able value type
 function att( ...args: TCV[] ): string { return log.fmtAttention( ...args ); };
 

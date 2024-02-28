@@ -143,7 +143,7 @@ function parseCommandLine(): void {
     }
 }
 
-let gServerMonitoringWS: any = null;
+let gServerMonitoringWS: ws.WebSocketServer | null = null;
 
 function initMonitoringServer(): void {
     const imaState: state.TIMAState = state.get();
@@ -159,6 +159,7 @@ function initMonitoringServer(): void {
     } catch ( err ) {
         log.error( "Failed start monitoring WS server on port {}, error is: {err}",
             imaState.nMonitoringPort, err );
+        return;
     }
     gServerMonitoringWS.on( "connection", function( wsPeer: any, req: any ): void {
         let ip = req.socket.remoteAddress;

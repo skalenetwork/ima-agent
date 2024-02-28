@@ -75,7 +75,7 @@ export async function doEthPaymentFromMainNet(
     joDepositBox: owaspUtils.ethersMod.ethers.Contract,
     joMessageProxyMainNet: owaspUtils.ethersMod.ethers.Contract, // for checking logs
     chainIdSChain: string,
-    weiHowMuch: any, // how much WEI money to send
+    weiHowMuch: owaspUtils.ethersMod.BigNumber, // how much WEI money to send
     transactionCustomizerMainNet: imaTx.TransactionCustomizer
 ): Promise<boolean> {
     const details = log.createMemoryStream();
@@ -89,17 +89,19 @@ export async function doEthPaymentFromMainNet(
         const arrArguments = [
             chainIdSChain
         ];
-        const gasPrice = await transactionCustomizerMainNet.computeGasPrice(
-            ethersProviderMainNet, 200000000000 );
+        const gasPrice: owaspUtils.ethersMod.BigNumber =
+            await transactionCustomizerMainNet.computeGasPrice(
+                ethersProviderMainNet, owaspUtils.toBN( 200000000000 ) );
         details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
-        const estimatedGas = await transactionCustomizerMainNet.computeGas(
-            details, ethersProviderMainNet,
-            "DepositBox", joDepositBox, "deposit", arrArguments,
-            joAccountSrc, strActionName,
-            gasPrice, 3000000 );
+        const estimatedGas: owaspUtils.ethersMod.BigNumber =
+            await transactionCustomizerMainNet.computeGas(
+                details, ethersProviderMainNet,
+                "DepositBox", joDepositBox, "deposit", arrArguments,
+                joAccountSrc, strActionName,
+                gasPrice, owaspUtils.toBN( 3000000 ) );
         details.trace( "{p}Using estimated gas={}", strLogPrefix, estimatedGas );
-        const isIgnore = false;
-        const strErrorOfDryRun = await imaTx.dryRunCall(
+        const isIgnore: boolean = false;
+        const strErrorOfDryRun: string | null = await imaTx.dryRunCall(
             details, ethersProviderMainNet,
             "DepositBox", joDepositBox, "deposit", arrArguments,
             joAccountSrc, strActionName, isIgnore,
@@ -171,7 +173,7 @@ export async function doEthPaymentFromSChain(
     joAccountDst: state.TAccount,
     joTokenManagerETH: owaspUtils.ethersMod.ethers.Contract,
     joMessageProxySChain: owaspUtils.ethersMod.ethers.Contract, // for checking logs
-    weiHowMuch: any, // how much WEI money to send
+    weiHowMuch: owaspUtils.ethersMod.BigNumber, // how much WEI money to send
     transactionCustomizerSChain: imaTx.TransactionCustomizer
 ): Promise<boolean> {
     const details = log.createMemoryStream();
@@ -183,21 +185,23 @@ export async function doEthPaymentFromSChain(
         const arrArguments = [
             owaspUtils.toBN( weiHowMuch )
         ];
-        const gasPrice = await transactionCustomizerSChain.computeGasPrice(
-            ethersProviderSChain, 200000000000 );
+        const gasPrice: owaspUtils.ethersMod.BigNumber =
+            await transactionCustomizerSChain.computeGasPrice(
+                ethersProviderSChain, owaspUtils.toBN( 200000000000 ) );
         details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
-        const estimatedGas = await transactionCustomizerSChain.computeGas(
-            details, ethersProviderSChain,
-            "TokenManagerETH", joTokenManagerETH, "exitToMain", arrArguments,
-            joAccountSrc, strActionName,
-            gasPrice, 6000000, 0, null );
+        const estimatedGas: owaspUtils.ethersMod.BigNumber =
+            await transactionCustomizerSChain.computeGas(
+                details, ethersProviderSChain,
+                "TokenManagerETH", joTokenManagerETH, "exitToMain", arrArguments,
+                joAccountSrc, strActionName,
+                gasPrice, owaspUtils.toBN( 6000000 ), owaspUtils.toBN( 0 ), null );
         details.trace( "{p}Using estimated gas={}", strLogPrefix, estimatedGas );
-        const isIgnore = true;
-        const strErrorOfDryRun = await imaTx.dryRunCall(
+        const isIgnore: boolean = true;
+        const strErrorOfDryRun: string | null = await imaTx.dryRunCall(
             details, ethersProviderSChain,
             "TokenManagerETH", joTokenManagerETH, "exitToMain", arrArguments,
             joAccountSrc, strActionName, isIgnore,
-            gasPrice, estimatedGas, 0, null );
+            gasPrice, estimatedGas, owaspUtils.toBN( 0 ), null );
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
@@ -208,7 +212,7 @@ export async function doEthPaymentFromSChain(
             details, ethersProviderSChain,
             "TokenManagerETH", joTokenManagerETH, "exitToMain", arrArguments,
             joAccountSrc, strActionName,
-            gasPrice, estimatedGas, 0, opts );
+            gasPrice, estimatedGas, owaspUtils.toBN( 0 ), opts );
         if( joReceipt ) {
             jarrReceipts.push( {
                 description: "doEthPaymentFromSChain",
@@ -267,17 +271,19 @@ export async function receiveEthPaymentFromSchainOnMainNet(
     try {
         strActionName = "Receive ETH payment from S-Chain on Main Met, getMyEth";
         const arrArguments: any = [];
-        const gasPrice = await transactionCustomizerMainNet.computeGasPrice(
-            ethersProviderMainNet, 200000000000 );
+        const gasPrice: owaspUtils.ethersMod.BigNumber =
+            await transactionCustomizerMainNet.computeGasPrice(
+                ethersProviderMainNet, owaspUtils.toBN( 200000000000 ) );
         details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
-        const estimatedGas = await transactionCustomizerMainNet.computeGas(
-            details, ethersProviderMainNet,
-            "DepositBoxETH", joDepositBoxETH, "getMyEth", arrArguments,
-            joAccountMN, strActionName,
-            gasPrice, 3000000 );
+        const estimatedGas: owaspUtils.ethersMod.BigNumber =
+            await transactionCustomizerMainNet.computeGas(
+                details, ethersProviderMainNet,
+                "DepositBoxETH", joDepositBoxETH, "getMyEth", arrArguments,
+                joAccountMN, strActionName,
+                gasPrice, owaspUtils.toBN( 3000000 ) );
         details.trace( "{p}Using estimated gas={}", strLogPrefix, estimatedGas );
-        const isIgnore = false;
-        const strErrorOfDryRun = await imaTx.dryRunCall(
+        const isIgnore: boolean = false;
+        const strErrorOfDryRun: string | null = await imaTx.dryRunCall(
             details, ethersProviderMainNet,
             "DepositBoxETH", joDepositBoxETH,
             "getMyEth", arrArguments,

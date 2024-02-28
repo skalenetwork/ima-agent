@@ -53,9 +53,9 @@ export interface TRunTimePayedCallOptions {
     arrArguments: any[]
     joAccount: state.TAccount
     strActionName: string
-    gasPrice: any
-    estimatedGas: any
-    weiHowMuch: any
+    gasPrice: owaspUtils.ethersMod.BigNumber
+    estimatedGas: owaspUtils.ethersMod.BigNumber
+    weiHowMuch: owaspUtils.ethersMod.BigNumber
     opts: TCustomPayedCallOptions
     strContractCallDescription: string
     strLogPrefix: string
@@ -77,7 +77,7 @@ let gFlagDryRunIsEnabled: boolean = true;
 export function dryRunIsEnabled(): boolean {
     return ( !!gFlagDryRunIsEnabled );
 }
-export function dryRunEnable( isEnable: any ): boolean {
+export function dryRunEnable( isEnable: boolean ): boolean {
     gFlagDryRunIsEnabled = ( isEnable != null && isEnable != undefined )
         ? ( !!isEnable )
         : true;
@@ -103,7 +103,9 @@ export async function dryRunCall(
     strContractName: string, joContract: owaspUtils.ethersMod.ethers.Contract,
     strMethodName: string, arrArguments: any[],
     joAccount: state.TAccount, strActionName: string, isDryRunResultIgnore: boolean,
-    gasPrice: any, gasValue: any, weiHowMuch?: any,
+    gasPrice: owaspUtils.ethersMod.BigNumber,
+    gasValue: owaspUtils.ethersMod.BigNumber,
+    weiHowMuch?: owaspUtils.ethersMod.BigNumber,
     opts?: any
 ): Promise<string | null> {
     if( !dryRunIsEnabled() )
@@ -318,7 +320,9 @@ export async function payedCall(
     strContractName: string, joContract: owaspUtils.ethersMod.ethers.Contract,
     strMethodName: any, arrArguments: any[],
     joAccount: state.TAccount, strActionName: string,
-    gasPrice: any, estimatedGas: any, weiHowMuch?: any,
+    gasPrice: owaspUtils.ethersMod.BigNumber,
+    estimatedGas: owaspUtils.ethersMod.BigNumber,
+    weiHowMuch?: owaspUtils.ethersMod.BigNumber,
     opts?: any
 ): Promise<any> {
     const optsPayedCall: TRunTimePayedCallOptions = {
@@ -332,7 +336,7 @@ export async function payedCall(
         strActionName,
         gasPrice,
         estimatedGas,
-        weiHowMuch,
+        weiHowMuch: weiHowMuch ?? owaspUtils.toBN( 0 ),
         opts,
         strContractCallDescription: "",
         strLogPrefix: "",
@@ -643,9 +647,12 @@ async function tmEnsureTransaction(
 }
 
 export class TransactionCustomizer {
-    gasPriceMultiplier: any;
-    gasMultiplier: any;
-    constructor ( gasPriceMultiplier: any, gasMultiplier: any ) {
+    gasPriceMultiplier: number | null;
+    gasMultiplier: number | null;
+    constructor (
+        gasPriceMultiplier: number | null | undefined,
+        gasMultiplier: number | null | undefined
+    ) {
         this.gasPriceMultiplier = gasPriceMultiplier
             ? owaspUtils.toFloat( gasPriceMultiplier )
             : null; // null means use current gasPrice or recommendedGasPrice
@@ -654,17 +661,16 @@ export class TransactionCustomizer {
 
     async computeGasPrice(
         ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
-        maxGasPrice: any ): Promise<any> {
-        const gasPrice =
-            owaspUtils.parseIntOrHex(
-                owaspUtils.toBN(
-                    await ethersProvider.getGasPrice() ).toHexString() );
+        maxGasPrice: owaspUtils.ethersMod.BigNumber
+    ): Promise<owaspUtils.ethersMod.BigNumber> {
+        const gasPrice: number = owaspUtils.parseIntOrHex( owaspUtils.toBN(
+            await ethersProvider.getGasPrice() ).toHexString() );
         if( gasPrice == 0 ||
             gasPrice == null ||
             gasPrice == undefined ||
             gasPrice <= 1000000000
         )
-            return owaspUtils.toBN( "1000000000" ).toHexString();
+            return owaspUtils.toBN( "1000000000" );
         else if(
             this.gasPriceMultiplier != null &&
             this.gasPriceMultiplier != undefined &&
@@ -673,11 +679,11 @@ export class TransactionCustomizer {
             maxGasPrice != undefined
         ) {
             let gasPriceMultiplied = gasPrice * this.gasPriceMultiplier;
-            if( gasPriceMultiplied > maxGasPrice )
-                gasPriceMultiplied = maxGasPrice;
+            if( gasPriceMultiplied > owaspUtils.toFloat( maxGasPrice.toString() ) )
+                gasPriceMultiplied = owaspUtils.toFloat( maxGasPrice.toString() );
             return owaspUtils.toBN( maxGasPrice );
         } else
-            return gasPrice;
+            return owaspUtils.toBN( gasPrice );
     }
 
     async computeGas(
@@ -686,10 +692,12 @@ export class TransactionCustomizer {
         strContractName: string, joContract: owaspUtils.ethersMod.ethers.Contract,
         strMethodName: string, arrArguments: any[],
         joAccount: state.TAccount, strActionName: string,
-        gasPrice: any, gasValueRecommended: any, weiHowMuch?: any,
+        gasPrice: owaspUtils.ethersMod.BigNumber,
+        gasValueRecommended: owaspUtils.ethersMod.BigNumber,
+        weiHowMuch?: owaspUtils.ethersMod.BigNumber,
         opts?: any
-    ): Promise<any> {
-        let estimatedGas: any = 0;
+    ): Promise<owaspUtils.ethersMod.BigNumber> {
+        let estimatedGas: owaspUtils.ethersMod.BigNumber = owaspUtils.toBN( 0 );
         const strContractMethodDescription = log.fmtDebug( "{p}({}).{sunny}",
             strContractName, joContract.address, strMethodName );
         let strArgumentsDescription = "";
@@ -725,16 +733,13 @@ export class TransactionCustomizer {
                 "{p}Estimate-gas error: {err}, default recommended gas value will be used " +
                 "instead of estimated, stack is:\n{stack}", strLogPrefix, err, err );
         }
-        estimatedGas = owaspUtils.parseIntOrHex( owaspUtils.toBN( estimatedGas ).toString() );
-        if( estimatedGas == 0 ) {
+        if( estimatedGas.eq( owaspUtils.toBN( 0 ) ) ) {
             estimatedGas = gasValueRecommended;
             details.warning( "{p}Will use recommended gas {} instead of estimated",
                 strLogPrefix, estimatedGas );
         }
-        if( this.gasMultiplier > 0.0 ) {
-            estimatedGas =
-                owaspUtils.parseIntOrHex( ( estimatedGas * this.gasMultiplier ).toString() );
-        }
+        if( this.gasMultiplier && this.gasMultiplier > 0.0 )
+            estimatedGas = estimatedGas.mul( owaspUtils.toBN( this.gasMultiplier ) );
         details.trace( "{p}Final amount of gas is {}", strLogPrefix, estimatedGas );
         return estimatedGas;
     }

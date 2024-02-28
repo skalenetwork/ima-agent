@@ -280,7 +280,7 @@ export function isSendImaAgentIndex(): boolean {
     return true;
 }
 
-let gTimerSChainDiscovery: any = null;
+let gTimerSChainDiscovery: ReturnType<typeof setInterval> | null = null;
 let gFlagIsInSChainDiscovery: boolean = false;
 
 function composeStillUnknownNodesMessage(
@@ -710,7 +710,7 @@ export async function discoverSChainNetwork(
     return optsDiscover.joSChainNetworkInfo;
 }
 
-let gIntervalPeriodicDiscovery: any = null;
+let gIntervalPeriodicDiscovery: ReturnType<typeof setInterval> | null = null;
 
 function checkPeriodicDiscoveryNoLongerNeeded(
     joSChainNetworkInfo: TSChainNetworkInfo | null, isSilentReDiscovery: boolean

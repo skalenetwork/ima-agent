@@ -27,7 +27,7 @@ import * as log from "./log.js";
 import * as imaHelperAPIs from "./imaHelperAPIs.js";
 import * as imaTx from "./imaTx.js";
 import * as threadInfo from "./threadInfo.js";
-import type * as owaspUtils from "./owaspUtils.js";
+import * as owaspUtils from "./owaspUtils.js";
 import type * as state from "./state.js";
 
 export async function invokeHasChain(
@@ -180,11 +180,11 @@ export async function registerSChainInDepositBoxes( // step 1
                 joTokenManagerERC721WithMetadata.address // call params
             ] ];
         const gasPrice = await transactionCustomizerMainNet.computeGasPrice(
-            ethersProviderMainNet, 200000000000 );
+            ethersProviderMainNet, owaspUtils.toBN( 200000000000 ) );
         details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const estimatedGas = await transactionCustomizerMainNet.computeGas( details,
             ethersProviderMainNet, "Linker", joLinker, "connectSchain", arrArguments,
-            joAccountMN, strActionName, gasPrice, 3000000 );
+            joAccountMN, strActionName, gasPrice, owaspUtils.toBN( 3000000 ) );
         details.trace( "{p}Using estimated gas={}", strLogPrefix, estimatedGas );
         const isIgnore = false;
         const strErrorOfDryRun = await imaTx.dryRunCall( details, ethersProviderMainNet,

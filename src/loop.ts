@@ -602,7 +602,9 @@ interface TWorkerData {
     }
 }
 
-export async function ensureHaveWorkers( opts: TParallelLoopRunOptions ): Promise<any> {
+export async function ensureHaveWorkers(
+    opts: TParallelLoopRunOptions
+): Promise< worker_threads.Worker[] > {
     if( gArrWorkers.length > 0 )
         return gArrWorkers;
     const cntWorkers = 2;
@@ -765,6 +767,7 @@ export async function ensureHaveWorkers( opts: TParallelLoopRunOptions ): Promis
     }
     log.debug( "Loop module did created its ",
         gArrWorkers.length, " worker(s) in ", threadInfo.threadDescription() );
+    return gArrWorkers;
 }
 
 export async function runParallelLoops( opts: TParallelLoopRunOptions ): Promise<boolean> {

@@ -112,7 +112,8 @@ async function findOutReferenceLogRecord(
     details: log.TLogger, strLogPrefix: string,
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     joMessageProxy: owaspUtils.ethersMod.ethers.Contract,
-    bnBlockId: any, nMessageNumberToFind: number, isVerbose?: boolean
+    bnBlockId: owaspUtils.ethersMod.BigNumber,
+    nMessageNumberToFind: number, isVerbose?: boolean
 ): Promise<any | null> {
     const bnMessageNumberToFind = owaspUtils.toBN( nMessageNumberToFind.toString() );
     const strEventName = "PreviousMessageReference";
@@ -156,7 +157,8 @@ async function findOutAllReferenceLogRecords(
     details: log.TLogger, strLogPrefix: string,
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     joMessageProxy: owaspUtils.ethersMod.ethers.Contract,
-    bnBlockId: any, nIncMsgCnt: number, nOutMsgCnt: number, isVerbose?: boolean
+    bnBlockId: owaspUtils.ethersMod.BigNumber,
+    nIncMsgCnt: number, nOutMsgCnt: number, isVerbose?: boolean
 ): Promise<any[]> {
     if( isVerbose ) {
         details.debug(
@@ -308,8 +310,8 @@ async function doQueryOutgoingMessageCounter( optsTransfer: TTransferOptions ): 
     optsTransfer.strActionName = "in-getOutgoingMessagesCounter()--classic-records-scanner";
     const attempts = 10;
     const strEventName = "OutgoingMessage";
-    const nBlockFrom = 0;
-    const nBlockTo = "latest";
+    const nBlockFrom: owaspUtils.ethersMod.BigNumber = owaspUtils.toBN( 0 );
+    const nBlockTo: owaspUtils.ethersMod.BigNumber | string = "latest";
     for( let nWalkMsgNumber = optsTransfer.nIncMsgCnt;
         nWalkMsgNumber < optsTransfer.nOutMsgCnt;
         ++nWalkMsgNumber
@@ -387,7 +389,8 @@ async function gatherMessages( optsTransfer: TTransferOptions ): Promise<boolean
         const idxProcessing = optsTransfer.cntProcessed + idxInBlock;
         if( idxProcessing > optsTransfer.nMaxTransactionsCount )
             break;
-        let nBlockFrom = 0; let nBlockTo = "latest";
+        let nBlockFrom: owaspUtils.ethersMod.BigNumber = owaspUtils.toBN( 0 );
+        let nBlockTo: owaspUtils.ethersMod.BigNumber | string = "latest";
         if( optsTransfer.arrLogRecordReferences.length > 0 ) {
             const joReferenceLogRecord = optsTransfer.arrLogRecordReferences.shift();
             if( joReferenceLogRecord && "currentBlockId" in joReferenceLogRecord &&
@@ -424,8 +427,9 @@ async function gatherMessages( optsTransfer: TTransferOptions ): Promise<boolean
                     optsTransfer.details, 10, optsTransfer.ethersProviderSrc );
                 optsTransfer.details.debug( "{p}Latest blockNumber is {}",
                     optsTransfer.strLogPrefix, nLatestBlockNumber );
-                const nDist = nLatestBlockNumber - blockNumber;
-                if( nDist < optsTransfer.nBlockAwaitDepth )
+                const nDist: owaspUtils.ethersMod.BigNumber =
+                    nLatestBlockNumber.sub( owaspUtils.toBN( blockNumber ) );
+                if( nDist.lt( owaspUtils.toBN( optsTransfer.nBlockAwaitDepth ) ) )
                     bSecurityCheckPassed = false;
                 optsTransfer.details.debug( "{p}Distance by blockNumber is {}, await check is {}",
                     optsTransfer.strLogPrefix, nDist,
@@ -588,28 +592,33 @@ async function callbackAllMessagesSign(
     optsTransfer.details.debug( "{p}....debug args for msgCounter set to {}: {}",
         optsTransfer.strLogPrefix, optsTransfer.nIdxCurrentMsgBlockStart, joDebugArgs );
     optsTransfer.strActionName = optsTransfer.strDirection + " - Post incoming messages";
-    const weiHowMuchPostIncomingMessages = undefined;
-    const gasPrice = await optsTransfer.transactionCustomizerDst.computeGasPrice(
-        optsTransfer.ethersProviderDst, 200000000000 );
+    const weiHowMuchPostIncomingMessages: owaspUtils.ethersMod.BigNumber | undefined = undefined;
+    const gasPrice: owaspUtils.ethersMod.BigNumber =
+        await optsTransfer.transactionCustomizerDst.computeGasPrice(
+            optsTransfer.ethersProviderDst, owaspUtils.toBN( 200000000000 ) );
     optsTransfer.details.debug( "{p}Using computed gasPrice {}={}",
         optsTransfer.strLogPrefix, gasPrice );
-    let estimatedGasPostIncomingMessages =
+    let estimatedGasPostIncomingMessages: owaspUtils.ethersMod.BigNumber =
         await optsTransfer.transactionCustomizerDst.computeGas(
             optsTransfer.details, optsTransfer.ethersProviderDst,
             "MessageProxy", optsTransfer.joMessageProxyDst,
             "postIncomingMessages", arrArgumentsPostIncomingMessages,
             optsTransfer.joAccountDst, optsTransfer.strActionName,
-            gasPrice, 10000000, weiHowMuchPostIncomingMessages, null );
+            gasPrice, owaspUtils.toBN( 10000000 ), weiHowMuchPostIncomingMessages, null );
     optsTransfer.details.debug( "{p}Using estimated gas={}",
         optsTransfer.strLogPrefix, estimatedGasPostIncomingMessages );
     if( optsTransfer.strDirection == "S2M" ) {
-        const expectedGasLimit = perMessageGasForTransfer * optsTransfer.jarrMessages.length +
-            additionalS2MTransferOverhead;
+        const expectedGasLimit: owaspUtils.ethersMod.BigNumber =
+        owaspUtils.toBN( perMessageGasForTransfer )
+            .mul( owaspUtils.toBN( optsTransfer.jarrMessages.length ) )
+            .add( owaspUtils.toBN( additionalS2MTransferOverhead ) );
         estimatedGasPostIncomingMessages =
-            Math.max( estimatedGasPostIncomingMessages, expectedGasLimit );
+            estimatedGasPostIncomingMessages.gt( expectedGasLimit )
+                ? estimatedGasPostIncomingMessages
+                : expectedGasLimit;
     }
     const isIgnorePostIncomingMessages = false;
-    const strErrorOfDryRun = await imaTx.dryRunCall(
+    const strErrorOfDryRun: string | null = await imaTx.dryRunCall(
         optsTransfer.details, optsTransfer.ethersProviderDst,
         "MessageProxy", optsTransfer.joMessageProxyDst,
         "postIncomingMessages", arrArgumentsPostIncomingMessages,

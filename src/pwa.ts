@@ -67,7 +67,7 @@ export function checkLoopWorkTypeStringIsCorrect( strLoopWorkType: string ): boo
     return false;
 }
 
-function composeEmptyStateForPendingWorkAnalysis(): any {
+function composeEmptyStateForPendingWorkAnalysis(): discoveryTools.TPWAState {
     return {
         oracle: { isInProgress: false, ts: 0 },
         m2s: { isInProgress: false, ts: 0 },
@@ -77,7 +77,8 @@ function composeEmptyStateForPendingWorkAnalysis(): any {
 }
 
 function getNodeProgressAndTimestamp(
-    joNode: discoveryTools.TSChainNode, strLoopWorkType: string, nIndexS2S: number ): any {
+    joNode: discoveryTools.TSChainNode, strLoopWorkType: string, nIndexS2S: number
+): discoveryTools.TMapValueItemS2S {
     if( !( "pwaState" in joNode ) )
         joNode.pwaState = composeEmptyStateForPendingWorkAnalysis();
     strLoopWorkType = strLoopWorkType.toLowerCase();
@@ -122,7 +123,8 @@ export async function checkOnLoopStart(
         for( let i = 0; i < arrWalkNodeIndices.length; ++i ) {
             const walkNodeIndex = arrWalkNodeIndices[i];
             const joNode = jarrNodes[walkNodeIndex];
-            const joProps: any = getNodeProgressAndTimestamp( joNode, strLoopWorkType, nIndexS2S );
+            const joProps: discoveryTools.TMapValueItemS2S =
+                getNodeProgressAndTimestamp( joNode, strLoopWorkType, nIndexS2S );
             if( joProps && typeof joProps === "object" &&
                 "isInProgress" in joProps && joProps.isInProgress &&
                 joProps.ts != 0 && nUtcUnixTimeStamp >= joProps.ts
@@ -182,7 +184,8 @@ export async function handleLoopStateArrived(
         if( !jarrNodes )
             throw new Error( "S-Chain network info is not available yet to PWA" );
         joNode = jarrNodes[nNodeNumber];
-        const joProps: any = getNodeProgressAndTimestamp( joNode, strLoopWorkType, nIndexS2S );
+        const joProps: discoveryTools.TMapValueItemS2S =
+        getNodeProgressAndTimestamp( joNode, strLoopWorkType, nIndexS2S );
         if( imaState.isPrintPWA ) {
             log.trace( "PWA loop-{} state arrived for node {}, PWA state {}, arrived " +
                 "signature is {}", se, nNodeNumber, joNode.pwaState, signature );

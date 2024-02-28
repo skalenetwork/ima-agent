@@ -53,7 +53,7 @@ export function setSleepBetweenTransactionsOnSChainMilliseconds( val?: number ):
 export function getWaitForNextBlockOnSChain(): boolean {
     return ( !!gFlagWaitForNextBlockOnSChain );
 }
-export function setWaitForNextBlockOnSChain( val: any ): void {
+export function setWaitForNextBlockOnSChain( val: boolean ): void {
     gFlagWaitForNextBlockOnSChain = ( !!val );
 }
 
@@ -64,7 +64,7 @@ export const currentTimestamp = (): number => {
 export async function safeWaitForNextBlockToAppear(
     details: log.TLogger, ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider
 ): Promise<void> {
-    const nBlockNumber: any =
+    const nBlockNumber: owaspUtils.ethersMod.BigNumber =
         owaspUtils.toBN( await safeGetBlockNumber( details, 10, ethersProvider ) );
     details.trace( "Waiting for next block to appear..." );
     details.trace( "    ...have block {}", nBlockNumber.toHexString() );
@@ -81,8 +81,8 @@ export async function safeWaitForNextBlockToAppear(
 export async function safeGetBlockNumber(
     details: log.TLogger, cntAttempts: number,
     ethersProvider: owaspUtils.ethersMod.providers.JsonRpcProvider,
-    retValOnFail?: any, throwIfServerOffline?: boolean
-): Promise<any> {
+    retValOnFail?: owaspUtils.ethersMod.BigNumber, throwIfServerOffline?: boolean
+): Promise<owaspUtils.ethersMod.BigNumber> {
     const strFnName: string = "getBlockNumber";
     const u: string = owaspUtils.ethersProviderToUrl( ethersProvider );
     const nWaitStepMilliseconds = 10 * 1000;
@@ -91,14 +91,12 @@ export async function safeGetBlockNumber(
     cntAttempts = ( owaspUtils.parseIntOrHex( cntAttempts ) < 1 )
         ? 1
         : owaspUtils.parseIntOrHex( cntAttempts );
-    if( retValOnFail == null || retValOnFail == undefined )
-        retValOnFail = "";
-    let ret = retValOnFail;
+    let ret: owaspUtils.ethersMod.BigNumber = retValOnFail ?? owaspUtils.toBN( 0 );
     let idxAttempt = 1;
     for( ; idxAttempt <= cntAttempts; ++idxAttempt ) {
         const isOnLine = await rpcCall.checkUrl( u, nWaitStepMilliseconds );
         if( !isOnLine ) {
-            ret = retValOnFail;
+            ret = retValOnFail ?? owaspUtils.toBN( 0 );
             if( !throwIfServerOffline )
                 return ret;
             details.error( "Cannot call {} via {url} because server is off-line",
@@ -107,15 +105,15 @@ export async function safeGetBlockNumber(
         }
         details.trace( "Repeat call to {} via {url}, attempt {}", strFnName + "()", u, idxAttempt );
         try {
-            ret = await ( ethersProvider as any )[strFnName]();
+            ret = owaspUtils.toBN( await ( ethersProvider as any )[strFnName]() );
             return ret;
         } catch ( err ) {
-            ret = retValOnFail;
+            ret = retValOnFail ?? owaspUtils.toBN( 0 );
             details.error( "Failed call attempt {} to  via {url}, error is: {err}, " +
                 "stack is:\n{stack}", idxAttempt, strFnName + "()", u, err, err );
         }
     }
-    if( ( idxAttempt + 1 ) > cntAttempts && ret === "" ) {
+    if( ( idxAttempt + 1 ) > cntAttempts && ( !ret ) ) {
         details.error( "Failed call to {} via {url} after {} attempts ",
             strFnName + "()", u, cntAttempts );
         throw new Error( `Failed call to ${strFnName}() via ${u} after ${cntAttempts} attempts` );
