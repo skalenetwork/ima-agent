@@ -738,8 +738,10 @@ export class TransactionCustomizer {
             details.warning( "{p}Will use recommended gas {} instead of estimated",
                 strLogPrefix, estimatedGas );
         }
-        if( this.gasMultiplier && this.gasMultiplier > 0.0 )
-            estimatedGas = estimatedGas.mul( owaspUtils.toBN( this.gasMultiplier ) );
+        if( this.gasMultiplier && this.gasMultiplier > 0.0 ) {
+            estimatedGas = owaspUtils.toBN( Math.round(
+                estimatedGas.toNumber() * this.gasMultiplier ) );
+        }
         details.trace( "{p}Final amount of gas is {}", strLogPrefix, estimatedGas );
         return estimatedGas;
     }
