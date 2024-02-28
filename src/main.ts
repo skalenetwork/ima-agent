@@ -94,12 +94,14 @@ function parseCommandLine(): void {
         log.trace( "Will require reimbursement chain name to do reimbursement estimation" );
         clpTools.commandLineTaskReimbursementEstimateAmount();
     }
-    if( imaState.nReimbursementRecharge ) {
+    if( imaState.nReimbursementRecharge &&
+        imaState.nReimbursementRecharge.gt( owaspUtils.toBN( 0 ) ) ) {
         haveReimbursementCommands = true;
         log.trace( "Will require reimbursement chain name to do reimbursement recharge" );
         clpTools.commandLineTaskReimbursementRecharge();
     }
-    if( imaState.nReimbursementWithdraw ) {
+    if( imaState.nReimbursementWithdraw &&
+        imaState.nReimbursementWithdraw.gt( owaspUtils.toBN( 0 ) ) ) {
         haveReimbursementCommands = true;
         log.trace( "Will require reimbursement chain name to do reimbursement withdraw" );
         clpTools.commandLineTaskReimbursementWithdraw();
