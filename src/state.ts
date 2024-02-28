@@ -408,7 +408,7 @@ export function get(): TIMAState {
         nAmountOfWei: owaspUtils.toBN( 0 ),
         nAmountOfToken: owaspUtils.toBN( 0 ),
         arrAmountsOfTokens: null,
-        idToken: "0",
+        idToken: "",
         idTokens: null,
 
         nTransferBlockSizeM2S: 4,

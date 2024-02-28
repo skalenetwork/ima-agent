@@ -886,8 +886,7 @@ export function commandLineTaskPaymentM2S(): void {
             if( imaState.chainProperties.mn.strCoinNameErc1155.length > 0 &&
                 imaState.idToken && imaState.idToken !== null &&
                 imaState.idToken !== undefined &&
-                imaState.nAmountOfToken && imaState.nAmountOfToken !== null &&
-                imaState.nAmountOfToken !== undefined &&
+                imaState.nAmountOfToken.gte( owaspUtils.toBN( 0 ) ) &&
                 ( ( !imaState.idTokens ) || imaState.idTokens === null ||
                     imaState.idTokens === undefined ) &&
                 ( ( !imaState.arrAmountsOfTokens ) || imaState.arrAmountsOfTokens === null ||
@@ -938,9 +937,7 @@ export function commandLineTaskPaymentM2S(): void {
                 ( !imaState.idToken ||
                     imaState.idToken === null ||
                     imaState.idToken === undefined ) &&
-                ( !imaState.nAmountOfToken ||
-                    imaState.nAmountOfToken === null ||
-                    imaState.nAmountOfToken === undefined )
+                imaState.nAmountOfToken.lte( owaspUtils.toBN( 0 ) )
             ) {
                 // ERC1155 Batch payment
                 log.information( "one M->S single ERC1155 Batch payment: {} {}",
@@ -1081,9 +1078,7 @@ export function commandLineTaskPaymentS2M(): void {
                 imaState.idToken &&
                 imaState.idToken !== null &&
                 imaState.idToken !== undefined &&
-                imaState.nAmountOfToken &&
-                imaState.nAmountOfToken !== null &&
-                imaState.nAmountOfToken !== undefined &&
+                imaState.nAmountOfToken.gte( owaspUtils.toBN( 0 ) ) &&
                 ( ( !imaState.idTokens ) ||
                     imaState.idTokens === null ||
                     imaState.idTokens === undefined ) &&
@@ -1132,12 +1127,10 @@ export function commandLineTaskPaymentS2M(): void {
                 imaState.arrAmountsOfTokens &&
                 imaState.arrAmountsOfTokens !== null &&
                 imaState.arrAmountsOfTokens !== undefined &&
-                ( !imaState.idToken ||
+                ( ( !imaState.idToken ) ||
                     imaState.idToken === null ||
                     imaState.idToken === undefined ) &&
-                ( !imaState.nAmountOfToken ||
-                    imaState.nAmountOfToken === null ||
-                    imaState.nAmountOfToken === undefined )
+                imaState.nAmountOfToken.lte( owaspUtils.toBN( 0 ) )
             ) {
                 // ERC1155 payment
                 log.information( "one S->M single ERC1155 payment: {} {}",
@@ -1305,9 +1298,7 @@ export function commandLineTaskPaymentS2S(): void {
                 imaState.idToken &&
                 imaState.idToken !== null &&
                 imaState.idToken !== undefined &&
-                imaState.nAmountOfToken &&
-                imaState.nAmountOfToken !== null &&
-                imaState.nAmountOfToken !== undefined &&
+                imaState.nAmountOfToken.gte( owaspUtils.toBN( 0 ) ) &&
                 ( ( !imaState.idTokens ) ||
                     imaState.idTokens === null ||
                     imaState.idTokens === undefined ) &&
@@ -1346,12 +1337,10 @@ export function commandLineTaskPaymentS2S(): void {
                 imaState.arrAmountsOfTokens &&
                 imaState.arrAmountsOfTokens !== null &&
                 imaState.arrAmountsOfTokens !== undefined &&
-                ( !imaState.idToken ||
+                ( ( !imaState.idToken ) ||
                     imaState.idToken === null ||
                     imaState.idToken === undefined ) &&
-                ( !imaState.nAmountOfToken ||
-                    imaState.nAmountOfToken === null ||
-                    imaState.nAmountOfToken === undefined )
+                imaState.nAmountOfToken.lte( owaspUtils.toBN( 0 ) )
             ) {
                 // ERC1155 Batch payment
                 log.information( "one S->S single ERC1155 Batch payment: {} {}",
