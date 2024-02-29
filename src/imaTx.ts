@@ -139,8 +139,20 @@ export async function dryRunCall(
             callOpts.gasPrice = owaspUtils.toBN( gasPrice ).toHexString();
         if( gasValue )
             callOpts.gasLimit = owaspUtils.toBN( gasValue ).toHexString();
-        if( weiHowMuch )
-            callOpts.value = owaspUtils.toBN( weiHowMuch ).toHexString();
+        if( weiHowMuch ) {
+            const bnWeiHowMuch = owaspUtils.toBN( weiHowMuch );
+            if( bnWeiHowMuch.gt( owaspUtils.toBN( 0 ) ) )
+                callOpts.value = bnWeiHowMuch.toHexString();
+            else
+                callOpts.value = 0;
+        } else if( callOpts.value ) {
+            // just beautify it and make it more friendly to Transaction Manager
+            const bnWeiHowMuch = owaspUtils.toBN( callOpts.value );
+            if( bnWeiHowMuch.gt( owaspUtils.toBN( 0 ) ) )
+                callOpts.value = bnWeiHowMuch.toHexString();
+            else
+                callOpts.value = 0;
+        }
         const joDryRunResult =
             await joContract.callStatic[strMethodName]( ...arrArguments, callOpts );
         details.trace( "{p}dry-run success: {}", strLogPrefix, joDryRunResult );
@@ -165,8 +177,20 @@ async function payedCallPrepare( optsPayedCall: TRunTimePayedCallOptions ): Prom
             owaspUtils.toBN( optsPayedCall.estimatedGas ).toHexString();
     }
     if( optsPayedCall.weiHowMuch ) {
-        optsPayedCall.callOpts.value =
-            owaspUtils.toBN( optsPayedCall.weiHowMuch ).toHexString();
+        const bnWeiHowMuch = owaspUtils.toBN( optsPayedCall.weiHowMuch );
+        if( bnWeiHowMuch.gt( owaspUtils.toBN( 0 ) ) )
+            optsPayedCall.callOpts.value = bnWeiHowMuch.toHexString();
+        else {
+            optsPayedCall.callOpts.value =
+                owaspUtils.toBN( optsPayedCall.weiHowMuch ).toHexString();
+        }
+    } else if( optsPayedCall.callOpts.value ) {
+        // just beautify it and make it more friendly to Transaction Manager
+        const bnWeiHowMuch = owaspUtils.toBN( optsPayedCall.callOpts.value );
+        if( bnWeiHowMuch.gt( owaspUtils.toBN( 0 ) ) )
+            optsPayedCall.callOpts.value = bnWeiHowMuch.toHexString();
+        else
+            optsPayedCall.callOpts.value = 0;
     }
     optsPayedCall.details.trace(
         "{p}payed-call of action {bright} will do payed-call {p} with call options {} " +
@@ -211,6 +235,12 @@ async function payedCallTM( optsPayedCall: TRunTimePayedCallOptions ): Promise<a
         delete txAdjusted.chainId;
     const { chainId } = await optsPayedCall.ethersProvider.getNetwork();
     txAdjusted.chainId = chainId;
+    if( "value" in txAdjusted && txAdjusted.value ) {
+        // just beautify it and make it more friendly to Transaction Manager
+        const bnWeiHowMuch = owaspUtils.toBN( txAdjusted.value );
+        if( bnWeiHowMuch.eq( owaspUtils.toBN( 0 ) ) )
+            txAdjusted.value = 0;
+    }
     optsPayedCall.details.trace( "{p}Adjusted transaction: {}", optsPayedCall.strLogPrefix,
         txAdjusted );
     if( redis == null )
@@ -723,8 +753,20 @@ export class TransactionCustomizer {
                 callOpts.gasPrice = owaspUtils.toBN( gasPrice ).toHexString();
             if( gasValueRecommended )
                 callOpts.gasLimit = owaspUtils.toBN( gasValueRecommended ).toHexString();
-            if( weiHowMuch )
-                callOpts.value = owaspUtils.toBN( weiHowMuch ).toHexString();
+            if( weiHowMuch ) {
+                const bnWeiHowMuch = owaspUtils.toBN( weiHowMuch );
+                if( bnWeiHowMuch.gt( owaspUtils.toBN( 0 ) ) )
+                    callOpts.value = bnWeiHowMuch.toHexString();
+                else
+                    callOpts.value = owaspUtils.toBN( weiHowMuch ).toHexString();
+            } else if( callOpts.value ) {
+                // just beautify it and make it more friendly to Transaction Manager
+                const bnWeiHowMuch = owaspUtils.toBN( callOpts.value );
+                if( bnWeiHowMuch.gt( owaspUtils.toBN( 0 ) ) )
+                    callOpts.value = bnWeiHowMuch.toHexString();
+                else
+                    callOpts.value = 0;
+            }
             details.trace( "Call options for estimate-gas {}", callOpts );
             estimatedGas = await joContract.estimateGas[strMethodName]( ...arrArguments, callOpts );
             details.success( "{p}estimate-gas success: {}", strLogPrefix, estimatedGas );
