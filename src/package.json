@@ -1,0 +1,56 @@
+{
+    "name": "skale-ima-agent-app",
+    "license": "AGPL-3.0",
+    "author": "SKALE Labs and contributors",
+    "type": "module",
+    "scripts": {
+        "build": "./node_modules/typescript/bin/tsc && cp -f ./pow ./build/pow",
+        "rebuild": "yarn clean-build && yarn build",
+        "clean-build": "rm -rf ./src/build/* || true",
+        "lint-check": "eslint -c .eslintrc.cjs ./*.ts",
+        "lint-fix": "eslint -c .eslintrc.cjs ./*.ts --fix",
+        "check-outdated": "yarn outdated",
+        "upgrade-to-latest": "yarn upgrade --latest"
+    },
+    "dependencies": {
+        "ethers": "^5.7.2",
+        "@ethersproject/experimental": "^5.7.0",
+        "solc": "0.8.6",        
+        "uuid": "^9.0.0",
+        "@types/uuid": "^9.0.7",
+        "express": "^4.18.2",
+        "@types/express": "^4.17.21",
+        "body-parser": "^1.20.1",
+        "@types/body-parser": "^1.19.5",
+        "jayson": "^4.0.0",
+        "ws": "^8.15.0 ",
+        "@types/ws": "^8.5.10",
+        "urllib": "^3.21.0",
+        "sha3": "2.1.4",
+        "serve-static": "^1.15.0",
+        "shelljs": "^0.8.5",
+        "@types/shelljs": "^0.8.15",
+        "connect": "^3.7.0",
+        "ethereum-multicall": "^2.16.1",
+        "ioredis": "^5.0.0",
+        "@types/ioredis": "^4.28.2",
+        "ethereumjs-util": "^7.1.5",
+        "ethereumjs-wallet": "^1.0.2"
+    },
+    "devDependencies": {
+        "eslint": "^8.53.0",
+        "eslint-config-standard-with-typescript": "^39.1.1",
+        "eslint-config-standard": "^17.1.0",
+        "eslint-plugin-import": "^2.29.0",
+        "eslint-plugin-node": "^11.1.0",
+        "eslint-plugin-promise": "^6.1.1",
+        "eslint-plugin-standard": "^4.0.1",
+        "eslint-plugin-n": "^16.3.0",
+        "typescript": "^5.3.3",
+        "@typescript-eslint/eslint-plugin": "^6.14.0"
+    },
+    "resolutions": {
+    }
+}
+
+

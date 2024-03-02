@@ -1,0 +1,292 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Build and test
+
+on:
+  push:
+    branches-ignore:
+      - 'docs-v*'
+  pull_request:
+    branches-ignore:
+      - 'docs-v*'
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  test-agent:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+      with:
+          submodules: recursive
+
+    - uses: oven-sh/setup-bun@v1
+
+    - name: System Version Checks
+      run: |
+        echo ------------ GIT_CURRENT_BRANCH
+        export GIT_CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+        echo $GIT_CURRENT_BRANCH
+        echo ------------ GIT_SYMBOLIC_BRANCH
+        export GIT_SYMBOLIC_BRANCH=$(git symbolic-ref --short HEAD)
+        echo $GIT_SYMBOLIC_BRANCH
+        echo ------------ GITHUB_WORKFLOW
+        echo $GITHUB_WORKFLOW
+        echo ------------ GITHUB_RUN_ID
+        echo $GITHUB_RUN_ID
+        echo ------------ GITHUB_RUN_NUMBER
+        echo $GITHUB_RUN_NUMBER
+        echo ------------ GITHUB_ACTION
+        echo $GITHUB_ACTION
+        echo ------------ GITHUB_ACTIONS
+        echo $GITHUB_ACTIONS
+        echo ------------ GITHUB_ACTOR
+        echo $GITHUB_ACTOR
+        echo ------------ GITHUB_REPOSITORY
+        echo $GITHUB_REPOSITORY
+        echo ------------ GITHUB_EVENT_NAME
+        echo $GITHUB_EVENT_NAME
+        echo ------------ GITHUB_EVENT_PATH
+        echo $GITHUB_EVENT_PATH
+        echo ------------ GITHUB_WORKSPACE
+        echo $GITHUB_WORKSPACE
+        echo ------------ GITHUB_SHA
+        echo $GITHUB_SHA
+        echo ------------ GITHUB_REF
+        echo $GITHUB_REF
+        echo ------------ GITHUB_HEAD_REF
+        echo $GITHUB_HEAD_REF
+        echo ------------ GITHUB_BASE_REF
+        echo $GITHUB_BASE_REF
+        echo ------------ user
+        echo $USER
+        echo ------------ home
+        echo $HOME
+        echo ------------ path
+        echo $PATH
+        echo ------------ pwd
+        pwd
+        echo ------------ unix name - a
+        uname -a || true
+        echo ------------ unix name - r
+        uname -r || true
+        echo ------------ lsb
+        lsb_release -a || true
+        echo ------------ hostnamectl
+        hostnamectl || true
+        echo ------------ /etc/os-release
+        cat /etc/os-release || true
+        echo ------------ /proc/version
+        cat /proc/version || true
+        echo ------------ lscpu
+        lscpu || true
+
+    - name: INIT - install needed utilities
+      run: |
+        sudo apt-get install -y jq sed
+
+    - name: INIT - install Node JS
+      run: |
+        curl -sL https://deb.nodesource.com/setup_18.x | sudo bash -
+        sudo apt-get install -y nodejs
+        sudo ln -s /usr/bin/node /usr/local/bin/node || true
+        
+    - name: INIT - install Node utilities
+      run: |
+        sudo npm install --global npm
+        sudo npm install --global color-support
+        sudo npm install --global yarn
+        sudo npm install --global node-gyp
+
+    - name: INIT - version checks of Node JS and its utilities
+      run: |
+        which node
+        node --version
+        which npx
+        npx --version
+        which npm
+        npm --version
+        which yarn
+        yarn --version
+        which node-gyp
+        node-gyp --version
+
+    - name: INIT - version checks of Bun SH
+      run: |
+        which bun
+        bun --version
+
+    - name: Install ESLINT
+      run: |
+        sudo npm install -g eslint
+        eslint --version
+
+    - name: Install all NPMs at root
+      run: |
+        yarn install
+        ls -1
+
+    - name: JS Lint Check src
+      run: |
+        yarn run lint-check
+        echo "Looks like no JS code formatting errors so far)"
+    
+    - name: JS Lint Check network-browser
+      run: |
+        yarn run lint-nb
+
+    - name: Python Version Checks
+      run: |
+        echo ------------ python version check
+        which python || echo "----> Looks like python was not installed, next command will fail"
+        python --version
+        echo ------------ python3 version check
+        which python3 || echo "----> Looks like python3 was not installed, next command will fail"
+        python3 --version
+
+    - name: Install Python Prerequisites
+      run: |
+        echo ------------ py3 installs
+        sudo apt-get install -y python3-pip python3-setuptools python3-dev
+        echo ------------ py3 wheel - apt
+        sudo apt-get install -y python3-wheel
+        echo ------------ py3 wheel - pip
+        pip3 install wheel
+        # echo ------------ slither analyzer install
+        # #pip3 install slither-analyzer==0.8.3
+        # pip3 install -r IMA/proxy/scripts/requirements.txt
+        # echo ------------ slither search attempt
+        # sudo find / -name slither || true
+        # echo ------------ slither location detection - after install
+        # export PATH=$PATH:/home/$USER/.local/bin
+        # which slither || echo "----> Looks like slither was not installed, next command will fail"
+        # echo ------------ slither version check - after install
+        # slither --version || true
+
+  test-integration:
+    runs-on: ubuntu-latest
+
+    env:
+      working-directory: ./test
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+          submodules: recursive
+    
+    - uses: oven-sh/setup-bun@v1
+
+    - name: Get yarn cache directory path
+      id: yarn-cache-dir-path
+      run: echo "::set-output name=dir::$(yarn cache dir)"
+
+    - uses: actions/cache@v2
+      id: yarn-cache
+      with:
+        path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-yarn-
+
+    - uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: INIT - install Node JS
+      run: |
+        curl -sL https://deb.nodesource.com/setup_18.x | sudo bash -
+        sudo apt-get install -y nodejs
+        sudo ln -s /usr/bin/node /usr/local/bin/node || true
+        
+    - name: INIT - install Node utilities
+      run: |
+        sudo npm install --global npm
+        sudo npm install --global color-support
+        sudo npm install --global yarn
+        sudo npm install --global node-gyp
+
+    - name: INIT - version checks of Node JS and its utilities
+      run: |
+        which node
+        node --version
+        which npx
+        npx --version
+        which npm
+        npm --version
+        which yarn
+        yarn --version
+        which node-gyp
+        node-gyp --version
+
+    - name: INIT - version checks of Bun SH
+      run: |
+        which bun
+        bun --version
+
+    - name: Install Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: Install all NPMs in src
+      working-directory: ./src
+      run: |
+        yarn install
+
+    - name: INIT - build IMA
+      working-directory: ./src
+      run: |
+        yarn rebuild
+
+    - name: Compile contracts
+      working-directory: ./IMA/proxy
+      run: |
+        yarn install
+
+    - name: Install all NPMs in test
+      working-directory: ./test
+      run: |
+        yarn install
+
+    - name: Start background ganache
+      working-directory: ./IMA/proxy
+      run: |
+        npx ganache --miner.blockGasLimit 12000000 --logging.quiet --chain.allowUnlimitedContractSize --wallet.defaultBalance 2000000 --wallet.accountKeysPath ../../test/accounts.json &
+        sleep 3
+        echo "Content of \"accounts.json\" is:"
+        cat ../../test/accounts.json | jq
+
+    - name: Prepare test (PY part)
+      working-directory: ./test
+      run: |
+        python3 ../scripts/config_from_accounts.py accounts.json config.json
+        echo "Content of \"config.json\" is:"
+        cat config.json | jq
+        export PRIVATE_KEY_FOR_ETHEREUM=$( cat config.json | jq -M .PRIVATE_KEY_FOR_ETHEREUM | tr -d '"' | sed -e "s/^0x//" )
+        echo "Value of \"PRIVATE_KEY_FOR_ETHEREUM\" is" $PRIVATE_KEY_FOR_ETHEREUM
+        export PRIVATE_KEY_FOR_SCHAIN=$( cat config.json | jq -M .PRIVATE_KEY_FOR_SCHAIN | tr -d '"' | sed -e "s/^0x//" ) 
+        echo "Value of \"PRIVATE_KEY_FOR_SCHAIN\" is" $PRIVATE_KEY_FOR_SCHAIN
+        pip3 install -r requirements.txt
+
+    - name: Run test (PY part)
+      working-directory: ./test
+      run: |
+        export URL_W3_ETHEREUM="http://127.0.0.1:8545"
+        export URL_W3_S_CHAIN="http://127.0.0.1:8545"
+        python3 test.py
+
+    - name: Prepare test (JS part)
+      working-directory: ./test
+      run: |
+        yarn install
+
+    - name: Run test (JS part)
+      working-directory: ./test
+      run: |
+        yarn test
