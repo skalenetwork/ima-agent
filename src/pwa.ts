@@ -30,6 +30,18 @@ import * as imaUtils from "./utils.js";
 import type * as state from "./state.js";
 import type * as discoveryTools from "./discoveryTools.js";
 import * as owaspUtils from "./owaspUtils.js";
+import type * as rpcCallFormats from "./rpcCallFormats.js";
+
+export interface TRPCInputIMANotifyLoopWork extends rpcCallFormats.TRPCInputBasicFields {
+    params: {
+        nNodeNumber: number
+        strLoopWorkType: string
+        nIndexS2S: number
+        isStart: boolean
+        ts: number
+        signature: imaBLS.TSignResult | null
+    }
+}
 
 function computeWalkNodeIndices( nNodeNumber: number, nNodesCount: number ): number[] {
     if( nNodeNumber === null || nNodeNumber === undefined ||
@@ -164,7 +176,7 @@ export async function checkOnLoopStart(
 
 export async function handleLoopStateArrived(
     imaState: state.TIMAState, nNodeNumber: number, strLoopWorkType: string, nIndexS2S: number,
-    isStart: boolean, ts: any, signature: any
+    isStart: boolean, ts: number, signature: any
 ): Promise<boolean> {
     const se = isStart ? "start" : "end";
     let isSuccess = false;
@@ -239,7 +251,8 @@ async function notifyOnLoopImpl(
         const strMessageHash = imaBLS.keccak256ForPendingWorkAnalysis(
             owaspUtils.toInteger( imaState.nNodeNumber ),
             strLoopWorkType, isStart, nUtcUnixTimeStamp );
-        const signature = await imaBLS.doSignReadyHash( strMessageHash, imaState.isPrintPWA );
+        const signature: imaBLS.TSignResult | null =
+            await imaBLS.doSignReadyHash( strMessageHash, imaState.isPrintPWA );
         await handleLoopStateArrived(
             imaState, imaState.nNodeNumber, strLoopWorkType,
             nIndexS2S, isStart, nUtcUnixTimeStamp, signature
@@ -263,7 +276,7 @@ async function notifyOnLoopImpl(
                     } );
             if( !joCall )
                 return false;
-            const joIn: any = {
+            const joIn: TRPCInputIMANotifyLoopWork = {
                 method: "skale_imaNotifyLoopWork",
                 params: {
                     nNodeNumber: owaspUtils.toInteger( imaState.nNodeNumber ),

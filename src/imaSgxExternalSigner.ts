@@ -2,12 +2,21 @@ import * as fs from "fs";
 import * as log from "./log.js";
 import * as owaspUtils from "./owaspUtils.js";
 import * as rpcCall from "./rpcCall.js";
+import type * as rpcCallFormats from "./rpcCallFormats.js";
 
 const gIsDebugLogging = false; // development option only, must be always false
 log.addStdout();
 
 // allow self-signed wss and https
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
+export interface TRPCInputECDSASignMessageHash extends rpcCallFormats.TRPCInputBasicFields {
+    params: {
+        keyName: string
+        messageHash: string
+        base: number
+    }
+}
 
 function finalizeOutput( jo: any ): void {
     if( !jo )
@@ -95,7 +104,7 @@ async function run(): Promise<void> {
         const joCall: rpcCall.TRPCCall = await rpcCall.create( strSgxWalletURL, rpcCallOpts );
         if( !joCall )
             throw new Error( `Failed to create JSON RPC call object to ${strSgxWalletURL}` );
-        const joIn: any = {
+        const joIn: TRPCInputECDSASignMessageHash = {
             method: "ecdsaSignMessageHash",
             params: {
                 keyName: strSgxKeyName.toString(),
@@ -103,7 +112,7 @@ async function run(): Promise<void> {
                 base: 16
             }
         };
-        const joOut: any = await joCall.call( joIn );
+        const joOut = await joCall.call( joIn );
         try {
             if( gIsDebugLogging )
                 log.debug( "SGX wallet ECDSA sign result is: {}", joOut );

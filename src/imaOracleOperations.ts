@@ -33,7 +33,7 @@ import type * as state from "./state.js";
 import type * as IMA from "./imaCore.js";
 
 export type TFunctionSignMsgOracle =
-    ( u256: owaspUtils.ethersMod.BigNumber,
+    ( u256: owaspUtils.ethersMod.BigNumber | string,
         details: log.TLogger,
         fnAfter: IMA.TFunctionAfterSigningMessages
     ) => Promise <void>;
@@ -285,7 +285,7 @@ export async function doOracleGasPriceSetup(
         optsGasPriceSetup.details.trace( "{p}Using internal u256 signing stub function",
             optsGasPriceSetup.strLogPrefix );
         optsGasPriceSetup.fnSignMsgOracle =
-            async function( u256: owaspUtils.ethersMod.BigNumber, details: log.TLogger,
+            async function( u256: owaspUtils.ethersMod.BigNumber | string, details: log.TLogger,
                 fnAfter: IMA.TFunctionAfterSigningMessages ): Promise<void> {
                 details.trace( "{p}u256 signing callback was not provided",
                     optsGasPriceSetup.strLogPrefix );

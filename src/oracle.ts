@@ -28,6 +28,8 @@ import * as rpcCall from "./rpcCall.js";
 import * as threadInfo from "./threadInfo.js";
 import * as owaspUtils from "./owaspUtils.js";
 import * as sha3Module from "sha3";
+import type * as rpcCallFormats from "./rpcCallFormats.js";
+
 const Keccak: any = sha3Module.Keccak;
 export const gConstMinPowResultLimit: number = 10000;
 export const gConstMaxPowResultLimit: number = 100000;
@@ -138,7 +140,8 @@ async function handleOracleSubmitRequestResult(
         if( nMillisecondsToSleep > 0 )
             await threadInfo.sleep( nMillisecondsToSleep );
         try {
-            const joIn: any = { method: "oracle_checkResult", params: [ joOut.result ] };
+            const joIn: rpcCallFormats.TRPCInputBasicFieldsWithArray =
+                { method: "oracle_checkResult", params: [ joOut.result ] };
             if( isVerboseTraceDetails ) {
                 details.debug( "RPC call oracle_checkResult attempt {} " +
                     "of {}...", idxAttempt, cntAttempts );
@@ -186,10 +189,11 @@ export async function oracleGetGasPrice(
             "\"post\":\"{\\\"jsonrpc\\\":\\\"2.0\\\"," +
             "\\\"method\\\":\\\"eth_gasPrice\\\",\\\"params\\\":[],\\\"id\\\":1}\"",
             details, isVerbose );
-        const joIn: any = { method: "oracle_submitRequest", params: [ s ] };
+        const joIn: rpcCallFormats.TRPCInputBasicFieldsWithArray =
+            { method: "oracle_submitRequest", params: [ s ] };
         if( isVerboseTraceDetails )
             details.debug( "RPC call {} is {}", "oracle_submitRequest", joIn );
-        const joOut: any = await joCall.call( joIn );
+        const joOut = await joCall.call( joIn );
         gp = await handleOracleSubmitRequestResult(
             oracleOpts, details, isVerboseTraceDetails, joCall, joIn, joOut );
         await joCall.disconnect();

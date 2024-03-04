@@ -6,6 +6,27 @@ export type TAddress = string;
 export type TBalance = owaspUtils.ethersMod.BigNumber;
 export type TTokenID = string;
 
+export interface TQAInformation {
+    skaledNumber: number
+    sequenceId: string
+    ts: string
+}
+
+export interface TIMAMessage {
+    sender: TAddress
+    destinationContract: TAddress
+    data: string
+    savedBlockNumberForOptimizations?: number
+}
+
+export interface TIMAOutgoingMessage {
+    dstChainHash: string
+    msgCounter: number
+    srcContract: TAddress
+    dstContract: TAddress
+    data: string
+}
+
 export interface TLoopStateSubPart {
     isInProgress: boolean
     wasInProgress: boolean

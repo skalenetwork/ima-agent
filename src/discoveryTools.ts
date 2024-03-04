@@ -30,6 +30,17 @@ import * as imaUtils from "./utils.js";
 import * as threadInfo from "./threadInfo.js";
 import * as owaspUtils from "./owaspUtils.js";
 import type * as clpTools from "./clpTools.js";
+import type * as rpcCallFormats from "./rpcCallFormats.js";
+
+export interface TRPCOutputFieldsDiscoverSkaleImaInfoResult {
+    result: TNodeImaInfo
+    error?: string
+}
+
+export interface TRPCOutputFieldsDiscoverSChainNetworkInfo {
+    result: TSChainNetworkInfo
+    error?: string
+}
 
 export type TFunctionAfterDiscovery = (
     err?: Error | string | null,
@@ -447,7 +458,9 @@ export async function continueSChainDiscoveryInBackgroundIfNeeded(
 
 function handleDiscoverSkaleImaInfoResult(
     optsDiscover: TDiscoveryOptions, strNodeDescColorized: string,
-    joNode: any, joCall: rpcCall.TRPCCall, joIn: any, joOut: any
+    joNode: TSChainNode, joCall: rpcCall.TRPCCall,
+    joIn: rpcCallFormats.TRPCInputBasicFieldsWithParams,
+    joOut: TRPCOutputFieldsDiscoverSkaleImaInfoResult
 ): void {
     joNode.imaInfo = joOut.result;
     if( isSChainNodeFullyDiscovered( joNode ) )
@@ -463,7 +476,7 @@ async function discoverSChainWalkNodes( optsDiscover: TDiscoveryOptions ): Promi
     optsDiscover.cntFailed = 0;
     for( let i = 0; i < optsDiscover.cntNodes; ++i ) {
         const nCurrentNodeIdx = owaspUtils.toInteger( i );
-        const joNode = optsDiscover.jarrNodes[nCurrentNodeIdx];
+        const joNode: TSChainNode = optsDiscover.jarrNodes[nCurrentNodeIdx];
         const strNodeURL = imaUtils.composeSChainNodeUrl( joNode );
         const strNodeDescColorized = log.fmtAttention( "#{}({url})", nCurrentNodeIdx, strNodeURL );
         if( !optsDiscover.isSilentReDiscovery ) {
@@ -493,10 +506,11 @@ async function discoverSChainWalkNodes( optsDiscover: TDiscoveryOptions ): Promi
             joCall = await rpcCall.create( strNodeURL, rpcCallOpts );
             if( !joCall )
                 throw new Error( `Failed to create JSON RPC call object to ${strNodeURL}` );
-            const joIn: any = { method: "skale_imaInfo", params: { } };
+            const joIn: rpcCallFormats.TRPCInputBasicFieldsWithParams =
+                { method: "skale_imaInfo", params: { } };
             if( isSendImaAgentIndex() )
                 joIn.params.fromImaAgentIndex = optsDiscover.imaState.nNodeNumber;
-            const joOut = await joCall.call( joIn );
+            const joOut: TRPCOutputFieldsDiscoverSkaleImaInfoResult = await joCall.call( joIn );
             handleDiscoverSkaleImaInfoResult(
                 optsDiscover, strNodeDescColorized, joNode, joCall, joIn, joOut );
         } catch ( err ) {
@@ -582,7 +596,10 @@ async function discoverSChainWait( optsDiscover: TDiscoveryOptions ): Promise<vo
 
 async function handleDiscoverSkaleNodesRpcInfoResult(
     optsDiscover: TDiscoveryOptions, scURL: string,
-    joCall: rpcCall.TRPCCall, joIn: any, joOut: any ): Promise<boolean> {
+    joCall: rpcCall.TRPCCall,
+    joIn: rpcCallFormats.TRPCInputBasicFieldsWithParams,
+    joOut: TRPCOutputFieldsDiscoverSChainNetworkInfo
+): Promise<boolean> {
     if( !optsDiscover.isSilentReDiscovery ) {
         log.trace( "{p}OK, got (own) S-Chain network information: {}",
             optsDiscover.strLogPrefix, joOut.result );
@@ -653,12 +670,12 @@ async function handleDiscoverSkaleNodesRpcInfoResult(
 
 export async function discoverSChainNetwork(
     fnAfter: TFunctionAfterDiscovery | null, isSilentReDiscovery: boolean,
-    joPrevSChainNetworkInfo: any, nCountToWait: number
+    joPrevSChainNetworkInfo: TSChainNetworkInfo | null, nCountToWait: number
 ): Promise<TSChainNetworkInfo | null> {
     const optsDiscover: TDiscoveryOptions = {
         fnAfter,
         isSilentReDiscovery: ( !!isSilentReDiscovery ),
-        joPrevSChainNetworkInfo: joPrevSChainNetworkInfo || null,
+        joPrevSChainNetworkInfo: joPrevSChainNetworkInfo ?? null,
         nCountToWait,
         imaState: state.get(),
         strLogPrefix: "S-Chain network discovery: ",
@@ -682,10 +699,11 @@ export async function discoverSChainNetwork(
         joCall = await rpcCall.create( scURL, rpcCallOpts );
         if( !joCall )
             throw new Error( `Failed to create JSON RPC call object to ${scURL}` );
-        const joIn: any = { method: "skale_nodesRpcInfo", params: { } };
+        const joIn: rpcCallFormats.TRPCInputBasicFieldsWithParams =
+            { method: "skale_nodesRpcInfo", params: { } };
         if( isSendImaAgentIndex() )
             joIn.params.fromImaAgentIndex = optsDiscover.imaState.nNodeNumber;
-        const joOut = await joCall.call( joIn );
+        const joOut: TRPCOutputFieldsDiscoverSChainNetworkInfo = await joCall.call( joIn );
         await handleDiscoverSkaleNodesRpcInfoResult(
             optsDiscover, scURL, joCall, joIn, joOut
         ).catch( function( err: Error | string ): void {

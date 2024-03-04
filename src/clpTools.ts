@@ -41,6 +41,7 @@ import * as loop from "./loop.js";
 import * as imaUtils from "./utils.js";
 import * as imaBLS from "./bls.js";
 import type * as imaTx from "./imaTx.js";
+import type * as rpcCallFormats from "./rpcCallFormats.js";
 
 export async function registerAll( isPrintSummaryRegistrationCosts: boolean ): Promise < boolean > {
     if( !await registerStep1( false ) )
@@ -1643,7 +1644,10 @@ export function commandLineTaskLoopSimple(): void {
 }
 
 async function handleBrowseSkaleModesRpcInfoResult(
-    strLogPrefix: string, joCall: rpcCall.TRPCCall, joIn: any, joOut: any
+    strLogPrefix: string, joCall:
+    rpcCall.TRPCCall,
+    joIn: rpcCallFormats.TRPCInputBasicFieldsWithParams,
+    joOut: rpcCallFormats.TRPCOutputBasicFields
 ): Promise<void> {
     const imaState: state.TIMAState = state.get();
     log.information( "{p}S-Chain network information: {}",
@@ -1664,7 +1668,8 @@ async function handleBrowseSkaleModesRpcInfoResult(
             joCall = await rpcCall.create( strNodeURL, rpcCallOpts );
             if( !joCall )
                 throw new Error( `Failed to create JSON RPC call object to ${strNodeURL}` );
-            const jIn: any = { method: "skale_imaInfo", params: { } };
+            const jIn: rpcCallFormats.TRPCInputBasicFieldsWithParams =
+                { method: "skale_imaInfo", params: { } };
             if( discoveryTools.isSendImaAgentIndex() )
                 jIn.params.fromImaAgentIndex = imaState.nNodeNumber;
             const joOut = await joCall.call( joIn );
@@ -1708,7 +1713,8 @@ export function commandLineTaskBrowseSChain(): void {
                     throw new Error( "Failed to create JSON RPC call object " +
                         `to ${imaState.chainProperties.sc.strURL}` );
                 }
-                const joIn: any = { method: "skale_nodesRpcInfo", params: { } };
+                const joIn: rpcCallFormats.TRPCInputBasicFieldsWithParams =
+                    { method: "skale_nodesRpcInfo", params: { } };
                 if( discoveryTools.isSendImaAgentIndex() )
                     joIn.params.fromImaAgentIndex = imaState.nNodeNumber;
                 const joOut = await joCall.call( joIn );
