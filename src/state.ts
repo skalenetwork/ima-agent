@@ -6,6 +6,32 @@ export type TAddress = string;
 export type TBalance = owaspUtils.ethersMod.BigNumber;
 export type TTokenID = string;
 
+export interface TSameAsTransactionReceipt {
+    to: string
+    from: string
+    contractAddress: string
+    transactionIndex: number
+    root?: string
+    gasUsed: owaspUtils.ethersMod.BigNumber
+    logsBloom: string
+    blockHash: string
+    transactionHash: string
+    logs: owaspUtils.ethersMod.providers.Log[]
+    blockNumber: number
+    confirmations: number
+    cumulativeGasUsed: owaspUtils.ethersMod.BigNumber
+    effectiveGasPrice: owaspUtils.ethersMod.BigNumber
+    byzantium: boolean
+    type: number
+    status?: number
+}
+
+export interface TReceiptDescription {
+    description: string
+    "optsTransfer.detailsString": string
+    receipt: TSameAsTransactionReceipt
+}
+
 export interface TQAInformation {
     skaledNumber: number
     sequenceId: string
@@ -15,8 +41,10 @@ export interface TQAInformation {
 export interface TIMAMessage {
     sender: TAddress
     destinationContract: TAddress
+    to?: TAddress
+    amount?: number
     data: string
-    savedBlockNumberForOptimizations?: number
+    savedBlockNumberForOptimizations?: owaspUtils.ethersMod.BigNumber
 }
 
 export interface TIMAOutgoingMessage {
@@ -25,6 +53,9 @@ export interface TIMAOutgoingMessage {
     srcContract: TAddress
     dstContract: TAddress
     data: string
+    to?: TAddress
+    amount?: number
+    savedBlockNumberForOptimizations?: owaspUtils.ethersMod.BigNumber
 }
 
 export interface TLoopStateSubPart {

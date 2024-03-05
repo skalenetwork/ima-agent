@@ -289,7 +289,10 @@ export async function doOracleGasPriceSetup(
                 fnAfter: IMA.TFunctionAfterSigningMessages ): Promise<void> {
                 details.trace( "{p}u256 signing callback was not provided",
                     optsGasPriceSetup.strLogPrefix );
-                await fnAfter( null, [ u256 ], null ); // null - no error, null - no signatures
+                const s256: string = ( typeof u256 === "string" )
+                    ? u256
+                    : owaspUtils.ensureStartsWith0x( u256.toHexString() );
+                await fnAfter( null, [ s256 ], null ); // null - no error, null - no signatures
             };
     } else {
         optsGasPriceSetup.details.trace( "{p}Using externally provided u256 signing function",

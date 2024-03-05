@@ -1027,7 +1027,7 @@ async function prepareSignMessagesImpl(
             optsSignOperation.jarrMessages,
             optsSignOperation.nIdxCurrentMsgBlockStart,
             optsSignOperation.joExtraSignOpts );
-        await optsSignOperation.fn( null, optsSignOperation.jarrMessages );
+        await optsSignOperation.fn( null, optsSignOperation.jarrMessages, null );
         return true;
     }
     await checkCorrectnessOfMessagesToSign(
@@ -1474,7 +1474,7 @@ async function doSignMessagesImpl(
         // eslint-disable-next-line n/handle-callback-err
         fn: fn ?? async function(
             err: Error | string | null,
-            jarrMessages: state.TIMAMessage[],
+            jarrMessages: state.TIMAMessage[] | string[],
             joGlueResult: TBLSGlueResult | null
         ): Promise < void > {},
         bHaveResultReportCalled: false,

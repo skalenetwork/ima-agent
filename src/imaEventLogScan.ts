@@ -28,6 +28,7 @@ import * as owaspUtils from "./owaspUtils.js";
 import * as rpcCall from "./rpcCall.js";
 import * as imaHelperAPIs from "./imaHelperAPIs.js";
 import * as imaTransferErrorHandling from "./imaTransferErrorHandling.js";
+import { type TSameAsTransactionReceipt } from "./state.js";
 
 export interface TProgressivePlanAtom {
     nBlockFrom: owaspUtils.ethersMod.BigNumber
@@ -105,8 +106,8 @@ export async function safeGetPastEventsProgressive(
     attempts: number, joContract: owaspUtils.ethersMod.ethers.Contract, strEventName: string,
     nBlockFrom: owaspUtils.ethersMod.BigNumber,
     nBlockTo: owaspUtils.ethersMod.BigNumber | string,
-    joFilter: any
-): Promise<any[]> {
+    joFilter: owaspUtils.ethersMod.EventFilter
+): Promise< owaspUtils.ethersMod.Event[] > {
     const strURL = owaspUtils.ethersProviderToUrl( ethersProvider );
     details.information( "{p}Will run progressive logs search for event {} via URL {url}, " +
         "from block {}, to block...", strLogPrefix, strEventName, strURL, nBlockFrom, nBlockTo );
@@ -190,8 +191,8 @@ export async function getContractCallEvents(
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     joContract: owaspUtils.ethersMod.ethers.Contract, strEventName: string,
     nBlockNumber: owaspUtils.ethersMod.BigNumber,
-    strTxHash: string, joFilter: any
-): Promise<any[]> {
+    strTxHash: string, joFilter: owaspUtils.ethersMod.EventFilter
+): Promise< owaspUtils.ethersMod.Event[] > {
     joFilter = joFilter || {};
     nBlockNumber = owaspUtils.toBN( nBlockNumber );
     const n10 = owaspUtils.toBN( 10 );
@@ -207,7 +208,7 @@ export async function getContractCallEvents(
     const joAllEventsInBlock = await safeGetPastEventsIterative(
         details, strLogPrefix, ethersProvider, 10, joContract, strEventName,
         nBlockFrom, nBlockTo, joFilter );
-    const joAllTransactionEvents: any = [];
+    const joAllTransactionEvents: owaspUtils.ethersMod.Event[] = [];
     let i: number;
     for( i = 0; i < joAllEventsInBlock.length; ++i ) {
         const joEvent = joAllEventsInBlock[i];
@@ -266,8 +267,9 @@ export async function safeGetTransactionCount(
 export async function safeGetTransactionReceipt(
     details: log.TLogger, cntAttempts: number,
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
-    txHash: string, retValOnFail?: any, throwIfServerOffline?: boolean
-): Promise<any> {
+    txHash: string, retValOnFail?: TSameAsTransactionReceipt | null,
+    throwIfServerOffline?: boolean
+): Promise< TSameAsTransactionReceipt | null > {
     const strFnName = "getTransactionReceipt";
     const u = owaspUtils.ethersProviderToUrl( ethersProvider );
     const nWaitStepMilliseconds = 10 * 1000;
@@ -277,8 +279,8 @@ export async function safeGetTransactionReceipt(
         ? 1
         : owaspUtils.parseIntOrHex( cntAttempts );
     if( retValOnFail == null || retValOnFail == undefined )
-        retValOnFail = "";
-    let ret = retValOnFail;
+        retValOnFail = null;
+    let ret: TSameAsTransactionReceipt | null = retValOnFail;
     let idxAttempt = 1;
     for( ; idxAttempt <= cntAttempts; ++idxAttempt ) {
         const isOnLine = await rpcCall.checkUrl( u, nWaitStepMilliseconds );
@@ -315,9 +317,9 @@ export async function safeGetPastEvents(
     cntAttempts: number, joContract: owaspUtils.ethersMod.ethers.Contract, strEventName: string,
     nBlockFrom: owaspUtils.ethersMod.BigNumber,
     nBlockTo: owaspUtils.ethersMod.BigNumber | string,
-    joFilter: any,
-    retValOnFail?: any, throwIfServerOffline?: boolean
-): Promise<any> {
+    joFilter: owaspUtils.ethersMod.EventFilter,
+    retValOnFail?: owaspUtils.ethersMod.Event[], throwIfServerOffline?: boolean
+): Promise< owaspUtils.ethersMod.Event[] > {
     const u = owaspUtils.ethersProviderToUrl( ethersProvider );
     const nWaitStepMilliseconds = 10 * 1000;
     if( throwIfServerOffline == null || throwIfServerOffline == undefined )
@@ -326,7 +328,7 @@ export async function safeGetPastEvents(
         ? 1
         : owaspUtils.parseIntOrHex( cntAttempts );
     if( retValOnFail == null || retValOnFail == undefined )
-        retValOnFail = "";
+        retValOnFail = [];
     let ret = retValOnFail;
     const nLatestBlockNumber = owaspUtils.toBN(
         await imaHelperAPIs.safeGetBlockNumber( details, 10, ethersProvider ) );
@@ -378,7 +380,7 @@ export async function safeGetPastEvents(
             }
         }
     }
-    if( ( idxAttempt + 1 ) === cntAttempts && ret === "" ) {
+    if( ( idxAttempt + 1 ) === cntAttempts && ( !ret ) ) {
         details.error(
             "{p}Failed filtering attempt for {} event via {url}, from block {}, to block {} " +
             "after {} attempts", strLogPrefix, strEventName, u, nBlockFrom.toHexString(),
@@ -396,8 +398,8 @@ export async function safeGetPastEventsIterative(
     attempts: number, joContract: owaspUtils.ethersMod.ethers.Contract, strEventName: string,
     nBlockFrom: owaspUtils.ethersMod.BigNumber,
     nBlockTo: owaspUtils.ethersMod.BigNumber | string,
-    joFilter: any
-): Promise<any> {
+    joFilter: owaspUtils.ethersMod.EventFilter
+): Promise< owaspUtils.ethersMod.Event[] > {
     if( imaHelperAPIs.getBlocksCountInInIterativeStepOfEventsScan() <= 0 ||
         imaHelperAPIs.getMaxIterationsInAllRangeEventsScan() <= 0 ) {
         details.warning(
@@ -450,7 +452,7 @@ export async function safeGetPastEventsIterative(
             const joAllEventsInBlock = await safeGetPastEvents( details, strLogPrefix,
                 ethersProvider, attempts, joContract, strEventName,
                 idxBlockSubRangeFrom, idxBlockSubRangeTo, joFilter );
-            if( joAllEventsInBlock && joAllEventsInBlock != "" && joAllEventsInBlock.length > 0 ) {
+            if( joAllEventsInBlock && joAllEventsInBlock && joAllEventsInBlock.length > 0 ) {
                 details.success( "{p}Result of iterative scan in {}/{} block range is {}",
                     strLogPrefix, nBlockFrom.toHexString(), nBlockTo.toHexString(),
                     joAllEventsInBlock );
@@ -469,5 +471,5 @@ export async function safeGetPastEventsIterative(
     }
     details.debug( "{p}Result of iterative scan in {}/{} is {}", strLogPrefix,
         nBlockFrom.toHexString(), nBlockTo.toHexString(), "empty block range" );
-    return "";
+    return [];
 }
