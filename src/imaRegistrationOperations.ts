@@ -119,11 +119,6 @@ export async function checkIsRegisteredSChainInDepositBoxes( // step 1
     return false;
 }
 
-export interface TReceipt {
-    description: string
-    receipt: any
-}
-
 export async function registerSChainInDepositBoxes( // step 1
     ethersProviderMainNet: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     joLinker: owaspUtils.ethersMod.ethers.Contract | null,
@@ -140,9 +135,9 @@ export async function registerSChainInDepositBoxes( // step 1
     transactionCustomizerMainNet: imaTx.TransactionCustomizer,
     cntWaitAttempts?: number,
     nSleepMilliseconds?: number
-): Promise<TReceipt[]> {
+): Promise< state.TReceiptDescription[]> {
     const details = log.createMemoryStream();
-    const jarrReceipts: TReceipt[] = [];
+    const jarrReceipts: state.TReceiptDescription[] = [];
     details.debug( "Main-net Linker address is..........{}", joLinker ? joLinker.address : "N/A" );
     details.debug( "S-Chain ID is.......................{}", chainNameSChain );
     const strLogPrefix = "Reg S in depositBoxes: ";
@@ -194,11 +189,9 @@ export async function registerSChainInDepositBoxes( // step 1
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
-        const joReceipt = await imaTx.payedCall(
-            details, ethersProviderMainNet,
-            "Linker", joLinker, "connectSchain", arrArguments,
-            joAccountMN, strActionName,
-            gasPrice, estimatedGas );
+        const joReceipt: state.TSameAsTransactionReceipt = await imaTx.payedCall(
+            details, ethersProviderMainNet, "Linker", joLinker, "connectSchain", arrArguments,
+            joAccountMN, strActionName, gasPrice, estimatedGas );
         if( joReceipt ) {
             jarrReceipts.push( {
                 description: "registerSChainInDepositBoxes",

@@ -354,7 +354,7 @@ export async function payedCall(
     estimatedGas: owaspUtils.ethersMod.BigNumber,
     weiHowMuch?: owaspUtils.ethersMod.BigNumber,
     opts?: any
-): Promise<any> {
+): Promise<state.TSameAsTransactionReceipt> {
     const optsPayedCall: TRunTimePayedCallOptions = {
         details,
         ethersProvider,

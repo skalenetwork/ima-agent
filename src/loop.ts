@@ -38,6 +38,7 @@ import * as skaleObserver from "./observer.js";
 import * as pwa from "./pwa.js";
 import * as state from "./state.js";
 import type * as worker_threads from "worker_threads";
+import * as imaTx from "./imaTx.js";
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const __dirname: string = path.dirname( url.fileURLToPath( import.meta.url ) );
@@ -516,12 +517,13 @@ export async function runTransferLoop( optsLoop: TLoopOptions ): Promise<boolean
 const gArrWorkers: worker_threads.Worker[] = [];
 const gArrClients: networkLayer.OutOfWorkerSocketClientPipe[] = [];
 
-function constructChainProperties( opts: TParallelLoopRunOptions ): any {
+function constructChainProperties( opts: TParallelLoopRunOptions ): state.TPropertiesOfChains {
     return {
         mn: {
             joAccount: {
                 privateKey: opts.imaState.chainProperties.mn.joAccount.privateKey,
                 address_: opts.imaState.chainProperties.mn.joAccount.address_,
+                address: function(): string { return owaspUtils.fnAddressImpl_( this ); },
                 strTransactionManagerURL:
                     opts.imaState.chainProperties.mn.joAccount.strTransactionManagerURL,
                 nTmPriority: opts.imaState.chainProperties.mn.joAccount.nTmPriority,
@@ -536,12 +538,24 @@ function constructChainProperties( opts: TParallelLoopRunOptions ): any {
             strChainName: opts.imaState.chainProperties.mn.strChainName,
             chainId: opts.imaState.chainProperties.mn.chainId,
             joAbiIMA: opts.imaState.chainProperties.mn.joAbiIMA,
-            bHaveAbiIMA: opts.imaState.chainProperties.mn.bHaveAbiIMA
+            bHaveAbiIMA: opts.imaState.chainProperties.mn.bHaveAbiIMA,
+            transactionCustomizer: imaTx.getTransactionCustomizerForMainNet(),
+            strPathAbiJson: "",
+            joErc20: null,
+            joErc721: null,
+            joErc1155: null,
+            strCoinNameErc20: "", // in-JSON coin name
+            strCoinNameErc721: "", // in-JSON coin name
+            strCoinNameErc1155: "", // in-JSON coin name
+            strPathJsonErc20: "",
+            strPathJsonErc721: "",
+            strPathJsonErc1155: ""
         },
         sc: {
             joAccount: {
                 privateKey: opts.imaState.chainProperties.sc.joAccount.privateKey,
                 address_: opts.imaState.chainProperties.sc.joAccount.address_,
+                address: function(): string { return owaspUtils.fnAddressImpl_( this ); },
                 strTransactionManagerURL:
                     opts.imaState.chainProperties.sc.joAccount.strTransactionManagerURL,
                 nTmPriority: opts.imaState.chainProperties.sc.joAccount.nTmPriority,
@@ -556,12 +570,24 @@ function constructChainProperties( opts: TParallelLoopRunOptions ): any {
             strChainName: opts.imaState.chainProperties.sc.strChainName,
             chainId: opts.imaState.chainProperties.sc.chainId,
             joAbiIMA: opts.imaState.chainProperties.sc.joAbiIMA,
-            bHaveAbiIMA: opts.imaState.chainProperties.sc.bHaveAbiIMA
+            bHaveAbiIMA: opts.imaState.chainProperties.sc.bHaveAbiIMA,
+            transactionCustomizer: imaTx.getTransactionCustomizerForSChain(),
+            strPathAbiJson: "",
+            joErc20: null,
+            joErc721: null,
+            joErc1155: null,
+            strCoinNameErc20: "", // in-JSON coin name
+            strCoinNameErc721: "", // in-JSON coin name
+            strCoinNameErc1155: "", // in-JSON coin name
+            strPathJsonErc20: "",
+            strPathJsonErc721: "",
+            strPathJsonErc1155: ""
         },
         tc: {
             joAccount: {
                 privateKey: opts.imaState.chainProperties.tc.joAccount.privateKey,
                 address_: opts.imaState.chainProperties.tc.joAccount.address_,
+                address: function(): string { return owaspUtils.fnAddressImpl_( this ); },
                 strTransactionManagerURL:
                     opts.imaState.chainProperties.tc.joAccount.strTransactionManagerURL,
                 nTmPriority: opts.imaState.chainProperties.tc.joAccount.nTmPriority,
@@ -576,7 +602,18 @@ function constructChainProperties( opts: TParallelLoopRunOptions ): any {
             strChainName: opts.imaState.chainProperties.tc.strChainName,
             chainId: opts.imaState.chainProperties.tc.chainId,
             joAbiIMA: opts.imaState.chainProperties.tc.joAbiIMA,
-            bHaveAbiIMA: opts.imaState.chainProperties.tc.bHaveAbiIMA
+            bHaveAbiIMA: opts.imaState.chainProperties.tc.bHaveAbiIMA,
+            transactionCustomizer: imaTx.getTransactionCustomizerForSChainTarget(),
+            strPathAbiJson: "",
+            joErc20: null,
+            joErc721: null,
+            joErc1155: null,
+            strCoinNameErc20: "", // in-JSON coin name
+            strCoinNameErc721: "", // in-JSON coin name
+            strCoinNameErc1155: "", // in-JSON coin name
+            strPathJsonErc20: "",
+            strPathJsonErc721: "",
+            strPathJsonErc1155: ""
         }
     };
 }

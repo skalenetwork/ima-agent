@@ -679,7 +679,7 @@ async function callbackAllMessagesSign(
         isCheckTransactionToSchain:
             ( optsTransfer.chainNameDst !== "Mainnet" )
     };
-    const joReceipt = await imaTx.payedCall(
+    const joReceipt: state.TSameAsTransactionReceipt = await imaTx.payedCall(
         optsTransfer.details, optsTransfer.ethersProviderDst,
         "MessageProxy", optsTransfer.joMessageProxyDst,
         "postIncomingMessages", arrArgumentsPostIncomingMessages,
@@ -713,7 +713,7 @@ async function callbackAllMessagesSign(
                 const joEvents = await imaEventLogScan.getContractCallEvents(
                     optsTransfer.details, optsTransfer.strLogPrefixShort,
                     optsTransfer.ethersProviderDst, optsTransfer.joMessageProxyDst, strEventName,
-                    joReceipt.blockNumber, joReceipt.transactionHash,
+                    owaspUtils.toBN( joReceipt.blockNumber ), joReceipt.transactionHash,
                     optsTransfer.joMessageProxyDst.filters[strEventName]() );
                 if( joEvents.length == 0 ) {
                     optsTransfer.details.success(

@@ -28,7 +28,7 @@ export interface TSameAsTransactionReceipt {
 
 export interface TReceiptDescription {
     description: string
-    "optsTransfer.detailsString": string
+    "optsTransfer.detailsString"?: string
     receipt: TSameAsTransactionReceipt
 }
 

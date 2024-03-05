@@ -31,6 +31,7 @@ import * as imaGasUsage from "./imaGasUsageOperations.js";
 import * as imaTransferErrorHandling from "./imaTransferErrorHandling.js";
 import type * as state from "./state.js";
 import type * as IMA from "./imaCore.js";
+import { type TBLSGlueResult } from "./bls.js";
 
 export type TFunctionSignMsgOracle =
     ( u256: owaspUtils.ethersMod.BigNumber | string,
@@ -48,11 +49,11 @@ export interface TGasPriceSetupOptions {
     chainIdSChain: string
     fnSignMsgOracle: TFunctionSignMsgOracle
     details: log.TLogger
-    jarrReceipts: any[]
+    jarrReceipts: state.TReceiptDescription[]
     strLogPrefix: string
     strActionName: string
     latestBlockNumber: owaspUtils.ethersMod.BigNumber | null
-    latestBlock: any | null
+    latestBlock: owaspUtils.ethersMod.ethers.providers.Block | null
     bnTimestampOfBlock: owaspUtils.ethersMod.BigNumber | null
     bnTimeZoneOffset: owaspUtils.ethersMod.BigNumber | null
     gasPriceOnMainNet: string | null
@@ -161,7 +162,7 @@ async function prepareOracleGasPriceSetup(
 
 async function handleOracleSigned(
     optsGasPriceSetup: TGasPriceSetupOptions, strError: Error | string | null,
-    u256: owaspUtils.ethersMod.BigNumber, joGlueResult: any | null ): Promise<void> {
+    u256: owaspUtils.ethersMod.BigNumber, joGlueResult: TBLSGlueResult | null ): Promise<void> {
     if( strError ) {
         optsGasPriceSetup.details.critical(
             "{p}Error in doOracleGasPriceSetup() during {bright}: {err}",
@@ -231,12 +232,13 @@ async function handleOracleSigned(
     const opts: imaTx.TCustomPayedCallOptions = {
         isCheckTransactionToSchain: ( optsGasPriceSetup.chainIdSChain !== "Mainnet" )
     };
-    const joReceipt = await imaTx.payedCall( optsGasPriceSetup.details,
-        optsGasPriceSetup.ethersProviderSChain,
-        "CommunityLocker", optsGasPriceSetup.joCommunityLocker,
-        "setGasPrice", arrArgumentsSetGasPrice,
-        optsGasPriceSetup.joAccountSC, optsGasPriceSetup.strActionName,
-        gasPrice, estimatedGasSetGasPrice, undefined, opts );
+    const joReceipt: state.TSameAsTransactionReceipt =
+        await imaTx.payedCall( optsGasPriceSetup.details,
+            optsGasPriceSetup.ethersProviderSChain,
+            "CommunityLocker", optsGasPriceSetup.joCommunityLocker,
+            "setGasPrice", arrArgumentsSetGasPrice,
+            optsGasPriceSetup.joAccountSC, optsGasPriceSetup.strActionName,
+            gasPrice, estimatedGasSetGasPrice, undefined, opts );
     if( joReceipt ) {
         optsGasPriceSetup.jarrReceipts.push( {
             description: "doOracleGasPriceSetup/setGasPrice",
@@ -307,11 +309,11 @@ export async function doOracleGasPriceSetup(
             optsGasPriceSetup.details,
             async function(
                 strError: Error | string | null,
-                jarrMessages: any[], // u256: owaspUtils.ethersMod.BigNumber,
-                joGlueResult: any | null
+                jarrMessages: state.TIMAMessage[] | string[],
+                joGlueResult: TBLSGlueResult | null
             ): Promise<void> {
                 const u256: owaspUtils.ethersMod.BigNumber =
-                    jarrMessages[0] as owaspUtils.ethersMod.BigNumber;
+                    owaspUtils.toBN( jarrMessages[0] as string );
                 await handleOracleSigned( optsGasPriceSetup, strError, u256, joGlueResult );
             } );
     } catch ( err ) {

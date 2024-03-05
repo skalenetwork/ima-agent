@@ -79,7 +79,7 @@ export async function doEthPaymentFromMainNet(
     transactionCustomizerMainNet: imaTx.TransactionCustomizer
 ): Promise<boolean> {
     const details = log.createMemoryStream();
-    const jarrReceipts: any[] = [];
+    const jarrReceipts: state.TReceiptDescription[] = [];
     let strActionName = "";
     const strLogPrefix = "M2S ETH Payment: ";
     try {
@@ -109,7 +109,7 @@ export async function doEthPaymentFromMainNet(
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
-        const joReceipt = await imaTx.payedCall(
+        const joReceipt: state.TSameAsTransactionReceipt = await imaTx.payedCall(
             details, ethersProviderMainNet,
             "DepositBox", joDepositBox, "deposit", arrArguments,
             joAccountSrc, strActionName,
@@ -131,7 +131,7 @@ export async function doEthPaymentFromMainNet(
             const joEvents = await imaEventLogScan.getContractCallEvents(
                 details, strLogPrefix,
                 ethersProviderMainNet, joMessageProxyMainNet, strEventName,
-                joReceipt.blockNumber, joReceipt.transactionHash,
+                owaspUtils.toBN( joReceipt.blockNumber ), joReceipt.transactionHash,
                 joMessageProxyMainNet.filters[strEventName]()
             );
             if( joEvents.length > 0 ) {
@@ -177,7 +177,7 @@ export async function doEthPaymentFromSChain(
     transactionCustomizerSChain: imaTx.TransactionCustomizer
 ): Promise<boolean> {
     const details = log.createMemoryStream();
-    const jarrReceipts: any = [];
+    const jarrReceipts: state.TReceiptDescription[] = [];
     let strActionName = "";
     const strLogPrefix = "S2M ETH Payment: ";
     try {
@@ -208,7 +208,7 @@ export async function doEthPaymentFromSChain(
         const opts: imaTx.TCustomPayedCallOptions = {
             isCheckTransactionToSchain: true
         };
-        const joReceipt = await imaTx.payedCall(
+        const joReceipt: state.TSameAsTransactionReceipt = await imaTx.payedCall(
             details, ethersProviderSChain,
             "TokenManagerETH", joTokenManagerETH, "exitToMain", arrArguments,
             joAccountSrc, strActionName,
@@ -230,7 +230,7 @@ export async function doEthPaymentFromSChain(
             const joEvents = await imaEventLogScan.getContractCallEvents(
                 details, strLogPrefix,
                 ethersProviderSChain, joMessageProxySChain, strEventName,
-                joReceipt.blockNumber, joReceipt.transactionHash,
+                owaspUtils.toBN( joReceipt.blockNumber ), joReceipt.transactionHash,
                 joMessageProxySChain.filters[strEventName]()
             );
             if( joEvents.length > 0 ) {
@@ -265,7 +265,7 @@ export async function receiveEthPaymentFromSchainOnMainNet(
     transactionCustomizerMainNet: imaTx.TransactionCustomizer
 ): Promise<boolean> {
     const details = log.createMemoryStream();
-    const jarrReceipts: any = [];
+    const jarrReceipts: state.TReceiptDescription[] = [];
     let strActionName = "";
     const strLogPrefix = "M2S ETH Receive: ";
     try {
@@ -292,7 +292,7 @@ export async function receiveEthPaymentFromSchainOnMainNet(
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
-        const joReceipt = await imaTx.payedCall(
+        const joReceipt: state.TSameAsTransactionReceipt = await imaTx.payedCall(
             details, ethersProviderMainNet,
             "DepositBoxETH", joDepositBoxETH,
             "getMyEth", arrArguments,

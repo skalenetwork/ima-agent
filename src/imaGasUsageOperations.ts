@@ -25,6 +25,7 @@
 
 import * as log from "./log.js";
 import * as owaspUtils from "./owaspUtils.js";
+import type * as state from "./state.js";
 
 export interface TGasUsageReportEntry {
     sumGasUsed: owaspUtils.ethersMod.BigNumber
@@ -32,7 +33,7 @@ export interface TGasUsageReportEntry {
 }
 
 export function composeGasUsageReportFromArray(
-    strName: string, jarrReceipts: any[]
+    strName: string, jarrReceipts: state.TReceiptDescription[]
 ): TGasUsageReportEntry {
     if( !( strName && typeof strName === "string" && jarrReceipts ) )
         return { sumGasUsed: owaspUtils.toBN( 0 ), strReport: "N/A" };
@@ -53,7 +54,7 @@ export function composeGasUsageReportFromArray(
 }
 
 export function printGasUsageReportFromArray(
-    strName: string, jarrReceipts: any[], details?: log.TLoggerBase ): void {
+    strName: string, jarrReceipts: state.TReceiptDescription[], details?: log.TLoggerBase ): void {
     details = details ?? log;
     const jo: TGasUsageReportEntry = composeGasUsageReportFromArray( strName, jarrReceipts );
     if( jo.strReport && typeof jo.strReport === "string" && jo.strReport.length > 0 &&

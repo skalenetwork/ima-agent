@@ -32,7 +32,7 @@ import type * as state from "./state.js";
 export async function reimbursementShowBalance(
     ethersProviderMainNet: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     joCommunityPool: owaspUtils.ethersMod.Contract,
-    joReceiverMainNet: any,
+    joReceiverMainNet: state.TAddress,
     strChainNameMainNet: string,
     chainIdMainNet: string,
     transactionCustomizerMainNet: imaTx.TransactionCustomizer,
@@ -74,7 +74,7 @@ export async function reimbursementShowBalance(
 export async function reimbursementEstimateAmount(
     ethersProviderMainNet: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     joCommunityPool: owaspUtils.ethersMod.Contract,
-    joReceiverMainNet: any,
+    joReceiverMainNet: state.TAddress,
     strChainNameMainNet: string,
     chainIdMainNet: string,
     transactionCustomizerMainNet: imaTx.TransactionCustomizer,
@@ -168,7 +168,7 @@ export async function reimbursementWalletRecharge(
     nReimbursementRecharge: state.TBalance | null
 ): Promise<boolean> {
     const details = log.createMemoryStream();
-    const jarrReceipts: any = [];
+    const jarrReceipts: state.TReceiptDescription[] = [];
     let strActionName = "";
     const strLogPrefix = "Gas Reimbursement - Wallet Recharge ";
     try {
@@ -195,7 +195,7 @@ export async function reimbursementWalletRecharge(
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
-        const joReceipt = await imaTx.payedCall(
+        const joReceipt: state.TSameAsTransactionReceipt = await imaTx.payedCall(
             details, ethersProviderMainNet,
             "CommunityPool", joCommunityPool, "rechargeUserWallet", arrArguments,
             joAccountMN, strActionName, gasPrice, estimatedGas,
@@ -232,7 +232,7 @@ export async function reimbursementWalletWithdraw(
     nReimbursementWithdraw: state.TBalance | null
 ): Promise<boolean> {
     const details = log.createMemoryStream();
-    const jarrReceipts: any = [];
+    const jarrReceipts: state.TReceiptDescription[] = [];
     let strActionName = "";
     const strLogPrefix = "Gas Reimbursement - Wallet Withdraw ";
     try {
@@ -261,11 +261,10 @@ export async function reimbursementWalletWithdraw(
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
-        const joReceipt = await imaTx.payedCall(
+        const joReceipt: state.TSameAsTransactionReceipt = await imaTx.payedCall(
             details, ethersProviderMainNet,
             "CommunityPool", joCommunityPool, "withdrawFunds", arrArguments,
-            joAccountMN, strActionName,
-            gasPrice, estimatedGas );
+            joAccountMN, strActionName, gasPrice, estimatedGas );
         if( joReceipt ) {
             jarrReceipts.push( {
                 description: "reimbursementWalletWithdraw",
@@ -298,7 +297,7 @@ export async function reimbursementSetRange(
     nReimbursementRange: number
 ): Promise<boolean> {
     const details = log.createMemoryStream();
-    const jarrReceipts: any = [];
+    const jarrReceipts: state.TReceiptDescription[] = [];
     let strActionName = "";
     const strLogPrefix = "Gas Reimbursement - Set Minimal time interval from S2M transfers ";
     try {
@@ -326,7 +325,7 @@ export async function reimbursementSetRange(
             throw new Error( strErrorOfDryRun );
 
         const opts: imaTx.TCustomPayedCallOptions = { isCheckTransactionToSchain: true };
-        const joReceipt = await imaTx.payedCall(
+        const joReceipt: state.TSameAsTransactionReceipt = await imaTx.payedCall(
             details, ethersProviderSChain,
             "CommunityLocker", joCommunityLocker, "setTimeLimitPerMessage", arrArguments,
             joAccountSC, strActionName, gasPrice, estimatedGas, undefined, opts );

@@ -57,8 +57,8 @@ export async function checkRegistrationAll(): Promise<boolean> {
 }
 
 export interface TRegistrationCostInformation {
-    mn: imaReg.TReceipt[]
-    sc: imaReg.TReceipt[]
+    mn: state.TReceiptDescription[]
+    sc: state.TReceiptDescription[]
 }
 
 const gInfoRegistrationCost: TRegistrationCostInformation = {
@@ -83,7 +83,7 @@ export async function registerStep1( isPrintSummaryRegistrationCosts: boolean ):
         log.posNeg( bSuccess, "already registered", "not registered yet" ) );
     if( bSuccess )
         return true;
-    const jarrReceipts: imaReg.TReceipt[] =
+    const jarrReceipts: state.TReceiptDescription[] =
         await imaReg.registerSChainInDepositBoxes( // step 1
             imaState.chainProperties.mn.ethersProvider,
             imaState.joLinker,
