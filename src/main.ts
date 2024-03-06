@@ -414,8 +414,10 @@ async function doTheJob(): Promise<void> {
 }
 
 function handleFirstSChainDiscoveryAttemptDone(
-    err: any, joSChainNetworkInfo: discoveryTools.TSChainNetworkInfo,
-    isSilentReDiscovery: boolean, fnOnPeriodicDiscoveryResultAvailable: any ): void {
+    err: Error | string | null | undefined,
+    joSChainNetworkInfo: discoveryTools.TSChainNetworkInfo,
+    isSilentReDiscovery: boolean,
+    fnOnPeriodicDiscoveryResultAvailable: any ): void {
     if( err ) {
     // error information is printed by discoveryTools.discoverSChainNetwork()
         process.exit( 166 );

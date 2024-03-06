@@ -44,7 +44,8 @@ if( parentPort ) {
     } );
 }
 
-function doSendMessage( type: string, endpoint: string | URL, workerUUID: any, data: any ): void {
+function doSendMessage(
+    type: string, endpoint: string | URL, workerUUID: string, data: object | string ): void {
     const jo: any = networkLayer.socketReceivedDataReverseMarshall( data );
     const joSend: any = {
         workerMessageType:

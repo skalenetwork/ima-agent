@@ -110,7 +110,7 @@ async function prepareOracleGasPriceSetup(
     optsGasPriceSetup.strActionName = "prepareOracleGasPriceSetup.getGasPrice()";
     optsGasPriceSetup.gasPriceOnMainNet = null;
     if( getEnabledOracle() ) {
-        const oracleOpts = {
+        const oracleOpts: imaOracle.TOracleOptions = {
             url: owaspUtils.ethersProviderToUrl( optsGasPriceSetup.ethersProviderSChain ),
             callOpts: { },
             nMillisecondsSleepBefore: 1000,

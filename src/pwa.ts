@@ -176,11 +176,11 @@ export async function checkOnLoopStart(
 
 export async function handleLoopStateArrived(
     imaState: state.TIMAState, nNodeNumber: number, strLoopWorkType: string, nIndexS2S: number,
-    isStart: boolean, ts: number, signature: any
+    isStart: boolean, ts: number, signature: imaBLS.TSignResult | null
 ): Promise<boolean> {
     const se = isStart ? "start" : "end";
     let isSuccess = false;
-    let joNode: any = null;
+    let joNode: discoveryTools.TSChainNode | null = null;
     try {
         if( !checkLoopWorkTypeStringIsCorrect( strLoopWorkType ) )
             throw new Error( `Specified value ${strLoopWorkType} is not a correct loop work type` );
@@ -195,6 +195,8 @@ export async function handleLoopStateArrived(
         const jarrNodes = imaState.joSChainNetworkInfo.network;
         if( !jarrNodes )
             throw new Error( "S-Chain network info is not available yet to PWA" );
+        if( !signature )
+            throw new Error( "no PWA signature to handle and verify" );
         joNode = jarrNodes[nNodeNumber];
         const joProps: discoveryTools.TMapValueItemS2S =
         getNodeProgressAndTimestamp( joNode, strLoopWorkType, nIndexS2S );

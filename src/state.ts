@@ -6,6 +6,12 @@ export type TAddress = string;
 export type TBalance = owaspUtils.ethersMod.BigNumber;
 export type TTokenID = string;
 
+export interface TAdditionalSummaryInTransactionReceipt {
+    bnGasSpent: owaspUtils.ethersMod.BigNumber
+    gasSpent: string
+    ethSpent: string
+}
+
 export interface TSameAsTransactionReceipt {
     to: string
     from: string
@@ -24,6 +30,7 @@ export interface TSameAsTransactionReceipt {
     byzantium: boolean
     type: number
     status?: number
+    summary?: TAdditionalSummaryInTransactionReceipt
 }
 
 export interface TReceiptDescription {
@@ -132,6 +139,12 @@ export interface TPropertiesOfChains {
     mn: TOneChainProperties
     sc: TOneChainProperties
     tc: TOneChainProperties
+}
+
+export interface TAccountConnectivityInfo {
+    isBad: boolean
+    strType: string
+    isAutoSend: boolean
 }
 
 function constructChainProperties(): TPropertiesOfChains {
@@ -583,6 +596,6 @@ export function isPreventExitAfterLastAction(): boolean {
     return gFlagIsPreventExitAfterLastAction;
 }
 
-export function setPreventExitAfterLastAction( isPrevent: any ): void {
+export function setPreventExitAfterLastAction( isPrevent?: boolean | null ): void {
     gFlagIsPreventExitAfterLastAction = ( !!isPrevent );
 }

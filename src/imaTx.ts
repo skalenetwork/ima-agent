@@ -40,9 +40,18 @@ import * as imaEventLogScan from "./imaEventLogScan.js";
 
 import * as threadInfo from "./threadInfo.js";
 
+export interface TCallOptions {
+    from?: state.TAdditionalSummaryInTransactionReceipt
+    gasPrice?: string
+    gasLimit?: string
+    value?: string
+};
+
 export interface TCustomPayedCallOptions {
     isCheckTransactionToSchain?: boolean
 }
+
+export declare type TPayedCallMethodArgument = any;
 
 export interface TRunTimePayedCallOptions {
     details: log.TLogger
@@ -50,27 +59,27 @@ export interface TRunTimePayedCallOptions {
     strContractName: string
     joContract: owaspUtils.ethersMod.Contract
     strMethodName: string
-    arrArguments: any[]
+    arrArguments: TPayedCallMethodArgument[]
     joAccount: state.TAccount
     strActionName: string
     gasPrice: owaspUtils.ethersMod.BigNumber
     estimatedGas: owaspUtils.ethersMod.BigNumber
     weiHowMuch: owaspUtils.ethersMod.BigNumber
-    opts: TCustomPayedCallOptions
+    opts?: TCustomPayedCallOptions | null
     strContractCallDescription: string
     strLogPrefix: string
-    joACI: any | null
-    unsignedTx: any | null
-    rawTx: any | null
-    txHash: any | null
-    joReceipt: any | null
-    callOpts: any
+    joACI: state.TAccountConnectivityInfo | null
+    unsignedTx: owaspUtils.ethersMod.PopulatedTransaction | null
+    rawTx: string | null
+    txHash: string | null
+    joReceipt: state.TSameAsTransactionReceipt | null
+    callOpts?: TCallOptions | null
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const __dirname: string = path.dirname( url.fileURLToPath( import.meta.url ) );
 
-let redis: any = null;
+let redis: Redis | null = null;
 
 let gFlagDryRunIsEnabled: boolean = true;
 
@@ -101,12 +110,12 @@ export async function dryRunCall(
     details: log.TLogger,
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     strContractName: string, joContract: owaspUtils.ethersMod.ethers.Contract,
-    strMethodName: string, arrArguments: any[],
+    strMethodName: string, arrArguments: TPayedCallMethodArgument[],
     joAccount: state.TAccount, strActionName: string, isDryRunResultIgnore: boolean,
     gasPrice: owaspUtils.ethersMod.BigNumber,
     gasValue: owaspUtils.ethersMod.BigNumber,
     weiHowMuch?: owaspUtils.ethersMod.BigNumber,
-    opts?: any
+    opts?: TCallOptions | null
 ): Promise<string | null> {
     if( !dryRunIsEnabled() )
         return null; // success
@@ -132,7 +141,7 @@ export async function dryRunCall(
         details.trace( "Dry-run of action {bright}...", strActionName );
         details.trace( "Will dry-run {}...", strContractCallDescription );
         const strAccountWalletAddress = joAccount.address();
-        const callOpts: any = {
+        const callOpts: TCallOptions = {
             from: strAccountWalletAddress
         };
         if( gasPrice )
@@ -144,14 +153,14 @@ export async function dryRunCall(
             if( bnWeiHowMuch.gt( owaspUtils.toBN( 0 ) ) )
                 callOpts.value = bnWeiHowMuch.toHexString();
             else
-                callOpts.value = 0;
+                callOpts.value = "0";
         } else if( callOpts.value ) {
             // just beautify it and make it more friendly to Transaction Manager
             const bnWeiHowMuch = owaspUtils.toBN( callOpts.value );
             if( bnWeiHowMuch.gt( owaspUtils.toBN( 0 ) ) )
                 callOpts.value = bnWeiHowMuch.toHexString();
             else
-                callOpts.value = 0;
+                callOpts.value = "0";
         }
         const joDryRunResult =
             await joContract.callStatic[strMethodName]( ...arrArguments, callOpts );
@@ -168,6 +177,8 @@ export async function dryRunCall(
 
 async function payedCallPrepare( optsPayedCall: TRunTimePayedCallOptions ): Promise<void> {
     optsPayedCall.joACI = getAccountConnectivityInfo( optsPayedCall.joAccount );
+    if( !optsPayedCall.callOpts )
+        optsPayedCall.callOpts = {};
     if( optsPayedCall.gasPrice ) {
         optsPayedCall.callOpts.gasPrice =
             owaspUtils.toBN( optsPayedCall.gasPrice ).toHexString();
@@ -190,7 +201,7 @@ async function payedCallPrepare( optsPayedCall: TRunTimePayedCallOptions ): Prom
         if( bnWeiHowMuch.gt( owaspUtils.toBN( 0 ) ) )
             optsPayedCall.callOpts.value = bnWeiHowMuch.toHexString();
         else
-            optsPayedCall.callOpts.value = 0;
+            optsPayedCall.callOpts.value = "0";
     }
     optsPayedCall.details.trace(
         "{p}payed-call of action {bright} will do payed-call {p} with call options {} " +
@@ -200,9 +211,9 @@ async function payedCallPrepare( optsPayedCall: TRunTimePayedCallOptions ): Prom
     optsPayedCall.unsignedTx =
         await optsPayedCall.joContract.populateTransaction[optsPayedCall.strMethodName](
             ...optsPayedCall.arrArguments, optsPayedCall.callOpts );
-    optsPayedCall.unsignedTx.nonce = owaspUtils.toBN(
+    optsPayedCall.unsignedTx.nonce =
         await optsPayedCall.ethersProvider.getTransactionCount(
-            optsPayedCall.joAccount.address() ) );
+            optsPayedCall.joAccount.address() );
     if( optsPayedCall.opts?.isCheckTransactionToSchain ) {
         optsPayedCall.unsignedTx = await checkTransactionToSchain(
             optsPayedCall.unsignedTx, optsPayedCall.details,
@@ -210,8 +221,8 @@ async function payedCallPrepare( optsPayedCall: TRunTimePayedCallOptions ): Prom
     }
     optsPayedCall.details.trace( "{p}populated transaction: {}", optsPayedCall.strLogPrefix,
         optsPayedCall.unsignedTx );
-    optsPayedCall.rawTx =
-        owaspUtils.ethersMod.ethers.utils.serializeTransaction( optsPayedCall.unsignedTx );
+    optsPayedCall.rawTx = owaspUtils.ethersMod.ethers.utils.serializeTransaction(
+        optsPayedCall.unsignedTx as owaspUtils.ethersMod.UnsignedTransaction );
     optsPayedCall.details.trace( "{p}taw transaction: {}", optsPayedCall.strLogPrefix,
         optsPayedCall.rawTx );
     optsPayedCall.txHash = owaspUtils.ethersMod.ethers.utils.keccak256( optsPayedCall.rawTx );
@@ -219,15 +230,21 @@ async function payedCallPrepare( optsPayedCall: TRunTimePayedCallOptions ): Prom
         optsPayedCall.txHash );
 }
 
-async function payedCallTM( optsPayedCall: TRunTimePayedCallOptions ): Promise<any> {
-    const txAdjusted: any =
+async function payedCallTM(
+    optsPayedCall: TRunTimePayedCallOptions
+): Promise< state.TSameAsTransactionReceipt > {
+    if( !optsPayedCall.unsignedTx )
+        throw new Error( "no unsigned TX to make payed call via Transaction Manager" );
+    const txAdjusted: owaspUtils.ethersMod.PopulatedTransaction =
         optsPayedCall.unsignedTx; // JSON.parse( JSON.stringify( optsPayedCall.rawTx ) );
     const arrNamesConvertToHex = [ "gas", "gasLimit", "optsPayedCall.gasPrice", "value" ];
     for( let idxName = 0; idxName < arrNamesConvertToHex.length; ++idxName ) {
         const strName = arrNamesConvertToHex[idxName];
-        if( strName in txAdjusted && typeof txAdjusted[strName] === "object" &&
-            typeof txAdjusted[strName].toHexString === "function" )
-            txAdjusted[strName] = owaspUtils.toHexStringSafe( txAdjusted[strName] );
+        if( strName in txAdjusted && typeof ( txAdjusted as any )[strName] === "object" &&
+            typeof ( txAdjusted as any )[strName].toHexString === "function" ) {
+            ( txAdjusted as any )[strName] =
+                owaspUtils.toHexStringSafe( ( txAdjusted as any )[strName] );
+        }
     }
     if( "gasLimit" in txAdjusted )
         delete txAdjusted.gasLimit;
@@ -239,7 +256,7 @@ async function payedCallTM( optsPayedCall: TRunTimePayedCallOptions ): Promise<a
         // just beautify it and make it more friendly to Transaction Manager
         const bnWeiHowMuch = owaspUtils.toBN( txAdjusted.value );
         if( bnWeiHowMuch.eq( owaspUtils.toBN( 0 ) ) )
-            txAdjusted.value = 0;
+            txAdjusted.value = owaspUtils.toBN( 0 );
     }
     optsPayedCall.details.trace( "{p}Adjusted transaction: {}", optsPayedCall.strLogPrefix,
         txAdjusted );
@@ -251,6 +268,8 @@ async function payedCallTM( optsPayedCall: TRunTimePayedCallOptions ): Promise<a
         const [ idTransaction, joReceiptFromTM ] = await tmEnsureTransaction(
             optsPayedCall.details, optsPayedCall.ethersProvider, priority, txAdjusted );
         optsPayedCall.joReceipt = joReceiptFromTM;
+        if( !optsPayedCall.joReceipt )
+            throw new Error( "null TX receipt from Transaction Manager" );
         optsPayedCall.details.trace( "{p}ID of TM-transaction: {}",
             optsPayedCall.strLogPrefix, idTransaction );
         const txHashSent = optsPayedCall.joReceipt.transactionHash;
@@ -278,12 +297,12 @@ async function payedCallSGX( optsPayedCall: TRunTimePayedCallOptions ): Promise<
         "\"" + optsPayedCall.joAccount.strSgxKeyName + "\" " +
         "\"" + owaspUtils.ethersProviderToUrl( optsPayedCall.ethersProvider ) + "\" " +
         "\"" + chainId + "\" " +
-        "\"" + ( tx.data ? tx.data : "" ) + "\" " +
-        "\"" + tx.to + "\" " +
-        "\"" + owaspUtils.toHexStringSafe( tx.value ) + "\" " +
-        "\"" + owaspUtils.toHexStringSafe( tx.gasPrice ) + "\" " +
-        "\"" + owaspUtils.toHexStringSafe( tx.gasLimit ) + "\" " +
-        "\"" + owaspUtils.toHexStringSafe( tx.nonce ) + "\" " +
+        "\"" + ( tx?.data ? tx.data : "" ) + "\" " +
+        "\"" + tx?.to + "\" " +
+        "\"" + owaspUtils.toHexStringSafe( tx?.value ) + "\" " +
+        "\"" + owaspUtils.toHexStringSafe( tx?.gasPrice ) + "\" " +
+        "\"" + owaspUtils.toHexStringSafe( tx?.gasLimit ) + "\" " +
+        "\"" + owaspUtils.toHexStringSafe( tx?.nonce ) + "\" " +
         "\"" + ( optsPayedCall.joAccount.strPathSslCert
         ? optsPayedCall.joAccount.strPathSslCert
         : "" ) + "\" " +
@@ -291,7 +310,7 @@ async function payedCallSGX( optsPayedCall: TRunTimePayedCallOptions ): Promise<
         ? optsPayedCall.joAccount.strPathSslKey
         : "" ) + "\" " +
         "";
-    const joSpawnOptions: any = {
+    const joSpawnOptions: childProcessModule.SpawnSyncOptions = {
         shell: true,
         cwd: __dirname,
         env: {},
@@ -307,14 +326,16 @@ async function payedCallSGX( optsPayedCall: TRunTimePayedCallOptions ): Promise<
     postConvertBN( optsPayedCall.joReceipt, "effectiveGasPrice" );
 }
 
-function postConvertBN( jo: any, name: any ): void {
+function postConvertBN(
+    jo: state.TSameAsTransactionReceipt | object | null | undefined,
+    name: string ): void {
     if( !jo )
         return;
     if( !( name in jo ) )
         return;
-    if( typeof jo[name] === "object" )
+    if( typeof ( jo as any )[name] === "object" )
         return;
-    jo[name] = owaspUtils.toBN( jo[name] );
+    ( jo as any )[name] = owaspUtils.toBN( ( jo as any )[name] );
 }
 
 async function payedCallDirect( optsPayedCall: TRunTimePayedCallOptions ): Promise<void> {
@@ -325,6 +346,8 @@ async function payedCallDirect( optsPayedCall: TRunTimePayedCallOptions ): Promi
     if( typeof chainId === "string" && chainId )
         chainId = owaspUtils.parseIntOrHex( chainId );
     optsPayedCall.details.trace( "{p}Chain ID is: {}", optsPayedCall.strLogPrefix, chainId );
+    if( !optsPayedCall.unsignedTx )
+        throw new Error( "no unsigned TX provided to make direct payed call" );
     if( ( !( chainId in optsPayedCall.unsignedTx ) ) ||
         ( !optsPayedCall.unsignedTx.chainId )
     ) {
@@ -348,12 +371,12 @@ async function payedCallDirect( optsPayedCall: TRunTimePayedCallOptions ): Promi
 export async function payedCall(
     details: log.TLogger, ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     strContractName: string, joContract: owaspUtils.ethersMod.ethers.Contract,
-    strMethodName: any, arrArguments: any[],
+    strMethodName: string, arrArguments: TPayedCallMethodArgument[],
     joAccount: state.TAccount, strActionName: string,
     gasPrice: owaspUtils.ethersMod.BigNumber,
     estimatedGas: owaspUtils.ethersMod.BigNumber,
     weiHowMuch?: owaspUtils.ethersMod.BigNumber,
-    opts?: any
+    opts?: TCustomPayedCallOptions | null
 ): Promise<state.TSameAsTransactionReceipt> {
     const optsPayedCall: TRunTimePayedCallOptions = {
         details,
@@ -397,7 +420,7 @@ export async function payedCall(
     optsPayedCall.strLogPrefix = `${strContractMethodDescription} `;
     try {
         await payedCallPrepare( optsPayedCall );
-        switch ( optsPayedCall.joACI.strType ) {
+        switch ( optsPayedCall.joACI?.strType ) {
         case "tm":
             await payedCallTM( optsPayedCall );
             break;
@@ -427,11 +450,16 @@ export async function payedCall(
     optsPayedCall.details.success( "{p}Done, TX was {sunny}-signed-and-sent, receipt is {}",
         optsPayedCall.strLogPrefix, optsPayedCall.joACI ? optsPayedCall.joACI.strType : "N/A",
         optsPayedCall.joReceipt );
+    if( !optsPayedCall.joReceipt )
+        throw new Error( "null TX receipt from Transaction Manager" );
     try {
+        if( !optsPayedCall.unsignedTx )
+            throw new Error( "no unsigned TX to calculate spent money" );
         const bnGasSpent = owaspUtils.toBN( optsPayedCall.joReceipt.cumulativeGasUsed );
         const gasSpent = bnGasSpent.toString();
         const ethSpent = owaspUtils.ethersMod.ethers.utils.formatEther(
-            optsPayedCall.joReceipt.cumulativeGasUsed.mul( optsPayedCall.unsignedTx.gasPrice ) );
+            optsPayedCall.joReceipt.cumulativeGasUsed.mul(
+                optsPayedCall.unsignedTx.gasPrice ?? await ethersProvider.getGasPrice() ) );
         optsPayedCall.joReceipt.summary = {
             bnGasSpent,
             gasSpent,
@@ -447,13 +475,17 @@ export async function payedCall(
 }
 
 export async function checkTransactionToSchain(
-    unsignedTx: any,
+    unsignedTx: owaspUtils.ethersMod.PopulatedTransaction,
     details: log.TLogger,
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     joAccount: state.TAccount
-): Promise<any> {
+): Promise< owaspUtils.ethersMod.PopulatedTransaction > {
     const strLogPrefix = "PoW-mining: ";
     try {
+        if( !unsignedTx.gasPrice )
+            throw new Error( "unsigned TX is missing \"gasPrice\" parameter" );
+        if( !unsignedTx.gasLimit )
+            throw new Error( "unsigned TX is missing \"gasLimit\" parameter" );
         const strFromAddress = joAccount.address(); // unsignedTx.from;
         const requiredBalance = unsignedTx.gasPrice.mul( unsignedTx.gasLimit );
         const balance = owaspUtils.toBN( await ethersProvider.getBalance( strFromAddress ) );
@@ -462,8 +494,7 @@ export async function checkTransactionToSchain(
             "required balance {}, gas limit is {} gas, checked unsigned transaction is {}",
             strLogPrefix, strFromAddress, owaspUtils.toHexStringSafe( balance ),
             owaspUtils.toHexStringSafe( requiredBalance ),
-            owaspUtils.toHexStringSafe( unsignedTx.gasLimit ), unsignedTx
-        );
+            owaspUtils.toHexStringSafe( unsignedTx.gasLimit ), unsignedTx );
         if( balance.lt( requiredBalance ) ) {
             details.warning( "{p}Insufficient funds for {}, will run PoW-mining to get {} of gas",
                 strLogPrefix, strFromAddress, owaspUtils.toHexStringSafe( unsignedTx.gasLimit ) );
@@ -500,8 +531,12 @@ export async function checkTransactionToSchain(
 }
 
 export async function calculatePowNumber(
-    address: string, nonce: any, gas: any, details: log.TLogger, strLogPrefix: string
-): Promise<any> {
+    address: state.TAddress,
+    nonce: string,
+    gas: string,
+    details: log.TLogger,
+    strLogPrefix: string
+): Promise< string | Buffer > {
     try {
         let _address = owaspUtils.ensureStartsWith0x( address );
         _address = ethereumJsUtilModule.toChecksumAddress( _address );
@@ -521,8 +556,10 @@ export async function calculatePowNumber(
     }
 }
 
-export function getAccountConnectivityInfo( joAccount: state.TAccount ): object {
-    const joACI: any = {
+export function getAccountConnectivityInfo(
+    joAccount: state.TAccount
+): state.TAccountConnectivityInfo {
+    const joACI: state.TAccountConnectivityInfo = {
         isBad: true,
         strType: "bad",
         isAutoSend: false
@@ -570,7 +607,10 @@ function tmMakeId( details: log.TLogger ): string {
     return id;
 }
 
-function tmMakeRecord( tx: any = {}, score: any ): any {
+function tmMakeRecord(
+    tx: owaspUtils.ethersMod.PopulatedTransaction = {},
+    score: number
+): string {
     const status = "PROPOSED";
     return JSON.stringify( {
         score,
@@ -584,7 +624,13 @@ function tmMakeScore( priority: number ): number {
     return priority * Math.pow( 10, ts.toString().length ) + ts;
 }
 
-async function tmSend( details: log.TLogger, tx: any, priority: number = 5 ): Promise<string> {
+async function tmSend(
+    details: log.TLogger,
+    tx: owaspUtils.ethersMod.PopulatedTransaction,
+    priority: number = 5
+): Promise<string> {
+    if( !redis )
+        throw new Error( "no redis instance to send transaction" );
     details.trace( "TM - sending tx {} ts: {}", tx, imaHelperAPIs.currentTimestamp() );
     const id = tmMakeId( details );
     const score = tmMakeScore( priority );
@@ -598,13 +644,20 @@ async function tmSend( details: log.TLogger, tx: any, priority: number = 5 ): Pr
     return id;
 }
 
-function tmIsFinished( record: any ): boolean {
+function tmIsFinished( record?: TTMRecord | null ): boolean {
     if( !record )
         return false;
     return [ "SUCCESS", "FAILED", "DROPPED" ].includes( record.status );
 }
 
-async function tmGetRecord( txId: any ): Promise<any | null> {
+export interface TTMRecord {
+    tx_hash: string
+    status: string
+}
+
+async function tmGetRecord( txId: string ): Promise< TTMRecord | null> {
+    if( !redis )
+        throw new Error( "no redis instance to get transaction record" );
     const r = await redis.get( txId );
     if( r != null )
         return JSON.parse( r );
@@ -613,9 +666,9 @@ async function tmGetRecord( txId: any ): Promise<any | null> {
 
 async function tmWait(
     details: log.TLogger,
-    txId: any,
+    txId: string,
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
-    nWaitSeconds: number = 36000 ): Promise<any | null> {
+    nWaitSeconds: number = 36000 ): Promise< state.TSameAsTransactionReceipt | null > {
     const strLogPrefix = log.fmtDebug( "(gathered details)" ) + " ";
     details.debug( "{p}TM - will wait TX {} to complete for {} second(s) maximum",
         strLogPrefix, txId, nWaitSeconds );
@@ -632,12 +685,13 @@ async function tmWait(
     else
         details.error( "{p}TM - TX {} status is {err}", strLogPrefix, txId, r.status );
 
-    if( ( !tmIsFinished( r ) ) || r.status == "DROPPED" ) {
+    if( ( !tmIsFinished( r ) ) || r?.status == "DROPPED" ) {
         details.error( "{p}TM - TX {} was unsuccessful, wait failed", strLogPrefix, txId );
         return null;
     }
-    const joReceipt: any = await imaEventLogScan.safeGetTransactionReceipt(
-        details, 10, ethersProvider, r.tx_hash );
+    const joReceipt: state.TSameAsTransactionReceipt | null =
+        await imaEventLogScan.safeGetTransactionReceipt(
+            details, 10, ethersProvider, r ? r.tx_hash : "" );
     if( !joReceipt ) {
         details.error( "{p}TM - TX {} was unsuccessful, failed to fetch transaction receipt",
             strLogPrefix, txId );
@@ -648,12 +702,12 @@ async function tmWait(
 
 async function tmEnsureTransaction(
     details: log.TLogger, ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
-    priority: any, txAdjusted: any,
+    priority: number, txAdjusted: owaspUtils.ethersMod.PopulatedTransaction,
     cntAttempts?: number, sleepMilliseconds?: number
-): Promise<any> {
+): Promise< [ string, state.TSameAsTransactionReceipt ] > {
     cntAttempts = cntAttempts ?? 1;
     sleepMilliseconds = sleepMilliseconds ?? ( 30 * 1000 );
-    let txId = "";
+    let txId: string = "";
     let joReceipt = null;
     let idxAttempt = 0;
     const strLogPrefix = log.fmtDebug( "(gathered details)" ) + " ";
@@ -720,12 +774,12 @@ export class TransactionCustomizer {
         details: log.TLogger,
         ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
         strContractName: string, joContract: owaspUtils.ethersMod.ethers.Contract,
-        strMethodName: string, arrArguments: any[],
+        strMethodName: string, arrArguments: TPayedCallMethodArgument[],
         joAccount: state.TAccount, strActionName: string,
         gasPrice: owaspUtils.ethersMod.BigNumber,
         gasValueRecommended: owaspUtils.ethersMod.BigNumber,
         weiHowMuch?: owaspUtils.ethersMod.BigNumber,
-        opts?: any
+        opts?: TCallOptions | null
     ): Promise<owaspUtils.ethersMod.BigNumber> {
         let estimatedGas: owaspUtils.ethersMod.BigNumber = owaspUtils.toBN( 0 );
         const strContractMethodDescription = log.fmtDebug( "{p}({}).{sunny}",
@@ -748,7 +802,7 @@ export class TransactionCustomizer {
             details.trace( "Estimate-gas of action {bright}...", strActionName );
             details.trace( "Will estimate-gas {}...", strContractCallDescription );
             const strAccountWalletAddress = joAccount.address();
-            const callOpts: any = { from: strAccountWalletAddress };
+            const callOpts: TCallOptions = { from: strAccountWalletAddress };
             if( gasPrice )
                 callOpts.gasPrice = owaspUtils.toBN( gasPrice ).toHexString();
             if( gasValueRecommended )
@@ -765,7 +819,7 @@ export class TransactionCustomizer {
                 if( bnWeiHowMuch.gt( owaspUtils.toBN( 0 ) ) )
                     callOpts.value = bnWeiHowMuch.toHexString();
                 else
-                    callOpts.value = 0;
+                    callOpts.value = "0";
             }
             details.trace( "Call options for estimate-gas {}", callOpts );
             estimatedGas = await joContract.estimateGas[strMethodName]( ...arrArguments, callOpts );

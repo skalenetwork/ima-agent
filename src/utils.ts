@@ -139,7 +139,7 @@ export function jsonFileSave( strPath: string, jo?: any, bLogOutput?: boolean ):
 const gMillisecondsToSleepStepWaitForClonedTokenToAppear: number = 1000;
 
 export async function waitForClonedTokenToAppear(
-    sc: any,
+    sc: state.TOneChainProperties,
     strTokenSuffix: string, // example "erc20"
     addressCallFrom: string,
     cntAttempts: number,
@@ -153,13 +153,15 @@ export async function waitForClonedTokenToAppear(
     const ts0 = log.timestampHR();
     let ts1;
     log.information( "Waiting for {} token to appear automatically deployed on S-Chain {}...",
-        strTokenSuffixUC, sc.chainName );
+        strTokenSuffixUC, sc.strChainName );
     log.debug( "... source chain name is {}", strMainnetName );
     log.debug( "... destination {} address is {}", "TokenManager" + strTokenSuffixUC,
-        sc.joABI["token_manager_" + strTokenSuffixLC + "_address"] );
+        sc.joAbiIMA["token_manager_" + strTokenSuffixLC + "_address"] );
+    if( !sc.ethersProvider )
+        throw new Error( "no EthersJS provider to wait for cloned token to appear" );
     const contractTokenManager = new owaspUtils.ethersMod.ethers.Contract(
-        sc.joABI["token_manager_" + strTokenSuffixLC + "_address"],
-        sc.joABI["token_manager_" + strTokenSuffixLC + "_abi"],
+        sc.joAbiIMA["token_manager_" + strTokenSuffixLC + "_address"],
+        sc.joAbiIMA["token_manager_" + strTokenSuffixLC + "_abi"],
         sc.ethersProvider );
     for( let idxAttempt = 0; idxAttempt < cntAttempts; ++idxAttempt ) {
         log.information( "Discovering {} step {}...", strTokenSuffixUC, idxAttempt );
@@ -168,7 +170,7 @@ export async function waitForClonedTokenToAppear(
         const addressOnSChain =
             await contractTokenManager.callStatic[
                 "clones" + log.capitalizeFirstLetter( strTokenSuffixLCshort )](
-                sc.ethersMod.ethers.utils.id( strMainnetName ),
+                owaspUtils.ethersMod.ethers.utils.id( strMainnetName ),
                 ( tokensMN.joABI as any )[strTokenSuffixUC + "_address"],
                 { from: addressCallFrom }
             );
@@ -176,18 +178,20 @@ export async function waitForClonedTokenToAppear(
             ts1 = log.timestampHR();
             log.success( "Done, duration is {}", log.getDurationString( ts0, ts1 ) );
             log.success( "Discovered {} instantiated on S-Chain {} at address {}",
-                strTokenSuffixUC, sc.chainName, addressOnSChain );
+                strTokenSuffixUC, sc.strChainName, addressOnSChain );
             return addressOnSChain;
         }
     }
     ts1 = log.timestampHR();
-    log.error( "Failed to discover {} instantiated on S-Chain {}", strTokenSuffixUC, sc.chainName );
+    log.error( "Failed to discover {} instantiated on S-Chain {}",
+        strTokenSuffixUC, sc.strChainName );
     throw new Error( `Failed to discover ${strTokenSuffixUC} instantiated ` +
-        `on S-Chain ${sc.chainName}` );
+        `on S-Chain ${sc.strChainName}` );
 }
 
-export async function waitForClonedTokenAppearErc20(
-    sc: any, tokenERC20SC: state.TTokeInformation, joAccountSC: state.TAccount,
+export async function waitForClonedTokenToAppearErc20(
+    sc: state.TOneChainProperties,
+    tokenERC20SC: state.TTokeInformation, joAccountSC: state.TAccount,
     tokensMN: TTokesABIHolder, strMainnetName: string
 ): Promise <void> {
     if( "abi" in tokenERC20SC && typeof tokenERC20SC.abi === "object" &&
@@ -203,8 +207,9 @@ export async function waitForClonedTokenAppearErc20(
     tokenERC20SC.address = addressOnSChain ? addressOnSChain.toString() : "";
 }
 
-export async function waitForClonedTokenAppearErc721(
-    sc: any, tokenERC721SC: state.TTokeInformation, joAccountSC: state.TAccount,
+export async function waitForClonedTokenToAppearErc721(
+    sc: state.TOneChainProperties,
+    tokenERC721SC: state.TTokeInformation, joAccountSC: state.TAccount,
     tokensMN: TTokesABIHolder, strMainnetName: string
 ): Promise <void> {
     if( "abi" in tokenERC721SC && typeof tokenERC721SC.abi === "object" &&
@@ -221,8 +226,9 @@ export async function waitForClonedTokenAppearErc721(
     tokenERC721SC.address = addressOnSChain ? addressOnSChain.toString() : "";
 }
 
-export async function waitForClonedTokenAppearErc721WithMetadata(
-    sc: any, tokenERC721SC: state.TTokeInformation, joAccountSC: state.TAccount,
+export async function waitForClonedTokenToAppearErc721WithMetadata(
+    sc: state.TOneChainProperties,
+    tokenERC721SC: state.TTokeInformation, joAccountSC: state.TAccount,
     tokensMN: TTokesABIHolder, strMainnetName: string
 ): Promise <void> {
     if( "abi" in tokenERC721SC && typeof tokenERC721SC.abi === "object" &&
@@ -240,8 +246,9 @@ export async function waitForClonedTokenAppearErc721WithMetadata(
     tokenERC721SC.address = addressOnSChain ? addressOnSChain.toString() : "";
 }
 
-export async function waitForClonedTokenAppearErc1155(
-    sc: any, tokenERC1155SC: state.TTokeInformation, joAccountSC: state.TAccount,
+export async function waitForClonedTokenToAppearErc1155(
+    sc: state.TOneChainProperties,
+    tokenERC1155SC: state.TTokeInformation, joAccountSC: state.TAccount,
     tokensMN: TTokesABIHolder, strMainnetName: string
 ): Promise <void> {
     if( "abi" in tokenERC1155SC && typeof tokenERC1155SC.abi === "object" &&

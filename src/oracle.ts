@@ -31,6 +31,17 @@ import * as sha3Module from "sha3";
 import type * as rpcCallFormats from "./rpcCallFormats.js";
 
 const Keccak: any = sha3Module.Keccak;
+
+export interface TOracleOptions {
+    url: string
+    callOpts: rpcCall.TRPCCallOpts | null
+    nMillisecondsSleepBefore: number
+    nMillisecondsSleepPeriod: number
+    cntAttempts: number
+    isVerbose: boolean
+    isVerboseTraceDetails: boolean
+}
+
 export const gConstMinPowResultLimit: number = 10000;
 export const gConstMaxPowResultLimit: number = 100000;
 
@@ -86,7 +97,7 @@ export function findPowNumber(
 }
 
 async function handleOracleCheckResultResult(
-    oracleOpts: any, details: log.TLogger, isVerboseTraceDetails: boolean,
+    oracleOpts: TOracleOptions, details: log.TLogger, isVerboseTraceDetails: boolean,
     joCall: rpcCall.TRPCCall, joIn: any, joOut: any
 ): Promise< owaspUtils.ethersMod.BigNumber > {
     if( isVerboseTraceDetails )
@@ -111,7 +122,7 @@ async function handleOracleCheckResultResult(
 }
 
 async function handleOracleSubmitRequestResult(
-    oracleOpts: any, details: log.TLogger, isVerboseTraceDetails: boolean,
+    oracleOpts: TOracleOptions, details: log.TLogger, isVerboseTraceDetails: boolean,
     joCall: rpcCall.TRPCCall, joIn: any, joOut: any
 ): Promise<owaspUtils.ethersMod.BigNumber> {
     const nMillisecondsSleepBefore = "nMillisecondsSleepBefore" in oracleOpts
@@ -167,11 +178,11 @@ async function handleOracleSubmitRequestResult(
 }
 
 export async function oracleGetGasPrice(
-    oracleOpts: any, details: log.TLogger
+    oracleOpts: TOracleOptions, details: log.TLogger
 ): Promise< owaspUtils.ethersMod.BigNumber > {
     details = details || log;
     const url: string = oracleOpts.url;
-    let gp: any = null;
+    let gp: owaspUtils.ethersMod.BigNumber | null = null;
     let joCall: rpcCall.TRPCCall | null = null;
     try {
         const isVerbose = "isVerbose" in oracleOpts ? oracleOpts.isVerbose : false;
@@ -181,7 +192,7 @@ export async function oracleGetGasPrice(
         if( !( log.verboseGet() >= log.verboseName2Number( "trace" ) ) )
             isVerboseTraceDetails = false;
         const callOpts = "callOpts" in oracleOpts ? oracleOpts.callOpts : { };
-        joCall = await rpcCall.create( url, callOpts || { } );
+        joCall = await rpcCall.create( url, callOpts ?? { } );
         if( !joCall )
             throw new Error( `Failed to create JSON RPC call object to ${url}` );
         const s = findPowNumber(
