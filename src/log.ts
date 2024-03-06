@@ -28,7 +28,13 @@ import * as fs from "fs";
 
 export { cc };
 
-export type TFunctionWrite = ( ...args: any[] ) => void;
+export declare type TLogArgument = cc.TColorableArgument;
+export declare type TFnFormatter = cc.TFnColorizer;
+
+export type TMapVerbose = Record<number, string>;
+export type TMapVerboseReverse = Record<string, number>;
+
+export type TFunctionWrite = ( ...args: TLogArgument[] ) => void;
 export type TFunctionClose = () => void;
 export type TFunctionOpen = () => void;
 export type TFunctionSize = () => number;
@@ -97,50 +103,6 @@ const getDurationString = cc.getDurationString;
 
 export { safeURL, replaceAll, timestampHR, capitalizeFirstLetter, getDurationString };
 
-export function validateRadix( value: any, radix?: any ): boolean {
-    value = ( value ? value.toString() : "10" ).trim();
-    radix = ( radix === null || radix === undefined )
-        ? ( ( value.length > 2 && value[0] == "0" && ( value[1] == "x" || value[1] == "X" ) )
-            ? 16
-            : 10 )
-        : parseInt( radix, 10 );
-    return radix;
-}
-
-export function validateInteger( value: any, radix?: any ): boolean {
-    try {
-        if( value === null || value === undefined )
-            return false;
-        if( value === 0 || value === 0.0 )
-            return true;
-        const s = value ? value.toString().trim() : "";
-        if( s.length < 1 )
-            return false;
-        radix = validateRadix( value, radix );
-        if( ( !isNaN( value ) ) &&
-            ( parseInt( value, radix ) == value || radix !== 10 ) &&
-            ( !isNaN( parseInt( value, radix ) ) )
-        )
-            return true;
-    } catch ( err ) {
-    }
-    return false;
-}
-
-export function toInteger( value: any, radix?: any ): number {
-    try {
-        if( value === 0 || value === 0.0 || value === null || value === undefined )
-            return 0;
-        value = ( value ? value.toString().trim() : "" ).trim();
-        radix = validateRadix( value, radix );
-        if( !validateInteger( value, radix ) )
-            return NaN;
-        return parseInt( value.toString().trim(), radix );
-    } catch ( err ) {
-    }
-    return 0;
-}
-
 export function autoEnableColorizationFromCommandLineArgs(): void {
     cc.autoEnableFromCommandLineArgs();
 }
@@ -159,14 +121,14 @@ export function setPrintTimestamps( b?: boolean ): void {
     gFlagLogWithTimeStamps = ( !!b );
 }
 
-export function n2s( n: any, sz: number ): string {
+export function n2s( n: TLogArgument, sz: number ): string {
     let s: string = n ? n.toString() : "";
     while( s.length < sz )
         s = "0" + s;
     return s;
 }
 
-export function generateTimestampString( ts?: any, isColorized?: boolean ): string {
+export function generateTimestampString( ts?: TLogArgument, isColorized?: boolean ): string {
     isColorized =
         ( typeof isColorized === "undefined" )
             ? true
@@ -174,11 +136,13 @@ export function generateTimestampString( ts?: any, isColorized?: boolean ): stri
     if( isColorized )
         isColorized = cc.isEnabled();
     ts = ( ts instanceof Date ) ? ts : new Date();
-    const ccDate = function( x?: any ): string { return isColorized ? cc.date( x ) : x; };
-    const ccTime = function( x?: any ): string { return isColorized ? cc.time( x ) : x; };
+    const ccDate = function( x?: TLogArgument ): string { return isColorized ? cc.date( x ) : x; };
+    const ccTime = function( x?: TLogArgument ): string { return isColorized ? cc.time( x ) : x; };
     const ccFractionPartOfTime =
-        function( x?: any ): string { return isColorized ? cc.fracTime( x ) : x; };
-    const ccBright = function( x?: any ): string { return isColorized ? cc.bright( x ) : x; };
+        function( x?: TLogArgument ): string { return isColorized ? cc.fracTime( x ) : x; };
+    const ccBright = function( x?: TLogArgument ): string {
+        return isColorized ? cc.bright( x ) : x;
+    };
     const s =
         ccDate( n2s( ts.getUTCFullYear(), 4 ) ) +
         ccBright( "-" ) + ccDate( n2s( ts.getUTCMonth() + 1, 2 ) ) +
@@ -190,7 +154,7 @@ export function generateTimestampString( ts?: any, isColorized?: boolean ): stri
     return s;
 }
 
-export function generateTimestampPrefix( ts?: any, isColorized?: boolean ): string {
+export function generateTimestampPrefix( ts?: TLogArgument, isColorized?: boolean ): string {
     return generateTimestampString( ts, isColorized ) + cc.bright( ":" ) + " ";
 }
 
@@ -276,7 +240,7 @@ export function createStandardOutputStream(): TLogger | null {
             haveOwnTimestamps: false,
             isPausedTimeStamps: false,
             strOwnIndent: "",
-            write: function( ...args: any[] ): void {
+            write: function( ...args: TLogArgument[] ): void {
                 let s = ( this.strOwnIndent ? this.strOwnIndent : "" ) +
                     ( ( this.haveOwnTimestamps && ( !this.isPausedTimeStamps ) )
                         ? generateTimestampPrefix( null, true )
@@ -287,7 +251,7 @@ export function createStandardOutputStream(): TLogger | null {
                         this.objStream.write( s );
                 } catch ( err ) { }
             },
-            writeRaw: function( ...args: any[] ): void {
+            writeRaw: function( ...args: TLogArgument[] ): void {
                 const s = fmtArgumentsArray( args );
                 try {
                     if( this.objStream && s.length > 0 )
@@ -302,59 +266,59 @@ export function createStandardOutputStream(): TLogger | null {
             exposeDetailsTo:
                 function( otherStream: TLogger, strTitle: string, isSuccess: boolean ): void { },
             // high-level formatters
-            fatal: function( ...args: any[] ): void {
+            fatal: function( ...args: TLogArgument[] ): void {
                 if( verboseGet() >= verboseName2Number( "fatal" ) )
                     this.write( getLogLinePrefixFatal() + fmtFatal( ...args ) );
             },
-            critical: function( ...args: any[] ): void {
+            critical: function( ...args: TLogArgument[] ): void {
                 if( verboseGet() >= verboseName2Number( "critical" ) ) {
                     this.write(
                         getLogLinePrefixCritical() + fmtCritical( ...args ) );
                 }
             },
-            error: function( ...args: any[] ): void {
+            error: function( ...args: TLogArgument[] ): void {
                 if( verboseGet() >= verboseName2Number( "error" ) )
                     this.write( getLogLinePrefixError() + fmtError( ...args ) );
             },
-            warning: function( ...args: any[] ): void {
+            warning: function( ...args: TLogArgument[] ): void {
                 if( verboseGet() >= verboseName2Number( "warning" ) )
                     this.write( getLogLinePrefixWarning() + fmtWarning( ...args ) );
             },
-            attention: function( ...args: any[] ): void {
+            attention: function( ...args: TLogArgument[] ): void {
                 if( verboseGet() >= verboseName2Number( "attention" ) ) {
                     this.write(
                         getLogLinePrefixAttention() + fmtAttention( ...args ) );
                 }
             },
-            information: function( ...args: any[] ): void {
+            information: function( ...args: TLogArgument[] ): void {
                 if( verboseGet() >= verboseName2Number( "information" ) ) {
                     this.write(
                         getLogLinePrefixInformation() + fmtInformation( ...args ) );
                 }
             },
-            info: function( ...args: any[] ): void {
+            info: function( ...args: TLogArgument[] ): void {
                 if( verboseGet() >= verboseName2Number( "information" ) ) {
                     this.write(
                         getLogLinePrefixInformation() + fmtInformation( ...args ) );
                 }
             },
-            notice: function( ...args: any[] ): void {
+            notice: function( ...args: TLogArgument[] ): void {
                 if( verboseGet() >= verboseName2Number( "notice" ) )
                     this.write( getLogLinePrefixNotice() + fmtNotice( ...args ) );
             },
-            note: function( ...args: any[] ): void {
+            note: function( ...args: TLogArgument[] ): void {
                 if( verboseGet() >= verboseName2Number( "notice" ) )
                     this.write( getLogLinePrefixNote() + fmtNote( ...args ) );
             },
-            debug: function( ...args: any[] ): void {
+            debug: function( ...args: TLogArgument[] ): void {
                 if( verboseGet() >= verboseName2Number( "debug" ) )
                     this.write( getLogLinePrefixDebug() + fmtDebug( ...args ) );
             },
-            trace: function( ...args: any[] ): void {
+            trace: function( ...args: TLogArgument[] ): void {
                 if( verboseGet() >= verboseName2Number( "trace" ) )
                     this.write( getLogLinePrefixTrace() + fmtTrace( ...args ) );
             },
-            success: function( ...args: any[] ): void {
+            success: function( ...args: TLogArgument[] ): void {
                 if( verboseGet() >= verboseName2Number( "information" ) )
                     this.write( getLogLinePrefixSuccess() + fmtSuccess( ...args ) );
             }
@@ -405,7 +369,7 @@ export function createMemoryOutputStream(): TLogger {
                     return true;
                 return false;
             },
-            write: function( ...args: any[] ): void {
+            write: function( ...args: TLogArgument[] ): void {
                 const s = fmtArgumentsArray( args );
                 const arr = s.split( "\n" );
                 for( let i = 0; i < arr.length; ++i ) {
@@ -420,7 +384,7 @@ export function createMemoryOutputStream(): TLogger {
                     this.arrAccumulatedLogTextLines.push( strHeader + strLine + "\n" );
                 }
             },
-            writeRaw: function( ...args: any[] ): void {
+            writeRaw: function( ...args: TLogArgument[] ): void {
                 const s = fmtArgumentsArray( args );
                 const arr = s.split( "\n" );
                 for( let i = 0; i < arr.length; ++i ) {
@@ -483,57 +447,57 @@ export function createMemoryOutputStream(): TLogger {
                 }
             },
             // high-level formatters
-            fatal: function( ...args: any[] ): void {
+            fatal: function( ...args: TLogArgument[] ): void {
                 if( verboseGet() >= verboseName2Number( "fatal" ) )
                     this.write( getLogLinePrefixFatal() + fmtFatal( ...args ) );
             },
-            critical: function( ...args: any[] ): void {
+            critical: function( ...args: TLogArgument[] ): void {
                 if( verboseGet() >= verboseName2Number( "critical" ) )
                     this.write( getLogLinePrefixCritical() + fmtCritical( ...args ) );
             },
-            error: function( ...args: any[] ): void {
+            error: function( ...args: TLogArgument[] ): void {
                 if( verboseGet() >= verboseName2Number( "error" ) )
                     this.write( getLogLinePrefixError() + fmtError( ...args ) );
             },
-            warning: function( ...args: any[] ): void {
+            warning: function( ...args: TLogArgument[] ): void {
                 if( verboseGet() >= verboseName2Number( "warning" ) )
                     this.write( getLogLinePrefixWarning() + fmtWarning( ...args ) );
             },
-            attention: function( ...args: any[] ): void {
+            attention: function( ...args: TLogArgument[] ): void {
                 if( verboseGet() >= verboseName2Number( "attention" ) ) {
                     this.write(
                         getLogLinePrefixAttention() + fmtAttention( ...args ) );
                 }
             },
-            information: function( ...args: any[] ): void {
+            information: function( ...args: TLogArgument[] ): void {
                 if( verboseGet() >= verboseName2Number( "information" ) ) {
                     this.write(
                         getLogLinePrefixInformation() + fmtInformation( ...args ) );
                 }
             },
-            info: function( ...args: any[] ): void {
+            info: function( ...args: TLogArgument[] ): void {
                 if( verboseGet() >= verboseName2Number( "information" ) ) {
                     this.write(
                         getLogLinePrefixInformation() + fmtInformation( ...args ) );
                 }
             },
-            notice: function( ...args: any[] ): void {
+            notice: function( ...args: TLogArgument[] ): void {
                 if( verboseGet() >= verboseName2Number( "notice" ) )
                     this.write( getLogLinePrefixNotice() + fmtNotice( ...args ) );
             },
-            note: function( ...args: any[] ): void {
+            note: function( ...args: TLogArgument[] ): void {
                 if( verboseGet() >= verboseName2Number( "notice" ) )
                     this.write( getLogLinePrefixNote() + fmtNote( ...args ) );
             },
-            debug: function( ...args: any[] ): void {
+            debug: function( ...args: TLogArgument[] ): void {
                 if( verboseGet() >= verboseName2Number( "debug" ) )
                     this.write( getLogLinePrefixDebug() + fmtDebug( ...args ) );
             },
-            trace: function( ...args: any[] ): void {
+            trace: function( ...args: TLogArgument[] ): void {
                 if( verboseGet() >= verboseName2Number( "trace" ) )
                     this.write( getLogLinePrefixTrace() + fmtTrace( ...args ) );
             },
-            success: function( ...args: any[] ): void {
+            success: function( ...args: TLogArgument[] ): void {
                 if( verboseGet() >= verboseName2Number( "information" ) )
                     this.write( getLogLinePrefixSuccess() + fmtSuccess( ...args ) );
             }
@@ -569,7 +533,7 @@ export function createFileOutput(
             haveOwnTimestamps: false,
             isPausedTimeStamps: false,
             strOwnIndent: "",
-            write: function( ...args: any[] ): void {
+            write: function( ...args: TLogArgument[] ): void {
                 let s = ( this.strOwnIndent ? this.strOwnIndent : "" ) +
                     ( ( this.haveOwnTimestamps && ( !this.isPausedTimeStamps ) )
                         ? generateTimestampPrefix( null, true )
@@ -582,7 +546,7 @@ export function createFileOutput(
                     }
                 } catch ( err ) { }
             },
-            writeRaw: function( ...args: any[] ): void {
+            writeRaw: function( ...args: TLogArgument[] ): void {
                 const s = fmtArgumentsArray( args );
                 try {
                     if( s.length > 0 ) {
@@ -640,59 +604,59 @@ export function createFileOutput(
             exposeDetailsTo:
                 function( otherStream: TLogger, strTitle: string, isSuccess: boolean ): void { },
             // high-level formatters
-            fatal: function( ...args: any[] ): void {
+            fatal: function( ...args: TLogArgument[] ): void {
                 if( verboseGet() >= verboseName2Number( "fatal" ) )
                     this.write( getLogLinePrefixFatal() + fmtFatal( ...args ) );
             },
-            critical: function( ...args: any[] ): void {
+            critical: function( ...args: TLogArgument[] ): void {
                 if( verboseGet() >= verboseName2Number( "critical" ) ) {
                     this.write(
                         getLogLinePrefixCritical() + fmtCritical( ...args ) );
                 }
             },
-            error: function( ...args: any[] ): void {
+            error: function( ...args: TLogArgument[] ): void {
                 if( verboseGet() >= verboseName2Number( "error" ) )
                     this.write( getLogLinePrefixError() + fmtError( ...args ) );
             },
-            warning: function( ...args: any[] ): void {
+            warning: function( ...args: TLogArgument[] ): void {
                 if( verboseGet() >= verboseName2Number( "warning" ) )
                     this.write( getLogLinePrefixWarning() + fmtWarning( ...args ) );
             },
-            attention: function( ...args: any[] ): void {
+            attention: function( ...args: TLogArgument[] ): void {
                 if( verboseGet() >= verboseName2Number( "attention" ) ) {
                     this.write(
                         getLogLinePrefixAttention() + fmtAttention( ...args ) );
                 }
             },
-            information: function( ...args: any[] ): void {
+            information: function( ...args: TLogArgument[] ): void {
                 if( verboseGet() >= verboseName2Number( "information" ) ) {
                     this.write(
                         getLogLinePrefixInformation() + fmtInformation( ...args ) );
                 }
             },
-            info: function( ...args: any[] ): void {
+            info: function( ...args: TLogArgument[] ): void {
                 if( verboseGet() >= verboseName2Number( "information" ) ) {
                     this.write(
                         getLogLinePrefixInformation() + fmtInformation( ...args ) );
                 }
             },
-            notice: function( ...args: any[] ): void {
+            notice: function( ...args: TLogArgument[] ): void {
                 if( verboseGet() >= verboseName2Number( "notice" ) )
                     this.write( getLogLinePrefixNotice() + fmtNotice( ...args ) );
             },
-            note: function( ...args: any[] ): void {
+            note: function( ...args: TLogArgument[] ): void {
                 if( verboseGet() >= verboseName2Number( "notice" ) )
                     this.write( getLogLinePrefixNote() + fmtNote( ...args ) );
             },
-            debug: function( ...args: any[] ): void {
+            debug: function( ...args: TLogArgument[] ): void {
                 if( verboseGet() >= verboseName2Number( "debug" ) )
                     this.write( getLogLinePrefixDebug() + fmtDebug( ...args ) );
             },
-            trace: function( ...args: any[] ): void {
+            trace: function( ...args: TLogArgument[] ): void {
                 if( verboseGet() >= verboseName2Number( "trace" ) )
                     this.write( getLogLinePrefixTrace() + fmtTrace( ...args ) );
             },
-            success: function( ...args: any[] ): void {
+            success: function( ...args: TLogArgument[] ): void {
                 if( verboseGet() >= verboseName2Number( "information" ) )
                     this.write( getLogLinePrefixSuccess() + fmtSuccess( ...args ) );
             }
@@ -719,7 +683,7 @@ export function insertFileOutput(
     return true;
 }
 
-export function extractErrorMessage( jo?: any, strDefaultErrorText?: string ): string {
+export function extractErrorMessage( jo?: TLogArgument, strDefaultErrorText?: string ): string {
     strDefaultErrorText = strDefaultErrorText ?? "unknown error or error without a description";
     if( !jo )
         return strDefaultErrorText;
@@ -747,12 +711,12 @@ export function extractErrorMessage( jo?: any, strDefaultErrorText?: string ): s
     return strDefaultErrorText;
 }
 
-function tryToSplitFormatString( strFormat?: string, cntArgsMax?: number ): any[] | null {
+function tryToSplitFormatString( strFormat?: string, cntArgsMax?: number ): TLogArgument[] | null {
     if( !( strFormat && typeof strFormat === "string" ) )
         return null;
     if( !cntArgsMax )
         cntArgsMax = 0;
-    const arrParts: any[] = [];
+    const arrParts: TLogArgument[] = [];
     let s = strFormat; let cntFoundArgs = 0;
     for( ; true; ) {
         if( cntFoundArgs >= cntArgsMax )
@@ -780,15 +744,18 @@ function tryToSplitFormatString( strFormat?: string, cntArgsMax?: number ): any[
     return arrParts;
 }
 
-export function fmtArgumentsArray( arrArgs: any[], fnFormatter?: any ): string {
-    fnFormatter = fnFormatter || function( arg: any ): any { return arg; };
+export function fmtArgumentsArray( arrArgs: TLogArgument[], fnFormatter?: TFnFormatter ): string {
+    fnFormatter = fnFormatter ?? function( arg: TLogArgument ): string { return arg; };
     const arrParts = ( arrArgs && arrArgs.length > 0 )
         ? tryToSplitFormatString( arrArgs[0], arrArgs.length - 1 )
         : null;
     let s = ""; let isValueMode = false;
-    const fnDefaultOneArgumentFormatter = function( arg?: any, fnCustomFormatter?: any ): string {
+    const fnDefaultOneArgumentFormatter = function(
+        arg?: TLogArgument, fnCustomFormatter?: TFnFormatter | null ): string {
         if( !fnCustomFormatter )
             fnCustomFormatter = fnFormatter;
+        if( !fnCustomFormatter )
+            fnCustomFormatter = function( x?: TLogArgument ): string { return x; };
         const t = typeof arg;
         if( t == "string" ) {
             if( arg.length > 0 ) {
@@ -801,7 +768,7 @@ export function fmtArgumentsArray( arrArgs: any[], fnFormatter?: any ): string {
             return cc.logArgToString( arg );
         return arg;
     };
-    const fnFormatOneArgument = function( arg: any, fmt?: any ): string {
+    const fnFormatOneArgument = function( arg: TLogArgument, fmt?: TLogArgument ): string {
         if( !arg )
             return arg;
         if( arg == " " || arg == "\n" )
@@ -881,12 +848,12 @@ export function outputStringToAllStreams( s: string ): void {
     }
 }
 
-export function write( ...args: any[] ): void {
+export function write( ...args: TLogArgument[] ): void {
     let s: string = getPrintTimestamps() ? generateTimestampPrefix( null, true ) : "";
     s += fmtArgumentsArray( args );
     outputStringToAllStreams( s );
 }
-export function writeRaw( ...args: any[] ): void {
+export function writeRaw( ...args: TLogArgument[] ): void {
     const s: string = fmtArgumentsArray( args );
     outputStringToAllStreams( s );
 }
@@ -926,89 +893,89 @@ export function getLogLinePrefixSuccess(): string {
 }
 
 // high-level format to returned string
-export function fmtFatal( ...args: any[] ): string {
+export function fmtFatal( ...args: TLogArgument[] ): string {
     return fmtArgumentsArray( args, cc.error );
 }
-export function fmtCritical( ...args: any[] ): string {
+export function fmtCritical( ...args: TLogArgument[] ): string {
     return fmtArgumentsArray( args, cc.error );
 }
-export function fmtError( ...args: any[] ): string {
+export function fmtError( ...args: TLogArgument[] ): string {
     return fmtArgumentsArray( args, cc.error );
 }
-export function fmtWarning( ...args: any[] ): string {
+export function fmtWarning( ...args: TLogArgument[] ): string {
     return fmtArgumentsArray( args, cc.warning );
 }
-export function fmtAttention( ...args: any[] ): string {
+export function fmtAttention( ...args: TLogArgument[] ): string {
     return fmtArgumentsArray( args, cc.attention );
 }
-export function fmtInformation( ...args: any[] ): string {
+export function fmtInformation( ...args: TLogArgument[] ): string {
     return fmtArgumentsArray( args, cc.info );
 }
-export function fmtInfo( ...args: any[] ): string {
+export function fmtInfo( ...args: TLogArgument[] ): string {
     return fmtArgumentsArray( args, cc.info );
 }
-export function fmtNotice( ...args: any[] ): string {
+export function fmtNotice( ...args: TLogArgument[] ): string {
     return fmtArgumentsArray( args, cc.notice );
 }
-export function fmtNote( ...args: any[] ): string {
+export function fmtNote( ...args: TLogArgument[] ): string {
     return fmtArgumentsArray( args, cc.note );
 }
-export function fmtDebug( ...args: any[] ): string {
+export function fmtDebug( ...args: TLogArgument[] ): string {
     return fmtArgumentsArray( args, cc.debug );
 }
-export function fmtTrace( ...args: any[] ): string {
+export function fmtTrace( ...args: TLogArgument[] ): string {
     return fmtArgumentsArray( args, cc.trace );
 }
-export function fmtSuccess( ...args: any[] ): string {
+export function fmtSuccess( ...args: TLogArgument[] ): string {
     return fmtArgumentsArray( args, cc.success );
 }
 
 // high-level formatted output
-export function fatal( ...args: any[] ): void {
+export function fatal( ...args: TLogArgument[] ): void {
     if( verboseGet() >= verboseName2Number( "fatal" ) )
         write( getLogLinePrefixFatal() + fmtFatal( ...args ) + "\n" );
 }
-export function critical( ...args: any[] ): void {
+export function critical( ...args: TLogArgument[] ): void {
     if( verboseGet() >= verboseName2Number( "critical" ) )
         write( getLogLinePrefixCritical() + fmtCritical( ...args ) + "\n" );
 }
-export function error( ...args: any[] ): void {
+export function error( ...args: TLogArgument[] ): void {
     if( verboseGet() >= verboseName2Number( "error" ) )
         write( getLogLinePrefixError() + fmtError( ...args ) + "\n" );
 }
-export function warning( ...args: any[] ): void {
+export function warning( ...args: TLogArgument[] ): void {
     if( verboseGet() >= verboseName2Number( "warning" ) )
         write( getLogLinePrefixWarning() + fmtWarning( ...args ) + "\n" );
 }
-export function attention( ...args: any[] ): void {
+export function attention( ...args: TLogArgument[] ): void {
     if( verboseGet() >= verboseName2Number( "attention" ) )
         write( getLogLinePrefixAttention() + fmtAttention( ...args ) + "\n" );
 }
-export function information( ...args: any[] ): void {
+export function information( ...args: TLogArgument[] ): void {
     if( verboseGet() >= verboseName2Number( "information" ) )
         write( getLogLinePrefixInformation() + fmtInformation( ...args ) + "\n" );
 }
-export function info( ...args: any[] ): void {
+export function info( ...args: TLogArgument[] ): void {
     if( verboseGet() >= verboseName2Number( "information" ) )
         write( getLogLinePrefixInformation() + fmtInformation( ...args ) + "\n" );
 }
-export function notice( ...args: any[] ): void {
+export function notice( ...args: TLogArgument[] ): void {
     if( verboseGet() >= verboseName2Number( "notice" ) )
         write( getLogLinePrefixNotice() + fmtNotice( ...args ) + "\n" );
 }
-export function note( ...args: any[] ): void {
+export function note( ...args: TLogArgument[] ): void {
     if( verboseGet() >= verboseName2Number( "notice" ) )
         write( getLogLinePrefixNote() + fmtNote( ...args ) + "\n" );
 }
-export function debug( ...args: any[] ): void {
+export function debug( ...args: TLogArgument[] ): void {
     if( verboseGet() >= verboseName2Number( "debug" ) )
         write( getLogLinePrefixDebug() + fmtDebug( ...args ) + "\n" );
 }
-export function trace( ...args: any[] ): void {
+export function trace( ...args: TLogArgument[] ): void {
     if( verboseGet() >= verboseName2Number( "trace" ) )
         write( getLogLinePrefixTrace() + fmtTrace( ...args ) + "\n" );
 }
-export function success( ...args: any[] ): void {
+export function success( ...args: TLogArgument[] ): void {
     if( verboseGet() >= verboseName2Number( "information" ) )
         write( getLogLinePrefixSuccess() + fmtSuccess( ...args ) + "\n" );
 }
@@ -1056,59 +1023,61 @@ export function toString(): string {
     return "";
 }
 
-const gMapVerbose: Map < number, string > = new Map < number, string >();
-gMapVerbose.set( 0, "silent" );
-gMapVerbose.set( 1, "fatal" );
-gMapVerbose.set( 2, "critical" );
-gMapVerbose.set( 3, "error" );
-gMapVerbose.set( 4, "warning" );
-gMapVerbose.set( 5, "attention" );
-gMapVerbose.set( 6, "information" );
-gMapVerbose.set( 7, "notice" );
-gMapVerbose.set( 8, "debug" );
-gMapVerbose.set( 9, "trace" );
+const gMapVerbose: TMapVerbose = { };
+gMapVerbose[0] = "silent";
+gMapVerbose[1] = "fatal";
+gMapVerbose[2] = "critical";
+gMapVerbose[3] = "error";
+gMapVerbose[4] = "warning";
+gMapVerbose[5] = "attention";
+gMapVerbose[6] = "information";
+gMapVerbose[7] = "notice";
+gMapVerbose[8] = "debug";
+gMapVerbose[9] = "trace";
 
-function computeVerboseAlias(): Map < string, number > {
-    const m: Map < string, number > = new Map < string, number >();
-    for( const [ key, val ] of gMapVerbose ) {
+function computeVerboseAlias(): TMapVerboseReverse {
+    const m: TMapVerboseReverse = { };
+    const arrKeys: string[] = Object.keys( gMapVerbose );
+    for( const key of arrKeys ) {
+        const val = gMapVerbose[key as any];
         const name = val;
         if( name )
-            m.set( name, key );
+            m[name] = key as any;
     }
-    m.set( "empty", m.get( "silent" ) ?? 0 ); // alias
-    m.set( "none", m.get( "silent" ) ?? 0 ); // alias
-    m.set( "stop", m.get( "fatal" ) ?? 0 ); // alias
-    m.set( "bad", m.get( "critical" ) ?? 0 ); // alias
-    m.set( "err", m.get( "error" ) ?? 0 ); // alias
-    m.set( "warn", m.get( "warning" ) ?? 0 ); // alias
-    m.set( "attn", m.get( "attention" ) ?? 0 ); // alias
-    m.set( "info", m.get( "information" ) ?? 0 ); // alias
-    m.set( "note", m.get( "notice" ) ?? 0 ); // alias
-    m.set( "dbg", m.get( "debug" ) ?? 0 ); // alias
-    m.set( "crazy", m.get( "trace" ) ?? 0 ); // alias
-    m.set( "detailed", m.get( "trace" ) ?? 0 ); // alias
+    m.empty = m.silent ?? 0; // alias
+    m.none = m.silent ?? 0; // alias
+    m.stop = m.fatal ?? 0; // alias
+    m.bad = m.critical ?? 0; // alias
+    m.err = m.error ?? 0; // alias
+    m.warn = m.warning ?? 0; // alias
+    m.attn = m.attention ?? 0; // alias
+    m.info = m.information ?? 0; // alias
+    m.note = m.notice ?? 0; // alias
+    m.dbg = m.debug ?? 0; // alias
+    m.crazy = m.trace ?? 0; // alias
+    m.detailed = m.trace ?? 0; // alias
     return m;
 }
-let gMapReversedVerbose: Map < string, number > = new Map < string, number >();
+let gMapReversedVerbose: TMapVerboseReverse = { };
 
-export function verbose(): any { return gMapVerbose; }
-export function verboseReversed(): Map < string, number > {
+export function verbose(): TMapVerbose { return gMapVerbose; }
+export function verboseReversed(): TMapVerboseReverse {
     if( !gMapReversedVerbose )
         gMapReversedVerbose = computeVerboseAlias();
     return gMapReversedVerbose;
 }
-export function verboseLevelAsTextForLog( vl: any ): string {
+export function verboseLevelAsTextForLog( vl: TLogArgument ): string {
     if( typeof vl === "undefined" )
         vl = verboseGet();
     if( vl in gMapVerbose ) {
-        const tl = gMapVerbose.get( vl ) ?? 0;
+        const tl = gMapVerbose[vl] ?? 0;
         return tl.toString();
     }
     return "unknown(" + JSON.stringify( vl ) + ")";
 }
 export function verboseName2Number( s: string ): number {
-    const mapReversedVerbose: Map < string, number > = verboseReversed();
-    const n = mapReversedVerbose.get( s );
+    const mapReversedVerbose: TMapVerboseReverse = verboseReversed();
+    const n = mapReversedVerbose[s];
     if( typeof n === "undefined" )
         return 9;
     return n;
@@ -1120,14 +1089,14 @@ let gVerboseLevel = verboseName2Number( "information" );
 export function exposeDetailsGet(): boolean {
     return ( !!gFlagIsExposeDetails );
 }
-export function exposeDetailsSet( isExpose: any ): void {
+export function exposeDetailsSet( isExpose: TLogArgument ): void {
     gFlagIsExposeDetails = ( !!isExpose );
 }
 
 export function verboseGet(): number {
     return cc.toInteger( gVerboseLevel );
 }
-export function verboseSet( vl?: any ): void {
+export function verboseSet( vl?: TLogArgument ): void {
     gVerboseLevel = parseInt( vl );
 }
 
@@ -1139,11 +1108,13 @@ export function verboseParse( s: string ): number {
             n = cc.toInteger( s );
         else {
             const ch0 = s[0].toLowerCase();
-            for( const [ key, val ] of gMapVerbose ) {
+            const arrKeys: string[] = Object.keys( gMapVerbose );
+            for( const key of arrKeys ) {
+                const val = gMapVerbose[key as any];
                 const name = val;
                 const ch1: string = name[0].toLowerCase();
                 if( ch0 == ch1 ) {
-                    n = key;
+                    n = key as any;
                     return n;
                 }
             }
@@ -1153,37 +1124,41 @@ export function verboseParse( s: string ): number {
 }
 
 export function verboseList(): void {
-    for( const [ key, val ] of gMapVerbose ) {
+    const arrKeys: string[] = Object.keys( gMapVerbose );
+    for( const key of arrKeys ) {
+        const val = gMapVerbose[key as any];
         const name = val;
         console.log( "    " + cc.j( key ) + cc.sunny( "=" ) + cc.bright( name ) );
     }
 }
 
-export function u( x?: any ): string {
+export function u( x?: TLogArgument ): string {
     return cc.isStringAlreadyColorized( x ) ? x : cc.u( x );
 }
 
-export function v( x?: any ): string {
+export function v( x?: TLogArgument ): string {
     return cc.isStringAlreadyColorized( x ) ? x : cc.j( x );
 }
 
-export function em( x?: any ): string {
+export function em( x?: TLogArgument ): string {
     return cc.isStringAlreadyColorized( x ) ? x : cc.warning( x );
 }
 
-export function stack( err?: any ): string {
+export function stack( err?: TLogArgument ): string {
     return cc.stack( err );
 }
 
-export function onOff( x?: any ): string {
+export function onOff( x?: TLogArgument ): string {
     return cc.isStringAlreadyColorized( x ) ? x : cc.onOff( x );
 }
 
-export function yn( x?: any ): string {
+export function yn( x?: TLogArgument ): string {
     return cc.isStringAlreadyColorized( x ) ? x : cc.yn( x );
 }
 
-export function posNeg( condition: any, strPositive: string, strNegative: string ): string {
+export function posNeg(
+    condition: TLogArgument, strPositive: string, strNegative: string
+): string {
     return condition
         ? ( cc.isStringAlreadyColorized( strPositive ) ? strPositive : cc.success( strPositive ) )
         : ( cc.isStringAlreadyColorized( strNegative ) ? strNegative : cc.error( strNegative ) );

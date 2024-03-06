@@ -41,7 +41,7 @@ import * as imaEventLogScan from "./imaEventLogScan.js";
 import * as threadInfo from "./threadInfo.js";
 
 export interface TCallOptions {
-    from?: state.TAdditionalSummaryInTransactionReceipt
+    from?: string
     gasPrice?: string
     gasLimit?: string
     value?: string

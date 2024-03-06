@@ -29,6 +29,7 @@ import * as threadInfo from "./threadInfo.js";
 import * as owaspUtils from "./owaspUtils.js";
 import * as sha3Module from "sha3";
 import type * as rpcCallFormats from "./rpcCallFormats.js";
+import type * as state from "./state.js";
 
 const Keccak: any = sha3Module.Keccak;
 
@@ -98,7 +99,7 @@ export function findPowNumber(
 
 async function handleOracleCheckResultResult(
     oracleOpts: TOracleOptions, details: log.TLogger, isVerboseTraceDetails: boolean,
-    joCall: rpcCall.TRPCCall, joIn: any, joOut: any
+    joCall: rpcCall.TRPCCall, joIn: state.TLoadedJSON, joOut: state.TLoadedJSON
 ): Promise< owaspUtils.ethersMod.BigNumber > {
     if( isVerboseTraceDetails )
         details.debug( "RPC call(oracle_checkResult) result is: {}", joOut );
@@ -109,7 +110,7 @@ async function handleOracleCheckResultResult(
         await joCall.disconnect();
         return owaspUtils.toBN( 0 );
     }
-    const joResult: any = JSON.parse( joOut.result );
+    const joResult: state.TLoadedJSON = JSON.parse( joOut.result );
     if( isVerboseTraceDetails )
         details.debug( "RPC call(oracle_checkResult) parsed result field is: {}", joResult );
     const gp: owaspUtils.ethersMod.BigNumber = owaspUtils.toBN( joResult.rslts[0] );
@@ -123,7 +124,7 @@ async function handleOracleCheckResultResult(
 
 async function handleOracleSubmitRequestResult(
     oracleOpts: TOracleOptions, details: log.TLogger, isVerboseTraceDetails: boolean,
-    joCall: rpcCall.TRPCCall, joIn: any, joOut: any
+    joCall: rpcCall.TRPCCall, joIn: state.TLoadedJSON, joOut: state.TLoadedJSON
 ): Promise<owaspUtils.ethersMod.BigNumber> {
     const nMillisecondsSleepBefore = "nMillisecondsSleepBefore" in oracleOpts
         ? oracleOpts.nMillisecondsSleepBefore

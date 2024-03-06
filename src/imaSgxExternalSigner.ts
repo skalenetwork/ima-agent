@@ -3,6 +3,7 @@ import * as log from "./log.js";
 import * as owaspUtils from "./owaspUtils.js";
 import * as rpcCall from "./rpcCall.js";
 import type * as rpcCallFormats from "./rpcCallFormats.js";
+import { type TSameAsTransactionReceipt, type TExpandedECDSA } from "./state.js";
 
 const gIsDebugLogging = false; // development option only, must be always false
 log.addStdout();
@@ -18,20 +19,20 @@ export interface TRPCInputECDSASignMessageHash extends rpcCallFormats.TRPCInputB
     }
 }
 
-function finalizeOutput( jo: any ): void {
+function finalizeOutput( jo: TSameAsTransactionReceipt | { error: string } | null ): void {
     if( !jo )
         return;
     process.stdout.write( log.fmtInformation( "{}", jo ) );
 }
 
-function postConvertBN( jo: any, name: any ): void {
+function postConvertBN( jo: TSameAsTransactionReceipt, name: string ): void {
     if( !jo )
         return;
     if( !( name in jo ) )
         return;
-    if( typeof jo[name] !== "object" )
+    if( typeof ( jo as any )[name] !== "object" )
         return;
-    jo[name] = owaspUtils.toHexStringSafe( jo[name] );
+    ( jo as any )[name] = owaspUtils.toHexStringSafe( ( jo as any )[name] );
 }
 
 async function run(): Promise<void> {
@@ -78,14 +79,14 @@ async function run(): Promise<void> {
             log.debug( "Path to SGX key file is {}", strPathKey );
         const ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider =
             owaspUtils.getEthersProviderFromURL( strURL );
-        const tx: any = {
+        const tx: owaspUtils.ethersMod.PopulatedTransaction = {
             data: tcData,
             to: txTo,
             value: owaspUtils.toBN( txValue ),
             chainId: owaspUtils.parseIntOrHex( chainId ),
             gasPrice: owaspUtils.toBN( gasPrice ),
             gasLimit: owaspUtils.toBN( gasLimit ),
-            nonce: owaspUtils.toBN( txNonce )
+            nonce: owaspUtils.toBN( txNonce ).toNumber()
         };
         if( gIsDebugLogging )
             log.debug( "--- Source TX ---> {}", tx );
@@ -119,7 +120,7 @@ async function run(): Promise<void> {
 
             const v = parseInt( joOut.result.signature_v );
             const ethV = v + owaspUtils.parseIntOrHex( chainId ) * 2 + 35;
-            const joExpanded = {
+            const joExpanded: TExpandedECDSA = {
                 recoveryParam: v,
                 v: ethV,
                 r: joOut.result.signature_r,
@@ -136,7 +137,8 @@ async function run(): Promise<void> {
             if( gIsDebugLogging )
                 log.debug( "--- Raw-sent transaction result ---> {}", sr );
 
-            const joReceipt: any = await ethersProvider.waitForTransaction( sr.hash );
+            const joReceipt: TSameAsTransactionReceipt =
+            await ethersProvider.waitForTransaction( sr.hash );
             if( gIsDebugLogging )
                 log.debug( "--- Transaction receipt ---> {}", joReceipt );
             joReceipt.chainId = tx.chainId;

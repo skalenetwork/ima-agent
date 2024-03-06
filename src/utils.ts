@@ -90,7 +90,9 @@ export function fileSave( strPath: string, s: string ): boolean {
     return false;
 }
 
-export function jsonFileLoad( strPath: string, joDefault?: any, bLogOutput?: boolean ): any {
+export function jsonFileLoad(
+    strPath: string, joDefault?: state.TLoadedJSON, bLogOutput?: boolean
+): state.TLoadedJSON {
     if( bLogOutput == undefined || bLogOutput == null )
         bLogOutput = false;
     joDefault = joDefault || {};
@@ -107,7 +109,7 @@ export function jsonFileLoad( strPath: string, joDefault?: any, bLogOutput?: boo
         if( bLogOutput )
             log.debug( "Did loaded content of JSON file {}, will parse it...", strPath );
 
-        const jo: any = JSON.parse( s );
+        const jo: state.TLoadedJSON = JSON.parse( s );
         if( bLogOutput )
             log.success( "Done, loaded content of JSON file {}.", strPath );
         return jo;
@@ -118,7 +120,9 @@ export function jsonFileLoad( strPath: string, joDefault?: any, bLogOutput?: boo
     return joDefault;
 }
 
-export function jsonFileSave( strPath: string, jo?: any, bLogOutput?: boolean ): any {
+export function jsonFileSave(
+    strPath: string, jo?: state.TLoadedJSON, bLogOutput?: boolean
+): state.TLoadedJSON {
     if( bLogOutput == undefined || bLogOutput == null )
         bLogOutput = false;
     if( bLogOutput )
@@ -171,7 +175,7 @@ export async function waitForClonedTokenToAppear(
             await contractTokenManager.callStatic[
                 "clones" + log.capitalizeFirstLetter( strTokenSuffixLCshort )](
                 owaspUtils.ethersMod.ethers.utils.id( strMainnetName ),
-                ( tokensMN.joABI as any )[strTokenSuffixUC + "_address"],
+                ( tokensMN.joABI as state.TLoadedJSON )[strTokenSuffixUC + "_address"],
                 { from: addressCallFrom }
             );
         if( addressOnSChain != "0x0000000000000000000000000000000000000000" ) {
@@ -203,7 +207,8 @@ export async function waitForClonedTokenToAppearErc20(
     const addressCallFrom = joAccountSC.address();
     const addressOnSChain = await waitForClonedTokenToAppear(
         sc, "erc20", addressCallFrom, 40, tokensMN, strMainnetName );
-    tokenERC20SC.abi = JSON.parse( JSON.stringify( ( tokensMN.joABI as any ).ERC20_abi ) );
+    tokenERC20SC.abi = JSON.parse(
+        JSON.stringify( ( tokensMN.joABI as state.TLoadedJSON ).ERC20_abi ) );
     tokenERC20SC.address = addressOnSChain ? addressOnSChain.toString() : "";
 }
 
@@ -222,7 +227,8 @@ export async function waitForClonedTokenToAppearErc721(
     const addressOnSChain =
         await waitForClonedTokenToAppear(
             sc, "erc721", addressCallFrom, 40, tokensMN, strMainnetName );
-    tokenERC721SC.abi = JSON.parse( JSON.stringify( ( tokensMN.joABI as any ).ERC721_abi ) );
+    tokenERC721SC.abi = JSON.parse(
+        JSON.stringify( ( tokensMN.joABI as state.TLoadedJSON ).ERC721_abi ) );
     tokenERC721SC.address = addressOnSChain ? addressOnSChain.toString() : "";
 }
 
@@ -241,8 +247,8 @@ export async function waitForClonedTokenToAppearErc721WithMetadata(
     const addressCallFrom = joAccountSC.address();
     const addressOnSChain = await waitForClonedTokenToAppear(
         sc, "erc721_with_metadata", addressCallFrom, 40, tokensMN, strMainnetName );
-    tokenERC721SC.abi =
-        JSON.parse( JSON.stringify( ( tokensMN.joABI as any ).ERC721_with_metadata_abi ) );
+    tokenERC721SC.abi = JSON.parse(
+        JSON.stringify( ( tokensMN.joABI as state.TLoadedJSON ).ERC721_with_metadata_abi ) );
     tokenERC721SC.address = addressOnSChain ? addressOnSChain.toString() : "";
 }
 
@@ -260,12 +266,13 @@ export async function waitForClonedTokenToAppearErc1155(
     const addressCallFrom = joAccountSC.address();
     const addressOnSChain = await waitForClonedTokenToAppear(
         sc, "erc1155", addressCallFrom, 40, tokensMN, strMainnetName );
-    tokenERC1155SC.abi = JSON.parse( JSON.stringify( ( tokensMN.joABI as any ).ERC1155_abi ) );
+    tokenERC1155SC.abi = JSON.parse(
+        JSON.stringify( ( tokensMN.joABI as state.TLoadedJSON ).ERC1155_abi ) );
     tokenERC1155SC.address = addressOnSChain ? addressOnSChain.toString() : "";
 }
 
 export function hexToBytes(
-    strHex?: any, isInversiveOrder?: boolean
+    strHex?: log.TLogArgument, isInversiveOrder?: boolean
 ): Uint8Array { // convert a hex string to a byte array
     isInversiveOrder = !!(
         ( isInversiveOrder != null && isInversiveOrder != undefined && isInversiveOrder )
@@ -293,7 +300,7 @@ export function bytesToHex(
     isInversiveOrder = !!(
         ( isInversiveOrder != null && isInversiveOrder != undefined && isInversiveOrder )
     );
-    const hex: any[] = [];
+    const hex: log.TLogArgument[] = [];
     for( let i = 0; i < arrBytes.length; i++ ) {
         const current = arrBytes[i] < 0 ? arrBytes[i] + 256 : arrBytes[i];
         const c0 = ( current >>> 4 ).toString( 16 );
@@ -353,11 +360,11 @@ export function bytesConcat( a1?: Uint8Array, a2?: Uint8Array ): Uint8Array {
     return concatUint8Arrays( a1, a2 );
 }
 
-export function toBuffer( ab?: any ): Buffer {
+export function toBuffer( ab?: log.TLogArgument ): Buffer {
     return Buffer.from( new Uint8Array( ab ) );
 }
 
-export function discoverCoinNameInJSON( jo?: any ): string {
+export function discoverCoinNameInJSON( jo?: state.TLoadedJSON ): string {
     if( typeof jo !== "object" )
         return "";
     const arrKeys = Object.keys( jo );
@@ -388,7 +395,8 @@ export function discoverCoinNameInJSON( jo?: any ): string {
 }
 
 export function checkKeyExistInABI(
-    strName: string, strFile: string, joABI: any, strKey: string, isExitOnError?: boolean
+    strName: string, strFile: string, joABI: state.TLoadedJSON,
+    strKey: string, isExitOnError?: boolean
 ): boolean {
     if( isExitOnError == null || isExitOnError == undefined )
         isExitOnError = true;
@@ -407,7 +415,8 @@ export function checkKeyExistInABI(
 }
 
 export function checkKeysExistInABI(
-    strName: string, strFile: string, joABI: any, arrKeys: any[], isExitOnError?: boolean
+    strName: string, strFile: string, joABI: state.TLoadedJSON,
+    arrKeys: string[], isExitOnError?: boolean
 ): boolean {
     const cnt = arrKeys.length;
     for( let i = 0; i < cnt; ++i ) {

@@ -2,6 +2,8 @@ import * as owaspUtils from "./owaspUtils.js";
 import * as imaTx from "./imaTx.js";
 import type * as discoveryTools from "./discoveryTools.js";
 
+export type TLoadedJSON = any;
+
 export type TAddress = string;
 export type TBalance = owaspUtils.ethersMod.BigNumber;
 export type TTokenID = string;
@@ -10,6 +12,13 @@ export interface TAdditionalSummaryInTransactionReceipt {
     bnGasSpent: owaspUtils.ethersMod.BigNumber
     gasSpent: string
     ethSpent: string
+}
+
+export interface TExpandedECDSA {
+    recoveryParam: number
+    v: number
+    r: string
+    s: string
 }
 
 export interface TSameAsTransactionReceipt {
@@ -31,6 +40,12 @@ export interface TSameAsTransactionReceipt {
     type: number
     status?: number
     summary?: TAdditionalSummaryInTransactionReceipt
+
+    chainId?: number
+    rawTX?: string
+    signature?: TExpandedECDSA
+
+    error?: Error | string | null
 }
 
 export interface TReceiptDescription {
@@ -101,10 +116,12 @@ export const gDefaultValueForLoopState: TLoopState = {
     }
 };
 
+export type TFnAccountAddress = () => string;
+
 export interface TAccount {
     address_?: string
     privateKey: string | null
-    address: any
+    address: TFnAccountAddress
     strTransactionManagerURL: string
     nTmPriority: number
     strSgxURL: string
@@ -122,11 +139,11 @@ export interface TOneChainProperties {
     strChainName: string
     chainId: string | number
     strPathAbiJson: string
-    joAbiIMA: any
+    joAbiIMA: TLoadedJSON
     bHaveAbiIMA: boolean
-    joErc20: any | null
-    joErc721: any | null
-    joErc1155: any | null
+    joErc20: TLoadedJSON | null
+    joErc721: TLoadedJSON | null
+    joErc1155: TLoadedJSON | null
     strCoinNameErc20: string // in-JSON coin name
     strCoinNameErc721: string // in-JSON coin name
     strCoinNameErc1155: string // in-JSON coin name
@@ -382,7 +399,7 @@ export interface TIMAState {
     chainProperties: TPropertiesOfChains
 
     strPathAbiJsonSkaleManager: string
-    joAbiSkaleManager: any
+    joAbiSkaleManager: TLoadedJSON
     bHaveSkaleManagerABI: boolean
 
     strChainNameOriginChain: string
@@ -426,7 +443,7 @@ export interface TIMAState {
 
     arrActions: TIMAAction[] // array of actions to run
 
-    receiver?: any | null
+    receiver?: TAddress | null
 
     haveOneTokenIdentifier: boolean
     haveArrayOfTokenIdentifiers: boolean

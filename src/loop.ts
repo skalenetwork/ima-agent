@@ -658,7 +658,7 @@ export async function ensureHaveWorkers(
                 workerData
             }
         ) );
-        gArrWorkers[idxWorker].on( "message", function( jo: any ): void {
+        gArrWorkers[idxWorker].on( "message", function( jo: state.TLoadedJSON ): void {
             networkLayer.outOfWorkerAPIs.onMessage( gArrWorkers[idxWorker], jo );
         } );
         const aClient = new networkLayer.OutOfWorkerSocketClientPipe(
@@ -666,7 +666,7 @@ export async function ensureHaveWorkers(
         gArrClients.push( aClient );
         aClient.logicalInitComplete = false;
         aClient.errorLogicalInit = null;
-        aClient.on( "message", async function( eventData: any ): Promise<void> {
+        aClient.on( "message", async function( eventData: state.TLoadedJSON ): Promise<void> {
             const joMessage = eventData.message;
             switch ( joMessage.method ) {
             case "init":
@@ -691,7 +691,7 @@ export async function ensureHaveWorkers(
                 break;
             } // switch ( joMessage.method )
         } );
-        const jo: any = {
+        const jo: state.TLoadedJSON = {
             method: "init",
             message: {
                 opts: {
@@ -815,7 +815,8 @@ export async function runParallelLoops( opts: TParallelLoopRunOptions ): Promise
     return true;
 }
 
-export async function spreadArrivedStateOfPendingWorkAnalysis( joMessage: any ): Promise<void> {
+export async function spreadArrivedStateOfPendingWorkAnalysis(
+    joMessage: state.TLoadedJSON ): Promise<void> {
     if( !( joMessage && typeof joMessage === "object" &&
         "method" in joMessage && joMessage.method == "skale_imaNotifyLoopWork" )
     )
@@ -827,7 +828,7 @@ export async function spreadArrivedStateOfPendingWorkAnalysis( joMessage: any ):
 
 export async function spreadUpdatedSChainNetwork( isFinal: boolean ): Promise<void> {
     const imaState: state.TIMAState = state.get();
-    const joMessage: any = {
+    const joMessage: state.TLoadedJSON = {
         method: "spreadUpdatedSChainNetwork",
         isFinal: ( !!isFinal ),
         joSChainNetworkInfo: imaState.joSChainNetworkInfo

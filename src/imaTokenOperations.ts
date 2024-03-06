@@ -38,7 +38,7 @@ export async function getBalanceErc20(
     chainId: string,
     joAccount: state.TAccount,
     strCoinName: string,
-    joABI: any
+    joABI: state.TLoadedJSON
 ): Promise<state.TBalance> {
     const strLogPrefix = "getBalanceErc20() call ";
     try {
@@ -67,7 +67,7 @@ export async function getOwnerOfErc721(
     chainId: string,
     joAccount: state.TAccount,
     strCoinName: string,
-    joABI: any,
+    joABI: state.TLoadedJSON,
     idToken: state.TTokenID
 ): Promise<state.TAddress | string> {
     const strLogPrefix = "getOwnerOfErc721() call ";
@@ -96,7 +96,7 @@ export async function getBalanceErc1155(
     chainId: string,
     joAccount: state.TAccount,
     strCoinName: string,
-    joABI: any,
+    joABI: state.TLoadedJSON,
     idToken: state.TTokenID
 ): Promise<state.TBalance> {
     const strLogPrefix = "getBalanceErc1155() call ";
@@ -134,9 +134,9 @@ export async function doErc721PaymentFromMainNet(
     weiHowMuch: state.TBalance, // how much ETH
     joTokenManagerERC721: owaspUtils.ethersMod.ethers.Contract, // only s-chain
     strCoinNameErc721MainNet: string,
-    erc721PrivateTestnetJsonMainNet: any,
+    erc721PrivateTestnetJsonMainNet: state.TLoadedJSON,
     strCoinNameErc721SChain: string,
-    erc721PrivateTestnetJsonSChain: any,
+    erc721PrivateTestnetJsonSChain: state.TLoadedJSON,
     transactionCustomizerMainNet: imaTx.TransactionCustomizer
 ): Promise<boolean> {
     const details = log.createMemoryStream();
@@ -274,9 +274,9 @@ export async function doErc20PaymentFromMainNet(
     weiHowMuch: state.TBalance, // how much ETH
     joTokenManagerERC20: owaspUtils.ethersMod.ethers.Contract, // only s-chain
     strCoinNameErc20MainNet: string,
-    erc20MainNet: any,
+    erc20MainNet: state.TLoadedJSON,
     strCoinNameErc20SChain: string,
-    erc20SChain: any,
+    erc20SChain: state.TLoadedJSON,
     transactionCustomizerMainNet: imaTx.TransactionCustomizer
 ): Promise<boolean> {
     const details = log.createMemoryStream();
@@ -414,9 +414,9 @@ export async function doErc1155PaymentFromMainNet(
     weiHowMuch: state.TBalance, // how much ETH
     joTokenManagerERC1155: owaspUtils.ethersMod.ethers.Contract, // only s-chain
     strCoinNameErc1155SMainNet: string,
-    erc1155PrivateTestnetJsonMainNet: any,
+    erc1155PrivateTestnetJsonMainNet: state.TLoadedJSON,
     strCoinNameErc1155SChain: string,
-    erc1155PrivateTestnetJsonSChain: any,
+    erc1155PrivateTestnetJsonSChain: state.TLoadedJSON,
     transactionCustomizerMainNet: imaTx.TransactionCustomizer
 ): Promise<boolean> {
     const details = log.createMemoryStream();
@@ -558,8 +558,8 @@ export async function doErc1155BatchPaymentFromMainNet(
     weiHowMuch: state.TBalance, // how much ETH
     joTokenManagerERC1155: owaspUtils.ethersMod.ethers.Contract, // only s-chain
     strCoinNameErc1155SMainNet: string,
-    erc1155PrivateTestnetJsonMainNet: any, strCoinNameErc1155SChain: string,
-    erc1155PrivateTestnetJsonSChain: any,
+    erc1155PrivateTestnetJsonMainNet: state.TLoadedJSON, strCoinNameErc1155SChain: string,
+    erc1155PrivateTestnetJsonSChain: state.TLoadedJSON,
     transactionCustomizerMainNet: imaTx.TransactionCustomizer
 ): Promise<boolean> {
     const details = log.createMemoryStream();
@@ -689,9 +689,9 @@ export async function doErc20PaymentFromSChain(
     tokenAmount: state.TBalance, // how much ERC20 tokens to send
     weiHowMuch: state.TBalance, // how much ETH
     strCoinNameErc20MainNet: string,
-    joErc20MainNet: any,
+    joErc20MainNet: state.TLoadedJSON,
     strCoinNameErc20SChain: string,
-    joErc20SChain: any,
+    joErc20SChain: state.TLoadedJSON,
     transactionCustomizerSChain: imaTx.TransactionCustomizer
 ): Promise<boolean> {
     const details = log.createMemoryStream();
@@ -836,9 +836,9 @@ export async function doErc721PaymentFromSChain(
     tokenId: state.TTokenID, // which ERC721 token id to send
     weiHowMuch: state.TBalance, // how much ETH
     strCoinNameErc721MainNet: string,
-    joErc721MainNet: any,
+    joErc721MainNet: state.TLoadedJSON,
     strCoinNameErc721SChain: string,
-    joErc721SChain: any,
+    joErc721SChain: state.TLoadedJSON,
     transactionCustomizerSChain: imaTx.TransactionCustomizer
 ): Promise<boolean> {
     const details = log.createMemoryStream();
@@ -986,9 +986,9 @@ export async function doErc1155PaymentFromSChain(
     tokenAmount: state.TBalance, // which ERC1155 token id to send
     weiHowMuch: state.TBalance, // how much ETH
     strCoinNameErc1155SMainNet: string,
-    joErc1155MainNet: any,
+    joErc1155MainNet: state.TLoadedJSON,
     strCoinNameErc1155SChain: string,
-    joErc1155Chain: any,
+    joErc1155Chain: state.TLoadedJSON,
     transactionCustomizerSChain: imaTx.TransactionCustomizer
 ): Promise<boolean> {
     const details = log.createMemoryStream();
@@ -1135,9 +1135,9 @@ export async function doErc1155BatchPaymentFromSChain(
     arrTokenAmounts: state.TBalance[], // which ERC1155 token amounts to send
     weiHowMuch: state.TBalance, // how much ETH
     strCoinNameErc1155SMainNet: string,
-    joErc1155MainNet: any,
+    joErc1155MainNet: state.TLoadedJSON,
     strCoinNameErc1155SChain: string,
-    joErc1155Chain: any,
+    joErc1155Chain: state.TLoadedJSON,
     transactionCustomizerSChain: imaTx.TransactionCustomizer
 ): Promise<boolean> {
     const details = log.createMemoryStream();
@@ -1277,8 +1277,8 @@ export async function doErc20PaymentS2S(
     nAmountOfToken: state.TBalance, // how much ERC20 tokens to send
     nAmountOfWei: state.TBalance, // how much to send
     strCoinNameErc20Src: string,
-    joSrcErc20: any,
-    ercDstAddress20: any, // only reverse payment needs it
+    joSrcErc20: state.TLoadedJSON,
+    ercDstAddress20: state.TAddress, // only reverse payment needs it
     tc: imaTx.TransactionCustomizer
 ): Promise<boolean> {
     const isReverse = !isForward;
@@ -1420,8 +1420,8 @@ export async function doErc721PaymentS2S(
     tokenId: state.TTokenID, // which ERC721 token id to send
     nAmountOfWei: state.TBalance, // how much to send
     strCoinNameErc721Src: string,
-    joSrcErc721: any,
-    ercDstAddress721: any, // only reverse payment needs it
+    joSrcErc721: state.TLoadedJSON,
+    ercDstAddress721: state.TAddress, // only reverse payment needs it
     tc: imaTx.TransactionCustomizer
 ): Promise<boolean> {
     const isReverse = !isForward;
@@ -1568,8 +1568,8 @@ export async function doErc1155PaymentS2S(
     nAmountOfToken: state.TBalance, // how much ERC1155 tokens to send
     nAmountOfWei: state.TBalance, // how much to send
     strCoinNameErc1155Src: string,
-    joSrcErc1155: any,
-    ercDstAddress1155: any, // only reverse payment needs it
+    joSrcErc1155: state.TLoadedJSON,
+    ercDstAddress1155: state.TAddress, // only reverse payment needs it
     tc: imaTx.TransactionCustomizer
 ): Promise<boolean> {
     const isReverse = !isForward;
@@ -1715,10 +1715,10 @@ export async function doErc1155BatchPaymentS2S(
     joTokenManagerERC1155Src: owaspUtils.ethersMod.ethers.Contract,
     arrTokenIds: state.TTokenID[], // which ERC1155 token id to send
     arrTokenAmounts: state.TBalance[], // which ERC1155 token id to send
-    nAmountOfWei: any, // how much to send
+    nAmountOfWei: state.TBalance, // how much to send
     strCoinNameErc1155Src: string,
-    joSrcErc1155: any,
-    ercDstAddress1155: any, // only reverse payment needs it
+    joSrcErc1155: state.TLoadedJSON,
+    ercDstAddress1155: state.TAddress, // only reverse payment needs it
     tc: imaTx.TransactionCustomizer
 ): Promise<boolean> {
     const isReverse = !isForward;
@@ -1864,7 +1864,7 @@ export async function mintErc20(
     strAddressMintTo: string,
     nAmount: state.TBalance,
     strTokenContractAddress: string,
-    joTokenContractABI: any,
+    joTokenContractABI: state.TLoadedJSON,
     tc: imaTx.TransactionCustomizer
 ): Promise< state.TSameAsTransactionReceipt | null > {
     let strActionName = "mintErc20() init";
@@ -1933,7 +1933,7 @@ export async function mintErc721(
     strAddressMintTo: string,
     idToken: state.TTokenID,
     strTokenContractAddress: string,
-    joTokenContractABI: any,
+    joTokenContractABI: state.TLoadedJSON,
     tc: imaTx.TransactionCustomizer
 ): Promise< state.TSameAsTransactionReceipt | null > {
     let strActionName = "mintErc721() init";
@@ -2006,7 +2006,7 @@ export async function mintErc1155(
     idToken: state.TTokenID,
     nAmount: state.TBalance,
     strTokenContractAddress: string,
-    joTokenContractABI: any,
+    joTokenContractABI: state.TLoadedJSON,
     tc: imaTx.TransactionCustomizer
 ): Promise< state.TSameAsTransactionReceipt | null > {
     let strActionName = "mintErc1155() init";
@@ -2081,7 +2081,7 @@ export async function burnErc20(
     strAddressBurnFrom: string,
     nAmount: state.TBalance,
     strTokenContractAddress: string,
-    joTokenContractABI: any,
+    joTokenContractABI: state.TLoadedJSON,
     tc: imaTx.TransactionCustomizer
 ): Promise< state.TSameAsTransactionReceipt | null > {
     let strActionName = "burnErc20() init";
@@ -2152,7 +2152,7 @@ export async function burnErc721(
     joAccount: state.TAccount,
     idToken: state.TTokenID,
     strTokenContractAddress: string,
-    joTokenContractABI: any,
+    joTokenContractABI: state.TLoadedJSON,
     tc: imaTx.TransactionCustomizer
 ): Promise< state.TSameAsTransactionReceipt | null > {
     let strActionName = "burnErc721() init";
@@ -2223,7 +2223,7 @@ export async function burnErc1155(
     idToken: state.TTokenID,
     nAmount: state.TBalance,
     strTokenContractAddress: string,
-    joTokenContractABI: any,
+    joTokenContractABI: state.TLoadedJSON,
     tc: imaTx.TransactionCustomizer
 ): Promise< state.TSameAsTransactionReceipt | null > {
     let strActionName = "burnErc1155() init";

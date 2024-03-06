@@ -246,7 +246,7 @@ function parseBasicArgs( imaState: state.TIMAState, joArg: TCliArgument ): boole
     }
     if( joArg.name == "verbose-list" ) {
         log.verboseList();
-        return true;
+        process.exit( 0 );
     }
     return false;
 }
