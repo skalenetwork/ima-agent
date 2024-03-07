@@ -256,7 +256,7 @@ async function payedCallTM(
         // just beautify it and make it more friendly to Transaction Manager
         const bnWeiHowMuch = owaspUtils.toBN( txAdjusted.value );
         if( bnWeiHowMuch.eq( owaspUtils.toBN( 0 ) ) )
-            txAdjusted.value = owaspUtils.toBN( 0 );
+            txAdjusted.value = owaspUtils.toBN( 0 ).toNumber() as any;
     }
     optsPayedCall.details.trace( "{p}Adjusted transaction: {}", optsPayedCall.strLogPrefix,
         txAdjusted );
@@ -621,7 +621,7 @@ function tmMakeRecord(
 
 function tmMakeScore( priority: number ): number {
     const ts = imaHelperAPIs.currentTimestamp();
-    return priority * Math.pow( 10, ts.toString().length ) + ts;
+    return Math.ceil( priority * Math.pow( 10, ts.toString().length ) + ts );
 }
 
 async function tmSend(
@@ -685,7 +685,7 @@ async function tmWait(
     else
         details.error( "{p}TM - TX {} status is {err}", strLogPrefix, txId, r.status );
 
-    if( ( !tmIsFinished( r ) ) || r?.status == "DROPPED" ) {
+    if( ( !tmIsFinished( r ) ) || ( r && r.status == "DROPPED" ) ) {
         details.error( "{p}TM - TX {} was unsuccessful, wait failed", strLogPrefix, txId );
         return null;
     }
