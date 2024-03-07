@@ -44,8 +44,10 @@ if( parentPort ) {
     } );
 }
 
-function doSendMessage(
-    type: string, endpoint: string | URL, workerUUID: string, data: object | string ): void {
+const doSendMessage: networkLayer.TFnSend = function(
+    worker: networkLayer.TWorker,
+    type: string, endpoint: string | URL, workerUUID: string, data: object | string
+): void {
     const jo: state.TLoadedJSON = networkLayer.socketReceivedDataReverseMarshall( data );
     const joSend: state.TLoadedJSON = {
         workerMessageType:
@@ -58,7 +60,7 @@ function doSendMessage(
     };
     if( parentPort )
         parentPort.postMessage( networkLayer.socketSentDataMarshall( joSend ) );
-}
+};
 
 class ObserverServer extends SocketServer {
     initComplete?: boolean;
