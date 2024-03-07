@@ -23,9 +23,13 @@
  * @copyright SKALE Labs 2019-Present
  */
 
+export type TType = any;
+export type TListener = any;
+export type TData = any;
+
 export class UniversalDispatcherEvent {
-    type: any;
-    constructor ( type: any, jo: any ) {
+    type: TType;
+    constructor ( type: TType, jo: any ) {
         this.type = type;
         for( const [ key, value ] of Object.entries( jo ) ) {
             if( key in this ) {
@@ -40,7 +44,7 @@ export class UniversalDispatcherEvent {
 
 export class EventDispatcher {
     // see https://stackoverflow.com/questions/36675693/eventtarget-interface-in-safari
-    _listeners: any[];
+    _listeners: TListener[];
     isDisposing: boolean;
     isDisposed: boolean;
     constructor () {
@@ -60,11 +64,11 @@ export class EventDispatcher {
         this.removeAllEventListeners();
     }
 
-    hasEventListener( type: any, listener: any ): boolean {
+    hasEventListener( type: TType, listener: TListener ): boolean {
         return this._listeners.some( item => item.type === type && item.listener === listener );
     }
 
-    addEventListener( type: any, listener: any ): EventDispatcher {
+    addEventListener( type: TType, listener: TListener ): EventDispatcher {
         if( !this.hasEventListener( type, listener ) ) {
             this._listeners.push( {
                 type,
@@ -75,7 +79,7 @@ export class EventDispatcher {
         return this;
     }
 
-    removeEventListener( type: any, listener: any ): EventDispatcher {
+    removeEventListener( type: TType, listener: TListener ): EventDispatcher {
         while( true ) {
             const index = ( listener != undefined )
                 ? this._listeners.findIndex(
@@ -96,11 +100,11 @@ export class EventDispatcher {
         return this;
     }
 
-    on( type: any, listener: any ): EventDispatcher {
+    on( type: TType, listener: TListener ): EventDispatcher {
         return this.addEventListener( type, listener );
     }
 
-    off( type: any, listener: any ): EventDispatcher {
+    off( type: TType, listener: TListener ): EventDispatcher {
         return this.removeEventListener( type, listener );
     }
 
@@ -108,7 +112,7 @@ export class EventDispatcher {
         return this.removeAllEventListeners();
     }
 
-    dispatchEvent( evt: any ): EventDispatcher {
+    dispatchEvent( evt: TData ): EventDispatcher {
         const a = this._listeners.filter( item => item.type === evt.type );
         for( const item of a ) {
             const {

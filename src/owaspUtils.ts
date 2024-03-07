@@ -49,6 +49,7 @@ const safeURL = log.safeURL;
 const replaceAll = log.replaceAll;
 const extractErrorMessage = log.extractErrorMessage;
 const validateInteger = cc.validateInteger;
+const validateRadix = cc.validateRadix;
 const toInteger = cc.toInteger;
 const validateFloat = cc.validateFloat;
 const toFloat = cc.toFloat;
@@ -56,7 +57,7 @@ const toBoolean = cc.toBoolean;
 
 export {
     ethersMod, safeURL, replaceAll, extractErrorMessage,
-    validateInteger, toInteger, validateFloat, toFloat, toBoolean
+    validateInteger, validateRadix, toInteger, validateFloat, toFloat, toBoolean
 };
 
 export function rxIsInt( val: log.TLogArgument ): boolean {
