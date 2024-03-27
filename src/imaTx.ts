@@ -54,7 +54,7 @@ export interface TCustomPayedCallOptions {
 export declare type TPayedCallMethodArgument = any;
 
 export interface TRunTimePayedCallOptions {
-    details: log.TLogger
+    details: log.TLoggerBase
     ethersProvider: owaspUtils.ethersMod.providers.JsonRpcProvider
     strContractName: string
     joContract: owaspUtils.ethersMod.Contract
@@ -107,7 +107,7 @@ export function dryRunIgnore( isIgnored: boolean ): boolean {
 }
 
 export async function dryRunCall(
-    details: log.TLogger,
+    details: log.TLoggerBase,
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     strContractName: string, joContract: owaspUtils.ethersMod.ethers.Contract,
     strMethodName: string, arrArguments: TPayedCallMethodArgument[],
@@ -367,7 +367,7 @@ async function payedCallDirect( optsPayedCall: TRunTimePayedCallOptions ): Promi
 }
 
 export async function payedCall(
-    details: log.TLogger, ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
+    details: log.TLoggerBase, ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     strContractName: string, joContract: owaspUtils.ethersMod.ethers.Contract,
     strMethodName: string, arrArguments: TPayedCallMethodArgument[],
     joAccount: state.TAccount, strActionName: string,
@@ -474,7 +474,7 @@ export async function payedCall(
 
 export async function checkTransactionToSchain(
     unsignedTx: owaspUtils.ethersMod.PopulatedTransaction,
-    details: log.TLogger,
+    details: log.TLoggerBase,
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     joAccount: state.TAccount
 ): Promise< owaspUtils.ethersMod.PopulatedTransaction > {
@@ -532,7 +532,7 @@ export async function calculatePowNumber(
     address: state.TAddress,
     nonce: string,
     gas: string,
-    details: log.TLogger,
+    details: log.TLoggerBase,
     strLogPrefix: string
 ): Promise< string | Buffer > {
     try {
@@ -597,7 +597,7 @@ function tmGenerateRandomHex( size: number ): string {
         .map( () => Math.floor( Math.random() * 16 ).toString( 16 ) ).join( "" );
 }
 
-function tmMakeId( details: log.TLogger ): string {
+function tmMakeId( details: log.TLoggerBase ): string {
     const prefix = "tx-";
     const unique = tmGenerateRandomHex( 16 );
     const id = prefix + unique + "js";
@@ -623,7 +623,7 @@ function tmMakeScore( priority: number ): number {
 }
 
 async function tmSend(
-    details: log.TLogger,
+    details: log.TLoggerBase,
     tx: owaspUtils.ethersMod.PopulatedTransaction,
     priority: number = 5
 ): Promise<string> {
@@ -663,7 +663,7 @@ async function tmGetRecord( txId: string ): Promise< TTMRecord | null> {
 }
 
 async function tmWait(
-    details: log.TLogger,
+    details: log.TLoggerBase,
     txId: string,
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     nWaitSeconds: number = 36000 ): Promise< state.TSameAsTransactionReceipt | null > {
@@ -699,7 +699,7 @@ async function tmWait(
 }
 
 async function tmEnsureTransaction(
-    details: log.TLogger, ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
+    details: log.TLoggerBase, ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     priority: number, txAdjusted: owaspUtils.ethersMod.PopulatedTransaction,
     cntAttempts?: number, sleepMilliseconds?: number
 ): Promise< [ string, state.TSameAsTransactionReceipt ] > {
@@ -769,7 +769,7 @@ export class TransactionCustomizer {
     }
 
     async computeGas(
-        details: log.TLogger,
+        details: log.TLoggerBase,
         ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
         strContractName: string, joContract: owaspUtils.ethersMod.ethers.Contract,
         strMethodName: string, arrArguments: TPayedCallMethodArgument[],

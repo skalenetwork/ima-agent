@@ -75,7 +75,7 @@ export interface TSignOperationOptions {
     strLogPrefixB: string
     joGatheringTracker: TGatheringTracker
     arrSignResults: TBLSSignResult[]
-    details: log.TLogger
+    details: log.TLoggerBase
     strGatheredDetailsName: string
     sequenceId: string
     jarrNodes: discoveryTools.TSChainNode[]
@@ -100,7 +100,7 @@ export interface TBSU256Options {
     joCallData: TBSU256CallData
     imaState: state.TIMAState
     strLogPrefix: string
-    details: log.TLogger
+    details: log.TLoggerBase
     joRetVal: TBLSSignResultReturnValue
     isSuccess: boolean
     nThreshold: number
@@ -130,7 +130,7 @@ export interface THandleVerifyAndSignOptions {
     joCallData: THandleVerifyAndSignCallData
     imaState: state.TIMAState
     strLogPrefix: string
-    details: log.TLogger
+    details: log.TLoggerBase
     joRetVal: TBLSSignResultReturnValue
     isSuccess: boolean
     nIdxCurrentMsgBlockStart: number
@@ -149,7 +149,7 @@ export interface THandleVerifyAndSignOptions {
 export interface TSignU256Options {
     u256: string
     fn: IMA.TFunctionAfterSigningMessages
-    details: log.TLogger
+    details: log.TLoggerBase
     imaState: state.TIMAState
     strLogPrefix: string
     joGatheringTracker: {
@@ -260,7 +260,7 @@ function discoverBlsParticipants( joSChainNetworkInfo: discoveryTools.TSChainNet
 }
 
 function checkBlsThresholdAndBlsParticipants(
-    nThreshold: number, nParticipants: number, strOperation: string, details: log.TLogger
+    nThreshold: number, nParticipants: number, strOperation: string, details: log.TLoggerBase
 ): boolean {
     details = details || log;
     if( nThreshold <= 0 ) {
@@ -283,7 +283,7 @@ function checkBlsThresholdAndBlsParticipants(
 
 function discoverPublicKeyByIndex(
     nNodeIndex: number, joSChainNetworkInfo: discoveryTools.TSChainNetworkInfo,
-    details: log.TLogger, isThrowException: boolean
+    details: log.TLoggerBase, isThrowException: boolean
 ): discoveryTools.TBLSPublicKey | null {
     details = details || log;
     const imaState: state.TIMAState = state.get();
@@ -307,7 +307,7 @@ function discoverPublicKeyByIndex(
 }
 
 function discoverCommonPublicKey(
-    details: log.TLogger, joSChainNetworkInfo: discoveryTools.TSChainNetworkInfo,
+    details: log.TLoggerBase, joSChainNetworkInfo: discoveryTools.TSChainNetworkInfo,
     isThrowException: boolean ): discoveryTools.TBLSCommonPublicKey | null {
     const imaState: state.TIMAState = state.get();
     joSChainNetworkInfo = joSChainNetworkInfo || imaState.joSChainNetworkInfo;
@@ -455,7 +455,7 @@ function allocBlsTmpActionDir(): string {
 }
 
 function performBlsGlue(
-    details: log.TLogger, strDirection: string, jarrMessages: state.TIMAMessage[],
+    details: log.TLoggerBase, strDirection: string, jarrMessages: state.TIMAMessage[],
     nIdxCurrentMsgBlockStart: number, strFromChainName: string, arrSignResults: TBLSSignResult[]
 ): TBLSGlueResult | null {
     const imaState: state.TIMAState = state.get();
@@ -546,7 +546,7 @@ function performBlsGlue(
 }
 
 function performBlsGlueU256(
-    details: log.TLogger, u256: string, arrSignResults: TBLSSignResult[]
+    details: log.TLoggerBase, u256: string, arrSignResults: TBLSSignResult[]
 ): TBLSGlueResult | null {
     const imaState: state.TIMAState = state.get();
     if( !imaState.joSChainNetworkInfo )
@@ -638,7 +638,7 @@ function performBlsGlueU256(
 }
 
 function performBlsVerifyI(
-    details: log.TLogger, strDirection: string, nZeroBasedNodeIndex: number,
+    details: log.TLoggerBase, strDirection: string, nZeroBasedNodeIndex: number,
     joResultFromNode: TBLSSignResultBase,
     jarrMessages: state.TIMAMessage[], nIdxCurrentMsgBlockStart: number, strFromChainName: string,
     joPublicKey: discoveryTools.TBLSPublicKey
@@ -702,7 +702,7 @@ function performBlsVerifyI(
 }
 
 function performBlsVerifyIU256(
-    details: log.TLogger,
+    details: log.TLoggerBase,
     nZeroBasedNodeIndex: number, joResultFromNode: TBLSSignResultBase, u256: string,
     joPublicKey: discoveryTools.TBLSPublicKey
 ): boolean {
@@ -756,7 +756,7 @@ function performBlsVerifyIU256(
 }
 
 function performBlsVerify(
-    details: log.TLogger, strDirection: string, joGlueResult: TBLSGlueResult,
+    details: log.TLoggerBase, strDirection: string, joGlueResult: TBLSGlueResult,
     jarrMessages: state.TIMAMessage[], nIdxCurrentMsgBlockStart: number, strFromChainName: string,
     joCommonPublicKey: discoveryTools.TBLSCommonPublicKey
 ): boolean {
@@ -824,7 +824,7 @@ function performBlsVerify(
 }
 
 function performBlsVerifyU256(
-    details: log.TLogger, joGlueResult: TBLSGlueResult, u256: string,
+    details: log.TLoggerBase, joGlueResult: TBLSGlueResult, u256: string,
     joCommonPublicKey: discoveryTools.TBLSCommonPublicKey
 ): boolean {
     if( !joGlueResult )
@@ -883,7 +883,7 @@ function performBlsVerifyU256(
 }
 
 async function checkCorrectnessOfMessagesToSign(
-    details: log.TLogger, strLogPrefix: string, strDirection: string,
+    details: log.TLoggerBase, strLogPrefix: string, strDirection: string,
     jarrMessages: state.TIMAMessage[], nIdxCurrentMsgBlockStart: number,
     joExtraSignOpts?: loop.TExtraSignOpts | null
 ): Promise < void > {
@@ -1898,7 +1898,7 @@ async function doSignU256Gathering( optsSignU256: TSignU256Options ): Promise < 
 }
 
 export async function doSignU256(
-    u256bn: owaspUtils.ethersMod.BigNumber | string, details: log.TLogger,
+    u256bn: owaspUtils.ethersMod.BigNumber | string, details: log.TLoggerBase,
     fn: IMA.TFunctionAfterSigningMessages ): Promise < void > {
     const u256: string = ( typeof u256bn === "string" )
         ? u256bn
@@ -2028,7 +2028,7 @@ export async function doVerifyReadyHash(
 }
 
 async function doSignReadyHashHandleCallResult(
-    strLogPrefix: string, details: log.TLogger,
+    strLogPrefix: string, details: log.TLoggerBase,
     strMessageHash: string, isExposeOutput: boolean, joCall: rpcCall.TRPCCall,
     joIn: TRPCInputBLSSignMessageHash, joOut: TRPCOutputBLSSignMessageHashResult
 ): Promise < TSignResult > {
@@ -2065,7 +2065,7 @@ export async function doSignReadyHash(
     strMessageHash: string, isExposeOutput: boolean ): Promise < TSignResult | null > {
     const imaState: state.TIMAState = state.get();
     const strLogPrefix = "";
-    const details: log.TLogger = log.createMemoryStream();
+    const details: log.TLoggerBase = log.createMemoryStream();
     let joSignResult: TSignResult | null = null;
     let joCall: rpcCall.TRPCCall | null = null;
     try {

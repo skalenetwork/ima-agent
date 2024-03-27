@@ -72,7 +72,7 @@ export interface TLoopOptions {
 
 export interface TParallelLoopRunOptions {
     imaState: state.TIMAState
-    details: log.TLogger
+    details: log.TLoggerBase
 }
 
 // Run transfer loop

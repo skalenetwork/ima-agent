@@ -35,7 +35,7 @@ import { type TBLSGlueResult } from "./bls.js";
 
 export type TFunctionSignMsgOracle =
     ( u256: owaspUtils.ethersMod.BigNumber | string,
-        details: log.TLogger,
+        details: log.TLoggerBase,
         fnAfter: IMA.TFunctionAfterSigningMessages
     ) => Promise <void>;
 
@@ -48,7 +48,7 @@ export interface TGasPriceSetupOptions {
     chainIdMainNet: string
     chainIdSChain: string
     fnSignMsgOracle: TFunctionSignMsgOracle
-    details: log.TLogger
+    details: log.TLoggerBase
     jarrReceipts: state.TReceiptDescription[]
     strLogPrefix: string
     strActionName: string
@@ -287,7 +287,7 @@ export async function doOracleGasPriceSetup(
         optsGasPriceSetup.details.trace( "{p}Using internal u256 signing stub function",
             optsGasPriceSetup.strLogPrefix );
         optsGasPriceSetup.fnSignMsgOracle =
-            async function( u256: owaspUtils.ethersMod.BigNumber | string, details: log.TLogger,
+            async function( u256: owaspUtils.ethersMod.BigNumber | string, details: log.TLoggerBase,
                 fnAfter: IMA.TFunctionAfterSigningMessages ): Promise<void> {
                 details.trace( "{p}u256 signing callback was not provided",
                     optsGasPriceSetup.strLogPrefix );

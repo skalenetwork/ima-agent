@@ -62,7 +62,7 @@ function getUtcTimestampString( aDate?: Date ): string {
 }
 
 export function findPowNumber(
-    strRequestPart: string, details: log.TLogger, isVerbose?: boolean ): string {
+    strRequestPart: string, details: log.TLoggerBase, isVerbose?: boolean ): string {
     details = details || log;
     if( isVerbose )
         details.debug( "source part of request to find PoW number is {}", strRequestPart );
@@ -98,7 +98,7 @@ export function findPowNumber(
 }
 
 async function handleOracleCheckResultResult(
-    oracleOpts: TOracleOptions, details: log.TLogger, isVerboseTraceDetails: boolean,
+    oracleOpts: TOracleOptions, details: log.TLoggerBase, isVerboseTraceDetails: boolean,
     joCall: rpcCall.TRPCCall, joIn: state.TLoadedJSON, joOut: state.TLoadedJSON
 ): Promise< owaspUtils.ethersMod.BigNumber > {
     if( isVerboseTraceDetails )
@@ -123,7 +123,7 @@ async function handleOracleCheckResultResult(
 }
 
 async function handleOracleSubmitRequestResult(
-    oracleOpts: TOracleOptions, details: log.TLogger, isVerboseTraceDetails: boolean,
+    oracleOpts: TOracleOptions, details: log.TLoggerBase, isVerboseTraceDetails: boolean,
     joCall: rpcCall.TRPCCall, joIn: state.TLoadedJSON, joOut: state.TLoadedJSON
 ): Promise<owaspUtils.ethersMod.BigNumber> {
     const nMillisecondsSleepBefore = "nMillisecondsSleepBefore" in oracleOpts
@@ -179,7 +179,7 @@ async function handleOracleSubmitRequestResult(
 }
 
 export async function oracleGetGasPrice(
-    oracleOpts: TOracleOptions, details: log.TLogger
+    oracleOpts: TOracleOptions, details: log.TLoggerBase
 ): Promise< owaspUtils.ethersMod.BigNumber > {
     details = details || log;
     const url: string = oracleOpts.url;

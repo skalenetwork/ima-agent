@@ -86,7 +86,7 @@ export interface TTransferOptions {
     nTransferLoopCounter: number
     strTransferErrorCategoryName: string
     strGatheredDetailsName: string
-    details: log.TLogger
+    details: log.TLoggerBase
     jarrReceipts: state.TReceiptDescription[]
     bErrorInSigningMessages: boolean
     strLogPrefixShort: string
@@ -151,7 +151,7 @@ function eventToLogReferenceRecord(
 }
 
 async function findOutReferenceLogRecord(
-    details: log.TLogger, strLogPrefix: string,
+    details: log.TLoggerBase, strLogPrefix: string,
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     joMessageProxy: owaspUtils.ethersMod.ethers.Contract,
     bnBlockId: owaspUtils.ethersMod.BigNumber,
@@ -190,7 +190,7 @@ async function findOutReferenceLogRecord(
 }
 
 async function findOutAllReferenceLogRecords(
-    details: log.TLogger, strLogPrefix: string,
+    details: log.TLoggerBase, strLogPrefix: string,
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     joMessageProxy: owaspUtils.ethersMod.ethers.Contract,
     bnBlockId: owaspUtils.ethersMod.BigNumber,

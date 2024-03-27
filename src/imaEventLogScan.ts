@@ -37,7 +37,7 @@ export interface TProgressivePlanAtom {
 }
 
 export function createProgressiveEventsScanPlan(
-    details: log.TLogger, nLatestBlockNumber: owaspUtils.ethersMod.BigNumber
+    details: log.TLoggerBase, nLatestBlockNumber: owaspUtils.ethersMod.BigNumber
 ): TProgressivePlanAtom[] {
     // assume Main Net mines 6 blocks per minute
     const blocksInOneMinute = owaspUtils.toBN( 6 );
@@ -101,7 +101,7 @@ export function createProgressiveEventsScanPlan(
 }
 
 export async function safeGetPastEventsProgressive(
-    details: log.TLogger, strLogPrefix: string,
+    details: log.TLoggerBase, strLogPrefix: string,
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     attempts: number, joContract: owaspUtils.ethersMod.ethers.Contract, strEventName: string,
     nBlockFrom: owaspUtils.ethersMod.BigNumber,
@@ -187,7 +187,7 @@ export async function safeGetPastEventsProgressive(
 }
 
 export async function getContractCallEvents(
-    details: log.TLogger, strLogPrefix: string,
+    details: log.TLoggerBase, strLogPrefix: string,
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     joContract: owaspUtils.ethersMod.ethers.Contract, strEventName: string,
     nBlockNumber: owaspUtils.ethersMod.BigNumber,
@@ -219,7 +219,7 @@ export async function getContractCallEvents(
 }
 
 export async function safeGetTransactionCount(
-    details: log.TLogger, cntAttempts: number,
+    details: log.TLoggerBase, cntAttempts: number,
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     address: string, param: any,
     retValOnFail: owaspUtils.ethersMod.BigNumber | null,
@@ -265,7 +265,7 @@ export async function safeGetTransactionCount(
 }
 
 export async function safeGetTransactionReceipt(
-    details: log.TLogger, cntAttempts: number,
+    details: log.TLoggerBase, cntAttempts: number,
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     txHash: string, retValOnFail?: TSameAsTransactionReceipt | null,
     throwIfServerOffline?: boolean
@@ -312,7 +312,7 @@ export async function safeGetTransactionReceipt(
 }
 
 export async function safeGetPastEvents(
-    details: log.TLogger, strLogPrefix: string,
+    details: log.TLoggerBase, strLogPrefix: string,
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     cntAttempts: number, joContract: owaspUtils.ethersMod.ethers.Contract, strEventName: string,
     nBlockFrom: owaspUtils.ethersMod.BigNumber,
@@ -393,7 +393,7 @@ export async function safeGetPastEvents(
 }
 
 export async function safeGetPastEventsIterative(
-    details: log.TLogger, strLogPrefix: string,
+    details: log.TLoggerBase, strLogPrefix: string,
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     attempts: number, joContract: owaspUtils.ethersMod.ethers.Contract, strEventName: string,
     nBlockFrom: owaspUtils.ethersMod.BigNumber,

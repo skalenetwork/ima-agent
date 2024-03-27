@@ -31,7 +31,7 @@ import * as owaspUtils from "./owaspUtils.js";
 import type * as state from "./state.js";
 
 export async function invokeHasChain(
-    details: log.TLogger,
+    details: log.TLoggerBase,
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider, // Main-Net or S-Chin
     joLinker: owaspUtils.ethersMod.Contract, // Main-Net or S-Chin
     joAccount: state.TAccount, // Main-Net or S-Chin
@@ -54,7 +54,7 @@ export async function invokeHasChain(
 }
 
 export async function waitForHasChain(
-    details: log.TLogger,
+    details: log.TLoggerBase,
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider, // Main-Net or S-Chin
     joLinker: owaspUtils.ethersMod.Contract, // Main-Net or S-Chin
     joAccount: state.TAccount, // Main-Net or S-Chin
