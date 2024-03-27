@@ -94,12 +94,14 @@ function parseCommandLine(): void {
         log.trace( "Will require reimbursement chain name to do reimbursement estimation" );
         clpTools.commandLineTaskReimbursementEstimateAmount();
     }
-    if( imaState.nReimbursementRecharge ) {
+    if( imaState.nReimbursementRecharge &&
+        imaState.nReimbursementRecharge.gt( owaspUtils.toBN( 0 ) ) ) {
         haveReimbursementCommands = true;
         log.trace( "Will require reimbursement chain name to do reimbursement recharge" );
         clpTools.commandLineTaskReimbursementRecharge();
     }
-    if( imaState.nReimbursementWithdraw ) {
+    if( imaState.nReimbursementWithdraw &&
+        imaState.nReimbursementWithdraw.gt( owaspUtils.toBN( 0 ) ) ) {
         haveReimbursementCommands = true;
         log.trace( "Will require reimbursement chain name to do reimbursement withdraw" );
         clpTools.commandLineTaskReimbursementWithdraw();
@@ -116,7 +118,7 @@ function parseCommandLine(): void {
     if( imaState.nAutoExitAfterSeconds > 0 ) {
         log.warning( "Automatic exit after {} second(s) is requested.",
             imaState.nAutoExitAfterSeconds );
-        const iv = owaspUtils.setInterval2( function(): void {
+        const iv: owaspUtils.TInterval2 = owaspUtils.setInterval2( function(): void {
             log.warning( "Performing automatic exit after {} second(s)...",
                 imaState.nAutoExitAfterSeconds );
             owaspUtils.clearInterval2( iv );
@@ -143,7 +145,7 @@ function parseCommandLine(): void {
     }
 }
 
-let gServerMonitoringWS: any = null;
+let gServerMonitoringWS: ws.WebSocketServer | null = null;
 
 function initMonitoringServer(): void {
     const imaState: state.TIMAState = state.get();
@@ -159,26 +161,27 @@ function initMonitoringServer(): void {
     } catch ( err ) {
         log.error( "Failed start monitoring WS server on port {}, error is: {err}",
             imaState.nMonitoringPort, err );
+        return;
     }
     gServerMonitoringWS.on( "connection", function( wsPeer: any, req: any ): void {
         let ip = req.socket.remoteAddress;
         if( "headers" in req && req.headers && typeof req.headers === "object" &&
             "x-forwarded-for" in req.headers && req.headers["x-forwarded-for"] )
             ip = req.headers["x-forwarded-for"]; // better under NGINX
-        if( ( !ip ) && "_socket" in req && req._socket && "remoteAddress" in req._socket )
+        if( !ip && "_socket" in req && req._socket && "remoteAddress" in req._socket )
             ip = req._socket.remoteAddress;
         if( !ip )
             ip = "N/A";
         if( imaState.bLogMonitoringServer )
             log.debug( "{p}New connection from {}", strLogPrefix, ip );
-        wsPeer.on( "message", function( message: any ): void {
-            const joAnswer: any = {
+        wsPeer.on( "message", function( message: string ): void {
+            const joAnswer: state.TLoadedJSON = {
                 method: null,
                 id: null,
                 error: null
             };
             try {
-                const joMessage: any = JSON.parse( message );
+                const joMessage: state.TLoadedJSON = JSON.parse( message );
                 if( imaState.bLogMonitoringServer )
                     log.trace( "{p}<<< message from {}: {}", strLogPrefix, ip, joMessage );
 
@@ -296,7 +299,7 @@ function initJsonRpcServer(): void {
         res.on( "error", function() {
             log.error( "IMA-to-IMA peer {} connection error, cannot send responses", ip );
         } );
-        const fnSendAnswer: any = function( joAnswer: any ): void {
+        const fnSendAnswer: any = function( joAnswer: state.TLoadedJSON ): void {
             try {
                 res.header( "Content-Type", "application/json" );
                 res.status( 200 ).send( JSON.stringify( joAnswer ) );
@@ -306,13 +309,13 @@ function initJsonRpcServer(): void {
                     strLogPrefix, joAnswer, ip, err, err );
             }
         };
-        let joAnswer: any = {
+        let joAnswer: state.TLoadedJSON = {
             method: null,
             id: null,
             error: null
         };
         try {
-            const joMessage: any = JSON.parse( message );
+            const joMessage: state.TLoadedJSON = JSON.parse( message );
             log.trace( "{p}<<< Peer message from {}: ", strLogPrefix, ip, joMessage );
             if( !( "method" in joMessage ) )
                 throw new Error( "\"method\" field was not specified" );
@@ -344,7 +347,7 @@ function initJsonRpcServer(): void {
                     owaspUtils.toInteger( joMessage.params.nNodeNumber ),
                     joMessage.params.strLoopWorkType,
                     joMessage.params.nIndexS2S,
-                    ( !!( joMessage.params.isStart ) ),
+                    !!joMessage.params.isStart,
                     owaspUtils.toInteger( joMessage.params.ts ),
                     joMessage.params.signature ) )
                     await loop.spreadArrivedStateOfPendingWorkAnalysis( joMessage );
@@ -356,7 +359,7 @@ function initJsonRpcServer(): void {
                 joAnswer.error = `Unknown method name ${joMessage.method} was specified`;
                 break;
             } // switch( joMessage.method )
-            if( ( !joAnswer ) || typeof joAnswer !== "object" ) {
+            if( !joAnswer || typeof joAnswer !== "object" ) {
                 joAnswer = {};
                 joAnswer.error = "internal error, null data returned";
             }
@@ -411,8 +414,10 @@ async function doTheJob(): Promise<void> {
 }
 
 function handleFirstSChainDiscoveryAttemptDone(
-    err: any, joSChainNetworkInfo: discoveryTools.TSChainNetworkInfo,
-    isSilentReDiscovery: boolean, fnOnPeriodicDiscoveryResultAvailable: any ): void {
+    err: Error | string | null | undefined,
+    joSChainNetworkInfo: discoveryTools.TSChainNetworkInfo,
+    isSilentReDiscovery: boolean,
+    fnOnPeriodicDiscoveryResultAvailable: any ): void {
     if( err ) {
     // error information is printed by discoveryTools.discoverSChainNetwork()
         process.exit( 166 );

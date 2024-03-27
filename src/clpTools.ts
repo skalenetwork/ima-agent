@@ -41,12 +41,13 @@ import * as loop from "./loop.js";
 import * as imaUtils from "./utils.js";
 import * as imaBLS from "./bls.js";
 import type * as imaTx from "./imaTx.js";
+import type * as rpcCallFormats from "./rpcCallFormats.js";
 
 export async function registerAll( isPrintSummaryRegistrationCosts: boolean ): Promise < boolean > {
     if( !await registerStep1( false ) )
         return false;
     if( isPrintSummaryRegistrationCosts )
-        printSummaryRegistrationCosts( log );
+        printSummaryRegistrationCosts();
     return true;
 }
 
@@ -56,8 +57,8 @@ export async function checkRegistrationAll(): Promise<boolean> {
 }
 
 export interface TRegistrationCostInformation {
-    mn: any[]
-    sc: any[]
+    mn: state.TReceiptDescription[]
+    sc: state.TReceiptDescription[]
 }
 
 const gInfoRegistrationCost: TRegistrationCostInformation = {
@@ -82,7 +83,7 @@ export async function registerStep1( isPrintSummaryRegistrationCosts: boolean ):
         log.posNeg( bSuccess, "already registered", "not registered yet" ) );
     if( bSuccess )
         return true;
-    const jarrReceipts: any =
+    const jarrReceipts: state.TReceiptDescription[] =
         await imaReg.registerSChainInDepositBoxes( // step 1
             imaState.chainProperties.mn.ethersProvider,
             imaState.joLinker,
@@ -130,7 +131,7 @@ export async function checkRegistrationStep1(): Promise<boolean> {
     return bRetVal;
 }
 
-export function printSummaryRegistrationCosts( details?: any ): void {
+export function printSummaryRegistrationCosts( details?: log.TLoggerBase ): void {
     if( !details )
         details = log;
     imaGasUsage.printGasUsageReportFromArray(
@@ -240,7 +241,7 @@ export function commandLineTaskMintErc721(): void {
                 try {
                     const strAddressMintTo = // same as caller/transaction signer
                         imaState.chainProperties.tc.joAccount.address();
-                    const idTokens: any[] =
+                    const idTokens: state.TTokenID[] =
                         ( imaState.haveArrayOfTokenIdentifiers && imaState.idTokens )
                             ? imaState.idTokens
                             : [];
@@ -286,7 +287,7 @@ export function commandLineTaskMintErc1155(): void {
                 try {
                     const strAddressMintTo = // same as caller/transaction signer
                         imaState.chainProperties.tc.joAccount.address();
-                    const idTokens: any[] =
+                    const idTokens: state.TTokenID[] =
                         ( imaState.haveArrayOfTokenIdentifiers && imaState.idTokens )
                             ? imaState.idTokens
                             : [];
@@ -370,7 +371,7 @@ export function commandLineTaskBurnErc721(): void {
             let bBurnIsOK = false;
             if( imaState.chainProperties.tc.strCoinNameErc721.length > 0 ) {
                 try {
-                    const idTokens: any[] =
+                    const idTokens: state.TTokenID[] =
                         ( imaState.haveArrayOfTokenIdentifiers && imaState.idTokens )
                             ? imaState.idTokens
                             : [];
@@ -417,7 +418,7 @@ export function commandLineTaskBurnErc1155(): void {
                 try {
                     const strAddressBurnFrom = // same as caller/transaction signer
                         imaState.chainProperties.tc.joAccount.address();
-                    const idTokens: any[] =
+                    const idTokens: state.TTokenID[] =
                         ( imaState.haveArrayOfTokenIdentifiers && imaState.idTokens )
                             ? imaState.idTokens
                             : [];
@@ -456,8 +457,18 @@ export function commandLineTaskBurnErc1155(): void {
     } );
 }
 
+export interface TBalanceDescription {
+    assetName: string
+    assetAddress?: state.TAddress | null
+    idToken?: state.TTokenID | null
+    owner?: state.TAddress | null
+    balance?: state.TBalance | null
+}
+
 export async function commandLineTaskShowBalanceEth(
-    arrBalancesMN: any[], arrBalancesSC: any[], arrBalancesTC: any[]
+    arrBalancesMN: TBalanceDescription[],
+    arrBalancesSC: TBalanceDescription[],
+    arrBalancesTC: TBalanceDescription[]
 ): Promise<void> {
     const imaState: state.TIMAState = state.get();
     let assetAddress: string | null = null;
@@ -520,7 +531,9 @@ export async function commandLineTaskShowBalanceEth(
 }
 
 export async function commandLineTaskShowBalanceErc20(
-    arrBalancesMN: any[], arrBalancesSC: any[], arrBalancesTC: any[]
+    arrBalancesMN: TBalanceDescription[],
+    arrBalancesSC: TBalanceDescription[],
+    arrBalancesTC: TBalanceDescription[]
 ): Promise<void> {
     const imaState: state.TIMAState = state.get();
     let assetAddress = null;
@@ -581,7 +594,10 @@ export async function commandLineTaskShowBalanceErc20(
 }
 
 export async function commandLineTaskShowBalanceErc721(
-    arrBalancesMN: any[], arrBalancesSC: any[], arrBalancesTC: any[], idTokens: any[]
+    arrBalancesMN: TBalanceDescription[],
+    arrBalancesSC: TBalanceDescription[],
+    arrBalancesTC: TBalanceDescription[],
+    idTokens: state.TTokenID[]
 ): Promise<void> {
     const imaState: state.TIMAState = state.get();
     let assetAddress = null;
@@ -654,7 +670,10 @@ export async function commandLineTaskShowBalanceErc721(
 }
 
 export async function commandLineTaskShowBalanceErc1155(
-    arrBalancesMN: any[], arrBalancesSC: any[], arrBalancesTC: any[], idTokens: any[]
+    arrBalancesMN: TBalanceDescription[],
+    arrBalancesSC: TBalanceDescription[],
+    arrBalancesTC: TBalanceDescription[],
+    idTokens: state.TTokenID[]
 ): Promise<void> {
     const imaState: state.TIMAState = state.get();
     let assetAddress = null;
@@ -731,13 +750,14 @@ export function commandLineTaskShowBalance(): void {
     imaState.arrActions.push( {
         name: "show balance",
         fn: async function(): Promise < boolean > {
-            const arrBalancesMN: any = [];
-            const arrBalancesSC: any = []; const arrBalancesTC: any = [];
+            const arrBalancesMN: TBalanceDescription[] = [];
+            const arrBalancesSC: TBalanceDescription[] = [];
+            const arrBalancesTC: TBalanceDescription[] = [];
             await commandLineTaskShowBalanceEth(
                 arrBalancesMN, arrBalancesSC, arrBalancesTC );
             await commandLineTaskShowBalanceErc20(
                 arrBalancesMN, arrBalancesSC, arrBalancesTC );
-            const idTokens: any[] =
+            const idTokens: state.TTokenID[] =
                 ( imaState.haveArrayOfTokenIdentifiers && imaState.idTokens )
                     ? imaState.idTokens
                     : [];
@@ -867,11 +887,10 @@ export function commandLineTaskPaymentM2S(): void {
             if( imaState.chainProperties.mn.strCoinNameErc1155.length > 0 &&
                 imaState.idToken && imaState.idToken !== null &&
                 imaState.idToken !== undefined &&
-                imaState.nAmountOfToken && imaState.nAmountOfToken !== null &&
-                imaState.nAmountOfToken !== undefined &&
-                ( ( !imaState.idTokens ) || imaState.idTokens === null ||
+                imaState.nAmountOfToken.gte( owaspUtils.toBN( 0 ) ) &&
+                ( !imaState.idTokens || imaState.idTokens === null ||
                     imaState.idTokens === undefined ) &&
-                ( ( !imaState.arrAmountsOfTokens ) || imaState.arrAmountsOfTokens === null ||
+                ( !imaState.arrAmountsOfTokens || imaState.arrAmountsOfTokens === null ||
                     imaState.arrAmountsOfTokens === undefined )
             ) {
                 // ERC1155 payment
@@ -919,9 +938,7 @@ export function commandLineTaskPaymentM2S(): void {
                 ( !imaState.idToken ||
                     imaState.idToken === null ||
                     imaState.idToken === undefined ) &&
-                ( !imaState.nAmountOfToken ||
-                    imaState.nAmountOfToken === null ||
-                    imaState.nAmountOfToken === undefined )
+                imaState.nAmountOfToken.lte( owaspUtils.toBN( 0 ) )
             ) {
                 // ERC1155 Batch payment
                 log.information( "one M->S single ERC1155 Batch payment: {} {}",
@@ -1062,13 +1079,11 @@ export function commandLineTaskPaymentS2M(): void {
                 imaState.idToken &&
                 imaState.idToken !== null &&
                 imaState.idToken !== undefined &&
-                imaState.nAmountOfToken &&
-                imaState.nAmountOfToken !== null &&
-                imaState.nAmountOfToken !== undefined &&
-                ( ( !imaState.idTokens ) ||
+                imaState.nAmountOfToken.gte( owaspUtils.toBN( 0 ) ) &&
+                ( !imaState.idTokens ||
                     imaState.idTokens === null ||
                     imaState.idTokens === undefined ) &&
-                ( ( !imaState.arrAmountsOfTokens ) ||
+                ( !imaState.arrAmountsOfTokens ||
                     imaState.arrAmountsOfTokens === null ||
                     imaState.arrAmountsOfTokens === undefined )
             ) {
@@ -1116,9 +1131,7 @@ export function commandLineTaskPaymentS2M(): void {
                 ( !imaState.idToken ||
                     imaState.idToken === null ||
                     imaState.idToken === undefined ) &&
-                ( !imaState.nAmountOfToken ||
-                    imaState.nAmountOfToken === null ||
-                    imaState.nAmountOfToken === undefined )
+                imaState.nAmountOfToken.lte( owaspUtils.toBN( 0 ) )
             ) {
                 // ERC1155 payment
                 log.information( "one S->M single ERC1155 payment: {} {}",
@@ -1214,17 +1227,17 @@ export function commandLineTaskPaymentS2S(): void {
             let strAddrErc721ExplicitTarget = imaState.strAddrErc721ExplicitTarget;
             let strAddrErc1155Explicit = imaState.strAddrErc1155Explicit;
             let strAddrErc1155ExplicitTarget = imaState.strAddrErc1155ExplicitTarget;
-            if( ( !strAddrErc20Explicit ) && sc.joErc20 && sc.strCoinNameErc20 )
+            if( !strAddrErc20Explicit && sc.joErc20 && sc.strCoinNameErc20 )
                 strAddrErc20Explicit = sc.joErc20[sc.strCoinNameErc20 + "_address"];
-            if( ( !strAddrErc20ExplicitTarget ) && tc.joErc20 && tc.strCoinNameErc20 )
+            if( !strAddrErc20ExplicitTarget && tc.joErc20 && tc.strCoinNameErc20 )
                 strAddrErc20ExplicitTarget = tc.joErc20[tc.strCoinNameErc20 + "_address"];
-            if( ( !strAddrErc721Explicit ) && sc.joErc721 && sc.strCoinNameErc721 )
+            if( !strAddrErc721Explicit && sc.joErc721 && sc.strCoinNameErc721 )
                 strAddrErc721Explicit = sc.joErc721[sc.strCoinNameErc721 + "_address"];
-            if( ( !strAddrErc721ExplicitTarget ) && tc.joErc721 && tc.strCoinNameErc721 )
+            if( !strAddrErc721ExplicitTarget && tc.joErc721 && tc.strCoinNameErc721 )
                 strAddrErc721ExplicitTarget = tc.joErc721[tc.strCoinNameErc721 + "_address"];
-            if( ( !strAddrErc1155Explicit ) && sc.joErc1155 && sc.strCoinNameErc1155 )
+            if( !strAddrErc1155Explicit && sc.joErc1155 && sc.strCoinNameErc1155 )
                 strAddrErc1155Explicit = sc.joErc1155[sc.strCoinNameErc1155 + "_address"];
-            if( ( !strAddrErc1155ExplicitTarget ) && tc.joErc1155 && tc.strCoinNameErc1155 )
+            if( !strAddrErc1155ExplicitTarget && tc.joErc1155 && tc.strCoinNameErc1155 )
                 strAddrErc1155ExplicitTarget = tc.joErc1155[tc.strCoinNameErc1155 + "_address"];
             const strAddrErc20Dst = isForward
                 ? strAddrErc20ExplicitTarget
@@ -1286,13 +1299,11 @@ export function commandLineTaskPaymentS2S(): void {
                 imaState.idToken &&
                 imaState.idToken !== null &&
                 imaState.idToken !== undefined &&
-                imaState.nAmountOfToken &&
-                imaState.nAmountOfToken !== null &&
-                imaState.nAmountOfToken !== undefined &&
-                ( ( !imaState.idTokens ) ||
+                imaState.nAmountOfToken.gte( owaspUtils.toBN( 0 ) ) &&
+                ( !imaState.idTokens ||
                     imaState.idTokens === null ||
                     imaState.idTokens === undefined ) &&
-                ( ( !imaState.arrAmountsOfTokens ) ||
+                ( !imaState.arrAmountsOfTokens ||
                     imaState.arrAmountsOfTokens === null ||
                     imaState.arrAmountsOfTokens === undefined )
             ) {
@@ -1330,9 +1341,7 @@ export function commandLineTaskPaymentS2S(): void {
                 ( !imaState.idToken ||
                     imaState.idToken === null ||
                     imaState.idToken === undefined ) &&
-                ( !imaState.nAmountOfToken ||
-                    imaState.nAmountOfToken === null ||
-                    imaState.nAmountOfToken === undefined )
+                imaState.nAmountOfToken.lte( owaspUtils.toBN( 0 ) )
             ) {
                 // ERC1155 Batch payment
                 log.information( "one S->S single ERC1155 Batch payment: {} {}",
@@ -1635,7 +1644,10 @@ export function commandLineTaskLoopSimple(): void {
 }
 
 async function handleBrowseSkaleModesRpcInfoResult(
-    strLogPrefix: string, joCall: rpcCall.TRPCCall, joIn: any, joOut: any
+    strLogPrefix: string, joCall:
+    rpcCall.TRPCCall,
+    joIn: rpcCallFormats.TRPCInputBasicFieldsWithParams,
+    joOut: rpcCallFormats.TRPCOutputBasicFields
 ): Promise<void> {
     const imaState: state.TIMAState = state.get();
     log.information( "{p}S-Chain network information: {}",
@@ -1656,7 +1668,8 @@ async function handleBrowseSkaleModesRpcInfoResult(
             joCall = await rpcCall.create( strNodeURL, rpcCallOpts );
             if( !joCall )
                 throw new Error( `Failed to create JSON RPC call object to ${strNodeURL}` );
-            const jIn: any = { method: "skale_imaInfo", params: { } };
+            const jIn: rpcCallFormats.TRPCInputBasicFieldsWithParams =
+                { method: "skale_imaInfo", params: { } };
             if( discoveryTools.isSendImaAgentIndex() )
                 jIn.params.fromImaAgentIndex = imaState.nNodeNumber;
             const joOut = await joCall.call( joIn );
@@ -1700,7 +1713,8 @@ export function commandLineTaskBrowseSChain(): void {
                     throw new Error( "Failed to create JSON RPC call object " +
                         `to ${imaState.chainProperties.sc.strURL}` );
                 }
-                const joIn: any = { method: "skale_nodesRpcInfo", params: { } };
+                const joIn: rpcCallFormats.TRPCInputBasicFieldsWithParams =
+                    { method: "skale_nodesRpcInfo", params: { } };
                 if( discoveryTools.isSendImaAgentIndex() )
                     joIn.params.fromImaAgentIndex = imaState.nNodeNumber;
                 const joOut = await joCall.call( joIn );

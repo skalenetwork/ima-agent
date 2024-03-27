@@ -28,15 +28,31 @@ import * as rpcCall from "./rpcCall.js";
 import * as threadInfo from "./threadInfo.js";
 import * as owaspUtils from "./owaspUtils.js";
 import * as sha3Module from "sha3";
-const Keccak: any = sha3Module.Keccak;
-export const gConstMinPowResultLimit: number = 10000;
-export const gConstMaxPowResultLimit: any = 100000;
+import type * as rpcCallFormats from "./rpcCallFormats.js";
+import type * as state from "./state.js";
 
-const gBigNumMinPowResult: any = owaspUtils.toBN( gConstMinPowResultLimit );
-const gBigNum1: any = owaspUtils.toBN( 1 );
-const gBigNum2: any = owaspUtils.toBN( 2 );
-const gBigNum256: any = owaspUtils.toBN( 256 );
-const gBigNumUpperPart: any = gBigNum2.pow( gBigNum256 ).sub( gBigNum1 );
+const Keccak: any = sha3Module.Keccak;
+
+export interface TOracleOptions {
+    url: string
+    callOpts: rpcCall.TRPCCallOpts | null
+    nMillisecondsSleepBefore: number
+    nMillisecondsSleepPeriod: number
+    cntAttempts: number
+    isVerbose: boolean
+    isVerboseTraceDetails: boolean
+}
+
+export const gConstMinPowResultLimit: number = 10000;
+export const gConstMaxPowResultLimit: number = 100000;
+
+const gBigNumMinPowResult: owaspUtils.ethersMod.BigNumber =
+    owaspUtils.toBN( gConstMinPowResultLimit );
+const gBigNum1: owaspUtils.ethersMod.BigNumber = owaspUtils.toBN( 1 );
+const gBigNum2: owaspUtils.ethersMod.BigNumber = owaspUtils.toBN( 2 );
+const gBigNum256: owaspUtils.ethersMod.BigNumber = owaspUtils.toBN( 256 );
+const gBigNumUpperPart: owaspUtils.ethersMod.BigNumber =
+    gBigNum2.pow( gBigNum256 ).sub( gBigNum1 );
 
 function getUtcTimestampString( aDate?: Date ): string {
     aDate = aDate ?? new Date(); // use now time if aDate is not specified
@@ -46,7 +62,7 @@ function getUtcTimestampString( aDate?: Date ): string {
 }
 
 export function findPowNumber(
-    strRequestPart: string, details: log.TLogger, isVerbose?: boolean ): any {
+    strRequestPart: string, details: log.TLoggerBase, isVerbose?: boolean ): string {
     details = details || log;
     if( isVerbose )
         details.debug( "source part of request to find PoW number is {}", strRequestPart );
@@ -70,9 +86,9 @@ export function findPowNumber(
             if( isVerbose ) {
                 details.debug( "computed n={}, this is resulting PoW number", i );
                 details.debug( "computed f={}={}", f.toString(),
-                    owaspUtils.ensureStartsWith0x( f.toString( 16 ) ) );
+                    owaspUtils.ensureStartsWith0x( f.toHexString() ) );
                 details.debug( "computed r={}={}={}", "(2**256-1)/f", r.toString(),
-                    owaspUtils.ensureStartsWith0x( r.toString( 16 ) ) );
+                    owaspUtils.ensureStartsWith0x( r.toHexString() ) );
                 details.debug( "computed s={}", s );
             }
             break;
@@ -82,9 +98,9 @@ export function findPowNumber(
 }
 
 async function handleOracleCheckResultResult(
-    oracleOpts: any, details: log.TLogger, isVerboseTraceDetails: boolean,
-    joCall: rpcCall.TRPCCall, joIn: any, joOut: any
-): Promise<any> {
+    oracleOpts: TOracleOptions, details: log.TLoggerBase, isVerboseTraceDetails: boolean,
+    joCall: rpcCall.TRPCCall, joIn: state.TLoadedJSON, joOut: state.TLoadedJSON
+): Promise< owaspUtils.ethersMod.BigNumber > {
     if( isVerboseTraceDetails )
         details.debug( "RPC call(oracle_checkResult) result is: {}", joOut );
     if( !( "result" in joOut && typeof joOut.result === "string" &&
@@ -92,24 +108,24 @@ async function handleOracleCheckResultResult(
         if( isVerboseTraceDetails )
             details.error( "Bad unexpected result in oracle_checkResult" );
         await joCall.disconnect();
-        return;
+        return owaspUtils.toBN( 0 );
     }
-    const joResult: any = JSON.parse( joOut.result );
+    const joResult: state.TLoadedJSON = JSON.parse( joOut.result );
     if( isVerboseTraceDetails )
         details.debug( "RPC call(oracle_checkResult) parsed result field is: {}", joResult );
-    const gp = owaspUtils.toBN( joResult.rslts[0] );
+    const gp: owaspUtils.ethersMod.BigNumber = owaspUtils.toBN( joResult.rslts[0] );
     if( isVerboseTraceDetails ) {
         details.success( "success, computed Gas Price={}={}",
-            gp.toString(), owaspUtils.ensureStartsWith0x( gp.toString( 16 ) ) );
+            gp.toString(), owaspUtils.ensureStartsWith0x( gp.toHexString() ) );
     }
     await joCall.disconnect();
     return gp;
 }
 
 async function handleOracleSubmitRequestResult(
-    oracleOpts: any, details: log.TLogger, isVerboseTraceDetails: boolean,
-    joCall: rpcCall.TRPCCall, joIn: any, joOut: any
-): Promise<any> {
+    oracleOpts: TOracleOptions, details: log.TLoggerBase, isVerboseTraceDetails: boolean,
+    joCall: rpcCall.TRPCCall, joIn: state.TLoadedJSON, joOut: state.TLoadedJSON
+): Promise<owaspUtils.ethersMod.BigNumber> {
     const nMillisecondsSleepBefore = "nMillisecondsSleepBefore" in oracleOpts
         ? oracleOpts.nMillisecondsSleepBefore
         : 1000;
@@ -128,7 +144,7 @@ async function handleOracleSubmitRequestResult(
             "non-successful result is {}", joOut );
         throw new Error( "ORACLE ERROR: Bad unexpected result(oracle_submitRequest)" );
     }
-    let gp = null;
+    let gp: owaspUtils.ethersMod.BigNumber | null = null;
     for( let idxAttempt = 0; idxAttempt < cntAttempts; ++idxAttempt ) {
         const nMillisecondsToSleep = ( !idxAttempt )
             ? nMillisecondsSleepBefore
@@ -136,13 +152,14 @@ async function handleOracleSubmitRequestResult(
         if( nMillisecondsToSleep > 0 )
             await threadInfo.sleep( nMillisecondsToSleep );
         try {
-            const joIn: any = { method: "oracle_checkResult", params: [ joOut.result ] };
+            const joIn: rpcCallFormats.TRPCInputBasicFieldsWithArray =
+                { method: "oracle_checkResult", params: [ joOut.result ] };
             if( isVerboseTraceDetails ) {
                 details.debug( "RPC call oracle_checkResult attempt {} " +
                     "of {}...", idxAttempt, cntAttempts );
                 details.debug( "RPC call(oracle_checkResult) is {}", joIn );
             }
-            gp = null;
+            gp = owaspUtils.toBN( 0 );
             joOut = await joCall.call( joIn );
             gp = await handleOracleCheckResultResult(
                 oracleOpts, details, isVerboseTraceDetails, joCall, joIn, joOut );
@@ -162,10 +179,11 @@ async function handleOracleSubmitRequestResult(
 }
 
 export async function oracleGetGasPrice(
-    oracleOpts: any, details: log.TLogger ): Promise<any> {
+    oracleOpts: TOracleOptions, details: log.TLoggerBase
+): Promise< owaspUtils.ethersMod.BigNumber > {
     details = details || log;
     const url: string = oracleOpts.url;
-    let gp: any = null;
+    let gp: owaspUtils.ethersMod.BigNumber | null = null;
     let joCall: rpcCall.TRPCCall | null = null;
     try {
         const isVerbose = "isVerbose" in oracleOpts ? oracleOpts.isVerbose : false;
@@ -175,7 +193,7 @@ export async function oracleGetGasPrice(
         if( !( log.verboseGet() >= log.verboseName2Number( "trace" ) ) )
             isVerboseTraceDetails = false;
         const callOpts = "callOpts" in oracleOpts ? oracleOpts.callOpts : { };
-        joCall = await rpcCall.create( url, callOpts || { } );
+        joCall = await rpcCall.create( url, callOpts ?? { } );
         if( !joCall )
             throw new Error( `Failed to create JSON RPC call object to ${url}` );
         const s = findPowNumber(
@@ -183,10 +201,11 @@ export async function oracleGetGasPrice(
             "\"post\":\"{\\\"jsonrpc\\\":\\\"2.0\\\"," +
             "\\\"method\\\":\\\"eth_gasPrice\\\",\\\"params\\\":[],\\\"id\\\":1}\"",
             details, isVerbose );
-        const joIn: any = { method: "oracle_submitRequest", params: [ s ] };
+        const joIn: rpcCallFormats.TRPCInputBasicFieldsWithArray =
+            { method: "oracle_submitRequest", params: [ s ] };
         if( isVerboseTraceDetails )
             details.debug( "RPC call {} is {}", "oracle_submitRequest", joIn );
-        const joOut: any = await joCall.call( joIn );
+        const joOut = await joCall.call( joIn );
         gp = await handleOracleSubmitRequestResult(
             oracleOpts, details, isVerboseTraceDetails, joCall, joIn, joOut );
         await joCall.disconnect();
@@ -200,4 +219,5 @@ export async function oracleGetGasPrice(
         throw new Error( `ORACLE ERROR: RPC connection problem for url ${url}, ` +
             `error description: ${owaspUtils.extractErrorMessage( err )}` );
     }
+    return owaspUtils.toBN( 0 );
 }

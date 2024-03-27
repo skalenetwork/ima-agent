@@ -29,6 +29,7 @@
 // top 10 hit parade: https://owasp.org/www-project-top-ten/
 
 import * as log from "./log.js";
+import * as cc from "./cc.js";
 import * as ethersMod from "ethers";
 import * as fs from "fs";
 
@@ -38,34 +39,41 @@ export interface TXYSignature {
 }
 
 export interface TBLSSignature {
-    blsSignature: any[2] // BLS glue of signatures, X then Y
+    blsSignature: string[] // BLS glue of signatures, X then Y, 2 items in array
     hashA: string // G1.X from joGlueResult.hashSrc
     hashB: string // G1.Y from joGlueResult.hashSrc
     counter: string | number | null
 }
 
-const BigNumber = ethersMod.ethers.BigNumber;
-
 const safeURL = log.safeURL;
 const replaceAll = log.replaceAll;
 const extractErrorMessage = log.extractErrorMessage;
+const validateInteger = cc.validateInteger;
+const validateRadix = cc.validateRadix;
+const toInteger = cc.toInteger;
+const validateFloat = cc.validateFloat;
+const toFloat = cc.toFloat;
+const toBoolean = cc.toBoolean;
 
-export { ethersMod, safeURL, replaceAll, extractErrorMessage, BigNumber };
+export {
+    ethersMod, safeURL, replaceAll, extractErrorMessage,
+    validateInteger, validateRadix, toInteger, validateFloat, toFloat, toBoolean
+};
 
-export function rxIsInt( val: any ): boolean {
+export function rxIsInt( val: log.TLogArgument ): boolean {
     try {
         const intRegex = /^-?\d+$/;
         if( !intRegex.test( val ) )
             return false;
         const intVal = parseInt( val, 10 );
-        if( parseFloat( val ) == intVal && ( !isNaN( intVal ) ) )
+        if( parseFloat( val ) == intVal && !isNaN( intVal ) )
             return true;
     } catch ( err ) {
     }
     return false;
 }
 
-export function rxIsFloat( val: any ): boolean {
+export function rxIsFloat( val: log.TLogArgument ): boolean {
     try {
         const floatRegex = /^-?\d+(?:[.,]\d*?)?$/;
         if( !floatRegex.test( val ) )
@@ -79,7 +87,7 @@ export function rxIsFloat( val: any ): boolean {
     return false;
 }
 
-export function parseIntOrHex( s: any ): number {
+export function parseIntOrHex( s: log.TLogArgument ): number {
     if( typeof s !== "string" )
         return parseInt( s );
     s = s.trim();
@@ -88,84 +96,14 @@ export function parseIntOrHex( s: any ): number {
     return parseInt( s, 10 );
 }
 
-export function validateRadix( value: any, radix?: any ): boolean {
-    value = ( value ? value.toString() : "10" ).trim();
-    radix = ( radix === null || radix === undefined )
-        ? ( ( value.length > 2 && value[0] == "0" && ( value[1] == "x" || value[1] == "X" ) )
-            ? 16
-            : 10 )
-        : parseInt( radix, 10 );
-    return radix;
-}
-
-export function validateInteger( value: any, radix?: any ): boolean {
-    try {
-        if( value === null || value === undefined )
-            return false;
-        if( value === 0 || value === 0.0 )
-            return true;
-        const s = value ? value.toString().trim() : "";
-        if( s.length < 1 )
-            return false;
-        radix = validateRadix( value, radix );
-        if( ( !isNaN( value ) ) &&
-            ( parseInt( value, radix ) == value || radix !== 10 ) &&
-            ( !isNaN( parseInt( value, radix ) ) )
-        )
-            return true;
-    } catch ( err ) {
-    }
-    return false;
-}
-
-export function toInteger( value: any, radix?: any ): number {
-    try {
-        if( value === 0 || value === 0.0 || value === null || value === undefined )
-            return 0;
-        value = ( value ? value.toString().trim() : "" ).trim();
-        radix = validateRadix( value, radix );
-        if( !validateInteger( value, radix ) )
-            return NaN;
-        return parseInt( value.toString().trim(), radix );
-    } catch ( err ) {
-    }
-    return 0;
-}
-
-export function validateFloat( value: any ): boolean {
-    try {
-        if( value === null || value === undefined )
-            return false;
-        if( value === 0 || value === 0.0 )
-            return true;
-        const f = parseFloat( value.toString().trim() );
-        if( isNaN( f ) )
-            return false;
-        return true;
-    } catch ( err ) {
-    }
-    return false;
-}
-
-export function toFloat( value: any ): number {
-    try {
-        if( value === 0 || value === 0.0 || value === null || value === undefined )
-            return 0.0;
-        const f = parseFloat( value.toString().trim() );
-        return f;
-    } catch ( err ) {
-    }
-    return 0.0;
-}
-
-export function validateURL( s: any ): boolean {
+export function validateURL( s: log.TLogArgument ): boolean {
     const url = toURL( s );
     if( url == null )
         return false;
     return true;
 }
 
-export function toURL( s: any ): URL | null {
+export function toURL( s: log.TLogArgument ): URL | null {
     try {
         if( s == null || s == undefined )
             return null;
@@ -181,8 +119,8 @@ export function toURL( s: any ): URL | null {
                 const ss = s.substring( 1, cnt - 1 );
                 const objURL = toURL( ss );
                 if( objURL != null && objURL != undefined ) {
-                    const anyURL: any = objURL;
-                    anyURL.strStrippedStringComma = sc;
+                    const anyURL: URL = objURL;
+                    ( anyURL as any ).strStrippedStringComma = sc;
                 }
                 return objURL;
             }
@@ -193,15 +131,15 @@ export function toURL( s: any ): URL | null {
             return null;
         if( objURL.hostname.length === 0 )
             return null;
-        const anyURL: any = objURL;
-        anyURL.strStrippedStringComma = null;
+        const anyURL: URL = objURL;
+        ( anyURL as any ).strStrippedStringComma = null;
         return objURL;
     } catch ( err ) {
         return null;
     }
 }
 
-export function toStringURL( s?: any, defValue?: string ): string {
+export function toStringURL( s?: log.TLogArgument, defValue?: string ): string {
     defValue = defValue ?? "";
     try {
         const url = toURL( s );
@@ -213,7 +151,7 @@ export function toStringURL( s?: any, defValue?: string ): string {
     }
 }
 
-export function isUrlHTTP( strURL?: any ): boolean {
+export function isUrlHTTP( strURL?: log.TLogArgument ): boolean {
     try {
         if( !validateURL( strURL ) )
             return false;
@@ -225,7 +163,7 @@ export function isUrlHTTP( strURL?: any ): boolean {
     return false;
 }
 
-export function isUrlWS( strURL?: any ): boolean {
+export function isUrlWS( strURL?: log.TLogArgument ): boolean {
     try {
         if( !validateURL( strURL ) )
             return false;
@@ -237,34 +175,11 @@ export function isUrlWS( strURL?: any ): boolean {
     return false;
 }
 
-export function toBoolean( value?: any ): boolean {
-    let b = false;
-    try {
-        if( value === null || value === undefined )
-            return false;
-        if( typeof value === "boolean" )
-            return value;
-        if( typeof value === "string" ) {
-            const ch = value[0].toLowerCase();
-            if( ch == "y" || ch == "t" )
-                b = true; else if( validateInteger( value ) )
-                b = !!toInteger( value ); else if( validateFloat( value ) )
-                b = !!toFloat( value ); else
-                b = !!b;
-        } else
-            b = !!b;
-    } catch ( err ) {
-        b = false;
-    }
-    b = !!b;
-    return b;
-}
-
-export function validateInputAddresses( address?: any ): boolean {
+export function validateInputAddresses( address?: log.TLogArgument ): boolean {
     return ( /^(0x){1}[0-9a-fA-F]{40}$/i.test( address ) );
 }
 
-export function validateEthAddress( value?: any ): boolean {
+export function validateEthAddress( value?: log.TLogArgument ): boolean {
     try {
         if( validateInputAddresses( ensureStartsWith0x( value ) ) )
             return true;
@@ -273,7 +188,7 @@ export function validateEthAddress( value?: any ): boolean {
     return false;
 }
 
-export function validateEthPrivateKey( value?: any ): boolean {
+export function validateEthPrivateKey( value?: log.TLogArgument ): boolean {
     try {
         const ethersWallet = new ethersMod.ethers.Wallet( ensureStartsWith0x( value ) );
         if( ethersWallet.address )
@@ -283,7 +198,7 @@ export function validateEthPrivateKey( value?: any ): boolean {
     return false;
 }
 
-export function toEthAddress( value?: any, defValue?: string ): string {
+export function toEthAddress( value?: log.TLogArgument, defValue?: string ): string {
     try {
         value = value ? ensureStartsWith0x( value.toString() ) : "";
         defValue = defValue ?? "";
@@ -294,7 +209,7 @@ export function toEthAddress( value?: any, defValue?: string ): string {
     return value;
 }
 
-export function toEthPrivateKey( value?: any, defValue?: string ): string {
+export function toEthPrivateKey( value?: log.TLogArgument, defValue?: string ): string {
     try {
         value = value ? value.toString() : "";
         defValue = defValue ?? "";
@@ -305,8 +220,8 @@ export function toEthPrivateKey( value?: any, defValue?: string ): string {
     return value;
 }
 
-export function verifyArgumentWithNonEmptyValue( joArg?: any ): any {
-    if( ( !joArg.value ) || ( typeof joArg.value === "string" && joArg.value.length === 0 ) ) {
+export function verifyArgumentWithNonEmptyValue( joArg?: log.TLogArgument ): log.TLogArgument {
+    if( !joArg.value || ( typeof joArg.value === "string" && joArg.value.length === 0 ) ) {
         console.log( log.fmtFatal( "(OWASP) Value {} of argument {} must not be empty",
             joArg.value, joArg.name ) );
         process.exit( 126 );
@@ -314,7 +229,7 @@ export function verifyArgumentWithNonEmptyValue( joArg?: any ): any {
     return joArg;
 }
 
-export function verifyArgumentIsURL( joArg?: any ): any {
+export function verifyArgumentIsURL( joArg?: log.TLogArgument ): void {
     try {
         verifyArgumentWithNonEmptyValue( joArg );
         const url = toURL( joArg.value );
@@ -336,15 +251,15 @@ export function verifyArgumentIsURL( joArg?: any ): any {
     }
 }
 
-export function verifyArgumentIsInteger( joArg?: any ): any {
+export function verifyArgumentIsInteger( joArg?: log.TLogArgument ): log.TLogArgument {
     try {
         verifyArgumentWithNonEmptyValue( joArg );
-        if( !validateInteger( joArg.value ) ) {
+        if( !cc.validateInteger( joArg.value ) ) {
             console.log( log.fmtFatal( "(OWASP) Value {} of argument {} must be valid integer",
                 joArg.value, joArg.name ) );
             process.exit( 126 );
         }
-        joArg.value = toInteger( joArg.value );
+        joArg.value = cc.toInteger( joArg.value );
         return joArg;
     } catch ( err ) {
         console.log( log.fmtFatal( "(OWASP) Value {} of argument {} must be valid integer",
@@ -353,7 +268,7 @@ export function verifyArgumentIsInteger( joArg?: any ): any {
     }
 }
 
-export function verifyArgumentIsIntegerIpPortNumber( joArg: any ): any {
+export function verifyArgumentIsIntegerIpPortNumber( joArg: log.TLogArgument ): log.TLogArgument {
     try {
         verifyArgumentIsInteger( joArg );
         if( joArg.value < 0 )
@@ -370,7 +285,7 @@ export function verifyArgumentIsIntegerIpPortNumber( joArg: any ): any {
     }
 }
 
-export function verifyArgumentIsPathToExistingFile( joArg?: any ): any {
+export function verifyArgumentIsPathToExistingFile( joArg?: log.TLogArgument ): void {
     try {
         verifyArgumentWithNonEmptyValue( joArg );
         const stats = fs.lstatSync( joArg.value );
@@ -392,7 +307,7 @@ export function verifyArgumentIsPathToExistingFile( joArg?: any ): any {
     }
 }
 
-export function verifyArgumentIsPathToExistingFolder( joArg?: any ): any {
+export function verifyArgumentIsPathToExistingFolder( joArg?: log.TLogArgument ): log.TLogArgument {
     try {
         verifyArgumentWithNonEmptyValue( joArg );
         const stats = fs.lstatSync( joArg.value );
@@ -414,7 +329,7 @@ export function verifyArgumentIsPathToExistingFolder( joArg?: any ): any {
     }
 }
 
-export function verifyArgumentIsArrayOfIntegers( joArg?: any ): any[] {
+export function verifyArgumentIsArrayOfIntegers( joArg?: log.TLogArgument ): log.TLogArgument[] {
     try {
         verifyArgumentWithNonEmptyValue( joArg );
         if( joArg.value.length < 3 ) {
@@ -436,12 +351,12 @@ export function verifyArgumentIsArrayOfIntegers( joArg?: any ): any[] {
                     newValue[index], joArg.name ) );
                 process.exit( 126 );
             }
-            if( !validateInteger( newValue[index] ) ) {
+            if( !cc.validateInteger( newValue[index] ) ) {
                 console.log( log.fmtFatal( "(OWASP) Value {} of argument {} must be valid integer",
                     newValue[index], joArg.name ) );
                 process.exit( 126 );
             }
-            newValue[index] = toInteger( newValue[index] );
+            newValue[index] = cc.toInteger( newValue[index] );
         }
         return newValue;
     } catch ( err ) {
@@ -451,7 +366,7 @@ export function verifyArgumentIsArrayOfIntegers( joArg?: any ): any[] {
     }
 }
 
-export function ensureStartsWith0x( s?: any ): string {
+export function ensureStartsWith0x( s?: log.TLogArgument ): string {
     if( s == null || s == undefined || typeof s !== "string" )
         return s;
     if( s.length < 2 )
@@ -461,7 +376,7 @@ export function ensureStartsWith0x( s?: any ): string {
     return "0x" + s;
 }
 
-export function removeStarting0x( s?: any ): string {
+export function removeStarting0x( s?: log.TLogArgument ): string {
     if( s == null || s == undefined || typeof s !== "string" )
         return s;
     if( s.length < 2 )
@@ -479,12 +394,12 @@ export function inetNtoA( n: number ): string {
     return ( a + "." + b + "." + c + "." + d );
 }
 
-export function ipFromHex( hex?: any ): string {
+export function ipFromHex( hex?: log.TLogArgument ): string {
     return inetNtoA( parseInt( removeStarting0x( hex ), 16 ) );
 }
 
-export function cloneObjectByRootKeys( joIn?: any ): any {
-    const joOut: any = { }; const arrKeys = Object.keys( joIn );
+export function cloneObjectByRootKeys( joIn?: log.TLogArgument ): log.TLogArgument {
+    const joOut: log.TLogArgument = { }; const arrKeys = Object.keys( joIn );
     for( let i = 0; i < arrKeys.length; ++i ) {
         const key = arrKeys[i];
         const value = joIn[key];
@@ -495,7 +410,7 @@ export function cloneObjectByRootKeys( joIn?: any ): any {
 
 // example: "1ether" -> "1000000000000000000"
 // supported suffix aliases, lowercase
-const gMapMoneyNameSuffixAliases: any = {
+const gMapMoneyNameSuffixAliases: Record< string, string > = {
     ethe: "ether",
     ethr: "ether",
     eth: "ether",
@@ -618,13 +533,14 @@ function moneyUnitNameToPostMultiplier( s: string ): string | null {
     return null;
 }
 
-export function parseMoneySpecToWei( s?: any, isThrowException?: boolean ): string {
+export function parseMoneySpecToWei(
+    s?: log.TLogArgument, isThrowException?: boolean ): ethersMod.BigNumber {
     try {
-        isThrowException = ( !!isThrowException );
+        isThrowException = !!isThrowException;
         if( s == null || s == undefined ) {
             if( isThrowException )
                 throw new Error( "no parse-able value provided" );
-            return "0";
+            return toBN( "0" );
         }
         s = s.toString().trim();
         let strNumber = "";
@@ -655,14 +571,14 @@ export function parseMoneySpecToWei( s?: any, isThrowException?: boolean ): stri
         if( mlr != null )
             s = s.mul( toBN( mlr ) );
         s = s.toString();
-        return s;
-    } catch ( err: any ) {
+        return toBN( s );
+    } catch ( err ) {
         if( isThrowException ) {
             throw new Error( `Parse error in parseMoneySpecToWei( ${s} ), ` +
-                `error is: ${err}` );
+                `error is: ${err as any}` );
         }
     }
-    return "0";
+    return toBN( "0" );
 }
 
 export function computeChainIdFromSChainName( strName: string ): string {
@@ -724,7 +640,7 @@ export function ethersProviderToUrl(
     return strURL ?? "N/A-URL";
 }
 
-export function isHexPrefixed( s: any ): boolean {
+export function isHexPrefixed( s: log.TLogArgument ): boolean {
     if( typeof s !== "string" ) {
         throw new Error(
             "Parameter value of owaspUtils.isHexPrefixed() must be type 'string' but it's " +
@@ -733,25 +649,25 @@ export function isHexPrefixed( s: any ): boolean {
     return ( s.slice( 0, 2 ) === "0x" );
 }
 
-export function stripHexPrefix( s: any ): string {
+export function stripHexPrefix( s: log.TLogArgument ): string {
     if( typeof s !== "string" )
         return s;
     return isHexPrefixed( s ) ? s.slice( 2 ) : s;
 }
 
-export function toBNbasic( x?: any, optionalRadix?: number ): any {
+export function toBNbasic( x?: log.TLogArgument, optionalRadix?: number ): ethersMod.BigNumber {
     try {
         if( optionalRadix && typeof optionalRadix === "number" && optionalRadix == 16 )
             x = ensureStartsWith0x( x );
-        const bn = ethersMod.ethers.BigNumber.from( x );
+        const bn = ethersMod.BigNumber.from( x );
         return bn;
-    } catch ( err: any ) {
-        console.log( `CRITICAL ERROR: Failure in owaspUtils.toBNbasic( ${x} ): ${err}` );
+    } catch ( err ) {
+        console.log( `CRITICAL ERROR: Failure in owaspUtils.toBNbasic( ${x} ): ${err as any}` );
         throw err;
     }
 }
 
-export function toBN( arg: any ): any {
+export function toBN( arg: log.TLogArgument ): ethersMod.BigNumber {
     if( typeof arg === "string" || typeof arg === "number" ) {
         let multiplier = toBNbasic( 1 );
         const formattedString = String( arg ).toLowerCase().trim();
@@ -784,24 +700,31 @@ export function toBN( arg: any ): any {
         "Note, decimals are not supported." );
 }
 
-export function isNumeric( s?: any ): boolean {
+export function isNumeric( s?: log.TLogArgument ): boolean {
     return /^\d+$/.test( s );
 }
 
-export function toHexStringSafe( val?: any ): string {
+export function toHexStringSafe( val?: ethersMod.BigNumber | number | bigint | null ): string {
     if( !val )
         return "0x0";
-    if( "toHexString" in val && typeof val.toHexString === "function" )
-        return val.toHexString();
     if( typeof val === "number" || typeof val === "bigint" )
         return ensureStartsWith0x( val.toString( 16 ) );
+    if( "toHexString" in val && typeof val.toHexString === "function" )
+        return val.toHexString();
     if( "toString" in val && typeof val.toString === "function" )
         return val.toString();
     return val.toString();
 }
 
-export function setInterval2( fn: () => void, t: number, stepMilliSeconds?: number ): any {
-    const iv: any = {
+export interface TInterval2 {
+    real_iv: NodeJS.Timeout | null
+    stepMilliSeconds: number
+    maxMilliSeconds: number
+    accumulatedMilliSeconds: number
+}
+
+export function setInterval2( fn: () => void, t: number, stepMilliSeconds?: number ): TInterval2 {
+    const iv: TInterval2 = {
         real_iv: null,
         stepMilliSeconds: stepMilliSeconds ?? 1000,
         maxMilliSeconds: t,
@@ -817,7 +740,7 @@ export function setInterval2( fn: () => void, t: number, stepMilliSeconds?: numb
     return iv;
 }
 
-export function clearInterval2( iv: any ): void {
+export function clearInterval2( iv: TInterval2 ): void {
     if( !iv )
         return;
     if( !( "real_iv" in iv ) )

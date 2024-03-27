@@ -30,16 +30,23 @@ export function verifyTransferErrorCategoryName( strCategory: string ): string {
     return ( strCategory ?? "default" );
 }
 
+export interface TTransferEventErrorDescription {
+    ts: number
+    category: string
+    textLog?: string
+};
+export type TMapTransferErrorCategories = Record<string, boolean>; ;
+
 const gMaxLastTransferErrors: number = 20;
-const gArrLastTransferErrors: any = [];
-let gMapTransferErrorCategories: any = { };
+const gArrLastTransferErrors: TTransferEventErrorDescription[] = [];
+let gMapTransferErrorCategories: TMapTransferErrorCategories = { };
 
 export const saveTransferEvents = new EventDispatcher();
 
-export function saveTransferError( strCategory: string, textLog: any, ts?: any ): void {
-    ts = ts || Math.round( ( new Date() ).getTime() / 1000 );
+export function saveTransferError( strCategory: string, textLog: string, ts?: number ): void {
+    ts = ts ?? Math.round( ( new Date() ).getTime() / 1000 );
     const catName = verifyTransferErrorCategoryName( strCategory );
-    const joTransferEventError: any = {
+    const joTransferEventError: TTransferEventErrorDescription = {
         ts,
         category: catName.toString(),
         textLog: textLog.toString()
@@ -69,13 +76,15 @@ export function saveTransferSuccessAll(): void {
     gMapTransferErrorCategories = { };
 }
 
-export function getLastTransferErrors( isIncludeTextLog: boolean ): any[] {
+export function getLastTransferErrors(
+    isIncludeTextLog: boolean ): TTransferEventErrorDescription[] {
     if( typeof isIncludeTextLog === "undefined" )
         isIncludeTextLog = true;
-    const jarr = JSON.parse( JSON.stringify( gArrLastTransferErrors ) );
+    const jarr: TTransferEventErrorDescription[] =
+        JSON.parse( JSON.stringify( gArrLastTransferErrors ) );
     if( !isIncludeTextLog ) {
         for( let i = 0; i < jarr.length; ++i ) {
-            const jo: any = jarr[i];
+            const jo: TTransferEventErrorDescription = jarr[i];
             if( "textLog" in jo )
                 delete jo.textLog;
         }
@@ -90,8 +99,8 @@ export function getLastErrorCategories(): string[] {
 let gFlagIsEnabledProgressiveEventsScan = true;
 
 export function getEnabledProgressiveEventsScan(): boolean {
-    return ( !!gFlagIsEnabledProgressiveEventsScan );
+    return !!gFlagIsEnabledProgressiveEventsScan;
 }
 export function setEnabledProgressiveEventsScan( isEnabled: boolean ): void {
-    gFlagIsEnabledProgressiveEventsScan = ( !!isEnabled );
+    gFlagIsEnabledProgressiveEventsScan = !!isEnabled;
 }

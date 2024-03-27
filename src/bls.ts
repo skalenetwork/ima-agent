@@ -39,18 +39,16 @@ import * as utils from "./socketUtils.js";
 import * as state from "./state.js";
 import type * as loop from "./loop.js";
 import type * as IMA from "./imaCore.js";
+import type * as rpcCallFormats from "./rpcCallFormats.js";
 
-export interface TQAInformation {
-    skaledNumber: number
-    sequenceId: string
-    ts: string
+export interface TBLSBasicSignResultFields {
+    errorMessage: string
+    status: number
+    error?: string | null
 }
 
-export interface TSignResult {
-    errorMessage?: string | null
+export interface TSignResult extends TBLSBasicSignResultFields {
     signatureShare?: string
-    status?: number
-    error?: string | null
 }
 
 export interface TGatheringTracker {
@@ -66,7 +64,7 @@ export interface TSignOperationOptions {
     imaState: state.TIMAState
     nTransferLoopCounter: number
     strDirection: string
-    jarrMessages: any[]
+    jarrMessages: state.TIMAMessage[]
     nIdxCurrentMsgBlockStart: number
     strFromChainName: string
     joExtraSignOpts?: loop.TExtraSignOpts | null
@@ -76,8 +74,8 @@ export interface TSignOperationOptions {
     strLogPrefixA: string
     strLogPrefixB: string
     joGatheringTracker: TGatheringTracker
-    arrSignResults: any[]
-    details: log.TLogger
+    arrSignResults: TBLSSignResult[]
+    details: log.TLoggerBase
     strGatheredDetailsName: string
     sequenceId: string
     jarrNodes: discoveryTools.TSChainNode[]
@@ -94,7 +92,7 @@ export interface TSignOperationOptions {
 export interface TBSU256CallData {
     params: {
         valueToSign: string
-        qa?: TQAInformation
+        qa?: state.TQAInformation
     }
 }
 
@@ -102,15 +100,15 @@ export interface TBSU256Options {
     joCallData: TBSU256CallData
     imaState: state.TIMAState
     strLogPrefix: string
-    details: log.TLogger
-    joRetVal: any | null
+    details: log.TLoggerBase
+    joRetVal: TBLSSignResultReturnValue
     isSuccess: boolean
     nThreshold: number
     nParticipants: number
-    u256: any | null
+    u256: string | null
     strMessageHash: string
     joAccount: state.TAccount | null
-    qa?: TQAInformation
+    qa?: state.TQAInformation
 }
 
 export interface THandleVerifyAndSignCallDataParams {
@@ -120,8 +118,8 @@ export interface THandleVerifyAndSignCallDataParams {
     srcChainID: string
     dstChainID: string
     direction: string
-    messages: any[]
-    qa?: TQAInformation
+    messages: state.TIMAMessage[]
+    qa?: state.TQAInformation
 }
 
 export interface THandleVerifyAndSignCallData {
@@ -132,8 +130,8 @@ export interface THandleVerifyAndSignOptions {
     joCallData: THandleVerifyAndSignCallData
     imaState: state.TIMAState
     strLogPrefix: string
-    details: log.TLogger
-    joRetVal: any
+    details: log.TLoggerBase
+    joRetVal: TBLSSignResultReturnValue
     isSuccess: boolean
     nIdxCurrentMsgBlockStart: number
     strFromChainName: string
@@ -141,7 +139,7 @@ export interface THandleVerifyAndSignOptions {
     strFromChainID: string
     strToChainID: string
     strDirection: string
-    jarrMessages: any[]
+    jarrMessages: state.TIMAMessage[]
     strMessageHash: string
     joExtraSignOpts: loop.TExtraSignOpts | null
     nThreshold: number
@@ -149,9 +147,9 @@ export interface THandleVerifyAndSignOptions {
 }
 
 export interface TSignU256Options {
-    u256: any
+    u256: string
     fn: IMA.TFunctionAfterSigningMessages
-    details: log.TLogger
+    details: log.TLoggerBase
     imaState: state.TIMAState
     strLogPrefix: string
     joGatheringTracker: {
@@ -162,7 +160,7 @@ export interface TSignU256Options {
         nWaitIntervalStepMilliseconds: number
         nWaitIntervalMaxSteps: number // 10 is 1 second
     }
-    arrSignResults: any[]
+    arrSignResults: TBLSSignResult[]
     jarrNodes: discoveryTools.TSChainNode[]
     nThreshold: number
     nParticipants: number
@@ -170,8 +168,66 @@ export interface TSignU256Options {
     errGathering: Error | string | null
 }
 
-const anyShellMod: any = shellMod as any;
-const shell = anyShellMod.default;
+export interface TBLSSignaturePointXYDecimals {
+    X: string
+    Y: string
+}
+
+export interface TBLSGlueResult {
+    signature: TBLSSignaturePointXYDecimals
+    hashSrc?: string
+    hashPoint?: TBLSSignaturePointXYDecimals
+    hint?: string
+}
+
+export interface TBLSPropertiesOfG1 {
+    hashPoint: TBLSSignaturePointXYDecimals
+    hint: string
+}
+
+export interface TBLSResultOfG1 {
+    g1: TBLSPropertiesOfG1
+}
+
+export interface TBLSSignResultBase {
+    index: string
+    signature: TBLSSignaturePointXYDecimals
+}
+export interface TBLSSignResult extends TBLSSignResultBase {
+    fromNode?: discoveryTools.TSChainNode
+    signResult: TSignResult
+}
+
+export interface TRPCInputSkaleIMAVerifyAndSign extends rpcCallFormats.TRPCInputBasicFields {
+    params: THandleVerifyAndSignCallDataParams
+}
+
+export interface TRPCInputBLSSignMessageHash extends rpcCallFormats.TRPCInputBasicFields {
+    params: {
+        keyShareName: string
+        messageHash: string
+        n: number
+        t: number
+    }
+}
+
+export interface TRPCOutputBLSSignMessageHashResult extends rpcCallFormats.TRPCOutputBasicFields {
+    signResult: TSignResult
+}
+
+export interface TRPCInputBLSSignU256 extends rpcCallFormats.TRPCInputBasicFields {
+    params: {
+        valueToSign: string
+    }
+}
+
+export interface TBLSSignResultReturnValue {
+    qa?: state.TQAInformation
+    result?: TBLSSignResult
+    error?: string
+}
+
+const shell = ( shellMod as any ).default;
 
 const Keccak = sha3Module.Keccak;
 
@@ -204,7 +260,7 @@ function discoverBlsParticipants( joSChainNetworkInfo: discoveryTools.TSChainNet
 }
 
 function checkBlsThresholdAndBlsParticipants(
-    nThreshold: number, nParticipants: number, strOperation: string, details: log.TLogger
+    nThreshold: number, nParticipants: number, strOperation: string, details: log.TLoggerBase
 ): boolean {
     details = details || log;
     if( nThreshold <= 0 ) {
@@ -227,7 +283,7 @@ function checkBlsThresholdAndBlsParticipants(
 
 function discoverPublicKeyByIndex(
     nNodeIndex: number, joSChainNetworkInfo: discoveryTools.TSChainNetworkInfo,
-    details: log.TLogger, isThrowException: boolean
+    details: log.TLoggerBase, isThrowException: boolean
 ): discoveryTools.TBLSPublicKey | null {
     details = details || log;
     const imaState: state.TIMAState = state.get();
@@ -251,7 +307,7 @@ function discoverPublicKeyByIndex(
 }
 
 function discoverCommonPublicKey(
-    details: log.TLogger, joSChainNetworkInfo: discoveryTools.TSChainNetworkInfo,
+    details: log.TLoggerBase, joSChainNetworkInfo: discoveryTools.TSChainNetworkInfo,
     isThrowException: boolean ): discoveryTools.TBLSCommonPublicKey | null {
     const imaState: state.TIMAState = state.get();
     joSChainNetworkInfo = joSChainNetworkInfo || imaState.joSChainNetworkInfo;
@@ -303,7 +359,7 @@ function arrayToKeccak256( arrBytes: Uint8Array ): Uint8Array {
 }
 
 function keccak256Message(
-    jarrMessages: any[], nIdxCurrentMsgBlockStart: number, strFromChainName: string
+    jarrMessages: state.TIMAMessage[], nIdxCurrentMsgBlockStart: number, strFromChainName: string
 ): string {
     let arrBytes = stringToKeccak256( strFromChainName );
     arrBytes = imaUtils.bytesConcat(
@@ -315,7 +371,7 @@ function keccak256Message(
     arrBytes = arrayToKeccak256( arrBytes );
     const cnt = jarrMessages.length;
     for( let i = 0; i < cnt; ++i ) {
-        const joMessage = jarrMessages[i];
+        const joMessage: state.TIMAMessage = jarrMessages[i];
         let bytesSender = imaUtils.hexToBytes( joMessage.sender.toString() );
         bytesSender = imaUtils.bytesAlignLeftWithZeroes( bytesSender, 32 );
         arrBytes = imaUtils.bytesConcat( arrBytes, bytesSender );
@@ -330,7 +386,7 @@ function keccak256Message(
     return owaspUtils.ensureStartsWith0x( imaUtils.bytesToHex( arrBytes, false ) );
 }
 
-export function keccak256U256( u256: any, isHash: boolean ): string {
+export function keccak256U256( u256: string, isHash: boolean ): string {
     let arrBytes = new Uint8Array();
     let bytesU256 = imaUtils.hexToBytes( u256 );
     bytesU256 = bytesU256.reverse();
@@ -348,7 +404,7 @@ export function keccak256U256( u256: any, isHash: boolean ): string {
 }
 
 export function keccak256ForPendingWorkAnalysis(
-    nNodeNumber: number, strLoopWorkType: string, isStart: boolean, ts: any
+    nNodeNumber: number, strLoopWorkType: string, isStart: boolean, ts: number
 ): string {
     let arrBytes = new Uint8Array();
 
@@ -378,7 +434,7 @@ export function keccak256ForPendingWorkAnalysis(
     return strMessageHash;
 }
 
-function splitSignatureShare( signatureShare: any ): any {
+function splitSignatureShare( signatureShare: string ): TBLSSignaturePointXYDecimals {
     const jarr = signatureShare.split( ":" );
     if( jarr.length < 2 )
         throw new Error( `Failed to split signatureShare=${signatureShare.toString()}` );
@@ -399,14 +455,14 @@ function allocBlsTmpActionDir(): string {
 }
 
 function performBlsGlue(
-    details: log.TLogger, strDirection: string, jarrMessages: any[],
-    nIdxCurrentMsgBlockStart: number, strFromChainName: string, arrSignResults: any[]
-): any {
+    details: log.TLoggerBase, strDirection: string, jarrMessages: state.TIMAMessage[],
+    nIdxCurrentMsgBlockStart: number, strFromChainName: string, arrSignResults: TBLSSignResult[]
+): TBLSGlueResult | null {
     const imaState: state.TIMAState = state.get();
     if( !imaState.joSChainNetworkInfo )
         throw new Error( "No own S-Chain network information" );
     const strLogPrefix = `${strDirection}/BLS/Glue: `;
-    let joGlueResult: any = null;
+    let joGlueResult: TBLSGlueResult | null = null;
     const nThreshold = discoverBlsThreshold( imaState.joSChainNetworkInfo );
     const nParticipants = discoverBlsParticipants( imaState.joSChainNetworkInfo );
     details.debug( "{p}Discovered BLS threshold is {}.", strLogPrefix, nThreshold );
@@ -425,7 +481,7 @@ function performBlsGlue(
         let strInput = "";
         const cnt = arrSignResults.length;
         for( let i = 0; i < cnt; ++i ) {
-            const jo: any = arrSignResults[i];
+            const jo: TBLSSignResult = arrSignResults[i];
             if( !jo )
                 throw new Error( `Failed to save BLS part ${i} because it's not JSON object` );
             const strPath = strActionDir + "/sign-result" + jo.index + ".json";
@@ -458,7 +514,8 @@ function performBlsGlue(
             details.trace( "{p}Will execute HashG1 command {}", strLogPrefix, strHasG1Command );
             strOutput = childProcessModule.execSync( strHasG1Command, { cwd: strActionDir } );
             details.trace( "{p}HashG1 output is:\n{raw}", strLogPrefix, strOutput || "<<EMPTY>>" );
-            const joResultHashG1 = imaUtils.jsonFileLoad( path.join( strActionDir, "g1.json" ) );
+            const joResultHashG1: TBLSResultOfG1 =
+                imaUtils.jsonFileLoad( path.join( strActionDir, "g1.json" ) );
             details.trace( "{p}HashG1 result is: {}", strLogPrefix, joResultHashG1 );
             if( "g1" in joResultHashG1 &&
                 "hint" in joResultHashG1.g1 &&
@@ -488,12 +545,14 @@ function performBlsGlue(
     return joGlueResult;
 }
 
-function performBlsGlueU256( details: log.TLogger, u256: any, arrSignResults: any[] ): any {
+function performBlsGlueU256(
+    details: log.TLoggerBase, u256: string, arrSignResults: TBLSSignResult[]
+): TBLSGlueResult | null {
     const imaState: state.TIMAState = state.get();
     if( !imaState.joSChainNetworkInfo )
         throw new Error( "No own S-Chain network information" );
     const strLogPrefix = "BLS/Glue: ";
-    let joGlueResult: any = null;
+    let joGlueResult: TBLSGlueResult | null = null;
     const nThreshold = discoverBlsThreshold( imaState.joSChainNetworkInfo );
     const nParticipants = discoverBlsParticipants( imaState.joSChainNetworkInfo );
     details.debug( "{p}Discovered BLS threshold is {}.", strLogPrefix, nThreshold );
@@ -512,7 +571,7 @@ function performBlsGlueU256( details: log.TLogger, u256: any, arrSignResults: an
         let strInput = "";
         const cnt = arrSignResults.length;
         for( let i = 0; i < cnt; ++i ) {
-            const jo: any = arrSignResults[i];
+            const jo: TBLSSignResult = arrSignResults[i];
             if( !jo )
                 throw new Error( `Failed to save BLS part ${i} because it's not JSON object` );
             const strPath = strActionDir + "/sign-result" + jo.index + ".json";
@@ -547,7 +606,8 @@ function performBlsGlueU256( details: log.TLogger, u256: any, arrSignResults: an
             strOutput = childProcessModule.execSync( strHasG1Command, { cwd: strActionDir } )
                 .toString( "utf8" );
             details.trace( "{p}HashG1 output is:\n{raw}", strLogPrefix, strOutput || "<<EMPTY>>" );
-            const joResultHashG1 = imaUtils.jsonFileLoad( path.join( strActionDir, "g1.json" ) );
+            const joResultHashG1: TBLSResultOfG1 =
+                imaUtils.jsonFileLoad( path.join( strActionDir, "g1.json" ) );
             details.trace( "{p}HashG1 result is: {}", strLogPrefix, joResultHashG1 );
             if( "g1" in joResultHashG1 &&
                 "hint" in joResultHashG1.g1 &&
@@ -578,9 +638,9 @@ function performBlsGlueU256( details: log.TLogger, u256: any, arrSignResults: an
 }
 
 function performBlsVerifyI(
-    details: log.TLogger, strDirection: string, nZeroBasedNodeIndex: number,
-    joResultFromNode: any,
-    jarrMessages: any[], nIdxCurrentMsgBlockStart: number, strFromChainName: string,
+    details: log.TLoggerBase, strDirection: string, nZeroBasedNodeIndex: number,
+    joResultFromNode: TBLSSignResultBase,
+    jarrMessages: state.TIMAMessage[], nIdxCurrentMsgBlockStart: number, strFromChainName: string,
     joPublicKey: discoveryTools.TBLSPublicKey
 ): boolean {
     if( !joResultFromNode )
@@ -642,8 +702,8 @@ function performBlsVerifyI(
 }
 
 function performBlsVerifyIU256(
-    details: log.TLogger,
-    nZeroBasedNodeIndex: number, joResultFromNode: any, u256: any,
+    details: log.TLoggerBase,
+    nZeroBasedNodeIndex: number, joResultFromNode: TBLSSignResultBase, u256: string,
     joPublicKey: discoveryTools.TBLSPublicKey
 ): boolean {
     if( !joResultFromNode )
@@ -696,8 +756,8 @@ function performBlsVerifyIU256(
 }
 
 function performBlsVerify(
-    details: log.TLogger, strDirection: string, joGlueResult: any,
-    jarrMessages: any[], nIdxCurrentMsgBlockStart: number, strFromChainName: string,
+    details: log.TLoggerBase, strDirection: string, joGlueResult: TBLSGlueResult,
+    jarrMessages: state.TIMAMessage[], nIdxCurrentMsgBlockStart: number, strFromChainName: string,
     joCommonPublicKey: discoveryTools.TBLSCommonPublicKey
 ): boolean {
     if( !joGlueResult )
@@ -764,7 +824,7 @@ function performBlsVerify(
 }
 
 function performBlsVerifyU256(
-    details: log.TLogger, joGlueResult: any, u256: any,
+    details: log.TLoggerBase, joGlueResult: TBLSGlueResult, u256: string,
     joCommonPublicKey: discoveryTools.TBLSCommonPublicKey
 ): boolean {
     if( !joGlueResult )
@@ -823,8 +883,8 @@ function performBlsVerifyU256(
 }
 
 async function checkCorrectnessOfMessagesToSign(
-    details: log.TLogger, strLogPrefix: string, strDirection: string,
-    jarrMessages: any[], nIdxCurrentMsgBlockStart: number,
+    details: log.TLoggerBase, strLogPrefix: string, strDirection: string,
+    jarrMessages: state.TIMAMessage[], nIdxCurrentMsgBlockStart: number,
     joExtraSignOpts?: loop.TExtraSignOpts | null
 ): Promise < void > {
     const imaState: state.TIMAState = state.get();
@@ -841,7 +901,7 @@ async function checkCorrectnessOfMessagesToSign(
         joChainName = imaState.chainProperties.mn.strChainName;
     } else if( strDirection == "S2S" ) {
         joAccount = imaState.chainProperties.sc.joAccount;
-        if( ( !joExtraSignOpts?.chainNameDst ) )
+        if( !joExtraSignOpts?.chainNameDst )
             throw new Error( "Missing destination chain name for BLS signing" );
         joChainName = joExtraSignOpts.chainNameDst;
         const ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider | null =
@@ -876,7 +936,7 @@ async function checkCorrectnessOfMessagesToSign(
     const cnt = jarrMessages.length;
     if( strDirection == "S2M" || strDirection == "S2S" ) {
         for( i = 0; i < cnt; ++i ) {
-            const joMessage = jarrMessages[i];
+            const joMessage: state.TIMAMessage = jarrMessages[i];
             const idxMessage = nIdxCurrentMsgBlockStart + i;
             try {
                 details.trace(
@@ -884,7 +944,7 @@ async function checkCorrectnessOfMessagesToSign(
                     "source contract is {}, destination contract is {}, message data is {}",
                     strLogPrefix, strDirection, i, cnt, idxMessage, joMessage.sender,
                     joMessage.destinationContract, joMessage.data );
-                const outgoingMessageData: any = {
+                const outgoingMessageData: state.TIMAOutgoingMessage = {
                     dstChainHash: owaspUtils.ethersMod.ethers.utils.id( joChainName ),
                     msgCounter: idxMessage,
                     srcContract: joMessage.sender,
@@ -927,8 +987,8 @@ async function prepareSignMessagesImpl(
         // eslint-disable-next-line n/handle-callback-err
         async function(
             err: Error | string | null,
-            jarrMessages: any[],
-            joGlueResult: any | null
+            jarrMessages: state.TIMAMessage[],
+            joGlueResult: TBLSGlueResult | null
         ): Promise < void > {};
     optsSignOperation.sequenceId =
         owaspUtils.removeStarting0x(
@@ -967,7 +1027,7 @@ async function prepareSignMessagesImpl(
             optsSignOperation.jarrMessages,
             optsSignOperation.nIdxCurrentMsgBlockStart,
             optsSignOperation.joExtraSignOpts );
-        await optsSignOperation.fn( null, optsSignOperation.jarrMessages );
+        await optsSignOperation.fn( null, optsSignOperation.jarrMessages, null );
         return true;
     }
     await checkCorrectnessOfMessagesToSign(
@@ -1031,7 +1091,7 @@ async function gatherSigningCheckFinish(
     optsSignOperation.strLogPrefixB = `${optsSignOperation.strDirection} /# ` +
         `${optsSignOperation.nTransferLoopCounter}/BLS/Summary: `;
     let strError: string | null = null; let strSuccessfulResultDescription: string | null = null;
-    const joGlueResult = performBlsGlue( optsSignOperation.details,
+    const joGlueResult: TBLSGlueResult | null = performBlsGlue( optsSignOperation.details,
         optsSignOperation.strDirection, optsSignOperation.jarrMessages,
         optsSignOperation.nIdxCurrentMsgBlockStart, optsSignOperation.strFromChainName,
         optsSignOperation.arrSignResults );
@@ -1228,8 +1288,10 @@ async function doSignConfigureChainAccessParams(
 }
 
 async function doSignProcessHandleCall(
-    optsSignOperation: TSignOperationOptions, joParams: any, joCall: rpcCall.TRPCCall,
-    joIn: any, joOut: any, i: number ): Promise < void > {
+    optsSignOperation: TSignOperationOptions, joParams: THandleVerifyAndSignCallDataParams,
+    joCall: rpcCall.TRPCCall,
+    joIn: TRPCInputSkaleIMAVerifyAndSign, joOut: rpcCallFormats.TRPCOutputBasicFields,
+    i: number ): Promise < void > {
     const imaState: state.TIMAState = state.get();
     const isThisNode = ( i == imaState.nNodeNumber );
     const joNode = optsSignOperation.jarrNodes[i];
@@ -1246,8 +1308,8 @@ async function doSignProcessHandleCall(
         optsSignOperation.strLogPrefix, log.generateTimestampString( null, true ),
         "skale_imaVerifyAndSign", i, strNodeURL, optsSignOperation.fromChainName,
         optsSignOperation.targetChainName, joParams, joOut, optsSignOperation.sequenceId );
-    if( ( !joOut ) || typeof joOut !== "object" || ( !( "result" in joOut ) ) ||
-        ( !joOut.result ) || typeof joOut.result !== "object" ||
+    if( !joOut || typeof joOut !== "object" || ( !( "result" in joOut ) ) ||
+        !joOut.result || typeof joOut.result !== "object" ||
         ( "error" in joOut && joOut.error ) ) {
         ++optsSignOperation.joGatheringTracker.nCountErrors;
         optsSignOperation.details.critical(
@@ -1282,7 +1344,7 @@ async function doSignProcessHandleCall(
                     return;
                 }
                 const arrTmp = joOut.result.signResult.signatureShare.split( ":" );
-                const joResultFromNode: any = {
+                const joResultFromNode: TBLSSignResultBase = {
                     index: nZeroBasedNodeIndex.toString(),
                     signature: {
                         X: arrTmp[0],
@@ -1390,14 +1452,15 @@ async function doSignProcessOneImpl(
         log.generateTimestampString( null, true ), "skale_imaVerifyAndSign", i, strNodeURL,
         optsSignOperation.fromChainName, optsSignOperation.targetChainName,
         joParams, optsSignOperation.sequenceId );
-    const joIn: any = { method: "skale_imaVerifyAndSign", params: joParams };
+    const joIn: TRPCInputSkaleIMAVerifyAndSign =
+        { method: "skale_imaVerifyAndSign", params: joParams };
     const joOut = await joCall.call( joIn );
     await doSignProcessHandleCall( optsSignOperation, joParams, joCall, joIn, joOut, i );
 }
 
 async function doSignMessagesImpl(
     nTransferLoopCounter: number, strDirection: string,
-    jarrMessages: any[], nIdxCurrentMsgBlockStart: number, strFromChainName: string,
+    jarrMessages: state.TIMAMessage[], nIdxCurrentMsgBlockStart: number, strFromChainName: string,
     joExtraSignOpts?: loop.TExtraSignOpts | null, fn?: IMA.TFunctionAfterSigningMessages
 ): Promise < void > {
     const optsSignOperation: TSignOperationOptions = {
@@ -1410,7 +1473,9 @@ async function doSignMessagesImpl(
         joExtraSignOpts,
         // eslint-disable-next-line n/handle-callback-err
         fn: fn ?? async function(
-            err: Error | string | null, jarrMessages: any[], joGlueResult: any | null
+            err: Error | string | null,
+            jarrMessages: state.TIMAMessage[] | string[],
+            joGlueResult: TBLSGlueResult | null
         ): Promise < void > {},
         bHaveResultReportCalled: false,
         strLogPrefix: "",
@@ -1510,7 +1575,7 @@ async function doSignMessagesImpl(
 
 export async function doSignMessagesM2S(
     nTransferLoopCounter: number,
-    jarrMessages: any[], nIdxCurrentMsgBlockStart: number, strFromChainName: string,
+    jarrMessages: state.TIMAMessage[], nIdxCurrentMsgBlockStart: number, strFromChainName: string,
     joExtraSignOpts?: loop.TExtraSignOpts | null, fn?: IMA.TFunctionAfterSigningMessages
 ): Promise < void > {
     await doSignMessagesImpl(
@@ -1521,7 +1586,7 @@ export async function doSignMessagesM2S(
 
 export async function doSignMessagesS2M(
     nTransferLoopCounter: number,
-    jarrMessages: any[], nIdxCurrentMsgBlockStart: number, strFromChainName: string,
+    jarrMessages: state.TIMAMessage[], nIdxCurrentMsgBlockStart: number, strFromChainName: string,
     joExtraSignOpts?: loop.TExtraSignOpts | null, fn?: IMA.TFunctionAfterSigningMessages
 ): Promise < void > {
     await doSignMessagesImpl(
@@ -1532,7 +1597,7 @@ export async function doSignMessagesS2M(
 
 export async function doSignMessagesS2S(
     nTransferLoopCounter: number,
-    jarrMessages: any[], nIdxCurrentMsgBlockStart: number, strFromChainName: string,
+    jarrMessages: state.TIMAMessage[], nIdxCurrentMsgBlockStart: number, strFromChainName: string,
     joExtraSignOpts?: loop.TExtraSignOpts | null, fn?: IMA.TFunctionAfterSigningMessages
 ): Promise < void > {
     await doSignMessagesImpl(
@@ -1563,7 +1628,7 @@ async function prepareSignU256( optsSignU256: TSignU256Options ): Promise < bool
         await optsSignU256.fn(
             "signature error(1, u256), S-Chain information " +
             "was not discovered properly and BLS threshold/participants are unknown",
-            optsSignU256.u256, null );
+            [ optsSignU256.u256 ], null );
         return false;
     }
     optsSignU256.nCountOfBlsPartsToCollect = optsSignU256.nThreshold;
@@ -1574,7 +1639,8 @@ async function prepareSignU256( optsSignU256: TSignU256Options ): Promise < bool
 }
 
 async function doSignU256OneImplHandleCallResult(
-    i: number, optsSignU256: TSignU256Options, joCall: rpcCall.TRPCCall, joIn: any, joOut: any
+    i: number, optsSignU256: TSignU256Options, joCall: rpcCall.TRPCCall,
+    joIn: TRPCInputBLSSignU256, joOut: rpcCallFormats.TRPCOutputBasicFields
 ): Promise < void > {
     const imaState: state.TIMAState = state.get();
     const isThisNode = ( i == imaState.nNodeNumber );
@@ -1587,9 +1653,9 @@ async function doSignU256OneImplHandleCallResult(
     ++optsSignU256.joGatheringTracker.nCountReceived;
     optsSignU256.details.trace( "{p}Did invoked {} for to sign value {}, answer is: {}",
         optsSignU256.strLogPrefix, "skale_imaBSU256", optsSignU256.u256.toString(), joOut );
-    if( ( !joOut ) || typeof joOut !== "object" || ( !( "result" in joOut ) ) ||
-        ( "error" in joOut && joOut.error ) ||
-        ( !joOut.result ) || typeof joOut.result !== "object" ||
+    const isWithError: boolean = !!( ( "error" in joOut && joOut.error ) );
+    if( !joOut || typeof joOut !== "object" || ( !( "result" in joOut ) ) ||
+        isWithError || !joOut.result || typeof joOut.result !== "object" ||
         ( !( "signature" in joOut.result ) ) || joOut.result.signature != "object"
     ) {
         ++optsSignU256.joGatheringTracker.nCountErrors;
@@ -1622,7 +1688,7 @@ async function doSignU256OneImplHandleCallResult(
                     return;
                 }
                 const arrTmp = joOut.result.signResult.signatureShare.split( ":" );
-                const joResultFromNode: any = {
+                const joResultFromNode: TBLSSignResultBase = {
                     index: nZeroBasedNodeIndex.toString(),
                     signature: { X: arrTmp[0], Y: arrTmp[1] }
                 };
@@ -1693,7 +1759,7 @@ async function doSignU256OneImpl(
             throw new Error( `Failed to create JSON RPC call object to ${strNodeURL}` );
         optsSignU256.details.trace( "{p}Will invoke skale_imaBSU256 for to sign value {}",
             optsSignU256.strLogPrefix, optsSignU256.u256.toString() );
-        const joIn: any = {
+        const joIn: TRPCInputBLSSignU256 = {
             method: "skale_imaBSU256",
             params: {
                 valueToSign: optsSignU256.u256 // must be 0x string, came from outside 0x string
@@ -1733,7 +1799,7 @@ async function gatherSigningCheckFinish256(
         return false;
     const strLogPrefixB = "BLS u256/Summary: ";
     const strError = null;
-    const joGlueResult = performBlsGlueU256(
+    const joGlueResult: TBLSGlueResult | null = performBlsGlueU256(
         optsSignU256.details, optsSignU256.u256, optsSignU256.arrSignResults );
     if( joGlueResult ) {
         optsSignU256.details.success( "{p}Got BLS glue u256 result: {}",
@@ -1770,7 +1836,7 @@ async function gatherSigningCheckFinish256(
         "Will call signed-256 answer-sending callback {}, u256 is {}, " +
         "glue result is {}", strError ? ( " with error " + log.fmtError( "{err}", strError ) ) : "",
         optsSignU256.u256, joGlueResult );
-    optsSignU256.fn( strError, optsSignU256.u256, joGlueResult )
+    optsSignU256.fn( strError, [ optsSignU256.u256 ], joGlueResult )
         .catch( function( err: Error | string ): void {
             optsSignU256.details.critical(
                 "Problem(2) in BLS u256 sign result handler: {err}", err );
@@ -1787,7 +1853,7 @@ async function gatherSigningCheckOverflow256(
     optsSignU256.fn(
         "signature error(2, u256), got " +
         `${optsSignU256.joGatheringTracker.nCountErrors} errors(s) for ` +
-        `${optsSignU256.jarrNodes.length}  node(s)`, optsSignU256.u256, null
+        `${optsSignU256.jarrNodes.length}  node(s)`, [ optsSignU256.u256 ], null
     ).catch( function( err: Error | string ): void {
         const cntSuccess = optsSignU256.arrSignResults.length;
         optsSignU256.details.critical(
@@ -1818,7 +1884,7 @@ async function doSignU256Gathering( optsSignU256: TSignU256Options ): Promise < 
         "signature error(3, u256), got " +
         `${optsSignU256.joGatheringTracker.nCountErrors}  errors(s) for ` +
         `${optsSignU256.jarrNodes.length} node(s)`,
-        optsSignU256.u256, null
+        [ optsSignU256.u256 ], null
     ).catch( function( err: Error | string ): void {
         const cntSuccess = optsSignU256.arrSignResults.length;
         optsSignU256.details.error(
@@ -1831,8 +1897,12 @@ async function doSignU256Gathering( optsSignU256: TSignU256Options ): Promise < 
     } );
 }
 
-export async function doSignU256( u256: any, details: log.TLogger,
+export async function doSignU256(
+    u256bn: owaspUtils.ethersMod.BigNumber | string, details: log.TLoggerBase,
     fn: IMA.TFunctionAfterSigningMessages ): Promise < void > {
+    const u256: string = ( typeof u256bn === "string" )
+        ? u256bn
+        : owaspUtils.ensureStartsWith0x( u256bn.toHexString() );
     const optsSignU256: TSignU256Options = {
         u256,
         fn,
@@ -1866,7 +1936,7 @@ export async function doSignU256( u256: any, details: log.TLogger,
     ) ) {
         optsSignU256.details.warning( "{p}BLS u256 signing is unavailable",
             optsSignU256.strLogPrefix );
-        await optsSignU256.fn( "BLS u256 signing is unavailable", optsSignU256.u256, null );
+        await optsSignU256.fn( "BLS u256 signing is unavailable", [ optsSignU256.u256 ], null );
         return;
     }
     if( !( await prepareSignU256( optsSignU256 ) ) )
@@ -1886,15 +1956,17 @@ export async function doSignU256( u256: any, details: log.TLogger,
 
 export async function doVerifyReadyHash(
     strMessageHash: string, nZeroBasedNodeIndex: number,
-    signature: any, isExposeOutput: boolean
+    signature: TSignResult, isExposeOutput: boolean
 ): Promise < boolean > {
     const imaState: state.TIMAState = state.get();
     const strDirection = "RAW";
     const strLogPrefix = `${strDirection}/BLS/#${nZeroBasedNodeIndex}: `;
     const details = log.createMemoryStream();
     let isSuccess = false;
+    if( !signature.signatureShare )
+        throw new Error( "No valid BLS signatureShare to verify" );
     const arrTmp = signature.signatureShare.split( ":" );
-    const joResultFromNode: any = {
+    const joResultFromNode: TBLSSignResultBase = {
         index: nZeroBasedNodeIndex.toString(),
         signature: {
             X: arrTmp[0],
@@ -1949,19 +2021,19 @@ export async function doVerifyReadyHash(
         fnShellRestore();
         isSuccess = false;
     }
-    if( isExposeOutput || ( !isSuccess ) )
+    if( isExposeOutput || !isSuccess )
         details.exposeDetailsTo( log.globalStream(), "BLS-raw-verifier", isSuccess );
     details.close();
     return isSuccess;
 }
 
 async function doSignReadyHashHandleCallResult(
-    strLogPrefix: string, details: log.TLogger,
+    strLogPrefix: string, details: log.TLoggerBase,
     strMessageHash: string, isExposeOutput: boolean, joCall: rpcCall.TRPCCall,
-    joIn: any, joOut: any
-): Promise < object > {
+    joIn: TRPCInputBLSSignMessageHash, joOut: TRPCOutputBLSSignMessageHashResult
+): Promise < TSignResult > {
     details.trace( "{p}Call to ", "SGX done, answer is: {}", strLogPrefix, joOut );
-    let joSignResult: TSignResult = joOut;
+    let joSignResult: TSignResult = joOut as any;
     if( joOut.result != null && joOut.result != undefined &&
         typeof joOut.result === "object" )
         joSignResult = joOut.result;
@@ -1990,10 +2062,10 @@ async function doSignReadyHashHandleCallResult(
 }
 
 export async function doSignReadyHash(
-    strMessageHash: string, isExposeOutput: any ): Promise < TSignResult | null > {
+    strMessageHash: string, isExposeOutput: boolean ): Promise < TSignResult | null > {
     const imaState: state.TIMAState = state.get();
     const strLogPrefix = "";
-    const details: log.TLogger = log.createMemoryStream();
+    const details: log.TLoggerBase = log.createMemoryStream();
     let joSignResult: TSignResult | null = null;
     let joCall: rpcCall.TRPCCall | null = null;
     try {
@@ -2031,7 +2103,7 @@ export async function doSignReadyHash(
         joCall = await rpcCall.create( joAccount.strSgxURL, rpcCallOpts );
         if( !joCall )
             throw new Error( `Failed to create JSON RPC call object to ${joAccount.strSgxURL}` );
-        const joIn: any = {
+        const joIn: TRPCInputBLSSignMessageHash = {
             jsonrpc: "2.0",
             id: utils.randomCallID(),
             method: "blsSignMessageHash",
@@ -2048,16 +2120,19 @@ export async function doSignReadyHash(
             strLogPrefix, details, strMessageHash, isExposeOutput, joCall, joIn, joOut );
     } catch ( err ) {
         const strError = owaspUtils.extractErrorMessage( err );
-        joSignResult = { };
-        joSignResult.error = strError;
+        joSignResult = {
+            errorMessage: strError,
+            status: -1,
+            error: strError
+        };
         details.error( "{p}JSON RPC call to SGX failed, error is: {err}, stack is:\n{stack}",
             strLogPrefix, err, err );
         if( joCall )
             await joCall.disconnect();
     }
     const isSuccess = !!( (
-        joSignResult && typeof joSignResult === "object" && ( !joSignResult.error ) ) );
-    if( isExposeOutput || ( !isSuccess ) )
+        joSignResult && typeof joSignResult === "object" && !joSignResult.error ) );
+    if( isExposeOutput || !isSuccess )
         details.exposeDetailsTo( log.globalStream(), "BLS-raw-signer", isSuccess );
     details.close();
     return joSignResult;
@@ -2128,14 +2203,16 @@ async function prepareS2sOfSkaleImaVerifyAndSign(
         "{p}{bright} verification algorithm will use for source chain name {} and destination " +
         "chain name {}", optsHandleVerifyAndSign.strLogPrefix,
         optsHandleVerifyAndSign.strDirection, strSChainNameSrc, strSChainNameDst );
-    const arrSChainsCached = skaleObserver.getLastCachedSChains();
-    if( ( !arrSChainsCached ) || arrSChainsCached.length == 0 ) {
+    const arrSChainsCached: skaleObserver.TSChainInformation[] =
+        skaleObserver.getLastCachedSChains();
+    if( !arrSChainsCached || arrSChainsCached.length == 0 ) {
         throw new Error( `Could not handle ${optsHandleVerifyAndSign.strDirection} ` +
             "skale_imaVerifyAndSign(1), no S-Chains in SKALE NETWORK observer cached yet, " +
             "try again later" );
     }
 
-    let joSChainSrc: any = null; let strUrlSrcSChain: string | null = null;
+    let joSChainSrc: skaleObserver.TSChainInformation | null = null;
+    let strUrlSrcSChain: string | null = null;
     for( let idxSChain = 0; idxSChain < arrSChainsCached.length; ++idxSChain ) {
         const joSChain = arrSChainsCached[idxSChain];
         if( joSChain.name.toString() == strSChainNameSrc.toString() ) {
@@ -2165,19 +2242,21 @@ async function prepareS2sOfSkaleImaVerifyAndSign(
 
 async function handleBlsSignMessageHashResult(
     optsHandleVerifyAndSign: THandleVerifyAndSignOptions, joCallData: THandleVerifyAndSignCallData,
-    joAccount: state.TAccount, joCall: rpcCall.TRPCCall, joIn: any, joOut: any
+    joAccount: state.TAccount, joCall: rpcCall.TRPCCall,
+    joIn: TRPCInputBLSSignMessageHash, joOut: TRPCOutputBLSSignMessageHashResult
 ): Promise < TSignResult > {
     optsHandleVerifyAndSign.details.trace( "{p}{bright} Call to SGX done, " +
         "answer is: {}", optsHandleVerifyAndSign.strLogPrefix,
     optsHandleVerifyAndSign.strDirection, joOut );
-    let joSignResult: TSignResult = joOut;
+    let joSignResult: TSignResult = joOut as any;
     if( joOut.result != null && joOut.result != undefined &&
         typeof joOut.result === "object" )
         joSignResult = joOut.result;
     if( joOut.signResult != null && joOut.signResult != undefined &&
         typeof joOut.signResult === "object" )
         joSignResult = joOut.signResult;
-    if( "qa" in optsHandleVerifyAndSign.joCallData.params )
+    if( "qa" in optsHandleVerifyAndSign.joCallData.params &&
+        optsHandleVerifyAndSign.joCallData.params.qa )
         optsHandleVerifyAndSign.joRetVal.qa = optsHandleVerifyAndSign.joCallData.params.qa;
     if( !joSignResult ) {
         const strError = "No signature arrived";
@@ -2202,8 +2281,9 @@ async function handleBlsSignMessageHashResult(
         throw new Error( strError );
     }
     optsHandleVerifyAndSign.isSuccess = true;
-    optsHandleVerifyAndSign.joRetVal.result = { signResult: joSignResult };
-    if( "qa" in optsHandleVerifyAndSign.joCallData.params )
+    optsHandleVerifyAndSign.joRetVal.result = { signResult: joSignResult } as any;
+    if( "qa" in optsHandleVerifyAndSign.joCallData.params &&
+    optsHandleVerifyAndSign.joCallData.params.qa )
         optsHandleVerifyAndSign.joRetVal.qa = optsHandleVerifyAndSign.joCallData.params.qa;
     await joCall.disconnect();
     return joSignResult;
@@ -2268,7 +2348,8 @@ export async function handleSkaleImaVerifyAndSign(
         joCall = await rpcCall.create( joAccount.strSgxURL, rpcCallOpts );
         if( !joCall )
             throw new Error( `Failed to create JSON RPC call object to ${joAccount.strSgxURL}` );
-        const joIn = {
+
+        const joIn: TRPCInputBLSSignMessageHash = {
             jsonrpc: "2.0",
             id: utils.randomCallID(),
             method: "blsSignMessageHash",
@@ -2340,11 +2421,13 @@ async function handleSkaleImaBSU256Prepare( optsBSU256: TBSU256Options ): Promis
 
 async function handleBlsSignMessageHash256Result(
     optsBSU256: TBSU256Options, joCallData: TBSU256CallData,
-    joCall: rpcCall.TRPCCall, joIn: any, joOut: any
+    joCall: rpcCall.TRPCCall,
+    joIn: TRPCInputBLSSignMessageHash,
+    joOut: TRPCOutputBLSSignMessageHashResult
 ): Promise < object > {
     optsBSU256.details.trace( "{p}Call to SGX done, answer is: {}",
         optsBSU256.strLogPrefix, joOut );
-    let joSignResult: TSignResult = joOut;
+    let joSignResult: TSignResult = joOut as any;
     if( joOut.result != null && joOut.result != undefined &&
         typeof joOut.result === "object" )
         joSignResult = joOut.result;
@@ -2372,7 +2455,7 @@ async function handleBlsSignMessageHash256Result(
         throw new Error( strError );
     }
     optsBSU256.isSuccess = true;
-    optsBSU256.joRetVal.result = { signResult: joSignResult };
+    optsBSU256.joRetVal.result = { signResult: joSignResult } as any;
     if( "qa" in optsBSU256.joCallData.params )
         optsBSU256.joRetVal.qa = optsBSU256.joCallData.params.qa;
     await joCall.disconnect();
@@ -2419,7 +2502,7 @@ export async function handleSkaleImaBSU256(
             throw new Error( "Failed to create JSON RPC call object " +
                 `to ${optsBSU256.joAccount.strSgxURL}` );
         }
-        const joIn = {
+        const joIn: TRPCInputBLSSignMessageHash = {
             jsonrpc: "2.0",
             id: utils.randomCallID(),
             method: "blsSignMessageHash",

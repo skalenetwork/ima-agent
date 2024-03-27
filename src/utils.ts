@@ -90,7 +90,9 @@ export function fileSave( strPath: string, s: string ): boolean {
     return false;
 }
 
-export function jsonFileLoad( strPath: string, joDefault?: any, bLogOutput?: boolean ): any {
+export function jsonFileLoad(
+    strPath: string, joDefault?: state.TLoadedJSON, bLogOutput?: boolean
+): state.TLoadedJSON {
     if( bLogOutput == undefined || bLogOutput == null )
         bLogOutput = false;
     joDefault = joDefault || {};
@@ -107,7 +109,7 @@ export function jsonFileLoad( strPath: string, joDefault?: any, bLogOutput?: boo
         if( bLogOutput )
             log.debug( "Did loaded content of JSON file {}, will parse it...", strPath );
 
-        const jo: any = JSON.parse( s );
+        const jo: state.TLoadedJSON = JSON.parse( s );
         if( bLogOutput )
             log.success( "Done, loaded content of JSON file {}.", strPath );
         return jo;
@@ -118,7 +120,9 @@ export function jsonFileLoad( strPath: string, joDefault?: any, bLogOutput?: boo
     return joDefault;
 }
 
-export function jsonFileSave( strPath: string, jo?: any, bLogOutput?: boolean ): any {
+export function jsonFileSave(
+    strPath: string, jo?: state.TLoadedJSON, bLogOutput?: boolean
+): state.TLoadedJSON {
     if( bLogOutput == undefined || bLogOutput == null )
         bLogOutput = false;
     if( bLogOutput )
@@ -139,7 +143,7 @@ export function jsonFileSave( strPath: string, jo?: any, bLogOutput?: boolean ):
 const gMillisecondsToSleepStepWaitForClonedTokenToAppear: number = 1000;
 
 export async function waitForClonedTokenToAppear(
-    sc: any,
+    sc: state.TOneChainProperties,
     strTokenSuffix: string, // example "erc20"
     addressCallFrom: string,
     cntAttempts: number,
@@ -153,13 +157,15 @@ export async function waitForClonedTokenToAppear(
     const ts0 = log.timestampHR();
     let ts1;
     log.information( "Waiting for {} token to appear automatically deployed on S-Chain {}...",
-        strTokenSuffixUC, sc.chainName );
+        strTokenSuffixUC, sc.strChainName );
     log.debug( "... source chain name is {}", strMainnetName );
     log.debug( "... destination {} address is {}", "TokenManager" + strTokenSuffixUC,
-        sc.joABI["token_manager_" + strTokenSuffixLC + "_address"] );
+        sc.joAbiIMA["token_manager_" + strTokenSuffixLC + "_address"] );
+    if( !sc.ethersProvider )
+        throw new Error( "no EthersJS provider to wait for cloned token to appear" );
     const contractTokenManager = new owaspUtils.ethersMod.ethers.Contract(
-        sc.joABI["token_manager_" + strTokenSuffixLC + "_address"],
-        sc.joABI["token_manager_" + strTokenSuffixLC + "_abi"],
+        sc.joAbiIMA["token_manager_" + strTokenSuffixLC + "_address"],
+        sc.joAbiIMA["token_manager_" + strTokenSuffixLC + "_abi"],
         sc.ethersProvider );
     for( let idxAttempt = 0; idxAttempt < cntAttempts; ++idxAttempt ) {
         log.information( "Discovering {} step {}...", strTokenSuffixUC, idxAttempt );
@@ -168,26 +174,28 @@ export async function waitForClonedTokenToAppear(
         const addressOnSChain =
             await contractTokenManager.callStatic[
                 "clones" + log.capitalizeFirstLetter( strTokenSuffixLCshort )](
-                sc.ethersMod.ethers.utils.id( strMainnetName ),
-                ( tokensMN.joABI as any )[strTokenSuffixUC + "_address"],
+                owaspUtils.ethersMod.ethers.utils.id( strMainnetName ),
+                ( tokensMN.joABI as state.TLoadedJSON )[strTokenSuffixUC + "_address"],
                 { from: addressCallFrom }
             );
         if( addressOnSChain != "0x0000000000000000000000000000000000000000" ) {
             ts1 = log.timestampHR();
             log.success( "Done, duration is {}", log.getDurationString( ts0, ts1 ) );
             log.success( "Discovered {} instantiated on S-Chain {} at address {}",
-                strTokenSuffixUC, sc.chainName, addressOnSChain );
+                strTokenSuffixUC, sc.strChainName, addressOnSChain );
             return addressOnSChain;
         }
     }
     ts1 = log.timestampHR();
-    log.error( "Failed to discover {} instantiated on S-Chain {}", strTokenSuffixUC, sc.chainName );
+    log.error( "Failed to discover {} instantiated on S-Chain {}",
+        strTokenSuffixUC, sc.strChainName );
     throw new Error( `Failed to discover ${strTokenSuffixUC} instantiated ` +
-        `on S-Chain ${sc.chainName}` );
+        `on S-Chain ${sc.strChainName}` );
 }
 
-export async function waitForClonedTokenAppearErc20(
-    sc: any, tokenERC20SC: state.TTokeInformation, joAccountSC: state.TAccount,
+export async function waitForClonedTokenToAppearErc20(
+    sc: state.TOneChainProperties,
+    tokenERC20SC: state.TTokeInformation, joAccountSC: state.TAccount,
     tokensMN: TTokesABIHolder, strMainnetName: string
 ): Promise <void> {
     if( "abi" in tokenERC20SC && typeof tokenERC20SC.abi === "object" &&
@@ -199,12 +207,14 @@ export async function waitForClonedTokenAppearErc20(
     const addressCallFrom = joAccountSC.address();
     const addressOnSChain = await waitForClonedTokenToAppear(
         sc, "erc20", addressCallFrom, 40, tokensMN, strMainnetName );
-    tokenERC20SC.abi = JSON.parse( JSON.stringify( ( tokensMN.joABI as any ).ERC20_abi ) );
+    tokenERC20SC.abi = JSON.parse(
+        JSON.stringify( ( tokensMN.joABI as state.TLoadedJSON ).ERC20_abi ) );
     tokenERC20SC.address = addressOnSChain ? addressOnSChain.toString() : "";
 }
 
-export async function waitForClonedTokenAppearErc721(
-    sc: any, tokenERC721SC: state.TTokeInformation, joAccountSC: state.TAccount,
+export async function waitForClonedTokenToAppearErc721(
+    sc: state.TOneChainProperties,
+    tokenERC721SC: state.TTokeInformation, joAccountSC: state.TAccount,
     tokensMN: TTokesABIHolder, strMainnetName: string
 ): Promise <void> {
     if( "abi" in tokenERC721SC && typeof tokenERC721SC.abi === "object" &&
@@ -217,12 +227,14 @@ export async function waitForClonedTokenAppearErc721(
     const addressOnSChain =
         await waitForClonedTokenToAppear(
             sc, "erc721", addressCallFrom, 40, tokensMN, strMainnetName );
-    tokenERC721SC.abi = JSON.parse( JSON.stringify( ( tokensMN.joABI as any ).ERC721_abi ) );
+    tokenERC721SC.abi = JSON.parse(
+        JSON.stringify( ( tokensMN.joABI as state.TLoadedJSON ).ERC721_abi ) );
     tokenERC721SC.address = addressOnSChain ? addressOnSChain.toString() : "";
 }
 
-export async function waitForClonedTokenAppearErc721WithMetadata(
-    sc: any, tokenERC721SC: state.TTokeInformation, joAccountSC: state.TAccount,
+export async function waitForClonedTokenToAppearErc721WithMetadata(
+    sc: state.TOneChainProperties,
+    tokenERC721SC: state.TTokeInformation, joAccountSC: state.TAccount,
     tokensMN: TTokesABIHolder, strMainnetName: string
 ): Promise <void> {
     if( "abi" in tokenERC721SC && typeof tokenERC721SC.abi === "object" &&
@@ -235,13 +247,14 @@ export async function waitForClonedTokenAppearErc721WithMetadata(
     const addressCallFrom = joAccountSC.address();
     const addressOnSChain = await waitForClonedTokenToAppear(
         sc, "erc721_with_metadata", addressCallFrom, 40, tokensMN, strMainnetName );
-    tokenERC721SC.abi =
-        JSON.parse( JSON.stringify( ( tokensMN.joABI as any ).ERC721_with_metadata_abi ) );
+    tokenERC721SC.abi = JSON.parse(
+        JSON.stringify( ( tokensMN.joABI as state.TLoadedJSON ).ERC721_with_metadata_abi ) );
     tokenERC721SC.address = addressOnSChain ? addressOnSChain.toString() : "";
 }
 
-export async function waitForClonedTokenAppearErc1155(
-    sc: any, tokenERC1155SC: state.TTokeInformation, joAccountSC: state.TAccount,
+export async function waitForClonedTokenToAppearErc1155(
+    sc: state.TOneChainProperties,
+    tokenERC1155SC: state.TTokeInformation, joAccountSC: state.TAccount,
     tokensMN: TTokesABIHolder, strMainnetName: string
 ): Promise <void> {
     if( "abi" in tokenERC1155SC && typeof tokenERC1155SC.abi === "object" &&
@@ -253,12 +266,13 @@ export async function waitForClonedTokenAppearErc1155(
     const addressCallFrom = joAccountSC.address();
     const addressOnSChain = await waitForClonedTokenToAppear(
         sc, "erc1155", addressCallFrom, 40, tokensMN, strMainnetName );
-    tokenERC1155SC.abi = JSON.parse( JSON.stringify( ( tokensMN.joABI as any ).ERC1155_abi ) );
+    tokenERC1155SC.abi = JSON.parse(
+        JSON.stringify( ( tokensMN.joABI as state.TLoadedJSON ).ERC1155_abi ) );
     tokenERC1155SC.address = addressOnSChain ? addressOnSChain.toString() : "";
 }
 
 export function hexToBytes(
-    strHex?: any, isInversiveOrder?: boolean
+    strHex?: log.TLogArgument, isInversiveOrder?: boolean
 ): Uint8Array { // convert a hex string to a byte array
     isInversiveOrder = !!(
         ( isInversiveOrder != null && isInversiveOrder != undefined && isInversiveOrder )
@@ -286,7 +300,7 @@ export function bytesToHex(
     isInversiveOrder = !!(
         ( isInversiveOrder != null && isInversiveOrder != undefined && isInversiveOrder )
     );
-    const hex: any[] = [];
+    const hex: log.TLogArgument[] = [];
     for( let i = 0; i < arrBytes.length; i++ ) {
         const current = arrBytes[i] < 0 ? arrBytes[i] + 256 : arrBytes[i];
         const c0 = ( current >>> 4 ).toString( 16 );
@@ -346,11 +360,11 @@ export function bytesConcat( a1?: Uint8Array, a2?: Uint8Array ): Uint8Array {
     return concatUint8Arrays( a1, a2 );
 }
 
-export function toBuffer( ab?: any ): Buffer {
+export function toBuffer( ab?: log.TLogArgument ): Buffer {
     return Buffer.from( new Uint8Array( ab ) );
 }
 
-export function discoverCoinNameInJSON( jo?: any ): string {
+export function discoverCoinNameInJSON( jo?: state.TLoadedJSON ): string {
     if( typeof jo !== "object" )
         return "";
     const arrKeys = Object.keys( jo );
@@ -381,7 +395,8 @@ export function discoverCoinNameInJSON( jo?: any ): string {
 }
 
 export function checkKeyExistInABI(
-    strName: string, strFile: string, joABI: any, strKey: string, isExitOnError?: boolean
+    strName: string, strFile: string, joABI: state.TLoadedJSON,
+    strKey: string, isExitOnError?: boolean
 ): boolean {
     if( isExitOnError == null || isExitOnError == undefined )
         isExitOnError = true;
@@ -400,7 +415,8 @@ export function checkKeyExistInABI(
 }
 
 export function checkKeysExistInABI(
-    strName: string, strFile: string, joABI: any, arrKeys: any[], isExitOnError?: boolean
+    strName: string, strFile: string, joABI: state.TLoadedJSON,
+    arrKeys: string[], isExitOnError?: boolean
 ): boolean {
     const cnt = arrKeys.length;
     for( let i = 0; i < cnt; ++i ) {
