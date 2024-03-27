@@ -66,7 +66,7 @@ export function rxIsInt( val: log.TLogArgument ): boolean {
         if( !intRegex.test( val ) )
             return false;
         const intVal = parseInt( val, 10 );
-        if( parseFloat( val ) == intVal && ( !isNaN( intVal ) ) )
+        if( parseFloat( val ) == intVal && !isNaN( intVal ) )
             return true;
     } catch ( err ) {
     }
@@ -221,7 +221,7 @@ export function toEthPrivateKey( value?: log.TLogArgument, defValue?: string ): 
 }
 
 export function verifyArgumentWithNonEmptyValue( joArg?: log.TLogArgument ): log.TLogArgument {
-    if( ( !joArg.value ) || ( typeof joArg.value === "string" && joArg.value.length === 0 ) ) {
+    if( !joArg.value || ( typeof joArg.value === "string" && joArg.value.length === 0 ) ) {
         console.log( log.fmtFatal( "(OWASP) Value {} of argument {} must not be empty",
             joArg.value, joArg.name ) );
         process.exit( 126 );
@@ -536,7 +536,7 @@ function moneyUnitNameToPostMultiplier( s: string ): string | null {
 export function parseMoneySpecToWei(
     s?: log.TLogArgument, isThrowException?: boolean ): ethersMod.BigNumber {
     try {
-        isThrowException = ( !!isThrowException );
+        isThrowException = !!isThrowException;
         if( s == null || s == undefined ) {
             if( isThrowException )
                 throw new Error( "no parse-able value provided" );

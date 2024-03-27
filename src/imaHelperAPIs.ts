@@ -51,10 +51,10 @@ export function setSleepBetweenTransactionsOnSChainMilliseconds( val?: number ):
 }
 
 export function getWaitForNextBlockOnSChain(): boolean {
-    return ( !!gFlagWaitForNextBlockOnSChain );
+    return !!gFlagWaitForNextBlockOnSChain;
 }
 export function setWaitForNextBlockOnSChain( val: boolean ): void {
-    gFlagWaitForNextBlockOnSChain = ( !!val );
+    gFlagWaitForNextBlockOnSChain = !!val;
 }
 
 export const currentTimestamp = (): number => {
@@ -113,7 +113,7 @@ export async function safeGetBlockNumber(
                 "stack is:\n{stack}", idxAttempt, strFnName + "()", u, err, err );
         }
     }
-    if( ( idxAttempt + 1 ) > cntAttempts && ( !ret ) ) {
+    if( ( idxAttempt + 1 ) > cntAttempts && !ret ) {
         details.error( "Failed call to {} via {url} after {} attempts ",
             strFnName + "()", u, cntAttempts );
         throw new Error( `Failed call to ${strFnName}() via ${u} after ${cntAttempts} attempts` );
@@ -162,17 +162,17 @@ export function getS2STransferModeDescriptionColorized(): string {
 }
 
 export function isForwardS2S(): boolean {
-    return ( !!gFlagIsForwardS2S );
+    return !!gFlagIsForwardS2S;
 }
 
 export function isReverseS2S(): boolean {
-    return ( !!gFlagIsForwardS2S );
+    return !gFlagIsForwardS2S;
 }
 
 export function setForwardS2S( b?: boolean ): void {
     if( b == null || b == undefined )
         b = true;
-    gFlagIsForwardS2S = ( !!b );
+    gFlagIsForwardS2S = !!b;
 }
 
 export function setReverseS2S( b?: boolean ): void {

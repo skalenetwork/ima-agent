@@ -168,7 +168,7 @@ function initMonitoringServer(): void {
         if( "headers" in req && req.headers && typeof req.headers === "object" &&
             "x-forwarded-for" in req.headers && req.headers["x-forwarded-for"] )
             ip = req.headers["x-forwarded-for"]; // better under NGINX
-        if( ( !ip ) && "_socket" in req && req._socket && "remoteAddress" in req._socket )
+        if( !ip && "_socket" in req && req._socket && "remoteAddress" in req._socket )
             ip = req._socket.remoteAddress;
         if( !ip )
             ip = "N/A";
@@ -347,7 +347,7 @@ function initJsonRpcServer(): void {
                     owaspUtils.toInteger( joMessage.params.nNodeNumber ),
                     joMessage.params.strLoopWorkType,
                     joMessage.params.nIndexS2S,
-                    ( !!( joMessage.params.isStart ) ),
+                    !!joMessage.params.isStart,
                     owaspUtils.toInteger( joMessage.params.ts ),
                     joMessage.params.signature ) )
                     await loop.spreadArrivedStateOfPendingWorkAnalysis( joMessage );
@@ -359,7 +359,7 @@ function initJsonRpcServer(): void {
                 joAnswer.error = `Unknown method name ${joMessage.method} was specified`;
                 break;
             } // switch( joMessage.method )
-            if( ( !joAnswer ) || typeof joAnswer !== "object" ) {
+            if( !joAnswer || typeof joAnswer !== "object" ) {
                 joAnswer = {};
                 joAnswer.error = "internal error, null data returned";
             }

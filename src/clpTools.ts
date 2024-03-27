@@ -888,9 +888,9 @@ export function commandLineTaskPaymentM2S(): void {
                 imaState.idToken && imaState.idToken !== null &&
                 imaState.idToken !== undefined &&
                 imaState.nAmountOfToken.gte( owaspUtils.toBN( 0 ) ) &&
-                ( ( !imaState.idTokens ) || imaState.idTokens === null ||
+                ( !imaState.idTokens || imaState.idTokens === null ||
                     imaState.idTokens === undefined ) &&
-                ( ( !imaState.arrAmountsOfTokens ) || imaState.arrAmountsOfTokens === null ||
+                ( !imaState.arrAmountsOfTokens || imaState.arrAmountsOfTokens === null ||
                     imaState.arrAmountsOfTokens === undefined )
             ) {
                 // ERC1155 payment
@@ -1080,10 +1080,10 @@ export function commandLineTaskPaymentS2M(): void {
                 imaState.idToken !== null &&
                 imaState.idToken !== undefined &&
                 imaState.nAmountOfToken.gte( owaspUtils.toBN( 0 ) ) &&
-                ( ( !imaState.idTokens ) ||
+                ( !imaState.idTokens ||
                     imaState.idTokens === null ||
                     imaState.idTokens === undefined ) &&
-                ( ( !imaState.arrAmountsOfTokens ) ||
+                ( !imaState.arrAmountsOfTokens ||
                     imaState.arrAmountsOfTokens === null ||
                     imaState.arrAmountsOfTokens === undefined )
             ) {
@@ -1128,7 +1128,7 @@ export function commandLineTaskPaymentS2M(): void {
                 imaState.arrAmountsOfTokens &&
                 imaState.arrAmountsOfTokens !== null &&
                 imaState.arrAmountsOfTokens !== undefined &&
-                ( ( !imaState.idToken ) ||
+                ( !imaState.idToken ||
                     imaState.idToken === null ||
                     imaState.idToken === undefined ) &&
                 imaState.nAmountOfToken.lte( owaspUtils.toBN( 0 ) )
@@ -1227,17 +1227,17 @@ export function commandLineTaskPaymentS2S(): void {
             let strAddrErc721ExplicitTarget = imaState.strAddrErc721ExplicitTarget;
             let strAddrErc1155Explicit = imaState.strAddrErc1155Explicit;
             let strAddrErc1155ExplicitTarget = imaState.strAddrErc1155ExplicitTarget;
-            if( ( !strAddrErc20Explicit ) && sc.joErc20 && sc.strCoinNameErc20 )
+            if( !strAddrErc20Explicit && sc.joErc20 && sc.strCoinNameErc20 )
                 strAddrErc20Explicit = sc.joErc20[sc.strCoinNameErc20 + "_address"];
-            if( ( !strAddrErc20ExplicitTarget ) && tc.joErc20 && tc.strCoinNameErc20 )
+            if( !strAddrErc20ExplicitTarget && tc.joErc20 && tc.strCoinNameErc20 )
                 strAddrErc20ExplicitTarget = tc.joErc20[tc.strCoinNameErc20 + "_address"];
-            if( ( !strAddrErc721Explicit ) && sc.joErc721 && sc.strCoinNameErc721 )
+            if( !strAddrErc721Explicit && sc.joErc721 && sc.strCoinNameErc721 )
                 strAddrErc721Explicit = sc.joErc721[sc.strCoinNameErc721 + "_address"];
-            if( ( !strAddrErc721ExplicitTarget ) && tc.joErc721 && tc.strCoinNameErc721 )
+            if( !strAddrErc721ExplicitTarget && tc.joErc721 && tc.strCoinNameErc721 )
                 strAddrErc721ExplicitTarget = tc.joErc721[tc.strCoinNameErc721 + "_address"];
-            if( ( !strAddrErc1155Explicit ) && sc.joErc1155 && sc.strCoinNameErc1155 )
+            if( !strAddrErc1155Explicit && sc.joErc1155 && sc.strCoinNameErc1155 )
                 strAddrErc1155Explicit = sc.joErc1155[sc.strCoinNameErc1155 + "_address"];
-            if( ( !strAddrErc1155ExplicitTarget ) && tc.joErc1155 && tc.strCoinNameErc1155 )
+            if( !strAddrErc1155ExplicitTarget && tc.joErc1155 && tc.strCoinNameErc1155 )
                 strAddrErc1155ExplicitTarget = tc.joErc1155[tc.strCoinNameErc1155 + "_address"];
             const strAddrErc20Dst = isForward
                 ? strAddrErc20ExplicitTarget
@@ -1300,10 +1300,10 @@ export function commandLineTaskPaymentS2S(): void {
                 imaState.idToken !== null &&
                 imaState.idToken !== undefined &&
                 imaState.nAmountOfToken.gte( owaspUtils.toBN( 0 ) ) &&
-                ( ( !imaState.idTokens ) ||
+                ( !imaState.idTokens ||
                     imaState.idTokens === null ||
                     imaState.idTokens === undefined ) &&
-                ( ( !imaState.arrAmountsOfTokens ) ||
+                ( !imaState.arrAmountsOfTokens ||
                     imaState.arrAmountsOfTokens === null ||
                     imaState.arrAmountsOfTokens === undefined )
             ) {
@@ -1338,7 +1338,7 @@ export function commandLineTaskPaymentS2S(): void {
                 imaState.arrAmountsOfTokens &&
                 imaState.arrAmountsOfTokens !== null &&
                 imaState.arrAmountsOfTokens !== undefined &&
-                ( ( !imaState.idToken ) ||
+                ( !imaState.idToken ||
                     imaState.idToken === null ||
                     imaState.idToken === undefined ) &&
                 imaState.nAmountOfToken.lte( owaspUtils.toBN( 0 ) )

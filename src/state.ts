@@ -614,5 +614,5 @@ export function isPreventExitAfterLastAction(): boolean {
 }
 
 export function setPreventExitAfterLastAction( isPrevent?: boolean | null ): void {
-    gFlagIsPreventExitAfterLastAction = ( !!isPrevent );
+    gFlagIsPreventExitAfterLastAction = !!isPrevent;
 }

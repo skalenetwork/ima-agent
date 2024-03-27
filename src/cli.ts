@@ -1324,7 +1324,7 @@ interface TMemoryInformation {
 
 function commonInitPrintSysInfo(): void {
     const imaState: state.TIMAState = state.get();
-    const isPrintGathered = ( !!( imaState.isPrintGathered ) );
+    const isPrintGathered = !!imaState.isPrintGathered;
     if( isPrintGathered ) {
         log.debug( "This process {sunny} is {}", "versions", process.versions );
         log.debug( "This process {sunny} is {}", "PID", process.pid );
@@ -1526,7 +1526,7 @@ function commonInitCheckContractPresences(): void {
 
 function commonInitPrintFoundContracts(): void {
     const imaState: state.TIMAState = state.get();
-    const isPrintGathered = ( !!( imaState.isPrintGathered ) );
+    const isPrintGathered = !!imaState.isPrintGathered;
     // deposit_box_eth_address                    --> deposit_box_eth_abi
     // deposit_box_erc20_address                  --> deposit_box_erc20_abi
     // deposit_box_erc721_address                 --> deposit_box_erc721_abi
@@ -1631,7 +1631,7 @@ function commonInitPrintFoundContracts(): void {
 
 function commonInitCheckErc20(): void {
     const imaState: state.TIMAState = state.get();
-    const isPrintGathered = ( !!( imaState.isPrintGathered ) );
+    const isPrintGathered = !!imaState.isPrintGathered;
     let n1 = 0;
     let n2 = 0;
     if( imaState.chainProperties.mn.strPathJsonErc20.length > 0 ) {
@@ -1662,9 +1662,7 @@ function commonInitCheckErc20(): void {
             if( n2 > 0 )
                 n2 = imaState.chainProperties.sc.strCoinNameErc20.length;
             if( n1 > 0 ) {
-                if( isPrintGathered &&
-                    ( !imaState.bShowConfigMode )
-                ) {
+                if( isPrintGathered && !imaState.bShowConfigMode ) {
                     if( isPrintGathered ) {
                         log.information( "Loaded Main-net ERC20 ABI {}",
                             imaState.chainProperties.tc.strCoinNameErc20 );
@@ -1787,7 +1785,7 @@ function commonInitCheckErc20(): void {
 
 function commonInitCheckErc721(): void {
     const imaState: state.TIMAState = state.get();
-    const isPrintGathered = ( !!( imaState.isPrintGathered ) );
+    const isPrintGathered = !!imaState.isPrintGathered;
     let n1 = 0;
     let n2 = 0;
     if( imaState.chainProperties.mn.strPathJsonErc721.length > 0 ) {
@@ -1945,7 +1943,7 @@ function commonInitCheckErc721(): void {
 
 function commonInitCheckErc1155(): void {
     const imaState: state.TIMAState = state.get();
-    const isPrintGathered = ( !!( imaState.isPrintGathered ) );
+    const isPrintGathered = !!imaState.isPrintGathered;
     let n1 = 0;
     let n2 = 0;
     if( imaState.chainProperties.mn.strPathJsonErc1155.length > 0 ) {
@@ -2104,8 +2102,8 @@ function commonInitCheckErc1155(): void {
 
 function commonInitCheckGeneralArgs(): void {
     const imaState: state.TIMAState = state.get();
-    const isPrintGathered = ( !!( imaState.isPrintGathered ) );
-    const isPrintSecurityValues = ( !!( imaState.isPrintSecurityValues ) );
+    const isPrintGathered = !!imaState.isPrintGathered;
+    const isPrintSecurityValues = !!imaState.isPrintSecurityValues;
     if( isPrintGathered ) {
         printAbout( true );
         log.information( "IMA AGENT is using Ethers JS version ",
@@ -2223,8 +2221,8 @@ function commonInitCheckGeneralArgs(): void {
 
 function commonInitCheckCredentialsArgs(): void {
     const imaState: state.TIMAState = state.get();
-    const isPrintGathered = ( !!( imaState.isPrintGathered ) );
-    const isPrintSecurityValues = ( !!( imaState.isPrintSecurityValues ) );
+    const isPrintGathered = !!imaState.isPrintGathered;
+    const isPrintSecurityValues = !!imaState.isPrintSecurityValues;
     try {
         ensureHaveCredentials(
             "Main Net",
@@ -2274,7 +2272,7 @@ function commonInitCheckCredentialsArgs(): void {
 
 function commonInitCheckTransferAmountArgs(): void {
     const imaState: state.TIMAState = state.get();
-    const isPrintGathered = ( !!( imaState.isPrintGathered ) );
+    const isPrintGathered = !!imaState.isPrintGathered;
     ensureHaveValue(
         "Amount of wei to transfer", imaState.nAmountOfWei,
         false, isPrintGathered, null, ( x: TCV ) => {
@@ -2284,7 +2282,7 @@ function commonInitCheckTransferAmountArgs(): void {
 
 function commonInitTransferringArgs(): void {
     const imaState: state.TIMAState = state.get();
-    const isPrintGathered = ( !!( imaState.isPrintGathered ) );
+    const isPrintGathered = !!imaState.isPrintGathered;
     ensureHaveValue(
         "M->S transfer block size", imaState.nTransferBlockSizeM2S,
         false, isPrintGathered, null, ( x: TCV ) => {
@@ -2392,7 +2390,7 @@ function commonInitTransferringArgs(): void {
 
 function commonInitCheckAccessArgs(): void {
     const imaState: state.TIMAState = state.get();
-    const isPrintGathered = ( !!( imaState.isPrintGathered ) );
+    const isPrintGathered = !!imaState.isPrintGathered;
     ensureHaveValue(
         "S-Chain node number(zero based)",
         imaState.nNodeNumber, false, isPrintGathered, null, ( x: TCV ) => {
@@ -2407,7 +2405,7 @@ function commonInitCheckAccessArgs(): void {
 
 function commonInitErcTokensArgs(): void {
     const imaState: state.TIMAState = state.get();
-    const isPrintGathered = ( !!( imaState.isPrintGathered ) );
+    const isPrintGathered = !!imaState.isPrintGathered;
     if( imaState.chainProperties.tc.strCoinNameErc20.length > 0 ) {
         ensureHaveValue(
             "Loaded Main-net ERC20 ABI ",
@@ -2530,7 +2528,7 @@ function commonInitErcTokensArgs(): void {
 
 function commonInitGasMultipliersAndTransactionArgs(): void {
     const imaState: state.TIMAState = state.get();
-    const isPrintGathered = ( !!( imaState.isPrintGathered ) );
+    const isPrintGathered = !!imaState.isPrintGathered;
     if( isPrintGathered ) {
         log.debug( log.fmtInformation( "Main Net Gas Price Multiplier is" ),
             "....................." +
@@ -2613,7 +2611,7 @@ function commonInitGasMultipliersAndTransactionArgs(): void {
 
 function commonInitLoggingArgs(): void {
     const imaState: state.TIMAState = state.get();
-    const isPrintGathered = ( !!( imaState.isPrintGathered ) );
+    const isPrintGathered = !!imaState.isPrintGathered;
     if( imaState.strLogFilePath.length > 0 ) {
         ensureHaveValue(
             "Log file path",
@@ -2625,7 +2623,7 @@ function commonInitLoggingArgs(): void {
             "Max size of log file path",
             imaState.nLogMaxSizeBeforeRotation, false,
             isPrintGathered, null, ( x: TCV ) => {
-                return ( ( !x ) && owaspUtils.toInteger( x ) <= 0 )
+                return ( !x && owaspUtils.toInteger( x ) <= 0 )
                     ? log.fmtWarning( "unlimited" )
                     : log.fmtNote( x );
             } );
@@ -2633,7 +2631,7 @@ function commonInitLoggingArgs(): void {
             "Max rotated count of log files",
             imaState.nLogMaxFilesCount,
             false, isPrintGathered, null, ( x: TCV ) => {
-                return ( ( !x ) && owaspUtils.toInteger( x ) <= 1 )
+                return ( !x && owaspUtils.toInteger( x ) <= 1 )
                     ? log.fmtWarning( "not set" )
                     : log.fmtNote( x );
             } );
@@ -2642,8 +2640,8 @@ function commonInitLoggingArgs(): void {
 
 function commonInitAutomaticExitArgs(): void {
     const imaState: state.TIMAState = state.get();
-    const isPrintGathered = ( !!( imaState.isPrintGathered ) );
-    const isPrintSecurityValues = ( !!( imaState.isPrintSecurityValues ) );
+    const isPrintGathered = !!imaState.isPrintGathered;
+    const isPrintSecurityValues = !!imaState.isPrintSecurityValues;
     ensureHaveValue(
         "Automatic exit(seconds)",
         imaState.nAutoExitAfterSeconds, false,

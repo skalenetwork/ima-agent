@@ -256,7 +256,7 @@ export async function safeGetTransactionCount(
                 "stack is:\n{stack}", idxAttempt, cntAttempts, strFnName + "()", u, err, err );
         }
     }
-    if( ( idxAttempt + 1 ) > cntAttempts && ( !ret ) ) {
+    if( ( idxAttempt + 1 ) > cntAttempts && !ret ) {
         details.error( "Failed call to {} via {url} after {} attempts",
             strFnName + "()", u, cntAttempts );
         throw new Error( `Failed call to ${strFnName}() via ${u} after ${cntAttempts} attempts` );
@@ -380,7 +380,7 @@ export async function safeGetPastEvents(
             }
         }
     }
-    if( ( idxAttempt + 1 ) === cntAttempts && ( !ret ) ) {
+    if( ( idxAttempt + 1 ) === cntAttempts && !ret ) {
         details.error(
             "{p}Failed filtering attempt for {} event via {url}, from block {}, to block {} " +
             "after {} attempts", strLogPrefix, strEventName, u, nBlockFrom.toHexString(),

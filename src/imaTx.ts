@@ -84,26 +84,26 @@ let redis: Redis | null = null;
 let gFlagDryRunIsEnabled: boolean = true;
 
 export function dryRunIsEnabled(): boolean {
-    return ( !!gFlagDryRunIsEnabled );
+    return !!gFlagDryRunIsEnabled;
 }
 export function dryRunEnable( isEnable: boolean ): boolean {
     gFlagDryRunIsEnabled = ( isEnable != null && isEnable != undefined )
-        ? ( !!isEnable )
+        ? !!isEnable
         : true;
-    return ( !!gFlagDryRunIsEnabled );
+    return !!gFlagDryRunIsEnabled;
 }
 
 let gFlagDryRunIsIgnored = true;
 
 export function dryRunIsIgnored(): boolean {
-    return ( !!gFlagDryRunIsIgnored );
+    return !!gFlagDryRunIsIgnored;
 }
 
 export function dryRunIgnore( isIgnored: boolean ): boolean {
     gFlagDryRunIsIgnored = ( isIgnored != null && isIgnored != undefined )
-        ? ( !!isIgnored )
+        ? !!isIgnored
         : true;
-    return ( !!gFlagDryRunIsIgnored );
+    return !!gFlagDryRunIsIgnored;
 }
 
 export async function dryRunCall(
@@ -120,7 +120,7 @@ export async function dryRunCall(
     if( !dryRunIsEnabled() )
         return null; // success
     isDryRunResultIgnore = ( isDryRunResultIgnore != null && isDryRunResultIgnore != undefined )
-        ? ( !!isDryRunResultIgnore )
+        ? !!isDryRunResultIgnore
         : false;
     const strContractMethodDescription = log.fmtDebug( "{p}({}).{sunny}",
         strContractName, joContract.address, strMethodName );
@@ -348,9 +348,7 @@ async function payedCallDirect( optsPayedCall: TRunTimePayedCallOptions ): Promi
     optsPayedCall.details.trace( "{p}Chain ID is: {}", optsPayedCall.strLogPrefix, chainId );
     if( !optsPayedCall.unsignedTx )
         throw new Error( "no unsigned TX provided to make direct payed call" );
-    if( ( !( chainId in optsPayedCall.unsignedTx ) ) ||
-        ( !optsPayedCall.unsignedTx.chainId )
-    ) {
+    if( ( !( chainId in optsPayedCall.unsignedTx ) ) || !optsPayedCall.unsignedTx.chainId ) {
         optsPayedCall.unsignedTx.chainId = chainId;
         optsPayedCall.details.trace( "{p}TX with chainId: {}",
             optsPayedCall.strLogPrefix, optsPayedCall.unsignedTx );
@@ -678,14 +676,14 @@ async function tmWait(
         await threadInfo.sleep( 500 );
     const r = await tmGetRecord( txId );
     details.debug( "{p}TM - TX {} record is {}", strLogPrefix, txId, r );
-    if( ( !r ) )
+    if( !r )
         details.error( "{p}TM - TX {} status is NULL RECORD", strLogPrefix, txId );
     else if( r.status == "SUCCESS" )
         details.success( "{p}TM - TX {} success", strLogPrefix, txId );
     else
         details.error( "{p}TM - TX {} status is {err}", strLogPrefix, txId, r.status );
 
-    if( ( !tmIsFinished( r ) ) || ( r && r.status == "DROPPED" ) ) {
+    if( !tmIsFinished( r ) || ( r && r.status == "DROPPED" ) ) {
         details.error( "{p}TM - TX {} was unsuccessful, wait failed", strLogPrefix, txId );
         return null;
     }

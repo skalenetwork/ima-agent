@@ -72,9 +72,9 @@ export function validateInteger( value: TColorableArgument, radix?: TColorableAr
         if( s.length < 1 )
             return false;
         radix = validateRadix( value, radix );
-        if( ( !isNaN( value ) ) &&
+        if( !isNaN( value ) &&
             ( parseInt( value, radix ) == value || radix !== 10 ) &&
-            ( !isNaN( parseInt( value, radix ) ) )
+            !isNaN( parseInt( value, radix ) )
         )
             return true;
     } catch ( err ) {
@@ -214,7 +214,7 @@ export function rainbowPart( s: string, i: number ): string {
 }
 
 export function rainbow( s?: TColorableArgument ): string {
-    if( ( !gFlagIsEnabled ) || ( !s ) || ( typeof s !== "string" ) || s.length == 0 )
+    if( !gFlagIsEnabled || !s || ( typeof s !== "string" ) || s.length == 0 )
         return s ? s.toString() : JSON.stringify( s );
     let res = "";
     const cnt = s.length;
@@ -314,7 +314,7 @@ export function toIpv4Arr( s: string ): string[] | null {
     // eslint-disable-next-line max-len
     if( /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test( s ) ) {
         const arr = s.split( "." );
-        if( ( !arr ) || arr.length !== 4 )
+        if( !arr || arr.length !== 4 )
             return null;
 
         return arr;

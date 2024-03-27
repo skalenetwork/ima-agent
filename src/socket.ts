@@ -296,7 +296,7 @@ export class BasicSocketPipe extends EventDispatcher {
     }
 
     send( data: TLoadedJSON, isFlush?: boolean ): void {
-        if( this.isDisposed || ( !this.isConnected ) )
+        if( this.isDisposed || !this.isConnected )
             return;
         if( this.isAutoFlush() ) {
             if( settings.logging.net.socket.send || settings.logging.net.socket.flush )
@@ -304,7 +304,7 @@ export class BasicSocketPipe extends EventDispatcher {
             this.implSend( data );
             return;
         }
-        isFlush = ( isFlush == undefined || isFlush == null ) ? true : ( !!( isFlush ) );
+        isFlush = ( isFlush == undefined || isFlush == null ) ? true : !!isFlush;
         const jo: TLoadedJSON = socketReceivedDataReverseMarshall( data );
         if( settings.logging.net.socket.accumulate )
             console.log( this.socketLoggingTextPrefix( "accumulate" ), data );
@@ -314,7 +314,7 @@ export class BasicSocketPipe extends EventDispatcher {
     }
 
     flush(): void {
-        if( this.isDisposed || ( !this.isConnected ) )
+        if( this.isDisposed || !this.isConnected )
             return;
         const cnt = this.arrAccumulatedMessages.length;
         if( cnt == 0 )
@@ -621,7 +621,7 @@ export class InWorkerServerPipe extends BasicSocketPipe {
     }
 
     implSend( data: TLoadedJSON ): void {
-        if( ( !this.isConnected ) || ( !this.fnSend ) || typeof this.fnSend !== "function" ) {
+        if( !this.isConnected || !this.fnSend || typeof this.fnSend !== "function" ) {
             const s = "Cannot send messages to disconnected in-worker server pipe";
             this.dispatchEvent(
                 new UniversalDispatcherEvent( "error", { socket: this, message: s.toString() } ) );
@@ -771,9 +771,7 @@ export class OutOfWorkerSocketClientPipe extends BasicSocketPipe {
     }
 
     implSend( data: TLoadedJSON ): void {
-        if( ( !this.isConnected ) ||
-            ( !this.worker ) ||
-            ( !this.fnSend ) ||
+        if( !this.isConnected || !this.worker || !this.fnSend ||
             typeof this.fnSend !== "function"
         ) {
             const s = "Cannot send messages to disconnected in-worker client pipe";
@@ -809,8 +807,8 @@ export class OutOfWorkerRelay extends EventDispatcher {
         super();
         const self = this;
         self.strRelayName = strRelayName ? strRelayName.toString() : "unnamed";
-        self.isAutoFlushIncoming = isAutoFlushIncoming ? true : ( !!isAutoFlushIncoming );
-        self.isAutoFlushOutgoing = isAutoFlushOutgoing ? true : ( !!isAutoFlushOutgoing );
+        self.isAutoFlushIncoming = isAutoFlushIncoming ? true : !!isAutoFlushIncoming;
+        self.isAutoFlushOutgoing = isAutoFlushOutgoing ? true : !!isAutoFlushOutgoing;
         if( !acceptor ) {
             throw new Error( `OutOfWorkerRelay ${self.strRelayName} needs acceptor ` +
                 "for normal functionality" );
@@ -1046,8 +1044,8 @@ export class OneToOneRelay extends EventDispatcher {
         super();
         const self = this;
         self.strRelayName = strRelayName ? strRelayName.toString() : "unnamed";
-        self.isAutoFlushIncoming = isAutoFlushIncoming ? true : ( !!isAutoFlushIncoming );
-        self.isAutoFlushOutgoing = isAutoFlushOutgoing ? true : ( !!isAutoFlushIncoming );
+        self.isAutoFlushIncoming = isAutoFlushIncoming ? true : !!isAutoFlushIncoming;
+        self.isAutoFlushOutgoing = isAutoFlushOutgoing ? true : !!isAutoFlushIncoming;
         self.pipeIncoming = pipeIncoming;
         self.pipeOutgoing = pipeOutgoing;
         if( ( !( "strSavedRemoteAddress" in pipeIncoming ) ) ||
@@ -1281,7 +1279,7 @@ export class DirectPipe extends BasicSocketPipe {
     url: string;
     constructor( counterPipe: DirectPipe | null, isBroadcastOpenEvents: boolean ) {
         super();
-        isBroadcastOpenEvents = ( !!isBroadcastOpenEvents );
+        isBroadcastOpenEvents = !!isBroadcastOpenEvents;
         this.socketType = "Direct";
         this.socketSubtype = "direct.not.initialized.yet";
         this.isConnected = false;
@@ -1342,7 +1340,7 @@ export class DirectPipe extends BasicSocketPipe {
     }
 
     implSend( data: TLoadedJSON ): void {
-        if( ( !this.isConnected ) || ( !this.counterPipe?.isConnected ) ) {
+        if( !this.isConnected || !this.counterPipe?.isConnected ) {
             const s = "Cannot send messages to disconnected local server pipe";
             this.dispatchEvent(
                 new UniversalDispatcherEvent( "error", { socket: this, message: s.toString() } ) );
@@ -1587,7 +1585,7 @@ export class WebSocketServerPipe extends BasicSocketPipe {
     }
 
     implSend( data: TLoadedJSON ): void {
-        if( ( !this.isConnected ) || ( !this.wsConnection ) ) {
+        if( !this.isConnected || !this.wsConnection ) {
             const s = "Cannot send messages to disconnected web socket server pipe";
             this.dispatchEvent(
                 new UniversalDispatcherEvent( "error", { socket: this, message: s.toString() } ) );
@@ -1685,7 +1683,7 @@ export class WebSocketClientPipe extends BasicSocketPipe {
     }
 
     implSend( data: TLoadedJSON ): void {
-        if( ( !this.isConnected ) || ( !this.wsConnection ) ) {
+        if( !this.isConnected || !this.wsConnection ) {
             const s = "Cannot send messages to disconnected web socket client pipe";
             this.dispatchEvent(
                 new UniversalDispatcherEvent( "error", { socket: this, message: s.toString() } ) );
@@ -1775,7 +1773,7 @@ export class WebSocketClientPipe extends BasicSocketPipe {
             console.warn( "WS client connect error:", err );
         }
         if( reconnectAfterMilliseconds != null && reconnectAfterMilliseconds != undefined ) {
-            if( reconnectAfterMilliseconds > 0 && ( !iv ) ) {
+            if( reconnectAfterMilliseconds > 0 && !iv ) {
                 const iv = setTimeout( function(): void {
                     try {
                         if( self.wsConnectAttempt( url, reconnectAfterMilliseconds, iv ) )
@@ -3390,7 +3388,7 @@ export class WebRTCServerPipe extends BasicSocketPipe {
     }
 
     implSend( data: TLoadedJSON ): void {
-        if( ( !this.isConnected ) || ( !this.rtcPeer ) ) {
+        if( !this.isConnected || !this.rtcPeer ) {
             const err = "Cannot send messages to disconnected WebRTC socket server pipe";
             this.onError( err );
             throw new Error( err );
@@ -3665,7 +3663,7 @@ export class WebRTCClientPipe extends BasicSocketPipe {
     }
 
     implSend( data: TLoadedJSON ): void {
-        if( ( !this.isConnected ) || ( !this.rtcPeer ) ) {
+        if( !this.isConnected || !this.rtcPeer ) {
             const s = "Cannot send messages to disconnected WebRTC socket client pipe";
             this.dispatchEvent(
                 new UniversalDispatcherEvent(

@@ -901,7 +901,7 @@ async function checkCorrectnessOfMessagesToSign(
         joChainName = imaState.chainProperties.mn.strChainName;
     } else if( strDirection == "S2S" ) {
         joAccount = imaState.chainProperties.sc.joAccount;
-        if( ( !joExtraSignOpts?.chainNameDst ) )
+        if( !joExtraSignOpts?.chainNameDst )
             throw new Error( "Missing destination chain name for BLS signing" );
         joChainName = joExtraSignOpts.chainNameDst;
         const ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider | null =
@@ -1308,8 +1308,8 @@ async function doSignProcessHandleCall(
         optsSignOperation.strLogPrefix, log.generateTimestampString( null, true ),
         "skale_imaVerifyAndSign", i, strNodeURL, optsSignOperation.fromChainName,
         optsSignOperation.targetChainName, joParams, joOut, optsSignOperation.sequenceId );
-    if( ( !joOut ) || typeof joOut !== "object" || ( !( "result" in joOut ) ) ||
-        ( !joOut.result ) || typeof joOut.result !== "object" ||
+    if( !joOut || typeof joOut !== "object" || ( !( "result" in joOut ) ) ||
+        !joOut.result || typeof joOut.result !== "object" ||
         ( "error" in joOut && joOut.error ) ) {
         ++optsSignOperation.joGatheringTracker.nCountErrors;
         optsSignOperation.details.critical(
@@ -1654,8 +1654,8 @@ async function doSignU256OneImplHandleCallResult(
     optsSignU256.details.trace( "{p}Did invoked {} for to sign value {}, answer is: {}",
         optsSignU256.strLogPrefix, "skale_imaBSU256", optsSignU256.u256.toString(), joOut );
     const isWithError: boolean = !!( ( "error" in joOut && joOut.error ) );
-    if( ( !joOut ) || typeof joOut !== "object" || ( !( "result" in joOut ) ) ||
-        isWithError || ( !joOut.result ) || typeof joOut.result !== "object" ||
+    if( !joOut || typeof joOut !== "object" || ( !( "result" in joOut ) ) ||
+        isWithError || !joOut.result || typeof joOut.result !== "object" ||
         ( !( "signature" in joOut.result ) ) || joOut.result.signature != "object"
     ) {
         ++optsSignU256.joGatheringTracker.nCountErrors;
@@ -2021,7 +2021,7 @@ export async function doVerifyReadyHash(
         fnShellRestore();
         isSuccess = false;
     }
-    if( isExposeOutput || ( !isSuccess ) )
+    if( isExposeOutput || !isSuccess )
         details.exposeDetailsTo( log.globalStream(), "BLS-raw-verifier", isSuccess );
     details.close();
     return isSuccess;
@@ -2131,8 +2131,8 @@ export async function doSignReadyHash(
             await joCall.disconnect();
     }
     const isSuccess = !!( (
-        joSignResult && typeof joSignResult === "object" && ( !joSignResult.error ) ) );
-    if( isExposeOutput || ( !isSuccess ) )
+        joSignResult && typeof joSignResult === "object" && !joSignResult.error ) );
+    if( isExposeOutput || !isSuccess )
         details.exposeDetailsTo( log.globalStream(), "BLS-raw-signer", isSuccess );
     details.close();
     return joSignResult;
@@ -2205,7 +2205,7 @@ async function prepareS2sOfSkaleImaVerifyAndSign(
         optsHandleVerifyAndSign.strDirection, strSChainNameSrc, strSChainNameDst );
     const arrSChainsCached: skaleObserver.TSChainInformation[] =
         skaleObserver.getLastCachedSChains();
-    if( ( !arrSChainsCached ) || arrSChainsCached.length == 0 ) {
+    if( !arrSChainsCached || arrSChainsCached.length == 0 ) {
         throw new Error( `Could not handle ${optsHandleVerifyAndSign.strDirection} ` +
             "skale_imaVerifyAndSign(1), no S-Chains in SKALE NETWORK observer cached yet, " +
             "try again later" );

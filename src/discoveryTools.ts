@@ -248,7 +248,7 @@ export function getSChainDiscoveredNodesCount(
 export async function waitUntilSChainStarted(): Promise<void> {
     const imaState: state.TIMAState = state.get();
     log.debug( "Checking S-Chain is accessible and sane..." );
-    if( ( !imaState.chainProperties.sc.strURL ) ||
+    if( !imaState.chainProperties.sc.strURL ||
         imaState.chainProperties.sc.strURL.length === 0
     ) {
         log.warning( "Skipped, S-Chain URL was not provided." );
@@ -268,7 +268,7 @@ export async function waitUntilSChainStarted(): Promise<void> {
                 log.critical( "S-Chain network discovery attempt failed: {err}", err );
                 isError = true;
             } );
-            if( ( !isError ) && joSChainNetworkInfo && typeof joSChainNetworkInfo === "object" ) {
+            if( !isError && joSChainNetworkInfo && typeof joSChainNetworkInfo === "object" ) {
                 imaState.joSChainNetworkInfo = joSChainNetworkInfo;
                 bSuccess = true;
             }
@@ -674,7 +674,7 @@ export async function discoverSChainNetwork(
 ): Promise<TSChainNetworkInfo | null> {
     const optsDiscover: TDiscoveryOptions = {
         fnAfter,
-        isSilentReDiscovery: ( !!isSilentReDiscovery ),
+        isSilentReDiscovery: !!isSilentReDiscovery,
         joPrevSChainNetworkInfo: joPrevSChainNetworkInfo ?? null,
         nCountToWait,
         imaState: state.get(),

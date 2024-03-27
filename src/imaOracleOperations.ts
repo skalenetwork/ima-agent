@@ -62,10 +62,10 @@ export interface TGasPriceSetupOptions {
 let gFlagIsEnabledOracle: boolean = false;
 
 export function getEnabledOracle(): boolean {
-    return ( !!gFlagIsEnabledOracle );
+    return !!gFlagIsEnabledOracle;
 }
 export function setEnabledOracle( isEnabled: boolean ): void {
-    gFlagIsEnabledOracle = ( !!isEnabled );
+    gFlagIsEnabledOracle = !!isEnabled;
 }
 
 async function prepareOracleGasPriceSetup(

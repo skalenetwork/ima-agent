@@ -999,7 +999,7 @@ async function doMainTransferLoopActions( optsTransfer: TTransferOptions ): Prom
                     "no extra options provided to transfer algorithm" );
             }
             const arrSChainsCached = skaleObserver.getLastCachedSChains();
-            if( ( !arrSChainsCached ) || arrSChainsCached.length == 0 ) {
+            if( !arrSChainsCached || arrSChainsCached.length == 0 ) {
                 throw new Error( "Could not validate S2S messages, " +
                     "no S-Chains in SKALE NETWORK observer cached yet, try again later" );
             }
@@ -1153,7 +1153,7 @@ export async function doTransfer(
         optsTransfer.details.debug( "{p}Message signing is {oo}",
             optsTransfer.strLogPrefix, optsTransfer.imaState.bSignMessages );
         if( optsTransfer.fnSignMessages == null || optsTransfer.fnSignMessages == undefined ||
-            ( !optsTransfer.imaState.bSignMessages )
+            !optsTransfer.imaState.bSignMessages
         ) {
             optsTransfer.details.debug( "{p}Using internal signing stub function",
                 optsTransfer.strLogPrefix );

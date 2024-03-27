@@ -99,8 +99,8 @@ export function getLastErrorCategories(): string[] {
 let gFlagIsEnabledProgressiveEventsScan = true;
 
 export function getEnabledProgressiveEventsScan(): boolean {
-    return ( !!gFlagIsEnabledProgressiveEventsScan );
+    return !!gFlagIsEnabledProgressiveEventsScan;
 }
 export function setEnabledProgressiveEventsScan( isEnabled: boolean ): void {
-    gFlagIsEnabledProgressiveEventsScan = ( !!isEnabled );
+    gFlagIsEnabledProgressiveEventsScan = !!isEnabled;
 }

@@ -210,7 +210,7 @@ export async function handleLoopStateArrived(
             strMessageHash, nNodeNumber, signature, imaState.isPrintPWA );
         if( !isSignatureOK )
             throw new Error( "BLS verification failed" );
-        joProps.isInProgress = ( !!isStart );
+        joProps.isInProgress = !!isStart;
         joProps.ts = owaspUtils.toInteger( ts );
         if( imaState.isPrintPWA ) {
             log.success(

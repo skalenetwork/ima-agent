@@ -110,7 +110,7 @@ export function enableColorization( bIsEnable?: boolean ): void {
     cc.enable( !!bIsEnable );
 }
 export function isEnabledColorization(): boolean {
-    return ( !!( cc.isEnabled() ) );
+    return !!cc.isEnabled();
 }
 
 export function getPrintTimestamps(): boolean {
@@ -118,7 +118,7 @@ export function getPrintTimestamps(): boolean {
 }
 
 export function setPrintTimestamps( b?: boolean ): void {
-    gFlagLogWithTimeStamps = ( !!b );
+    gFlagLogWithTimeStamps = !!b;
 }
 
 export function n2s( n: TLogArgument, sz: number ): string {
@@ -132,7 +132,7 @@ export function generateTimestampString( ts?: TLogArgument, isColorized?: boolea
     isColorized =
         ( typeof isColorized === "undefined" )
             ? true
-            : ( !!isColorized );
+            : !!isColorized;
     if( isColorized )
         isColorized = cc.isEnabled();
     ts = ( ts instanceof Date ) ? ts : new Date();
@@ -242,7 +242,7 @@ export function createStandardOutputStream(): TLogger | null {
             strOwnIndent: "",
             write: function( ...args: TLogArgument[] ): void {
                 let s = ( this.strOwnIndent ? this.strOwnIndent : "" ) +
-                    ( ( this.haveOwnTimestamps && ( !this.isPausedTimeStamps ) )
+                    ( ( this.haveOwnTimestamps && !this.isPausedTimeStamps )
                         ? generateTimestampPrefix( null, true )
                         : "" );
                 s += fmtArgumentsArray( args );
@@ -378,7 +378,7 @@ export function createMemoryOutputStream(): TLogger {
                     if( this.isLastLineEndsWithCarriageReturn() ||
                         this.isBeginningOfAccumulatedLog() ) {
                         strHeader = ( this.strOwnIndent ? this.strOwnIndent : "" );
-                        if( this.haveOwnTimestamps && ( !this.isPausedTimeStamps ) )
+                        if( this.haveOwnTimestamps && !this.isPausedTimeStamps )
                             strHeader += generateTimestampPrefix( null, true );
                     }
                     this.arrAccumulatedLogTextLines.push( strHeader + strLine + "\n" );
@@ -411,7 +411,7 @@ export function createMemoryOutputStream(): TLogger {
                     return;
                 let werePausedTimeStamps = false;
                 try {
-                    werePausedTimeStamps = ( !!otherStream.isPausedTimeStamps );
+                    werePausedTimeStamps = !!otherStream.isPausedTimeStamps;
                     otherStream.isPausedTimeStamps = true;
                 } catch ( err ) {
                 }
@@ -535,7 +535,7 @@ export function createFileOutput(
             strOwnIndent: "",
             write: function( ...args: TLogArgument[] ): void {
                 let s = ( this.strOwnIndent ? this.strOwnIndent : "" ) +
-                    ( ( this.haveOwnTimestamps && ( !this.isPausedTimeStamps ) )
+                    ( ( this.haveOwnTimestamps && !this.isPausedTimeStamps )
                         ? generateTimestampPrefix( null, true )
                         : "" );
                 s += fmtArgumentsArray( args );
@@ -1087,10 +1087,10 @@ let gFlagIsExposeDetails = false;
 let gVerboseLevel = verboseName2Number( "information" );
 
 export function exposeDetailsGet(): boolean {
-    return ( !!gFlagIsExposeDetails );
+    return !!gFlagIsExposeDetails;
 }
 export function exposeDetailsSet( isExpose: TLogArgument ): void {
-    gFlagIsExposeDetails = ( !!isExpose );
+    gFlagIsExposeDetails = !!isExpose;
 }
 
 export function verboseGet(): number {

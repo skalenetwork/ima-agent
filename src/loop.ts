@@ -830,7 +830,7 @@ export async function spreadUpdatedSChainNetwork( isFinal: boolean ): Promise<vo
     const imaState: state.TIMAState = state.get();
     const joMessage: state.TLoadedJSON = {
         method: "spreadUpdatedSChainNetwork",
-        isFinal: ( !!isFinal ),
+        isFinal: !!isFinal,
         joSChainNetworkInfo: imaState.joSChainNetworkInfo
     };
     const cntWorkers = gArrWorkers.length;

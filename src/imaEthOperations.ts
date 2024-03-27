@@ -44,7 +44,7 @@ export async function getBalanceEth(
         if( !( ethersProvider && joAccount ) )
             return owaspUtils.toBN( 0 );
         const strAddress = joAccount.address();
-        if( ( !isMainNet ) && contractERC20 ) {
+        if( !isMainNet && contractERC20 ) {
             const balance =
                 await contractERC20.callStatic.balanceOf( strAddress, { from: strAddress } );
             return balance;
