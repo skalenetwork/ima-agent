@@ -613,6 +613,6 @@ export function isPreventExitAfterLastAction(): boolean {
     return gFlagIsPreventExitAfterLastAction;
 }
 
-export function setPreventExitAfterLastAction( isPrevent?: boolean | null ): void {
+export function setPreventExitAfterLastAction( isPrevent?: boolean ): void {
     gFlagIsPreventExitAfterLastAction = !!isPrevent;
 }
