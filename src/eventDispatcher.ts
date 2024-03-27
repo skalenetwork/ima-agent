@@ -24,8 +24,25 @@
  */
 
 export type TType = string;
-export type TListener = any;
 export type TData = any;
+export type THandlerFunction = any;
+
+export interface TListenerOptions {
+    once: boolean
+}
+
+export interface TListener {
+    type: TType
+    listener: TListener
+    options?: TListenerOptions
+    call: ( eventDispatcher: any, data: TData ) => void
+}
+
+export interface TListenersEntry {
+    type: TType
+    listener: TListener
+    options: TListenerOptions
+}
 
 export class UniversalDispatcherEvent {
     type: TType;
@@ -44,7 +61,7 @@ export class UniversalDispatcherEvent {
 
 export class EventDispatcher {
     // see https://stackoverflow.com/questions/36675693/eventtarget-interface-in-safari
-    _listeners: TListener[];
+    _listeners: TListenersEntry[];
     isDisposing: boolean;
     isDisposed: boolean;
     constructor () {
@@ -100,7 +117,7 @@ export class EventDispatcher {
         return this;
     }
 
-    on( type: TType, listener: TListener ): EventDispatcher {
+    on( type: TType, listener: TListener | THandlerFunction ): EventDispatcher {
         return this.addEventListener( type, listener );
     }
 
@@ -120,8 +137,8 @@ export class EventDispatcher {
                 listener,
                 options: { once }
             } = item;
-            listener.call( this, evt );
-            if( once === true )
+            listener?.call( this, evt );
+            if( once )
                 this.removeEventListener( type, listener );
         }
         return this;
