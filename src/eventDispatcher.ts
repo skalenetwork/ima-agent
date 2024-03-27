@@ -23,7 +23,7 @@
  * @copyright SKALE Labs 2019-Present
  */
 
-export type TType = any;
+export type TType = string;
 export type TListener = any;
 export type TData = any;
 
