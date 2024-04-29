@@ -29,6 +29,7 @@ import * as https from "https";
 import * as net from "net";
 import { validateURL, isUrlWS } from "./owaspUtils.js";
 import * as log from "./log.js";
+import type * as state from "./state.js";
 
 export interface TRPCCallOpts {
     cert?: string
@@ -42,7 +43,7 @@ export type TFunctionConnectionResultHandler =
     ) => Promise < void >;
 
 export type TFunctionCallResultHandler =
-    ( joIn: any, joOut: any, err: Error | string | null
+    ( joIn: state.TLoadedJSON, joOut: state.TLoadedJSON, err: Error | string | null
     ) => Promise < void >;
 
 export type TFunctionReconnect =
@@ -50,16 +51,16 @@ export type TFunctionReconnect =
 export type TFunctionReconnectIfNeeded =
     ( fnAfter: TFunctionConnectionResultHandler ) => Promise < void >;
 export type TFunctionCall =
-    ( joIn: any, fnAfter?: TFunctionCallResultHandler ) => Promise < any >;
+    ( joIn: state.TLoadedJSON, fnAfter?: TFunctionCallResultHandler ) => Promise < any >;
 export type TFunctionDisconnect = (
     fnAfter?: TFunctionConnectionResultHandler
 ) => Promise < void >;
 
 export type TCallID = string | number | bigint;
 export interface TCallHandlerEntry {
-    joIn: any
+    joIn: state.TLoadedJSON
     fn: TFunctionCallResultHandler
-    out: any
+    out: state.TLoadedJSON
     iv?: NodeJS.Timeout | null
 }
 export type TMapPendingByCallID = Map < TCallID, TCallHandlerEntry >;
@@ -162,7 +163,7 @@ export async function doConnect(
                 doReconnectWsStep( joCall, opts )
                     .then( function(): void {} ).catch( function(): void {} );
             } );
-            joCall.wsConn.on( "message", function incoming( data: any ) {
+            joCall.wsConn.on( "message", function incoming( data: string ) {
                 const joOut = JSON.parse( data );
                 if( joOut.id in joCall.mapPendingByCallID ) {
                     const entry = joCall.mapPendingByCallID.get( joOut.id );
@@ -279,7 +280,7 @@ async function doDisconnect(
 }
 
 export async function doCall(
-    joCall: TRPCCall, joIn: any, fn: TFunctionCallResultHandler ): Promise <void> {
+    joCall: TRPCCall, joIn: state.TLoadedJSON, fn: TFunctionCallResultHandler ): Promise <void> {
     joIn = enrichTopLevelFieldsInJSON( joIn );
     if( joCall.wsConn ) {
         const entry: TCallHandlerEntry = {
@@ -304,7 +305,7 @@ export async function doCall(
             return;
         }
         const strBody = JSON.stringify( joIn );
-        let errCall: string | null = null; let joOut: any | null = null;
+        let errCall: string | null = null; let joOut: state.TLoadedJSON | null = null;
         if( joCall.joRpcOptions?.cert && typeof joCall.joRpcOptions.cert === "string" &&
             joCall.joRpcOptions.key && typeof joCall.joRpcOptions.key === "string"
         ) {
@@ -449,7 +450,9 @@ export async function rpcCallCreate(
             await doConnectIfNeeded( joCall, opts, fnAfter );
         },
         call:
-        async function( joIn: any, fnAfter?: TFunctionCallResultHandler ): Promise<void> {
+        async function(
+            joIn: state.TLoadedJSON, fnAfter?: TFunctionCallResultHandler
+        ): Promise<void> {
             const self = this;
             const promiseComplete = new Promise < any >( function( resolve, reject ): void {
                 self.reconnectIfNeeded(
@@ -462,7 +465,8 @@ export async function rpcCallCreate(
                         }
                         await doCall( joCall, joIn,
                             async function(
-                                joIn: any, joOut: any, err: Error | string | null
+                                joIn: state.TLoadedJSON, joOut: state.TLoadedJSON,
+                                err: Error | string | null
                             ): Promise<void> {
                                 if( fnAfter )
                                     await fnAfter( joIn, joOut, err );
@@ -492,7 +496,7 @@ export async function rpcCallCreate(
 
 export { rpcCallCreate as create };
 
-export function generateRandomIntegerInRange( min: any, max: any ): number {
+export function generateRandomIntegerInRange( min: number, max: number ): number {
     min = Math.ceil( min );
     max = Math.floor( max );
     return Math.floor( Math.random() * ( max - min + 1 ) ) + min;
@@ -502,7 +506,7 @@ export function generateRandomRpcCallId(): number {
     return generateRandomIntegerInRange( 1, Number.MAX_SAFE_INTEGER );
 }
 
-export function enrichTopLevelFieldsInJSON( jo: any ): any {
+export function enrichTopLevelFieldsInJSON( jo: state.TLoadedJSON ): state.TLoadedJSON {
     if( ( !( "jsonrpc" in jo ) ) ||
         ( typeof jo.jsonrpc !== "string" ) ||
         jo.jsonrpc.length === 0
@@ -513,7 +517,7 @@ export function enrichTopLevelFieldsInJSON( jo: any ): any {
     return jo;
 }
 
-export function isValidUrl( s: any ): boolean {
+export function isValidUrl( s: state.TLoadedJSON | null ): boolean {
     if( !s )
         return false;
     try {
@@ -525,7 +529,7 @@ export function isValidUrl( s: any ): boolean {
     return false;
 }
 
-export function getValidUrl( s: any ): URL | null {
+export function getValidUrl( s: state.TLoadedJSON | null ): URL | null {
     if( !s )
         return null;
     try {
@@ -535,7 +539,7 @@ export function getValidUrl( s: any ): URL | null {
     return null;
 }
 
-export function getDefaultPort( strProtocol: any ): number {
+export function getDefaultPort( strProtocol: state.TLoadedJSON | null ): number {
     if( !strProtocol )
         return 80;
     switch ( strProtocol.toString().toLowerCase() ) {
@@ -549,7 +553,7 @@ export function getDefaultPort( strProtocol: any ): number {
     return 80;
 }
 
-export function getValidHostAndPort( s: any ): any {
+export function getValidHostAndPort( s: state.TLoadedJSON | null ): state.TLoadedJSON {
     const u = getValidUrl( s );
     if( !u )
         return null;

@@ -32,13 +32,13 @@ import type * as state from "./state.js";
 export async function reimbursementShowBalance(
     ethersProviderMainNet: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     joCommunityPool: owaspUtils.ethersMod.Contract,
-    joReceiverMainNet: any,
+    joReceiverMainNet: state.TAddress,
     strChainNameMainNet: string,
     chainIdMainNet: string,
     transactionCustomizerMainNet: imaTx.TransactionCustomizer,
     strReimbursementChain: string,
     isForcePrintOut: boolean
-): Promise<any> {
+): Promise<owaspUtils.ethersMod.BigNumber> {
     const details = log.createMemoryStream();
     let s = "";
     const strLogPrefix = "Gas Reimbursement - Show Balance ";
@@ -46,8 +46,9 @@ export async function reimbursementShowBalance(
         const addressFrom = joReceiverMainNet;
         details.debug( "{p}Querying wallet {}/{} balance...",
             strLogPrefix, strReimbursementChain, addressFrom );
-        const xWei = await joCommunityPool.callStatic.getBalance(
-            addressFrom, strReimbursementChain, { from: addressFrom } );
+        const xWei: owaspUtils.ethersMod.BigNumber = owaspUtils.toBN(
+            await joCommunityPool.callStatic.getBalance(
+                addressFrom, strReimbursementChain, { from: addressFrom } ) );
         s = strLogPrefix + log.fmtSuccess( "Balance(wei): {}", xWei );
         if( isForcePrintOut )
             log.information( s );
@@ -66,20 +67,20 @@ export async function reimbursementShowBalance(
             "stack is:\n{stack}", strLogPrefix, err, err );
         details.exposeDetailsTo( log.globalStream(), "reimbursementShowBalance", false );
         details.close();
-        return 0;
+        return owaspUtils.toBN( 0 );
     }
 }
 
 export async function reimbursementEstimateAmount(
     ethersProviderMainNet: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     joCommunityPool: owaspUtils.ethersMod.Contract,
-    joReceiverMainNet: any,
+    joReceiverMainNet: state.TAddress,
     strChainNameMainNet: string,
     chainIdMainNet: string,
     transactionCustomizerMainNet: imaTx.TransactionCustomizer,
     strReimbursementChain: string,
     isForcePrintOut: boolean
-): Promise<any> {
+): Promise<owaspUtils.ethersMod.BigNumber> {
     const details = log.createMemoryStream();
     let s = "";
     const strLogPrefix = "Gas Reimbursement - Estimate Amount To Recharge ";
@@ -87,43 +88,46 @@ export async function reimbursementEstimateAmount(
         details.debug( "{p}Querying wallet {} balance...",
             strLogPrefix, strReimbursementChain );
         const addressReceiver = joReceiverMainNet;
-        const xWei =
-        await joCommunityPool.callStatic.getBalance(
-            addressReceiver, strReimbursementChain, { from: addressReceiver } );
+        const xWei: owaspUtils.ethersMod.BigNumber =
+            owaspUtils.toBN( await joCommunityPool.callStatic.getBalance(
+                addressReceiver, strReimbursementChain, { from: addressReceiver } ) );
         s = strLogPrefix + log.fmtSuccess( "Balance(wei): {}", xWei );
         if( isForcePrintOut )
             log.information( s );
         details.information( s );
-        const xEth = owaspUtils.ethersMod.ethers.utils.formatEther( owaspUtils.toBN( xWei ) );
+        const xEth: owaspUtils.ethersMod.BigNumber =
+            owaspUtils.toBN( owaspUtils.ethersMod.ethers.utils.formatEther(
+                owaspUtils.toBN( xWei ) ) );
         s = strLogPrefix + log.fmtSuccess( "Balance(eth): {}", xEth );
         if( isForcePrintOut )
             log.information( s );
         details.information( s );
-        const minTransactionGas = owaspUtils.parseIntOrHex(
+        const minTransactionGas: owaspUtils.ethersMod.BigNumber = owaspUtils.toBN(
             await joCommunityPool.callStatic.minTransactionGas( { from: addressReceiver } ) );
         s = strLogPrefix + log.fmtSuccess( "MinTransactionGas: {}", minTransactionGas );
         if( isForcePrintOut )
             log.information( s );
         details.information( s );
 
-        const gasPrice = await transactionCustomizerMainNet.computeGasPrice(
-            ethersProviderMainNet, 200000000000 );
+        const gasPrice: owaspUtils.ethersMod.BigNumber =
+            owaspUtils.toBN( await transactionCustomizerMainNet.computeGasPrice(
+                ethersProviderMainNet, owaspUtils.toBN( 200000000000 ) ) );
         s = strLogPrefix + log.fmtSuccess( "Multiplied Gas Price: {}", gasPrice );
         if( isForcePrintOut )
             log.information( s );
         details.information( s );
 
-        const minAmount = minTransactionGas * gasPrice;
+        const minAmount = minTransactionGas.mul( gasPrice );
         s = strLogPrefix + log.fmtSuccess( "Minimum recharge balance: {}", minAmount );
         if( isForcePrintOut )
             log.information( s );
         details.information( s );
 
-        let amountToRecharge = 0;
-        if( xWei >= minAmount )
-            amountToRecharge = 1;
+        let amountToRecharge: owaspUtils.ethersMod.BigNumber = owaspUtils.toBN( 0 );
+        if( xWei.gte( minAmount ) )
+            amountToRecharge = owaspUtils.toBN( 1 );
         else
-            amountToRecharge = minAmount - xWei;
+            amountToRecharge = minAmount.sub( xWei );
 
         s = strLogPrefix + log.fmtSuccess( "Estimated amount to recharge(wei): {}",
             amountToRecharge );
@@ -131,9 +135,9 @@ export async function reimbursementEstimateAmount(
             log.information( s );
         details.information( s );
 
-        const amountToRechargeEth =
-            owaspUtils.ethersMod.ethers.utils.formatEther(
-                owaspUtils.toBN( amountToRecharge.toString() ) );
+        const amountToRechargeEth: owaspUtils.ethersMod.BigNumber =
+            owaspUtils.toBN( owaspUtils.ethersMod.ethers.utils.formatEther(
+                owaspUtils.toBN( amountToRecharge.toString() ) ) );
         s = strLogPrefix + log.fmtSuccess( "Estimated amount to recharge(eth): {}",
             amountToRechargeEth );
         if( isForcePrintOut )
@@ -149,7 +153,7 @@ export async function reimbursementEstimateAmount(
             "stack is:\n{stack}", strLogPrefix, err, err );
         details.exposeDetailsTo( log.globalStream(), "reimbursementEstimateAmount", false );
         details.close();
-        return 0;
+        return owaspUtils.toBN( 0 );
     }
 }
 
@@ -161,10 +165,10 @@ export async function reimbursementWalletRecharge(
     chainIdMainNet: string,
     transactionCustomizerMainNet: imaTx.TransactionCustomizer,
     strReimbursementChain: string,
-    nReimbursementRecharge: string | number | null
-): Promise<any> {
+    nReimbursementRecharge: state.TBalance | null
+): Promise<boolean> {
     const details = log.createMemoryStream();
-    const jarrReceipts: any = [];
+    const jarrReceipts: state.TReceiptDescription[] = [];
     let strActionName = "";
     const strLogPrefix = "Gas Reimbursement - Wallet Recharge ";
     try {
@@ -174,26 +178,28 @@ export async function reimbursementWalletRecharge(
         const addressReceiver = joAccountMN.address();
         const arrArguments = [ strReimbursementChain, addressReceiver ];
         const gasPrice = await transactionCustomizerMainNet.computeGasPrice(
-            ethersProviderMainNet, 200000000000 );
+            ethersProviderMainNet, owaspUtils.toBN( 200000000000 ) );
         details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const estimatedGas = await transactionCustomizerMainNet.computeGas(
             details, ethersProviderMainNet,
             "CommunityPool", joCommunityPool, "rechargeUserWallet", arrArguments,
-            joAccountMN, strActionName, gasPrice, 3000000, nReimbursementRecharge, null );
+            joAccountMN, strActionName, gasPrice, owaspUtils.toBN( 3000000 ),
+            nReimbursementRecharge ?? owaspUtils.toBN( 0 ), null );
         details.trace( "{p}Using estimated gas={}", strLogPrefix, estimatedGas );
         const isIgnore = false;
         const strErrorOfDryRun = await imaTx.dryRunCall(
             details, ethersProviderMainNet,
             "CommunityPool", joCommunityPool, "rechargeUserWallet", arrArguments,
             joAccountMN, strActionName, isIgnore,
-            gasPrice, estimatedGas, nReimbursementRecharge, null );
+            gasPrice, estimatedGas, nReimbursementRecharge ?? owaspUtils.toBN( 0 ), null );
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
-        const joReceipt = await imaTx.payedCall(
+        const joReceipt: state.TSameAsTransactionReceipt = await imaTx.payedCall(
             details, ethersProviderMainNet,
             "CommunityPool", joCommunityPool, "rechargeUserWallet", arrArguments,
-            joAccountMN, strActionName, gasPrice, estimatedGas, nReimbursementRecharge, null );
+            joAccountMN, strActionName, gasPrice, estimatedGas,
+            nReimbursementRecharge ?? owaspUtils.toBN( 0 ), null );
         if( joReceipt ) {
             jarrReceipts.push( {
                 description: "reimbursementWalletRecharge",
@@ -223,10 +229,10 @@ export async function reimbursementWalletWithdraw(
     chainIdMainNet: string,
     transactionCustomizerMainNet: imaTx.TransactionCustomizer,
     strReimbursementChain: string,
-    nReimbursementWithdraw: string | number | null
-): Promise<any> {
+    nReimbursementWithdraw: state.TBalance | null
+): Promise<boolean> {
     const details = log.createMemoryStream();
-    const jarrReceipts: any = [];
+    const jarrReceipts: state.TReceiptDescription[] = [];
     let strActionName = "";
     const strLogPrefix = "Gas Reimbursement - Wallet Withdraw ";
     try {
@@ -239,12 +245,12 @@ export async function reimbursementWalletWithdraw(
                 owaspUtils.toBN( nReimbursementWithdraw ).toHexString() )
         ];
         const gasPrice = await transactionCustomizerMainNet.computeGasPrice(
-            ethersProviderMainNet, 200000000000 );
+            ethersProviderMainNet, owaspUtils.toBN( 200000000000 ) );
         details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const estimatedGas = await transactionCustomizerMainNet.computeGas(
             details, ethersProviderMainNet,
             "CommunityPool", joCommunityPool, "withdrawFunds", arrArguments,
-            joAccountMN, strActionName, gasPrice, 3000000 );
+            joAccountMN, strActionName, gasPrice, owaspUtils.toBN( 3000000 ) );
         details.trace( "{p}Using estimated gas={}", strLogPrefix, estimatedGas );
         const isIgnore = false;
         const strErrorOfDryRun = await imaTx.dryRunCall(
@@ -255,11 +261,10 @@ export async function reimbursementWalletWithdraw(
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
-        const joReceipt = await imaTx.payedCall(
+        const joReceipt: state.TSameAsTransactionReceipt = await imaTx.payedCall(
             details, ethersProviderMainNet,
             "CommunityPool", joCommunityPool, "withdrawFunds", arrArguments,
-            joAccountMN, strActionName,
-            gasPrice, estimatedGas );
+            joAccountMN, strActionName, gasPrice, estimatedGas );
         if( joReceipt ) {
             jarrReceipts.push( {
                 description: "reimbursementWalletWithdraw",
@@ -289,10 +294,10 @@ export async function reimbursementSetRange(
     chainIdSChain: string,
     transactionCustomizerSChain: imaTx.TransactionCustomizer,
     strChainNameOriginChain: string,
-    nReimbursementRange: any
-): Promise<any> {
+    nReimbursementRange: number
+): Promise<boolean> {
     const details = log.createMemoryStream();
-    const jarrReceipts: any = [];
+    const jarrReceipts: state.TReceiptDescription[] = [];
     let strActionName = "";
     const strLogPrefix = "Gas Reimbursement - Set Minimal time interval from S2M transfers ";
     try {
@@ -304,12 +309,12 @@ export async function reimbursementSetRange(
             owaspUtils.ensureStartsWith0x( owaspUtils.toBN( nReimbursementRange ).toHexString() )
         ];
         const gasPrice = await transactionCustomizerSChain.computeGasPrice(
-            ethersProviderSChain, 200000000000 );
+            ethersProviderSChain, owaspUtils.toBN( 200000000000 ) );
         details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const estimatedGas = await transactionCustomizerSChain.computeGas(
             details, ethersProviderSChain,
             "CommunityLocker", joCommunityLocker, "setTimeLimitPerMessage", arrArguments,
-            joAccountSC, strActionName, gasPrice, 3000000 );
+            joAccountSC, strActionName, gasPrice, owaspUtils.toBN( 3000000 ) );
         details.trace( "{p}Using estimated gas={}", strLogPrefix, estimatedGas );
         const isIgnore = false;
         const strErrorOfDryRun = await imaTx.dryRunCall(
@@ -320,7 +325,7 @@ export async function reimbursementSetRange(
             throw new Error( strErrorOfDryRun );
 
         const opts: imaTx.TCustomPayedCallOptions = { isCheckTransactionToSchain: true };
-        const joReceipt = await imaTx.payedCall(
+        const joReceipt: state.TSameAsTransactionReceipt = await imaTx.payedCall(
             details, ethersProviderSChain,
             "CommunityLocker", joCommunityLocker, "setTimeLimitPerMessage", arrArguments,
             joAccountSC, strActionName, gasPrice, estimatedGas, undefined, opts );

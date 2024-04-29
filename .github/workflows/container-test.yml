@@ -379,7 +379,7 @@ jobs:
         export NO_ANSI_COLORS=1
         node ./index.js
 
-    - name: RUN - full test - one SKALED and one IMA Agent are down
+    - name: RUN - full test - Main Net connectivity problems testing
       working-directory: ${{env.working-directory}}
       run: |
         export IMA_AGENT_ROOT_DIR=$(pwd)

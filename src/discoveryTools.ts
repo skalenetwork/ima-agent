@@ -29,6 +29,18 @@ import * as state from "./state.js";
 import * as imaUtils from "./utils.js";
 import * as threadInfo from "./threadInfo.js";
 import * as owaspUtils from "./owaspUtils.js";
+import type * as clpTools from "./clpTools.js";
+import type * as rpcCallFormats from "./rpcCallFormats.js";
+
+export interface TRPCOutputFieldsDiscoverSkaleImaInfoResult {
+    result: TNodeImaInfo
+    error?: string
+}
+
+export interface TRPCOutputFieldsDiscoverSChainNetworkInfo {
+    result: TSChainNetworkInfo
+    error?: string
+}
 
 export type TFunctionAfterDiscovery = (
     err?: Error | string | null,
@@ -64,11 +76,18 @@ export interface TPWAStateItem {
     ts: number
 }
 
+export interface TMapValueItemS2S {
+    isInProgress: boolean
+    ts: number
+}
+
+export type TMapS2S = Record<number, TMapValueItemS2S>;
+
 export interface TPWAState {
     oracle: TPWAStateItem
     m2s: TPWAStateItem
     s2m: TPWAStateItem
-    s2s: { mapS2S: any }
+    s2s: { mapS2S: TMapS2S }
 }
 
 export interface TSChainNode {
@@ -132,7 +151,10 @@ export interface TDiscoveryOptions {
     nCountAvailable: number
 }
 
-export function formatBalanceInfo( bi: any, strAddress: string ): string {
+export function formatBalanceInfo(
+    bi: clpTools.TBalanceDescription,
+    strAddress: state.TAddress
+): string {
     let s = "";
     s += log.fmtInformation( "{p}", bi.assetName );
     if( "assetAddress" in bi &&
@@ -145,8 +167,8 @@ export function formatBalanceInfo( bi: any, strAddress: string ): string {
         ? log.fmtInformation( "{p}", bi.owner )
         : log.fmtInformation( "{p}", bi.balance );
     if( bi.assetName == "ERC721" ) {
-        const isSame =
-            ( bi.owner.trim().toLowerCase() == strAddress.trim().toLowerCase() );
+        const isSame = ( bi.owner && strAddress &&
+            bi.owner.trim().toLowerCase() == strAddress.trim().toLowerCase() );
         s += " " + ( isSame
             ? log.fmtSuccess( "same (as account {} specified in the command line arguments)",
                 strAddress )
@@ -226,7 +248,7 @@ export function getSChainDiscoveredNodesCount(
 export async function waitUntilSChainStarted(): Promise<void> {
     const imaState: state.TIMAState = state.get();
     log.debug( "Checking S-Chain is accessible and sane..." );
-    if( ( !imaState.chainProperties.sc.strURL ) ||
+    if( !imaState.chainProperties.sc.strURL ||
         imaState.chainProperties.sc.strURL.length === 0
     ) {
         log.warning( "Skipped, S-Chain URL was not provided." );
@@ -246,7 +268,7 @@ export async function waitUntilSChainStarted(): Promise<void> {
                 log.critical( "S-Chain network discovery attempt failed: {err}", err );
                 isError = true;
             } );
-            if( ( !isError ) && joSChainNetworkInfo && typeof joSChainNetworkInfo === "object" ) {
+            if( !isError && joSChainNetworkInfo && typeof joSChainNetworkInfo === "object" ) {
                 imaState.joSChainNetworkInfo = joSChainNetworkInfo;
                 bSuccess = true;
             }
@@ -269,7 +291,7 @@ export function isSendImaAgentIndex(): boolean {
     return true;
 }
 
-let gTimerSChainDiscovery: any = null;
+let gTimerSChainDiscovery: ReturnType<typeof setInterval> | null = null;
 let gFlagIsInSChainDiscovery: boolean = false;
 
 function composeStillUnknownNodesMessage(
@@ -436,7 +458,9 @@ export async function continueSChainDiscoveryInBackgroundIfNeeded(
 
 function handleDiscoverSkaleImaInfoResult(
     optsDiscover: TDiscoveryOptions, strNodeDescColorized: string,
-    joNode: any, joCall: rpcCall.TRPCCall, joIn: any, joOut: any
+    joNode: TSChainNode, joCall: rpcCall.TRPCCall,
+    joIn: rpcCallFormats.TRPCInputBasicFieldsWithParams,
+    joOut: TRPCOutputFieldsDiscoverSkaleImaInfoResult
 ): void {
     joNode.imaInfo = joOut.result;
     if( isSChainNodeFullyDiscovered( joNode ) )
@@ -452,7 +476,7 @@ async function discoverSChainWalkNodes( optsDiscover: TDiscoveryOptions ): Promi
     optsDiscover.cntFailed = 0;
     for( let i = 0; i < optsDiscover.cntNodes; ++i ) {
         const nCurrentNodeIdx = owaspUtils.toInteger( i );
-        const joNode = optsDiscover.jarrNodes[nCurrentNodeIdx];
+        const joNode: TSChainNode = optsDiscover.jarrNodes[nCurrentNodeIdx];
         const strNodeURL = imaUtils.composeSChainNodeUrl( joNode );
         const strNodeDescColorized = log.fmtAttention( "#{}({url})", nCurrentNodeIdx, strNodeURL );
         if( !optsDiscover.isSilentReDiscovery ) {
@@ -482,10 +506,11 @@ async function discoverSChainWalkNodes( optsDiscover: TDiscoveryOptions ): Promi
             joCall = await rpcCall.create( strNodeURL, rpcCallOpts );
             if( !joCall )
                 throw new Error( `Failed to create JSON RPC call object to ${strNodeURL}` );
-            const joIn: any = { method: "skale_imaInfo", params: { } };
+            const joIn: rpcCallFormats.TRPCInputBasicFieldsWithParams =
+                { method: "skale_imaInfo", params: { } };
             if( isSendImaAgentIndex() )
                 joIn.params.fromImaAgentIndex = optsDiscover.imaState.nNodeNumber;
-            const joOut = await joCall.call( joIn );
+            const joOut: TRPCOutputFieldsDiscoverSkaleImaInfoResult = await joCall.call( joIn );
             handleDiscoverSkaleImaInfoResult(
                 optsDiscover, strNodeDescColorized, joNode, joCall, joIn, joOut );
         } catch ( err ) {
@@ -571,7 +596,10 @@ async function discoverSChainWait( optsDiscover: TDiscoveryOptions ): Promise<vo
 
 async function handleDiscoverSkaleNodesRpcInfoResult(
     optsDiscover: TDiscoveryOptions, scURL: string,
-    joCall: rpcCall.TRPCCall, joIn: any, joOut: any ): Promise<boolean> {
+    joCall: rpcCall.TRPCCall,
+    joIn: rpcCallFormats.TRPCInputBasicFieldsWithParams,
+    joOut: TRPCOutputFieldsDiscoverSChainNetworkInfo
+): Promise<boolean> {
     if( !optsDiscover.isSilentReDiscovery ) {
         log.trace( "{p}OK, got (own) S-Chain network information: {}",
             optsDiscover.strLogPrefix, joOut.result );
@@ -642,12 +670,12 @@ async function handleDiscoverSkaleNodesRpcInfoResult(
 
 export async function discoverSChainNetwork(
     fnAfter: TFunctionAfterDiscovery | null, isSilentReDiscovery: boolean,
-    joPrevSChainNetworkInfo: any, nCountToWait: number
+    joPrevSChainNetworkInfo: TSChainNetworkInfo | null, nCountToWait: number
 ): Promise<TSChainNetworkInfo | null> {
     const optsDiscover: TDiscoveryOptions = {
         fnAfter,
-        isSilentReDiscovery: ( !!isSilentReDiscovery ),
-        joPrevSChainNetworkInfo: joPrevSChainNetworkInfo || null,
+        isSilentReDiscovery: !!isSilentReDiscovery,
+        joPrevSChainNetworkInfo: joPrevSChainNetworkInfo ?? null,
         nCountToWait,
         imaState: state.get(),
         strLogPrefix: "S-Chain network discovery: ",
@@ -671,10 +699,11 @@ export async function discoverSChainNetwork(
         joCall = await rpcCall.create( scURL, rpcCallOpts );
         if( !joCall )
             throw new Error( `Failed to create JSON RPC call object to ${scURL}` );
-        const joIn: any = { method: "skale_nodesRpcInfo", params: { } };
+        const joIn: rpcCallFormats.TRPCInputBasicFieldsWithParams =
+            { method: "skale_nodesRpcInfo", params: { } };
         if( isSendImaAgentIndex() )
             joIn.params.fromImaAgentIndex = optsDiscover.imaState.nNodeNumber;
-        const joOut = await joCall.call( joIn );
+        const joOut: TRPCOutputFieldsDiscoverSChainNetworkInfo = await joCall.call( joIn );
         await handleDiscoverSkaleNodesRpcInfoResult(
             optsDiscover, scURL, joCall, joIn, joOut
         ).catch( function( err: Error | string ): void {
@@ -699,7 +728,7 @@ export async function discoverSChainNetwork(
     return optsDiscover.joSChainNetworkInfo;
 }
 
-let gIntervalPeriodicDiscovery: any = null;
+let gIntervalPeriodicDiscovery: ReturnType<typeof setInterval> | null = null;
 
 function checkPeriodicDiscoveryNoLongerNeeded(
     joSChainNetworkInfo: TSChainNetworkInfo | null, isSilentReDiscovery: boolean

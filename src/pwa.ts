@@ -30,6 +30,18 @@ import * as imaUtils from "./utils.js";
 import type * as state from "./state.js";
 import type * as discoveryTools from "./discoveryTools.js";
 import * as owaspUtils from "./owaspUtils.js";
+import type * as rpcCallFormats from "./rpcCallFormats.js";
+
+export interface TRPCInputIMANotifyLoopWork extends rpcCallFormats.TRPCInputBasicFields {
+    params: {
+        nNodeNumber: number
+        strLoopWorkType: string
+        nIndexS2S: number
+        isStart: boolean
+        ts: number
+        signature: imaBLS.TSignResult | null
+    }
+}
 
 function computeWalkNodeIndices( nNodeNumber: number, nNodesCount: number ): number[] {
     if( nNodeNumber === null || nNodeNumber === undefined ||
@@ -67,7 +79,7 @@ export function checkLoopWorkTypeStringIsCorrect( strLoopWorkType: string ): boo
     return false;
 }
 
-function composeEmptyStateForPendingWorkAnalysis(): any {
+function composeEmptyStateForPendingWorkAnalysis(): discoveryTools.TPWAState {
     return {
         oracle: { isInProgress: false, ts: 0 },
         m2s: { isInProgress: false, ts: 0 },
@@ -77,7 +89,8 @@ function composeEmptyStateForPendingWorkAnalysis(): any {
 }
 
 function getNodeProgressAndTimestamp(
-    joNode: discoveryTools.TSChainNode, strLoopWorkType: string, nIndexS2S: number ): any {
+    joNode: discoveryTools.TSChainNode, strLoopWorkType: string, nIndexS2S: number
+): discoveryTools.TMapValueItemS2S {
     if( !( "pwaState" in joNode ) )
         joNode.pwaState = composeEmptyStateForPendingWorkAnalysis();
     strLoopWorkType = strLoopWorkType.toLowerCase();
@@ -122,7 +135,8 @@ export async function checkOnLoopStart(
         for( let i = 0; i < arrWalkNodeIndices.length; ++i ) {
             const walkNodeIndex = arrWalkNodeIndices[i];
             const joNode = jarrNodes[walkNodeIndex];
-            const joProps: any = getNodeProgressAndTimestamp( joNode, strLoopWorkType, nIndexS2S );
+            const joProps: discoveryTools.TMapValueItemS2S =
+                getNodeProgressAndTimestamp( joNode, strLoopWorkType, nIndexS2S );
             if( joProps && typeof joProps === "object" &&
                 "isInProgress" in joProps && joProps.isInProgress &&
                 joProps.ts != 0 && nUtcUnixTimeStamp >= joProps.ts
@@ -162,11 +176,11 @@ export async function checkOnLoopStart(
 
 export async function handleLoopStateArrived(
     imaState: state.TIMAState, nNodeNumber: number, strLoopWorkType: string, nIndexS2S: number,
-    isStart: boolean, ts: any, signature: any
+    isStart: boolean, ts: number, signature: imaBLS.TSignResult | null
 ): Promise<boolean> {
     const se = isStart ? "start" : "end";
     let isSuccess = false;
-    let joNode: any = null;
+    let joNode: discoveryTools.TSChainNode | null = null;
     try {
         if( !checkLoopWorkTypeStringIsCorrect( strLoopWorkType ) )
             throw new Error( `Specified value ${strLoopWorkType} is not a correct loop work type` );
@@ -181,8 +195,11 @@ export async function handleLoopStateArrived(
         const jarrNodes = imaState.joSChainNetworkInfo.network;
         if( !jarrNodes )
             throw new Error( "S-Chain network info is not available yet to PWA" );
+        if( !signature )
+            throw new Error( "no PWA signature to handle and verify" );
         joNode = jarrNodes[nNodeNumber];
-        const joProps: any = getNodeProgressAndTimestamp( joNode, strLoopWorkType, nIndexS2S );
+        const joProps: discoveryTools.TMapValueItemS2S =
+        getNodeProgressAndTimestamp( joNode, strLoopWorkType, nIndexS2S );
         if( imaState.isPrintPWA ) {
             log.trace( "PWA loop-{} state arrived for node {}, PWA state {}, arrived " +
                 "signature is {}", se, nNodeNumber, joNode.pwaState, signature );
@@ -193,7 +210,7 @@ export async function handleLoopStateArrived(
             strMessageHash, nNodeNumber, signature, imaState.isPrintPWA );
         if( !isSignatureOK )
             throw new Error( "BLS verification failed" );
-        joProps.isInProgress = ( !!isStart );
+        joProps.isInProgress = !!isStart;
         joProps.ts = owaspUtils.toInteger( ts );
         if( imaState.isPrintPWA ) {
             log.success(
@@ -236,7 +253,8 @@ async function notifyOnLoopImpl(
         const strMessageHash = imaBLS.keccak256ForPendingWorkAnalysis(
             owaspUtils.toInteger( imaState.nNodeNumber ),
             strLoopWorkType, isStart, nUtcUnixTimeStamp );
-        const signature = await imaBLS.doSignReadyHash( strMessageHash, imaState.isPrintPWA );
+        const signature: imaBLS.TSignResult | null =
+            await imaBLS.doSignReadyHash( strMessageHash, imaState.isPrintPWA );
         await handleLoopStateArrived(
             imaState, imaState.nNodeNumber, strLoopWorkType,
             nIndexS2S, isStart, nUtcUnixTimeStamp, signature
@@ -260,7 +278,7 @@ async function notifyOnLoopImpl(
                     } );
             if( !joCall )
                 return false;
-            const joIn: any = {
+            const joIn: TRPCInputIMANotifyLoopWork = {
                 method: "skale_imaNotifyLoopWork",
                 params: {
                     nNodeNumber: owaspUtils.toInteger( imaState.nNodeNumber ),

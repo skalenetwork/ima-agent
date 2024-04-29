@@ -27,11 +27,11 @@ import * as log from "./log.js";
 import * as imaHelperAPIs from "./imaHelperAPIs.js";
 import * as imaTx from "./imaTx.js";
 import * as threadInfo from "./threadInfo.js";
-import type * as owaspUtils from "./owaspUtils.js";
+import * as owaspUtils from "./owaspUtils.js";
 import type * as state from "./state.js";
 
 export async function invokeHasChain(
-    details: log.TLogger,
+    details: log.TLoggerBase,
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider, // Main-Net or S-Chin
     joLinker: owaspUtils.ethersMod.Contract, // Main-Net or S-Chin
     joAccount: state.TAccount, // Main-Net or S-Chin
@@ -54,7 +54,7 @@ export async function invokeHasChain(
 }
 
 export async function waitForHasChain(
-    details: log.TLogger,
+    details: log.TLoggerBase,
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider, // Main-Net or S-Chin
     joLinker: owaspUtils.ethersMod.Contract, // Main-Net or S-Chin
     joAccount: state.TAccount, // Main-Net or S-Chin
@@ -135,9 +135,9 @@ export async function registerSChainInDepositBoxes( // step 1
     transactionCustomizerMainNet: imaTx.TransactionCustomizer,
     cntWaitAttempts?: number,
     nSleepMilliseconds?: number
-): Promise<any> {
+): Promise< state.TReceiptDescription[]> {
     const details = log.createMemoryStream();
-    const jarrReceipts: any[] = [];
+    const jarrReceipts: state.TReceiptDescription[] = [];
     details.debug( "Main-net Linker address is..........{}", joLinker ? joLinker.address : "N/A" );
     details.debug( "S-Chain ID is.......................{}", chainNameSChain );
     const strLogPrefix = "Reg S in depositBoxes: ";
@@ -175,11 +175,11 @@ export async function registerSChainInDepositBoxes( // step 1
                 joTokenManagerERC721WithMetadata.address // call params
             ] ];
         const gasPrice = await transactionCustomizerMainNet.computeGasPrice(
-            ethersProviderMainNet, 200000000000 );
+            ethersProviderMainNet, owaspUtils.toBN( 200000000000 ) );
         details.trace( "{p}Using computed gasPrice={}", strLogPrefix, gasPrice );
         const estimatedGas = await transactionCustomizerMainNet.computeGas( details,
             ethersProviderMainNet, "Linker", joLinker, "connectSchain", arrArguments,
-            joAccountMN, strActionName, gasPrice, 3000000 );
+            joAccountMN, strActionName, gasPrice, owaspUtils.toBN( 3000000 ) );
         details.trace( "{p}Using estimated gas={}", strLogPrefix, estimatedGas );
         const isIgnore = false;
         const strErrorOfDryRun = await imaTx.dryRunCall( details, ethersProviderMainNet,
@@ -189,11 +189,9 @@ export async function registerSChainInDepositBoxes( // step 1
         if( strErrorOfDryRun )
             throw new Error( strErrorOfDryRun );
 
-        const joReceipt = await imaTx.payedCall(
-            details, ethersProviderMainNet,
-            "Linker", joLinker, "connectSchain", arrArguments,
-            joAccountMN, strActionName,
-            gasPrice, estimatedGas );
+        const joReceipt: state.TSameAsTransactionReceipt = await imaTx.payedCall(
+            details, ethersProviderMainNet, "Linker", joLinker, "connectSchain", arrArguments,
+            joAccountMN, strActionName, gasPrice, estimatedGas );
         if( joReceipt ) {
             jarrReceipts.push( {
                 description: "registerSChainInDepositBoxes",
@@ -212,7 +210,7 @@ export async function registerSChainInDepositBoxes( // step 1
         details.exposeDetailsTo(
             log.globalStream(), "registerSChainInDepositBoxes", false );
         details.close();
-        return null;
+        return [];
     }
     if( log.exposeDetailsGet() ) {
         details.exposeDetailsTo(

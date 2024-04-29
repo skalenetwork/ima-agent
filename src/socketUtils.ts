@@ -59,16 +59,16 @@ export const randomString = function(
         return "";
     isABC = ( isABC == null || isABC == undefined )
         ? true
-        : ( !!isABC );
+        : !!isABC;
     isDigits = ( isDigits == null || isDigits == undefined )
         ? false
-        : ( !!isDigits );
+        : !!isDigits;
     isSpecChr = ( isSpecChr == null || isSpecChr == undefined )
         ? false
-        : ( !!isSpecChr );
+        : !!isSpecChr;
     isPunctuation = ( isPunctuation == null || isPunctuation == undefined )
         ? false
-        : ( !!isPunctuation );
+        : !!isPunctuation;
     let arrCharacters = "";
     if( isABC )
         arrCharacters += "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -199,9 +199,9 @@ export const formatDateTime = function(
         return "undefined-date-time";
     if( !( dt instanceof Date ) )
         return "not-a-date-time";
-    isDate = ( isDate == null || isDate == undefined ) ? true : ( !!isDate );
-    isTime = ( isTime == null || isTime == undefined ) ? true : ( !!isTime );
-    if( ( !isDate ) && ( !isTime ) )
+    isDate = ( isDate == null || isDate == undefined ) ? true : !!isDate;
+    isTime = ( isTime == null || isTime == undefined ) ? true : !!isTime;
+    if( !isDate && !isTime )
         return "";
     let s = "";
     if( isDate ) {
@@ -232,7 +232,7 @@ export const formatDateTime = function(
             zeroPaddingLeft( dt.getSeconds(), 2 );
         isMilliseconds = ( isMilliseconds == null || isMilliseconds == undefined )
             ? true
-            : ( !!isMilliseconds );
+            : !!isMilliseconds;
         if( isMilliseconds ) {
             sepMilliseconds =
                 ( sepMilliseconds == null ||
