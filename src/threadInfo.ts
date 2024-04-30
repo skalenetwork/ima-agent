@@ -41,7 +41,7 @@ export function getCurrentThreadID(): number {
 }
 
 export function isMainThread(): boolean {
-    return ( !!( worker_threads.isMainThread ) );
+    return !!worker_threads.isMainThread;
 }
 
 export function threadDescription( isColorized?: boolean ): string {

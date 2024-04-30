@@ -2,6 +2,8 @@ import * as fs from "fs";
 import * as log from "./log.js";
 import * as owaspUtils from "./owaspUtils.js";
 import * as rpcCall from "./rpcCall.js";
+import type * as rpcCallFormats from "./rpcCallFormats.js";
+import { type TSameAsTransactionReceipt, type TExpandedECDSA } from "./state.js";
 
 const gIsDebugLogging = false; // development option only, must be always false
 log.addStdout();
@@ -9,20 +11,28 @@ log.addStdout();
 // allow self-signed wss and https
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
-function finalizeOutput( jo: any ): void {
+export interface TRPCInputECDSASignMessageHash extends rpcCallFormats.TRPCInputBasicFields {
+    params: {
+        keyName: string
+        messageHash: string
+        base: number
+    }
+}
+
+function finalizeOutput( jo: TSameAsTransactionReceipt | { error: string } | null ): void {
     if( !jo )
         return;
     process.stdout.write( log.fmtInformation( "{}", jo ) );
 }
 
-function postConvertBN( jo: any, name: any ): void {
+function postConvertBN( jo: TSameAsTransactionReceipt, name: string ): void {
     if( !jo )
         return;
     if( !( name in jo ) )
         return;
-    if( typeof jo[name] !== "object" )
+    if( typeof ( jo as any )[name] !== "object" )
         return;
-    jo[name] = owaspUtils.toHexStringSafe( jo[name] );
+    ( jo as any )[name] = owaspUtils.toHexStringSafe( ( jo as any )[name] );
 }
 
 async function run(): Promise<void> {
@@ -69,14 +79,14 @@ async function run(): Promise<void> {
             log.debug( "Path to SGX key file is {}", strPathKey );
         const ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider =
             owaspUtils.getEthersProviderFromURL( strURL );
-        const tx: any = {
+        const tx: owaspUtils.ethersMod.PopulatedTransaction = {
             data: tcData,
             to: txTo,
             value: owaspUtils.toBN( txValue ),
             chainId: owaspUtils.parseIntOrHex( chainId ),
             gasPrice: owaspUtils.toBN( gasPrice ),
             gasLimit: owaspUtils.toBN( gasLimit ),
-            nonce: owaspUtils.toBN( txNonce )
+            nonce: owaspUtils.toBN( txNonce ).toNumber()
         };
         if( gIsDebugLogging )
             log.debug( "--- Source TX ---> {}", tx );
@@ -95,7 +105,7 @@ async function run(): Promise<void> {
         const joCall: rpcCall.TRPCCall = await rpcCall.create( strSgxWalletURL, rpcCallOpts );
         if( !joCall )
             throw new Error( `Failed to create JSON RPC call object to ${strSgxWalletURL}` );
-        const joIn: any = {
+        const joIn: TRPCInputECDSASignMessageHash = {
             method: "ecdsaSignMessageHash",
             params: {
                 keyName: strSgxKeyName.toString(),
@@ -103,14 +113,14 @@ async function run(): Promise<void> {
                 base: 16
             }
         };
-        const joOut: any = await joCall.call( joIn );
+        const joOut = await joCall.call( joIn );
         try {
             if( gIsDebugLogging )
                 log.debug( "SGX wallet ECDSA sign result is: {}", joOut );
 
             const v = parseInt( joOut.result.signature_v );
             const ethV = v + owaspUtils.parseIntOrHex( chainId ) * 2 + 35;
-            const joExpanded = {
+            const joExpanded: TExpandedECDSA = {
                 recoveryParam: v,
                 v: ethV,
                 r: joOut.result.signature_r,
@@ -127,7 +137,8 @@ async function run(): Promise<void> {
             if( gIsDebugLogging )
                 log.debug( "--- Raw-sent transaction result ---> {}", sr );
 
-            const joReceipt: any = await ethersProvider.waitForTransaction( sr.hash );
+            const joReceipt: TSameAsTransactionReceipt =
+            await ethersProvider.waitForTransaction( sr.hash );
             if( gIsDebugLogging )
                 log.debug( "--- Transaction receipt ---> {}", joReceipt );
             joReceipt.chainId = tx.chainId;

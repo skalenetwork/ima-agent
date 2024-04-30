@@ -2,6 +2,84 @@ import * as owaspUtils from "./owaspUtils.js";
 import * as imaTx from "./imaTx.js";
 import type * as discoveryTools from "./discoveryTools.js";
 
+export type TLoadedJSON = any;
+
+export type TAddress = string;
+export type TBalance = owaspUtils.ethersMod.BigNumber;
+export type TTokenID = string;
+
+export interface TAdditionalSummaryInTransactionReceipt {
+    bnGasSpent: owaspUtils.ethersMod.BigNumber
+    gasSpent: string
+    ethSpent: string
+}
+
+export interface TExpandedECDSA {
+    recoveryParam: number
+    v: number
+    r: string
+    s: string
+}
+
+export interface TSameAsTransactionReceipt {
+    to: string
+    from: string
+    contractAddress: string
+    transactionIndex: number
+    root?: string
+    gasUsed: owaspUtils.ethersMod.BigNumber
+    logsBloom: string
+    blockHash: string
+    transactionHash: string
+    logs: owaspUtils.ethersMod.providers.Log[]
+    blockNumber: number
+    confirmations: number
+    cumulativeGasUsed: owaspUtils.ethersMod.BigNumber
+    effectiveGasPrice: owaspUtils.ethersMod.BigNumber
+    byzantium: boolean
+    type: number
+    status?: number
+    summary?: TAdditionalSummaryInTransactionReceipt
+
+    chainId?: number
+    rawTX?: string
+    signature?: TExpandedECDSA
+
+    error?: Error | string | null
+}
+
+export interface TReceiptDescription {
+    description: string
+    "optsTransfer.detailsString"?: string
+    receipt: TSameAsTransactionReceipt
+}
+
+export interface TQAInformation {
+    skaledNumber: number
+    sequenceId: string
+    ts: string
+}
+
+export interface TIMAMessage {
+    sender: TAddress
+    destinationContract: TAddress
+    to?: TAddress
+    amount?: number
+    data: string
+    savedBlockNumberForOptimizations?: owaspUtils.ethersMod.BigNumber
+}
+
+export interface TIMAOutgoingMessage {
+    dstChainHash: string
+    msgCounter: number
+    srcContract: TAddress
+    dstContract: TAddress
+    data: string
+    to?: TAddress
+    amount?: number
+    savedBlockNumberForOptimizations?: owaspUtils.ethersMod.BigNumber
+}
+
 export interface TLoopStateSubPart {
     isInProgress: boolean
     wasInProgress: boolean
@@ -38,10 +116,12 @@ export const gDefaultValueForLoopState: TLoopState = {
     }
 };
 
+export type TFnAccountAddress = () => string;
+
 export interface TAccount {
     address_?: string
     privateKey: string | null
-    address: any
+    address: TFnAccountAddress
     strTransactionManagerURL: string
     nTmPriority: number
     strSgxURL: string
@@ -59,11 +139,11 @@ export interface TOneChainProperties {
     strChainName: string
     chainId: string | number
     strPathAbiJson: string
-    joAbiIMA: any
+    joAbiIMA: TLoadedJSON
     bHaveAbiIMA: boolean
-    joErc20: any | null
-    joErc721: any | null
-    joErc1155: any | null
+    joErc20: TLoadedJSON | null
+    joErc721: TLoadedJSON | null
+    joErc1155: TLoadedJSON | null
     strCoinNameErc20: string // in-JSON coin name
     strCoinNameErc721: string // in-JSON coin name
     strCoinNameErc1155: string // in-JSON coin name
@@ -76,6 +156,12 @@ export interface TPropertiesOfChains {
     mn: TOneChainProperties
     sc: TOneChainProperties
     tc: TOneChainProperties
+}
+
+export interface TAccountConnectivityInfo {
+    isBad: boolean
+    strType: string
+    isAutoSend: boolean
 }
 
 function constructChainProperties(): TPropertiesOfChains {
@@ -237,11 +323,11 @@ export interface TIMAState {
     bNoWaitSChainStarted: boolean
     nMaxWaitSChainAttempts: number // 20
 
-    nAmountOfWei: any
-    nAmountOfToken: any
-    arrAmountsOfTokens: any[] | null
-    idToken: any
-    idTokens: any[] | null
+    nAmountOfWei: TBalance
+    nAmountOfToken: TBalance
+    arrAmountsOfTokens: TBalance[] | null
+    idToken: TTokenID
+    idTokens: TTokenID[] | null
 
     nTransferBlockSizeM2S: number
     nTransferBlockSizeS2M: number
@@ -313,7 +399,7 @@ export interface TIMAState {
     chainProperties: TPropertiesOfChains
 
     strPathAbiJsonSkaleManager: string
-    joAbiSkaleManager: any
+    joAbiSkaleManager: TLoadedJSON
     bHaveSkaleManagerABI: boolean
 
     strChainNameOriginChain: string
@@ -333,8 +419,8 @@ export interface TIMAState {
 
     strReimbursementChain: string
     isShowReimbursementBalance: boolean
-    nReimbursementRecharge: string | number | null
-    nReimbursementWithdraw: string | number | null
+    nReimbursementRecharge: TBalance | null
+    nReimbursementWithdraw: TBalance | null
     nReimbursementRange: number // < 0 - do not change anything
     isReimbursementEstimate?: boolean
 
@@ -357,7 +443,7 @@ export interface TIMAState {
 
     arrActions: TIMAAction[] // array of actions to run
 
-    receiver?: any | null
+    receiver?: TAddress | null
 
     haveOneTokenIdentifier: boolean
     haveArrayOfTokenIdentifiers: boolean
@@ -401,10 +487,10 @@ export function get(): TIMAState {
         bNoWaitSChainStarted: false,
         nMaxWaitSChainAttempts: Number.MAX_SAFE_INTEGER, // 20
 
-        nAmountOfWei: 0,
-        nAmountOfToken: 0,
+        nAmountOfWei: owaspUtils.toBN( 0 ),
+        nAmountOfToken: owaspUtils.toBN( 0 ),
         arrAmountsOfTokens: null,
-        idToken: 0,
+        idToken: "",
         idTokens: null,
 
         nTransferBlockSizeM2S: 4,
@@ -487,8 +573,8 @@ export function get(): TIMAState {
 
         strReimbursementChain: "",
         isShowReimbursementBalance: false,
-        nReimbursementRecharge: 0,
-        nReimbursementWithdraw: 0,
+        nReimbursementRecharge: owaspUtils.toBN( 0 ),
+        nReimbursementWithdraw: owaspUtils.toBN( 0 ),
         nReimbursementRange: -1, // < 0 - do not change anything
 
         joSChainDiscovery: {
@@ -527,6 +613,6 @@ export function isPreventExitAfterLastAction(): boolean {
     return gFlagIsPreventExitAfterLastAction;
 }
 
-export function setPreventExitAfterLastAction( isPrevent: any ): void {
-    gFlagIsPreventExitAfterLastAction = ( !!isPrevent );
+export function setPreventExitAfterLastAction( isPrevent?: boolean ): void {
+    gFlagIsPreventExitAfterLastAction = !!isPrevent;
 }

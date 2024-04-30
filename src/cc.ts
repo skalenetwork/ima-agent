@@ -23,6 +23,9 @@
  * @copyright SKALE Labs 2019-Present
  */
 
+export declare type TColorableArgument = any;
+export type TFnColorizer = ( a: TColorableArgument ) => string;
+
 let gFlagIsEnabled: boolean = false;
 
 export function autoEnableFromCommandLineArgs(): void {
@@ -35,7 +38,7 @@ export function enable( b?: boolean ): void {
     gFlagIsEnabled = !!b;
 }
 
-export function isStringAlreadyColorized( s?: any ): boolean {
+export function isStringAlreadyColorized( s?: TColorableArgument ): boolean {
     if( s && typeof s === "string" && s.length > 0 && s[0] == "\x1b" )
         return true;
     return false;
@@ -49,7 +52,7 @@ export function replaceAll( str: string, find: string, replace: string ): string
     return str.replace( new RegExp( find, "g" ), replace );
 }
 
-export function validateRadix( value: any, radix?: any ): boolean {
+export function validateRadix( value: TColorableArgument, radix?: TColorableArgument ): boolean {
     value = ( value ? value.toString() : "10" ).trim();
     radix = ( radix === null || radix === undefined )
         ? ( ( value.length > 2 && value[0] == "0" && ( value[1] == "x" || value[1] == "X" ) )
@@ -59,7 +62,7 @@ export function validateRadix( value: any, radix?: any ): boolean {
     return radix;
 }
 
-export function validateInteger( value: any, radix?: any ): boolean {
+export function validateInteger( value: TColorableArgument, radix?: TColorableArgument ): boolean {
     try {
         if( value === null || value === undefined )
             return false;
@@ -69,9 +72,9 @@ export function validateInteger( value: any, radix?: any ): boolean {
         if( s.length < 1 )
             return false;
         radix = validateRadix( value, radix );
-        if( ( !isNaN( value ) ) &&
+        if( !isNaN( value ) &&
             ( parseInt( value, radix ) == value || radix !== 10 ) &&
-            ( !isNaN( parseInt( value, radix ) ) )
+            !isNaN( parseInt( value, radix ) )
         )
             return true;
     } catch ( err ) {
@@ -79,7 +82,7 @@ export function validateInteger( value: any, radix?: any ): boolean {
     return false;
 }
 
-export function toInteger( value: any, radix?: any ): number {
+export function toInteger( value: TColorableArgument, radix?: TColorableArgument ): number {
     try {
         if( value === 0 || value === 0.0 || value === null || value === undefined )
             return 0;
@@ -93,7 +96,7 @@ export function toInteger( value: any, radix?: any ): number {
     return 0;
 }
 
-export function validateFloat( value: any ): boolean {
+export function validateFloat( value: TColorableArgument ): boolean {
     try {
         if( value === null || value === undefined )
             return false;
@@ -108,7 +111,7 @@ export function validateFloat( value: any ): boolean {
     return false;
 }
 
-export function toFloat( value: any ): number {
+export function toFloat( value: TColorableArgument ): number {
     try {
         if( value === 0 || value === 0.0 || value === null || value === undefined )
             return 0.0;
@@ -119,18 +122,18 @@ export function toFloat( value: any ): number {
     return 0.0;
 }
 
-export function toBoolean( value?: any ): boolean {
+export function toBoolean( value?: TColorableArgument ): boolean {
     let b = false;
     try {
+        if( value === null || value === undefined )
+            return false;
         if( typeof value === "boolean" )
             return value;
         if( typeof value === "string" ) {
             const ch = value[0].toLowerCase();
             if( ch == "y" || ch == "t" )
-                b = true;
-            else if( /^-?\d+$/.test( value ) ) // check string is integer
-                b = !!parseInt( value, 10 );
-            else if( /^-?\d+(?:[.,]\d*?)?$/.test( value ) ) // check string is float
+                b = true; else if( validateInteger( value ) )
+                b = !!toInteger( value ); else if( validateFloat( value ) )
                 b = !!toFloat( value ); else
                 b = !!b;
         } else
@@ -142,24 +145,27 @@ export function toBoolean( value?: any ): boolean {
     return b;
 }
 
-export function yn( flag?: any ): string {
+export function yn( flag?: TColorableArgument ): string {
     if( !gFlagIsEnabled )
         return flag ? "true" : "false";
     return toBoolean( flag ) ? yes( "yes" ) : no( "no" );
 }
 
-export function tf( flag?: any ): string {
+export function tf( flag?: TColorableArgument ): string {
     if( !gFlagIsEnabled )
         return flag ? "true" : "false";
     return toBoolean( flag ) ? yes( "true" ) : no( "false" );
 }
 
-export function onOff( flag?: any ): string {
+export function onOff( flag?: TColorableArgument ): string {
     if( !gFlagIsEnabled )
         return flag ? "true" : "false";
     return toBoolean( flag ) ? yes( "on" ) : no( "off" );
 }
-const gMapColorDefinitions: any = {
+
+export type TMapColorDefinitions = Record<string, string>;
+
+const gMapColorDefinitions: TMapColorDefinitions = {
     reset: "\x1b[0m",
     enlight: "\x1b[1m",
     dim: "\x1b[2m",
@@ -185,7 +191,7 @@ const gMapColorDefinitions: any = {
     bBgWhite: "\x1b[47m"
 };
 
-const gArrRainbowParts: any[] = [
+const gArrRainbowParts: string[] = [
     gMapColorDefinitions.enlight + gMapColorDefinitions.fgRed,
     gMapColorDefinitions.fgRed,
     gMapColorDefinitions.enlight + gMapColorDefinitions.fgYellow,
@@ -207,8 +213,8 @@ export function rainbowPart( s: string, i: number ): string {
     return gArrRainbowParts[j] + s + gMapColorDefinitions.reset;
 }
 
-export function rainbow( s?: any ): string {
-    if( ( !gFlagIsEnabled ) || ( !s ) || ( typeof s !== "string" ) || s.length == 0 )
+export function rainbow( s?: TColorableArgument ): string {
+    if( !gFlagIsEnabled || !s || ( typeof s !== "string" ) || s.length == 0 )
         return s ? s.toString() : JSON.stringify( s );
     let res = "";
     const cnt = s.length;
@@ -217,7 +223,7 @@ export function rainbow( s?: any ): string {
     return res;
 }
 
-export function isInt2( n?: any ): boolean {
+export function isInt2( n?: TColorableArgument ): boolean {
     const intRegex = /^-?\d+$/;
     if( !intRegex.test( n ) )
         return false;
@@ -226,12 +232,12 @@ export function isInt2( n?: any ): boolean {
     return parseFloat( n ) == intVal && !isNaN( intVal );
 }
 
-export function isFloat2( n?: any ): boolean {
+export function isFloat2( n?: TColorableArgument ): boolean {
     const val = parseFloat( n );
     return !isNaN( val );
 }
 
-function urlObjColorized( objURL?: any ): string {
+function urlObjColorized( objURL?: TColorableArgument ): string {
     let strURL = "";
     if( !objURL )
         return strURL;
@@ -255,24 +261,24 @@ function urlObjColorized( objURL?: any ): string {
     return strURL;
 }
 
-export function urlStrColorized( s?: any ): string {
+export function urlStrColorized( s?: TColorableArgument ): string {
     const objURL = safeURL( s );
     if( !objURL )
         return "";
     return urlObjColorized( objURL );
 }
 
-export function urlColorized( x?: any ): string {
+export function urlColorized( x?: TColorableArgument ): string {
     if( typeof x === "string" || x instanceof String )
         return urlStrColorized( x );
     return urlObjColorized( x );
 }
 
-export function u( x?: any ): string {
+export function u( x?: TColorableArgument ): string {
     return urlColorized( x );
 }
 
-export function safeURL( arg?: any ): URL | null {
+export function safeURL( arg?: TColorableArgument ): URL | null {
     try {
         const sc = arg[0];
         if( sc == "\"" || sc == "'" ) {
@@ -281,7 +287,7 @@ export function safeURL( arg?: any ): URL | null {
                 const ss = arg.substring( 1, cnt - 1 );
                 const objURL = safeURL( ss );
                 if( objURL != null && objURL != undefined ) {
-                    const anyURL: any = objURL;
+                    const anyURL: TColorableArgument = objURL;
                     anyURL.strStrippedStringComma = sc;
                 }
 
@@ -296,7 +302,7 @@ export function safeURL( arg?: any ): URL | null {
         if( objURL.hostname.length === 0 )
             return null;
 
-        const anyURL: any = objURL;
+        const anyURL: TColorableArgument = objURL;
         anyURL.strStrippedStringComma = null;
         return objURL;
     } catch ( err ) {
@@ -304,11 +310,11 @@ export function safeURL( arg?: any ): URL | null {
     }
 }
 
-export function toIpv4Arr( s: string ): any[] | null {
+export function toIpv4Arr( s: string ): string[] | null {
     // eslint-disable-next-line max-len
     if( /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test( s ) ) {
         const arr = s.split( "." );
-        if( ( !arr ) || arr.length !== 4 )
+        if( !arr || arr.length !== 4 )
             return null;
 
         return arr;
@@ -316,7 +322,7 @@ export function toIpv4Arr( s: string ): any[] | null {
     return null;
 }
 
-export function logArgToStringAsIpv4( arg?: any ): string {
+export function logArgToStringAsIpv4( arg?: TColorableArgument ): string {
     const arr = toIpv4Arr( arg );
     if( !arr )
         return arg.toString();
@@ -330,7 +336,7 @@ export function logArgToStringAsIpv4( arg?: any ): string {
     return s;
 }
 
-export function logArgToString( ...args: any[] ): string {
+export function logArgToString( ...args: TColorableArgument[] ): string {
     let i;
     const cnt = arguments.length;
     let s = "";
@@ -368,7 +374,7 @@ export function logArgToString( ...args: any[] ): string {
             const objURL = safeURL( arg );
             if( objURL != null && objURL != undefined ) {
                 let strURL = "";
-                const anyURL: any = objURL;
+                const anyURL: TColorableArgument = objURL;
                 if( anyURL.strStrippedStringComma )
                     strURL += normal( anyURL.strStrippedStringComma );
 
@@ -428,9 +434,12 @@ export function logArgToString( ...args: any[] ): string {
     return s;
 }
 
-export const getCircularReplacerForJsonStringify = (): any => {
+export type TFnCircularReplacerForJsonStringify =
+    ( key: TColorableArgument, value: TColorableArgument ) => TColorableArgument;
+
+export const getCircularReplacerForJsonStringify = (): TFnCircularReplacerForJsonStringify => {
     const seen = new WeakSet();
-    return ( key: any, value: any ): any => {
+    return ( key: TColorableArgument, value: TColorableArgument ): TColorableArgument => {
         if( typeof value === "object" && value !== null ) {
             if( seen.has( value ) )
                 return;
@@ -442,9 +451,9 @@ export const getCircularReplacerForJsonStringify = (): any => {
 
 export const jsonColorizer: any = { // see http://jsfiddle.net/unLSJ/
     cntCensoredMax: 30000, // zero to disable censoring
-    censor: ( censor: any ): any => {
+    censor: ( censor: TColorableArgument ): TColorableArgument => {
         let i = 0;
-        return ( key: any, value: any ) => {
+        return ( key: TColorableArgument, value: TColorableArgument ) => {
             if( i !== 0 && typeof ( censor ) === "object" &&
                 typeof ( value ) === "object" && censor == value
             )
@@ -457,7 +466,12 @@ export const jsonColorizer: any = { // see http://jsfiddle.net/unLSJ/
             return value;
         };
     },
-    replacerHTML: ( match?: any, pIndent?: any, pKey?: any, pVal?: any, pEnd?: any ): any => {
+    replacerHTML: (
+        match?: TColorableArgument,
+        pIndent?: TColorableArgument,
+        pKey?: TColorableArgument,
+        pVal?: TColorableArgument,
+        pEnd?: TColorableArgument ): TColorableArgument => {
         const key = "<span class=json-key>";
         const val = "<span class=json-value>";
         const str = "<span class=json-string>";
@@ -470,7 +484,7 @@ export const jsonColorizer: any = { // see http://jsfiddle.net/unLSJ/
 
         return r + ( pEnd || "" );
     },
-    prettyPrintHTML: ( obj?: any ) => {
+    prettyPrintHTML: ( obj?: TColorableArgument ) => {
         const jsonLine = /^( *)("[\w]+": )?("[^"]*"|[\w.+-]*)?([,[{])?$/mg;
         const s =
             JSON.stringify(
@@ -483,7 +497,12 @@ export const jsonColorizer: any = { // see http://jsfiddle.net/unLSJ/
                 .replace( jsonLine, jsonColorizer.replacerHTML );
         return s;
     },
-    replacerConsole: ( match?: any, pIndent?: any, pKey?: any, pVal?: any, pEnd?: any ): any => {
+    replacerConsole: (
+        match?: TColorableArgument,
+        pIndent?: TColorableArgument,
+        pKey?: TColorableArgument,
+        pVal?: TColorableArgument,
+        pEnd?: TColorableArgument ): TColorableArgument => {
         let r = pIndent || "";
         if( pKey )
             r = r + logArgToString( pKey.replace( /[": ]/g, "" ) ) + ": ";
@@ -493,7 +512,7 @@ export const jsonColorizer: any = { // see http://jsfiddle.net/unLSJ/
 
         return r + ( pEnd || "" );
     },
-    prettyPrintConsole: ( obj?: any ): any => {
+    prettyPrintConsole: ( obj?: TColorableArgument ): TColorableArgument => {
         if( !gFlagIsEnabled ) {
             if( obj === null )
                 return "null";
@@ -540,13 +559,13 @@ export const jsonColorizer: any = { // see http://jsfiddle.net/unLSJ/
 // see:
 // http://jsfiddle.net/KJQ9K/554
 // https://qastack.ru/programming/4810841/pretty-print-json-using-javascript
-export function syntaxHighlightJSON( jo?: any, strKeyNamePrefix?: string ): string {
+export function syntaxHighlightJSON( jo?: TColorableArgument, strKeyNamePrefix?: string ): string {
     strKeyNamePrefix = strKeyNamePrefix ?? "";
     jo = jo.replace( /&/g, "&amp;" ).replace( /</g, "&lt;" ).replace( />/g, "&gt;" );
     return jo.replace(
     // eslint-disable-next-line max-len
         /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g,
-        function( match: any ): string {
+        function( match: TColorableArgument ): string {
             if( !gFlagIsEnabled )
                 return match;
             let cls = "number";
@@ -589,7 +608,7 @@ export function syntaxHighlightJSON( jo?: any, strKeyNamePrefix?: string ): stri
         } );
 }
 
-export function safeStringifyJSON( jo?: any, n?: number ): string | undefined {
+export function safeStringifyJSON( jo?: TColorableArgument, n?: number ): string | undefined {
     try {
         const s = JSON.stringify( jo, getCircularReplacerForJsonStringify(), n );
         return s;
@@ -598,11 +617,11 @@ export function safeStringifyJSON( jo?: any, n?: number ): string | undefined {
     return undefined;
 }
 
-export function jn( x?: any ): string {
+export function jn( x?: TColorableArgument ): string {
     return jsonColorizer.prettyPrintConsole( x );
 }
 
-export function j1( x?: any, n?: number, strKeyNamePrefix?: string ): string {
+export function j1( x?: TColorableArgument, n?: number, strKeyNamePrefix?: string ): string {
     let isDefaultKeyNamePrefix = false;
     if( typeof strKeyNamePrefix !== "string" ) {
         strKeyNamePrefix = " ";
@@ -617,7 +636,7 @@ export function j1( x?: any, n?: number, strKeyNamePrefix?: string ): string {
     return s;
 }
 
-export function j( x?: any ): string {
+export function j( x?: TColorableArgument ): string {
     return j1( x ); // jn
 }
 
@@ -670,210 +689,210 @@ export {
     bBgWhite
 };
 
-export function normal( s?: any ): string {
+export function normal( s?: TColorableArgument ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return fgWhite + s + reset;
 }
 
-export function trace( s?: any ): string {
+export function trace( s?: TColorableArgument ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return fgWhite + s + reset;
 }
 
-export function debug( s?: any ): string {
+export function debug( s?: TColorableArgument ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return fgWhite + s + reset;
 }
-export function debugDark( s?: any ): string {
+export function debugDark( s?: TColorableArgument ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return fgBlack + enlight + s + reset;
 }
 
-export function note( s?: any ): string {
+export function note( s?: TColorableArgument ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return fgBlue + s + reset;
 }
 
-export function notice( s?: any ): string {
+export function notice( s?: TColorableArgument ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return fgMagenta + s + reset;
 }
 
-export function info( s?: any ): string {
+export function info( s?: TColorableArgument ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return fgBlue + enlight + s + reset;
 }
 
-export function warning( s?: any ): string {
+export function warning( s?: TColorableArgument ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return fgYellow + s + reset;
 }
 
-export function warn( s?: any ): string {
+export function warn( s?: TColorableArgument ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return fgYellow + s + reset;
 }
 
-export function error( s?: any ): string {
+export function error( s?: TColorableArgument ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return fgRed + s + reset;
 }
 
-export function fatal( s?: any ): string {
+export function fatal( s?: TColorableArgument ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return bgRed + fgYellow + enlight + s + reset;
 }
 
-export function success( s?: any ): string {
+export function success( s?: TColorableArgument ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return fgGreen + enlight + s + reset;
 }
 
-export function attention( s?: any ): string {
+export function attention( s?: TColorableArgument ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return fgCyan + s + reset;
 }
 
-export function bright( s?: any ): string {
+export function bright( s?: TColorableArgument ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return fgWhite + enlight + s + reset;
 }
 
-export function sunny( s?: any ): string {
+export function sunny( s?: TColorableArgument ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return fgYellow + enlight + s + reset;
 }
 
-export function rx( s?: any ): string {
+export function rx( s?: TColorableArgument ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return fgMagenta + s + reset;
 }
 
-export function rxa( s?: any ): string {
+export function rxa( s?: TColorableArgument ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return fgMagenta + enlight + s + reset;
 }
 
-export function tx( s?: any ): string {
+export function tx( s?: TColorableArgument ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return fgGreen + s + reset;
 }
 
-export function txa( s?: any ): string {
+export function txa( s?: TColorableArgument ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return fgGreen + enlight + s + reset;
 }
 
-export function date( s?: any ): string {
+export function date( s?: TColorableArgument ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return fgYellow + s + reset;
 }
 
-export function time( s?: any ): string {
+export function time( s?: TColorableArgument ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return fgMagenta + enlight + s + reset;
 }
 
-export function fracTime( s?: any ): string {
+export function fracTime( s?: TColorableArgument ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return fgMagenta + s + reset;
 }
 
-export function yes( s?: any ): string {
+export function yes( s?: TColorableArgument ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return fgGreen + enlight + s + reset;
 }
 
-export function no( s?: any ): string {
+export function no( s?: TColorableArgument ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return fgRed + s + reset;
 }
 
-export function number( s?: any ): string {
+export function number( s?: TColorableArgument ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return fgBlue + enlight + s + reset;
 }
 
-export function real( s?: any ): string {
+export function real( s?: TColorableArgument ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return fgMagenta + s + reset;
 }
 
-export function undefval( s?: any ): string {
+export function undefval( s?: TColorableArgument ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return fgGreen + enlight + s + reset;
 }
 
-export function nullval( s?: any ): string {
+export function nullval( s?: TColorableArgument ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return fgGreen + enlight + s + reset;
 }
 
-export function nanval( s?: any ): string {
+export function nanval( s?: TColorableArgument ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return fgGreen + enlight + s + reset;
 }
 
-export function yellow( s?: any ): string {
+export function yellow( s?: TColorableArgument ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return fgYellow + s + reset;
 }
 
-export function magenta( s?: any ): string {
+export function magenta( s?: TColorableArgument ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return fgMagenta + s + reset;
 }
 
-export function cla( s?: any ): string {
+export function cla( s?: TColorableArgument ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return fgBlue + dim + s + reset;
 }
 
-export function kk( s?: any ): string {
+export function kk( s?: TColorableArgument ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return fgYellow + enlight + s + reset;
 }
 
-export function strval( s?: any ): string {
+export function strval( s?: TColorableArgument ): string {
     if( !gFlagIsEnabled )
         return s ? s.toString() : JSON.stringify( s );
     return fgYellow + s + reset;
 }
 
-export function n2s( n: any, sz: number ): string {
+export function n2s( n: TColorableArgument, sz: number ): string {
     let s = n ? n.toString() : "";
     while( s.length < sz )
         s = "0" + s;
@@ -892,7 +911,7 @@ export function timestampUnix(): number {
     return ts;
 }
 
-function trimLeftUnneededTimestampZeros( s?: any ): string {
+function trimLeftUnneededTimestampZeros( s?: TColorableArgument ): string {
     while( s.length >= 2 ) {
         if( s[0] == "0" && s[1] >= "0" && s[1] <= "9" )
             s = s.substring( 1 );
@@ -935,7 +954,7 @@ export function getDurationString( tsFrom: number, tsTo: number ): string {
     return ( n ? n.toString() : "" ) + " " + ( ( n > 1 ) ? "days" : "day" ) + "," + s;
 }
 
-export function capitalizeFirstLetter( s?: any ): string {
+export function capitalizeFirstLetter( s?: TColorableArgument ): string {
     if( !s )
         return JSON.stringify( s );
     let s2 = s.toString();
@@ -945,7 +964,7 @@ export function capitalizeFirstLetter( s?: any ): string {
     return s2;
 }
 
-function errFnDottedName( s?: any ): string {
+function errFnDottedName( s?: TColorableArgument ): string {
     const arr = s.split( "." );
     const cnt = arr.length;
     let i; let s2 = "";
@@ -957,7 +976,7 @@ function errFnDottedName( s?: any ): string {
     return s2;
 }
 
-function errFnName( s?: any ): string {
+function errFnName( s?: TColorableArgument ): string {
     if( s.indexOf( "async " ) == 0 )
         return bright( "async" ) + " " + errFnDottedName( s.substring( 6 ) );
     return errFnDottedName( s );
@@ -986,7 +1005,7 @@ function errLocLn( s: string, isWithBraces?: boolean ): string {
     return s2;
 }
 
-export function stack( err?: any ): string {
+export function stack( err?: TColorableArgument ): string {
     if( !err )
         return "";
     if( err && "stack" in err ) {

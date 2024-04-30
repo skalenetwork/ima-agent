@@ -44,9 +44,12 @@ if( parentPort ) {
     } );
 }
 
-function doSendMessage( type: any, endpoint: any, workerUUID: any, data: any ): void {
-    const jo: any = networkLayer.socketReceivedDataReverseMarshall( data );
-    const joSend: any = {
+const doSendMessage: networkLayer.TFnSend = function(
+    worker: networkLayer.TWorker,
+    type: string, endpoint: string | URL, workerUUID: string, data: object | string
+): void {
+    const jo: state.TLoadedJSON = networkLayer.socketReceivedDataReverseMarshall( data );
+    const joSend: state.TLoadedJSON = {
         workerMessageType:
             ( type && typeof type === "string" && type.length > 0 )
                 ? type
@@ -57,7 +60,7 @@ function doSendMessage( type: any, endpoint: any, workerUUID: any, data: any ): 
     };
     if( parentPort )
         parentPort.postMessage( networkLayer.socketSentDataMarshall( joSend ) );
-}
+};
 
 class ObserverServer extends SocketServer {
     initComplete?: boolean;
@@ -73,7 +76,8 @@ class ObserverServer extends SocketServer {
         self.intervalPeriodicSchainsCaching = null;
         self.bIsPeriodicCachingStepInProgress = false;
         self.mapApiHandlers.init =
-        function( joMessage: any, joAnswer: any, eventData: any, socket: any ): any {
+        function( joMessage: state.TLoadedJSON, joAnswer: any,
+            eventData: state.TLoadedJSON, socket: any ): any {
             joAnswer.message = {
                 method: joMessage.method.toString(),
                 error: null
@@ -82,7 +86,7 @@ class ObserverServer extends SocketServer {
                 return joAnswer;
             self.log = function(): void {
                 const args = Array.prototype.slice.call( arguments );
-                const jo: any = {
+                const jo: state.TLoadedJSON = {
                     method: "log",
                     error: null,
                     message: args.join( " " )
@@ -111,8 +115,8 @@ class ObserverServer extends SocketServer {
             log.verboseSet( self.opts.imaState.verbose_ );
             log.exposeDetailsSet( self.opts.imaState.expose_details_ );
             imaTransferErrorHandling.saveTransferEvents.on( "error",
-                function( eventData: any ): void {
-                    const jo: any = {
+                function( eventData: state.TLoadedJSON ): void {
+                    const jo: state.TLoadedJSON = {
                         method: "saveTransferError",
                         message: eventData.detail
                     };
@@ -120,8 +124,8 @@ class ObserverServer extends SocketServer {
                     socket.send( jo, isFlush );
                 } );
             imaTransferErrorHandling.saveTransferEvents.on( "success",
-                function( eventData: any ): void {
-                    const jo: any = {
+                function( eventData: state.TLoadedJSON ): void {
+                    const jo: state.TLoadedJSON = {
                         method: "saveTransferSuccess",
                         message: eventData.detail
                     };
@@ -189,7 +193,8 @@ class ObserverServer extends SocketServer {
             return joAnswer;
         };
         self.mapApiHandlers.spreadUpdatedSChainNetwork =
-            function( joMessage: any, joAnswer: any, eventData: any, socket: any ): void {
+            function( joMessage: state.TLoadedJSON, joAnswer: any,
+                eventData: state.TLoadedJSON, socket: any ): void {
                 self.initLogMethods();
                 self.debug(
                     "New own S-Chains network information is arrived to {} loop worker " +
@@ -199,7 +204,8 @@ class ObserverServer extends SocketServer {
                 imaState.joSChainNetworkInfo = joMessage.joSChainNetworkInfo;
             };
         self.mapApiHandlers.skale_imaNotifyLoopWork =
-            function( joMessage: any, joAnswer: any, eventData: any, socket: any ): void {
+            function( joMessage: state.TLoadedJSON, joAnswer: any,
+                eventData: state.TLoadedJSON, socket: any ): void {
                 self.initLogMethods();
                 pwa.handleLoopStateArrived( // NOTICE: no await here, executed async
                     imaState,
@@ -230,73 +236,73 @@ class ObserverServer extends SocketServer {
         const self: any = this;
         if( "fatal" in self && self.fatal && typeof self.fatal === "function" )
             return;
-        self.fatal = function( ...args: any[] ) {
+        self.fatal = function( ...args: log.TLogArgument[] ) {
             if( log.verboseGet() >= log.verboseName2Number( "fatal" ) ) {
                 self.log( log.getLogLinePrefixFatal() +
                     log.fmtFatal( ...args ) );
             }
         };
-        self.critical = function( ...args: any[] ) {
+        self.critical = function( ...args: log.TLogArgument[] ) {
             if( log.verboseGet() >= log.verboseName2Number( "critical" ) ) {
                 self.log( log.getLogLinePrefixCritical() +
                 log.fmtCritical( ...args ) );
             }
         };
-        self.error = function( ...args: any[] ) {
+        self.error = function( ...args: log.TLogArgument[] ) {
             if( log.verboseGet() >= log.verboseName2Number( "error" ) ) {
                 self.log( log.getLogLinePrefixError() +
                 log.fmtError( ...args ) );
             }
         };
-        self.warning = function( ...args: any[] ) {
+        self.warning = function( ...args: log.TLogArgument[] ) {
             if( log.verboseGet() >= log.verboseName2Number( "warning" ) ) {
                 self.log( log.getLogLinePrefixWarning() +
                 log.fmtWarning( ...args ) );
             }
         };
-        self.attention = function( ...args: any[] ) {
+        self.attention = function( ...args: log.TLogArgument[] ) {
             if( log.verboseGet() >= log.verboseName2Number( "attention" ) ) {
                 self.log( log.getLogLinePrefixAttention() +
                 log.fmtAttention( ...args ) );
             }
         };
-        self.information = function( ...args: any[] ) {
+        self.information = function( ...args: log.TLogArgument[] ) {
             if( log.verboseGet() >= log.verboseName2Number( "information" ) ) {
                 self.log( log.getLogLinePrefixInformation() +
                 log.fmtInformation( ...args ) );
             }
         };
-        self.info = function( ...args: any[] ) {
+        self.info = function( ...args: log.TLogArgument[] ) {
             if( log.verboseGet() >= log.verboseName2Number( "information" ) ) {
                 self.log( log.getLogLinePrefixInformation() +
                 log.fmtInformation( ...args ) );
             }
         };
-        self.notice = function( ...args: any[] ) {
+        self.notice = function( ...args: log.TLogArgument[] ) {
             if( log.verboseGet() >= log.verboseName2Number( "notice" ) ) {
                 self.log( log.getLogLinePrefixNotice() +
                 log.fmtNotice( ...args ) );
             }
         };
-        self.note = function( ...args: any[] ) {
+        self.note = function( ...args: log.TLogArgument[] ) {
             if( log.verboseGet() >= log.verboseName2Number( "notice" ) ) {
                 self.log( log.getLogLinePrefixNote() +
                 log.fmtNote( ...args ) );
             }
         };
-        self.debug = function( ...args: any[] ) {
+        self.debug = function( ...args: log.TLogArgument[] ) {
             if( log.verboseGet() >= log.verboseName2Number( "debug" ) ) {
                 self.log( log.getLogLinePrefixDebug() +
                 log.fmtDebug( ...args ) );
             }
         };
-        self.trace = function( ...args: any[] ) {
+        self.trace = function( ...args: log.TLogArgument[] ) {
             if( log.verboseGet() >= log.verboseName2Number( "trace" ) ) {
                 self.log( log.getLogLinePrefixTrace() +
                 log.fmtTrace( ...args ) );
             }
         };
-        self.success = function( ...args: any[] ) {
+        self.success = function( ...args: log.TLogArgument[] ) {
             if( log.verboseGet() >= log.verboseName2Number( "information" ) ) {
                 self.log( log.getLogLinePrefixSuccess() +
                 log.fmtSuccess( ...args ) );
