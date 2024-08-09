@@ -1006,6 +1006,18 @@ function parseBlsExposeArgs( imaState: state.TIMAState, joArg: TCliArgument ): b
     return false;
 }
 
+function parsePoWExposeArgs( imaState: state.TIMAState, joArg: TCliArgument ): boolean {
+    if( joArg.name == "expose-pow" ) {
+        imaTx.exposePoWSet( true );
+        return true;
+    }
+    if( joArg.name == "no-expose-pow" ) {
+        imaTx.exposePoWSet( false );
+        return true;
+    }
+    return false;
+}
+
 function parseLoggingArgs( imaState: state.TIMAState, joArg: TCliArgument ): boolean {
     if( joArg.name == "gathered" ) {
         imaState.isPrintGathered = true;
@@ -1249,6 +1261,8 @@ export function parse(
         if( parsePendingWorkAnalysisArgs( imaState, joArg ) )
             continue;
         if( parseBlsExposeArgs( imaState, joArg ) )
+            continue;
+        if( parsePoWExposeArgs( imaState, joArg ) )
             continue;
         if( parseLoggingArgs( imaState, joArg ) )
             continue;
@@ -2592,6 +2606,9 @@ function commonInitGasMultipliersAndTransactionArgs(): void {
             ( imaBLS.exposeBlsErrorsGet()
                 ? log.fmtSuccess( "enabled" )
                 : log.fmtError( "disabled" ) ) );
+        log.debug( log.fmtInformation( "Expose PoW details to log is" ),
+            "........................." +
+            ( imaTx.exposePoWGet() ? log.fmtSuccess( "enabled" ) : log.fmtError( "disabled" ) ) );
         log.debug( log.fmtInformation( "Oracle based gas reimbursement is" ),
             "...................." +
             ( imaOracleOperations.getEnabledOracle()

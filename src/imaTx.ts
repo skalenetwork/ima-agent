@@ -472,6 +472,15 @@ export async function payedCall(
     return optsPayedCall.joReceipt;
 }
 
+let isExposeErrorsOfPoW: boolean = false;
+
+export function exposePoWGet(): boolean {
+    return !!isExposeErrorsOfPoW;
+}
+export function exposePoWSet( aSomeFlagValue: boolean ): void {
+    isExposeErrorsOfPoW = !!aSomeFlagValue;
+}
+
 export async function checkTransactionToSchain(
     unsignedTx: owaspUtils.ethersMod.PopulatedTransaction,
     details: log.TLoggerBase,
@@ -487,43 +496,62 @@ export async function checkTransactionToSchain(
         const strFromAddress = joAccount.address(); // unsignedTx.from;
         const requiredBalance = unsignedTx.gasPrice.mul( unsignedTx.gasLimit );
         const balance = owaspUtils.toBN( await ethersProvider.getBalance( strFromAddress ) );
-        details.trace(
-            "{p}Will check whether PoW-mining  is needed for sender {} with balance {} using " +
-            "required balance {}, gas limit is {} gas, checked unsigned transaction is {}",
-            strLogPrefix, strFromAddress, owaspUtils.toHexStringSafe( balance ),
-            owaspUtils.toHexStringSafe( requiredBalance ),
-            owaspUtils.toHexStringSafe( unsignedTx.gasLimit ), unsignedTx );
+        if( exposePoWGet() ) {
+            details.trace(
+                "{p}Will check whether PoW-mining  is needed for sender {} with balance {} using " +
+                "required balance {}, gas limit is {} gas, checked unsigned transaction is {}",
+                strLogPrefix, strFromAddress, owaspUtils.toHexStringSafe( balance ),
+                owaspUtils.toHexStringSafe( requiredBalance ),
+                owaspUtils.toHexStringSafe( unsignedTx.gasLimit ), unsignedTx );
+        }
         if( balance.lt( requiredBalance ) ) {
-            details.warning( "{p}Insufficient funds for {}, will run PoW-mining to get {} of gas",
-                strLogPrefix, strFromAddress, owaspUtils.toHexStringSafe( unsignedTx.gasLimit ) );
+            if( exposePoWGet() ) {
+                details.warning(
+                    "{p}Insufficient funds for {}, will run PoW-mining to get {} of gas",
+                    strLogPrefix, strFromAddress,
+                    owaspUtils.toHexStringSafe( unsignedTx.gasLimit ) );
+            }
             const powNumberBuffer = await calculatePowNumber(
                 strFromAddress, owaspUtils.toBN( unsignedTx.nonce ).toHexString(),
                 owaspUtils.toHexStringSafe( unsignedTx.gasLimit ), details, strLogPrefix );
-            details.debug( "{p}Returned PoW-mining number {}", strLogPrefix, powNumberBuffer );
+            if( exposePoWGet() )
+                details.debug( "{p}Returned PoW-mining number {}", strLogPrefix, powNumberBuffer );
+
             let powNumber: string = powNumberBuffer.toString( "utf8" ).trim();
             powNumber = imaUtils.replaceAll( powNumber, "\r", "" );
             powNumber = imaUtils.replaceAll( powNumber, "\n", "" );
             powNumber = imaUtils.replaceAll( powNumber, "\t", "" );
             powNumber = powNumber.trim();
-            details.trace( "{p}Trimmed PoW-mining number is {}", strLogPrefix, powNumber );
+            if( exposePoWGet() )
+                details.trace( "{p}Trimmed PoW-mining number is {}", strLogPrefix, powNumber );
+
             if( !powNumber )
                 throw new Error( "Failed to compute gas price with PoW-mining(1), got empty text" );
             powNumber = owaspUtils.ensureStartsWith0x(
                 owaspUtils.toBN( owaspUtils.ensureStartsWith0x( powNumber ) ).toHexString() );
-            details.trace( "{p}BN PoW-mining number is {}", strLogPrefix, powNumber );
+            if( exposePoWGet() )
+                details.trace( "{p}BN PoW-mining number is {}", strLogPrefix, powNumber );
+
             const powNumberBN = owaspUtils.toBN( powNumber );
             if( powNumberBN.eq( owaspUtils.toBN( "0" ) ) )
                 throw new Error( "Failed to compute gas price with PoW-mining(2), got zero value" );
             unsignedTx.gasPrice = owaspUtils.toBN( powNumberBN.toHexString() );
-            details.success( "{p}Success, finally (after PoW-mining) modified unsigned " +
-                "transaction is {}", strLogPrefix, unsignedTx );
+            if( exposePoWGet() ) {
+                details.success( "{p}Success, finally (after PoW-mining) modified unsigned " +
+                    "transaction is {}", strLogPrefix, unsignedTx );
+            }
         } else {
-            details.success( "{p}Have sufficient funds for {}, PoW-mining is not needed and " +
-                "will be skipped", strLogPrefix, strFromAddress );
+            if( exposePoWGet() ) {
+                details.success( "{p}Have sufficient funds for {}, PoW-mining is not needed and " +
+                    "will be skipped", strLogPrefix, strFromAddress );
+            }
         }
     } catch ( err ) {
-        details.critical( "{p}PoW-mining error(checkTransactionToSchain): exception occur before " +
-            "PoW-mining, error is: {err}, stack is:\n{stack}", strLogPrefix, err, err );
+        if( exposePoWGet() ) {
+            details.critical(
+                "{p}PoW-mining error(checkTransactionToSchain): exception occur before " +
+                "PoW-mining, error is: {err}, stack is:\n{stack}", strLogPrefix, err, err );
+        }
     }
     return unsignedTx;
 }
@@ -543,13 +571,20 @@ export async function calculatePowNumber(
         const _gas = owaspUtils.parseIntOrHex( gas );
         const powScriptPath = path.join( __dirname, "pow" );
         const cmd = `${powScriptPath} ${_address} ${_nonce} ${_gas}`;
-        details.trace( "{p}Will run PoW-mining command: {}", strLogPrefix, cmd );
+        if( exposePoWGet() )
+            details.trace( "{p}Will run PoW-mining command: {}", strLogPrefix, cmd );
+
         const res = childProcessModule.execSync( cmd );
-        details.trace( "{p}Got PoW-mining execution result: {}", strLogPrefix, res );
+        if( exposePoWGet() )
+            details.trace( "{p}Got PoW-mining execution result: {}", strLogPrefix, res );
+
         return res;
     } catch ( err ) {
-        details.critical( "{p}PoW-mining error(calculatePowNumber): exception occur during " +
-            "PoW-mining, error is: {err}, stack is:\n{stack}", strLogPrefix, err, err );
+        if( exposePoWGet() ) {
+            details.critical(
+                "{p}PoW-mining error(calculatePowNumber): exception occur during " +
+                "PoW-mining, error is: {err}, stack is:\n{stack}", strLogPrefix, err, err );
+        }
         throw err;
     }
 }
