@@ -1044,8 +1044,10 @@ async function prepareSignMessagesImpl(
             "message(s) to process {}", optsSignOperation.strLogPrefix,
             optsSignOperation.nIdxCurrentMsgBlockStart, optsSignOperation.jarrMessages.length,
             optsSignOperation.jarrMessages );
-        optsSignOperation.details.exposeDetailsTo(
-            log.globalStream(), optsSignOperation.strGatheredDetailsName, false );
+        if( exposeBlsErrorsGet() ) {
+            optsSignOperation.details.exposeDetailsTo(
+                log.globalStream(), optsSignOperation.strGatheredDetailsName, false );
+        }
         optsSignOperation.details.close();
         await checkCorrectnessOfMessagesToSign(
             optsSignOperation.details, optsSignOperation.strLogPrefix,
@@ -1081,8 +1083,10 @@ async function prepareSignMessagesImpl(
         "prepare sign messages " + optsSignOperation.strDirection,
         optsSignOperation.details ) ) {
         optsSignOperation.bHaveResultReportCalled = true;
-        optsSignOperation.details.exposeDetailsTo(
-            log.globalStream(), optsSignOperation.strGatheredDetailsName, false );
+        if( exposeBlsErrorsGet() ) {
+            optsSignOperation.details.exposeDetailsTo(
+                log.globalStream(), optsSignOperation.strGatheredDetailsName, false );
+        }
         optsSignOperation.details.close();
         await optsSignOperation.fn(
             "signature error(1), S-Chain information " +
@@ -1254,9 +1258,9 @@ async function gatherSigningFinishImpl(
                         "Problem(5) in BLS sign result handler, not enough successful BLS " +
                         "signature parts({}) and timeout reached, error details: {err}",
                         cntSuccess, err );
+                    optsSignOperation.details.exposeDetailsTo(
+                        log.globalStream(), optsSignOperation.strGatheredDetailsName, false );
                 }
-                optsSignOperation.details.exposeDetailsTo(
-                    log.globalStream(), optsSignOperation.strGatheredDetailsName, false );
                 optsSignOperation.details.close();
                 optsSignOperation.details = log.globalStream();
             } );
@@ -1279,9 +1283,9 @@ async function gatherSigningFinishImpl(
                 optsSignOperation.details.error(
                     "Problem(6) in BLS sign result handler, not enough successful BLS signature " +
                     "parts({}) and timeout reached, error details: {err}", cntSuccess, err );
+                optsSignOperation.details.exposeDetailsTo(
+                    log.globalStream(), optsSignOperation.strGatheredDetailsName, false );
             }
-            optsSignOperation.details.exposeDetailsTo(
-                log.globalStream(), optsSignOperation.strGatheredDetailsName, false );
             optsSignOperation.details.close();
             optsSignOperation.details = log.globalStream();
         } );
@@ -1625,8 +1629,10 @@ async function doSignMessagesImpl(
     }
     optsSignOperation.details.success( "{p} completed", optsSignOperation.strGatheredDetailsName );
     if( optsSignOperation.details ) {
-        optsSignOperation.details.exposeDetailsTo(
-            log.globalStream(), optsSignOperation.strGatheredDetailsName, true );
+        if( exposeBlsErrorsGet() ) {
+            optsSignOperation.details.exposeDetailsTo(
+                log.globalStream(), optsSignOperation.strGatheredDetailsName, true );
+        }
         optsSignOperation.details.close();
     }
 }
@@ -2104,7 +2110,7 @@ export async function doVerifyReadyHash(
         fnShellRestore();
         isSuccess = false;
     }
-    if( isExposeOutput || !isSuccess )
+    if( isExposeOutput || ( ( !isSuccess ) && exposeBlsErrorsGet() ) )
         details.exposeDetailsTo( log.globalStream(), "BLS-raw-verifier", isSuccess );
     details.close();
     return isSuccess;
@@ -2221,7 +2227,7 @@ export async function doSignReadyHash(
     }
     const isSuccess = !!( (
         joSignResult && typeof joSignResult === "object" && !joSignResult.error ) );
-    if( isExposeOutput || !isSuccess )
+    if( isExposeOutput || ( ( !isSuccess ) && exposeBlsErrorsGet() ) )
         details.exposeDetailsTo( log.globalStream(), "BLS-raw-signer", isSuccess );
     details.close();
     return joSignResult;
