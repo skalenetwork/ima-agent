@@ -34,6 +34,7 @@ import * as imaHelperAPIs from "./imaHelperAPIs.js";
 import * as imaTransferErrorHandling from "./imaTransferErrorHandling.js";
 import * as imaOracleOperations from "./imaOracleOperations.js";
 import * as imaTx from "./imaTx.js";
+import * as imaBLS from "./bls.js";
 import * as state from "./state.js";
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -993,6 +994,18 @@ function parsePendingWorkAnalysisArgs( imaState: state.TIMAState, joArg: TCliArg
     return false;
 }
 
+function parseBlsExposeArgs( imaState: state.TIMAState, joArg: TCliArgument ): boolean {
+    if( joArg.name == "expose-bls" ) {
+        imaBLS.exposeBlsErrorsSet( true );
+        return true;
+    }
+    if( joArg.name == "no-expose-bls" ) {
+        imaBLS.exposeBlsErrorsSet( false );
+        return true;
+    }
+    return false;
+}
+
 function parseLoggingArgs( imaState: state.TIMAState, joArg: TCliArgument ): boolean {
     if( joArg.name == "gathered" ) {
         imaState.isPrintGathered = true;
@@ -1234,6 +1247,8 @@ export function parse(
         if( parseMulticallArgs( imaState, joArg ) )
             continue;
         if( parsePendingWorkAnalysisArgs( imaState, joArg ) )
+            continue;
+        if( parseBlsExposeArgs( imaState, joArg ) )
             continue;
         if( parseLoggingArgs( imaState, joArg ) )
             continue;
@@ -2572,6 +2587,11 @@ function commonInitGasMultipliersAndTransactionArgs(): void {
         log.debug( log.fmtInformation( "Expose PWA details to log is" ),
             "........................." +
             ( imaState.isPrintPWA ? log.fmtSuccess( "enabled" ) : log.fmtError( "disabled" ) ) );
+        log.debug( log.fmtInformation( "Expose BLS error details to log is" ),
+            "..................." +
+            ( imaBLS.exposeBlsErrorsGet()
+                ? log.fmtSuccess( "enabled" )
+                : log.fmtError( "disabled" ) ) );
         log.debug( log.fmtInformation( "Oracle based gas reimbursement is" ),
             "...................." +
             ( imaOracleOperations.getEnabledOracle()

@@ -208,6 +208,8 @@ LOGGING options:
     --no-expose-security-info ..............Do not expose security-related values in log output. Default mode.
     --expose-pwa ...........................Expose IMA agent pending work analysis information
     --no-expose-pwa ........................Do not expose IMA agent pending work analysis information. Default mode.
+    --expose-bls ...........................Expose BLS related errors
+    --no-expose-bls ........................Do not expose BLS related errors. Default mode.
     --accumulated-log-in-transfer ..........Use accumulated log in message transfer loop.
     --accumulated-log-in-bls-signer ........Use accumulated log in BLS signer.
     --dynamic-log-in-transfer ..............Use realtime log in message transfer loop.
