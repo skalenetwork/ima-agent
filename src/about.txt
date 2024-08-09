@@ -212,6 +212,8 @@ LOGGING options:
     --no-expose-bls ........................Do not expose BLS related errors. Default mode.
     --expose-pow ...........................Expose Proof-of-Work related info
     --no-expose-pow ........................Do not expose Proof-of-Work related info. Default mode.
+    --expose-mcn ...........................Expose incoming and outgoing message counters related info
+    --no-expose-mcn ........................Do not expose incoming and outgoing message counters related info. Default mode.
     --accumulated-log-in-transfer ..........Use accumulated log in message transfer loop.
     --accumulated-log-in-bls-signer ........Use accumulated log in BLS signer.
     --dynamic-log-in-transfer ..............Use realtime log in message transfer loop.

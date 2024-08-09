@@ -240,6 +240,15 @@ async function findOutAllReferenceLogRecords(
     return arrLogRecordReferences;
 }
 
+let isExposeMsgCounterInfo: boolean = false;
+
+export function exposeMsgCounterInfoGet(): boolean {
+    return !!isExposeMsgCounterInfo;
+}
+export function exposeMsgCounterInfoSet( aSomeFlagValue: boolean ): void {
+    isExposeMsgCounterInfo = !!aSomeFlagValue;
+}
+
 let gTransferLoopCounter = 0;
 
 // Do real money movement from main-net to S-chain by sniffing events
@@ -269,8 +278,10 @@ async function doQueryOutgoingMessageCounter(
         optsTransfer.strLogPrefixShort, optsTransfer.joMessageProxyDst.address );
     optsTransfer.strActionName = "src-chain.MessageProxy.getOutgoingMessagesCounter()";
     try {
-        optsTransfer.details.debug( "{p}Will call {bright}...",
-            optsTransfer.strLogPrefix, optsTransfer.strActionName );
+        if( exposeMsgCounterInfoGet() ) {
+            optsTransfer.details.debug( "{p}Will call {bright}...",
+                optsTransfer.strLogPrefix, optsTransfer.strActionName );
+        }
         nPossibleIntegerValue =
             await optsTransfer.joMessageProxySrc.callStatic.getOutgoingMessagesCounter(
                 optsTransfer.chainNameDst,
@@ -280,16 +291,23 @@ async function doQueryOutgoingMessageCounter(
                 `message counter ${nPossibleIntegerValue} which is not a valid integer` );
         }
         optsTransfer.nOutMsgCnt = owaspUtils.toInteger( nPossibleIntegerValue );
-        optsTransfer.details.information( "{p}Result of {bright} call: {}",
-            optsTransfer.strLogPrefix, optsTransfer.strActionName, optsTransfer.nOutMsgCnt );
+        if( exposeMsgCounterInfoGet() ) {
+            optsTransfer.details.information( "{p}Result of {bright} call: {}",
+                optsTransfer.strLogPrefix, optsTransfer.strActionName, optsTransfer.nOutMsgCnt );
+        }
     } catch ( err ) {
-        optsTransfer.details.critical(
-            "(IMMEDIATE) error caught during {bright}, error details: {err}, stack is:\n{stack}",
-            optsTransfer.strActionName, err, err );
+        if( exposeMsgCounterInfoGet() ) {
+            optsTransfer.details.critical(
+                "(IMMEDIATE) error caught during {bright}, " +
+                "error details: {err}, stack is:\n{stack}",
+                optsTransfer.strActionName, err, err );
+        }
     }
     optsTransfer.strActionName = "dst-chain.MessageProxy.getIncomingMessagesCounter()";
-    optsTransfer.details.debug( "{p}Will call {bright}...",
-        optsTransfer.strLogPrefix, optsTransfer.strActionName );
+    if( exposeMsgCounterInfoGet() ) {
+        optsTransfer.details.debug( "{p}Will call {bright}...",
+            optsTransfer.strLogPrefix, optsTransfer.strActionName );
+    }
     nPossibleIntegerValue =
         await optsTransfer.joMessageProxyDst.callStatic.getIncomingMessagesCounter(
             optsTransfer.chainNameSrc, { from: optsTransfer.joAccountDst.address() } );
@@ -298,8 +316,10 @@ async function doQueryOutgoingMessageCounter(
             `counter ${nPossibleIntegerValue} which is not a valid integer` );
     }
     optsTransfer.nIncMsgCnt = owaspUtils.toInteger( nPossibleIntegerValue );
-    optsTransfer.details.debug( "{p}Result of {bright} call: {}",
-        optsTransfer.strLogPrefix, optsTransfer.strActionName, optsTransfer.nIncMsgCnt );
+    if( exposeMsgCounterInfoGet() ) {
+        optsTransfer.details.debug( "{p}Result of {bright} call: {}",
+            optsTransfer.strLogPrefix, optsTransfer.strActionName, optsTransfer.nIncMsgCnt );
+    }
     optsTransfer.strActionName = "src-chain.MessageProxy.getIncomingMessagesCounter()";
     nPossibleIntegerValue =
         await optsTransfer.joMessageProxySrc.callStatic.getIncomingMessagesCounter(
@@ -309,8 +329,10 @@ async function doQueryOutgoingMessageCounter(
             `message counter ${nPossibleIntegerValue} + which is not a valid integer` );
     }
     const idxLastToPopNotIncluding = owaspUtils.toInteger( nPossibleIntegerValue );
-    optsTransfer.details.debug( "{p}Result of {bright} call: {}",
-        optsTransfer.strLogPrefix, optsTransfer.strActionName, idxLastToPopNotIncluding );
+    if( exposeMsgCounterInfoGet() ) {
+        optsTransfer.details.debug( "{p}Result of {bright} call: {}",
+            optsTransfer.strLogPrefix, optsTransfer.strActionName, idxLastToPopNotIncluding );
+    }
     // first, try optimized scanner
     optsTransfer.arrLogRecordReferences = [];
     try {
