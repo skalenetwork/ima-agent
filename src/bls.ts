@@ -510,7 +510,7 @@ function performBlsGlue(
         joGlueResult = imaUtils.jsonFileLoad( path.join( strActionDir, "glue-result.json" ) );
         details.trace( "{p}BLS glue result is: {}", strLogPrefix, joGlueResult );
         if( joGlueResult && "X" in joGlueResult.signature && "Y" in joGlueResult.signature ) {
-            details.success( "{p}BLS glue success", strLogPrefix );
+            details.debug( "{p}BLS glue success", strLogPrefix ); // success
             joGlueResult.hashSrc = strMessageHash;
             details.trace( "{p}Computing G1 hash point...", strLogPrefix );
             const strPath = strActionDir + "/hash.json";
@@ -604,7 +604,7 @@ function performBlsGlueU256(
         joGlueResult = imaUtils.jsonFileLoad( path.join( strActionDir, "glue-result.json" ) );
         details.trace( "{p}BLS glue result is:\n{}", strLogPrefix, joGlueResult );
         if( joGlueResult && "X" in joGlueResult.signature && "Y" in joGlueResult.signature ) {
-            details.success( "{p}BLS glue success", strLogPrefix );
+            details.debug( "{p}BLS glue success", strLogPrefix ); // success
             joGlueResult.hashSrc = strMessageHash;
             details.trace( "{p}Computing G1 hash point...", strLogPrefix );
             const strPath = strActionDir + "/hash.json";
@@ -702,7 +702,8 @@ function performBlsVerifyI(
             .toString( "utf8" );
         details.trace( "{p}BLS node #{} verify output is:\n{raw}", strLogPrefix,
             nZeroBasedNodeIndex, strOutput || "<<EMPTY>>" );
-        details.success( "{p}BLS node #{} verify success", strLogPrefix, nZeroBasedNodeIndex );
+        details.debug( // success
+            "{p}BLS node #{} verify success", strLogPrefix, nZeroBasedNodeIndex ); // success
         fnShellRestore();
         return true;
     } catch ( err ) {
@@ -758,7 +759,8 @@ function performBlsVerifyIU256(
             .toString( "utf8" );
         details.trace( "{p}BLS u256 node #{} verify output is:\n{raw}", strLogPrefix,
             nZeroBasedNodeIndex, strOutput || "<<EMPTY>>" );
-        details.success( "{p}BLS u256 node #{} verify success", strLogPrefix, nZeroBasedNodeIndex );
+        // success
+        details.debug( "{p}BLS u256 node #{} verify success", strLogPrefix, nZeroBasedNodeIndex );
         fnShellRestore();
         return true;
     } catch ( err ) {
@@ -829,7 +831,7 @@ function performBlsVerify(
             .toString( "utf8" );
         details.trace( "{p}BLS/summary verify output is:\n{raw}", strLogPrefix,
             strOutput || "<<EMPTY>>" );
-        details.success( "{p}BLS/summary verify success", strLogPrefix );
+        details.debug( "{p}BLS/summary verify success", strLogPrefix ); // success
         fnShellRestore();
         return true;
     } catch ( err ) {
@@ -889,7 +891,7 @@ function performBlsVerifyU256(
             .toString( "utf8" );
         details.trace( "{p}BLS u256/summary verify output is:\n{raw}", strLogPrefix,
             strOutput || "<<EMPTY>>" );
-        details.success( "{p}BLS u256/summary verify success", strLogPrefix );
+        details.debug( "{p}BLS u256/summary verify success", strLogPrefix ); // success
         fnShellRestore();
         return true;
     } catch ( err ) {
@@ -999,8 +1001,11 @@ async function checkCorrectnessOfMessagesToSign(
     if( cntBadMessages > 0 ) {
         details.critical( "{p}Correctness validation failed for {} of {} message(s)",
             strLogPrefix, cntBadMessages, cnt );
-    } else
-        details.success( "{p}Correctness validation passed for {} message(s)", strLogPrefix, cnt );
+    } else {
+        // success
+        details.debug(
+            "{p}Correctness validation passed for {} message(s)", strLogPrefix, cnt );
+    }
 }
 
 async function prepareSignMessagesImpl(
@@ -1118,7 +1123,8 @@ async function gatherSigningCheckFinish(
         optsSignOperation.nIdxCurrentMsgBlockStart, optsSignOperation.strFromChainName,
         optsSignOperation.arrSignResults );
     if( joGlueResult ) {
-        optsSignOperation.details.success( "{p}Got BLS glue result: {}",
+        optsSignOperation.details.debug( // success
+            "{p}Got BLS glue result: {}",
             optsSignOperation.strLogPrefixB, joGlueResult );
         if( optsSignOperation.imaState.strPathBlsVerify.length > 0 ) {
             if( !optsSignOperation.imaState.joSChainNetworkInfo )
@@ -1138,7 +1144,8 @@ async function gatherSigningCheckFinish(
                 optsSignOperation.strFromChainName, joCommonPublicKey
             ) ) {
                 strSuccessfulResultDescription = "Got successful summary BLS verification result";
-                optsSignOperation.details.success( "{p}{bright}",
+                optsSignOperation.details.debug( // success
+                    "{p}{bright}",
                     optsSignOperation.strLogPrefixB, strSuccessfulResultDescription );
             } else {
                 strError = "BLS verification failed";
@@ -1373,7 +1380,7 @@ async function doSignProcessHandleCall(
                 const cntSuccess = optsSignOperation.arrSignResults.length;
                 if( cntSuccess > optsSignOperation.nCountOfBlsPartsToCollect ) {
                     ++optsSignOperation.joGatheringTracker.nCountSkipped;
-                    optsSignOperation.details.notice(
+                    optsSignOperation.details.debug(
                         "{p}Will ignore sign result for node {} because {}/{} threshold number " +
                         "of BLS signature parts already gathered",
                         optsSignOperation.strLogPrefixA, nZeroBasedNodeIndex,
@@ -1406,7 +1413,7 @@ async function doSignProcessHandleCall(
                     optsSignOperation.strFromChainName,
                     joPublicKey
                 ) ) {
-                    optsSignOperation.details.success(
+                    optsSignOperation.details.debug( // success
                         "{p}Got successful BLS verification result for node {} with index {}",
                         optsSignOperation.strLogPrefixA, joNode.nodeID, nZeroBasedNodeIndex );
                     bNodeSignatureOKay = true; // node verification passed
@@ -1613,7 +1620,8 @@ async function doSignMessagesImpl(
             } );
         }
     }
-    optsSignOperation.details.success( "{p} completed", optsSignOperation.strGatheredDetailsName );
+    optsSignOperation.details.debug( // success
+        "{p} completed", optsSignOperation.strGatheredDetailsName );
     if( optsSignOperation.details ) {
         optsSignOperation.details.exposeDetailsTo(
             log.globalStream(), optsSignOperation.strGatheredDetailsName, true );
@@ -1728,7 +1736,7 @@ async function doSignU256OneImplHandleCallResult(
                 const cntSuccess = optsSignU256.arrSignResults.length;
                 if( cntSuccess > optsSignU256.nCountOfBlsPartsToCollect ) {
                     ++optsSignU256.joGatheringTracker.nCountSkipped;
-                    optsSignU256.details.notice(
+                    optsSignU256.details.debug(
                         "{p}Will ignore sign result for node {} because {}/{} threshold " +
                         "number of BLS signature parts already gathered", strLogPrefixA,
                         nZeroBasedNodeIndex, optsSignU256.nThreshold,
@@ -1752,7 +1760,7 @@ async function doSignU256OneImplHandleCallResult(
                 if( performBlsVerifyIU256(
                     optsSignU256.details, nZeroBasedNodeIndex, joResultFromNode,
                     optsSignU256.u256, joPublicKey ) ) {
-                    optsSignU256.details.success(
+                    optsSignU256.details.debug( // success
                         "{p}Got successful BLS verification result for node {} " +
                         "with index {}", strLogPrefixA, joNode.nodeID,
                         nZeroBasedNodeIndex );
@@ -1858,7 +1866,8 @@ async function gatherSigningCheckFinish256(
     const joGlueResult: TBLSGlueResult | null = performBlsGlueU256(
         optsSignU256.details, optsSignU256.u256, optsSignU256.arrSignResults );
     if( joGlueResult ) {
-        optsSignU256.details.success( "{p}Got BLS glue u256 result: {}",
+        optsSignU256.details.debug( // success
+            "{p}Got BLS glue u256 result: {}",
             strLogPrefixB, joGlueResult );
         if( optsSignU256.imaState.strPathBlsVerify.length > 0 ) {
             if( !optsSignU256.imaState.joSChainNetworkInfo )
@@ -1875,7 +1884,8 @@ async function gatherSigningCheckFinish256(
                 optsSignU256.u256, joCommonPublicKey ) ) {
                 const strSuccessfulResultDescription =
                     "Got successful summary BLS u256 verification result";
-                optsSignU256.details.success( "{p}{}", strLogPrefixB,
+                optsSignU256.details.debug( // success
+                    "{p}{}", strLogPrefixB,
                     strSuccessfulResultDescription );
             } else {
                 const strError = "BLS verification failed";
@@ -2017,7 +2027,7 @@ export async function doSignU256(
             optsSignU256.errGathering.toString() );
         return;
     }
-    optsSignU256.details.information( "{p}Completed signing u256 procedure",
+    optsSignU256.details.debug( "{p}Completed signing u256 procedure",
         optsSignU256.strLogPrefix );
 }
 
@@ -2077,7 +2087,8 @@ export async function doVerifyReadyHash(
             .toString( "utf8" );
         details.trace( "{p}BLS node #{} verify output is:\n{raw}", strLogPrefix,
             nZeroBasedNodeIndex, strOutput || "<<EMPTY>>" );
-        details.success( "{p}BLS node #{} verify success", strLogPrefix, nZeroBasedNodeIndex );
+        details.debug( // success
+            "{p}BLS node #{} verify success", strLogPrefix, nZeroBasedNodeIndex );
         fnShellRestore();
         isSuccess = true;
     } catch ( err ) {
