@@ -548,9 +548,9 @@ function performBlsGlue(
         if( exposeBlsErrorsGet() ) {
             details.critical( "{p}BLS glue error description is: {err}, stack is: \n{stack}",
                 strLogPrefix, err, err );
-            details.critical( "{p}BLS glue output is:\n{raw}",
-                strLogPrefix, strOutput || "<<EMPTY>>" );
         }
+        details.critical( "{p}BLS glue output is:\n{raw}",
+            strLogPrefix, strOutput || "<<EMPTY>>" );
         fnShellRestore();
         joGlueResult = null;
     }
@@ -643,8 +643,8 @@ function performBlsGlueU256(
         if( exposeBlsErrorsGet() ) {
             details.critical( "BLS glue error description is: {err}, stack is: \n{stack}",
                 err, err );
-            details.critical( "BLS glue output is:\n{raw}", strOutput || "<<EMPTY>>" );
         }
+        details.critical( "BLS glue output is:\n{raw}", strOutput || "<<EMPTY>>" );
         fnShellRestore();
         joGlueResult = null;
     }
@@ -709,9 +709,9 @@ function performBlsVerifyI(
         if( exposeBlsErrorsGet() ) {
             details.critical( "{p}BLS node #{} verify error:, error description is: {err}, " +
                 "stack is: \n{stack}", strLogPrefix, nZeroBasedNodeIndex, err, err );
-            details.critical( "{p}BLS node #{} verify output is:\n{raw}",
-                strLogPrefix, nZeroBasedNodeIndex, strOutput || "<<EMPTY>>" );
         }
+        details.critical( "{p}BLS node #{} verify output is:\n{raw}",
+            strLogPrefix, nZeroBasedNodeIndex, strOutput || "<<EMPTY>>" );
         fnShellRestore();
     }
     return false;
@@ -765,9 +765,9 @@ function performBlsVerifyIU256(
         if( exposeBlsErrorsGet() ) {
             details.error( "{p}BLS u256 node #{} verify error, error description is: {err}, " +
                 "stack is: \n{stack}", strLogPrefix, nZeroBasedNodeIndex, err, err );
-            details.error( "{p}BLS u256 node #{} verify output is:\n{raw}",
-                strLogPrefix, nZeroBasedNodeIndex, strOutput || "<<EMPTY>>" );
         }
+        details.error( "{p}BLS u256 node #{} verify output is:\n{raw}",
+            strLogPrefix, nZeroBasedNodeIndex, strOutput || "<<EMPTY>>" );
         fnShellRestore();
     }
     return false;
@@ -836,8 +836,8 @@ function performBlsVerify(
         if( exposeBlsErrorsGet() ) {
             details.error( "{p}BLS/summary verify error description is: {err}, stack is:\n{stack}",
                 strLogPrefix, err, err );
-            details.error( "BLS/summary verify output is:\n{raw}", strOutput || "<<EMPTY>>" );
         }
+        details.error( "BLS/summary verify output is:\n{raw}", strOutput || "<<EMPTY>>" );
         fnShellRestore();
     }
     return false;
@@ -896,9 +896,9 @@ function performBlsVerifyU256(
         if( exposeBlsErrorsGet() ) {
             details.error( "{p}BLS u256/summary  error description is: {err}, stack is: \n{stack}",
                 strLogPrefix, err, err );
-            details.error( "{p}BLS u256/summary verify output is:\n{raw}", strLogPrefix,
-                strOutput || "<<EMPTY>>" );
         }
+        details.error( "{p}BLS u256/summary verify output is:\n{raw}", strLogPrefix,
+            strOutput || "<<EMPTY>>" );
         fnShellRestore();
     }
     return false;
@@ -987,22 +987,18 @@ async function checkCorrectnessOfMessagesToSign(
                 }
             } catch ( err ) {
                 ++cntBadMessages;
-                if( exposeBlsErrorsGet() ) {
-                    details.critical(
-                        "{p}{bright} Correctness validation failed for message {} sent to {}, " +
-                        "message is: {}, error information: {err}, stack is:\n{stack}",
-                        strLogPrefix, strDirection, idxMessage, joChainName, joMessage,
-                        err, err );
-                }
+                details.critical(
+                    "{p}{bright} Correctness validation failed for message {} sent to {}, " +
+                    "message is: {}, error information: {err}, stack is:\n{stack}",
+                    strLogPrefix, strDirection, idxMessage, joChainName, joMessage,
+                    err, err );
             }
         }
     }
     // TODO: M2S - check events
     if( cntBadMessages > 0 ) {
-        if( exposeBlsErrorsGet() ) {
-            details.critical( "{p}Correctness validation failed for {} of {} message(s)",
-                strLogPrefix, cntBadMessages, cnt );
-        }
+        details.critical( "{p}Correctness validation failed for {} of {} message(s)",
+            strLogPrefix, cntBadMessages, cnt );
     } else
         details.success( "{p}Correctness validation passed for {} message(s)", strLogPrefix, cnt );
 }
@@ -1044,10 +1040,8 @@ async function prepareSignMessagesImpl(
             "message(s) to process {}", optsSignOperation.strLogPrefix,
             optsSignOperation.nIdxCurrentMsgBlockStart, optsSignOperation.jarrMessages.length,
             optsSignOperation.jarrMessages );
-        if( exposeBlsErrorsGet() ) {
-            optsSignOperation.details.exposeDetailsTo(
-                log.globalStream(), optsSignOperation.strGatheredDetailsName, false );
-        }
+        optsSignOperation.details.exposeDetailsTo(
+            log.globalStream(), optsSignOperation.strGatheredDetailsName, false );
         optsSignOperation.details.close();
         await checkCorrectnessOfMessagesToSign(
             optsSignOperation.details, optsSignOperation.strLogPrefix,
@@ -1083,10 +1077,8 @@ async function prepareSignMessagesImpl(
         "prepare sign messages " + optsSignOperation.strDirection,
         optsSignOperation.details ) ) {
         optsSignOperation.bHaveResultReportCalled = true;
-        if( exposeBlsErrorsGet() ) {
-            optsSignOperation.details.exposeDetailsTo(
-                log.globalStream(), optsSignOperation.strGatheredDetailsName, false );
-        }
+        optsSignOperation.details.exposeDetailsTo(
+            log.globalStream(), optsSignOperation.strGatheredDetailsName, false );
         optsSignOperation.details.close();
         await optsSignOperation.fn(
             "signature error(1), S-Chain information " +
@@ -1258,9 +1250,9 @@ async function gatherSigningFinishImpl(
                         "Problem(5) in BLS sign result handler, not enough successful BLS " +
                         "signature parts({}) and timeout reached, error details: {err}",
                         cntSuccess, err );
-                    optsSignOperation.details.exposeDetailsTo(
-                        log.globalStream(), optsSignOperation.strGatheredDetailsName, false );
                 }
+                optsSignOperation.details.exposeDetailsTo(
+                    log.globalStream(), optsSignOperation.strGatheredDetailsName, false );
                 optsSignOperation.details.close();
                 optsSignOperation.details = log.globalStream();
             } );
@@ -1283,9 +1275,9 @@ async function gatherSigningFinishImpl(
                 optsSignOperation.details.error(
                     "Problem(6) in BLS sign result handler, not enough successful BLS signature " +
                     "parts({}) and timeout reached, error details: {err}", cntSuccess, err );
-                optsSignOperation.details.exposeDetailsTo(
-                    log.globalStream(), optsSignOperation.strGatheredDetailsName, false );
             }
+            optsSignOperation.details.exposeDetailsTo(
+                log.globalStream(), optsSignOperation.strGatheredDetailsName, false );
             optsSignOperation.details.close();
             optsSignOperation.details = log.globalStream();
         } );
@@ -1358,13 +1350,11 @@ async function doSignProcessHandleCall(
         !joOut.result || typeof joOut.result !== "object" ||
         ( "error" in joOut && joOut.error ) ) {
         ++optsSignOperation.joGatheringTracker.nCountErrors;
-        if( exposeBlsErrorsGet() ) {
-            optsSignOperation.details.critical(
-                "{p}S-Chain node {} reported wallet error: {err}, sequence ID is ",
-                optsSignOperation.strLogPrefix, strNodeDescColorized,
-                owaspUtils.extractErrorMessage( joOut, "unknown wallet error(1)" ),
-                optsSignOperation.sequenceId );
-        }
+        optsSignOperation.details.critical(
+            "{p}S-Chain node {} reported wallet error: {err}, sequence ID is ",
+            optsSignOperation.strLogPrefix, strNodeDescColorized,
+            owaspUtils.extractErrorMessage( joOut, "unknown wallet error(1)" ),
+            optsSignOperation.sequenceId );
         await joCall.disconnect();
         return;
     }
@@ -1447,13 +1437,11 @@ async function doSignProcessHandleCall(
         }
     } catch ( err ) {
         ++optsSignOperation.joGatheringTracker.nCountErrors;
-        if( exposeBlsErrorsGet() ) {
-            optsSignOperation.details.critical(
-                "{p}S-Chain node {} signature fail from node {}, error is {err}" +
-                ", sequence ID is {}, stack is:\n{stack}",
-                optsSignOperation.strLogPrefix, strNodeDescColorized, joNode.nodeID,
-                err, optsSignOperation.sequenceId, err );
-        }
+        optsSignOperation.details.critical(
+            "{p}S-Chain node {} signature fail from node {}, error is {err}" +
+            ", sequence ID is {}, stack is:\n{stack}",
+            optsSignOperation.strLogPrefix, strNodeDescColorized, joNode.nodeID,
+            err, optsSignOperation.sequenceId, err );
     }
     await joCall.disconnect();
 }
@@ -1615,11 +1603,9 @@ async function doSignMessagesImpl(
                 log.critical( "Failed BLS sign due to error-reporting callback exception: {err}",
                     err );
                 if( optsSignOperation.details ) {
-                    if( exposeBlsErrorsGet() ) {
-                        optsSignOperation.details.critical(
-                            "Failed BLS sign due to error-reporting callback exception: {err}",
-                            err );
-                    }
+                    optsSignOperation.details.critical(
+                        "Failed BLS sign due to error-reporting callback exception: {err}",
+                        err );
                     optsSignOperation.details.exposeDetailsTo(
                         log.globalStream(), optsSignOperation.strGatheredDetailsName, false );
                     optsSignOperation.details.close();
@@ -1629,10 +1615,8 @@ async function doSignMessagesImpl(
     }
     optsSignOperation.details.success( "{p} completed", optsSignOperation.strGatheredDetailsName );
     if( optsSignOperation.details ) {
-        if( exposeBlsErrorsGet() ) {
-            optsSignOperation.details.exposeDetailsTo(
-                log.globalStream(), optsSignOperation.strGatheredDetailsName, true );
-        }
+        optsSignOperation.details.exposeDetailsTo(
+            log.globalStream(), optsSignOperation.strGatheredDetailsName, true );
         optsSignOperation.details.close();
     }
 }
@@ -1725,10 +1709,8 @@ async function doSignU256OneImplHandleCallResult(
         ++optsSignU256.joGatheringTracker.nCountErrors;
         const strErrorMessage =
             owaspUtils.extractErrorMessage( joOut, "unknown wallet error(2)" );
-        if( exposeBlsErrorsGet() ) {
-            optsSignU256.details.error( "{p}S-Chain node {} reported wallet error: {err}",
-                optsSignU256.strLogPrefix, strNodeDescColorized, strErrorMessage );
-        }
+        optsSignU256.details.error( "{p}S-Chain node {} reported wallet error: {err}",
+            optsSignU256.strLogPrefix, strNodeDescColorized, strErrorMessage );
         await joCall.disconnect();
         return;
     }
@@ -2031,10 +2013,8 @@ export async function doSignU256(
     await doSignU256Gathering( optsSignU256 );
     optsSignU256.details.trace( "Will await BLS u256 sign result..." );
     if( optsSignU256.errGathering ) {
-        if( exposeBlsErrorsGet() ) {
-            optsSignU256.details.error( "Failed BLS u256 sign result awaiting: {err}",
-                optsSignU256.errGathering.toString() );
-        }
+        optsSignU256.details.error( "Failed BLS u256 sign result awaiting: {err}",
+            optsSignU256.errGathering.toString() );
         return;
     }
     optsSignU256.details.information( "{p}Completed signing u256 procedure",
@@ -2104,13 +2084,13 @@ export async function doVerifyReadyHash(
         if( exposeBlsErrorsGet() ) {
             details.critical( "{p}BLS node #{} verify error, error description is: {err}" +
                 ", stack is:\n{stack}", strLogPrefix, nZeroBasedNodeIndex, err, err );
-            details.critical( "{p}BLS node #{} verify output is:\n{raw}",
-                strLogPrefix, nZeroBasedNodeIndex, strOutput || "<<EMPTY>>" );
         }
+        details.critical( "{p}BLS node #{} verify output is:\n{raw}",
+            strLogPrefix, nZeroBasedNodeIndex, strOutput || "<<EMPTY>>" );
         fnShellRestore();
         isSuccess = false;
     }
-    if( isExposeOutput || ( ( !isSuccess ) && exposeBlsErrorsGet() ) )
+    if( isExposeOutput || ( !isSuccess ) )
         details.exposeDetailsTo( log.globalStream(), "BLS-raw-verifier", isSuccess );
     details.close();
     return isSuccess;
@@ -2133,7 +2113,6 @@ async function doSignReadyHashHandleCallResult(
         const strError = "No signature arrived";
         if( exposeBlsErrorsGet() )
             details.error( "{p}BLS-sign(1) finished with error: {err}", strLogPrefix, strError );
-
         await joCall.disconnect();
         throw new Error( strError );
     }
@@ -2218,16 +2197,14 @@ export async function doSignReadyHash(
             status: -1,
             error: strError
         };
-        if( exposeBlsErrorsGet() ) {
-            details.error( "{p}JSON RPC call to SGX failed, error is: {err}, stack is:\n{stack}",
-                strLogPrefix, err, err );
-        }
+        details.error( "{p}JSON RPC call to SGX failed, error is: {err}, stack is:\n{stack}",
+            strLogPrefix, err, err );
         if( joCall )
             await joCall.disconnect();
     }
     const isSuccess = !!( (
         joSignResult && typeof joSignResult === "object" && !joSignResult.error ) );
-    if( isExposeOutput || ( ( !isSuccess ) && exposeBlsErrorsGet() ) )
+    if( isExposeOutput || ( !isSuccess ) )
         details.exposeDetailsTo( log.globalStream(), "BLS-raw-signer", isSuccess );
     details.close();
     return joSignResult;
@@ -2356,11 +2333,9 @@ async function handleBlsSignMessageHashResult(
     if( !joSignResult ) {
         const strError = "No signature arrived";
         optsHandleVerifyAndSign.joRetVal.error = strError;
-        if( exposeBlsErrorsGet() ) {
-            optsHandleVerifyAndSign.details.error(
-                "{p}BLS-sign(1) finished with error: {err}",
-                optsHandleVerifyAndSign.strLogPrefix, strError );
-        }
+        optsHandleVerifyAndSign.details.error(
+            "{p}BLS-sign(1) finished with error: {err}",
+            optsHandleVerifyAndSign.strLogPrefix, strError );
         await joCall.disconnect();
         throw new Error( strError );
     }
@@ -2464,12 +2439,10 @@ export async function handleSkaleImaVerifyAndSign(
         await handleBlsSignMessageHashResult(
             optsHandleVerifyAndSign, joCallData, joAccount, joCall, joIn, joOut );
     } catch ( err ) {
-        if( exposeBlsErrorsGet() ) {
-            optsHandleVerifyAndSign.details.error(
-                "{p}{bright}JSON RPC call(handleSkaleImaVerifyAndSign) " +
-                "to SGX failed, RPC call failed, error is: {err}",
-                optsHandleVerifyAndSign.strLogPrefix, optsHandleVerifyAndSign.strDirection, err );
-        }
+        optsHandleVerifyAndSign.details.error(
+            "{p}{bright}JSON RPC call(handleSkaleImaVerifyAndSign) " +
+            "to SGX failed, RPC call failed, error is: {err}",
+            optsHandleVerifyAndSign.strLogPrefix, optsHandleVerifyAndSign.strDirection, err );
         if( joCall )
             await joCall.disconnect();
         throw new Error( "JSON RPC call(handleSkaleImaVerifyAndSign) to SGX failed, " +
@@ -2536,11 +2509,9 @@ async function handleBlsSignMessageHash256Result(
     if( !joSignResult ) {
         const strError = "No signature arrived";
         optsBSU256.joRetVal.error = strError;
-        if( exposeBlsErrorsGet() ) {
-            optsBSU256.details.error(
-                "{p}U256/BLS-sign(1) finished with error: {err}",
-                optsBSU256.strLogPrefix, strError );
-        }
+        optsBSU256.details.error(
+            "{p}U256/BLS-sign(1) finished with error: {err}",
+            optsBSU256.strLogPrefix, strError );
         await joCall.disconnect();
         throw new Error( strError );
     }
@@ -2551,10 +2522,8 @@ async function handleBlsSignMessageHash256Result(
         const strError = "BLS-sign finished with " +
             `error: ${joSignResult.errorMessage}`;
         optsBSU256.joRetVal.error = strError;
-        if( exposeBlsErrorsGet() ) {
-            optsBSU256.details.error( "{p}U256/BLS-sign(2) finished with error: {err}",
-                optsBSU256.strLogPrefix, joSignResult.errorMessage );
-        }
+        optsBSU256.details.error( "{p}U256/BLS-sign(2) finished with error: {err}",
+            optsBSU256.strLogPrefix, joSignResult.errorMessage );
         await joCall.disconnect();
         throw new Error( strError );
     }
@@ -2625,11 +2594,9 @@ export async function handleSkaleImaBSU256(
         optsBSU256.isSuccess = false;
         const strError = owaspUtils.extractErrorMessage( err );
         optsBSU256.joRetVal.error = strError;
-        if( exposeBlsErrorsGet() ) {
-            optsBSU256.details.error(
-                "{p}JSON RPC call(handleSkaleImaBSU256) to SGX failed, " +
-                "RPC call failed, error is: {err}", optsBSU256.strLogPrefix, err );
-        }
+        optsBSU256.details.error(
+            "{p}JSON RPC call(handleSkaleImaBSU256) to SGX failed, " +
+            "RPC call failed, error is: {err}", optsBSU256.strLogPrefix, err );
         if( joCall )
             await joCall.disconnect();
         throw new Error( "JSON RPC call(handleSkaleImaBSU256) to SGX failed, " +
