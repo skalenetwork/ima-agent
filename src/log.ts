@@ -1042,7 +1042,7 @@ function computeVerboseAlias(): TMapVerboseReverse {
         const val = gMapVerbose[key as any];
         const name = val;
         if( name )
-            m[name] = parseInt( key as any );
+            m[name] = parseInt( key );
     }
     m.empty = m.silent ?? 0; // alias
     m.none = m.silent ?? 0; // alias
@@ -1098,7 +1098,10 @@ export function verboseGet(): number {
     return cc.toInteger( gVerboseLevel );
 }
 export function verboseSet( vl?: TLogArgument ): void {
-    gVerboseLevel = 0 + ( vl ? parseInt( vl.toString() ) : gVerboseLevelDefaultValue );
+    gVerboseLevel = 0 + ( vl
+        ? parseInt( ( vl as string ).toString() )
+        : gVerboseLevelDefaultValue
+    );
 }
 
 export function verboseParse( s: string ): number {
