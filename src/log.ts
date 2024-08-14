@@ -1042,7 +1042,7 @@ function computeVerboseAlias(): TMapVerboseReverse {
         const val = gMapVerbose[key as any];
         const name = val;
         if( name )
-            m[name] = key as any;
+            m[name] = parseInt( key );
     }
     m.empty = m.silent ?? 0; // alias
     m.none = m.silent ?? 0; // alias
@@ -1062,7 +1062,7 @@ let gMapReversedVerbose: TMapVerboseReverse = { };
 
 export function verbose(): TMapVerbose { return gMapVerbose; }
 export function verboseReversed(): TMapVerboseReverse {
-    if( !gMapReversedVerbose )
+    if( Object.keys( gMapReversedVerbose ).length == 0 )
         gMapReversedVerbose = computeVerboseAlias();
     return gMapReversedVerbose;
 }
@@ -1083,8 +1083,9 @@ export function verboseName2Number( s: string ): number {
     return n;
 }
 
-let gFlagIsExposeDetails = false;
-let gVerboseLevel = verboseName2Number( "information" );
+let gFlagIsExposeDetails: boolean = false;
+let gVerboseLevel: number = verboseName2Number( "information" );
+const gVerboseLevelDefaultValue: number = 6;
 
 export function exposeDetailsGet(): boolean {
     return !!gFlagIsExposeDetails;
@@ -1097,11 +1098,14 @@ export function verboseGet(): number {
     return cc.toInteger( gVerboseLevel );
 }
 export function verboseSet( vl?: TLogArgument ): void {
-    gVerboseLevel = parseInt( vl );
+    gVerboseLevel = 0 + ( vl
+        ? parseInt( ( vl as string ).toString() )
+        : gVerboseLevelDefaultValue
+    );
 }
 
 export function verboseParse( s: string ): number {
-    let n: number = 5;
+    let n: number = 0 + gVerboseLevelDefaultValue;
     try {
         const isNumbersOnly = /^\d+$/.test( s );
         if( isNumbersOnly )

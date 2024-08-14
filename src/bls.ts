@@ -231,6 +231,15 @@ const shell = ( shellMod as any ).default;
 
 const Keccak = sha3Module.Keccak;
 
+let isExposeErrorsOfBLS: boolean = false;
+
+export function exposeBlsErrorsGet(): boolean {
+    return !!isExposeErrorsOfBLS;
+}
+export function exposeBlsErrorsSet( aSomeFlagValue: boolean ): void {
+    isExposeErrorsOfBLS = !!aSomeFlagValue;
+}
+
 function discoverBlsThreshold( joSChainNetworkInfo: discoveryTools.TSChainNetworkInfo ): number {
     const imaState: state.TIMAState = state.get();
     joSChainNetworkInfo = joSChainNetworkInfo || imaState.joSChainNetworkInfo;
@@ -501,7 +510,7 @@ function performBlsGlue(
         joGlueResult = imaUtils.jsonFileLoad( path.join( strActionDir, "glue-result.json" ) );
         details.trace( "{p}BLS glue result is: {}", strLogPrefix, joGlueResult );
         if( joGlueResult && "X" in joGlueResult.signature && "Y" in joGlueResult.signature ) {
-            details.success( "{p}BLS glue success", strLogPrefix );
+            details.debug( "{p}BLS glue success", strLogPrefix ); // success
             joGlueResult.hashSrc = strMessageHash;
             details.trace( "{p}Computing G1 hash point...", strLogPrefix );
             const strPath = strActionDir + "/hash.json";
@@ -536,9 +545,12 @@ function performBlsGlue(
         }
         fnShellRestore();
     } catch ( err ) {
-        details.critical( "{p}BLS glue error description is: {err}, stack is: \n{stack}",
-            strLogPrefix, err, err );
-        details.critical( "{p}BLS glue output is:\n{raw}", strLogPrefix, strOutput || "<<EMPTY>>" );
+        if( exposeBlsErrorsGet() ) {
+            details.critical( "{p}BLS glue error description is: {err}, stack is: \n{stack}",
+                strLogPrefix, err, err );
+        }
+        details.critical( "{p}BLS glue output is:\n{raw}",
+            strLogPrefix, strOutput || "<<EMPTY>>" );
         fnShellRestore();
         joGlueResult = null;
     }
@@ -592,7 +604,7 @@ function performBlsGlueU256(
         joGlueResult = imaUtils.jsonFileLoad( path.join( strActionDir, "glue-result.json" ) );
         details.trace( "{p}BLS glue result is:\n{}", strLogPrefix, joGlueResult );
         if( joGlueResult && "X" in joGlueResult.signature && "Y" in joGlueResult.signature ) {
-            details.success( "{p}BLS glue success", strLogPrefix );
+            details.debug( "{p}BLS glue success", strLogPrefix ); // success
             joGlueResult.hashSrc = strMessageHash;
             details.trace( "{p}Computing G1 hash point...", strLogPrefix );
             const strPath = strActionDir + "/hash.json";
@@ -628,8 +640,10 @@ function performBlsGlueU256(
         }
         fnShellRestore();
     } catch ( err ) {
-        details.critical( "BLS glue error description is: {err}, stack is: \n{stack}",
-            err, err );
+        if( exposeBlsErrorsGet() ) {
+            details.critical( "BLS glue error description is: {err}, stack is: \n{stack}",
+                err, err );
+        }
         details.critical( "BLS glue output is:\n{raw}", strOutput || "<<EMPTY>>" );
         fnShellRestore();
         joGlueResult = null;
@@ -688,12 +702,15 @@ function performBlsVerifyI(
             .toString( "utf8" );
         details.trace( "{p}BLS node #{} verify output is:\n{raw}", strLogPrefix,
             nZeroBasedNodeIndex, strOutput || "<<EMPTY>>" );
-        details.success( "{p}BLS node #{} verify success", strLogPrefix, nZeroBasedNodeIndex );
+        details.debug( // success
+            "{p}BLS node #{} verify success", strLogPrefix, nZeroBasedNodeIndex ); // success
         fnShellRestore();
         return true;
     } catch ( err ) {
-        details.critical( "{p}BLS node #{} verify error:, error description is: {err}, " +
-            "stack is: \n{stack}", strLogPrefix, nZeroBasedNodeIndex, err, err );
+        if( exposeBlsErrorsGet() ) {
+            details.critical( "{p}BLS node #{} verify error:, error description is: {err}, " +
+                "stack is: \n{stack}", strLogPrefix, nZeroBasedNodeIndex, err, err );
+        }
         details.critical( "{p}BLS node #{} verify output is:\n{raw}",
             strLogPrefix, nZeroBasedNodeIndex, strOutput || "<<EMPTY>>" );
         fnShellRestore();
@@ -742,12 +759,15 @@ function performBlsVerifyIU256(
             .toString( "utf8" );
         details.trace( "{p}BLS u256 node #{} verify output is:\n{raw}", strLogPrefix,
             nZeroBasedNodeIndex, strOutput || "<<EMPTY>>" );
-        details.success( "{p}BLS u256 node #{} verify success", strLogPrefix, nZeroBasedNodeIndex );
+        // success
+        details.debug( "{p}BLS u256 node #{} verify success", strLogPrefix, nZeroBasedNodeIndex );
         fnShellRestore();
         return true;
     } catch ( err ) {
-        details.error( "{p}BLS u256 node #{} verify error, error description is: {err}, " +
-            "stack is: \n{stack}", strLogPrefix, nZeroBasedNodeIndex, err, err );
+        if( exposeBlsErrorsGet() ) {
+            details.error( "{p}BLS u256 node #{} verify error, error description is: {err}, " +
+                "stack is: \n{stack}", strLogPrefix, nZeroBasedNodeIndex, err, err );
+        }
         details.error( "{p}BLS u256 node #{} verify output is:\n{raw}",
             strLogPrefix, nZeroBasedNodeIndex, strOutput || "<<EMPTY>>" );
         fnShellRestore();
@@ -811,12 +831,14 @@ function performBlsVerify(
             .toString( "utf8" );
         details.trace( "{p}BLS/summary verify output is:\n{raw}", strLogPrefix,
             strOutput || "<<EMPTY>>" );
-        details.success( "{p}BLS/summary verify success", strLogPrefix );
+        details.debug( "{p}BLS/summary verify success", strLogPrefix ); // success
         fnShellRestore();
         return true;
     } catch ( err ) {
-        details.error( "{p}BLS/summary verify error description is: {err}, stack is:\n{stack}",
-            strLogPrefix, err, err );
+        if( exposeBlsErrorsGet() ) {
+            details.error( "{p}BLS/summary verify error description is: {err}, stack is:\n{stack}",
+                strLogPrefix, err, err );
+        }
         details.error( "BLS/summary verify output is:\n{raw}", strOutput || "<<EMPTY>>" );
         fnShellRestore();
     }
@@ -869,12 +891,14 @@ function performBlsVerifyU256(
             .toString( "utf8" );
         details.trace( "{p}BLS u256/summary verify output is:\n{raw}", strLogPrefix,
             strOutput || "<<EMPTY>>" );
-        details.success( "{p}BLS u256/summary verify success", strLogPrefix );
+        details.debug( "{p}BLS u256/summary verify success", strLogPrefix ); // success
         fnShellRestore();
         return true;
     } catch ( err ) {
-        details.error( "{p}BLS u256/summary  error description is: {err}, stack is: \n{stack}",
-            strLogPrefix, err, err );
+        if( exposeBlsErrorsGet() ) {
+            details.error( "{p}BLS u256/summary  error description is: {err}, stack is: \n{stack}",
+                strLogPrefix, err, err );
+        }
         details.error( "{p}BLS u256/summary verify output is:\n{raw}", strLogPrefix,
             strOutput || "<<EMPTY>>" );
         fnShellRestore();
@@ -977,8 +1001,11 @@ async function checkCorrectnessOfMessagesToSign(
     if( cntBadMessages > 0 ) {
         details.critical( "{p}Correctness validation failed for {} of {} message(s)",
             strLogPrefix, cntBadMessages, cnt );
-    } else
-        details.success( "{p}Correctness validation passed for {} message(s)", strLogPrefix, cnt );
+    } else {
+        // success
+        details.debug(
+            "{p}Correctness validation passed for {} message(s)", strLogPrefix, cnt );
+    }
 }
 
 async function prepareSignMessagesImpl(
@@ -1096,7 +1123,8 @@ async function gatherSigningCheckFinish(
         optsSignOperation.nIdxCurrentMsgBlockStart, optsSignOperation.strFromChainName,
         optsSignOperation.arrSignResults );
     if( joGlueResult ) {
-        optsSignOperation.details.success( "{p}Got BLS glue result: {}",
+        optsSignOperation.details.debug( // success
+            "{p}Got BLS glue result: {}",
             optsSignOperation.strLogPrefixB, joGlueResult );
         if( optsSignOperation.imaState.strPathBlsVerify.length > 0 ) {
             if( !optsSignOperation.imaState.joSChainNetworkInfo )
@@ -1105,8 +1133,10 @@ async function gatherSigningCheckFinish(
                 optsSignOperation.details, optsSignOperation.imaState.joSChainNetworkInfo, false );
             if( !joCommonPublicKey ) {
                 strError = "No BLS common public key";
-                optsSignOperation.details.error( "{p}{err}",
-                    optsSignOperation.strLogPrefixB, strError );
+                if( exposeBlsErrorsGet() ) {
+                    optsSignOperation.details.error( "{p}{err}",
+                        optsSignOperation.strLogPrefixB, strError );
+                }
             } else if( performBlsVerify(
                 optsSignOperation.details, optsSignOperation.strDirection,
                 joGlueResult, optsSignOperation.jarrMessages,
@@ -1114,12 +1144,15 @@ async function gatherSigningCheckFinish(
                 optsSignOperation.strFromChainName, joCommonPublicKey
             ) ) {
                 strSuccessfulResultDescription = "Got successful summary BLS verification result";
-                optsSignOperation.details.success( "{p}{bright}",
+                optsSignOperation.details.debug( // success
+                    "{p}{bright}",
                     optsSignOperation.strLogPrefixB, strSuccessfulResultDescription );
             } else {
                 strError = "BLS verification failed";
-                optsSignOperation.details.error( "{p}{err}",
-                    optsSignOperation.strLogPrefixB, strError );
+                if( exposeBlsErrorsGet() ) {
+                    optsSignOperation.details.error( "{p}{err}",
+                        optsSignOperation.strLogPrefixB, strError );
+                }
             }
         }
     } else {
@@ -1135,8 +1168,10 @@ async function gatherSigningCheckFinish(
     optsSignOperation.fn(
         strError, optsSignOperation.jarrMessages, joGlueResult )
         .catch( function( err: Error | string ): void {
-            optsSignOperation.details.critical(
-                "Problem(2) in BLS sign result handler: {err}", err );
+            if( exposeBlsErrorsGet() ) {
+                optsSignOperation.details.critical(
+                    "Problem(2) in BLS sign result handler: {err}", err );
+            }
             optsSignOperation.errGathering = "Problem(2) in BLS sign " +
                 `result handler: ${owaspUtils.extractErrorMessage( err )}`;
         } );
@@ -1154,9 +1189,11 @@ async function gatherSigningCheckOverflow(
         optsSignOperation.jarrMessages, null
     ).catch( function( err: Error | string ): void {
         const cntSuccess = optsSignOperation.arrSignResults.length;
-        optsSignOperation.details.error(
-            "Problem(3) in BLS sign result handler, not enough successful BLS signature " +
-            "parts({}) when all attempts done, error details: {err}", cntSuccess, err );
+        if( exposeBlsErrorsGet() ) {
+            optsSignOperation.details.error(
+                "Problem(3) in BLS sign result handler, not enough successful BLS signature " +
+                "parts({}) when all attempts done, error details: {err}", cntSuccess, err );
+        }
         optsSignOperation.errGathering = "Problem(3) in BLS sign result handler, not enough " +
             `successful BLS signature parts(${cntSuccess}) when all attempts done, ` +
             `error details: ${owaspUtils.extractErrorMessage( err )}`;
@@ -1186,9 +1223,11 @@ async function gatherSigningStartImpl(
         optsSignOperation.jarrMessages, null
     ).catch( function( err: Error | string ): void {
         const cntSuccess = optsSignOperation.arrSignResults.length;
-        optsSignOperation.details.critical(
-            "Problem(4) in BLS sign result handler, not enough successful BLS signature " +
-            "parts({}) and timeout reached, error details: {err}", cntSuccess, err );
+        if( exposeBlsErrorsGet() ) {
+            optsSignOperation.details.critical(
+                "Problem(4) in BLS sign result handler, not enough successful BLS signature " +
+                "parts({}) and timeout reached, error details: {err}", cntSuccess, err );
+        }
         optsSignOperation.errGathering = "Problem(4) in BLS sign result handler, not enough " +
             `successful BLS signature parts(${cntSuccess}) and timeout reached, ` +
             `error details: ${owaspUtils.extractErrorMessage( err )}`;
@@ -1213,10 +1252,12 @@ async function gatherSigningFinishImpl(
                 optsSignOperation.jarrMessages, null
             ).catch( function( err: Error | string ): void {
                 const cntSuccess = optsSignOperation.arrSignResults.length;
-                optsSignOperation.details.error(
-                    "Problem(5) in BLS sign result handler, not enough successful BLS " +
-                    "signature parts({}) and timeout reached, error details: {err}",
-                    cntSuccess, err );
+                if( exposeBlsErrorsGet() ) {
+                    optsSignOperation.details.error(
+                        "Problem(5) in BLS sign result handler, not enough successful BLS " +
+                        "signature parts({}) and timeout reached, error details: {err}",
+                        cntSuccess, err );
+                }
                 optsSignOperation.details.exposeDetailsTo(
                     log.globalStream(), optsSignOperation.strGatheredDetailsName, false );
                 optsSignOperation.details.close();
@@ -1226,8 +1267,10 @@ async function gatherSigningFinishImpl(
         return;
     }
     if( !optsSignOperation.bHaveResultReportCalled ) {
-        optsSignOperation.details.error( "Failed BLS sign result awaiting(2): {err}",
-            "No reports were arrived" );
+        if( exposeBlsErrorsGet() ) {
+            optsSignOperation.details.error( "Failed BLS sign result awaiting(2): {err}",
+                "No reports were arrived" );
+        }
         optsSignOperation.bHaveResultReportCalled = true;
         await optsSignOperation.fn(
             `Failed to gather BLS signatures in ${optsSignOperation.jarrNodes.length}  node(s), ` +
@@ -1235,9 +1278,11 @@ async function gatherSigningFinishImpl(
             optsSignOperation.jarrMessages, null
         ).catch( function( err: Error | string ): void {
             const cntSuccess = optsSignOperation.arrSignResults.length;
-            optsSignOperation.details.error(
-                "Problem(6) in BLS sign result handler, not enough successful BLS signature " +
-                "parts({}) and timeout reached, error details: {err}", cntSuccess, err );
+            if( exposeBlsErrorsGet() ) {
+                optsSignOperation.details.error(
+                    "Problem(6) in BLS sign result handler, not enough successful BLS signature " +
+                    "parts({}) and timeout reached, error details: {err}", cntSuccess, err );
+            }
             optsSignOperation.details.exposeDetailsTo(
                 log.globalStream(), optsSignOperation.strGatheredDetailsName, false );
             optsSignOperation.details.close();
@@ -1335,7 +1380,7 @@ async function doSignProcessHandleCall(
                 const cntSuccess = optsSignOperation.arrSignResults.length;
                 if( cntSuccess > optsSignOperation.nCountOfBlsPartsToCollect ) {
                     ++optsSignOperation.joGatheringTracker.nCountSkipped;
-                    optsSignOperation.details.notice(
+                    optsSignOperation.details.debug(
                         "{p}Will ignore sign result for node {} because {}/{} threshold number " +
                         "of BLS signature parts already gathered",
                         optsSignOperation.strLogPrefixA, nZeroBasedNodeIndex,
@@ -1368,20 +1413,24 @@ async function doSignProcessHandleCall(
                     optsSignOperation.strFromChainName,
                     joPublicKey
                 ) ) {
-                    optsSignOperation.details.success(
+                    optsSignOperation.details.debug( // success
                         "{p}Got successful BLS verification result for node {} with index {}",
                         optsSignOperation.strLogPrefixA, joNode.nodeID, nZeroBasedNodeIndex );
                     bNodeSignatureOKay = true; // node verification passed
                 } else {
-                    optsSignOperation.details.error( "{p} BLS verification failed",
-                        optsSignOperation.strLogPrefixA );
+                    if( exposeBlsErrorsGet() ) {
+                        optsSignOperation.details.error( "{p} BLS verification failed",
+                            optsSignOperation.strLogPrefixA );
+                    }
                 }
             } catch ( err ) {
-                optsSignOperation.details.critical(
-                    "{p}S-Chain node {} partial signature fail from with index {}" +
-                    ", error is {err}, sequence ID is {}, stack is:\n{stack}",
-                    optsSignOperation.strLogPrefixA, strNodeDescColorized, nZeroBasedNodeIndex,
-                    err, optsSignOperation.sequenceId, err );
+                if( exposeBlsErrorsGet() ) {
+                    optsSignOperation.details.critical(
+                        "{p}S-Chain node {} partial signature fail from with index {}" +
+                        ", error is {err}, sequence ID is {}, stack is:\n{stack}",
+                        optsSignOperation.strLogPrefixA, strNodeDescColorized, nZeroBasedNodeIndex,
+                        err, optsSignOperation.sequenceId, err );
+                }
             }
             if( bNodeSignatureOKay ) {
                 optsSignOperation.arrSignResults.push( {
@@ -1421,11 +1470,13 @@ async function doSignProcessOneImpl(
         ).catch( function( err: Error | string ): void {
             ++optsSignOperation.joGatheringTracker.nCountReceived;
             ++optsSignOperation.joGatheringTracker.nCountErrors;
-            optsSignOperation.details.error(
-                "{p}JSON RPC call(doSignProcessOneImpl) to S-Chain node {} failed, " +
-                "RPC call failed, error is: {err}, sequence ID is {}",
-                optsSignOperation.strLogPrefix, strNodeDescColorized,
-                err, optsSignOperation.sequenceId );
+            if( exposeBlsErrorsGet() ) {
+                optsSignOperation.details.error(
+                    "{p}JSON RPC call(doSignProcessOneImpl) to S-Chain node {} failed, " +
+                    "RPC call failed, error is: {err}, sequence ID is {}",
+                    optsSignOperation.strLogPrefix, strNodeDescColorized,
+                    err, optsSignOperation.sequenceId );
+            }
             if( joCall )
                 joCall.disconnect().then( function(): void {} ).catch( function(): void {} );
         } );
@@ -1536,16 +1587,20 @@ async function doSignMessagesImpl(
             }
             doSignProcessOneImpl( i, optsSignOperation )
                 .then( function(): void {} ).catch( function( err ): void {
-                    log.error(
-                        "Failed single BLS sign processing, reported error is: {err}", err );
+                    if( exposeBlsErrorsGet() ) {
+                        log.error(
+                            "Failed single BLS sign processing, reported error is: {err}", err );
+                    }
                 } );
         }
         await gatherSigningStartImpl( optsSignOperation );
         await gatherSigningFinishImpl( optsSignOperation );
     } catch ( err ) {
         if( optsSignOperation.details ) {
-            optsSignOperation.details.critical( "Failed BLS sign due to generic " +
-                "flow exception: {err}, stack is:\n{stack}", err, err );
+            if( exposeBlsErrorsGet() ) {
+                optsSignOperation.details.critical( "Failed BLS sign due to generic " +
+                    "flow exception: {err}, stack is:\n{stack}", err, err );
+            }
         }
         if( !optsSignOperation.bHaveResultReportCalled ) {
             optsSignOperation.bHaveResultReportCalled = true;
@@ -1565,7 +1620,8 @@ async function doSignMessagesImpl(
             } );
         }
     }
-    optsSignOperation.details.success( "{p} completed", optsSignOperation.strGatheredDetailsName );
+    optsSignOperation.details.debug( // success
+        "{p} completed", optsSignOperation.strGatheredDetailsName );
     if( optsSignOperation.details ) {
         optsSignOperation.details.exposeDetailsTo(
             log.globalStream(), optsSignOperation.strGatheredDetailsName, true );
@@ -1680,7 +1736,7 @@ async function doSignU256OneImplHandleCallResult(
                 const cntSuccess = optsSignU256.arrSignResults.length;
                 if( cntSuccess > optsSignU256.nCountOfBlsPartsToCollect ) {
                     ++optsSignU256.joGatheringTracker.nCountSkipped;
-                    optsSignU256.details.notice(
+                    optsSignU256.details.debug(
                         "{p}Will ignore sign result for node {} because {}/{} threshold " +
                         "number of BLS signature parts already gathered", strLogPrefixA,
                         nZeroBasedNodeIndex, optsSignU256.nThreshold,
@@ -1704,21 +1760,25 @@ async function doSignU256OneImplHandleCallResult(
                 if( performBlsVerifyIU256(
                     optsSignU256.details, nZeroBasedNodeIndex, joResultFromNode,
                     optsSignU256.u256, joPublicKey ) ) {
-                    optsSignU256.details.success(
+                    optsSignU256.details.debug( // success
                         "{p}Got successful BLS verification result for node {} " +
                         "with index {}", strLogPrefixA, joNode.nodeID,
                         nZeroBasedNodeIndex );
                     bNodeSignatureOKay = true; // node verification passed
                 } else {
-                    optsSignU256.details.error( "{p} BLS u256 one node verify failed",
-                        strLogPrefixA );
+                    if( exposeBlsErrorsGet() ) {
+                        optsSignU256.details.error( "{p} BLS u256 one node verify failed",
+                            strLogPrefixA );
+                    }
                 }
             } catch ( err ) {
-                optsSignU256.details.critical(
-                    "{p}S-Chain node {} sign CRITICAL ERROR: partial signature fail from " +
-                    "with index {}, error is {err}, stack is:\n{stack}",
-                    strLogPrefixA, strNodeDescColorized, nZeroBasedNodeIndex,
-                    err, err );
+                if( exposeBlsErrorsGet() ) {
+                    optsSignU256.details.critical(
+                        "{p}S-Chain node {} sign CRITICAL ERROR: partial signature fail from " +
+                        "with index {}, error is {err}, stack is:\n{stack}",
+                        strLogPrefixA, strNodeDescColorized, nZeroBasedNodeIndex,
+                        err, err );
+                }
             }
             if( bNodeSignatureOKay ) {
                 optsSignU256.arrSignResults.push( {
@@ -1733,10 +1793,12 @@ async function doSignU256OneImplHandleCallResult(
         }
     } catch ( err ) {
         ++optsSignU256.joGatheringTracker.nCountErrors;
-        optsSignU256.details.critical(
-            "{p}S-Chain node {} signature fail from node {}, error is {err}, " +
-            "stack is:\n{stack}", optsSignU256.strLogPrefix,
-            strNodeDescColorized, joNode.nodeID, err, err );
+        if( exposeBlsErrorsGet() ) {
+            optsSignU256.details.critical(
+                "{p}S-Chain node {} signature fail from node {}, error is {err}, " +
+                "stack is:\n{stack}", optsSignU256.strLogPrefix,
+                strNodeDescColorized, joNode.nodeID, err, err );
+        }
     }
     await joCall.disconnect();
 }
@@ -1771,10 +1833,12 @@ async function doSignU256OneImpl(
     } catch ( err ) {
         ++optsSignU256.joGatheringTracker.nCountReceived;
         ++optsSignU256.joGatheringTracker.nCountErrors;
-        optsSignU256.details.error(
-            "{p}JSON RPC call(doSignU256OneImpl) to S-Chain node {} failed, RPC call was " +
-            "not created, error is: {err}",
-            optsSignU256.strLogPrefix, strNodeDescColorized, err );
+        if( exposeBlsErrorsGet() ) {
+            optsSignU256.details.error(
+                "{p}JSON RPC call(doSignU256OneImpl) to S-Chain node {} failed, RPC call was " +
+                "not created, error is: {err}",
+                optsSignU256.strLogPrefix, strNodeDescColorized, err );
+        }
         if( joCall )
             await joCall.disconnect();
         return true;
@@ -1802,7 +1866,8 @@ async function gatherSigningCheckFinish256(
     const joGlueResult: TBLSGlueResult | null = performBlsGlueU256(
         optsSignU256.details, optsSignU256.u256, optsSignU256.arrSignResults );
     if( joGlueResult ) {
-        optsSignU256.details.success( "{p}Got BLS glue u256 result: {}",
+        optsSignU256.details.debug( // success
+            "{p}Got BLS glue u256 result: {}",
             strLogPrefixB, joGlueResult );
         if( optsSignU256.imaState.strPathBlsVerify.length > 0 ) {
             if( !optsSignU256.imaState.joSChainNetworkInfo )
@@ -1813,24 +1878,30 @@ async function gatherSigningCheckFinish256(
                 if( !optsSignU256.imaState.joSChainNetworkInfo )
                     throw new Error( "No own S-Chain network information" );
                 const strError = "No BLS common public key";
-                optsSignU256.details.error( "{p}{}", strLogPrefixB, strError );
+                if( exposeBlsErrorsGet() )
+                    optsSignU256.details.error( "{p}{}", strLogPrefixB, strError );
             } else if( performBlsVerifyU256( optsSignU256.details, joGlueResult,
                 optsSignU256.u256, joCommonPublicKey ) ) {
                 const strSuccessfulResultDescription =
                     "Got successful summary BLS u256 verification result";
-                optsSignU256.details.success( "{p}{}", strLogPrefixB,
+                optsSignU256.details.debug( // success
+                    "{p}{}", strLogPrefixB,
                     strSuccessfulResultDescription );
             } else {
                 const strError = "BLS verification failed";
-                optsSignU256.details.error( "{p}BLS verification failure:{}",
-                    strLogPrefixB, strError );
+                if( exposeBlsErrorsGet() ) {
+                    optsSignU256.details.error( "{p}BLS verification failure:{}",
+                        strLogPrefixB, strError );
+                }
             }
         }
     } else {
         const strError = "BLS u256 glue failed, no glue result arrived";
-        optsSignU256.details.error(
-            "{p}Problem(1) in BLS u256 sign result handler: {err}",
-            strLogPrefixB, strError );
+        if( exposeBlsErrorsGet() ) {
+            optsSignU256.details.error(
+                "{p}Problem(1) in BLS u256 sign result handler: {err}",
+                strLogPrefixB, strError );
+        }
     }
     optsSignU256.details.trace(
         "Will call signed-256 answer-sending callback {}, u256 is {}, " +
@@ -1838,8 +1909,10 @@ async function gatherSigningCheckFinish256(
         optsSignU256.u256, joGlueResult );
     optsSignU256.fn( strError, [ optsSignU256.u256 ], joGlueResult )
         .catch( function( err: Error | string ): void {
-            optsSignU256.details.critical(
-                "Problem(2) in BLS u256 sign result handler: {err}", err );
+            if( exposeBlsErrorsGet() ) {
+                optsSignU256.details.critical(
+                    "Problem(2) in BLS u256 sign result handler: {err}", err );
+            }
             optsSignU256.errGathering = "Problem(2) in BLS u256 sign result " +
                 `handler: ${owaspUtils.extractErrorMessage( err )}`;
         } );
@@ -1856,10 +1929,12 @@ async function gatherSigningCheckOverflow256(
         `${optsSignU256.jarrNodes.length}  node(s)`, [ optsSignU256.u256 ], null
     ).catch( function( err: Error | string ): void {
         const cntSuccess = optsSignU256.arrSignResults.length;
-        optsSignU256.details.critical(
-            "Problem(3) in BLS u256 sign result handler, not enough successful BLS " +
-            "signature parts({} when all attempts done, error details: {err}",
-            cntSuccess, err );
+        if( exposeBlsErrorsGet() ) {
+            optsSignU256.details.critical(
+                "Problem(3) in BLS u256 sign result handler, not enough successful BLS " +
+                "signature parts({} when all attempts done, error details: {err}",
+                cntSuccess, err );
+        }
         optsSignU256.errGathering = "Problem(3) in BLS u256 sign result handler, not " +
             `enough successful BLS signature parts(${cntSuccess} when all attempts ` +
             `done, error details: ${owaspUtils.extractErrorMessage( err )}`;
@@ -1887,10 +1962,12 @@ async function doSignU256Gathering( optsSignU256: TSignU256Options ): Promise < 
         [ optsSignU256.u256 ], null
     ).catch( function( err: Error | string ): void {
         const cntSuccess = optsSignU256.arrSignResults.length;
-        optsSignU256.details.error(
-            "Problem(4) in BLS u256 sign result handler, not enough successful BLS " +
-            "signature parts({}) and timeout reached, error details: {err",
-            cntSuccess, err );
+        if( exposeBlsErrorsGet() ) {
+            optsSignU256.details.error(
+                "Problem(4) in BLS u256 sign result handler, not enough successful BLS " +
+                "signature parts({}) and timeout reached, error details: {err",
+                cntSuccess, err );
+        }
         optsSignU256.errGathering = "Problem(4) in BLS u256 sign result handler, not " +
             `enough successful BLS signature parts(${cntSuccess}) and timeout ` +
             `reached, error details: ${owaspUtils.extractErrorMessage( err )}`;
@@ -1950,7 +2027,7 @@ export async function doSignU256(
             optsSignU256.errGathering.toString() );
         return;
     }
-    optsSignU256.details.information( "{p}Completed signing u256 procedure",
+    optsSignU256.details.debug( "{p}Completed signing u256 procedure",
         optsSignU256.strLogPrefix );
 }
 
@@ -2010,18 +2087,21 @@ export async function doVerifyReadyHash(
             .toString( "utf8" );
         details.trace( "{p}BLS node #{} verify output is:\n{raw}", strLogPrefix,
             nZeroBasedNodeIndex, strOutput || "<<EMPTY>>" );
-        details.success( "{p}BLS node #{} verify success", strLogPrefix, nZeroBasedNodeIndex );
+        details.debug( // success
+            "{p}BLS node #{} verify success", strLogPrefix, nZeroBasedNodeIndex );
         fnShellRestore();
         isSuccess = true;
     } catch ( err ) {
-        details.critical( "{p}BLS node #{} verify error, error description is: {err}" +
+        if( exposeBlsErrorsGet() ) {
+            details.critical( "{p}BLS node #{} verify error, error description is: {err}" +
                 ", stack is:\n{stack}", strLogPrefix, nZeroBasedNodeIndex, err, err );
+        }
         details.critical( "{p}BLS node #{} verify output is:\n{raw}",
             strLogPrefix, nZeroBasedNodeIndex, strOutput || "<<EMPTY>>" );
         fnShellRestore();
         isSuccess = false;
     }
-    if( isExposeOutput || !isSuccess )
+    if( isExposeOutput || ( !isSuccess ) )
         details.exposeDetailsTo( log.globalStream(), "BLS-raw-verifier", isSuccess );
     details.close();
     return isSuccess;
@@ -2042,7 +2122,8 @@ async function doSignReadyHashHandleCallResult(
         joSignResult = joOut.signResult;
     if( !joSignResult ) {
         const strError = "No signature arrived";
-        details.error( "{p}BLS-sign(1) finished with error: {err}", strLogPrefix, strError );
+        if( exposeBlsErrorsGet() )
+            details.error( "{p}BLS-sign(1) finished with error: {err}", strLogPrefix, strError );
         await joCall.disconnect();
         throw new Error( strError );
     }
@@ -2051,8 +2132,10 @@ async function doSignReadyHashHandleCallResult(
         joSignResult.errorMessage.length > 0
     ) {
         const strError = `BLS-sign finished with error: ${joSignResult.errorMessage};`;
-        details.error( "{p}BLS-sign(2) finished with error: {err}",
-            strLogPrefix, joSignResult.errorMessage );
+        if( exposeBlsErrorsGet() ) {
+            details.error( "{p}BLS-sign(2) finished with error: {err}",
+                strLogPrefix, joSignResult.errorMessage );
+        }
         await joCall.disconnect();
         throw new Error( strError );
     }
@@ -2132,7 +2215,7 @@ export async function doSignReadyHash(
     }
     const isSuccess = !!( (
         joSignResult && typeof joSignResult === "object" && !joSignResult.error ) );
-    if( isExposeOutput || !isSuccess )
+    if( isExposeOutput || ( !isSuccess ) )
         details.exposeDetailsTo( log.globalStream(), "BLS-raw-signer", isSuccess );
     details.close();
     return joSignResult;
@@ -2438,7 +2521,8 @@ async function handleBlsSignMessageHash256Result(
         const strError = "No signature arrived";
         optsBSU256.joRetVal.error = strError;
         optsBSU256.details.error(
-            "{p}U256/BLS-sign(1) finished with error: {err}", optsBSU256.strLogPrefix, strError );
+            "{p}U256/BLS-sign(1) finished with error: {err}",
+            optsBSU256.strLogPrefix, strError );
         await joCall.disconnect();
         throw new Error( strError );
     }
