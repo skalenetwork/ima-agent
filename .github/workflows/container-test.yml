@@ -328,7 +328,7 @@ jobs:
         cd sgxwallet/run_sgx_sim
         rm -rf ../../local_sgxwallet_output_log.txt &> /dev/null
         echo " --------------------------- stopping sgx wallet ------------------------------------------------------------------------------------------------------ "
-        docker-compose down
+        docker compose down
         echo " --------------------------- fixing sgx wallets docker config ----------------------------------------------------------------------------------------- "
         mv docker-compose.yml docker-compose.yml.old-previous || true
         echo "version: '3'"                                 > docker-compose.yml
@@ -354,7 +354,7 @@ jobs:
         echo '        max-file: "4"'                       >> docker-compose.yml
         echo '    command: -s -y -V -d'                    >> docker-compose.yml
         echo " --------------------------- pulling sgx wallet ------------------------------------------------------------------------------------------------------- "
-        docker-compose pull
+        docker compose pull
         cd ../..
         cd ..
 
@@ -363,7 +363,7 @@ jobs:
       run: |
         cd comprehensive-test
         cd sgxwallet/run_sgx_sim
-        docker-compose up &> ../../local_sgxwallet_output_log.txt &
+        docker compose up &> ../../local_sgxwallet_output_log.txt &
         sleep 90
         cd ../..
         cd ..
@@ -458,7 +458,7 @@ jobs:
       run: |
         cd comprehensive-test
         cd sgxwallet/run_sgx_sim
-        docker-compose down
+        docker compose down
         cd ../..
         cd ..
 
