@@ -1,14 +1,14 @@
 
 name: Comprehensive test
 
-on: 
+on:
   push:
     branches-ignore:
       - 'docs-v*'
   pull_request:
     branches-ignore:
       - 'docs-v*'
-  
+
 jobs:
   cancel-runs:
     name: Cancel Previous Runs
@@ -141,12 +141,12 @@ jobs:
         sudo rm -rf /usr/local/include/node* || true &> /dev/null
         sudo rm -rf /usr/local/bin/node* || true &> /dev/null
 
-    - name: INIT - install Node JS
-      run: |
-        curl -sL https://deb.nodesource.com/setup_18.x | sudo bash -
-        sudo apt-get install -y nodejs
-        sudo ln -s /usr/bin/node /usr/local/bin/node || true
-        
+    - name: Install NODE JS
+      uses: actions/setup-node@v2
+      with:
+        node-version: 20
+        cache: 'yarn'
+
     - name: INIT - install Node utilities
       run: |
         sudo npm install --global npm
@@ -201,6 +201,7 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: 3.8
+        cache: 'pip'
 
     - name: INIT - Install everything in IMA
       working-directory: ${{env.working-directory}}
@@ -274,7 +275,7 @@ jobs:
       working-directory: ${{env.working-directory}}
       run: |
         cd comprehensive-test
-        cd engine 
+        cd engine
         yarn install
 
     - name: INIT - download SGX Wallet
