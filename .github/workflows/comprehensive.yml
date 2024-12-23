@@ -141,11 +141,15 @@ jobs:
         sudo rm -rf /usr/local/include/node* || true &> /dev/null
         sudo rm -rf /usr/local/bin/node* || true &> /dev/null
 
-    - name: Install NODE JS
-      uses: actions/setup-node@v2
+    - name: Setup Node.js and Yarn
+      uses: actions/setup-node@v3
       with:
         node-version: 20
         cache: 'yarn'
+        check-latest: true
+
+    - name: Verify Yarn Installation
+      run: yarn --version
 
     - name: INIT - install Node utilities
       run: |
