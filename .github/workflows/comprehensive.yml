@@ -349,7 +349,7 @@ jobs:
       run: |
         cd comprehensive-test
         rm -rf transaction-manager || true
-        git clone https://github.com/skalenetwork/transaction-manager --recursive
+        git clone --branch stable https://github.com/skalenetwork/transaction-manager --recursive
         cd ..
 
     - name: INIT - start transaction manager and redis
