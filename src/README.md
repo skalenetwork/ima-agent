@@ -52,7 +52,7 @@ Notice: `ACCOUNT_FOR_ETHEREUM` address corresponds to `PRIVATE_KEY_FOR_ETHEREUM`
 Rebuild all the contracts once to ensure everything initialized OK:
 
 ```shell
-    cd $IMA_ROOT/proxy
+    cd $IMA_ROOT
     npx hardhat clean && npx hardhat compile
 ```
 
@@ -61,7 +61,7 @@ Rebuild all the contracts once to ensure everything initialized OK:
 For mainnet, invoke:
 
 ```shell
-    cd $IMA_ROOT/proxy
+    cd $IMA_ROOT
     yarn run deploy-to-mainnet
     ls -1 ./data/
 ```
@@ -71,7 +71,7 @@ You should see **proxyMainnet.json** file listed.
 For SKALE chain, invoke:
 
 ```shell
-    cd $IMA_ROOT/proxy
+    cd $IMA_ROOT
     yarn run deploy-to-schain
     ls -1 ./data/
 ```
@@ -153,8 +153,8 @@ You can check whether **IMA** is already bound with:
         --id-s-chain=Bob \
         --cid-main-net=-4 \
         --cid-s-chain=-4 \
-        --abi-main-net=../proxy/data/proxyMainnet.json \
-        --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+        --abi-main-net=../data/proxyMainnet.json \
+        --abi-s-chain=../data/proxySchain_Bob.json \
         --key-main-net=$PRIVATE_KEY_FOR_ETHEREUM \
         --key-s-chain=$PRIVATE_KEY_FOR_SCHAIN
 ```
@@ -170,8 +170,8 @@ You can check whether **IMA** is already bound with:
         --id-s-chain=Bob \
         --cid-main-net=-4 \
         --cid-s-chain=-4 \
-        --abi-main-net=../proxy/data/proxyMainnet.json \
-        --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+        --abi-main-net=../data/proxyMainnet.json \
+        --abi-s-chain=../data/proxySchain_Bob.json \
         --key-main-net=$PRIVATE_KEY_FOR_ETHEREUM \
         --key-s-chain=$PRIVATE_KEY_FOR_SCHAIN
 ```
@@ -189,8 +189,8 @@ Performed with the **--loop** command line option:
         --id-s-chain=Bob \
         --cid-main-net=-4 \
         --cid-s-chain=-4 \
-        --abi-main-net=../proxy/data/proxyMainnet.json \
-        --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+        --abi-main-net=../data/proxyMainnet.json \
+        --abi-s-chain=../data/proxySchain_Bob.json \
         --key-main-net=$PRIVATE_KEY_FOR_ETHEREUM \
         --key-s-chain=$PRIVATE_KEY_FOR_SCHAIN
 ```
@@ -211,8 +211,8 @@ Show balance:
         --id-s-chain=Bob \
         --cid-main-net=-4 \
         --cid-s-chain=-4 \
-        --abi-main-net=../proxy/data/proxyMainnet.json \
-        --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+        --abi-main-net=../data/proxyMainnet.json \
+        --abi-s-chain=../data/proxySchain_Bob.json \
         --reimbursement-chain=Bob \
         --reimbursement-balance
         --receiver=$ADDRESS_FOR_ETHEREUM
@@ -228,8 +228,8 @@ Estimate amount:
         --id-s-chain=Bob \
         --cid-main-net=-4 \
         --cid-s-chain=-4 \
-        --abi-main-net=../proxy/data/proxyMainnet.json \
-        --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+        --abi-main-net=../data/proxyMainnet.json \
+        --abi-s-chain=../data/proxySchain_Bob.json \
         --reimbursement-chain=Bob \
         --reimbursement-estimate \
         --receiver=$ADDRESS_FOR_ETHEREUM
@@ -245,8 +245,8 @@ Recharge balance with 1 ETH:
         --id-s-chain=Bob \
         --cid-main-net=-4 \
         --cid-s-chain=-4 \
-        --abi-main-net=../proxy/data/proxyMainnet.json \
-        --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+        --abi-main-net=../data/proxyMainnet.json \
+        --abi-s-chain=../data/proxySchain_Bob.json \
         --key-main-net=$PRIVATE_KEY_FOR_ETHEREUM \
         --reimbursement-chain=Bob \
         --reimbursement-recharge=1eth
@@ -262,8 +262,8 @@ Withdraw 1 ETH:
         --id-s-chain=Bob \
         --cid-main-net=-4 \
         --cid-s-chain=-4 \
-        --abi-main-net=../proxy/data/proxyMainnet.json \
-        --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+        --abi-main-net=../data/proxyMainnet.json \
+        --abi-s-chain=../data/proxySchain_Bob.json \
         --key-main-net=$PRIVATE_KEY_FOR_ETHEREUM \
         --reimbursement-chain=Bob \
         --reimbursement-withdraw=1eth
@@ -279,8 +279,8 @@ Set minimal time range in seconds between **S-Chain** back to **Main Net** messa
         --id-s-chain=Bob \
         --cid-main-net=-4 \
         --cid-s-chain=-4 \
-        --abi-main-net=../proxy/data/proxyMainnet.json \
-        --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+        --abi-main-net=../data/proxyMainnet.json \
+        --abi-s-chain=../data/proxySchain_Bob.json \
         --key-main-net=$PRIVATE_KEY_FOR_ETHEREUM \
         --key-s-chain=$PRIVATE_KEY_FOR_S_CHAIN \
         --reimbursement-range=0
@@ -328,8 +328,8 @@ Performed with the **--m2s-payment** command line option:
         --id-s-chain=Bob \
         --cid-main-net=-4 \
         --cid-s-chain=-4 \
-        --abi-main-net=../proxy/data/proxyMainnet.json \
-        --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+        --abi-main-net=../data/proxyMainnet.json \
+        --abi-s-chain=../data/proxySchain_Bob.json \
         --key-main-net=$PRIVATE_KEY_FOR_ETHEREUM \
         --address-s-chain=$ACCOUNT_FOR_SCHAIN
 ```
@@ -350,8 +350,8 @@ Performed with the **--s2m-payment** command line option:
         --id-s-chain=Bob \
         --cid-main-net=-4 \
         --cid-s-chain=-4 \
-        --abi-main-net=../proxy/data/proxyMainnet.json \
-        --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+        --abi-main-net=../data/proxyMainnet.json \
+        --abi-s-chain=../data/proxySchain_Bob.json \
         --address-main-net=$ACCOUNT_FOR_ETHEREUM \
         --key-s-chain=$PRIVATE_KEY_FOR_SCHAIN
 ```
@@ -371,8 +371,8 @@ Performed with the **--s2m-view** command line option:
         --cid-main-net=-4 \
         --cid-s-chain=-4 \
         --id-s-chain=Bob \
-        --abi-main-net=../proxy/data/proxyMainnet.json \
-        --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+        --abi-main-net=../data/proxyMainnet.json \
+        --abi-s-chain=../data/proxySchain_Bob.json \
         --key-main-net=$PRIVATE_KEY_FOR_ETHEREUM
 ```
 
@@ -391,8 +391,8 @@ Performed with the **--s2m-receive** command line option:
         --id-s-chain=Bob \
         --cid-main-net=-4 \
         --cid-s-chain=-4 \
-        --abi-main-net=../proxy/data/proxyMainnet.json \
-        --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+        --abi-main-net=../data/proxyMainnet.json \
+        --abi-s-chain=../data/proxySchain_Bob.json \
         --key-main-net=$PRIVATE_KEY_FOR_ETHEREUM
 ```
 
@@ -430,8 +430,8 @@ Performed with the **--m2s-transfer** command line option:
         --id-s-chain=Bob \
         --cid-main-net=-4 \
         --cid-s-chain=-4 \
-        --abi-main-net=../proxy/data/proxyMainnet.json \
-        --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+        --abi-main-net=../data/proxyMainnet.json \
+        --abi-s-chain=../data/proxySchain_Bob.json \
         --key-main-net=PRIVATE_KEY_FOR_ETHEREUM \
         --key-s-chain=$PRIVATE_KEY_FOR_SCHAIN
 ```
@@ -449,8 +449,8 @@ Performed with the **--s2m-transfer** command line option:
         --id-s-chain=Bob \
         --cid-main-net=-4 \
         --cid-s-chain=-4 \
-        --abi-main-net=../proxy/data/proxyMainnet.json \
-        --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+        --abi-main-net=../data/proxyMainnet.json \
+        --abi-s-chain=../data/proxySchain_Bob.json \
         --key-main-net=$PRIVATE_KEY_FOR_ETHEREUM \
         --key-s-chain=$PRIVATE_KEY_FOR_SCHAIN
 ```
@@ -468,8 +468,8 @@ Performed with the **--transfer** command line option:
         --id-s-chain=Bob \
         --cid-main-net=-4 \
         --cid-s-chain=-4 \
-        --abi-main-net=../proxy/data/proxyMainnet.json \
-        --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+        --abi-main-net=../data/proxyMainnet.json \
+        --abi-s-chain=../data/proxySchain_Bob.json \
         --key-main-net=$PRIVATE_KEY_FOR_ETHEREUM \
         --key-s-chain=$PRIVATE_KEY_FOR_SCHAIN
 ```
@@ -515,8 +515,8 @@ Performed with the **--m2s-payment** command line option:
         --id-s-chain=Bob \
         --cid-main-net=-4 \
         --cid-s-chain=-4 \
-        --abi-main-net=../proxy/data/proxyMainnet.json \
-        --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+        --abi-main-net=../data/proxyMainnet.json \
+        --abi-s-chain=../data/proxySchain_Bob.json \
         --erc20-main-net=...path.../data-mn.json \
         --erc20-s-chain=...path.../data-sc.json \
         --key-main-net=$PRIVATE_KEY_FOR_ETHEREUM \
@@ -552,8 +552,8 @@ Performed with the **--s2m-payment** command line option:
         --id-s-chain=Bob \
         --cid-main-net=-4 \
         --cid-s-chain=-4 \
-        --abi-main-net=../proxy/data/proxyMainnet.json \
-        --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+        --abi-main-net=../data/proxyMainnet.json \
+        --abi-s-chain=../data/proxySchain_Bob.json \
         --erc20-main-net=...path.../data-mn.json \
         --erc20-s-chain=...path.../data-sc.json \
         --address-main-net=$ACCOUNT_FOR_ETHEREUM \
@@ -590,8 +590,8 @@ You can asl **IMA Agent** to show ETH and, optionally, various token balances an
         --id-s-chain=Bob \
         --cid-main-net=-4 \
         --cid-s-chain=-4 \
-        --abi-main-net=../proxy/data/proxyMainnet.json \
-        --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+        --abi-main-net=../data/proxyMainnet.json \
+        --abi-s-chain=../data/proxySchain_Bob.json \
         --address-main-net=$ACCOUNT_FOR_ETHEREUM \
         --address-s-chain=$ACCOUNT_FOR_SCHAIN \
         --erc20-main-net=.....path-to.....ERC20.abi.mn.json \
@@ -699,8 +699,8 @@ Here is example of IMA message processing loop invocation with BLS support:
         --id-s-chain=Bob \
         --cid-main-net=-4 \
         --cid-s-chain=-4 \
-        --abi-main-net=../proxy/data/proxyMainnet.json \
-        --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+        --abi-main-net=../data/proxyMainnet.json \
+        --abi-s-chain=../data/proxySchain_Bob.json \
         --key-main-net=$PRIVATE_KEY_FOR_ETHEREUM \
         --key-s-chain=$PRIVATE_KEY_FOR_SCHAIN \
         --sign-messages \
@@ -716,8 +716,8 @@ Here is example of IMA message processing loop invocation with BLS support:
         --id-s-chain=Bob \
         --cid-main-net=-4 \
         --cid-s-chain=-4 \
-        --abi-main-net=../proxy/data/proxyMainnet.json \
-        --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+        --abi-main-net=../data/proxyMainnet.json \
+        --abi-s-chain=../data/proxySchain_Bob.json \
         --key-main-net=$PRIVATE_KEY_FOR_ETHEREUM \
         --key-s-chain=$PRIVATE_KEY_FOR_SCHAIN \
         --sign-messages \
