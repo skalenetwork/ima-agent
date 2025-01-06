@@ -1,6 +1,7 @@
 [submodule "IMA"]
 	path = IMA
 	url = https://github.com/skalenetwork/IMA.git
+	branch = stable
 [submodule "hardhat-node"]
 	path = hardhat-node
 	url = https://github.com/skalenetwork/hardhat-node.git
