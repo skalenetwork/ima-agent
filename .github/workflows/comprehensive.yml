@@ -105,8 +105,14 @@ jobs:
         sudo apt-get install -y procps
         sudo apt-get install -y curl
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
+    - name: Set up Docker
+      uses: docker/setup-docker@v2
+
+    - name: Install Docker Compose
+      run: |
+        sudo curl -L "https://github.com/docker/compose/releases/download/v2.32.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+        sudo chmod +x /usr/local/bin/docker-compose
+        docker-compose --version
 
     - name: INIT - reconfigure docker and restart its daemon
       run: |
@@ -293,7 +299,7 @@ jobs:
         cd sgxwallet/run_sgx_sim
         rm -rf ../../local_sgxwallet_output_log.txt &> /dev/null
         echo " --------------------------- stopping sgx wallet ------------------------------------------------------------------------------------------------------ "
-        docker compose down
+        docker-compose down
         echo " --------------------------- fixing sgx wallets docker config ----------------------------------------------------------------------------------------- "
         mv docker-compose.yml docker-compose.yml.old-previous || true
         echo "version: '3'"                                 > docker-compose.yml
@@ -318,7 +324,7 @@ jobs:
         echo '        max-file: "4"'                       >> docker-compose.yml
         echo '    command: -s -y -V -d'                    >> docker-compose.yml
         echo " --------------------------- pulling sgx wallet ------------------------------------------------------------------------------------------------------- "
-        docker compose pull
+        docker-compose pull
         cd ../..
         cd ..
 
@@ -327,7 +333,7 @@ jobs:
       run: |
         cd comprehensive-test
         cd sgxwallet/run_sgx_sim
-        docker compose up &> ../../local_sgxwallet_output_log.txt &
+        docker-compose up &> ../../local_sgxwallet_output_log.txt &
         sleep 90
         cd ../..
         cd ..
@@ -404,7 +410,7 @@ jobs:
       run: |
         cd comprehensive-test
         cd sgxwallet/run_sgx_sim
-        docker compose down
+        docker-compose down
         cd ../..
         cd ..
 
