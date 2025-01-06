@@ -105,9 +105,6 @@ jobs:
         sudo apt-get install -y procps
         sudo apt-get install -y curl
 
-    - name: Set up Docker
-      uses: docker/setup-docker@v2
-
     - name: Install Docker Compose
       run: |
         sudo curl -L "https://github.com/docker/compose/releases/download/v2.32.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
