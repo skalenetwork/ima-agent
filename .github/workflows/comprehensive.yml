@@ -257,7 +257,7 @@ jobs:
       working-directory: ${{env.working-directory}}
       run: |
         cd comprehensive-test
-        git clone https://github.com/skalenetwork/skale-manager.git --recursive
+        git clone --branch test-ima-agent https://github.com/skalenetwork/skale-manager.git --recursive
         cd ..
 
     - name: INIT - install Skale Manager dependencies
