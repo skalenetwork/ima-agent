@@ -269,7 +269,7 @@ jobs:
       run: |
         cd comprehensive-test
         sudo rm -rf ./skale-manager || true
-        git clone https://github.com/skalenetwork/skale-manager.git --recursive
+        git clone --branch test-ima-agent https://github.com/skalenetwork/skale-manager.git --recursive
         cd ..
 
     - name: INIT - install Skale Manager dependencies
@@ -384,7 +384,7 @@ jobs:
       run: |
         cd comprehensive-test
         sudo rm -rf ./transaction-manager || true
-        git clone --branch stable https://github.com/skalenetwork/transaction-manager --recursive
+        git clone https://github.com/skalenetwork/transaction-manager --recursive
         cd ..
 
     - name: INIT - start transaction manager and redis

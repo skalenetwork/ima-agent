@@ -260,7 +260,7 @@ jobs:
         npx ganache --miner.blockGasLimit 12000000 --logging.quiet --chain.allowUnlimitedContractSize --wallet.defaultBalance 2000000 --wallet.accountKeysPath ../../test/accounts.json &
         sleep 3
         echo "Content of \"accounts.json\" is:"
-        cat ../../test/accounts.json | jq
+        cat ../test/accounts.json | jq
 
     - name: Prepare test (PY part)
       working-directory: ./test
