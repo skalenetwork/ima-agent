@@ -1,14 +1,14 @@
 
 name: Comprehensive test
 
-on: 
+on:
   push:
     branches-ignore:
       - 'docs-v*'
   pull_request:
     branches-ignore:
       - 'docs-v*'
-  
+
 jobs:
   cancel-runs:
     name: Cancel Previous Runs
@@ -107,10 +107,8 @@ jobs:
 
     - name: INIT - install docker
       run: |
-        sudo apt-get remove -y docker* containerd* || true
-        curl -fsSL https://get.docker.com -o install-docker.sh
-        sudo sh install-docker.sh
-        docker --version
+        sudo curl -L "https://github.com/docker/compose/releases/download/v2.32.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+        sudo chmod +x /usr/local/bin/docker-compose
         docker-compose --version
 
     - name: INIT - reconfigure docker and restart its daemon
@@ -146,7 +144,7 @@ jobs:
         curl -sL https://deb.nodesource.com/setup_18.x | sudo bash -
         sudo apt-get install -y nodejs
         sudo ln -s /usr/bin/node /usr/local/bin/node || true
-        
+
     - name: INIT - install Node utilities
       run: |
         sudo npm install --global npm
@@ -259,7 +257,7 @@ jobs:
       working-directory: ${{env.working-directory}}
       run: |
         cd comprehensive-test
-        git clone https://github.com/skalenetwork/skale-manager.git --recursive
+        git clone --branch test-ima-agent https://github.com/skalenetwork/skale-manager.git --recursive
         cd ..
 
     - name: INIT - install Skale Manager dependencies
@@ -274,7 +272,7 @@ jobs:
       working-directory: ${{env.working-directory}}
       run: |
         cd comprehensive-test
-        cd engine 
+        cd engine
         yarn install
 
     - name: INIT - download SGX Wallet
