@@ -6,7 +6,7 @@ on:
 jobs:
   check-linked-issues:
     name: Check if pull request has linked issues
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Get issues
         id: get-issues
@@ -15,5 +15,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
       - name: PR has not linked issues
         if: join(steps.get-issues.outputs.issues) == ''
-        run: 
+        run:
           exit 1
