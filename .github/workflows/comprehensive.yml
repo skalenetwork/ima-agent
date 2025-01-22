@@ -175,7 +175,7 @@ jobs:
       run: |
         export IMA_AGENT_ROOT_DIR=$(pwd)
         echo IMA_AGENT_ROOT_DIR = $IMA_AGENT_ROOT_DIR
-        git clone --branch remove-proxy-dir https://github.com/skalenetwork/comprehensive-test.git --recursive
+        git clone https://github.com/skalenetwork/comprehensive-test.git --recursive
 
     - name: INIT - install Ethereum Main Net emulation
       working-directory: ${{env.working-directory}}
@@ -257,7 +257,7 @@ jobs:
       working-directory: ${{env.working-directory}}
       run: |
         cd comprehensive-test
-        git clone --branch test-ima-agent https://github.com/skalenetwork/skale-manager.git --recursive
+        git clone --branch ima-agent-custom https://github.com/skalenetwork/skale-manager.git --recursive
         cd ..
 
     - name: INIT - install Skale Manager dependencies
