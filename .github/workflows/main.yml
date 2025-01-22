@@ -14,7 +14,7 @@ on:
 jobs:
   test-agent:
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -93,7 +93,7 @@ jobs:
         curl -sL https://deb.nodesource.com/setup_18.x | sudo bash -
         sudo apt-get install -y nodejs
         sudo ln -s /usr/bin/node /usr/local/bin/node || true
-        
+
     - name: INIT - install Node utilities
       run: |
         sudo npm install --global npm
@@ -133,7 +133,7 @@ jobs:
       run: |
         yarn run lint-check
         echo "Looks like no JS code formatting errors so far)"
-    
+
     - name: JS Lint Check network-browser
       run: |
         yarn run lint-nb
@@ -167,7 +167,7 @@ jobs:
         # slither --version || true
 
   test-integration:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     env:
       working-directory: ./test
@@ -176,14 +176,14 @@ jobs:
     - uses: actions/checkout@v2
       with:
           submodules: recursive
-    
+
     - uses: oven-sh/setup-bun@v1
 
     - name: Get yarn cache directory path
       id: yarn-cache-dir-path
       run: echo "::set-output name=dir::$(yarn cache dir)"
 
-    - uses: actions/cache@v2
+    - uses: actions/cache@v4.2.0
       id: yarn-cache
       with:
         path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
@@ -191,7 +191,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-yarn-
 
-    - uses: actions/cache@v2
+    - uses: actions/cache@v4.2.0
       with:
         path: ~/.cache/pip
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -203,7 +203,7 @@ jobs:
         curl -sL https://deb.nodesource.com/setup_18.x | sudo bash -
         sudo apt-get install -y nodejs
         sudo ln -s /usr/bin/node /usr/local/bin/node || true
-        
+
     - name: INIT - install Node utilities
       run: |
         sudo npm install --global npm
@@ -270,7 +270,7 @@ jobs:
         cat config.json | jq
         export PRIVATE_KEY_FOR_ETHEREUM=$( cat config.json | jq -M .PRIVATE_KEY_FOR_ETHEREUM | tr -d '"' | sed -e "s/^0x//" )
         echo "Value of \"PRIVATE_KEY_FOR_ETHEREUM\" is" $PRIVATE_KEY_FOR_ETHEREUM
-        export PRIVATE_KEY_FOR_SCHAIN=$( cat config.json | jq -M .PRIVATE_KEY_FOR_SCHAIN | tr -d '"' | sed -e "s/^0x//" ) 
+        export PRIVATE_KEY_FOR_SCHAIN=$( cat config.json | jq -M .PRIVATE_KEY_FOR_SCHAIN | tr -d '"' | sed -e "s/^0x//" )
         echo "Value of \"PRIVATE_KEY_FOR_SCHAIN\" is" $PRIVATE_KEY_FOR_SCHAIN
         pip3 install -r requirements.txt
 
