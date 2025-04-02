@@ -14,8 +14,9 @@
     },
     "dependencies": {
         "ethers": "^5.7.2",
+        "@skalenetwork/skale-contracts-ethers-v5": "1.0.2-develop.61",
         "@ethersproject/experimental": "^5.7.0",
-        "solc": "0.8.6",        
+        "solc": "0.8.6",
         "uuid": "^9.0.0",
         "@types/uuid": "^9.0.7",
         "express": "^4.18.2",
@@ -49,8 +50,5 @@
         "typescript": "^5.3.3",
         "@typescript-eslint/eslint-plugin": "^6.14.0"
     },
-    "resolutions": {
-    }
+    "resolutions": {}
 }
-
-
