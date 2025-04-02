@@ -4,24 +4,31 @@
 
 Required env variables:
 
--   `MAINNET_RPC_URL` - endpoint of the Mainnet network where skale-manager contracts are deployed
--   `SCHAIN_RPC_URL` - endpoint of the current sChain
--   `SCHAIN_NAME` - name of the current sChain
+* `MAINNET_RPC_URL` - endpoint of the Mainnet network where skale-manager contracts are deployed
 
--   `SCHAIN_PROXY_PATH` - IMA ABI from sChain
--   `MANAGER_ABI_PATH` - skale-manager ABI from Mainnet
--   `IMA_NETWORK_BROWSER_DATA_PATH` - path to JSON file where network-browser results will be saved
+* `SCHAIN_RPC_URL` - endpoint of the current sChain
+
+* `SCHAIN_NAME` - name of the current sChain
+
+* `MANAGER_CONTRACTS` - Address or alias for skale-manager contracts
+
+* `IMA_NETWORK_BROWSER_DATA_PATH` - path to JSON file where network-browser results will be saved
 
 Optional env variables:
 
--   `MULTICALL` - use ethers multicall provider (default: `false`)
--   `CONNECTED_ONLY` - collect info only for connected chains (default: `true`)
+* `MULTICALL` - use ethers multicall provider (default: `false`)
 
--   `POST_ERROR_DELAY` - delay before retry if error happened in browser loop (seconds, default: `5`)
--   `NETWORK_BROWSER_DELAY` - delay between iterations of the network-browser (seconds, default: `10800`)
--   `NETWORK_BROWSER_TIMEOUT` - maximum amount of time allocated to the browse function (seconds, default: `1200`)
--   `NETWORK_BROWSER_LOG_LEVEL` - log level (0: silly, 1: trace, 2: debug, 3: info, 4: warn, 5: error, 6: fatal, default: `1`)
--   `NETWORK_BROWSER_LOG_PRETTY` - colored logs, (boolean, default: `false`)
+* `CONNECTED_ONLY` - collect info only for connected chains (default: `true`)
+
+* `POST_ERROR_DELAY` - delay before retry if error happened in browser loop (seconds, default: `5`)
+
+* `NETWORK_BROWSER_DELAY` - delay between iterations of the network-browser (seconds, default: `10800`)
+
+* `NETWORK_BROWSER_TIMEOUT` - maximum amount of time allocated to the browse function (seconds, default: `1200`)
+
+* `NETWORK_BROWSER_LOG_LEVEL` - log level (0: silly, 1: trace, 2: debug, 3: info, 4: warn, 5: error, 6: fatal, default: `1`)
+
+* `NETWORK_BROWSER_LOG_PRETTY` - colored logs, (boolean, default: `false`)
 
 ## Development
 

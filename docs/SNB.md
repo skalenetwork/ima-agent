@@ -5,11 +5,11 @@
 **SKALE Network Browser** (**SNB**) is part of IMA responsible for collecting data about all SKALE chains from skale-manager.
 SKALE Network Browser can work as a standalone tool to browse SKALE network or work as a part of IMA agent.
 
-- SNB is implemented as a separate module of IMA agent.
-- SNB can work as a standalone tool to browse SKALE network or work as a part of IMA agent.
-- SNB saves results of SKALE network scan to the specified file.
-- SNB runs in an infinite loop and periodically refreshes SKALE network data.
-- SNB runs as a separate process and managed by `startup.js` script.
+* SNB is implemented as a separate module of IMA agent.
+* SNB can work as a standalone tool to browse SKALE network or work as a part of IMA agent.
+* SNB saves results of SKALE network scan to the specified file.
+* SNB runs in an infinite loop and periodically refreshes SKALE network data.
+* SNB runs as a separate process and managed by `startup.js` script.
 
 ## Architecture
 
@@ -25,27 +25,27 @@ SNB runs in an endless loop - `safeNetworkBrowserLoop` and periodically refreshe
 
 It has multiple delays/timeouts that serve different purposes:
 
--   `POST_ERROR_DELAY` - delay before retry if error happened in browser loop (seconds, default: `5`)
--   `NETWORK_BROWSER_DELAY` - delay between iterations of the network-browser (seconds, default: `10800`)
--   `NETWORK_BROWSER_TIMEOUT` - maximum amount of time allocated to the browse function (seconds, default: `1200`)
+* `POST_ERROR_DELAY` - delay before retry if error happened in browser loop (seconds, default: `5`)
+* `NETWORK_BROWSER_DELAY` - delay between iterations of the network-browser (seconds, default: `10800`)
+* `NETWORK_BROWSER_TIMEOUT` - maximum amount of time allocated to the browse function (seconds, default: `1200`)
 
 See more details in the [network-browser README](../network-browser/README.md).
 
-- Mainnet provider is created using `MAINNET_RPC_URL` env variable and optional `MULTICALL` env variable
-- `sChainsInternal` and `nodes` contracts are created using `MANAGER_ABI_PATH` env variable
-- `SCHAIN_URL` pinged in a loop to determine if local/remote skaled is running and ready to accept requests
+* Mainnet provider is created using `MAINNET_RPC_URL` env variable and optional `MULTICALL` env variable
+* `sChainsInternal` and `nodes` contracts are created using `MANAGER_CONTRACTS` env variable
+* `SCHAIN_URL` pinged in a loop to determine if local/remote skaled is running and ready to accept requests
 
 After this, SNB starts its main loop.
 On each iteration, SNB performs the following steps:
 
-- All sChain hashes are requested from `sChainsInternal` contract
-- For each sChain, its data is requested from `sChainsInternal` contract using `schains` call
-- Optional step: if `CONNECTED_ONLY` env variable is set to `true`, only connected sChains are processed
-- To determine if sChain is connected, sChain provider is inited using `SCHAIN_RPC_URL` env variable and `isConnectedChain` call is performed on `messageProxy` contract on local sChain
-- For each chain nodes in the group are requested from `sChainsInternal` contract using `getNodesInGroup` call
-- For each node id node data is requested from `nodes` contract using `nodes` call, `getNodeDomainName` call and `getSchainHashesForNode` call
-- Endpoints are computed using `nodeStruct` function for each node
-- Resulting data is saved to the file specified in `IMA_NETWORK_BROWSER_DATA_PATH` env variable along with the timestamp
+* All sChain hashes are requested from `sChainsInternal` contract
+* For each sChain, its data is requested from `sChainsInternal` contract using `schains` call
+* Optional step: if `CONNECTED_ONLY` env variable is set to `true`, only connected sChains are processed
+* To determine if sChain is connected, sChain provider is inited using `SCHAIN_RPC_URL` env variable and `isConnectedChain` call is performed on `messageProxy` contract on local sChain
+* For each chain nodes in the group are requested from `sChainsInternal` contract using `getNodesInGroup` call
+* For each node id node data is requested from `nodes` contract using `nodes` call, `getNodeDomainName` call and `getSchainHashesForNode` call
+* Endpoints are computed using `nodeStruct` function for each node
+* Resulting data is saved to the file specified in `IMA_NETWORK_BROWSER_DATA_PATH` env variable along with the timestamp
 
 All calls in the loops are performed using `multicall` provider if `MULTICALL` env variable is set to `true`.
 See Diagram 3 for more details.
@@ -53,16 +53,19 @@ See Diagram 3 for more details.
 ## Component Diagrams
 
 ### Diagram 1. High-Level Architecture
+
 This diagram shows how IMA container is structured and how SNB is integrated into it:
 
 ![IMA Container Structure](./ima-container-structure.png)
 
 ### Diagram 2. SNB Loop
+
 This diagram shows SNB’s browse loop:
 
 ![SNB Loop](./snb-loop.png)
 
 ### Diagram 3. SNB Internal Structure
+
 This diagram shows SNB’s internal structure:
 
 ![SNB Structure](./snb-structure.png)
@@ -148,9 +151,9 @@ SNB is covered by unit tests and also tested as a part of integration tests of i
 
 Unit tests in the `network-browser` works as follows:
 
-- Local hardhat network is started locally
-- `skale-manager` contracts are deployed to the local network
-- Before each test, a set of nodes and sChains are created on `skale-manager`
-- Tests are executed using `bun:test` framework
+* Local hardhat network is started locally
+* `skale-manager` contracts are deployed to the local network
+* Before each test, a set of nodes and sChains are created on `skale-manager`
+* Tests are executed using `bun:test` framework
 
 Units tests are located in the `network-browser/tests` folder.

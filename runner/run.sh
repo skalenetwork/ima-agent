@@ -6,9 +6,6 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 : "${SCHAIN_DIR?Need to set SCHAIN_DIR}"
 
-: "${MAINNET_PROXY_PATH?Need to set MAINNET_PROXY_PATH}"
-: "${SCHAIN_PROXY_PATH?Need to set SCHAIN_PROXY_PATH}"
-
 : "${STATE_FILE?Need to set STATE_FILE}"
 
 : "${SCHAIN_NAME?Need to set SCHAIN_NAME}"
