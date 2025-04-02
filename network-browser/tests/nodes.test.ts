@@ -1,12 +1,7 @@
 import { describe, beforeAll, test, expect } from 'bun:test'
 import { Contract, Wallet, id } from 'ethers'
 
-import {
-    getMainnetProvider,
-    nodesContract,
-    getMainnetManagerAbi,
-    schainsInternalContract
-} from '../src/contracts'
+import { getMainnetProvider } from '../src/contracts'
 import { getNodes } from '../src/nodes'
 import { getNodeIdsInGroups } from '../src/schains'
 import { MAINNET_RPC_URL } from '../src/constants'
@@ -15,9 +10,6 @@ import { Node } from '../src/interfaces'
 import {
     ETH_PRIVATE_KEY,
     NODES_IN_SCHAIN,
-    validatorsContract,
-    managerContract,
-    schainsContract,
     addAllPermissions,
     generateWallets,
     initDefaultValidator,
@@ -26,7 +18,8 @@ import {
     addTestSchainTypes,
     createSchain,
     randomString,
-    nodeNamesToIds
+    nodeNamesToIds,
+    getManagerProject
 } from './testUtils'
 
 describe('nodes module test', () => {
@@ -42,13 +35,19 @@ describe('nodes module test', () => {
         const provider = await getMainnetProvider(MAINNET_RPC_URL, false)
         wallet = new Wallet(ETH_PRIVATE_KEY, provider)
 
-        const managerAbi = getMainnetManagerAbi()
-        const validators = validatorsContract(managerAbi, wallet)
-        schainsInternal = schainsInternalContract(managerAbi, wallet)
-        const schains = schainsContract(managerAbi, wallet)
-        const manager = managerContract(managerAbi, wallet)
+        const managerProject = await getManagerProject()
 
-        nodes = nodesContract(managerAbi, provider)
+        const manager = (await managerProject.getContract('SkaleManager')) as Contract
+        manager.connect(wallet)
+
+        const validators = (await managerProject.getContract('Validators')) as Contract
+        validators.connect(wallet)
+
+        const schains = (await managerProject.getContract('Schains')) as Contract
+        schains.connect(wallet)
+
+        schainsInternal = (await managerProject.getContract('SchainsInternal')) as Contract
+        nodes = (await managerProject.getContract('Nodes')) as Contract
 
         await addAllPermissions(validators, schainsInternal, schains, wallet)
         await initDefaultValidator(validators)

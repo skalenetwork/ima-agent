@@ -38,7 +38,7 @@ import {
     MULTICALL,
     CONNECTED_ONLY,
     SCHAIN_RPC_URL,
-    MANAGER_ALIAS
+    MANAGER_CONTRACTS
 } from './src/constants'
 
 const log = new Logger<ILogObj>(getLoggerConfig('loop'))
@@ -60,7 +60,7 @@ async function safeNetworkBrowserLoop() {
     const provider = await getMainnetProvider(MAINNET_RPC_URL, MULTICALL)
     const network = await skaleContracts.getNetworkByProvider(provider)
     const managerProject = await network.getProject(SkaleProject.MANAGER)
-    const manager = await managerProject.getInstance(MANAGER_ALIAS)
+    const manager = await managerProject.getInstance(MANAGER_CONTRACTS)
     const schainsInternal = (await manager.getContract(SkaleContract.SCHAINS_INTERNAL)) as Contract
     const nodes = (await manager.getContract(SkaleContract.NODES)) as Contract
 

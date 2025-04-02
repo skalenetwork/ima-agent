@@ -2,24 +2,15 @@ import { unlinkSync, existsSync } from 'node:fs'
 import { describe, beforeAll, test, expect, beforeEach } from 'bun:test'
 import { Contract, Wallet } from 'ethers'
 
-import {
-    getMainnetProvider,
-    nodesContract,
-    getMainnetManagerAbi,
-    schainsInternalContract
-} from '../src/contracts'
+import { getMainnetProvider } from '../src/contracts'
 import { browse } from '../src/browser'
 import { getSChain } from '../src/schains'
-import { readJson } from '../src/tools'
-import { NetworkBrowserData } from '../src/interfaces'
+import { MessageProxyCache, NetworkBrowserData } from '../src/interfaces'
 import { MAINNET_RPC_URL, IMA_NETWORK_BROWSER_DATA_PATH } from '../src/constants'
 
 import {
     ETH_PRIVATE_KEY,
     NODES_IN_SCHAIN,
-    validatorsContract,
-    managerContract,
-    schainsContract,
     addAllPermissions,
     generateWallets,
     initDefaultValidator,
@@ -27,7 +18,9 @@ import {
     registerNodes,
     addTestSchainTypes,
     createSchain,
-    randomString
+    randomString,
+    readJson,
+    getManagerProject
 } from './testUtils'
 
 describe('browser module test', () => {
@@ -41,13 +34,19 @@ describe('browser module test', () => {
         const provider = await getMainnetProvider(MAINNET_RPC_URL, false)
         wallet = new Wallet(ETH_PRIVATE_KEY, provider)
 
-        const managerAbi = getMainnetManagerAbi()
-        const validators = validatorsContract(managerAbi, wallet)
-        schainsInternal = schainsInternalContract(managerAbi, wallet)
-        const schains = schainsContract(managerAbi, wallet)
-        const manager = managerContract(managerAbi, wallet)
+        const managerProject = await getManagerProject()
 
-        nodes = nodesContract(managerAbi, provider)
+        const manager = (await managerProject.getContract('SkaleManager')) as Contract
+        manager.connect(wallet)
+
+        const validators = (await managerProject.getContract('Validators')) as Contract
+        validators.connect(wallet)
+
+        const schains = (await managerProject.getContract('Schains')) as Contract
+        schains.connect(wallet)
+
+        schainsInternal = (await managerProject.getContract('SchainsInternal')) as Contract
+        nodes = (await managerProject.getContract('Nodes')) as Contract
 
         await addAllPermissions(validators, schainsInternal, schains, wallet)
         await initDefaultValidator(validators)
@@ -72,7 +71,8 @@ describe('browser module test', () => {
         expect(schain.mainnetOwner).toBe(wallet.address)
 
         expect(existsSync(IMA_NETWORK_BROWSER_DATA_PATH)).toBeFalse
-        await browse(schainsInternal, nodes)
+        const messageProxyCache: MessageProxyCache = {}
+        await browse(schainsInternal, nodes, messageProxyCache)
         expect(existsSync(IMA_NETWORK_BROWSER_DATA_PATH)).toBeTrue
 
         const nbData: NetworkBrowserData = readJson(IMA_NETWORK_BROWSER_DATA_PATH)

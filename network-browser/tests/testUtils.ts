@@ -14,12 +14,13 @@ import {
     TransactionResponse
 } from 'ethers'
 import { ec } from 'elliptic'
-
-import { getMainnetManagerAbi } from '../src/contracts'
+import { readFileSync } from 'node:fs'
+import { skaleContracts } from '@skalenetwork/skale-contracts-ethers-v6'
+import { SkaleProject } from '../src/interfaces'
+import { MANAGER_CONTRACTS, MAINNET_RPC_URL } from '../src/constants'
+import { getMainnetProvider } from '../src/contracts'
 
 const secp256k1EC = new ec('secp256k1')
-
-import { type SkaleManagerAbi } from '../src/interfaces'
 
 export const ETH_PRIVATE_KEY = process.env.ETH_PRIVATE_KEY!
 
@@ -30,16 +31,16 @@ const ETH_TRANSFER_AMOUNT = '0.1'
 const CONFIRMATION_BLOCKS = 2
 const GAS_MULTIPLIER = 1.2
 
-export function validatorsContract(abi: SkaleManagerAbi, wallet: Wallet): Contract {
-    return new Contract(abi.validator_service_address, abi.validator_service_abi, wallet)
+export async function getManagerProject() {
+    const provider = await getMainnetProvider(MAINNET_RPC_URL, false)
+    const network = await skaleContracts.getNetworkByProvider(provider)
+    const managerProject = await network.getProject(SkaleProject.MANAGER)
+    return await managerProject.getInstance(MANAGER_CONTRACTS)
 }
 
-export function schainsContract(abi: SkaleManagerAbi, wallet: Wallet): Contract {
-    return new Contract(abi.schains_address, abi.schains_abi, wallet)
-}
-
-export function managerContract(abi: SkaleManagerAbi, wallet: Wallet): Contract {
-    return new Contract(abi.skale_manager_address, abi.skale_manager_abi, wallet)
+export function readJson(filepath: string): any {
+    const data = readFileSync(filepath, 'utf8')
+    return JSON.parse(data)
 }
 
 export async function addAllPermissions(
@@ -150,11 +151,11 @@ export async function linkNodes(
 }
 
 export async function registerNodes(nodes: Contract, wallets: Wallet[]): Promise<string[]> {
+    const managerProject = await getManagerProject()
+    const manager = (await managerProject.getContract('SkaleManager')) as Contract
     const promises = wallets.map(async (wallet, i) => {
         console.log(`${i + 1}/${wallets.length} registering node for: ${wallet.address}`)
-        const managerAbi = getMainnetManagerAbi()
-        const manager = managerContract(managerAbi, wallet)
-
+        manager.connect(wallet)
         const { ip, port, name, domainName, publicIp } = generateNodeInfo(wallet.address, i)
 
         const skaleNonce = randNum(0, 10000)

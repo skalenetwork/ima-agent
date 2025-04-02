@@ -43,7 +43,7 @@ export const MAINNET_RPC_URL = requiredEnv('MAINNET_RPC_URL')
 export const SCHAIN_RPC_URL = requiredEnv('SCHAIN_RPC_URL')
 export const SCHAIN_NAME = requiredEnv('SCHAIN_NAME')
 
-export const MANAGER_ALIAS = requiredEnv('MANAGER_ALIAS')
+export const MANAGER_CONTRACTS = requiredEnv('MANAGER_CONTRACTS')
 export const IMA_NETWORK_BROWSER_DATA_PATH = requiredEnv('IMA_NETWORK_BROWSER_DATA_PATH')
 
 // optional

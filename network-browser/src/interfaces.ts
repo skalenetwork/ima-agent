@@ -21,7 +21,7 @@
  * @copyright SKALE Labs 2023-Present
  */
 
-import { type InterfaceAbi, type Contract } from 'ethers'
+import { type Contract } from 'ethers'
 
 export enum SkaleProject {
     MANAGER = 'skale-manager',
@@ -93,24 +93,6 @@ export interface SChain {
     originator: string
     nodes?: Node[]
     chainId?: number
-}
-
-export interface SkaleManagerAbi {
-    nodes_address: string
-    nodes_abi: InterfaceAbi
-    schains_address: string
-    schains_abi: InterfaceAbi
-    schains_internal_address: string
-    schains_internal_abi: InterfaceAbi
-    validator_service_address: string
-    validator_service_abi: InterfaceAbi
-    skale_manager_address: string
-    skale_manager_abi: InterfaceAbi
-}
-
-export interface SChainImaAbi {
-    message_proxy_chain_address: string
-    message_proxy_chain_abi: InterfaceAbi
 }
 
 export type MessageProxyCache = Record<string, Contract>
