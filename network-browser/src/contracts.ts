@@ -21,20 +21,10 @@
  * @copyright SKALE Labs 2023-Present
  */
 
-import { JsonRpcProvider, type Provider, Contract, type Network, type ContractRunner } from 'ethers'
+import { JsonRpcProvider, type Provider, type Network } from 'ethers'
 import mc from 'ethers-multicall-provider'
-import { type SkaleManagerAbi, type SChainImaAbi } from './interfaces'
-import { readJson } from './tools'
 
-import { SCHAIN_PROXY_PATH, MANAGER_ABI_PATH, NETWORKS_WITH_MULTICALL } from './constants'
-
-export function getSChainImaAbi(): SChainImaAbi {
-    return readJson(SCHAIN_PROXY_PATH)
-}
-
-export function getMainnetManagerAbi(): SkaleManagerAbi {
-    return readJson(MANAGER_ABI_PATH)
-}
+import { NETWORKS_WITH_MULTICALL } from './constants'
 
 function hasMulticall(network: Network): boolean {
     return NETWORKS_WITH_MULTICALL.includes(network.chainId)
@@ -50,16 +40,4 @@ export async function getMainnetProvider(endpoint: string, multicall: boolean): 
 
 export function getSChainProvider(endpoint: string): Provider {
     return new JsonRpcProvider(endpoint)
-}
-
-export function schainsInternalContract(abi: SkaleManagerAbi, runner: ContractRunner): Contract {
-    return new Contract(abi.schains_internal_address, abi.schains_internal_abi, runner)
-}
-
-export function messageProxyContract(abi: SChainImaAbi, runner: ContractRunner): Contract {
-    return new Contract(abi.message_proxy_chain_address, abi.message_proxy_chain_abi, runner)
-}
-
-export function nodesContract(abi: SkaleManagerAbi, runner: ContractRunner): Contract {
-    return new Contract(abi.nodes_address, abi.nodes_abi, runner)
 }

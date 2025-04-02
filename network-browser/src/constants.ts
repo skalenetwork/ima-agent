@@ -20,13 +20,15 @@
  * @copyright SKALE Labs 2023-Present
  */
 
-import { requiredEnv, booleanEnv, secondsEnv, optionalEnvNumber } from './envTools'
+import { requiredEnv, booleanEnv, secondsEnv, optionalEnvNumber, optionalEnv } from './envTools'
 
 // internal
 
 export const PORTS_PER_SCHAIN = 64
 export const DEFAULT_PING_DELAY = 10000
 export const DEFAULT_PING_ITERATIONS = 50000
+
+const PREDEPLOYED_ALIAS = 'predeployed'
 
 export const NETWORKS_WITH_MULTICALL = [
     1n, // mainnet
@@ -41,13 +43,13 @@ export const MAINNET_RPC_URL = requiredEnv('MAINNET_RPC_URL')
 export const SCHAIN_RPC_URL = requiredEnv('SCHAIN_RPC_URL')
 export const SCHAIN_NAME = requiredEnv('SCHAIN_NAME')
 
-export const SCHAIN_PROXY_PATH = requiredEnv('SCHAIN_PROXY_PATH')
-export const MANAGER_ABI_PATH = requiredEnv('MANAGER_ABI_PATH')
+export const MANAGER_ALIAS = requiredEnv('MANAGER_ALIAS')
 export const IMA_NETWORK_BROWSER_DATA_PATH = requiredEnv('IMA_NETWORK_BROWSER_DATA_PATH')
 
 // optional
 
-export const MULTICALL = booleanEnv('MULTICALL', true)
+export const SCHAIN_IMA_ALIAS = optionalEnv('SCHAIN_IMA_ALIAS', PREDEPLOYED_ALIAS)
+export const MULTICALL = booleanEnv('MULTICALL', false)
 export const CONNECTED_ONLY = booleanEnv('CONNECTED_ONLY', true)
 
 export const POST_ERROR_DELAY = secondsEnv(process.env.POST_ERROR_DELAY, 5)

@@ -17,8 +17,9 @@
     "_fix": "bash ethers_hotfix.sh"
   },
   "dependencies": {
-    "ethers": "6.8.1",
-    "ethers-multicall-provider": "^5.0.0",
+    "ethers": "6.13.5",
+    "ethers-multicall-provider": "^6.4.2",
+    "@skalenetwork/skale-contracts-ethers-v6": "1.0.2-develop.54",
     "tslog": "^4.9.2"
   },
   "devDependencies": {

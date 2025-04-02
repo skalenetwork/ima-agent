@@ -22,9 +22,17 @@
  */
 
 import { type Contract, id } from 'ethers'
-import { type SChain, type SChainArray } from './interfaces'
-import { getSChainImaAbi, getSChainProvider, messageProxyContract } from './contracts'
-import { SCHAIN_RPC_URL } from './constants'
+import { skaleContracts } from '@skalenetwork/skale-contracts-ethers-v6'
+
+import {
+    type SChain,
+    type SChainArray,
+    type MessageProxyCache,
+    SkaleProject,
+    SkaleContract
+} from './interfaces'
+import { getSChainProvider } from './contracts'
+import { SCHAIN_IMA_ALIAS, SCHAIN_RPC_URL } from './constants'
 
 export async function getSChainHashes(schainsInternal: Contract): Promise<string[]> {
     return await schainsInternal.getSchains()
@@ -49,9 +57,12 @@ export async function getSChains(
     return schainsArray.map((schainArray) => schainStruct(schainArray))
 }
 
-export async function filterConnectedOnly(schains: SChain[]): Promise<SChain[]> {
+export async function filterConnectedOnly(
+    schains: SChain[],
+    messageProxyCache: MessageProxyCache
+): Promise<SChain[]> {
     const promiseArray = schains.map(async (schain) => {
-        const conditionResult = await isChainConnected(schain.name)
+        const conditionResult = await isChainConnected(schain.name, messageProxyCache)
         return { schain, conditionResult }
     })
     const results = await Promise.all(promiseArray)
@@ -71,9 +82,23 @@ export async function getNodeIdsInGroups(
     )
 }
 
-async function isChainConnected(schainName: string): Promise<boolean> {
-    const provider = getSChainProvider(SCHAIN_RPC_URL)
-    const messageProxy = messageProxyContract(getSChainImaAbi(), provider)
+async function isChainConnected(
+    schainName: string,
+    messageProxyCache: MessageProxyCache
+): Promise<boolean> {
+    let messageProxy: Contract
+
+    if (messageProxyCache[schainName] !== undefined) {
+        messageProxy = messageProxyCache[schainName]
+    } else {
+        const provider = getSChainProvider(SCHAIN_RPC_URL)
+        const network = await skaleContracts.getNetworkByProvider(provider)
+        const managerProject = network.getProject(SkaleProject.SCHAIN_IMA)
+        const manager = await managerProject.getInstance(SCHAIN_IMA_ALIAS)
+        messageProxy = (await manager.getContract(SkaleContract.MESSAGE_PROXY)) as Contract
+        messageProxyCache[schainName] = messageProxy
+    }
+
     return await messageProxy.isConnectedChain(schainName)
 }
 

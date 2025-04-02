@@ -24,7 +24,7 @@
 import { type Contract } from 'ethers'
 import { Logger, type ILogObj } from 'tslog'
 
-import { type SChain, type NetworkBrowserData } from './interfaces'
+import { type SChain, type NetworkBrowserData, type MessageProxyCache } from './interfaces'
 import {
     getSChainHashes,
     getSChains,
@@ -38,14 +38,18 @@ import { writeJson, currentTimestamp, chainIdInt, getLoggerConfig } from './tool
 
 const log = new Logger<ILogObj>(getLoggerConfig('browser'))
 
-export async function browse(schainsInternal: Contract, nodes: Contract): Promise<void> {
+export async function browse(
+    schainsInternal: Contract,
+    nodes: Contract,
+    messageProxyCache: MessageProxyCache
+): Promise<void> {
     log.info('Browse iteration started, collecting chains')
 
     const start = performance.now()
     let schainsHashes = await getSChainHashes(schainsInternal)
     let schains: SChain[] = await getSChains(schainsInternal, schainsHashes)
     if (CONNECTED_ONLY) {
-        schains = await filterConnectedOnly(schains)
+        schains = await filterConnectedOnly(schains, messageProxyCache)
         schainsHashes = filterConnectedHashes(schainsHashes, schains)
     }
     log.info(`Going to gather information about ${schains.length} chains`)

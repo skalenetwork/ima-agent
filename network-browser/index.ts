@@ -20,15 +20,15 @@
  * @copyright SKALE Labs 2023-Present
  */
 
-import {
-    schainsInternalContract,
-    nodesContract,
-    getMainnetManagerAbi,
-    getMainnetProvider
-} from './src/contracts'
+import { type Contract } from 'ethers'
+import { Logger, type ILogObj } from 'tslog'
+import { skaleContracts } from '@skalenetwork/skale-contracts-ethers-v6'
+
+import { getMainnetProvider } from './src/contracts'
 import { delay, getLoggerConfig, checkEndpoint, withTimeout } from './src/tools'
 import { BrowserTimeoutError } from './src/errors'
 import { browse } from './src/browser'
+import { SkaleProject, SkaleContract, MessageProxyCache } from './src/interfaces'
 import {
     MAINNET_RPC_URL,
     SCHAIN_NAME,
@@ -37,10 +37,9 @@ import {
     NETWORK_BROWSER_DELAY,
     MULTICALL,
     CONNECTED_ONLY,
-    SCHAIN_RPC_URL
+    SCHAIN_RPC_URL,
+    MANAGER_ALIAS
 } from './src/constants'
-
-import { Logger, type ILogObj } from 'tslog'
 
 const log = new Logger<ILogObj>(getLoggerConfig('loop'))
 
@@ -59,13 +58,21 @@ async function safeNetworkBrowserLoop() {
     await checkEndpoint(MAINNET_RPC_URL)
 
     const provider = await getMainnetProvider(MAINNET_RPC_URL, MULTICALL)
-    const managerAbi = getMainnetManagerAbi()
-    const schainsInternal = schainsInternalContract(managerAbi, provider)
-    const nodes = nodesContract(managerAbi, provider)
+    const network = await skaleContracts.getNetworkByProvider(provider)
+    const managerProject = await network.getProject(SkaleProject.MANAGER)
+    const manager = await managerProject.getInstance(MANAGER_ALIAS)
+    const schainsInternal = (await manager.getContract(SkaleContract.SCHAINS_INTERNAL)) as Contract
+    const nodes = (await manager.getContract(SkaleContract.NODES)) as Contract
+
+    const messageProxyCache: MessageProxyCache = {}
+    log.info('Initialized message proxy contract cache')
 
     while (true) {
         try {
-            await withTimeout(browse(schainsInternal, nodes), NETWORK_BROWSER_TIMEOUT)
+            await withTimeout(
+                browse(schainsInternal, nodes, messageProxyCache),
+                NETWORK_BROWSER_TIMEOUT
+            )
             await delay(NETWORK_BROWSER_DELAY)
         } catch (error) {
             if (error instanceof BrowserTimeoutError) {

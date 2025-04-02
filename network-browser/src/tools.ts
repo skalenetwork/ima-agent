@@ -23,7 +23,7 @@
 import { JsonRpcProvider, id, toBeHex } from 'ethers'
 import { Logger, type ILogObj } from 'tslog'
 
-import { readFileSync, writeFileSync, renameSync } from 'fs'
+import { writeFileSync, renameSync } from 'fs'
 import { BrowserTimeoutError } from './errors'
 import {
     DEFAULT_PING_DELAY,
@@ -78,11 +78,6 @@ export function hexToIp(hexString: string): string {
 
 export function currentTimestamp(): number {
     return Math.floor(Date.now() / 1000)
-}
-
-export function readJson(filepath: string): any {
-    const data = readFileSync(filepath, 'utf8')
-    return JSON.parse(data)
 }
 
 export function writeJson(filepath: string, data: any): void {

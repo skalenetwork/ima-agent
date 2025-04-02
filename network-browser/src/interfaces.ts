@@ -21,7 +21,20 @@
  * @copyright SKALE Labs 2023-Present
  */
 
-import { type InterfaceAbi } from 'ethers'
+import { type InterfaceAbi, type Contract } from 'ethers'
+
+export enum SkaleProject {
+    MANAGER = 'skale-manager',
+    ALLOCATOR = 'skale-allocator',
+    MAINNET_IMA = 'mainnet-ima',
+    SCHAIN_IMA = 'schain-ima'
+}
+
+export enum SkaleContract {
+    SCHAINS_INTERNAL = 'SchainsInternal',
+    NODES = 'Nodes',
+    MESSAGE_PROXY = 'MessageProxyForSchain'
+}
 
 export type AddressType = `0x${string}`
 
@@ -99,6 +112,8 @@ export interface SChainImaAbi {
     message_proxy_chain_address: string
     message_proxy_chain_abi: InterfaceAbi
 }
+
+export type MessageProxyCache = Record<string, Contract>
 
 export interface NetworkBrowserData {
     schains: SChain[]
