@@ -40,7 +40,7 @@ import * as state from "./state.js";
 import type * as worker_threads from "worker_threads";
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-const __dirname: string = path.dirname( url.fileURLToPath( import.meta.url ) );
+const __dirname: string = path.dirname(url.fileURLToPath(import.meta.url));
 
 export interface TExtraSignOpts {
     chainNameSrc: string
@@ -77,119 +77,119 @@ export interface TParallelLoopRunOptions {
 // Run transfer loop
 
 export function checkTimeFraming(
-    aDateTime: Date | null, strDirection: string, joRuntimeOpts: TRuntimeOpts ): boolean {
+    aDateTime: Date | null, strDirection: string, joRuntimeOpts: TRuntimeOpts): boolean {
     try {
         const imaState: state.TIMAState = state.get();
-        if( imaState.nTimeFrameSeconds <= 0 || imaState.nNodesCount <= 1 )
+        if (imaState.nTimeFrameSeconds <= 0 || imaState.nNodesCount <= 1)
             return true; // time framing is disabled
 
-        if( aDateTime == null || aDateTime == undefined )
+        if (aDateTime == null || aDateTime == undefined)
             aDateTime = new Date(); // now
 
         const nFrameShift = 0;
 
         // Unix UTC timestamp, see:
         // https://stackoverflow.com/questions/9756120/how-do-i-get-a-utc-timestamp-in-javascript
-        const nUtcUnixTimeStamp = Math.floor( ( aDateTime ).getTime() / 1000 );
+        const nUtcUnixTimeStamp = Math.floor((aDateTime).getTime() / 1000);
 
         const nSecondsRangeForAllSChains = imaState.nTimeFrameSeconds * imaState.nNodesCount;
-        const nMod = Math.floor( nUtcUnixTimeStamp % nSecondsRangeForAllSChains );
-        let nActiveNodeFrameIndex = Math.floor( nMod / imaState.nTimeFrameSeconds );
-        if( nFrameShift > 0 ) {
+        const nMod = Math.floor(nUtcUnixTimeStamp % nSecondsRangeForAllSChains);
+        let nActiveNodeFrameIndex = Math.floor(nMod / imaState.nTimeFrameSeconds);
+        if (nFrameShift > 0) {
             nActiveNodeFrameIndex += nFrameShift;
             nActiveNodeFrameIndex %= imaState.nNodesCount; // for safety only
         }
-        let bSkip = ( nActiveNodeFrameIndex != imaState.nNodeNumber );
+        let bSkip = (nActiveNodeFrameIndex != imaState.nNodeNumber);
         let bInsideGap = false;
 
         const nRangeStart =
             nUtcUnixTimeStamp -
-            Math.floor( nUtcUnixTimeStamp % nSecondsRangeForAllSChains );
+            Math.floor(nUtcUnixTimeStamp % nSecondsRangeForAllSChains);
         const nFrameStart = nRangeStart + imaState.nNodeNumber * imaState.nTimeFrameSeconds;
         const nGapStart = nFrameStart + imaState.nTimeFrameSeconds - imaState.nNextFrameGap;
-        if( !bSkip ) {
-            if( nUtcUnixTimeStamp >= nGapStart ) {
+        if (!bSkip) {
+            if (nUtcUnixTimeStamp >= nGapStart) {
                 bSkip = true;
                 bInsideGap = true;
             }
         }
-        let strFrameInfo = log.fmtDebug( "\n",
+        let strFrameInfo = log.fmtDebug("\n",
             "    Unix UTC time stamp", "........",
-            log.fmtInformation( "{}", nUtcUnixTimeStamp ), "\n",
+            log.fmtInformation("{}", nUtcUnixTimeStamp), "\n",
             "    All Chains Range", "...........", nSecondsRangeForAllSChains, "\n",
-            "    S-Chain Range Mod", "..........", log.fmtInformation( "{}", nMod ), "\n",
+            "    S-Chain Range Mod", "..........", log.fmtInformation("{}", nMod), "\n",
             "    Active Node Frame Index", "....",
-            log.fmtInformation( "{}", nActiveNodeFrameIndex ), "\n",
+            log.fmtInformation("{}", nActiveNodeFrameIndex), "\n",
             "    Testing Frame Index", "........",
-            log.fmtInformation( "{}", imaState.nNodeNumber ), "\n",
+            log.fmtInformation("{}", imaState.nNodeNumber), "\n",
             "    Transfer Direction", ".........",
-            log.fmtInformation( "{bright}", strDirection || "NA" ), "\n" );
-        if( nFrameShift > 0 ) {
+            log.fmtInformation("{bright}", strDirection || "NA"), "\n");
+        if (nFrameShift > 0) {
             strFrameInfo += log.fmtDebug(
                 "    Frame Shift", "................",
-                log.fmtInformation( "{}", nFrameShift ), "\n",
+                log.fmtInformation("{}", nFrameShift), "\n",
                 "    S2S known chain index", "......",
-                log.fmtInformation( "{}", joRuntimeOpts.idxChainKnownForS2S ), "\n",
+                log.fmtInformation("{}", joRuntimeOpts.idxChainKnownForS2S), "\n",
                 "    S2S known chains count", ".....",
-                log.fmtInformation( "{}", joRuntimeOpts.cntChainsKnownForS2S ), "\n"
+                log.fmtInformation("{}", joRuntimeOpts.cntChainsKnownForS2S), "\n"
             );
-            if( "joExtraSignOpts" in joRuntimeOpts &&
-                typeof joRuntimeOpts.joExtraSignOpts === "object" ) {
-                strFrameInfo += log.fmtDebug( "    S-Chain source", ".............",
-                    log.fmtInformation( "{}", joRuntimeOpts.joExtraSignOpts.chainNameSrc ),
-                    "/", log.fmtInformation( "{}", joRuntimeOpts.joExtraSignOpts.chainIdSrc ),
-                    "\n" );
+            if ("joExtraSignOpts" in joRuntimeOpts &&
+                typeof joRuntimeOpts.joExtraSignOpts === "object") {
+                strFrameInfo += log.fmtDebug("    S-Chain source", ".............",
+                    log.fmtInformation("{}", joRuntimeOpts.joExtraSignOpts.chainNameSrc),
+                    "/", log.fmtInformation("{}", joRuntimeOpts.joExtraSignOpts.chainIdSrc),
+                    "\n");
             } else {
-                const s1: string = log.fmtInformation( "{}",
+                const s1: string = log.fmtInformation("{}",
                     joRuntimeOpts.joExtraSignOpts
                         ? joRuntimeOpts.joExtraSignOpts.chainNameDst
-                        : "N/A" );
-                const s2: string = log.fmtInformation( "{}",
+                        : "N/A");
+                const s2: string = log.fmtInformation("{}",
                     joRuntimeOpts.joExtraSignOpts
                         ? joRuntimeOpts.joExtraSignOpts.chainIdDst
-                        : "N/A" );
-                strFrameInfo += log.fmtDebug( "    S-Chain destination", "........",
-                    s1, "/", s2, "\n" );
+                        : "N/A");
+                strFrameInfo += log.fmtDebug("    S-Chain destination", "........",
+                    s1, "/", s2, "\n");
             }
         }
         strFrameInfo += log.fmtDebug(
-            "    Is skip", "....................", log.yn( bSkip ), "\n",
-            "    Is inside gap", "..............", log.yn( bInsideGap ), "\n",
-            "    Range Start", "................", log.fmtInformation( "{}", nRangeStart ), "\n",
-            "    Frame Start", "................", log.fmtInformation( "{}", nFrameStart ), "\n",
-            "    Gap Start", "..................", log.fmtInformation( "{}", nGapStart ), "\n" );
-        log.write( strFrameInfo );
-        if( bSkip )
+            "    Is skip", "....................", log.yn(bSkip), "\n",
+            "    Is inside gap", "..............", log.yn(bInsideGap), "\n",
+            "    Range Start", "................", log.fmtInformation("{}", nRangeStart), "\n",
+            "    Frame Start", "................", log.fmtInformation("{}", nFrameStart), "\n",
+            "    Gap Start", "..................", log.fmtInformation("{}", nGapStart), "\n");
+        log.write(strFrameInfo);
+        if (bSkip)
             return false;
-    } catch ( err ) {
-        log.error( "Exception in time framing check in {}: {err}, stack is:{}{stack}",
-            threadInfo.threadDescription(), err, "\n", err );
+    } catch (err) {
+        log.error("Exception in time framing check in {}: {err}, stack is:{}{stack}",
+            threadInfo.threadDescription(), err, "\n", err);
     }
     return true;
 };
 
 async function singleTransferLoopPartOracle(
-    optsLoop: TLoopOptions, strLogPrefix: string ): Promise<boolean> {
+    optsLoop: TLoopOptions, strLogPrefix: string): Promise<boolean> {
     const imaState: state.TIMAState = state.get();
     let b0 = true;
-    if( optsLoop.enableStepOracle && imaOracleOperations.getEnabledOracle() ) {
-        log.notice( "{p}Will invoke Oracle gas price setup in {}...",
-            strLogPrefix, threadInfo.threadDescription() );
+    if (optsLoop.enableStepOracle && imaOracleOperations.getEnabledOracle()) {
+        log.notice("{p}Will invoke Oracle gas price setup in {}...",
+            strLogPrefix, threadInfo.threadDescription());
         try {
-            if( !await pwa.checkOnLoopStart( imaState, "oracle" ) ) {
+            if (!await pwa.checkOnLoopStart(imaState, "oracle")) {
                 imaState.loopState.oracle.wasInProgress = false;
-                log.notice( "{p}Skipped(oracle) in {} due to cancel mode reported from PWA",
-                    strLogPrefix, threadInfo.threadDescription() );
+                log.notice("{p}Skipped(oracle) in {} due to cancel mode reported from PWA",
+                    strLogPrefix, threadInfo.threadDescription());
             } else {
-                if( checkTimeFraming( null, "oracle", optsLoop.joRuntimeOpts ) ) {
+                if (checkTimeFraming(null, "oracle", optsLoop.joRuntimeOpts)) {
                     imaState.loopState.oracle.isInProgress = true;
-                    await pwa.notifyOnLoopStart( imaState, "oracle" );
-                    if( !imaState.chainProperties.mn.ethersProvider )
-                        throw new Error( "No provider for MN" );
-                    if( !imaState.chainProperties.sc.ethersProvider )
-                        throw new Error( "No provider for SC" );
-                    if( !imaState.joCommunityLocker )
-                        throw new Error( "No CommunityLocker contract" );
+                    await pwa.notifyOnLoopStart(imaState, "oracle");
+                    if (!imaState.chainProperties.mn.ethersProvider)
+                        throw new Error("No provider for MN");
+                    if (!imaState.chainProperties.sc.ethersProvider)
+                        throw new Error("No provider for SC");
+                    if (!imaState.joCommunityLocker)
+                        throw new Error("No CommunityLocker contract");
                     b0 = await imaOracleOperations.doOracleGasPriceSetup(
                         imaState.chainProperties.mn.ethersProvider,
                         imaState.chainProperties.sc.ethersProvider,
@@ -205,49 +205,49 @@ async function singleTransferLoopPartOracle(
                         imaBLS.doSignU256
                     );
                     imaState.loopState.oracle.isInProgress = false;
-                    await pwa.notifyOnLoopEnd( imaState, "oracle" );
+                    await pwa.notifyOnLoopEnd(imaState, "oracle");
                 } else {
-                    log.notice( "{p}Skipped(oracle) in {} due to time framing check",
-                        strLogPrefix, threadInfo.threadDescription() );
+                    log.notice("{p}Skipped(oracle) in {} due to time framing check",
+                        strLogPrefix, threadInfo.threadDescription());
                 }
             }
-        } catch ( err ) {
-            log.error( "{p}Oracle operation exception: {} in {err}, stack is:{}{stack}",
-                strLogPrefix, err, threadInfo.threadDescription(), "\n", err );
+        } catch (err) {
+            log.error("{p}Oracle operation exception: {} in {err}, stack is:{}{stack}",
+                strLogPrefix, err, threadInfo.threadDescription(), "\n", err);
             imaState.loopState.oracle.isInProgress = false;
-            await pwa.notifyOnLoopEnd( imaState, "oracle" );
+            await pwa.notifyOnLoopEnd(imaState, "oracle");
             throw err;
         }
-        log.information( "{p}Oracle gas price setup done in {}: {}",
-            strLogPrefix, threadInfo.threadDescription(), b0 );
+        log.information("{p}Oracle gas price setup done in {}: {}",
+            strLogPrefix, threadInfo.threadDescription(), b0);
     }
     return b0;
 }
 
 async function singleTransferLoopPartM2S(
-    optsLoop: TLoopOptions, strLogPrefix: string ): Promise<boolean> {
+    optsLoop: TLoopOptions, strLogPrefix: string): Promise<boolean> {
     const imaState: state.TIMAState = state.get();
     let b1 = true;
-    if( optsLoop.enableStepM2S ) {
-        log.notice( "{p}Will invoke M2S transfer in {}...",
-            strLogPrefix, threadInfo.threadDescription() );
+    if (optsLoop.enableStepM2S) {
+        log.notice("{p}Will invoke M2S transfer in {}...",
+            strLogPrefix, threadInfo.threadDescription());
         try {
-            if( !await pwa.checkOnLoopStart( imaState, "m2s" ) ) {
+            if (!await pwa.checkOnLoopStart(imaState, "m2s")) {
                 imaState.loopState.m2s.wasInProgress = false;
-                log.notice( "{p}Skipped(m2s) in {} due to cancel mode reported from PWA",
-                    strLogPrefix, threadInfo.threadDescription() );
+                log.notice("{p}Skipped(m2s) in {} due to cancel mode reported from PWA",
+                    strLogPrefix, threadInfo.threadDescription());
             } else {
-                if( checkTimeFraming( null, "m2s", optsLoop.joRuntimeOpts ) ) {
+                if (checkTimeFraming(null, "m2s", optsLoop.joRuntimeOpts)) {
                     imaState.loopState.m2s.isInProgress = true;
-                    await pwa.notifyOnLoopStart( imaState, "m2s" );
-                    if( !imaState.chainProperties.mn.ethersProvider )
-                        throw new Error( "No provider for MN" );
-                    if( !imaState.chainProperties.sc.ethersProvider )
-                        throw new Error( "No provider for SC" );
-                    if( !imaState.joMessageProxyMainNet )
-                        throw new Error( "No MessageProxyMainNet contract" );
-                    if( !imaState.joMessageProxySChain )
-                        throw new Error( "No MessageProxySChain ) contract" );
+                    await pwa.notifyOnLoopStart(imaState, "m2s");
+                    if (!imaState.chainProperties.mn.ethersProvider)
+                        throw new Error("No provider for MN");
+                    if (!imaState.chainProperties.sc.ethersProvider)
+                        throw new Error("No provider for SC");
+                    if (!imaState.joMessageProxyMainNet)
+                        throw new Error("No MessageProxyMainNet contract");
+                    if (!imaState.joMessageProxySChain)
+                        throw new Error("No MessageProxySChain ) contract");
                     b1 = await IMA.doTransfer( // main-net --> s-chain
                         "M2S",
                         optsLoop.joRuntimeOpts,
@@ -277,50 +277,50 @@ async function singleTransferLoopPartM2S(
                         imaState.chainProperties.sc.transactionCustomizer
                     );
                     imaState.loopState.m2s.isInProgress = false;
-                    await pwa.notifyOnLoopEnd( imaState, "m2s" );
+                    await pwa.notifyOnLoopEnd(imaState, "m2s");
                 } else {
-                    log.notice( "{p}Skipped(m2s) in {} due to time framing check",
-                        strLogPrefix, threadInfo.threadDescription() );
+                    log.notice("{p}Skipped(m2s) in {} due to time framing check",
+                        strLogPrefix, threadInfo.threadDescription());
                 }
             }
-        } catch ( err ) {
-            log.error( "{p}M2S transfer exception in {}: {err}, stack is:{}{stack}",
-                strLogPrefix, threadInfo.threadDescription(), err, "\n", err );
+        } catch (err) {
+            log.error("{p}M2S transfer exception in {}: {err}, stack is:{}{stack}",
+                strLogPrefix, threadInfo.threadDescription(), err, "\n", err);
             imaState.loopState.m2s.isInProgress = false;
-            await pwa.notifyOnLoopEnd( imaState, "m2s" );
+            await pwa.notifyOnLoopEnd(imaState, "m2s");
             throw err;
         }
-        log.information( "{p}M2S transfer done in {}: {}",
-            strLogPrefix, threadInfo.threadDescription(), b1 );
+        log.information("{p}M2S transfer done in {}: {}",
+            strLogPrefix, threadInfo.threadDescription(), b1);
     } else
-        log.debug( "{p}Skipped M2S transfer in {}.", strLogPrefix, threadInfo.threadDescription() );
+        log.debug("{p}Skipped M2S transfer in {}.", strLogPrefix, threadInfo.threadDescription());
     return b1;
 }
 
 async function singleTransferLoopPartS2M(
-    optsLoop: TLoopOptions, strLogPrefix: string ): Promise<boolean> {
+    optsLoop: TLoopOptions, strLogPrefix: string): Promise<boolean> {
     const imaState: state.TIMAState = state.get();
     let b2 = true;
-    if( optsLoop.enableStepS2M ) {
-        log.notice( "{p}Will invoke S2M transfer in {}...",
-            strLogPrefix, threadInfo.threadDescription() );
+    if (optsLoop.enableStepS2M) {
+        log.notice("{p}Will invoke S2M transfer in {}...",
+            strLogPrefix, threadInfo.threadDescription());
         try {
-            if( !await pwa.checkOnLoopStart( imaState, "s2m" ) ) {
+            if (!await pwa.checkOnLoopStart(imaState, "s2m")) {
                 imaState.loopState.s2m.wasInProgress = false;
-                log.notice( "{p}Skipped(s2m) in {} due to cancel mode reported from PWA",
-                    strLogPrefix, threadInfo.threadDescription() );
+                log.notice("{p}Skipped(s2m) in {} due to cancel mode reported from PWA",
+                    strLogPrefix, threadInfo.threadDescription());
             } else {
-                if( checkTimeFraming( null, "s2m", optsLoop.joRuntimeOpts ) ) {
+                if (checkTimeFraming(null, "s2m", optsLoop.joRuntimeOpts)) {
                     imaState.loopState.s2m.isInProgress = true;
-                    await pwa.notifyOnLoopStart( imaState, "s2m" );
-                    if( !imaState.chainProperties.mn.ethersProvider )
-                        throw new Error( "No provider for MN" );
-                    if( !imaState.chainProperties.sc.ethersProvider )
-                        throw new Error( "No provider for SC" );
-                    if( !imaState.joMessageProxyMainNet )
-                        throw new Error( "No MessageProxyMainNet contract" );
-                    if( !imaState.joMessageProxySChain )
-                        throw new Error( "No MessageProxySChain contract" );
+                    await pwa.notifyOnLoopStart(imaState, "s2m");
+                    if (!imaState.chainProperties.mn.ethersProvider)
+                        throw new Error("No provider for MN");
+                    if (!imaState.chainProperties.sc.ethersProvider)
+                        throw new Error("No provider for SC");
+                    if (!imaState.joMessageProxyMainNet)
+                        throw new Error("No MessageProxyMainNet contract");
+                    if (!imaState.joMessageProxySChain)
+                        throw new Error("No MessageProxySChain contract");
                     b2 = await IMA.doTransfer( // s-chain --> main-net
                         "S2M",
                         optsLoop.joRuntimeOpts,
@@ -354,41 +354,41 @@ async function singleTransferLoopPartS2M(
                         imaState.chainProperties.mn.transactionCustomizer
                     );
                     imaState.loopState.s2m.isInProgress = false;
-                    await pwa.notifyOnLoopEnd( imaState, "s2m" );
+                    await pwa.notifyOnLoopEnd(imaState, "s2m");
                 } else {
-                    log.notice( "{p}Skipped(s2m) in {} due to time framing check",
-                        strLogPrefix, threadInfo.threadDescription() );
+                    log.notice("{p}Skipped(s2m) in {} due to time framing check",
+                        strLogPrefix, threadInfo.threadDescription());
                 }
             }
-        } catch ( err ) {
-            log.error( "{p}S2M transfer exception in {err}: , stack is:{}{stack}",
-                strLogPrefix, threadInfo.threadDescription(), err, "\n", err );
+        } catch (err) {
+            log.error("{p}S2M transfer exception in {err}: , stack is:{}{stack}",
+                strLogPrefix, threadInfo.threadDescription(), err, "\n", err);
             imaState.loopState.s2m.isInProgress = false;
-            await pwa.notifyOnLoopEnd( imaState, "s2m" );
+            await pwa.notifyOnLoopEnd(imaState, "s2m");
             throw err;
         }
-        log.information( "{p}S2M transfer done in {}: {}",
-            strLogPrefix, threadInfo.threadDescription(), b2 );
+        log.information("{p}S2M transfer done in {}: {}",
+            strLogPrefix, threadInfo.threadDescription(), b2);
     } else {
-        log.debug( "{p}Skipped S2M transfer in {}.",
-            strLogPrefix, threadInfo.threadDescription() );
+        log.debug("{p}Skipped S2M transfer in {}.",
+            strLogPrefix, threadInfo.threadDescription());
     }
     return b2;
 }
 
 async function singleTransferLoopPartS2S(
-    optsLoop: TLoopOptions, strLogPrefix: string ): Promise<boolean> {
+    optsLoop: TLoopOptions, strLogPrefix: string): Promise<boolean> {
     const imaState: state.TIMAState = state.get();
     let b3 = true;
-    if( optsLoop.enableStepS2S && imaState.optsS2S.isEnabled ) {
-        log.notice( "{p}Will invoke all S2S transfers...", strLogPrefix );
+    if (optsLoop.enableStepS2S && imaState.optsS2S.isEnabled) {
+        log.notice("{p}Will invoke all S2S transfers...", strLogPrefix);
         try {
-            if( !imaState.chainProperties.sc.ethersProvider )
-                throw new Error( "No provider for SC" );
-            if( !imaState.joMessageProxySChain )
-                throw new Error( "No MessageProxySChain contract" );
-            if( !imaState.joTokenManagerETH )
-                throw new Error( "No TokenManagerETH contract" );
+            if (!imaState.chainProperties.sc.ethersProvider)
+                throw new Error("No provider for SC");
+            if (!imaState.joMessageProxySChain)
+                throw new Error("No MessageProxySChain contract");
+            if (!imaState.joTokenManagerETH)
+                throw new Error("No TokenManagerETH contract");
             b3 = await IMA.doAllS2S( // s-chain --> s-chain
                 optsLoop.joRuntimeOpts,
                 imaState,
@@ -409,79 +409,79 @@ async function singleTransferLoopPartS2S(
                 imaBLS.doSignMessagesS2S,
                 imaState.chainProperties.sc.transactionCustomizer
             );
-        } catch ( err ) {
-            log.error( "{p}S2S transfer exception in {}: {err}, stack is:{}{stack}",
-                strLogPrefix, threadInfo.threadDescription(), err, "\n", err );
+        } catch (err) {
+            log.error("{p}S2S transfer exception in {}: {err}, stack is:{}{stack}",
+                strLogPrefix, threadInfo.threadDescription(), err, "\n", err);
             throw err;
         }
-        log.information( "{p}All S2S transfers done in {}: {}",
-            strLogPrefix, threadInfo.threadDescription(), b3 );
+        log.information("{p}All S2S transfers done in {}: {}",
+            strLogPrefix, threadInfo.threadDescription(), b3);
     } else
-        log.debug( "{p}Skipped S2S transfer in {}.", strLogPrefix, threadInfo.threadDescription() );
+        log.debug("{p}Skipped S2S transfer in {}.", strLogPrefix, threadInfo.threadDescription());
 
     return b3;
 }
 
-function printLoopPartSkippedWarning( strLoopPartName: string ): void {
-    log.warning( "Skipped {} transfer loop part due to other single transfer loop is in " +
-        "progress right now", strLoopPartName );
+function printLoopPartSkippedWarning(strLoopPartName: string): void {
+    log.warning("Skipped {} transfer loop part due to other single transfer loop is in " +
+        "progress right now", strLoopPartName);
 }
 
 export async function singleTransferLoop(
-    optsLoop: TLoopOptions ): Promise<boolean> {
+    optsLoop: TLoopOptions): Promise<boolean> {
     const imaState: state.TIMAState = state.get();
-    const strLogPrefix = `Single Loop in ${threadInfo.threadDescription( false )} `;
+    const strLogPrefix = `Single Loop in ${threadInfo.threadDescription(false)} `;
     try {
-        log.debug( "{p}{p}", strLogPrefix, imaHelperAPIs.longSeparator );
+        log.debug("{p}{p}", strLogPrefix, imaHelperAPIs.longSeparator);
         let b0 = false; let b1 = false; let b2 = false; let b3 = false;
         // Oracle loop part:
-        if( optsLoop.enableStepOracle ) {
-            if( imaState.loopState.oracle.isInProgress ) {
+        if (optsLoop.enableStepOracle) {
+            if (imaState.loopState.oracle.isInProgress) {
                 imaState.loopState.oracle.wasInProgress = false;
-                printLoopPartSkippedWarning( "Oracle" );
+                printLoopPartSkippedWarning("Oracle");
                 b0 = true;
             } else
-                b0 = await singleTransferLoopPartOracle( optsLoop, strLogPrefix );
+                b0 = await singleTransferLoopPartOracle(optsLoop, strLogPrefix);
         } else
             b0 = true;
         // M2S loop part:
-        if( optsLoop.enableStepM2S ) {
-            if( imaState.loopState.m2s.isInProgress ) {
+        if (optsLoop.enableStepM2S) {
+            if (imaState.loopState.m2s.isInProgress) {
                 imaState.loopState.m2s.wasInProgress = false;
-                printLoopPartSkippedWarning( "M2S" );
+                printLoopPartSkippedWarning("M2S");
                 b1 = true;
             } else
-                b1 = await singleTransferLoopPartM2S( optsLoop, strLogPrefix );
+                b1 = await singleTransferLoopPartM2S(optsLoop, strLogPrefix);
         } else
             b1 = true;
         // S2M loop part:
-        if( optsLoop.enableStepS2M ) {
-            if( imaState.loopState.s2m.isInProgress ) {
+        if (optsLoop.enableStepS2M) {
+            if (imaState.loopState.s2m.isInProgress) {
                 imaState.loopState.s2m.wasInProgress = false;
-                printLoopPartSkippedWarning( "S2M" );
+                printLoopPartSkippedWarning("S2M");
                 b2 = true;
             } else
-                b2 = await singleTransferLoopPartS2M( optsLoop, strLogPrefix );
+                b2 = await singleTransferLoopPartS2M(optsLoop, strLogPrefix);
         } else
             b2 = true;
         // S2S loop part:
-        if( optsLoop.enableStepS2S ) {
-            if( imaState.loopState.s2s.isInProgress ) {
+        if (optsLoop.enableStepS2S) {
+            if (imaState.loopState.s2s.isInProgress) {
                 imaState.loopState.s2s.wasInProgress = false;
-                printLoopPartSkippedWarning( "S2S" );
+                printLoopPartSkippedWarning("S2S");
                 b3 = true;
             } else
-                b3 = await singleTransferLoopPartS2S( optsLoop, strLogPrefix );
+                b3 = await singleTransferLoopPartS2S(optsLoop, strLogPrefix);
         } else
             b3 = true;
         // Final status check loop part:
         const bResult = b0 && b1 && b2 && b3;
-        log.notice( "{p}Final completion status for all performed transfer loop parts is {}",
-            strLogPrefix, bResult );
+        log.notice("{p}Final completion status for all performed transfer loop parts is {}",
+            strLogPrefix, bResult);
         return bResult;
-    } catch ( err ) {
-        log.error( "{p}Exception in transfer loop: {err}, stack is:{}{stack}", strLogPrefix,
-            err, "\n", err );
+    } catch (err) {
+        log.error("{p}Exception in transfer loop: {err}, stack is:{}{stack}", strLogPrefix,
+            err, "\n", err);
     }
     imaState.loopState.oracle.isInProgress = false;
     imaState.loopState.m2s.isInProgress = false;
@@ -490,24 +490,24 @@ export async function singleTransferLoop(
     return false;
 }
 export async function singleTransferLoopWithRepeat(
-    optsLoop: TLoopOptions ): Promise<void> {
+    optsLoop: TLoopOptions): Promise<void> {
     const imaState: state.TIMAState = state.get();
-    await singleTransferLoop( optsLoop );
-    setTimeout( function(): void {
-        singleTransferLoopWithRepeat( optsLoop )
-            .then( function(): void {} ).catch( function(): void {} );
-    }, imaState.nLoopPeriodSeconds * 1000 );
+    await singleTransferLoop(optsLoop);
+    setTimeout(function (): void {
+        singleTransferLoopWithRepeat(optsLoop)
+            .then(function (): void { }).catch(function (): void { });
+    }, imaState.nLoopPeriodSeconds * 1000);
 };
-export async function runTransferLoop( optsLoop: TLoopOptions ): Promise<boolean> {
+export async function runTransferLoop(optsLoop: TLoopOptions): Promise<boolean> {
     const imaState: state.TIMAState = state.get();
-    const isDelayFirstRun = owaspUtils.toBoolean( optsLoop.isDelayFirstRun );
-    if( isDelayFirstRun ) {
-        setTimeout( function(): void {
-            singleTransferLoopWithRepeat( optsLoop )
-                .then( function(): void {} ).catch( function(): void {} );
-        }, imaState.nLoopPeriodSeconds * 1000 );
+    const isDelayFirstRun = owaspUtils.toBoolean(optsLoop.isDelayFirstRun);
+    if (isDelayFirstRun) {
+        setTimeout(function (): void {
+            singleTransferLoopWithRepeat(optsLoop)
+                .then(function (): void { }).catch(function (): void { });
+        }, imaState.nLoopPeriodSeconds * 1000);
     } else
-        await singleTransferLoopWithRepeat( optsLoop );
+        await singleTransferLoopWithRepeat(optsLoop);
     return true;
 }
 
@@ -516,7 +516,7 @@ export async function runTransferLoop( optsLoop: TLoopOptions ): Promise<boolean
 const gArrWorkers: worker_threads.Worker[] = [];
 const gArrClients: networkLayer.OutOfWorkerSocketClientPipe[] = [];
 
-function constructChainProperties( opts: TParallelLoopRunOptions ): any {
+function constructChainProperties(opts: TParallelLoopRunOptions): any {
     return {
         mn: {
             joAccount: {
@@ -581,16 +581,16 @@ function constructChainProperties( opts: TParallelLoopRunOptions ): any {
     };
 }
 
-function getDefaultOptsLoop( idxWorker: number ): TLoopOptions {
+function getDefaultOptsLoop(idxWorker: number): TLoopOptions {
     const optsLoop: TLoopOptions = {
         joRuntimeOpts: {
             isInsideWorker: true, idxChainKnownForS2S: 0, cntChainsKnownForS2S: 0
         },
         isDelayFirstRun: false,
-        enableStepOracle: ( idxWorker == 0 ),
-        enableStepM2S: ( idxWorker == 0 ),
-        enableStepS2M: ( idxWorker == 1 ),
-        enableStepS2S: ( idxWorker == 0 )
+        enableStepOracle: (idxWorker == 0),
+        enableStepM2S: (idxWorker == 0),
+        enableStepS2M: (idxWorker == 1),
+        enableStepS2S: (idxWorker == 0)
     };
     return optsLoop;
 }
@@ -602,62 +602,62 @@ interface TWorkerData {
     }
 }
 
-export async function ensureHaveWorkers( opts: TParallelLoopRunOptions ): Promise<any> {
-    if( gArrWorkers.length > 0 )
+export async function ensureHaveWorkers(opts: TParallelLoopRunOptions): Promise<any> {
+    if (gArrWorkers.length > 0)
         return gArrWorkers;
     const cntWorkers = 2;
-    log.debug( "Loop module will create its ",
-        cntWorkers, " worker(s) in ", threadInfo.threadDescription(), "..." );
-    for( let idxWorker = 0; idxWorker < cntWorkers; ++idxWorker ) {
+    log.debug("Loop module will create its ",
+        cntWorkers, " worker(s) in ", threadInfo.threadDescription(), "...");
+    for (let idxWorker = 0; idxWorker < cntWorkers; ++idxWorker) {
         const workerData: TWorkerData = {
             url: "ima_loop_server" + idxWorker,
             colorization: { isEnabled: log.isEnabledColorization() }
         };
-        gArrWorkers.push( new threadInfo.Worker(
-            path.join( __dirname, "loopWorker.js" ),
+        gArrWorkers.push(new threadInfo.Worker(
+            path.join(__dirname, "loopWorker.js"),
             { // "type": "module",
                 workerData
             }
-        ) );
-        gArrWorkers[idxWorker].on( "message", function( jo: any ): void {
-            networkLayer.outOfWorkerAPIs.onMessage( gArrWorkers[idxWorker], jo );
-        } );
+        ));
+        gArrWorkers[idxWorker].on("message", function (jo: any): void {
+            networkLayer.outOfWorkerAPIs.onMessage(gArrWorkers[idxWorker], jo);
+        });
         const aClient = new networkLayer.OutOfWorkerSocketClientPipe(
-            workerData.url, gArrWorkers[idxWorker] );
-        gArrClients.push( aClient );
+            workerData.url, gArrWorkers[idxWorker]);
+        gArrClients.push(aClient);
         aClient.logicalInitComplete = false;
         aClient.errorLogicalInit = null;
-        aClient.on( "message", async function( eventData: any ): Promise<void> {
+        aClient.on("message", async function (eventData: any): Promise<void> {
             const joMessage = eventData.message;
-            switch ( joMessage.method ) {
-            case "init":
-                if( !joMessage.error ) {
-                    aClient.logicalInitComplete = true;
+            switch (joMessage.method) {
+                case "init":
+                    if (!joMessage.error) {
+                        aClient.logicalInitComplete = true;
+                        break;
+                    }
+                    aClient.errorLogicalInit = joMessage.error;
+                    opts.details.critical(
+                        " Loop worker thread {} reported/returned init error: {err}",
+                        idxWorker, joMessage.error);
                     break;
-                }
-                aClient.errorLogicalInit = joMessage.error;
-                opts.details.critical(
-                    " Loop worker thread {} reported/returned init error: {err}",
-                    idxWorker, joMessage.error );
-                break;
-            case "log":
-                log.information( "LOOP WORKER {} {}", workerData.url, joMessage.message );
-                break;
-            case "saveTransferError":
-                imaTransferErrorHandling.saveTransferError(
-                    joMessage.message.category, joMessage.message.textLog, joMessage.message.ts );
-                break;
-            case "saveTransferSuccess":
-                imaTransferErrorHandling.saveTransferSuccess( joMessage.message.category );
-                break;
+                case "log":
+                    log.information("LOOP WORKER {} {}", workerData.url, joMessage.message);
+                    break;
+                case "saveTransferError":
+                    imaTransferErrorHandling.saveTransferError(
+                        joMessage.message.category, joMessage.message.textLog, joMessage.message.ts);
+                    break;
+                case "saveTransferSuccess":
+                    imaTransferErrorHandling.saveTransferSuccess(joMessage.message.category);
+                    break;
             } // switch ( joMessage.method )
-        } );
+        });
         const jo: any = {
             method: "init",
             message: {
                 opts: {
                     imaState: {
-                        optsLoop: getDefaultOptsLoop( idxWorker ),
+                        optsLoop: getDefaultOptsLoop(idxWorker),
                         verbose_: log.verboseGet(),
                         expose_details_: log.exposeDetailsGet(),
                         loopState: state.gDefaultValueForLoopState,
@@ -727,9 +727,7 @@ export async function ensureHaveWorkers( opts: TParallelLoopRunOptions ): Promis
                         joEthErc20: null,
                         joEthErc20Target: null,
 
-                        chainProperties: constructChainProperties( opts ),
-                        joAbiSkaleManager: opts.imaState.joAbiSkaleManager,
-                        bHaveSkaleManagerABI: opts.imaState.bHaveSkaleManagerABI,
+                        chainProperties: constructChainProperties(opts),
                         strChainNameOriginChain: opts.imaState.strChainNameOriginChain,
                         isPWA: opts.imaState.isPWA,
                         nTimeoutSecondsPWA: opts.imaState.nTimeoutSecondsPWA,
@@ -757,42 +755,42 @@ export async function ensureHaveWorkers( opts: TParallelLoopRunOptions ): Promis
                 colorization: { isEnabled: log.isEnabledColorization() }
             }
         };
-        while( !aClient.logicalInitComplete ) {
-            log.information( "LOOP server is not initialized yet..." );
-            await threadInfo.sleep( 1000 );
-            aClient.send( jo );
+        while (!aClient.logicalInitComplete) {
+            log.information("LOOP server is not initialized yet...");
+            await threadInfo.sleep(1000);
+            aClient.send(jo);
         }
     }
-    log.debug( "Loop module did created its ",
-        gArrWorkers.length, " worker(s) in ", threadInfo.threadDescription() );
+    log.debug("Loop module did created its ",
+        gArrWorkers.length, " worker(s) in ", threadInfo.threadDescription());
 }
 
-export async function runParallelLoops( opts: TParallelLoopRunOptions ): Promise<boolean> {
-    log.notice( "Will start parallel IMA transfer loops in {}...", threadInfo.threadDescription() );
-    await ensureHaveWorkers( opts );
-    log.success( "Done, did started parallel IMA transfer loops in {}, have {} worker(s) and {} " +
-        "clients(s).", threadInfo.threadDescription(), gArrWorkers.length, gArrClients.length );
+export async function runParallelLoops(opts: TParallelLoopRunOptions): Promise<boolean> {
+    log.notice("Will start parallel IMA transfer loops in {}...", threadInfo.threadDescription());
+    await ensureHaveWorkers(opts);
+    log.success("Done, did started parallel IMA transfer loops in {}, have {} worker(s) and {} " +
+        "clients(s).", threadInfo.threadDescription(), gArrWorkers.length, gArrClients.length);
     return true;
 }
 
-export async function spreadArrivedStateOfPendingWorkAnalysis( joMessage: any ): Promise<void> {
-    if( !( joMessage && typeof joMessage === "object" &&
-        "method" in joMessage && joMessage.method == "skale_imaNotifyLoopWork" )
+export async function spreadArrivedStateOfPendingWorkAnalysis(joMessage: any): Promise<void> {
+    if (!(joMessage && typeof joMessage === "object" &&
+        "method" in joMessage && joMessage.method == "skale_imaNotifyLoopWork")
     )
         return;
     const cntWorkers = gArrWorkers.length;
-    for( let idxWorker = 0; idxWorker < cntWorkers; ++idxWorker )
-        gArrClients[idxWorker].send( joMessage );
+    for (let idxWorker = 0; idxWorker < cntWorkers; ++idxWorker)
+        gArrClients[idxWorker].send(joMessage);
 }
 
-export async function spreadUpdatedSChainNetwork( isFinal: boolean ): Promise<void> {
+export async function spreadUpdatedSChainNetwork(isFinal: boolean): Promise<void> {
     const imaState: state.TIMAState = state.get();
     const joMessage: any = {
         method: "spreadUpdatedSChainNetwork",
-        isFinal: ( !!isFinal ),
+        isFinal: (!!isFinal),
         joSChainNetworkInfo: imaState.joSChainNetworkInfo
     };
     const cntWorkers = gArrWorkers.length;
-    for( let idxWorker = 0; idxWorker < cntWorkers; ++idxWorker )
-        gArrClients[idxWorker].send( joMessage );
+    for (let idxWorker = 0; idxWorker < cntWorkers; ++idxWorker)
+        gArrClients[idxWorker].send(joMessage);
 }

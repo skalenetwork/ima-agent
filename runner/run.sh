@@ -10,6 +10,10 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 : "${SCHAIN_NAME?Need to set SCHAIN_NAME}"
 
+: "${MANAGER_CONTRACTS?Need to set MANAGER_CONTRACTS}"
+: "${IMA_CONTRACTS?Need to set IMA_CONTRACTS}"
+: "${IMA_SCHAIN_CONTRACTS?Need to set IMA_SCHAIN_CONTRACTS}"
+
 : "${SCHAIN_RPC_URL?Need to set SCHAIN_RPC_URL}"
 : "${MAINNET_RPC_URL?Need to set MAINNET_RPC_URL}"
 
@@ -64,15 +68,15 @@ BASE_OPTIONS="--gas-price-multiplier=$GAS_PRICE_MULTIPLIER \
 --cross-ima \
 --json-rpc-port=$RPC_PORT \
 --s2s-enable \
---abi-skale-manager=$MANAGER_ABI_PATH \
+--manager-contracts=$MANAGER_CONTRACTS \
+--ima-contracts=$IMA_CONTRACTS \
+--ima-schain-contracts=$IMA_SCHAIN_CONTRACTS \
 --url-main-net=$MAINNET_RPC_URL \
 --url-s-chain=$SCHAIN_RPC_URL \
 --id-main-net=Mainnet \
 --id-s-chain=$SCHAIN_NAME \
 --cid-main-net=$CID_MAIN_NET \
 --cid-s-chain=$CID_SCHAIN \
---abi-main-net=$MAINNET_PROXY_PATH \
---abi-s-chain=$SCHAIN_PROXY_PATH \
 --sgx-url=$SGX_URL \
 --sgx-bls-key=$BLS_KEY_NAME \
 --sgx-ecdsa-key=$ECDSA_KEY_NAME \

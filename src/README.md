@@ -8,9 +8,11 @@ This article refers to **SKALE Interchain Messaging Agent** as **IMA**.
 
 **IMA** consists of the following parts:
 
-    -  Contracts on Mainnet
-    -  Contracts on a SKALE Chain
-    -  NodeJS based app
+```
+-  Contracts on Mainnet
+-  Contracts on a SKALE Chain
+-  NodeJS based app
+```
 
 ## Contracts installation
 
@@ -76,7 +78,7 @@ For SKALE chain, invoke:
     ls -1 ./data/
 ```
 
-You should see **proxySchain_*s-chain-name-here*.json** file listed.
+You should see **proxySchain\_*s-chain-name-here*.json** file listed.
 
 ## IMA transaction signing
 
@@ -153,8 +155,8 @@ You can check whether **IMA** is already bound with:
         --id-s-chain=Bob \
         --cid-main-net=-4 \
         --cid-s-chain=-4 \
-        --abi-main-net=../proxy/data/proxyMainnet.json \
-        --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+        --ima-contracts=0x0 \
+        --ima-schain-contracts=0x0 \
         --key-main-net=$PRIVATE_KEY_FOR_ETHEREUM \
         --key-s-chain=$PRIVATE_KEY_FOR_SCHAIN
 ```
@@ -170,8 +172,8 @@ You can check whether **IMA** is already bound with:
         --id-s-chain=Bob \
         --cid-main-net=-4 \
         --cid-s-chain=-4 \
-        --abi-main-net=../proxy/data/proxyMainnet.json \
-        --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+        --ima-contracts=0x0 \
+        --ima-schain-contracts=0x0 \
         --key-main-net=$PRIVATE_KEY_FOR_ETHEREUM \
         --key-s-chain=$PRIVATE_KEY_FOR_SCHAIN
 ```
@@ -189,8 +191,8 @@ Performed with the **--loop** command line option:
         --id-s-chain=Bob \
         --cid-main-net=-4 \
         --cid-s-chain=-4 \
-        --abi-main-net=../proxy/data/proxyMainnet.json \
-        --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+        --ima-contracts=0x0 \
+        --ima-schain-contracts=0x0 \
         --key-main-net=$PRIVATE_KEY_FOR_ETHEREUM \
         --key-s-chain=$PRIVATE_KEY_FOR_SCHAIN
 ```
@@ -211,8 +213,8 @@ Show balance:
         --id-s-chain=Bob \
         --cid-main-net=-4 \
         --cid-s-chain=-4 \
-        --abi-main-net=../proxy/data/proxyMainnet.json \
-        --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+        --ima-contracts=0x0 \
+        --ima-schain-contracts=0x0 \
         --reimbursement-chain=Bob \
         --reimbursement-balance
         --receiver=$ADDRESS_FOR_ETHEREUM
@@ -228,8 +230,8 @@ Estimate amount:
         --id-s-chain=Bob \
         --cid-main-net=-4 \
         --cid-s-chain=-4 \
-        --abi-main-net=../proxy/data/proxyMainnet.json \
-        --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+        --ima-contracts=0x0 \
+        --ima-schain-contracts=0x0 \
         --reimbursement-chain=Bob \
         --reimbursement-estimate \
         --receiver=$ADDRESS_FOR_ETHEREUM
@@ -245,8 +247,8 @@ Recharge balance with 1 ETH:
         --id-s-chain=Bob \
         --cid-main-net=-4 \
         --cid-s-chain=-4 \
-        --abi-main-net=../proxy/data/proxyMainnet.json \
-        --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+        --ima-contracts=0x0 \
+        --ima-schain-contracts=0x0 \
         --key-main-net=$PRIVATE_KEY_FOR_ETHEREUM \
         --reimbursement-chain=Bob \
         --reimbursement-recharge=1eth
@@ -262,8 +264,8 @@ Withdraw 1 ETH:
         --id-s-chain=Bob \
         --cid-main-net=-4 \
         --cid-s-chain=-4 \
-        --abi-main-net=../proxy/data/proxyMainnet.json \
-        --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+        --ima-contracts=0x0 \
+        --ima-schain-contracts=0x0 \
         --key-main-net=$PRIVATE_KEY_FOR_ETHEREUM \
         --reimbursement-chain=Bob \
         --reimbursement-withdraw=1eth
@@ -279,8 +281,8 @@ Set minimal time range in seconds between **S-Chain** back to **Main Net** messa
         --id-s-chain=Bob \
         --cid-main-net=-4 \
         --cid-s-chain=-4 \
-        --abi-main-net=../proxy/data/proxyMainnet.json \
-        --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+        --ima-contracts=0x0 \
+        --ima-schain-contracts=0x0 \
         --key-main-net=$PRIVATE_KEY_FOR_ETHEREUM \
         --key-s-chain=$PRIVATE_KEY_FOR_S_CHAIN \
         --reimbursement-range=0
@@ -328,8 +330,8 @@ Performed with the **--m2s-payment** command line option:
         --id-s-chain=Bob \
         --cid-main-net=-4 \
         --cid-s-chain=-4 \
-        --abi-main-net=../proxy/data/proxyMainnet.json \
-        --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+        --ima-contracts=0x0 \
+        --ima-schain-contracts=0x0 \
         --key-main-net=$PRIVATE_KEY_FOR_ETHEREUM \
         --address-s-chain=$ACCOUNT_FOR_SCHAIN
 ```
@@ -350,8 +352,8 @@ Performed with the **--s2m-payment** command line option:
         --id-s-chain=Bob \
         --cid-main-net=-4 \
         --cid-s-chain=-4 \
-        --abi-main-net=../proxy/data/proxyMainnet.json \
-        --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+        --ima-contracts=0x0 \
+        --ima-schain-contracts=0x0 \
         --address-main-net=$ACCOUNT_FOR_ETHEREUM \
         --key-s-chain=$PRIVATE_KEY_FOR_SCHAIN
 ```
@@ -371,8 +373,8 @@ Performed with the **--s2m-view** command line option:
         --cid-main-net=-4 \
         --cid-s-chain=-4 \
         --id-s-chain=Bob \
-        --abi-main-net=../proxy/data/proxyMainnet.json \
-        --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+        --ima-contracts=0x0 \
+        --ima-schain-contracts=0x0 \
         --key-main-net=$PRIVATE_KEY_FOR_ETHEREUM
 ```
 
@@ -391,8 +393,8 @@ Performed with the **--s2m-receive** command line option:
         --id-s-chain=Bob \
         --cid-main-net=-4 \
         --cid-s-chain=-4 \
-        --abi-main-net=../proxy/data/proxyMainnet.json \
-        --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+        --ima-contracts=0x0 \
+        --ima-schain-contracts=0x0 \
         --key-main-net=$PRIVATE_KEY_FOR_ETHEREUM
 ```
 
@@ -430,8 +432,8 @@ Performed with the **--m2s-transfer** command line option:
         --id-s-chain=Bob \
         --cid-main-net=-4 \
         --cid-s-chain=-4 \
-        --abi-main-net=../proxy/data/proxyMainnet.json \
-        --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+        --ima-contracts=0x0 \
+        --ima-schain-contracts=0x0 \
         --key-main-net=PRIVATE_KEY_FOR_ETHEREUM \
         --key-s-chain=$PRIVATE_KEY_FOR_SCHAIN
 ```
@@ -449,8 +451,8 @@ Performed with the **--s2m-transfer** command line option:
         --id-s-chain=Bob \
         --cid-main-net=-4 \
         --cid-s-chain=-4 \
-        --abi-main-net=../proxy/data/proxyMainnet.json \
-        --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+        --ima-contracts=0x0 \
+        --ima-schain-contracts=0x0 \
         --key-main-net=$PRIVATE_KEY_FOR_ETHEREUM \
         --key-s-chain=$PRIVATE_KEY_FOR_SCHAIN
 ```
@@ -468,34 +470,36 @@ Performed with the **--transfer** command line option:
         --id-s-chain=Bob \
         --cid-main-net=-4 \
         --cid-s-chain=-4 \
-        --abi-main-net=../proxy/data/proxyMainnet.json \
-        --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+        --ima-contracts=0x0 \
+        --ima-schain-contracts=0x0 \
         --key-main-net=$PRIVATE_KEY_FOR_ETHEREUM \
         --key-s-chain=$PRIVATE_KEY_FOR_SCHAIN
 ```
 
 ### Transfer loop parameters
 
-    -  --skip-dry-run - Skip dry run contract method calls.
-    -  --ignore-dry-run - Ignore result of dry run contract method calls and continue execute.
-    -  --dry-run - Use error results of dry run contract method calls as actual errors and stop execute.
-    -  --m2s-transfer-block-size - Number of transactions in one block to use in money transfer loop from Main-net to S-chain.
-    -  --s2m-transfer-block-size - Number of transactions in one block to use in money transfer loop from S-chain to Main-net.
-    -  --s2s-transfer-block-size - Number of transactions in one block to use in money transfer loop from S-chain to S-chain.
-    -  --transfer-block-size - Number of transactions in one block to use in both money transfer loops.
-    -  --m2s-max-transactions - Maximal number of transactions to do in money transfer loop from Main-net to S-chain (0 is unlimited).
-    -  --s2m-max-transactions - Maximal number of transactions to do in money transfer loop from S-chain to Main-net (0 is unlimited).
-    -  --s2s-max-transactions - Maximal number of transactions to do in money transfer loop from S-chain to S-chain (0 is unlimited).
-    -  --max-transactions - Maximal number of transactions to do in both money transfer loops (0 is unlimited).
-    -  --m2s-await-blocks - Maximal number of blocks to wait to appear in blockchain before transaction from Main-net to S-chain (0 is no wait).
-    -  --s2m-await-blocks - Maximal number of blocks to wait to appear in blockchain before transaction from S-chain to Main-net (0 is no wait).
-    -  --s2s-await-blocks - Maximal number of blocks to wait to appear in blockchain before transaction from S-chain to S-chain (0 is no wait).
-    -  --await-blocks - Maximal number of blocks to wait to appear in blockchain before transaction between both S-chain and Main-net (0 is no wait).
-    -  --period - Transfer loop period(seconds).
-    -  --node-number=value - S-Chain node number(zero based).
-    -  --nodes-count=value - S-Chain nodes count.
-    -  --time-framing=value - Specifies period(in seconds) for time framing. Zero means disable time framing.
-    -  --time-gap=value - Specifies gap(in seconds) before next time frame.
+```
+-  --skip-dry-run - Skip dry run contract method calls.
+-  --ignore-dry-run - Ignore result of dry run contract method calls and continue execute.
+-  --dry-run - Use error results of dry run contract method calls as actual errors and stop execute.
+-  --m2s-transfer-block-size - Number of transactions in one block to use in money transfer loop from Main-net to S-chain.
+-  --s2m-transfer-block-size - Number of transactions in one block to use in money transfer loop from S-chain to Main-net.
+-  --s2s-transfer-block-size - Number of transactions in one block to use in money transfer loop from S-chain to S-chain.
+-  --transfer-block-size - Number of transactions in one block to use in both money transfer loops.
+-  --m2s-max-transactions - Maximal number of transactions to do in money transfer loop from Main-net to S-chain (0 is unlimited).
+-  --s2m-max-transactions - Maximal number of transactions to do in money transfer loop from S-chain to Main-net (0 is unlimited).
+-  --s2s-max-transactions - Maximal number of transactions to do in money transfer loop from S-chain to S-chain (0 is unlimited).
+-  --max-transactions - Maximal number of transactions to do in both money transfer loops (0 is unlimited).
+-  --m2s-await-blocks - Maximal number of blocks to wait to appear in blockchain before transaction from Main-net to S-chain (0 is no wait).
+-  --s2m-await-blocks - Maximal number of blocks to wait to appear in blockchain before transaction from S-chain to Main-net (0 is no wait).
+-  --s2s-await-blocks - Maximal number of blocks to wait to appear in blockchain before transaction from S-chain to S-chain (0 is no wait).
+-  --await-blocks - Maximal number of blocks to wait to appear in blockchain before transaction between both S-chain and Main-net (0 is no wait).
+-  --period - Transfer loop period(seconds).
+-  --node-number=value - S-Chain node number(zero based).
+-  --nodes-count=value - S-Chain nodes count.
+-  --time-framing=value - Specifies period(in seconds) for time framing. Zero means disable time framing.
+-  --time-gap=value - Specifies gap(in seconds) before next time frame.
+```
 
 ### S-Chain specific configuration for more then one node S-Chains
 
@@ -515,8 +519,8 @@ Performed with the **--m2s-payment** command line option:
         --id-s-chain=Bob \
         --cid-main-net=-4 \
         --cid-s-chain=-4 \
-        --abi-main-net=../proxy/data/proxyMainnet.json \
-        --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+        --ima-contracts=0x0 \
+        --ima-schain-contracts=0x0 \
         --erc20-main-net=...path.../data-mn.json \
         --erc20-s-chain=...path.../data-sc.json \
         --key-main-net=$PRIVATE_KEY_FOR_ETHEREUM \
@@ -552,8 +556,8 @@ Performed with the **--s2m-payment** command line option:
         --id-s-chain=Bob \
         --cid-main-net=-4 \
         --cid-s-chain=-4 \
-        --abi-main-net=../proxy/data/proxyMainnet.json \
-        --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+        --ima-contracts=0x0 \
+        --ima-schain-contracts=0x0 \
         --erc20-main-net=...path.../data-mn.json \
         --erc20-s-chain=...path.../data-sc.json \
         --address-main-net=$ACCOUNT_FOR_ETHEREUM \
@@ -590,8 +594,8 @@ You can asl **IMA Agent** to show ETH and, optionally, various token balances an
         --id-s-chain=Bob \
         --cid-main-net=-4 \
         --cid-s-chain=-4 \
-        --abi-main-net=../proxy/data/proxyMainnet.json \
-        --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+        --ima-contracts=0x0 \
+        --ima-schain-contracts=0x0 \
         --address-main-net=$ACCOUNT_FOR_ETHEREUM \
         --address-s-chain=$ACCOUNT_FOR_SCHAIN \
         --erc20-main-net=.....path-to.....ERC20.abi.mn.json \
@@ -625,18 +629,20 @@ Adding **--sign-messages** command line parameter turns on **BLS message signing
 Agent app will scan **S-Chain** network and ask each of nodes to sign messages transferred from **MainNet** to **S-Chain**.
 This options requires all **S-Chain** nodes to be configured with **SGX Wallet** or **Emu Wallet** access information.
 
-The **--bls-glue** command line parameter must be used to specify path to the **bls_glue** application.
+The **--bls-glue** command line parameter must be used to specify path to the **bls\_glue** application.
 This parameter must be specified if **--sign-messages** parameter is present.
 
-The **--bls-verify** command line parameter must be used to specify path to the **verify_bls** application.
+The **--bls-verify** command line parameter must be used to specify path to the **verify\_bls** application.
 This parameter is optional. If it was specified, then **IMA Agent** application will verify gathered BLS signatures.
 
-The **--hash-g1** command line parameter must be used to specify path to the **hash_g1** application.
+The **--hash-g1** command line parameter must be used to specify path to the **hash\_g1** application.
 
 Message signing will work only on **S-Chain** where each **skaled** node configured properly and able to:
 
-    -  provide brows information for entire **S-Chain** network
-    -  provide **IMA** signing APIs and parameters
+```
+-  provide brows information for entire **S-Chain** network
+-  provide **IMA** signing APIs and parameters
+```
 
 Here is example of correct **config.json** file for **skaled** node:
 
@@ -699,8 +705,8 @@ Here is example of IMA message processing loop invocation with BLS support:
         --id-s-chain=Bob \
         --cid-main-net=-4 \
         --cid-s-chain=-4 \
-        --abi-main-net=../proxy/data/proxyMainnet.json \
-        --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+        --ima-contracts=0x0 \
+        --ima-schain-contracts=0x0 \
         --key-main-net=$PRIVATE_KEY_FOR_ETHEREUM \
         --key-s-chain=$PRIVATE_KEY_FOR_SCHAIN \
         --sign-messages \
@@ -716,8 +722,8 @@ Here is example of IMA message processing loop invocation with BLS support:
         --id-s-chain=Bob \
         --cid-main-net=-4 \
         --cid-s-chain=-4 \
-        --abi-main-net=../proxy/data/proxyMainnet.json \
-        --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+        --ima-contracts=0x0 \
+        --ima-schain-contracts=0x0 \
         --key-main-net=$PRIVATE_KEY_FOR_ETHEREUM \
         --key-s-chain=$PRIVATE_KEY_FOR_SCHAIN \
         --sign-messages \
