@@ -40,7 +40,7 @@ describe('nodes module test', () => {
         const manager = (await managerProject.getContract('SkaleManager')) as Contract
         manager.connect(wallet)
 
-        const validators = (await managerProject.getContract('Validators')) as Contract
+        const validators = (await managerProject.getContract('ValidatorService')) as Contract
         validators.connect(wallet)
 
         const schains = (await managerProject.getContract('Schains')) as Contract
