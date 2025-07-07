@@ -7,8 +7,17 @@
  
 
 thread 0: 
-main.js -> main.ts::main() -> commandLineTaskLoop -> runParallelLoops -> ensureHaveWorkers 
-                                      ->  thread 1: ima_loop_server0 (ObserverServer) -> runTransferLoop -> singleTransferLoopWithRepeat -> singleTransferLoop -> 
+main() 
+  commandLineTaskLoop() 
+    runParallelLoops()
+       ensureHaveWorkers 
+       
+       
+       thread 1: 
+         ima_loop_server0 (ObserverServer) -> 
+            runTransferLoop -> 
+              singleTransferLoopWithRepeat -> 
+               singleTransferLoop -> 
                 singleTransferLoopPartM2S -> 
                    doTransfer("M2S") -> 
                       doQueryOutgoingMessageCounter -> 
@@ -46,8 +55,7 @@ main.js -> main.ts::main() -> commandLineTaskLoop -> runParallelLoops -> ensureH
                                dryRunCall
                                payedCall
                                                  
-                                                          
-
+                                                        
              singleTransferLoopPartS2S
                 doAllS2S
                   (loop through all connected chains):
@@ -65,8 +73,18 @@ main.js -> main.ts::main() -> commandLineTaskLoop -> runParallelLoops -> ensureH
                            
                        
 
-
-
-                                      ->  thread 2: ima_loop_server1 (ObserverServer) -> runTransferLoop -> singleTransferLoopWithRepeat -> singleTransferLoop -> singleTransferLoopPartS2M
+     thread 2: ima_loop_server1 (ObserverServer) 
+       runTransferLoop -> singleTransferLoopWithRepeat -> singleTransferLoop -> 
+         singleTransferLoopPartS2M
+           doTransfer("S2M")
+              doQueryOutgoingMessageCounter
+              doMainTransferLoopActions
+                 gatherMessages
+                 handleAllMessagesSigning
+                    doSignMessagesS2M
+                      doSignMessagesImpl
+                    callbackAllMessagesSign
+                      ...
+                      Checking that there is no PostMessageError in events
 
 
