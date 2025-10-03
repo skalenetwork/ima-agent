@@ -26,30 +26,49 @@
 import * as log from "./log.js";
 import * as owaspUtils from "./owaspUtils.js";
 
-export function composeGasUsageReportFromArray( strName: string, jarrReceipts: any[] ): any {
-    if( !( strName && typeof strName === "string" && jarrReceipts ) )
-        return { sumGasUsed: 0, strReport: "N/A" };
-    let i; let sumGasUsed = owaspUtils.toBN( "0" );
-    let s = "\n" + log.fmtInformation( "Gas usage report for " ) +
-            log.fmtInformation( "{p}\n", strName );
-    for( i = 0; i < jarrReceipts.length; ++i ) {
-        try {
-            sumGasUsed = sumGasUsed.add( owaspUtils.toBN( jarrReceipts[i].receipt.gasUsed ) );
-            s += log.fmtInformation( "    {p}", jarrReceipts[i].description ) +
-                log.fmtDebug( "....." ) +
-                log.fmtInformation( "{p}\n", jarrReceipts[i].receipt.gasUsed.toString() );
-        } catch ( err ) { }
-    }
-    s += "    " + log.fmtAttention( "SUM" ) + log.fmtDebug( "....." ) +
-        log.fmtInformation( "{}", sumGasUsed.toString() );
-    return { sumGasUsed, strReport: s };
+export function composeGasUsageReportFromArray(
+  strName: string,
+  jarrReceipts: any[],
+): any {
+  if (!(strName && typeof strName === "string" && jarrReceipts))
+    return { sumGasUsed: 0, strReport: "N/A" };
+  let i;
+  let sumGasUsed = owaspUtils.toBN("0");
+  let s =
+    "\n" +
+    log.fmtInformation("Gas usage report for ") +
+    log.fmtInformation("{p}\n", strName);
+  for (i = 0; i < jarrReceipts.length; ++i) {
+    try {
+      sumGasUsed = sumGasUsed.add(
+        owaspUtils.toBN(jarrReceipts[i].receipt.gasUsed),
+      );
+      s +=
+        log.fmtInformation("    {p}", jarrReceipts[i].description) +
+        log.fmtDebug(".....") +
+        log.fmtInformation("{p}\n", jarrReceipts[i].receipt.gasUsed.toString());
+    } catch (err) {}
+  }
+  s +=
+    "    " +
+    log.fmtAttention("SUM") +
+    log.fmtDebug(".....") +
+    log.fmtInformation("{}", sumGasUsed.toString());
+  return { sumGasUsed, strReport: s };
 }
 
 export function printGasUsageReportFromArray(
-    strName: string, jarrReceipts: any[], details?: any ): void {
-    details = details || log;
-    const jo: any = composeGasUsageReportFromArray( strName, jarrReceipts );
-    if( jo.strReport && typeof jo.strReport === "string" && jo.strReport.length > 0 &&
-        jo.sumGasUsed?.gt( owaspUtils.toBN( "0" ) ) )
-        log.information( jo.strReport );
+  strName: string,
+  jarrReceipts: any[],
+  details?: any,
+): void {
+  details = details || log;
+  const jo: any = composeGasUsageReportFromArray(strName, jarrReceipts);
+  if (
+    jo.strReport &&
+    typeof jo.strReport === "string" &&
+    jo.strReport.length > 0 &&
+    jo.sumGasUsed?.gt(owaspUtils.toBN("0"))
+  )
+    log.information(jo.strReport);
 }

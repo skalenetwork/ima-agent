@@ -23,75 +23,81 @@
  * @copyright SKALE Labs 2019-Present
  */
 
-import { UniversalDispatcherEvent, EventDispatcher }
-    from "./eventDispatcher.js";
+import {
+  UniversalDispatcherEvent,
+  EventDispatcher,
+} from "./eventDispatcher.js";
 
-export function verifyTransferErrorCategoryName( strCategory: string ): string {
-    return ( strCategory ?? "default" );
+export function verifyTransferErrorCategoryName(strCategory: string): string {
+  return strCategory ?? "default";
 }
 
 const gMaxLastTransferErrors: number = 20;
 const gArrLastTransferErrors: any = [];
-let gMapTransferErrorCategories: any = { };
+let gMapTransferErrorCategories: any = {};
 
 export const saveTransferEvents = new EventDispatcher();
 
-export function saveTransferError( strCategory: string, textLog: any, ts?: any ): void {
-    ts = ts || Math.round( ( new Date() ).getTime() / 1000 );
-    const catName = verifyTransferErrorCategoryName( strCategory );
-    const joTransferEventError: any = {
-        ts,
-        category: catName.toString(),
-        textLog: textLog.toString()
-    };
-    gArrLastTransferErrors.push( joTransferEventError );
-    while( gArrLastTransferErrors.length > gMaxLastTransferErrors )
-        gArrLastTransferErrors.shift();
-    gMapTransferErrorCategories[catName] = true;
-    saveTransferEvents.dispatchEvent(
-        new UniversalDispatcherEvent(
-            "error",
-            { detail: joTransferEventError } ) );
+export function saveTransferError(
+  strCategory: string,
+  textLog: any,
+  ts?: any,
+): void {
+  ts = ts || Math.round(new Date().getTime() / 1000);
+  const catName = verifyTransferErrorCategoryName(strCategory);
+  const joTransferEventError: any = {
+    ts,
+    category: catName.toString(),
+    textLog: textLog.toString(),
+  };
+  gArrLastTransferErrors.push(joTransferEventError);
+  while (gArrLastTransferErrors.length > gMaxLastTransferErrors)
+    gArrLastTransferErrors.shift();
+  gMapTransferErrorCategories[catName] = true;
+  saveTransferEvents.dispatchEvent(
+    new UniversalDispatcherEvent("error", { detail: joTransferEventError }),
+  );
 }
 
-export function saveTransferSuccess( strCategory: string ): void {
-    const catName = verifyTransferErrorCategoryName( strCategory );
-    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-    try { delete gMapTransferErrorCategories[catName]; } catch ( err ) { }
-    saveTransferEvents.dispatchEvent(
-        new UniversalDispatcherEvent(
-            "success",
-            { detail: { category: strCategory } } ) );
+export function saveTransferSuccess(strCategory: string): void {
+  const catName = verifyTransferErrorCategoryName(strCategory);
+  // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+  try {
+    delete gMapTransferErrorCategories[catName];
+  } catch (err) {}
+  saveTransferEvents.dispatchEvent(
+    new UniversalDispatcherEvent("success", {
+      detail: { category: strCategory },
+    }),
+  );
 }
 
 export function saveTransferSuccessAll(): void {
-    // clear all transfer error categories, out of time frame
-    gMapTransferErrorCategories = { };
+  // clear all transfer error categories, out of time frame
+  gMapTransferErrorCategories = {};
 }
 
-export function getLastTransferErrors( isIncludeTextLog: boolean ): any[] {
-    if( typeof isIncludeTextLog === "undefined" )
-        isIncludeTextLog = true;
-    const jarr = JSON.parse( JSON.stringify( gArrLastTransferErrors ) );
-    if( !isIncludeTextLog ) {
-        for( let i = 0; i < jarr.length; ++i ) {
-            const jo: any = jarr[i];
-            if( "textLog" in jo )
-                delete jo.textLog;
-        }
+export function getLastTransferErrors(isIncludeTextLog: boolean): any[] {
+  if (typeof isIncludeTextLog === "undefined") isIncludeTextLog = true;
+  const jarr = JSON.parse(JSON.stringify(gArrLastTransferErrors));
+  if (!isIncludeTextLog) {
+    for (let i = 0; i < jarr.length; ++i) {
+      const jo: any = jarr[i];
+      if ("textLog" in jo) delete jo.textLog;
     }
-    return jarr;
+  }
+  return jarr;
 }
 
 export function getLastErrorCategories(): string[] {
-    return Object.keys( gMapTransferErrorCategories );
+  return Object.keys(gMapTransferErrorCategories);
 }
 
 let gFlagIsEnabledProgressiveEventsScan = true;
 
 export function getEnabledProgressiveEventsScan(): boolean {
-    return ( !!gFlagIsEnabledProgressiveEventsScan );
+  return !!gFlagIsEnabledProgressiveEventsScan;
 }
-export function setEnabledProgressiveEventsScan( isEnabled: boolean ): void {
-    gFlagIsEnabledProgressiveEventsScan = ( !!isEnabled );
+export function setEnabledProgressiveEventsScan(isEnabled: boolean): void {
+  gFlagIsEnabledProgressiveEventsScan = !!isEnabled;
 }

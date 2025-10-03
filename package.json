@@ -12,9 +12,11 @@
         "lint-fix": "cd src && yarn lint-fix && cd ..",
         "postinstall": "cd src && yarn install && cd .. && cd IMA && yarn install && cd .. && yarn install-nb",
         "check-outdated": "yarn outdated; cd src; yarn outdated; cd ..; cd IMA; yarn outdated; cd ..",
-        "upgrade-to-latest": "yarn upgrade --latest; cd src; yarn upgrade --latest; cd ..; cd IMA; yarn upgrade --latest; cd .."
+        "upgrade-to-latest": "yarn upgrade --latest; cd src; yarn upgrade --latest; cd ..; cd IMA; yarn upgrade --latest; cd ..",
+        "prettier": "prettier --write \"src/**/*.{ts,tsx,js,mdx}\""
     },
     "dependencies": {
+        "prettier": "^3.6.2",
         "remark": "^15.0.1"
     }
 }
