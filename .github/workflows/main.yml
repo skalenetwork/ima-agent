@@ -19,11 +19,11 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v5
       with:
           submodules: recursive
 
-    - uses: oven-sh/setup-bun@v1
+    - uses: oven-sh/setup-bun@v2
 
     - name: System Version Checks
       run: |
@@ -173,11 +173,11 @@ jobs:
       working-directory: ./test
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v5
       with:
           submodules: recursive
     
-    - uses: oven-sh/setup-bun@v1
+    - uses: oven-sh/setup-bun@v2
 
     - name: Get yarn cache directory path
       id: yarn-cache-dir-path
