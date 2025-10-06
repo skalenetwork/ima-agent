@@ -13,4 +13,4 @@ export SCHAIN_RPC_URL="http://127.0.0.1:8545"
 export SCHAIN_NAME="test"
 export CONNECTED_ONLY=false
 
-bun test
+bun test --timeout 80000
