@@ -14,7 +14,7 @@ on:
 jobs:
   test-agent:
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -167,7 +167,7 @@ jobs:
         # slither --version || true
 
   test-integration:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     env:
       working-directory: ./test

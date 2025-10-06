@@ -5,7 +5,7 @@ env:
   MANAGER_TAG: "1.9.3-beta.0"
 jobs:
   test_network_browser:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v5
         with:
