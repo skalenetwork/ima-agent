@@ -18,7 +18,7 @@ jobs:
         uses: styfle/cancel-workflow-action@0.9.1
         with:
           access_token: ${{ github.token }}
-  test-comprehensive:
+  test-comprehensive-container-test:
 
     runs-on: self-hosted
 
