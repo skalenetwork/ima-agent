@@ -14,16 +14,16 @@ on:
 jobs:
   test-agent:
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v5
       with:
           submodules: recursive
 
-    - uses: oven-sh/setup-bun@v1
+    - uses: oven-sh/setup-bun@v2
 
     - name: System Version Checks
       run: |
@@ -167,23 +167,23 @@ jobs:
         # slither --version || true
 
   test-integration:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     env:
       working-directory: ./test
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v5
       with:
           submodules: recursive
     
-    - uses: oven-sh/setup-bun@v1
+    - uses: oven-sh/setup-bun@v2
 
     - name: Get yarn cache directory path
       id: yarn-cache-dir-path
       run: echo "::set-output name=dir::$(yarn cache dir)"
 
-    - uses: actions/cache@v2
+    - uses: actions/cache@v4
       id: yarn-cache
       with:
         path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
@@ -191,7 +191,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-yarn-
 
-    - uses: actions/cache@v2
+    - uses: actions/cache@v4
       with:
         path: ~/.cache/pip
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}

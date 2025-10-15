@@ -5,15 +5,15 @@ env:
   MANAGER_TAG: "1.9.3-beta.0"
 jobs:
   test_network_browser:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v5
         with:
           submodules: true
-      - uses: oven-sh/setup-bun@v1
+      - uses: oven-sh/setup-bun@v2
       - name: Launch hardhat node
         working-directory: hardhat-node
-        run: docker-compose up -d
+        run: docker compose up -d
       - name: Deploy manager contracts
         run: |
           bash ./helper-scripts/deploy_test_manager.sh

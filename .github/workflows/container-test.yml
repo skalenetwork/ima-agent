@@ -12,19 +12,19 @@ on:
 jobs:
   cancel-runs:
     name: Cancel Previous Runs
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Cancel Previous Runs
         uses: styfle/cancel-workflow-action@0.9.1
         with:
           access_token: ${{ github.token }}
-  test-comprehensive:
+  test-comprehensive-container-test:
 
     runs-on: self-hosted
 
     steps:
 
-    - uses: oven-sh/setup-bun@v1
+    - uses: oven-sh/setup-bun@v2
 
     - name: INIT - force pre-clean
       run: |
@@ -41,11 +41,11 @@ jobs:
         sudo rm -rf ./sgxwallet || true
         sudo rm -rf ./transaction-manager || true
 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v5
       with:
           submodules: recursive
     
-    - uses: oven-sh/setup-bun@v1
+    - uses: oven-sh/setup-bun@v2
 
     - name: INFO - github environment variable checks
       run: |
@@ -327,7 +327,7 @@ jobs:
         cd sgxwallet/run_sgx_sim
         rm -rf ../../local_sgxwallet_output_log.txt &> /dev/null
         echo " --------------------------- stopping sgx wallet ------------------------------------------------------------------------------------------------------ "
-        docker-compose down
+        docker compose down
         echo " --------------------------- fixing sgx wallets docker config ----------------------------------------------------------------------------------------- "
         mv docker-compose.yml docker-compose.yml.old-previous || true
         echo "version: '3'"                                 > docker-compose.yml
@@ -353,7 +353,7 @@ jobs:
         echo '        max-file: "4"'                       >> docker-compose.yml
         echo '    command: -s -y -V -d'                    >> docker-compose.yml
         echo " --------------------------- pulling sgx wallet ------------------------------------------------------------------------------------------------------- "
-        docker-compose pull
+        docker compose pull
         cd ../..
         cd ..
 
@@ -362,7 +362,7 @@ jobs:
       run: |
         cd comprehensive-test
         cd sgxwallet/run_sgx_sim
-        docker-compose up &> ../../local_sgxwallet_output_log.txt &
+        docker compose up &> ../../local_sgxwallet_output_log.txt &
         sleep 90
         cd ../..
         cd ..
@@ -457,7 +457,7 @@ jobs:
       run: |
         cd comprehensive-test
         cd sgxwallet/run_sgx_sim
-        docker-compose down
+        docker compose down
         cd ../..
         cd ..
 
