@@ -246,7 +246,7 @@ const imaState = {
         }
     },
 
-    "strPathAbiJsonSkaleManager": null,
+    "strSkaleManagerContracts": "",
     "joAbiSkaleManager": { },
     "bHaveSkaleManagerABI": false,
 
@@ -276,7 +276,7 @@ const imaState = {
 state.set( imaState );
 
 imaCLI.commonInit();
-imaCLI.initContracts();
+await imaCLI.initContracts();
 
 describe( "OWASP-1", function() {
 
@@ -960,7 +960,6 @@ describe( "CLI", function() {
                     "23ABDBD3C61B5330AF61EBE8BEF582F4E5CC08E554053A718BDCE7813B9DC1FC" ),
                 "--key-s-chain=" + ( imaState.chainProperties.sc.joAccount.privateKey ||
                     "80ebc2e00b8f13c5e2622b5694ab63ee80f7c5399554d2a12feeb0212eb8c69e" ),
-                //"--abi-skale-manager=" + imaState.strPathAbiJsonSkaleManager,
                 "--abi-main-net=" + imaState.chainProperties.mn.strPathAbiJson,
                 "--abi-s-chain=" + imaState.chainProperties.sc.strPathAbiJson,
                 // --erc721-main-net --erc721-s-chain --addr-erc721-s-chain

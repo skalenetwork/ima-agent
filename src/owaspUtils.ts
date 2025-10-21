@@ -451,6 +451,11 @@ export function verifyArgumentIsArrayOfIntegers( joArg?: any ): any[] {
     }
 }
 
+export function ensureNonEmptyString(value: string | undefined | null): boolean {
+    if( value == null || value == undefined || value.length === 0 ) return false;
+    return true;
+}
+
 export function ensureStartsWith0x( s?: any ): string {
     if( s == null || s == undefined || typeof s !== "string" )
         return s;

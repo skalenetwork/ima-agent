@@ -58,9 +58,7 @@ export interface TOneChainProperties {
     strURL: string
     strChainName: string
     chainId: string | number
-    strPathAbiJson: string
-    joAbiIMA: any
-    bHaveAbiIMA: boolean
+    strAliasOrAddress: string | null
     joErc20: any | null
     joErc721: any | null
     joErc1155: any | null
@@ -106,9 +104,6 @@ function constructChainProperties(): TPropertiesOfChains {
             strChainName:
                 ( process.env.CHAIN_NAME_ETHEREUM ?? "Mainnet" ).toString().trim(),
             chainId: owaspUtils.toInteger( process.env.CID_ETHEREUM ) ?? -4,
-            strPathAbiJson: "",
-            joAbiIMA: { },
-            bHaveAbiIMA: false,
             joErc20: null,
             joErc721: null,
             joErc1155: null,
@@ -144,9 +139,6 @@ function constructChainProperties(): TPropertiesOfChains {
             strChainName:
                 ( process.env.CHAIN_NAME_SCHAIN ?? "id-S-chain" ).toString().trim(),
             chainId: owaspUtils.toInteger( process.env.CID_SCHAIN ) ?? -4,
-            strPathAbiJson: "",
-            joAbiIMA: { },
-            bHaveAbiIMA: false,
             joErc20: null,
             joErc721: null,
             joErc1155: null,
@@ -183,9 +175,6 @@ function constructChainProperties(): TPropertiesOfChains {
             strChainName:
                 ( process.env.CHAIN_NAME_SCHAIN_TARGET ?? "id-T-chain" ).toString().trim(),
             chainId: owaspUtils.toInteger( process.env.CID_SCHAIN_TARGET ) || -4,
-            strPathAbiJson: "",
-            joAbiIMA: { },
-            bHaveAbiIMA: false,
             joErc20: null,
             joErc721: null,
             joErc1155: null,
@@ -312,9 +301,7 @@ export interface TIMAState {
 
     chainProperties: TPropertiesOfChains
 
-    strPathAbiJsonSkaleManager: string
-    joAbiSkaleManager: any
-    bHaveSkaleManagerABI: boolean
+    strSkaleManagerContracts: string
 
     strChainNameOriginChain: string
 
@@ -465,9 +452,7 @@ export function get(): TIMAState {
 
         chainProperties: constructChainProperties(),
 
-        strPathAbiJsonSkaleManager: "",
-        joAbiSkaleManager: { },
-        bHaveSkaleManagerABI: false,
+        strSkaleManagerContracts: "",
 
         strChainNameOriginChain:
             ( process.env.CHAIN_NAME_SCHAIN_ORIGIN ?? "Mainnet" ).toString().trim(),

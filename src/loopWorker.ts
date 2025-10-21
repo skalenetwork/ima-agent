@@ -170,7 +170,7 @@ class ObserverServer extends SocketServer {
             imaState.chainProperties.tc.transactionCustomizer =
                 imaTx.getTransactionCustomizerForSChainTarget();
             state.set( imaState );
-            imaCLI.initContracts();
+            await imaCLI.initContracts();
             self.initComplete = true;
             self.information( "IMA loop worker ", workerData.url,
                 " will do the following work:\n    Oracle operations.....",

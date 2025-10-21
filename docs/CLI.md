@@ -70,10 +70,10 @@ One or more of the following URL, chain name and chain ID parameters are needed 
 
 For most of operations, **IMA** needs ABIs of **Skale Manager**, **Ethereum(Main Net)**, **S-Chain(s)**:
 
-    --abi-skale-manager=path........Path to JSON file containing Skale Manager ABI. Optional parameter. It's needed for S-Chain to S-Chain transfers.
-    --abi-main-net=path.............Path to JSON file containing IMA ABI for Main-net.
-    --abi-s-chain=path..............Path to JSON file containing IMA ABI for S-chain.
-    --abi-t-chain=path..............Path to JSON file containing IMA ABI for S<->S Target S-chain.
+    --manager-contracts=str........Alias or address of skale-manager contracts. Optional parameter. It's needed for S-Chain to S-Chain transfers.
+    --ima-contracts-main-net=str.............Alias or address of IMA for Main-net.
+    --ima-contracts-s-chain=str..............Alias or address of IMA for S-chain.
+    --ima-contracts-t-chain=str..............Alias or address of IMA for S<->S Target S-chain.
 
 Token transfer commands require token APIs on appropriate chains.
 
@@ -186,7 +186,7 @@ Token transfer operations require token amounts and/or token IDs:
 
 **S-Chain** to **S-Chain** transfers must be turned on and require periodic **SKALE network re-discovery**:
 
-    --s2s-enable....................Enables S-Chain to S-Chain transfers. Default mode. The abi-skale-manager path must be provided.
+    --s2s-enable....................Enables S-Chain to S-Chain transfers. Default mode. The manager-contracts path must be provided.
     --s2s-disable...................Disables S-Chain to S-Chain transfers.
     --net-rediscover=number.........SKALE NETWORK re-discovery interval(in seconds). Default is 3600 seconds or 1 hour, specify 0 to disable SKALE NETWORK re-discovery.
 

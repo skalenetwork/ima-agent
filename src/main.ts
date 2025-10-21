@@ -135,7 +135,7 @@ function parseCommandLine(): void {
     }
     if( imaState.bIsNeededCommonInit ) {
         imaCLI.commonInit();
-        imaCLI.initContracts();
+        await imaCLI.initContracts();
     }
     if( imaState.bShowConfigMode ) {
     // just show configuration values and exit

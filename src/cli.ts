@@ -23,6 +23,8 @@
  * @copyright SKALE Labs 2019-Present
  */
 
+import { skaleContracts } from '@skalenetwork/skale-contracts-ethers-v5';
+
 import * as path from "path";
 import * as url from "url";
 import * as os from "os";
@@ -507,24 +509,24 @@ function parseCredentialsArgs( imaState: state.TIMAState, joArg: any ): boolean 
 }
 
 function parseAbiArgs( imaState: state.TIMAState, joArg: any ): boolean {
-    if( joArg.name == "abi-skale-manager" ) {
-        owaspUtils.verifyArgumentIsPathToExistingFile( joArg );
-        imaState.strPathAbiJsonSkaleManager = imaUtils.normalizePath( joArg.value );
+    if( joArg.name == "manager-contracts" ) {
+        owaspUtils.verifyArgumentWithNonEmptyValue( joArg );
+        imaState.strSkaleManagerContracts = joArg.value;
         return true;
     }
-    if( joArg.name == "abi-main-net" ) {
-        owaspUtils.verifyArgumentIsPathToExistingFile( joArg );
-        imaState.chainProperties.mn.strPathAbiJson = imaUtils.normalizePath( joArg.value );
+    if( joArg.name == "ima-contracts-main-net" ) {
+        owaspUtils.verifyArgumentWithNonEmptyValue( joArg );
+        imaState.chainProperties.mn.strAliasOrAddress = joArg.value;
         return true;
     }
-    if( joArg.name == "abi-s-chain" ) {
-        owaspUtils.verifyArgumentIsPathToExistingFile( joArg );
-        imaState.chainProperties.sc.strPathAbiJson = imaUtils.normalizePath( joArg.value );
+    if( joArg.name == "ima-contracts-s-chain" ) {
+        owaspUtils.verifyArgumentWithNonEmptyValue( joArg );
+        imaState.chainProperties.sc.strAliasOrAddress = joArg.value;
         return true;
     }
-    if( joArg.name == "abi-t-chain" ) {
-        owaspUtils.verifyArgumentIsPathToExistingFile( joArg );
-        imaState.chainProperties.tc.strPathAbiJson = imaUtils.normalizePath( joArg.value );
+    if( joArg.name == "ima-contracts-t-chain" ) {
+        owaspUtils.verifyArgumentWithNonEmptyValue( joArg );
+        imaState.chainProperties.tc.strAliasOrAddress = joArg.value;
         return true;
     }
     return false;
@@ -1351,159 +1353,6 @@ function commonInitPrintSysInfo(): void {
     }
 }
 
-function commonInitCheckAbiPaths(): void {
-    const imaState: state.TIMAState = state.get();
-    if( imaState.strPathAbiJsonSkaleManager &&
-        ( typeof imaState.strPathAbiJsonSkaleManager === "string" ) &&
-        imaState.strPathAbiJsonSkaleManager.length > 0
-    ) {
-        imaState.joAbiSkaleManager =
-            imaUtils.jsonFileLoad( imaState.strPathAbiJsonSkaleManager, null );
-        imaState.bHaveSkaleManagerABI = true;
-    } else {
-        imaState.bHaveSkaleManagerABI = false;
-        log.warning( "WARNING: No Skale Manager ABI file path is provided in command line " +
-            "arguments(needed for particular operations only)" );
-    }
-
-    if( imaState.chainProperties.mn.strPathAbiJson &&
-        typeof imaState.chainProperties.mn.strPathAbiJson === "string" &&
-        imaState.chainProperties.mn.strPathAbiJson.length > 0 ) {
-        imaState.chainProperties.mn.joAbiIMA =
-            imaUtils.jsonFileLoad( imaState.chainProperties.mn.strPathAbiJson, null );
-        imaState.chainProperties.mn.bHaveAbiIMA = true;
-    } else {
-        imaState.chainProperties.mn.bHaveAbiIMA = false;
-        log.warning( "WARNING: No Main-net IMA ABI file path is provided in command line " +
-            "arguments(needed for particular operations only)" );
-    }
-
-    if( imaState.chainProperties.sc.strPathAbiJson &&
-        typeof imaState.chainProperties.sc.strPathAbiJson === "string" &&
-        imaState.chainProperties.sc.strPathAbiJson.length > 0
-    ) {
-        imaState.chainProperties.sc.joAbiIMA =
-            imaUtils.jsonFileLoad( imaState.chainProperties.sc.strPathAbiJson, null );
-        imaState.chainProperties.sc.bHaveAbiIMA = true;
-    } else {
-        imaState.chainProperties.sc.bHaveAbiIMA = false;
-        log.warning( "WARNING: No S-Chain IMA ABI file path is provided in command line arguments" +
-            "(needed for particular operations only)" );
-    }
-
-    if( imaState.chainProperties.tc.strPathAbiJson &&
-        typeof imaState.chainProperties.tc.strPathAbiJson === "string" &&
-        imaState.chainProperties.tc.strPathAbiJson.length > 0
-    ) {
-        imaState.chainProperties.tc.joAbiIMA =
-            imaUtils.jsonFileLoad( imaState.chainProperties.tc.strPathAbiJson, null );
-        imaState.chainProperties.tc.bHaveAbiIMA = true;
-    } else {
-        imaState.chainProperties.tc.bHaveAbiIMA = false;
-        log.warning( "WARNING: No S<->S Target S-Chain IMA ABI file path is provided " +
-            "in command line arguments(needed for particular operations only)" );
-    }
-}
-
-function commonInitCheckContractPresences(): void {
-    const imaState: state.TIMAState = state.get();
-    if( imaState.bHaveSkaleManagerABI ) {
-        imaUtils.checkKeysExistInABI( "skale-manager",
-            imaState.strPathAbiJsonSkaleManager,
-            imaState.joAbiSkaleManager, [
-                // partial list of Skale Manager's contracts specified here:
-                "constants_holder_abi",
-                "constants_holder_address",
-                "nodes_abi",
-                "nodes_address",
-                "key_storage_abi",
-                "key_storage_address",
-                "schains_abi",
-                "schains_address",
-                "schains_internal_abi",
-                "schains_internal_address",
-                "skale_d_k_g_abi",
-                "skale_d_k_g_address",
-                "skale_manager_abi",
-                "skale_manager_address",
-                "skale_token_abi",
-                "skale_token_address",
-                "validator_service_abi",
-                "validator_service_address",
-                "wallets_abi",
-                "wallets_address"
-            ] );
-    } else if( imaState.optsS2S.isEnabled )
-        log.warning( "WARNING: Missing Skale Manager ABI path for S-Chain to S-Chain transfers" );
-
-    if( imaState.chainProperties.mn.bHaveAbiIMA ) {
-        imaUtils.checkKeysExistInABI( "main-net",
-            imaState.chainProperties.mn.strPathAbiJson,
-            imaState.chainProperties.mn.joAbiIMA, [
-                "deposit_box_eth_abi",
-                "deposit_box_eth_address",
-                "message_proxy_mainnet_abi",
-                "message_proxy_mainnet_address",
-                "linker_abi",
-                "linker_address",
-                "deposit_box_erc20_abi",
-                "deposit_box_erc20_address",
-                "deposit_box_erc721_abi",
-                "deposit_box_erc721_address",
-                "deposit_box_erc1155_abi",
-                "deposit_box_erc1155_address",
-                "deposit_box_erc721_with_metadata_abi",
-                "deposit_box_erc721_with_metadata_address",
-                "community_pool_abi",
-                "community_pool_address"
-            ] );
-    }
-    if( imaState.chainProperties.sc.bHaveAbiIMA ) {
-        imaUtils.checkKeysExistInABI( "S-Chain",
-            imaState.chainProperties.sc.strPathAbiJson,
-            imaState.chainProperties.sc.joAbiIMA, [
-                "token_manager_eth_abi",
-                "token_manager_eth_address",
-                "token_manager_erc20_abi",
-                "token_manager_erc20_address",
-                "token_manager_erc721_abi",
-                "token_manager_erc721_address",
-                "token_manager_erc1155_abi",
-                "token_manager_erc1155_address",
-                "token_manager_erc721_with_metadata_abi",
-                "token_manager_erc721_with_metadata_address",
-                "message_proxy_chain_abi",
-                "message_proxy_chain_address",
-                "token_manager_linker_abi",
-                "token_manager_linker_address",
-                "community_locker_abi",
-                "community_locker_address"
-            ] );
-    }
-    if( imaState.chainProperties.tc.bHaveAbiIMA ) {
-        imaUtils.checkKeysExistInABI( "S<->S Target S-Chain",
-            imaState.chainProperties.tc.strPathAbiJson,
-            imaState.chainProperties.tc.joAbiIMA, [
-                "token_manager_eth_abi",
-                "token_manager_eth_address",
-                "token_manager_erc20_abi",
-                "token_manager_erc20_address",
-                "token_manager_erc721_abi",
-                "token_manager_erc721_address",
-                "token_manager_erc1155_abi",
-                "token_manager_erc1155_address",
-                "token_manager_erc721_with_metadata_abi",
-                "token_manager_erc721_with_metadata_address",
-                "message_proxy_chain_abi",
-                "message_proxy_chain_address",
-                "token_manager_linker_abi",
-                "token_manager_linker_address",
-                "community_locker_abi",
-                "community_locker_address"
-            ] );
-    }
-}
-
 function commonInitPrintFoundContracts(): void {
     const imaState: state.TIMAState = state.get();
     const isPrintGathered = ( !!( imaState.isPrintGathered ) );
@@ -2163,23 +2012,23 @@ function commonInitCheckGeneralArgs(): void {
             return log.fmtNote( x );
         } );
     ensureHaveValue(
-        "Skale Manager ABI JSON file path",
-        imaState.strPathAbiJsonSkaleManager, false, isPrintGathered, null, ( x: any ) => {
+        "Skale Manager alias or address",
+        imaState.strSkaleManagerContracts, false, isPrintGathered, null, ( x: any ) => {
             return log.fmtWarning( x );
         } );
     ensureHaveValue(
-        "Main-net ABI JSON file path",
-        imaState.chainProperties.mn.strPathAbiJson, false, isPrintGathered, null, ( x: any ) => {
+        "Main-net alias or address - IMA",
+        imaState.chainProperties.mn.strAliasOrAddress, false, isPrintGathered, null, ( x: any ) => {
             return log.fmtWarning( x );
         } );
     ensureHaveValue(
-        "S-Chain ABI JSON file path",
-        imaState.chainProperties.sc.strPathAbiJson, false, isPrintGathered, null, ( x: any ) => {
+        "S-Chain alias or address - IMA",
+        imaState.chainProperties.sc.strAliasOrAddress, false, isPrintGathered, null, ( x: any ) => {
             return log.fmtWarning( x );
         } );
     ensureHaveValue(
-        "S<->S Target S-Chain ABI JSON file path",
-        imaState.chainProperties.tc.strPathAbiJson, false, isPrintGathered, null, ( x: any ) => {
+        "S<->S Target S-Chain alias or address - IMA",
+        imaState.chainProperties.tc.strAliasOrAddress, false, isPrintGathered, null, ( x: any ) => {
             return log.fmtWarning( x );
         } );
 
@@ -2275,7 +2124,7 @@ function commonInitTransferringArgs(): void {
         false, isPrintGathered, null, ( x: any ) => {
             return log.fmtNote( x );
         } );
-    if( imaState.bHaveSkaleManagerABI ) {
+    if( imaState.strSkaleManagerContracts !== undefined && imaState.strSkaleManagerContracts !== '' ) {
         ensureHaveValue(
             "S->S transfer block size", imaState.nTransferBlockSizeS2S,
             false, isPrintGathered, null, ( x: any ) => {
@@ -2292,7 +2141,7 @@ function commonInitTransferringArgs(): void {
         false, isPrintGathered, null, ( x: any ) => {
             return log.fmtNote( x );
         } );
-    if( imaState.bHaveSkaleManagerABI ) {
+    if( imaState.strSkaleManagerContracts !== undefined && imaState.strSkaleManagerContracts !== '' ) {
         ensureHaveValue(
             "S->S transfer job steps", imaState.nTransferStepsS2S,
             false, isPrintGathered, null, ( x: any ) => {
@@ -2309,7 +2158,7 @@ function commonInitTransferringArgs(): void {
         false, isPrintGathered, null, ( x: any ) => {
             return log.fmtNote( x );
         } );
-    if( imaState.bHaveSkaleManagerABI ) {
+    if( imaState.strSkaleManagerContracts !== undefined && imaState.strSkaleManagerContracts !== '' ) {
         ensureHaveValue(
             "S->S transactions limit", imaState.nMaxTransactionsS2S,
             false, isPrintGathered, null, ( x: any ) => {
@@ -2326,7 +2175,7 @@ function commonInitTransferringArgs(): void {
         isPrintGathered, null, ( x: any ) => {
             return log.fmtNote( x );
         } );
-    if( imaState.bHaveSkaleManagerABI ) {
+    if( imaState.strSkaleManagerContracts !== undefined && imaState.strSkaleManagerContracts !== '' ) {
         ensureHaveValue(
             "S->S await blocks", imaState.nBlockAwaitDepthS2S, false,
             isPrintGathered, null, ( x: any ) => {
@@ -2343,7 +2192,7 @@ function commonInitTransferringArgs(): void {
         false, isPrintGathered, null, ( x: any ) => {
             return log.fmtNote( x );
         } );
-    if( imaState.bHaveSkaleManagerABI ) {
+    if( imaState.strSkaleManagerContracts !== undefined && imaState.strSkaleManagerContracts !== '' ) {
         ensureHaveValue(
             "S->S minimal block age", imaState.nBlockAgeS2S,
             false, isPrintGathered, null, ( x: any ) => {
@@ -2629,8 +2478,6 @@ function commonInitAutomaticExitArgs(): void {
 export function commonInit(): void {
     const imaState: state.TIMAState = state.get();
     commonInitPrintSysInfo();
-    commonInitCheckAbiPaths();
-    commonInitCheckContractPresences();
     commonInitCheckErc20();
     commonInitCheckErc721();
     commonInitCheckErc1155();
@@ -2689,130 +2536,111 @@ export function imaInitEthersProviders(): void {
     }
 } // imaInitEthersProviders
 
-function initContractsIMA(): void {
+
+export declare enum Project {
+    MANAGER = "skale-manager",
+    ALLOCATOR = "skale-allocator",
+    MAINNET_IMA = "mainnet-ima",
+    SCHAIN_IMA = "schain-ima"
+}
+
+
+async function initContractsIMA(): Promise<void> {
     const imaState: state.TIMAState = state.get();
-    if( imaState.chainProperties.mn.bHaveAbiIMA ) {
+    if( owaspUtils.ensureNonEmptyString(imaState.chainProperties.mn.strAliasOrAddress) ) {
         const cp = imaState.chainProperties.mn;
-        if( cp.ethersProvider ) {
+        if( cp.ethersProvider && cp.strAliasOrAddress ) {
             const ep: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider = cp.ethersProvider;
-            const joABI = cp.joAbiIMA;
-            imaState.joDepositBoxETH = new owaspUtils.ethersMod.ethers.Contract(
-                joABI.deposit_box_eth_address, joABI.deposit_box_eth_abi, ep ); // only main net
-            imaState.joDepositBoxERC20 = new owaspUtils.ethersMod.ethers.Contract(
-                joABI.deposit_box_erc20_address, joABI.deposit_box_erc20_abi, ep ); // only main net
-            imaState.joDepositBoxERC721 = new owaspUtils.ethersMod.ethers.Contract(
-                joABI.deposit_box_erc721_address, joABI.deposit_box_erc721_abi, ep
-            ); // only main net
-            imaState.joDepositBoxERC1155 = new owaspUtils.ethersMod.ethers.Contract(
-                joABI.deposit_box_erc1155_address, joABI.deposit_box_erc1155_abi, ep );
-            // only main net
-            imaState.joDepositBoxERC721WithMetadata = new owaspUtils.ethersMod.ethers.Contract(
-                joABI.deposit_box_erc721_with_metadata_address,
-                joABI.deposit_box_erc721_with_metadata_abi, ep ); // only main net
-            imaState.joCommunityPool = new owaspUtils.ethersMod.ethers.Contract(
-                joABI.community_pool_address, joABI.community_pool_abi, ep ); // only main net
-            imaState.joLinker = new owaspUtils.ethersMod.ethers.Contract(
-                joABI.linker_address, joABI.linker_abi, ep ); // only main net
-            imaState.joMessageProxyMainNet = new owaspUtils.ethersMod.ethers.Contract(
-                joABI.message_proxy_mainnet_address, joABI.message_proxy_mainnet_abi, ep );
+
+            const network = await skaleContracts.getNetworkByProvider(ep);
+            const project = await network.getProject(Project.MAINNET_IMA);
+            const instance = await project.getInstance(cp.strAliasOrAddress);
+
+            imaState.joDepositBoxETH = await instance.getContract('DepositBoxEth');
+            imaState.joDepositBoxERC20 = await instance.getContract('DepositBoxERC20');
+            imaState.joDepositBoxERC721 = await instance.getContract('DepositBoxERC721');
+            imaState.joDepositBoxERC1155 = await instance.getContract('DepositBoxERC1155');
+            imaState.joDepositBoxERC1155 = await instance.getContract('DepositBoxERC1155');
+            imaState.joDepositBoxERC721WithMetadata = await instance.getContract(
+                'DepositBoxERC721WithMetadata');
+            imaState.joCommunityPool = await instance.getContract('CommunityPool');
+            imaState.joLinker = await instance.getContract('Linker');
+            imaState.joMessageProxyMainNet = await instance.getContract('MessageProxyForMainnet');
         }
     }
-    if( imaState.chainProperties.sc.bHaveAbiIMA ) {
+    if( owaspUtils.ensureNonEmptyString(imaState.chainProperties.sc.strAliasOrAddress) ) {
         const cp = imaState.chainProperties.sc;
-        if( cp.ethersProvider ) {
+        if( cp.ethersProvider && cp.strAliasOrAddress ) {
             const ep: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider | null =
                 cp.ethersProvider;
-            const joABI = cp.joAbiIMA;
-            imaState.joTokenManagerETH = new owaspUtils.ethersMod.ethers.Contract(
-                joABI.token_manager_eth_address, joABI.token_manager_eth_abi, ep ); // only s-chain
-            imaState.joTokenManagerERC20 = new owaspUtils.ethersMod.ethers.Contract(
-                joABI.token_manager_erc20_address, joABI.token_manager_erc20_abi,
-                ep ); // only s-chain
-            imaState.joTokenManagerERC721 = new owaspUtils.ethersMod.ethers.Contract(
-                joABI.token_manager_erc721_address, joABI.token_manager_erc721_abi,
-                ep ); // only s-chain
-            imaState.joTokenManagerERC1155 = new owaspUtils.ethersMod.ethers.Contract(
-                joABI.token_manager_erc1155_address, joABI.token_manager_erc1155_abi,
-                ep ); // only s-chain
-            imaState.joTokenManagerERC721WithMetadata = new owaspUtils.ethersMod.ethers.Contract(
-                joABI.token_manager_erc721_with_metadata_address,
-                joABI.token_manager_erc721_with_metadata_abi, ep ); // only s-chain
-            imaState.joCommunityLocker = new owaspUtils.ethersMod.ethers.Contract(
-                joABI.community_locker_address, joABI.community_locker_abi, ep ); // only s-chain
-            imaState.joMessageProxySChain = new owaspUtils.ethersMod.ethers.Contract(
-                joABI.message_proxy_chain_address, joABI.message_proxy_chain_abi, ep );
-            imaState.joTokenManagerLinker = new owaspUtils.ethersMod.ethers.Contract(
-                joABI.token_manager_linker_address, joABI.token_manager_linker_abi, ep );
-            imaState.joEthErc20 = new owaspUtils.ethersMod.ethers.Contract(
-                joABI.eth_erc20_address, joABI.eth_erc20_abi, ep ); // only s-chain
+
+            const network = await skaleContracts.getNetworkByProvider(ep);
+            const project = await network.getProject(Project.SCHAIN_IMA);
+            const instance = await project.getInstance(cp.strAliasOrAddress);
+
+            imaState.joTokenManagerETH = await instance.getContract('TokenManagerEth');
+            imaState.joTokenManagerERC20 = await instance.getContract('TokenManagerERC20');
+            imaState.joTokenManagerERC721 = await instance.getContract('TokenManagerERC721');
+            imaState.joTokenManagerERC1155 = await instance.getContract('TokenManagerERC1155');
+            imaState.joTokenManagerERC721WithMetadata = await instance.getContract(
+                'TokenManagerERC721WithMetadata');
+            imaState.joCommunityLocker = await instance.getContract('CommunityLocker');
+            imaState.joMessageProxySChain = await instance.getContract('MessageProxyForSchain');
+            imaState.joTokenManagerLinker = await instance.getContract('TokenManagerLinker');
+            imaState.joEthErc20 = await instance.getContract('EthErc20');            
         }
     }
-    if( imaState.chainProperties.tc.bHaveAbiIMA ) {
+    if( owaspUtils.ensureNonEmptyString(imaState.chainProperties.tc.strAliasOrAddress) ) {
         const cp = imaState.chainProperties.tc;
-        if( cp.ethersProvider ) {
+        if( cp.ethersProvider && cp.strAliasOrAddress ) {
             const ep: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider = cp.ethersProvider;
-            const joABI = cp.joAbiIMA;
-            imaState.joTokenManagerETHTarget = new owaspUtils.ethersMod.ethers.Contract(
-                joABI.token_manager_eth_address, joABI.token_manager_eth_abi, ep ); // only s-chain
-            imaState.joTokenManagerERC20Target = new owaspUtils.ethersMod.ethers.Contract(
-                joABI.token_manager_erc20_address, joABI.token_manager_erc20_abi,
-                ep ); // only s-chain
-            imaState.joTokenManagerERC721Target = new owaspUtils.ethersMod.ethers.Contract(
-                joABI.token_manager_erc721_address, joABI.token_manager_erc721_abi,
-                ep ); // only s-chain
-            imaState.joTokenManagerERC1155Target = new owaspUtils.ethersMod.ethers.Contract(
-                joABI.token_manager_erc1155_address, joABI.token_manager_erc1155_abi,
-                ep ); // only s-chain
-            imaState.joTokenManagerERC721WithMetadataTarget =
-                new owaspUtils.ethersMod.ethers.Contract(
-                    joABI.token_manager_erc721_with_metadata_address,
-                    joABI.token_manager_erc721_with_metadata_abi, ep ); // only s-chain
-            imaState.joCommunityLockerTarget = new owaspUtils.ethersMod.ethers.Contract(
-                joABI.community_locker_address, joABI.community_locker_abi, ep ); // only s-chain
-            imaState.joMessageProxySChainTarget = new owaspUtils.ethersMod.ethers.Contract(
-                joABI.message_proxy_chain_address, joABI.message_proxy_chain_abi, ep );
-            imaState.joTokenManagerLinkerTarget = new owaspUtils.ethersMod.ethers.Contract(
-                joABI.token_manager_linker_address, joABI.token_manager_linker_abi, ep );
-            imaState.joEthErc20Target = new owaspUtils.ethersMod.ethers.Contract(
-                joABI.eth_erc20_address, joABI.eth_erc20_abi, ep ); // only s-chain
+
+            const network = await skaleContracts.getNetworkByProvider(ep);
+            const project = await network.getProject(Project.SCHAIN_IMA);
+            const instance = await project.getInstance(cp.strAliasOrAddress);
+
+            imaState.joTokenManagerETHTarget = await instance.getContract('TokenManagerEth');
+            imaState.joTokenManagerERC20Target = await instance.getContract('TokenManagerERC20');
+            imaState.joTokenManagerERC721Target = await instance.getContract('TokenManagerERC721');
+            imaState.joTokenManagerERC1155Target = await instance.getContract('TokenManagerERC1155');
+            imaState.joTokenManagerERC721WithMetadataTarget = await instance.getContract(
+                'TokenManagerERC721WithMetadata');
+            imaState.joCommunityLockerTarget = await instance.getContract('CommunityLocker');
+            imaState.joMessageProxySChainTarget = await instance.getContract('MessageProxyForSchain');
+            imaState.joTokenManagerLinkerTarget = await instance.getContract('TokenManagerLinker');
+            imaState.joEthErc20Target = await instance.getContract('EthErc20');            
         }
     }
 }
 
-function initContractsSkaleManager(): void {
+async function initContractsSkaleManager(): Promise<void> {
     const imaState: state.TIMAState = state.get();
-    if( imaState.bHaveSkaleManagerABI ) {
+    if( owaspUtils.ensureNonEmptyString(imaState.strSkaleManagerContracts) ) {
         const cp = imaState.chainProperties.mn;
         if( cp.ethersProvider ) {
             const ep: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider = cp.ethersProvider;
-            const joABI = imaState.joAbiSkaleManager;
-            imaState.joConstantsHolder = new owaspUtils.ethersMod.ethers.Contract(
-                joABI.constants_holder_address, joABI.constants_holder_abi, ep );
-            imaState.joNodes = new owaspUtils.ethersMod.ethers.Contract(
-                joABI.nodes_address, joABI.nodes_abi, ep );
-            imaState.joKeyStorage = new owaspUtils.ethersMod.ethers.Contract(
-                joABI.key_storage_address, joABI.key_storage_abi, ep );
-            imaState.joSChains = new owaspUtils.ethersMod.ethers.Contract(
-                joABI.schains_address, joABI.schains_abi, ep );
-            imaState.joSChainsInternal = new owaspUtils.ethersMod.ethers.Contract(
-                joABI.schains_internal_address, joABI.schains_internal_abi, ep );
-            imaState.joSkaleDKG = new owaspUtils.ethersMod.ethers.Contract(
-                joABI.skale_d_k_g_address, joABI.skale_d_k_g_abi, ep );
-            imaState.joSkaleManager = new owaspUtils.ethersMod.ethers.Contract(
-                joABI.skale_manager_address, joABI.skale_manager_abi, ep );
-            imaState.joSkaleToken = new owaspUtils.ethersMod.ethers.Contract(
-                joABI.skale_token_address, joABI.skale_token_abi, ep );
-            imaState.joValidatorService = new owaspUtils.ethersMod.ethers.Contract(
-                joABI.validator_service_address, joABI.validator_service_abi, ep );
-            imaState.joWallets = new owaspUtils.ethersMod.ethers.Contract(
-                joABI.wallets_address, joABI.wallets_abi, ep );
+
+            const network = await skaleContracts.getNetworkByProvider(ep);
+            const project = await network.getProject(Project.MANAGER);
+            const instance = await project.getInstance(imaState.strSkaleManagerContracts);
+
+            imaState.joConstantsHolder = await instance.getContract('ConstantsHolder');
+            imaState.joNodes = await instance.getContract('Nodes');
+            imaState.joKeyStorage = await instance.getContract('KeyStorage');
+            imaState.joSChains = await instance.getContract('Schains');
+            imaState.joSChainsInternal = await instance.getContract('SchainsInternal');
+            imaState.joSkaleDKG = await instance.getContract('SkaleDKG');
+            imaState.joSkaleManager = await instance.getContract('SkaleManager');
+            imaState.joSkaleToken = await instance.getContract('SkaleToken');
+            imaState.joValidatorService = await instance.getContract('ValidatorService');
+            imaState.joWallets = await instance.getContract('Wallets');
         }
     }
 }
 
-export function initContracts(): void {
+export async function initContracts(): Promise<void> {
     imaInitEthersProviders();
-    initContractsIMA();
-    initContractsSkaleManager();
+    await initContractsIMA();
+    await initContractsSkaleManager();
     commonInitPrintFoundContracts();
 }

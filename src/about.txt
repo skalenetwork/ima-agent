@@ -15,10 +15,10 @@ BLOCKCHAIN NETWORK options:
     --cid-s-chain=number....................S-chain Ethereum chain ID Value is automatically loaded from the CID_SCHAIN environment variable if not specified. Default value is -4.
     --cid-t-chain=number....................S<->S Target S-chain Ethereum chain ID Value is automatically loaded from the CID_SCHAIN_TARGET environment variable if not specified. Default value is -4.
 BLOCKCHAIN INTERFACE options:
-    --abi-skale-manager=path................Path to JSON file containing Skale Manager ABI. Optional parameter. It's needed for S-Chain to S-Chain transfers.
-    --abi-main-net=path.....................Path to JSON file containing IMA ABI for Main-net.
-    --abi-s-chain=path......................Path to JSON file containing IMA ABI for S-chain.
-    --abi-t-chain=path......................Path to JSON file containing IMA ABI for S<->S Target S-chain.
+    --manager-contracts=str........Alias or address of skale-manager contracts. Optional parameter. It's needed for S-Chain to S-Chain transfers.
+    --ima-contracts-main-net=str.............Alias or address of IMA for Main-net.
+    --ima-contracts-s-chain=str..............Alias or address of IMA for S-chain.
+    --ima-contracts-t-chain=str..............Alias or address of IMA for S<->S Target S-chain.
 ERC20 INTERFACE options:
     --erc20-main-net=path...................Path to JSON file containing ERC20 ABI for Main-net.
     --erc20-s-chain=path....................Path to JSON file containing ERC20 ABI for S-chain.
@@ -87,7 +87,7 @@ GENERAL TRANSFER options:
     --sleep-between-tx=number...............Sleep time (in milliseconds) between transactions during complex operations.
     --wait-next-block.......................Wait for next block between transactions during complex operations.
 S-CHAIN TO S-CHAIN TRANSFER options:
-    --s2s-enable ...........................Enables S-Chain to S-Chain transfers. Default mode. The abi-skale-manager path must be provided.
+    --s2s-enable ...........................Enables S-Chain to S-Chain transfers. Default mode. The manager-contracts path must be provided.
     --s2s-disable ..........................Disables S-Chain to S-Chain transfers.
     --network-browser-path=path.............Path to SKALE NETWORK browse data file in JSON format containing descriptions of S-Chains connected to this S-Chain.
 PAYMENT TRANSACTION options:

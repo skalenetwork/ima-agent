@@ -67,7 +67,7 @@ BASE_OPTIONS="--gas-price-multiplier=$GAS_PRICE_MULTIPLIER \
 --cross-ima \
 --json-rpc-port=$RPC_PORT \
 --s2s-enable \
---abi-skale-manager=$MANAGER_ABI_PATH \
+--manager-contracts=$MANAGER_ABI_PATH \
 --url-main-net=$MAINNET_RPC_URL \
 --url-s-chain=$SCHAIN_RPC_URL \
 --id-main-net=Mainnet \

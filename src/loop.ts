@@ -535,8 +535,6 @@ function constructChainProperties( opts: TParallelLoopRunOptions ): any {
             strURL: opts.imaState.chainProperties.mn.strURL,
             strChainName: opts.imaState.chainProperties.mn.strChainName,
             chainId: opts.imaState.chainProperties.mn.chainId,
-            joAbiIMA: opts.imaState.chainProperties.mn.joAbiIMA,
-            bHaveAbiIMA: opts.imaState.chainProperties.mn.bHaveAbiIMA
         },
         sc: {
             joAccount: {
@@ -555,8 +553,6 @@ function constructChainProperties( opts: TParallelLoopRunOptions ): any {
             strURL: opts.imaState.chainProperties.sc.strURL,
             strChainName: opts.imaState.chainProperties.sc.strChainName,
             chainId: opts.imaState.chainProperties.sc.chainId,
-            joAbiIMA: opts.imaState.chainProperties.sc.joAbiIMA,
-            bHaveAbiIMA: opts.imaState.chainProperties.sc.bHaveAbiIMA
         },
         tc: {
             joAccount: {
@@ -575,8 +571,6 @@ function constructChainProperties( opts: TParallelLoopRunOptions ): any {
             strURL: opts.imaState.chainProperties.tc.strURL,
             strChainName: opts.imaState.chainProperties.tc.strChainName,
             chainId: opts.imaState.chainProperties.tc.chainId,
-            joAbiIMA: opts.imaState.chainProperties.tc.joAbiIMA,
-            bHaveAbiIMA: opts.imaState.chainProperties.tc.bHaveAbiIMA
         }
     };
 }
@@ -728,8 +722,7 @@ export async function ensureHaveWorkers( opts: TParallelLoopRunOptions ): Promis
                         joEthErc20Target: null,
 
                         chainProperties: constructChainProperties( opts ),
-                        joAbiSkaleManager: opts.imaState.joAbiSkaleManager,
-                        bHaveSkaleManagerABI: opts.imaState.bHaveSkaleManagerABI,
+                        strSkaleManagerContracts: opts.imaState.strSkaleManagerContracts,
                         strChainNameOriginChain: opts.imaState.strChainNameOriginChain,
                         isPWA: opts.imaState.isPWA,
                         nTimeoutSecondsPWA: opts.imaState.nTimeoutSecondsPWA,

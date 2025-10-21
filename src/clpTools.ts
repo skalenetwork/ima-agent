@@ -67,7 +67,7 @@ const gInfoRegistrationCost: TRegistrationCostInformation = {
 
 export async function registerStep1( isPrintSummaryRegistrationCosts: boolean ): Promise<boolean> {
     const imaState: state.TIMAState = state.get();
-    imaCLI.initContracts();
+    await imaCLI.initContracts();
     const strLogPrefix = "Reg 1: ";
     log.information( "{p}Will check chain registration now...", strLogPrefix );
     if( !imaState.chainProperties.mn.ethersProvider )
@@ -118,7 +118,7 @@ export async function registerStep1( isPrintSummaryRegistrationCosts: boolean ):
 
 export async function checkRegistrationStep1(): Promise<boolean> {
     const imaState: state.TIMAState = state.get();
-    imaCLI.initContracts();
+    await imaCLI.initContracts();
     if( !imaState.chainProperties.mn.ethersProvider )
         throw new Error( "No provider for MN" );
     const bRetVal = await imaReg.checkIsRegisteredSChainInDepositBoxes( // step 1
