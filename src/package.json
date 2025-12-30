@@ -13,7 +13,7 @@
         "upgrade-to-latest": "yarn upgrade --latest"
     },
     "dependencies": {
-        "ethers": "^5.7.2",
+        "ethers": "^6.10.0",
         "@ethersproject/experimental": "^5.7.0",
         "solc": "0.8.6",        
         "uuid": "^9.0.0",
