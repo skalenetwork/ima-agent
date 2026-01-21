@@ -15,7 +15,7 @@
     "dependencies": {
         "ethers": "^5.7.2",
         "@ethersproject/experimental": "^5.7.0",
-        "solc": "0.8.6",        
+        "solc": "0.8.24",        
         "uuid": "^9.0.0",
         "@types/uuid": "^9.0.7",
         "express": "^4.18.2",
