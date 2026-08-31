@@ -822,7 +822,74 @@ function performBlsVerifyU256(
     return false;
 }
 
-async function checkCorrectnessOfMessagesToSign(
+function areSameAddresses( valueA: any, valueB: any ): boolean {
+    try {
+        return owaspUtils.ethersMod.ethers.utils.getAddress( valueA.toString() ) ==
+            owaspUtils.ethersMod.ethers.utils.getAddress( valueB.toString() );
+    } catch ( err ) {
+        return false;
+    }
+}
+
+function areSameBytes( valueA: any, valueB: any ): boolean {
+    try {
+        return owaspUtils.ethersMod.ethers.utils.hexlify( valueA ).toLowerCase() ==
+            owaspUtils.ethersMod.ethers.utils.hexlify( valueB ).toLowerCase();
+    } catch ( err ) {
+        return false;
+    }
+}
+
+async function checkM2SMessageEvent(
+    joMessageProxy: owaspUtils.ethersMod.ethers.Contract,
+    ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
+    joChainName: string, joMessage: any, idxMessage: number
+): Promise < void > {
+    if( !ethersProvider )
+        throw new Error( "No Mainnet provider available for M2S event validation" );
+    if( !joMessageProxy )
+        throw new Error( "No Mainnet MessageProxy available for M2S event validation" );
+    if( !joMessage || typeof joMessage !== "object" ||
+        !( "savedBlockNumberForOptimizations" in joMessage )
+    )
+        throw new Error( "M2S message does not include its Mainnet event block number" );
+
+    const bnBlockNumber = owaspUtils.toBN( joMessage.savedBlockNumberForOptimizations );
+    if( bnBlockNumber.lt( 0 ) )
+        throw new Error( "M2S message contains an invalid Mainnet event block number" );
+
+    const strEventName = "OutgoingMessage";
+    const strDestinationChainHash = owaspUtils.ethersMod.ethers.utils.id( joChainName );
+    const bnMessageIndex = owaspUtils.toBN( idxMessage );
+    const joFilter = joMessageProxy.filters[strEventName](
+        strDestinationChainHash, bnMessageIndex );
+    const strBlockNumber = bnBlockNumber.toHexString();
+    const arrEvents = await joMessageProxy.queryFilter(
+        joFilter, strBlockNumber, strBlockNumber );
+
+    for( let idxEvent = 0; idxEvent < arrEvents.length; ++idxEvent ) {
+        const joEvent = arrEvents[idxEvent];
+        if( !joEvent || joEvent.removed || !joEvent.args || joEvent.args.length < 5 )
+            continue;
+        let isSameBlock = false;
+        try {
+            isSameBlock = owaspUtils.toBN( joEvent.blockNumber ).eq( bnBlockNumber );
+        } catch ( err ) {}
+        if( isSameBlock &&
+            areSameBytes( joEvent.args[0], strDestinationChainHash ) &&
+            owaspUtils.toBN( joEvent.args[1] ).eq( bnMessageIndex ) &&
+            areSameAddresses( joEvent.args[2], joMessage.sender ) &&
+            areSameAddresses( joEvent.args[3], joMessage.destinationContract ) &&
+            areSameBytes( joEvent.args[4], joMessage.data )
+        )
+            return;
+    }
+    throw new Error(
+        `No matching Mainnet OutgoingMessage event found for M2S message ${idxMessage} ` +
+        `in block ${bnBlockNumber.toString()}` );
+}
+
+export async function checkCorrectnessOfMessagesToSign(
     details: log.TLogger, strLogPrefix: string, strDirection: string,
     jarrMessages: any[], nIdxCurrentMsgBlockStart: number,
     joExtraSignOpts?: loop.TExtraSignOpts | null
@@ -874,7 +941,26 @@ async function checkCorrectnessOfMessagesToSign(
         nIdxCurrentMsgBlockStart, joChainName );
     let cntBadMessages = 0; let i = 0;
     const cnt = jarrMessages.length;
-    if( strDirection == "S2M" || strDirection == "S2S" ) {
+    if( strDirection == "M2S" ) {
+        const ethersProvider = imaState.chainProperties.mn.ethersProvider;
+        for( i = 0; i < cnt; ++i ) {
+            const joMessage = jarrMessages[i];
+            const idxMessage = nIdxCurrentMsgBlockStart + i;
+            try {
+                if( !joMessageProxy || !ethersProvider || !joChainName )
+                    throw new Error( "Missing Mainnet access parameters for M2S validation" );
+                await checkM2SMessageEvent(
+                    joMessageProxy, ethersProvider, joChainName, joMessage, idxMessage );
+            } catch ( err ) {
+                ++cntBadMessages;
+                details.critical(
+                    "{p}{bright} Mainnet event validation failed for M2S message {}, " +
+                    "message is: {}, error information: {err}, stack is:\n{stack}",
+                    strLogPrefix, idxMessage, joMessage, err, err );
+                break;
+            }
+        }
+    } else if( strDirection == "S2M" || strDirection == "S2S" ) {
         for( i = 0; i < cnt; ++i ) {
             const joMessage = jarrMessages[i];
             const idxMessage = nIdxCurrentMsgBlockStart + i;
@@ -910,13 +996,15 @@ async function checkCorrectnessOfMessagesToSign(
                     "message is: {}, error information: {err}, stack is:\n{stack}",
                     strLogPrefix, strDirection, idxMessage, joChainName, joMessage,
                     err, err );
+                break;
             }
         }
     }
-    // TODO: M2S - check events
     if( cntBadMessages > 0 ) {
         details.critical( "{p}Correctness validation failed for {} of {} message(s)",
             strLogPrefix, cntBadMessages, cnt );
+        throw new Error(
+            `Correctness validation failed for ${cntBadMessages} of ${cnt} message(s)` );
     } else
         details.success( "{p}Correctness validation passed for {} message(s)", strLogPrefix, cnt );
 }
@@ -2063,6 +2151,68 @@ export async function doSignReadyHash(
     return joSignResult;
 }
 
+function validateVerifyAndSignRequestRoute(
+    optsHandleVerifyAndSign: THandleVerifyAndSignOptions
+): void {
+    const imaState = optsHandleVerifyAndSign.imaState;
+    const mn = imaState.chainProperties.mn;
+    const sc = imaState.chainProperties.sc;
+    const isSameRouteValue = function( actual: any, expected: any ): boolean {
+        return actual != null && expected != null && actual.toString() == expected.toString();
+    };
+    if( !Array.isArray( optsHandleVerifyAndSign.jarrMessages ) ||
+        optsHandleVerifyAndSign.jarrMessages.length == 0
+    )
+        throw new Error( "Cannot verify and sign an empty IMA message batch" );
+    if( typeof optsHandleVerifyAndSign.nIdxCurrentMsgBlockStart !== "number" ||
+        !Number.isSafeInteger( optsHandleVerifyAndSign.nIdxCurrentMsgBlockStart ) ||
+        optsHandleVerifyAndSign.nIdxCurrentMsgBlockStart < 0
+    )
+        throw new Error( "Invalid starting IMA message index" );
+
+    let expectedSourceName: any = null; let expectedSourceID: any = null;
+    let expectedDestinationName: any = null; let expectedDestinationID: any = null;
+    let nMaxMessages = 0;
+    if( optsHandleVerifyAndSign.strDirection == "M2S" ) {
+        expectedSourceName = mn.strChainName;
+        expectedSourceID = mn.chainId;
+        expectedDestinationName = sc.strChainName;
+        expectedDestinationID = sc.chainId;
+        nMaxMessages = imaState.nTransferBlockSizeM2S;
+    } else if( optsHandleVerifyAndSign.strDirection == "S2M" ) {
+        expectedSourceName = sc.strChainName;
+        expectedSourceID = sc.chainId;
+        expectedDestinationName = mn.strChainName;
+        expectedDestinationID = mn.chainId;
+        nMaxMessages = imaState.nTransferBlockSizeS2M;
+    } else if( optsHandleVerifyAndSign.strDirection == "S2S" )
+        nMaxMessages = imaState.nTransferBlockSizeS2S;
+    else {
+        throw new Error(
+            `Unknown IMA message direction ${optsHandleVerifyAndSign.strDirection}` );
+    }
+    if( !Number.isSafeInteger( nMaxMessages ) || nMaxMessages <= 0 ) {
+        throw new Error(
+            `Invalid configured ${optsHandleVerifyAndSign.strDirection} message batch size` );
+    }
+    if( optsHandleVerifyAndSign.jarrMessages.length > nMaxMessages ) {
+        throw new Error(
+            `IMA ${optsHandleVerifyAndSign.strDirection} signing request batch size ` +
+            `${optsHandleVerifyAndSign.jarrMessages.length} exceeds configured maximum ` +
+            `${nMaxMessages}` );
+    }
+    if( expectedSourceName != null &&
+        ( !isSameRouteValue( optsHandleVerifyAndSign.strFromChainName, expectedSourceName ) ||
+        !isSameRouteValue( optsHandleVerifyAndSign.strFromChainID, expectedSourceID ) ||
+        !isSameRouteValue( optsHandleVerifyAndSign.strToChainName, expectedDestinationName ) ||
+        !isSameRouteValue( optsHandleVerifyAndSign.strToChainID, expectedDestinationID ) )
+    ) {
+        throw new Error(
+            `IMA ${optsHandleVerifyAndSign.strDirection} signing request route does not match ` +
+            "the locally configured chains" );
+    }
+}
+
 async function prepareHandlingOfSkaleImaVerifyAndSign(
     optsHandleVerifyAndSign: THandleVerifyAndSignOptions ): Promise < boolean > {
     optsHandleVerifyAndSign.details.debug( "{p}Will verify and sign {}",
@@ -2081,6 +2231,7 @@ async function prepareHandlingOfSkaleImaVerifyAndSign(
         optsHandleVerifyAndSign.joCallData.params.direction;
     optsHandleVerifyAndSign.jarrMessages =
         optsHandleVerifyAndSign.joCallData.params.messages;
+    validateVerifyAndSignRequestRoute( optsHandleVerifyAndSign );
     optsHandleVerifyAndSign.details.trace(
         "{p}{bright} verification algorithm will work for transfer from chain {}/{} to " +
         "chain {}/{} and work with array of message(s) {}",
