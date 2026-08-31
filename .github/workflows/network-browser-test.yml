@@ -16,7 +16,7 @@ jobs:
         run: docker compose up -d
       - name: Deploy manager contracts
         run: |
-          bash ./helper-scripts/deploy_test_manager.sh
+          bash ./helper-scripts/deploy_manager.sh
           docker rmi -f skalenetwork/skale-manager:${{ env.MANAGER_TAG }}
 
       - name: Install network-browser dependencies
