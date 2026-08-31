@@ -1248,21 +1248,48 @@ describe( "BLS message origin validation", function() {
     const data = "0x1234";
     const messageIndex = 7;
     const blockNumber = 42;
+    const blockHash = "0x" + "ab".repeat( 32 );
     let previousProvider;
     let previousMessageProxy;
     let previousMainnetAccount;
     let previousSChainNetworkInfo;
+    let previousBlockAwaitDepthM2S;
+    let previousBlockAgeM2S;
     let events;
     let queryCount;
+    let getBlockNumberCount;
+    let getBlockCount;
+    let canonicalBlockHash;
+    let filteredMessageIndexes;
 
     beforeEach( function() {
         previousProvider = imaState.chainProperties.mn.ethersProvider;
         previousMessageProxy = imaState.joMessageProxyMainNet;
         previousMainnetAccount = imaState.chainProperties.mn.joAccount;
         previousSChainNetworkInfo = imaState.joSChainNetworkInfo;
+        previousBlockAwaitDepthM2S = imaState.nBlockAwaitDepthM2S;
+        previousBlockAgeM2S = imaState.nBlockAgeM2S;
         events = [];
         queryCount = 0;
-        imaState.chainProperties.mn.ethersProvider = {};
+        getBlockNumberCount = 0;
+        getBlockCount = 0;
+        canonicalBlockHash = blockHash;
+        filteredMessageIndexes = [];
+        imaState.nBlockAwaitDepthM2S = 0;
+        imaState.nBlockAgeM2S = 0;
+        imaState.chainProperties.mn.ethersProvider = {
+            getBlockNumber: async function() {
+                ++getBlockNumberCount;
+                return blockNumber + 10;
+            },
+            getBlock: async function() {
+                ++getBlockCount;
+                return {
+                    hash: canonicalBlockHash,
+                    timestamp: Math.floor( Date.now() / 1000 ) - 120
+                };
+            }
+        };
         imaState.chainProperties.mn.joAccount = {
             address: function () { return sender; }
         };
@@ -1270,6 +1297,7 @@ describe( "BLS message origin validation", function() {
             address: "0x3333333333333333333333333333333333333333",
             filters: {
                 OutgoingMessage: function( destinationChainHash, outgoingMessageIndex ) {
+                    filteredMessageIndexes = outgoingMessageIndex;
                     return { destinationChainHash, outgoingMessageIndex };
                 }
             },
@@ -1307,6 +1335,8 @@ describe( "BLS message origin validation", function() {
         imaState.joMessageProxyMainNet = previousMessageProxy;
         imaState.chainProperties.mn.joAccount = previousMainnetAccount;
         imaState.joSChainNetworkInfo = previousSChainNetworkInfo;
+        imaState.nBlockAwaitDepthM2S = previousBlockAwaitDepthM2S;
+        imaState.nBlockAgeM2S = previousBlockAgeM2S;
         state.set( imaState );
     } );
 
@@ -1319,14 +1349,15 @@ describe( "BLS message origin validation", function() {
         };
     }
 
-    function makeMainnetEvent( eventData = data ) {
+    function makeMainnetEvent( eventData = data, eventMessageIndex = messageIndex ) {
         return {
             blockNumber,
+            blockHash,
             removed: false,
             args: [
                 owaspUtils.ethersMod.ethers.utils.id(
                     imaState.chainProperties.sc.strChainName ),
-                owaspUtils.ethersMod.ethers.BigNumber.from( messageIndex ),
+                owaspUtils.ethersMod.ethers.BigNumber.from( eventMessageIndex ),
                 sender,
                 destinationContract,
                 eventData
@@ -1371,6 +1402,87 @@ describe( "BLS message origin validation", function() {
             await imaBLS.checkCorrectnessOfMessagesToSign(
                 details, "", "M2S", [makeMessage()], messageIndex );
             assert.equal( queryCount, 1 );
+        } finally {
+            details.close();
+        }
+    } );
+
+    it( "rejects an M2S event that lacks the configured Mainnet depth", async function() {
+        imaState.nBlockAwaitDepthM2S = 11;
+        events = [makeMainnetEvent()];
+        const details = log.createMemoryStream();
+        try {
+            await assert.rejects(
+                imaBLS.checkCorrectnessOfMessagesToSign(
+                    details, "", "M2S", [makeMessage()], messageIndex ),
+                /Correctness validation failed/ );
+            assert.equal( getBlockNumberCount, 1 );
+            assert.equal( getBlockCount, 0 );
+        } finally {
+            details.close();
+        }
+    } );
+
+    it( "rejects an M2S event that lacks the configured Mainnet age", async function() {
+        imaState.nBlockAgeM2S = 1000;
+        events = [makeMainnetEvent()];
+        const details = log.createMemoryStream();
+        try {
+            await assert.rejects(
+                imaBLS.checkCorrectnessOfMessagesToSign(
+                    details, "", "M2S", [makeMessage()], messageIndex ),
+                /Correctness validation failed/ );
+            assert.equal( getBlockNumberCount, 1 );
+            assert.equal( getBlockCount, 1 );
+        } finally {
+            details.close();
+        }
+    } );
+
+    it( "accepts an M2S event that meets configured Mainnet finality", async function() {
+        imaState.nBlockAwaitDepthM2S = 10;
+        imaState.nBlockAgeM2S = 100;
+        events = [makeMainnetEvent()];
+        const details = log.createMemoryStream();
+        try {
+            await imaBLS.checkCorrectnessOfMessagesToSign(
+                details, "", "M2S", [makeMessage()], messageIndex );
+        } finally {
+            details.close();
+        }
+    } );
+
+    it( "validates messages from one block with one Mainnet query", async function() {
+        imaState.nBlockAwaitDepthM2S = 10;
+        imaState.nBlockAgeM2S = 100;
+        events = [makeMainnetEvent( data, messageIndex ),
+            makeMainnetEvent( data, messageIndex + 1 )];
+        const details = log.createMemoryStream();
+        try {
+            await imaBLS.checkCorrectnessOfMessagesToSign(
+                details, "", "M2S", [makeMessage(), makeMessage()], messageIndex );
+            assert.equal( queryCount, 1 );
+            assert.equal( getBlockNumberCount, 1 );
+            assert.equal( getBlockCount, 1 );
+            assert.deepEqual(
+                filteredMessageIndexes.map( function( value ) { return value.toNumber(); } ),
+                [messageIndex, messageIndex + 1] );
+        } finally {
+            details.close();
+        }
+    } );
+
+    it( "rejects an M2S event removed by a Mainnet reorganization", async function() {
+        imaState.nBlockAwaitDepthM2S = 1;
+        canonicalBlockHash = "0x" + "cd".repeat( 32 );
+        events = [makeMainnetEvent()];
+        const details = log.createMemoryStream();
+        try {
+            await assert.rejects(
+                imaBLS.checkCorrectnessOfMessagesToSign(
+                    details, "", "M2S", [makeMessage()], messageIndex ),
+                /Correctness validation failed/ );
+            assert.equal( getBlockCount, 1 );
         } finally {
             details.close();
         }

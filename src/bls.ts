@@ -31,6 +31,7 @@ import * as childProcessModule from "child_process";
 import * as rpcCall from "./rpcCall.js";
 import * as shellMod from "shelljs";
 import * as imaUtils from "./utils.js";
+import * as imaHelperAPIs from "./imaHelperAPIs.js";
 import * as sha3Module from "sha3";
 import * as skaleObserver from "./observer.js";
 import * as discoveryTools from "./discoveryTools.js";
@@ -840,53 +841,157 @@ function areSameBytes( valueA: any, valueB: any ): boolean {
     }
 }
 
-async function checkM2SMessageEvent(
+async function checkM2SMessageEventFinality(
+    ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
+    bnBlockNumber: owaspUtils.ethersMod.ethers.BigNumber, arrEvents: any[],
+    bnLatestBlockNumber: owaspUtils.ethersMod.ethers.BigNumber | null,
+    nBlockAwaitDepth: number, nBlockAge: number
+): Promise < void > {
+    if( nBlockAwaitDepth == 0 && nBlockAge == 0 )
+        return;
+    if( !bnLatestBlockNumber )
+        throw new Error( "No Mainnet head available for M2S event finality validation" );
+    if( bnLatestBlockNumber.lt( bnBlockNumber ) )
+        throw new Error( "M2S message event block is ahead of the Mainnet head" );
+
+    const bnBlockDepth = bnLatestBlockNumber.sub( bnBlockNumber );
+    if( bnBlockDepth.lt( nBlockAwaitDepth ) ) {
+        throw new Error(
+            `M2S message event has depth ${bnBlockDepth.toString()}, ` +
+            `required depth is ${nBlockAwaitDepth}` );
+    }
+
+    const strBlockNumber = bnBlockNumber.toHexString();
+    const joBlock = await ethersProvider.getBlock( strBlockNumber );
+    if( !joBlock?.hash )
+        throw new Error( "M2S message event is no longer in the canonical Mainnet block" );
+    for( let idxEvent = 0; idxEvent < arrEvents.length; ++idxEvent ) {
+        if( !arrEvents[idxEvent]?.blockHash ||
+            !areSameBytes( joBlock.hash, arrEvents[idxEvent].blockHash )
+        )
+            throw new Error( "M2S message event is no longer in the canonical Mainnet block" );
+    }
+
+    if( nBlockAge > 0 ) {
+        if( !owaspUtils.validateInteger( joBlock.timestamp ) )
+            throw new Error( "M2S message event block has an invalid timestamp" );
+        const nBlockTimestamp = owaspUtils.toInteger( joBlock.timestamp );
+        const nActualBlockAge = imaHelperAPIs.currentTimestamp() - nBlockTimestamp;
+        if( nActualBlockAge < nBlockAge ) {
+            throw new Error(
+                `M2S message event age is ${nActualBlockAge} seconds, ` +
+                `required age is ${nBlockAge} seconds` );
+        }
+    }
+}
+
+async function checkM2SMessageEvents(
     joMessageProxy: owaspUtils.ethersMod.ethers.Contract,
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
-    joChainName: string, joMessage: any, idxMessage: number
+    joChainName: string, jarrMessages: any[], nIdxCurrentMsgBlockStart: number
 ): Promise < void > {
     if( !ethersProvider )
         throw new Error( "No Mainnet provider available for M2S event validation" );
     if( !joMessageProxy )
         throw new Error( "No Mainnet MessageProxy available for M2S event validation" );
-    if( !joMessage || typeof joMessage !== "object" ||
-        !( "savedBlockNumberForOptimizations" in joMessage )
-    )
-        throw new Error( "M2S message does not include its Mainnet event block number" );
-
-    const bnBlockNumber = owaspUtils.toBN( joMessage.savedBlockNumberForOptimizations );
-    if( bnBlockNumber.lt( 0 ) )
-        throw new Error( "M2S message contains an invalid Mainnet event block number" );
-
     const strEventName = "OutgoingMessage";
     const strDestinationChainHash = owaspUtils.ethersMod.ethers.utils.id( joChainName );
-    const bnMessageIndex = owaspUtils.toBN( idxMessage );
-    const joFilter = joMessageProxy.filters[strEventName](
-        strDestinationChainHash, bnMessageIndex );
-    const strBlockNumber = bnBlockNumber.toHexString();
-    const arrEvents = await joMessageProxy.queryFilter(
-        joFilter, strBlockNumber, strBlockNumber );
-
-    for( let idxEvent = 0; idxEvent < arrEvents.length; ++idxEvent ) {
-        const joEvent = arrEvents[idxEvent];
-        if( !joEvent || joEvent.removed || !joEvent.args || joEvent.args.length < 5 )
-            continue;
-        let isSameBlock = false;
-        try {
-            isSameBlock = owaspUtils.toBN( joEvent.blockNumber ).eq( bnBlockNumber );
-        } catch ( err ) {}
-        if( isSameBlock &&
-            areSameBytes( joEvent.args[0], strDestinationChainHash ) &&
-            owaspUtils.toBN( joEvent.args[1] ).eq( bnMessageIndex ) &&
-            areSameAddresses( joEvent.args[2], joMessage.sender ) &&
-            areSameAddresses( joEvent.args[3], joMessage.destinationContract ) &&
-            areSameBytes( joEvent.args[4], joMessage.data )
-        )
-            return;
+    // Recheck finality at the signer boundary: RPC callers can bypass imaCore's transfer-side
+    // checks, and each signer must apply its own Mainnet view before issuing a BLS share.
+    const imaState: state.TIMAState = state.get();
+    const nBlockAwaitDepth = imaState.nBlockAwaitDepthM2S;
+    const nBlockAge = imaState.nBlockAgeM2S;
+    if(
+        !Number.isSafeInteger( nBlockAwaitDepth ) || nBlockAwaitDepth < 0 ||
+        !Number.isSafeInteger( nBlockAge ) || nBlockAge < 0
+    )
+        throw new Error( "Invalid configured M2S Mainnet finality requirements" );
+    const mapMessagesByBlock = new Map<string, any>();
+    for( let idxMessageInBatch = 0;
+        idxMessageInBatch < jarrMessages.length;
+        ++idxMessageInBatch
+    ) {
+        const joMessage = jarrMessages[idxMessageInBatch];
+        const idxMessage = nIdxCurrentMsgBlockStart + idxMessageInBatch;
+        if( !joMessage || typeof joMessage !== "object" ||
+            !( "savedBlockNumberForOptimizations" in joMessage )
+        ) {
+            throw new Error(
+                `M2S message ${idxMessage} does not include its Mainnet event block number` );
+        }
+        const bnBlockNumber = owaspUtils.toBN( joMessage.savedBlockNumberForOptimizations );
+        if( bnBlockNumber.lt( 0 ) ) {
+            throw new Error(
+                `M2S message ${idxMessage} has an invalid Mainnet event block number` );
+        }
+        const strBlockNumber = bnBlockNumber.toHexString();
+        let joBlockMessages = mapMessagesByBlock.get( strBlockNumber );
+        if( !joBlockMessages ) {
+            joBlockMessages = { bnBlockNumber, arrMessages: [] };
+            mapMessagesByBlock.set( strBlockNumber, joBlockMessages );
+        }
+        joBlockMessages.arrMessages.push( {
+            joMessage,
+            idxMessage,
+            bnMessageIndex: owaspUtils.toBN( idxMessage )
+        } );
     }
-    throw new Error(
-        `No matching Mainnet OutgoingMessage event found for M2S message ${idxMessage} ` +
-        `in block ${bnBlockNumber.toString()}` );
+
+    const bnLatestBlockNumber = ( nBlockAwaitDepth > 0 || nBlockAge > 0 )
+        ? owaspUtils.toBN( await ethersProvider.getBlockNumber() )
+        : null;
+
+    for( const [ strBlockNumber, joBlockMessages ] of mapMessagesByBlock ) {
+        const arrMessageIndexes = joBlockMessages.arrMessages.map(
+            ( joMessageInfo: any ) => joMessageInfo.bnMessageIndex );
+        const joFilter = joMessageProxy.filters[strEventName](
+            strDestinationChainHash, arrMessageIndexes );
+        const arrEvents = await joMessageProxy.queryFilter(
+            joFilter, strBlockNumber, strBlockNumber );
+        const arrMatchedEvents: any[] = [];
+        for( let idxMessageInBlock = 0;
+            idxMessageInBlock < joBlockMessages.arrMessages.length;
+            ++idxMessageInBlock
+        ) {
+            const joMessageInfo = joBlockMessages.arrMessages[idxMessageInBlock];
+            let joMatchingEvent: any = null;
+            for( let idxEvent = 0; idxEvent < arrEvents.length; ++idxEvent ) {
+                const joEvent = arrEvents[idxEvent];
+                if( !joEvent || joEvent.removed || !joEvent.args || joEvent.args.length < 5 )
+                    continue;
+                const [
+                    destinationChainHash,
+                    messageIndex,
+                    sender,
+                    destinationContract,
+                    messageData
+                ] = joEvent.args;
+                try {
+                    if(
+                        areSameBytes( destinationChainHash, strDestinationChainHash ) &&
+                        owaspUtils.toBN( messageIndex ).eq( joMessageInfo.bnMessageIndex ) &&
+                        areSameAddresses( sender, joMessageInfo.joMessage.sender ) &&
+                        areSameAddresses(
+                            destinationContract, joMessageInfo.joMessage.destinationContract ) &&
+                        areSameBytes( messageData, joMessageInfo.joMessage.data )
+                    ) {
+                        joMatchingEvent = joEvent;
+                        break;
+                    }
+                } catch ( err ) {}
+            }
+            if( !joMatchingEvent ) {
+                throw new Error(
+                    "No matching Mainnet OutgoingMessage event found for M2S message " +
+                    `${joMessageInfo.idxMessage} in block ` +
+                    `${joBlockMessages.bnBlockNumber.toString()}` );
+            }
+            arrMatchedEvents.push( joMatchingEvent );
+        }
+        await checkM2SMessageEventFinality(
+            ethersProvider, joBlockMessages.bnBlockNumber, arrMatchedEvents,
+            bnLatestBlockNumber, nBlockAwaitDepth, nBlockAge );
+    }
 }
 
 export async function checkCorrectnessOfMessagesToSign(
@@ -939,29 +1044,25 @@ export async function checkCorrectnessOfMessagesToSign(
         joMessageProxy ? joMessageProxy.address : "<NullContract>",
         strCallerAccountAddress, jarrMessages.length, jarrMessages,
         nIdxCurrentMsgBlockStart, joChainName );
-    let cntBadMessages = 0; let i = 0;
+    let isBatchValidationFailed = false;
     const cnt = jarrMessages.length;
     if( strDirection == "M2S" ) {
         const ethersProvider = imaState.chainProperties.mn.ethersProvider;
-        for( i = 0; i < cnt; ++i ) {
-            const joMessage = jarrMessages[i];
-            const idxMessage = nIdxCurrentMsgBlockStart + i;
-            try {
-                if( !joMessageProxy || !ethersProvider || !joChainName )
-                    throw new Error( "Missing Mainnet access parameters for M2S validation" );
-                await checkM2SMessageEvent(
-                    joMessageProxy, ethersProvider, joChainName, joMessage, idxMessage );
-            } catch ( err ) {
-                ++cntBadMessages;
-                details.critical(
-                    "{p}{bright} Mainnet event validation failed for M2S message {}, " +
-                    "message is: {}, error information: {err}, stack is:\n{stack}",
-                    strLogPrefix, idxMessage, joMessage, err, err );
-                break;
-            }
+        try {
+            if( !joMessageProxy || !ethersProvider || !joChainName )
+                throw new Error( "Missing Mainnet access parameters for M2S validation" );
+            await checkM2SMessageEvents(
+                joMessageProxy, ethersProvider, joChainName,
+                jarrMessages, nIdxCurrentMsgBlockStart );
+        } catch ( err ) {
+            isBatchValidationFailed = true;
+            details.critical(
+                "{p}{bright} Mainnet event validation failed for M2S message batch " +
+                "starting at {}, messages are: {}, error information: {err}, stack is:\n{stack}",
+                strLogPrefix, nIdxCurrentMsgBlockStart, jarrMessages, err, err );
         }
     } else if( strDirection == "S2M" || strDirection == "S2S" ) {
-        for( i = 0; i < cnt; ++i ) {
+        for( let i = 0; i < cnt; ++i ) {
             const joMessage = jarrMessages[i];
             const idxMessage = nIdxCurrentMsgBlockStart + i;
             try {
@@ -990,7 +1091,7 @@ export async function checkCorrectnessOfMessagesToSign(
                         `message is: ${JSON.stringify( joMessage )}` );
                 }
             } catch ( err ) {
-                ++cntBadMessages;
+                isBatchValidationFailed = true;
                 details.critical(
                     "{p}{bright} Correctness validation failed for message {} sent to {}, " +
                     "message is: {}, error information: {err}, stack is:\n{stack}",
@@ -1000,11 +1101,11 @@ export async function checkCorrectnessOfMessagesToSign(
             }
         }
     }
-    if( cntBadMessages > 0 ) {
-        details.critical( "{p}Correctness validation failed for {} of {} message(s)",
-            strLogPrefix, cntBadMessages, cnt );
+    if( isBatchValidationFailed ) {
+        details.critical( "{p}Correctness validation failed for the {} batch of {} message(s)",
+            strLogPrefix, strDirection, cnt );
         throw new Error(
-            `Correctness validation failed for ${cntBadMessages} of ${cnt} message(s)` );
+            `Correctness validation failed for the ${strDirection} batch of ${cnt} message(s)` );
     } else
         details.success( "{p}Correctness validation passed for {} message(s)", strLogPrefix, cnt );
 }
