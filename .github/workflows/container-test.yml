@@ -184,8 +184,7 @@ jobs:
         sudo rm -rf ./comprehensive-test || true
         export IMA_AGENT_ROOT_DIR=$(pwd)
         echo IMA_AGENT_ROOT_DIR = $IMA_AGENT_ROOT_DIR
-        git clone --branch fix/flattened-ima-layout --single-branch \
-          https://github.com/skalenetwork/comprehensive-test.git --recursive
+        git clone https://github.com/skalenetwork/comprehensive-test.git --recursive
 
     - name: INIT - install Ethereum Main Net emulation
       working-directory: ${{env.working-directory}}
