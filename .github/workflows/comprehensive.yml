@@ -8,6 +8,9 @@ on:
   pull_request:
     branches-ignore:
       - 'docs-v*'
+
+env:
+  SKALE_MANAGER_TAG: "1.12.0-develop.30"
   
 jobs:
   cancel-runs:
@@ -292,7 +295,7 @@ jobs:
       working-directory: ${{env.working-directory}}
       run: |
         cd comprehensive-test
-        git clone https://github.com/skalenetwork/skale-manager.git --recursive
+        git clone --branch "$SKALE_MANAGER_TAG" --single-branch https://github.com/skalenetwork/skale-manager.git --recursive
         cd ..
 
     - name: INIT - install Skale Manager dependencies
