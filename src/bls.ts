@@ -1173,21 +1173,21 @@ async function prepareSignMessagesImpl(
         optsSignOperation.imaState.strPathBlsGlue.length > 0 &&
         optsSignOperation.imaState.joSChainNetworkInfo
     ) ) {
-        optsSignOperation.bHaveResultReportCalled = true;
         optsSignOperation.details.debug(
             "{p}BLS message signing is turned off, first real message index is: {}, have {} " +
             "message(s) to process {}", optsSignOperation.strLogPrefix,
             optsSignOperation.nIdxCurrentMsgBlockStart, optsSignOperation.jarrMessages.length,
             optsSignOperation.jarrMessages );
-        optsSignOperation.details.exposeDetailsTo(
-            log.globalStream(), optsSignOperation.strGatheredDetailsName, false );
-        optsSignOperation.details.close();
         await checkCorrectnessOfMessagesToSign(
             optsSignOperation.details, optsSignOperation.strLogPrefix,
             optsSignOperation.strDirection,
             optsSignOperation.jarrMessages,
             optsSignOperation.nIdxCurrentMsgBlockStart,
             optsSignOperation.joExtraSignOpts );
+        optsSignOperation.bHaveResultReportCalled = true;
+        optsSignOperation.details.exposeDetailsTo(
+            log.globalStream(), optsSignOperation.strGatheredDetailsName, false );
+        optsSignOperation.details.close();
         await optsSignOperation.fn( null, optsSignOperation.jarrMessages );
         return true;
     }

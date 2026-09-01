@@ -1382,6 +1382,22 @@ describe( "BLS message origin validation", function() {
         assert.equal( queryCount, 1 );
     } );
 
+    it( "reports disabled-signing validation failure exactly once", async function() {
+        const reports = [];
+        await imaBLS.doSignMessagesM2S(
+            0, [makeMessage()], messageIndex,
+            imaState.chainProperties.mn.strChainName, null,
+            async function( err, messages, signResult ) {
+                reports.push( { err, messages, signResult } );
+            } );
+
+        assert.equal( reports.length, 1 );
+        assert.match( reports[0].err, /Correctness validation failed/ );
+        assert.deepEqual( reports[0].messages, [makeMessage()] );
+        assert.equal( reports[0].signResult, null );
+        assert.equal( queryCount, 1 );
+    } );
+
     it( "rejects an M2S message whose data differs from the Mainnet event", async function() {
         events = [makeMainnetEvent( "0xabcd" )];
         const details = log.createMemoryStream();
