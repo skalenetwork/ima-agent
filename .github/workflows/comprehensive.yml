@@ -372,21 +372,24 @@ jobs:
         cd comprehensive-test
         cd sgxwallet/run_sgx_sim
         docker compose up &> ../../local_sgxwallet_output_log.txt &
-        sleep 90
         cd ../..
         cd ..
 
-    - name: INIT - check SGX Wallet has listening ports
+    - name: INIT - wait for SGX Wallet listening ports
       working-directory: ${{env.working-directory}}
       run: |
-        echo "sleeping 45 seconds..."
-        sleep 45
-        echo "checking port 1026 commonly used by SGX Wallet for HTTPS..."
-        sudo netstat -tulpn | grep 1026
-        echo "...Done"
-        echo "checking port 1027 commonly used by SGX Wallet for HTTP..."
-        sudo netstat -tulpn | grep 1027
-        echo "...Done"
+        deadline=$((SECONDS + 300))
+        until netstat -ltn | awk '$4 ~ /:1026$/ { found = 1 } END { exit !found }' && \
+              netstat -ltn | awk '$4 ~ /:1027$/ { found = 1 } END { exit !found }'; do
+          if (( SECONDS >= deadline )); then
+            echo "SGX Wallet did not open ports 1026 and 1027 within 300 seconds"
+            docker compose -f comprehensive-test/sgxwallet/run_sgx_sim/docker-compose.yml ps || true
+            tail -n 200 comprehensive-test/local_sgxwallet_output_log.txt || true
+            exit 1
+          fi
+          sleep 5
+        done
+        echo "SGX Wallet is listening on ports 1026 and 1027"
 
     - name: INIT - download transaction manager
       working-directory: ${{env.working-directory}}
