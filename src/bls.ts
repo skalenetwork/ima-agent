@@ -948,45 +948,73 @@ async function checkM2SMessageEvents(
             strDestinationChainHash, arrMessageIndexes );
         const arrEvents = await joMessageProxy.queryFilter(
             joFilter, strBlockNumber, strBlockNumber );
+        if( arrEvents.length !== joBlockMessages.arrMessages.length ) {
+            throw new Error(
+                `Expected ${joBlockMessages.arrMessages.length} Mainnet OutgoingMessage ` +
+                `event(s) in block ${joBlockMessages.bnBlockNumber.toString()}, ` +
+                `got ${arrEvents.length}` );
+        }
+
+        const mapEventsByMessageIndex = new Map<string, any>();
+        for( let idxEvent = 0; idxEvent < arrEvents.length; ++idxEvent ) {
+            const joEvent = arrEvents[idxEvent];
+            if( !joEvent || joEvent.removed || !joEvent.args || joEvent.args.length < 5 ) {
+                throw new Error(
+                    "Malformed Mainnet OutgoingMessage event found in block " +
+                    joBlockMessages.bnBlockNumber.toString() );
+            }
+            const [
+                destinationChainHash,
+                messageIndex,
+                sender,
+                destinationContract,
+                messageData
+            ] = joEvent.args;
+            const bnMessageIndex = owaspUtils.toBN( messageIndex );
+            const strMessageIndex = bnMessageIndex.toHexString();
+            if( mapEventsByMessageIndex.has( strMessageIndex ) ) {
+                throw new Error(
+                    "Multiple Mainnet OutgoingMessage events found for message " +
+                    `${bnMessageIndex.toString()} in block ` +
+                    `${joBlockMessages.bnBlockNumber.toString()}` );
+            }
+            mapEventsByMessageIndex.set( strMessageIndex, {
+                joEvent,
+                destinationChainHash,
+                sender,
+                destinationContract,
+                messageData
+            } );
+        }
+
         const arrMatchedEvents: any[] = [];
         for( let idxMessageInBlock = 0;
             idxMessageInBlock < joBlockMessages.arrMessages.length;
             ++idxMessageInBlock
         ) {
             const joMessageInfo = joBlockMessages.arrMessages[idxMessageInBlock];
-            let joMatchingEvent: any = null;
-            for( let idxEvent = 0; idxEvent < arrEvents.length; ++idxEvent ) {
-                const joEvent = arrEvents[idxEvent];
-                if( !joEvent || joEvent.removed || !joEvent.args || joEvent.args.length < 5 )
-                    continue;
-                const [
-                    destinationChainHash,
-                    messageIndex,
-                    sender,
-                    destinationContract,
-                    messageData
-                ] = joEvent.args;
-                try {
-                    if(
-                        areSameBytes( destinationChainHash, strDestinationChainHash ) &&
-                        owaspUtils.toBN( messageIndex ).eq( joMessageInfo.bnMessageIndex ) &&
-                        areSameAddresses( sender, joMessageInfo.joMessage.sender ) &&
-                        areSameAddresses(
-                            destinationContract, joMessageInfo.joMessage.destinationContract ) &&
-                        areSameBytes( messageData, joMessageInfo.joMessage.data )
-                    ) {
-                        joMatchingEvent = joEvent;
-                        break;
-                    }
-                } catch ( err ) {}
-            }
-            if( !joMatchingEvent ) {
-                throw new Error(
-                    "No matching Mainnet OutgoingMessage event found for M2S message " +
-                    `${joMessageInfo.idxMessage} in block ` +
-                    `${joBlockMessages.bnBlockNumber.toString()}` );
-            }
-            arrMatchedEvents.push( joMatchingEvent );
+            const joMatchingEventInfo = mapEventsByMessageIndex.get(
+                joMessageInfo.bnMessageIndex.toHexString() );
+            const strNoMatchingEventError =
+                "No matching Mainnet OutgoingMessage event found for M2S message " +
+                `${joMessageInfo.idxMessage} in block ` +
+                `${joBlockMessages.bnBlockNumber.toString()}`;
+            if( !joMatchingEventInfo )
+                throw new Error( strNoMatchingEventError );
+            if(
+                !areSameBytes(
+                    joMatchingEventInfo.destinationChainHash,
+                    strDestinationChainHash ) ||
+                !areSameAddresses(
+                    joMatchingEventInfo.sender, joMessageInfo.joMessage.sender ) ||
+                !areSameAddresses(
+                    joMatchingEventInfo.destinationContract,
+                    joMessageInfo.joMessage.destinationContract ) ||
+                !areSameBytes(
+                    joMatchingEventInfo.messageData, joMessageInfo.joMessage.data )
+            )
+                throw new Error( strNoMatchingEventError );
+            arrMatchedEvents.push( joMatchingEventInfo.joEvent );
         }
         await checkM2SMessageEventFinality(
             ethersProvider, joBlockMessages.bnBlockNumber, arrMatchedEvents,

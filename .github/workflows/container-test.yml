@@ -440,6 +440,20 @@ jobs:
       run: |
         export IMA_AGENT_ROOT_DIR=$(pwd)
         echo IMA_AGENT_ROOT_DIR = $IMA_AGENT_ROOT_DIR
+        # TODO: Remove these compatibility workarounds after comprehensive-test supports
+        # the flattened IMA layout and passes SKALE_MANAGER_ADDRESS to IMA deployment.
+        if [ ! -e "$IMA_AGENT_ROOT_DIR/IMA/proxy" ]; then
+          ln -s . "$IMA_AGENT_ROOT_DIR/IMA/proxy"
+        fi
+        if ! grep -q '"SKALE_MANAGER_ADDRESS": "" + g_joSkaleManagerABI.skale_manager_address' \
+          comprehensive-test/engine/index.js; then
+          sed -i \
+            '/"ACCOUNT_FOR_ETHEREUM": "" + private_key_2_account_address(g_w3_main_net, g_strPrivateKeyImaMN),/i\
+        "SKALE_MANAGER_ADDRESS": "" + g_joSkaleManagerABI.skale_manager_address,' \
+            comprehensive-test/engine/index.js
+        fi
+        grep -q '"SKALE_MANAGER_ADDRESS": "" + g_joSkaleManagerABI.skale_manager_address' \
+          comprehensive-test/engine/index.js
         cd comprehensive-test/engine
         export ALL_SKALE_TEST_CLOUD_RUN=1
         #
