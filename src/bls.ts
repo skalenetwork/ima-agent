@@ -1097,6 +1097,8 @@ export async function checkCorrectnessOfMessagesToSign(
                     "message is: {}, error information: {err}, stack is:\n{stack}",
                     strLogPrefix, strDirection, idxMessage, joChainName, joMessage,
                     err, err );
+                // Batch signing is all-or-nothing;
+                // stop after the first failure because the batch is already invalid.
                 break;
             }
         }
