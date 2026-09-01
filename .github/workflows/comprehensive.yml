@@ -3,8 +3,11 @@ name: Comprehensive test
 
 on: 
   push:
-    branches-ignore:
-      - 'docs-v*'
+    branches:
+      - develop
+      - beta
+      - stable
+      - '*.*.*'
   pull_request:
     branches-ignore:
       - 'docs-v*'
