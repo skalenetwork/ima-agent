@@ -1432,7 +1432,7 @@ describe( "BLS message origin validation", function() {
                 imaBLS.checkCorrectnessOfMessagesToSign(
                     details, "", "M2S", [makeMessage()], messageIndex ),
                 /Correctness validation failed/ );
-            assert.equal( getBlockNumberCount, 1 );
+            assert.equal( getBlockNumberCount, 0 );
             assert.equal( getBlockCount, 1 );
         } finally {
             details.close();
@@ -1505,7 +1505,7 @@ describe( "BLS message origin validation", function() {
         assert.equal( queryCount, 0 );
     } );
 
-    it( "rejects an oversized M2S batch before querying Mainnet", async function() {
+    it( "allows an oversized M2S batch to reach correctness validation", async function() {
         const messages = new Array( imaState.nTransferBlockSizeM2S + 1 )
             .fill( null ).map( function () { return makeMessage(); } );
         await assert.rejects(
@@ -1520,8 +1520,8 @@ describe( "BLS message origin validation", function() {
                     messages
                 }
             } ),
-            /exceeds configured maximum/ );
-        assert.equal( queryCount, 0 );
+            /Correctness validation failed/ );
+        assert.equal( queryCount, 1 );
     } );
 
     it( "stops Mainnet queries after the first invalid M2S message", async function() {

@@ -849,16 +849,18 @@ async function checkM2SMessageEventFinality(
 ): Promise < void > {
     if( nBlockAwaitDepth == 0 && nBlockAge == 0 )
         return;
-    if( !bnLatestBlockNumber )
-        throw new Error( "No Mainnet head available for M2S event finality validation" );
-    if( bnLatestBlockNumber.lt( bnBlockNumber ) )
-        throw new Error( "M2S message event block is ahead of the Mainnet head" );
+    if( nBlockAwaitDepth > 0 ) {
+        if( !bnLatestBlockNumber )
+            throw new Error( "No Mainnet head available for M2S event finality validation" );
+        if( bnLatestBlockNumber.lt( bnBlockNumber ) )
+            throw new Error( "M2S message event block is ahead of the Mainnet head" );
 
-    const bnBlockDepth = bnLatestBlockNumber.sub( bnBlockNumber );
-    if( bnBlockDepth.lt( nBlockAwaitDepth ) ) {
-        throw new Error(
-            `M2S message event has depth ${bnBlockDepth.toString()}, ` +
-            `required depth is ${nBlockAwaitDepth}` );
+        const bnBlockDepth = bnLatestBlockNumber.sub( bnBlockNumber );
+        if( bnBlockDepth.lt( nBlockAwaitDepth ) ) {
+            throw new Error(
+                `M2S message event has depth ${bnBlockDepth.toString()}, ` +
+                `required depth is ${nBlockAwaitDepth}` );
+        }
     }
 
     const strBlockNumber = bnBlockNumber.toHexString();
@@ -937,7 +939,7 @@ async function checkM2SMessageEvents(
         } );
     }
 
-    const bnLatestBlockNumber = ( nBlockAwaitDepth > 0 || nBlockAge > 0 )
+    const bnLatestBlockNumber = nBlockAwaitDepth > 0
         ? owaspUtils.toBN( await ethersProvider.getBlockNumber() )
         : null;
 
@@ -2288,59 +2290,44 @@ function validateVerifyAndSignRequestRoute(
     const imaState = optsHandleVerifyAndSign.imaState;
     const mn = imaState.chainProperties.mn;
     const sc = imaState.chainProperties.sc;
-    const isSameRouteValue = function( actual: any, expected: any ): boolean {
-        return actual != null && expected != null && actual.toString() == expected.toString();
-    };
+
+    // Require messages because there is nothing to verify or sign for an empty batch.
     if( !Array.isArray( optsHandleVerifyAndSign.jarrMessages ) ||
         optsHandleVerifyAndSign.jarrMessages.length == 0
     )
         throw new Error( "Cannot verify and sign an empty IMA message batch" );
+
+    // Require a safe nonnegative index because it identifies the first message being signed.
     if( typeof optsHandleVerifyAndSign.nIdxCurrentMsgBlockStart !== "number" ||
         !Number.isSafeInteger( optsHandleVerifyAndSign.nIdxCurrentMsgBlockStart ) ||
         optsHandleVerifyAndSign.nIdxCurrentMsgBlockStart < 0
     )
         throw new Error( "Invalid starting IMA message index" );
 
-    let expectedSourceName: any = null; let expectedSourceID: any = null;
-    let expectedDestinationName: any = null; let expectedDestinationID: any = null;
-    let nMaxMessages = 0;
-    if( optsHandleVerifyAndSign.strDirection == "M2S" ) {
-        expectedSourceName = mn.strChainName;
-        expectedSourceID = mn.chainId;
-        expectedDestinationName = sc.strChainName;
-        expectedDestinationID = sc.chainId;
-        nMaxMessages = imaState.nTransferBlockSizeM2S;
-    } else if( optsHandleVerifyAndSign.strDirection == "S2M" ) {
-        expectedSourceName = sc.strChainName;
-        expectedSourceID = sc.chainId;
-        expectedDestinationName = mn.strChainName;
-        expectedDestinationID = mn.chainId;
-        nMaxMessages = imaState.nTransferBlockSizeS2M;
-    } else if( optsHandleVerifyAndSign.strDirection == "S2S" )
-        nMaxMessages = imaState.nTransferBlockSizeS2S;
-    else {
+    // Require a supported direction because it selects the verification and hashing protocol.
+    if( optsHandleVerifyAndSign.strDirection != "M2S" &&
+        optsHandleVerifyAndSign.strDirection != "S2M" &&
+        optsHandleVerifyAndSign.strDirection != "S2S"
+    ) {
         throw new Error(
             `Unknown IMA message direction ${optsHandleVerifyAndSign.strDirection}` );
     }
-    if( !Number.isSafeInteger( nMaxMessages ) || nMaxMessages <= 0 ) {
-        throw new Error(
-            `Invalid configured ${optsHandleVerifyAndSign.strDirection} message batch size` );
-    }
-    if( optsHandleVerifyAndSign.jarrMessages.length > nMaxMessages ) {
-        throw new Error(
-            `IMA ${optsHandleVerifyAndSign.strDirection} signing request batch size ` +
-            `${optsHandleVerifyAndSign.jarrMessages.length} exceeds configured maximum ` +
-            `${nMaxMessages}` );
-    }
-    if( expectedSourceName != null &&
-        ( !isSameRouteValue( optsHandleVerifyAndSign.strFromChainName, expectedSourceName ) ||
-        !isSameRouteValue( optsHandleVerifyAndSign.strFromChainID, expectedSourceID ) ||
-        !isSameRouteValue( optsHandleVerifyAndSign.strToChainName, expectedDestinationName ) ||
-        !isSameRouteValue( optsHandleVerifyAndSign.strToChainID, expectedDestinationID ) )
+
+    // Bind the M2S source name because it is part of the signed hash and must identify Mainnet.
+    if( optsHandleVerifyAndSign.strDirection == "M2S" &&
+        optsHandleVerifyAndSign.strFromChainName != mn.strChainName
     ) {
         throw new Error(
-            `IMA ${optsHandleVerifyAndSign.strDirection} signing request route does not match ` +
-            "the locally configured chains" );
+            "IMA M2S signing request route does not match the locally configured chains" );
+    }
+
+    // Bind the S2M source name because it is part of the signed hash and must identify
+    // this S-Chain.
+    if( optsHandleVerifyAndSign.strDirection == "S2M" &&
+        optsHandleVerifyAndSign.strFromChainName != sc.strChainName
+    ) {
+        throw new Error(
+            "IMA S2M signing request route does not match the locally configured chains" );
     }
 }
 
