@@ -34,6 +34,7 @@ import * as imaTx from "../src/build/imaTx.js";
 import * as log from "../src/build/log.js";
 import * as imaUtils from "../src/build/utils.js";
 import * as imaCLI from "../src/build/cli.js";
+import * as imaBLS from "../src/build/bls.js";
 
 import * as state from "../src/build/state.js";
 
@@ -1239,4 +1240,477 @@ describe( "Agent Utils Module-3", function() {
 
     } );
 
+} );
+
+describe( "BLS message origin validation", function() {
+    const sender = "0x1111111111111111111111111111111111111111";
+    const destinationContract = "0x2222222222222222222222222222222222222222";
+    const data = "0x1234";
+    const messageIndex = 7;
+    const blockNumber = 42;
+    const blockHash = "0x" + "ab".repeat( 32 );
+    let previousProvider;
+    let previousMessageProxy;
+    let previousMainnetAccount;
+    let previousSChainNetworkInfo;
+    let previousBlockAwaitDepthM2S;
+    let previousBlockAgeM2S;
+    let events;
+    let queryCount;
+    let getBlockNumberCount;
+    let getBlockCount;
+    let canonicalBlockHash;
+    let filteredMessageIndexes;
+
+    beforeEach( function() {
+        previousProvider = imaState.chainProperties.mn.ethersProvider;
+        previousMessageProxy = imaState.joMessageProxyMainNet;
+        previousMainnetAccount = imaState.chainProperties.mn.joAccount;
+        previousSChainNetworkInfo = imaState.joSChainNetworkInfo;
+        previousBlockAwaitDepthM2S = imaState.nBlockAwaitDepthM2S;
+        previousBlockAgeM2S = imaState.nBlockAgeM2S;
+        events = [];
+        queryCount = 0;
+        getBlockNumberCount = 0;
+        getBlockCount = 0;
+        canonicalBlockHash = blockHash;
+        filteredMessageIndexes = [];
+        imaState.nBlockAwaitDepthM2S = 0;
+        imaState.nBlockAgeM2S = 0;
+        imaState.chainProperties.mn.ethersProvider = {
+            getBlockNumber: async function() {
+                ++getBlockNumberCount;
+                return blockNumber + 10;
+            },
+            getBlock: async function() {
+                ++getBlockCount;
+                return {
+                    hash: canonicalBlockHash,
+                    timestamp: Math.floor( Date.now() / 1000 ) - 120
+                };
+            }
+        };
+        imaState.chainProperties.mn.joAccount = {
+            address: function () { return sender; }
+        };
+        imaState.joMessageProxyMainNet = {
+            address: "0x3333333333333333333333333333333333333333",
+            filters: {
+                OutgoingMessage: function( destinationChainHash, outgoingMessageIndex ) {
+                    filteredMessageIndexes = outgoingMessageIndex;
+                    return { destinationChainHash, outgoingMessageIndex };
+                }
+            },
+            queryFilter: async function( filter, fromBlock, toBlock ) {
+                ++queryCount;
+                assert.equal( fromBlock, "0x2a" );
+                assert.equal( toBlock, "0x2a" );
+                return events;
+            }
+        };
+        imaState.joSChainNetworkInfo = {
+            network: [{
+                nodeID: 0,
+                schainIndex: 0,
+                imaInfo: {
+                    n: 1,
+                    t: 1,
+                    thisNodeIndex: 0,
+                    BLSPublicKey0: "1",
+                    BLSPublicKey1: "1",
+                    BLSPublicKey2: "1",
+                    BLSPublicKey3: "1",
+                    commonBLSPublicKey0: "1",
+                    commonBLSPublicKey1: "1",
+                    commonBLSPublicKey2: "1",
+                    commonBLSPublicKey3: "1"
+                }
+            }]
+        };
+        state.set( imaState );
+    } );
+
+    afterEach( function() {
+        imaState.chainProperties.mn.ethersProvider = previousProvider;
+        imaState.joMessageProxyMainNet = previousMessageProxy;
+        imaState.chainProperties.mn.joAccount = previousMainnetAccount;
+        imaState.joSChainNetworkInfo = previousSChainNetworkInfo;
+        imaState.nBlockAwaitDepthM2S = previousBlockAwaitDepthM2S;
+        imaState.nBlockAgeM2S = previousBlockAgeM2S;
+        state.set( imaState );
+    } );
+
+    function makeMessage() {
+        return {
+            sender,
+            destinationContract,
+            data,
+            savedBlockNumberForOptimizations: blockNumber
+        };
+    }
+
+    function makeMainnetEvent( eventData = data, eventMessageIndex = messageIndex ) {
+        return {
+            blockNumber,
+            blockHash,
+            removed: false,
+            args: [
+                owaspUtils.ethersMod.ethers.utils.id(
+                    imaState.chainProperties.sc.strChainName ),
+                owaspUtils.ethersMod.ethers.BigNumber.from( eventMessageIndex ),
+                sender,
+                destinationContract,
+                eventData
+            ]
+        };
+    }
+
+    it( "rejects an M2S message without a matching Mainnet event", async function() {
+        await assert.rejects(
+            imaBLS.handleSkaleImaVerifyAndSign( {
+                params: {
+                    direction: "M2S",
+                    startMessageIdx: messageIndex,
+                    srcChainName: imaState.chainProperties.mn.strChainName,
+                    dstChainName: imaState.chainProperties.sc.strChainName,
+                    srcChainID: imaState.chainProperties.mn.chainId.toString(),
+                    dstChainID: imaState.chainProperties.sc.chainId.toString(),
+                    messages: [makeMessage()]
+                }
+            } ),
+            /Correctness validation failed/ );
+        assert.equal( queryCount, 1 );
+    } );
+
+    it( "reports disabled-signing validation failure exactly once", async function() {
+        const reports = [];
+        await imaBLS.doSignMessagesM2S(
+            0, [makeMessage()], messageIndex,
+            imaState.chainProperties.mn.strChainName, null,
+            async function( err, messages, signResult ) {
+                reports.push( { err, messages, signResult } );
+            } );
+
+        assert.equal( reports.length, 1 );
+        assert.match( reports[0].err, /Correctness validation failed/ );
+        assert.deepEqual( reports[0].messages, [makeMessage()] );
+        assert.equal( reports[0].signResult, null );
+        assert.equal( queryCount, 1 );
+    } );
+
+    it( "rejects an M2S message whose data differs from the Mainnet event", async function() {
+        events = [makeMainnetEvent( "0xabcd" )];
+        const details = log.createMemoryStream();
+        try {
+            await assert.rejects(
+                imaBLS.checkCorrectnessOfMessagesToSign(
+                    details, "", "M2S", [makeMessage()], messageIndex ),
+                /Correctness validation failed/ );
+        } finally {
+            details.close();
+        }
+    } );
+
+    it( "accepts an M2S message backed by the exact Mainnet event", async function() {
+        events = [makeMainnetEvent()];
+        const details = log.createMemoryStream();
+        try {
+            await imaBLS.checkCorrectnessOfMessagesToSign(
+                details, "", "M2S", [makeMessage()], messageIndex );
+            assert.equal( queryCount, 1 );
+            assert.equal( getBlockCount, 1 );
+        } finally {
+            details.close();
+        }
+    } );
+
+    it( "rejects an M2S event that lacks the configured Mainnet depth", async function() {
+        imaState.nBlockAwaitDepthM2S = 11;
+        events = [makeMainnetEvent()];
+        const details = log.createMemoryStream();
+        try {
+            await assert.rejects(
+                imaBLS.checkCorrectnessOfMessagesToSign(
+                    details, "", "M2S", [makeMessage()], messageIndex ),
+                /Correctness validation failed/ );
+            assert.equal( getBlockNumberCount, 1 );
+            assert.equal( getBlockCount, 0 );
+        } finally {
+            details.close();
+        }
+    } );
+
+    it( "rejects an M2S event that lacks the configured Mainnet age", async function() {
+        imaState.nBlockAgeM2S = 1000;
+        events = [makeMainnetEvent()];
+        const details = log.createMemoryStream();
+        try {
+            await assert.rejects(
+                imaBLS.checkCorrectnessOfMessagesToSign(
+                    details, "", "M2S", [makeMessage()], messageIndex ),
+                /Correctness validation failed/ );
+            assert.equal( getBlockNumberCount, 0 );
+            assert.equal( getBlockCount, 1 );
+        } finally {
+            details.close();
+        }
+    } );
+
+    it( "accepts an M2S event that meets configured Mainnet finality", async function() {
+        imaState.nBlockAwaitDepthM2S = 10;
+        imaState.nBlockAgeM2S = 100;
+        events = [makeMainnetEvent()];
+        const details = log.createMemoryStream();
+        try {
+            await imaBLS.checkCorrectnessOfMessagesToSign(
+                details, "", "M2S", [makeMessage()], messageIndex );
+        } finally {
+            details.close();
+        }
+    } );
+
+    it( "validates messages from one block with one Mainnet query", async function() {
+        imaState.nBlockAwaitDepthM2S = 10;
+        imaState.nBlockAgeM2S = 100;
+        events = [makeMainnetEvent( data, messageIndex ),
+            makeMainnetEvent( data, messageIndex + 1 )];
+        const details = log.createMemoryStream();
+        try {
+            await imaBLS.checkCorrectnessOfMessagesToSign(
+                details, "", "M2S", [makeMessage(), makeMessage()], messageIndex );
+            assert.equal( queryCount, 1 );
+            assert.equal( getBlockNumberCount, 1 );
+            assert.equal( getBlockCount, 1 );
+            assert.deepEqual(
+                filteredMessageIndexes.map( function( value ) { return value.toNumber(); } ),
+                [messageIndex, messageIndex + 1] );
+        } finally {
+            details.close();
+        }
+    } );
+
+    it( "rejects an M2S event removed by a Mainnet reorganization", async function() {
+        canonicalBlockHash = "0x" + "cd".repeat( 32 );
+        events = [makeMainnetEvent()];
+        const details = log.createMemoryStream();
+        try {
+            await assert.rejects(
+                imaBLS.checkCorrectnessOfMessagesToSign(
+                    details, "", "M2S", [makeMessage()], messageIndex ),
+                /Correctness validation failed/ );
+            assert.equal( getBlockCount, 1 );
+        } finally {
+            details.close();
+        }
+    } );
+
+    it( "rejects request metadata that relabels an M2S signing request", async function() {
+        const validRoute = {
+            direction: "M2S",
+            startMessageIdx: messageIndex,
+            srcChainName: imaState.chainProperties.mn.strChainName,
+            dstChainName: imaState.chainProperties.sc.strChainName,
+            srcChainID: imaState.chainProperties.mn.chainId.toString(),
+            dstChainID: imaState.chainProperties.sc.chainId.toString(),
+            messages: [makeMessage()]
+        };
+        const invalidRoutes = [
+            { srcChainName: "other-mainnet" },
+            { srcChainID: "123456" },
+            { dstChainName: "other-schain" },
+            { dstChainID: "654321" }
+        ];
+        for( const invalidRoute of invalidRoutes ) {
+            await assert.rejects(
+                imaBLS.handleSkaleImaVerifyAndSign( {
+                    params: { ...validRoute, ...invalidRoute }
+                } ),
+                /route does not match the locally configured chains/ );
+        }
+        assert.equal( queryCount, 0 );
+    } );
+
+    it( "rejects any mismatched fixed endpoint in S2M and S2S routes", async function() {
+        const routes = [
+            {
+                params: {
+                    direction: "S2M",
+                    startMessageIdx: messageIndex,
+                    srcChainName: "other-schain",
+                    dstChainName: imaState.chainProperties.mn.strChainName,
+                    srcChainID: imaState.chainProperties.sc.chainId.toString(),
+                    dstChainID: imaState.chainProperties.mn.chainId.toString(),
+                    messages: [makeMessage()]
+                }
+            },
+            {
+                params: {
+                    direction: "S2M",
+                    startMessageIdx: messageIndex,
+                    srcChainName: imaState.chainProperties.sc.strChainName,
+                    dstChainName: imaState.chainProperties.mn.strChainName,
+                    srcChainID: "123456",
+                    dstChainID: imaState.chainProperties.mn.chainId.toString(),
+                    messages: [makeMessage()]
+                }
+            },
+            {
+                params: {
+                    direction: "S2M",
+                    startMessageIdx: messageIndex,
+                    srcChainName: imaState.chainProperties.sc.strChainName,
+                    dstChainName: "other-mainnet",
+                    srcChainID: imaState.chainProperties.sc.chainId.toString(),
+                    dstChainID: imaState.chainProperties.mn.chainId.toString(),
+                    messages: [makeMessage()]
+                }
+            },
+            {
+                params: {
+                    direction: "S2M",
+                    startMessageIdx: messageIndex,
+                    srcChainName: imaState.chainProperties.sc.strChainName,
+                    dstChainName: imaState.chainProperties.mn.strChainName,
+                    srcChainID: imaState.chainProperties.sc.chainId.toString(),
+                    dstChainID: "123456",
+                    messages: [makeMessage()]
+                }
+            },
+            {
+                params: {
+                    direction: "S2S",
+                    startMessageIdx: messageIndex,
+                    srcChainName: "source-schain",
+                    dstChainName: "other-schain",
+                    srcChainID: "123456",
+                    dstChainID: imaState.chainProperties.sc.chainId.toString(),
+                    messages: [makeMessage()]
+                }
+            },
+            {
+                params: {
+                    direction: "S2S",
+                    startMessageIdx: messageIndex,
+                    srcChainName: "source-schain",
+                    dstChainName: imaState.chainProperties.sc.strChainName,
+                    srcChainID: "123456",
+                    dstChainID: "654321",
+                    messages: [makeMessage()]
+                }
+            }
+        ];
+        for( const route of routes ) {
+            await assert.rejects(
+                imaBLS.handleSkaleImaVerifyAndSign( route ),
+                /route does not match the locally configured chains/ );
+        }
+        assert.equal( queryCount, 0 );
+    } );
+
+    it( "allows a remote S2S source through local destination route validation", async function() {
+        await assert.rejects(
+            imaBLS.handleSkaleImaVerifyAndSign( {
+                params: {
+                    direction: "S2S",
+                    startMessageIdx: messageIndex,
+                    srcChainName: "source-schain",
+                    dstChainName: imaState.chainProperties.sc.strChainName,
+                    srcChainID: "123456",
+                    dstChainID: imaState.chainProperties.sc.chainId.toString(),
+                    messages: [makeMessage()]
+                }
+            } ),
+            /no S-Chains in SKALE NETWORK observer cached yet/ );
+        assert.equal( queryCount, 0 );
+    } );
+
+    it( "rejects an S2S source ID that disagrees with observer metadata", async function() {
+        const cacheDirectory = fs.mkdtempSync( path.join( os.tmpdir(), "ima-s2s-cache-" ) );
+        const cachePath = path.join( cacheDirectory, "schains.json" );
+        fs.writeFileSync( cachePath, JSON.stringify( {
+            updatedAt: Date.now(),
+            schains: [{
+                name: "source-schain",
+                chainId: 123456,
+                nodes: [{ endpoints: { ip: { http: "http://127.0.0.1:8545" } } }]
+            }]
+        } ) );
+        const previousNetworkBrowserPath = imaState.optsS2S.strNetworkBrowserPath;
+        imaState.optsS2S.strNetworkBrowserPath = cachePath;
+        try {
+            await assert.rejects(
+                imaBLS.handleSkaleImaVerifyAndSign( {
+                    params: {
+                        direction: "S2S",
+                        startMessageIdx: messageIndex,
+                        srcChainName: "source-schain",
+                        dstChainName: imaState.chainProperties.sc.strChainName,
+                        srcChainID: "654321",
+                        dstChainID: imaState.chainProperties.sc.chainId.toString(),
+                        messages: [makeMessage()]
+                    }
+                } ),
+                /source ID does not match the discovered source chain/ );
+            assert.equal( queryCount, 0 );
+        } finally {
+            imaState.optsS2S.strNetworkBrowserPath = previousNetworkBrowserPath;
+            fs.rmSync( cacheDirectory, { recursive: true, force: true } );
+        }
+    } );
+
+    it( "rejects malformed signing batch metadata before message validation", async function() {
+        const validParams = {
+            direction: "M2S",
+            startMessageIdx: messageIndex,
+            srcChainName: imaState.chainProperties.mn.strChainName,
+            dstChainName: imaState.chainProperties.sc.strChainName,
+            srcChainID: imaState.chainProperties.mn.chainId.toString(),
+            dstChainID: imaState.chainProperties.sc.chainId.toString(),
+            messages: [makeMessage()]
+        };
+        const invalidRequests = [
+            { params: { ...validParams, messages: [] }, error: /empty IMA message batch/ },
+            { params: { ...validParams, startMessageIdx: -1 }, error: /starting IMA message index/ },
+            { params: { ...validParams, startMessageIdx: 1.5 }, error: /starting IMA message index/ },
+            { params: { ...validParams, direction: "M2M" }, error: /Unknown IMA message direction/ }
+        ];
+        for( const invalidRequest of invalidRequests ) {
+            await assert.rejects(
+                imaBLS.handleSkaleImaVerifyAndSign( { params: invalidRequest.params } ),
+                invalidRequest.error );
+        }
+        assert.equal( queryCount, 0 );
+    } );
+
+    it( "allows an oversized M2S batch to reach correctness validation", async function() {
+        const messages = new Array( imaState.nTransferBlockSizeM2S + 1 )
+            .fill( null ).map( function () { return makeMessage(); } );
+        await assert.rejects(
+            imaBLS.handleSkaleImaVerifyAndSign( {
+                params: {
+                    direction: "M2S",
+                    startMessageIdx: messageIndex,
+                    srcChainName: imaState.chainProperties.mn.strChainName,
+                    dstChainName: imaState.chainProperties.sc.strChainName,
+                    srcChainID: imaState.chainProperties.mn.chainId.toString(),
+                    dstChainID: imaState.chainProperties.sc.chainId.toString(),
+                    messages
+                }
+            } ),
+            /Correctness validation failed/ );
+        assert.equal( queryCount, 1 );
+    } );
+
+    it( "stops Mainnet queries after the first invalid M2S message", async function() {
+        const details = log.createMemoryStream();
+        try {
+            await assert.rejects(
+                imaBLS.checkCorrectnessOfMessagesToSign(
+                    details, "", "M2S", [makeMessage(), makeMessage()], messageIndex ),
+                /Correctness validation failed/ );
+            assert.equal( queryCount, 1 );
+        } finally {
+            details.close();
+        }
+    } );
 } );

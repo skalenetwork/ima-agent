@@ -3,11 +3,22 @@ name: Comprehensive test
 
 on: 
   push:
-    branches-ignore:
-      - 'docs-v*'
+    branches:
+      - develop
+      - beta
+      - stable
+      - '*.*.*'
   pull_request:
     branches-ignore:
       - 'docs-v*'
+
+env:
+  SKALE_MANAGER_TAG: "1.12.0-develop.30"
+  # TEMPORARY: IMA 2.3.0-stable.0 uses pkg_resources, which is unavailable
+  # with current setuptools on Python 3.12. Remove these overrides once the
+  # stable IMA release used by this repository includes commit 904a9db1.
+  IMA_PYTHON312_WORKAROUND_BRANCH: "workaround/python312-pkg-resources"
+  IMA_PYTHON312_WORKAROUND_COMMIT: "904a9db1c790a346dc821b1d94ce474e8d2234ac"
   
 jobs:
   cancel-runs:
@@ -60,6 +71,14 @@ jobs:
     - uses: actions/checkout@v5
       with:
           submodules: recursive
+
+    - name: INIT - Apply temporary Python 3.12 IMA workaround
+      run: |
+        git -C IMA fetch --depth=1 origin \
+          "refs/heads/${IMA_PYTHON312_WORKAROUND_BRANCH}"
+        test "$(git -C IMA rev-parse FETCH_HEAD)" = \
+          "$IMA_PYTHON312_WORKAROUND_COMMIT"
+        git -C IMA checkout --detach "$IMA_PYTHON312_WORKAROUND_COMMIT"
 
     - uses: oven-sh/setup-bun@v2
 
@@ -176,7 +195,7 @@ jobs:
 
     - name: INIT - install Node JS
       run: |
-        curl -sL https://deb.nodesource.com/setup_18.x | sudo bash -
+        curl -sL https://deb.nodesource.com/setup_22.x | sudo bash -
         sudo apt-get install -y nodejs
         sudo ln -s /usr/bin/node /usr/local/bin/node || true
         
@@ -210,7 +229,8 @@ jobs:
       run: |
         export IMA_AGENT_ROOT_DIR=$(pwd)
         echo IMA_AGENT_ROOT_DIR = $IMA_AGENT_ROOT_DIR
-        git clone https://github.com/skalenetwork/comprehensive-test.git --recursive
+        git clone --branch main --single-branch \
+          https://github.com/skalenetwork/comprehensive-test.git --recursive
 
     - name: INIT - install Ethereum Main Net emulation
       working-directory: ${{env.working-directory}}
@@ -230,10 +250,10 @@ jobs:
         ./run.sh &> ../local_mainnet_output_log.txt &
         cd ../..
 
-    - name: INIT - Install PYTHON
-      uses: actions/setup-python@v2
+    - name: INIT - Install Python
+      uses: actions/setup-python@v5
       with:
-        python-version: 3.8
+        python-version: '3.12'
 
     - name: INIT - Install everything in IMA
       working-directory: ${{env.working-directory}}
@@ -292,7 +312,7 @@ jobs:
       working-directory: ${{env.working-directory}}
       run: |
         cd comprehensive-test
-        git clone https://github.com/skalenetwork/skale-manager.git --recursive
+        git clone --branch "$SKALE_MANAGER_TAG" --single-branch https://github.com/skalenetwork/skale-manager.git --recursive
         cd ..
 
     - name: INIT - install Skale Manager dependencies
@@ -366,21 +386,24 @@ jobs:
         cd comprehensive-test
         cd sgxwallet/run_sgx_sim
         docker compose up &> ../../local_sgxwallet_output_log.txt &
-        sleep 90
         cd ../..
         cd ..
 
-    - name: INIT - check SGX Wallet has listening ports
+    - name: INIT - wait for SGX Wallet listening ports
       working-directory: ${{env.working-directory}}
       run: |
-        echo "sleeping 45 seconds..."
-        sleep 45
-        echo "checking port 1026 commonly used by SGX Wallet for HTTPS..."
-        sudo netstat -tulpn | grep 1026
-        echo "...Done"
-        echo "checking port 1027 commonly used by SGX Wallet for HTTP..."
-        sudo netstat -tulpn | grep 1027
-        echo "...Done"
+        deadline=$((SECONDS + 300))
+        until netstat -ltn | awk '$4 ~ /:1026$/ { found = 1 } END { exit !found }' && \
+              netstat -ltn | awk '$4 ~ /:1027$/ { found = 1 } END { exit !found }'; do
+          if (( SECONDS >= deadline )); then
+            echo "SGX Wallet did not open ports 1026 and 1027 within 300 seconds"
+            docker compose -f comprehensive-test/sgxwallet/run_sgx_sim/docker-compose.yml ps || true
+            tail -n 200 comprehensive-test/local_sgxwallet_output_log.txt || true
+            exit 1
+          fi
+          sleep 5
+        done
+        echo "SGX Wallet is listening on ports 1026 and 1027"
 
     - name: INIT - download transaction manager
       working-directory: ${{env.working-directory}}

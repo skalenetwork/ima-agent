@@ -12,7 +12,7 @@ RUN apt-get install --no-install-recommends -y unzip curl wget
 # NOTICE: to remove extra dep above: sudo rm /etc/apt/sources.list.d/focal-security.list
 
 RUN wget https://www.openssl.org/source/old/1.1.0/openssl-1.1.0l.tar.gz
-RUN tar xfz openssl-1.1.0l.tar.gz 
+RUN tar xfz openssl-1.1.0l.tar.gz
 RUN cd openssl-1.1.0l && ./config && make && make install && cd ..
 RUN ldconfig
 
@@ -44,11 +44,7 @@ COPY package.json package.json
 COPY runner runner
 COPY src src
 COPY src/pow src/build/pow
-RUN mkdir IMA
-COPY IMA/proxy IMA/proxy
-COPY IMA/package.json IMA/package.json
-COPY IMA/postinstall.sh IMA/postinstall.sh
-COPY IMA/VERSION IMA/VERSION
+COPY IMA IMA
 COPY package.json package.json
 COPY VERSION VERSION
 

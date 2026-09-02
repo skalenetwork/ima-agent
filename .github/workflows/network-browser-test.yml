@@ -2,7 +2,7 @@ name: network-browser test
 on: [push]
 env:
   ETH_PRIVATE_KEY: ${{ secrets.ETH_PRIVATE_KEY }}
-  MANAGER_TAG: "1.9.3-beta.0"
+  MANAGER_TAG: "1.13.1-stable.0"
 jobs:
   test_network_browser:
     runs-on: ubuntu-22.04
@@ -16,7 +16,7 @@ jobs:
         run: docker compose up -d
       - name: Deploy manager contracts
         run: |
-          bash ./helper-scripts/deploy_test_manager.sh
+          bash ./helper-scripts/deploy_manager.sh
           docker rmi -f skalenetwork/skale-manager:${{ env.MANAGER_TAG }}
 
       - name: Install network-browser dependencies
