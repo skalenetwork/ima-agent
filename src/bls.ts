@@ -847,8 +847,6 @@ async function checkM2SMessageEventFinality(
     bnLatestBlockNumber: owaspUtils.ethersMod.ethers.BigNumber | null,
     nBlockAwaitDepth: number, nBlockAge: number
 ): Promise < void > {
-    if( nBlockAwaitDepth == 0 && nBlockAge == 0 )
-        return;
     if( nBlockAwaitDepth > 0 ) {
         if( !bnLatestBlockNumber )
             throw new Error( "No Mainnet head available for M2S event finality validation" );
@@ -2313,21 +2311,35 @@ function validateVerifyAndSignRequestRoute(
             `Unknown IMA message direction ${optsHandleVerifyAndSign.strDirection}` );
     }
 
-    // Bind the M2S source name because it is part of the signed hash and must identify Mainnet.
+    // Bind M2S to the configured Mainnet source and local S-Chain destination.
     if( optsHandleVerifyAndSign.strDirection == "M2S" &&
-        optsHandleVerifyAndSign.strFromChainName != mn.strChainName
+        ( optsHandleVerifyAndSign.strFromChainName != mn.strChainName ||
+            optsHandleVerifyAndSign.strFromChainID != mn.chainId.toString() ||
+            optsHandleVerifyAndSign.strToChainName != sc.strChainName ||
+            optsHandleVerifyAndSign.strToChainID != sc.chainId.toString() )
     ) {
         throw new Error(
             "IMA M2S signing request route does not match the locally configured chains" );
     }
 
-    // Bind the S2M source name because it is part of the signed hash and must identify
-    // this S-Chain.
+    // Bind S2M to the local S-Chain source and configured Mainnet destination.
     if( optsHandleVerifyAndSign.strDirection == "S2M" &&
-        optsHandleVerifyAndSign.strFromChainName != sc.strChainName
+        ( optsHandleVerifyAndSign.strFromChainName != sc.strChainName ||
+            optsHandleVerifyAndSign.strFromChainID != sc.chainId.toString() ||
+            optsHandleVerifyAndSign.strToChainName != mn.strChainName ||
+            optsHandleVerifyAndSign.strToChainID != mn.chainId.toString() )
     ) {
         throw new Error(
             "IMA S2M signing request route does not match the locally configured chains" );
+    }
+
+    // Bind S2S to the local S-Chain destination; its source is discovered dynamically.
+    if( optsHandleVerifyAndSign.strDirection == "S2S" &&
+        ( optsHandleVerifyAndSign.strToChainName != sc.strChainName ||
+            optsHandleVerifyAndSign.strToChainID != sc.chainId.toString() )
+    ) {
+        throw new Error(
+            "IMA S2S signing request route does not match the locally configured chains" );
     }
 }
 
@@ -2417,6 +2429,10 @@ async function prepareS2sOfSkaleImaVerifyAndSign(
         throw new Error( `Could not handle ${optsHandleVerifyAndSign.strDirection} ` +
             "skale_imaVerifyAndSign(2), failed to discover source chain access parameters, " +
             "try again later" );
+    }
+    if( optsHandleVerifyAndSign.strFromChainID != joSChainSrc.chainId.toString() ) {
+        throw new Error(
+            "IMA S2S signing request source ID does not match the discovered source chain" );
     }
     optsHandleVerifyAndSign.details.trace(
         "{p}{bright} verification algorithm discovered source chain URL is {url}, chain name " +

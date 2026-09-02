@@ -216,7 +216,8 @@ jobs:
       run: |
         export IMA_AGENT_ROOT_DIR=$(pwd)
         echo IMA_AGENT_ROOT_DIR = $IMA_AGENT_ROOT_DIR
-        git clone https://github.com/skalenetwork/comprehensive-test.git --recursive
+        git clone --branch fix/sgx-wallet-readiness --single-branch \
+          https://github.com/skalenetwork/comprehensive-test.git --recursive
 
     - name: INIT - install Ethereum Main Net emulation
       working-directory: ${{env.working-directory}}
@@ -236,10 +237,10 @@ jobs:
         ./run.sh &> ../local_mainnet_output_log.txt &
         cd ../..
 
-    - name: INIT - Install PYTHON
-      uses: actions/setup-python@v2
+    - name: INIT - Install Python
+      uses: actions/setup-python@v5
       with:
-        python-version: 3.8
+        python-version: '3.12'
 
     - name: INIT - Install everything in IMA
       working-directory: ${{env.working-directory}}

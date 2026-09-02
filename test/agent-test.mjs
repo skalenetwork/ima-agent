@@ -1418,6 +1418,7 @@ describe( "BLS message origin validation", function() {
             await imaBLS.checkCorrectnessOfMessagesToSign(
                 details, "", "M2S", [makeMessage()], messageIndex );
             assert.equal( queryCount, 1 );
+            assert.equal( getBlockCount, 1 );
         } finally {
             details.close();
         }
@@ -1489,7 +1490,6 @@ describe( "BLS message origin validation", function() {
     } );
 
     it( "rejects an M2S event removed by a Mainnet reorganization", async function() {
-        imaState.nBlockAwaitDepthM2S = 1;
         canonicalBlockHash = "0x" + "cd".repeat( 32 );
         events = [makeMainnetEvent()];
         const details = log.createMemoryStream();
@@ -1505,19 +1505,180 @@ describe( "BLS message origin validation", function() {
     } );
 
     it( "rejects request metadata that relabels an M2S signing request", async function() {
-        await assert.rejects(
-            imaBLS.handleSkaleImaVerifyAndSign( {
+        const validRoute = {
+            direction: "M2S",
+            startMessageIdx: messageIndex,
+            srcChainName: imaState.chainProperties.mn.strChainName,
+            dstChainName: imaState.chainProperties.sc.strChainName,
+            srcChainID: imaState.chainProperties.mn.chainId.toString(),
+            dstChainID: imaState.chainProperties.sc.chainId.toString(),
+            messages: [makeMessage()]
+        };
+        const invalidRoutes = [
+            { srcChainName: "other-mainnet" },
+            { srcChainID: "123456" },
+            { dstChainName: "other-schain" },
+            { dstChainID: "654321" }
+        ];
+        for( const invalidRoute of invalidRoutes ) {
+            await assert.rejects(
+                imaBLS.handleSkaleImaVerifyAndSign( {
+                    params: { ...validRoute, ...invalidRoute }
+                } ),
+                /route does not match the locally configured chains/ );
+        }
+        assert.equal( queryCount, 0 );
+    } );
+
+    it( "rejects any mismatched fixed endpoint in S2M and S2S routes", async function() {
+        const routes = [
+            {
                 params: {
                     direction: "S2M",
                     startMessageIdx: messageIndex,
-                    srcChainName: imaState.chainProperties.mn.strChainName,
+                    srcChainName: "other-schain",
+                    dstChainName: imaState.chainProperties.mn.strChainName,
+                    srcChainID: imaState.chainProperties.sc.chainId.toString(),
+                    dstChainID: imaState.chainProperties.mn.chainId.toString(),
+                    messages: [makeMessage()]
+                }
+            },
+            {
+                params: {
+                    direction: "S2M",
+                    startMessageIdx: messageIndex,
+                    srcChainName: imaState.chainProperties.sc.strChainName,
+                    dstChainName: imaState.chainProperties.mn.strChainName,
+                    srcChainID: "123456",
+                    dstChainID: imaState.chainProperties.mn.chainId.toString(),
+                    messages: [makeMessage()]
+                }
+            },
+            {
+                params: {
+                    direction: "S2M",
+                    startMessageIdx: messageIndex,
+                    srcChainName: imaState.chainProperties.sc.strChainName,
+                    dstChainName: "other-mainnet",
+                    srcChainID: imaState.chainProperties.sc.chainId.toString(),
+                    dstChainID: imaState.chainProperties.mn.chainId.toString(),
+                    messages: [makeMessage()]
+                }
+            },
+            {
+                params: {
+                    direction: "S2M",
+                    startMessageIdx: messageIndex,
+                    srcChainName: imaState.chainProperties.sc.strChainName,
+                    dstChainName: imaState.chainProperties.mn.strChainName,
+                    srcChainID: imaState.chainProperties.sc.chainId.toString(),
+                    dstChainID: "123456",
+                    messages: [makeMessage()]
+                }
+            },
+            {
+                params: {
+                    direction: "S2S",
+                    startMessageIdx: messageIndex,
+                    srcChainName: "source-schain",
+                    dstChainName: "other-schain",
+                    srcChainID: "123456",
+                    dstChainID: imaState.chainProperties.sc.chainId.toString(),
+                    messages: [makeMessage()]
+                }
+            },
+            {
+                params: {
+                    direction: "S2S",
+                    startMessageIdx: messageIndex,
+                    srcChainName: "source-schain",
                     dstChainName: imaState.chainProperties.sc.strChainName,
-                    srcChainID: imaState.chainProperties.mn.chainId.toString(),
+                    srcChainID: "123456",
+                    dstChainID: "654321",
+                    messages: [makeMessage()]
+                }
+            }
+        ];
+        for( const route of routes ) {
+            await assert.rejects(
+                imaBLS.handleSkaleImaVerifyAndSign( route ),
+                /route does not match the locally configured chains/ );
+        }
+        assert.equal( queryCount, 0 );
+    } );
+
+    it( "allows a remote S2S source through local destination route validation", async function() {
+        await assert.rejects(
+            imaBLS.handleSkaleImaVerifyAndSign( {
+                params: {
+                    direction: "S2S",
+                    startMessageIdx: messageIndex,
+                    srcChainName: "source-schain",
+                    dstChainName: imaState.chainProperties.sc.strChainName,
+                    srcChainID: "123456",
                     dstChainID: imaState.chainProperties.sc.chainId.toString(),
                     messages: [makeMessage()]
                 }
             } ),
-            /route does not match the locally configured chains/ );
+            /no S-Chains in SKALE NETWORK observer cached yet/ );
+        assert.equal( queryCount, 0 );
+    } );
+
+    it( "rejects an S2S source ID that disagrees with observer metadata", async function() {
+        const cacheDirectory = fs.mkdtempSync( path.join( os.tmpdir(), "ima-s2s-cache-" ) );
+        const cachePath = path.join( cacheDirectory, "schains.json" );
+        fs.writeFileSync( cachePath, JSON.stringify( {
+            updatedAt: Date.now(),
+            schains: [{
+                name: "source-schain",
+                chainId: 123456,
+                nodes: [{ endpoints: { ip: { http: "http://127.0.0.1:8545" } } }]
+            }]
+        } ) );
+        const previousNetworkBrowserPath = imaState.optsS2S.strNetworkBrowserPath;
+        imaState.optsS2S.strNetworkBrowserPath = cachePath;
+        try {
+            await assert.rejects(
+                imaBLS.handleSkaleImaVerifyAndSign( {
+                    params: {
+                        direction: "S2S",
+                        startMessageIdx: messageIndex,
+                        srcChainName: "source-schain",
+                        dstChainName: imaState.chainProperties.sc.strChainName,
+                        srcChainID: "654321",
+                        dstChainID: imaState.chainProperties.sc.chainId.toString(),
+                        messages: [makeMessage()]
+                    }
+                } ),
+                /source ID does not match the discovered source chain/ );
+            assert.equal( queryCount, 0 );
+        } finally {
+            imaState.optsS2S.strNetworkBrowserPath = previousNetworkBrowserPath;
+            fs.rmSync( cacheDirectory, { recursive: true, force: true } );
+        }
+    } );
+
+    it( "rejects malformed signing batch metadata before message validation", async function() {
+        const validParams = {
+            direction: "M2S",
+            startMessageIdx: messageIndex,
+            srcChainName: imaState.chainProperties.mn.strChainName,
+            dstChainName: imaState.chainProperties.sc.strChainName,
+            srcChainID: imaState.chainProperties.mn.chainId.toString(),
+            dstChainID: imaState.chainProperties.sc.chainId.toString(),
+            messages: [makeMessage()]
+        };
+        const invalidRequests = [
+            { params: { ...validParams, messages: [] }, error: /empty IMA message batch/ },
+            { params: { ...validParams, startMessageIdx: -1 }, error: /starting IMA message index/ },
+            { params: { ...validParams, startMessageIdx: 1.5 }, error: /starting IMA message index/ },
+            { params: { ...validParams, direction: "M2M" }, error: /Unknown IMA message direction/ }
+        ];
+        for( const invalidRequest of invalidRequests ) {
+            await assert.rejects(
+                imaBLS.handleSkaleImaVerifyAndSign( { params: invalidRequest.params } ),
+                invalidRequest.error );
+        }
         assert.equal( queryCount, 0 );
     } );
 
