@@ -229,7 +229,7 @@ jobs:
       run: |
         export IMA_AGENT_ROOT_DIR=$(pwd)
         echo IMA_AGENT_ROOT_DIR = $IMA_AGENT_ROOT_DIR
-        git clone --branch fix/sgx-wallet-readiness --single-branch \
+        git clone --branch main --single-branch \
           https://github.com/skalenetwork/comprehensive-test.git --recursive
 
     - name: INIT - install Ethereum Main Net emulation
