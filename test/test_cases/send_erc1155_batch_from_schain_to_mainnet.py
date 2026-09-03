@@ -44,12 +44,12 @@ class SendERC1155BatchToMainnet(TestCase):
         # mint
         address = self.blockchain.key_to_address(self.config.mainnet_key)
         mint_txn = self.erc1155.functions.mintBatch(address, self.token_ids, self.token_amounts, "0x")\
-            .buildTransaction({
+            .build_transaction({
                 'gas': 8000000,
                 'nonce': self.blockchain.get_transactions_count_on_mainnet(address)})
         signed_txn = self.blockchain.web3_mainnet.eth.account\
-            .signTransaction(mint_txn, private_key=self.config.mainnet_key)
-        self.blockchain.web3_mainnet.eth.sendRawTransaction(signed_txn.rawTransaction)
+            .sign_transaction(mint_txn, private_key=self.config.mainnet_key)
+        self.blockchain.web3_mainnet.eth.send_raw_transaction(signed_txn.raw_transaction)
         self.blockchain.disableWhitelistERC1155(self.config.mainnet_key, self.config.schain_name)
         self.blockchain.enableAutomaticDeployERC1155(self.config.schain_key, "Mainnet")
         # send to schain

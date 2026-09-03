@@ -471,6 +471,15 @@ export function removeStarting0x( s?: any ): string {
     return s;
 }
 
+export function areSameBytes( valueA: any, valueB: any ): boolean {
+    try {
+        return ethersMod.ethers.utils.hexlify( valueA ).toLowerCase() ==
+            ethersMod.ethers.utils.hexlify( valueB ).toLowerCase();
+    } catch ( err ) {
+        return false;
+    }
+}
+
 export function inetNtoA( n: number ): string {
     const a = ( ( n >> 24 ) & 0xFF ) >>> 0;
     const b = ( ( n >> 16 ) & 0xFF ) >>> 0;

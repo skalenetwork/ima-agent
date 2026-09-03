@@ -21,7 +21,7 @@
 class Config:
     src_root = '.'
     agent_src = 'src'
-    proxy_root = 'IMA/proxy'
+    proxy_root = 'IMA'
     test_root = 'test'
     test_working_dir = 'working'
     test_resource_dir = 'resources'
