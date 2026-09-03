@@ -1236,7 +1236,9 @@ export async function doAllS2S( // s-chain --> s-chain
                         chainIdDst,
                         joAccountSrc,
                         joAccountDst,
-                        ethersProviderSrc,
+                        // a local S2S transfer already holds a trusted source provider; the
+                        // node quorum only applies to the skale_imaVerifyAndSign RPC path
+                        ethersProviderSrc: [ ethersProviderSrc ],
                         ethersProviderDst
                     };
                     joRuntimeOpts.idxChainKnownForS2S = idxSChain;

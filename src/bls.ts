@@ -175,6 +175,66 @@ const anyShellMod: any = shellMod as any;
 const shell = anyShellMod.default;
 
 const Keccak = sha3Module.Keccak;
+const nOutgoingMessageQueryTimeoutMilliseconds = 10_000;
+
+interface TOutgoingMessageQueryResult {
+    isValid: boolean
+    providerUrl: string
+    reason?: string
+}
+
+async function safeQueryOutgoingMessageData(
+    joMessageProxys: owaspUtils.ethersMod.ethers.Contract[],
+    outgoingMessageData: any,
+    options: any,
+    details: log.TLogger,
+    strLogPrefix: string,
+    strDirection: string
+): Promise<boolean> {
+    const results: TOutgoingMessageQueryResult[] = await Promise.all(
+        joMessageProxys.map( async joMessageProxy => {
+            const providerUrl = owaspUtils.ethersProviderToUrl(
+                joMessageProxy.provider as
+                    owaspUtils.ethersMod.ethers.providers.JsonRpcProvider );
+            try {
+                const isValid = await joMessageProxy
+                    .callStatic.verifyOutgoingMessageData( outgoingMessageData, options );
+                return { isValid: isValid === true, providerUrl };
+            } catch ( err ) {
+                return {
+                    isValid: false,
+                    providerUrl,
+                    reason: owaspUtils.extractErrorMessage( err )
+                };
+            }
+        } )
+    );
+
+    for( const result of results ) {
+        if( result.isValid ) {
+            details.trace(
+                "{p}{bright} Got verification call result {} from provider {url}, real " +
+                "message index is: {}", strLogPrefix, strDirection,
+                result.isValid, result.providerUrl, outgoingMessageData.msgCounter );
+        } else {
+            details.trace(
+                "{p}{bright} Got verification call result {} from provider {url}, real " +
+                "message index is: {}, failure reason is: {}",
+                strLogPrefix, strDirection, result.isValid, result.providerUrl,
+                outgoingMessageData.msgCounter, result.reason ?? "false on-chain" );
+        }
+    }
+
+    const nRequiredTrueResults = Math.floor( 2 * joMessageProxys.length / 3 ) + 1;
+    const nTrueResults = results.filter( result => result.isValid ).length;
+    const isValid = nTrueResults >= nRequiredTrueResults;
+    details.trace(
+        "{p}{bright} Got unified verification call result {}, real message index is: {}, " +
+        "true provider results are {} of {}, required {}",
+        strLogPrefix, strDirection, isValid, outgoingMessageData.msgCounter,
+        nTrueResults, joMessageProxys.length, nRequiredTrueResults );
+    return isValid;
+}
 
 function discoverBlsThreshold( joSChainNetworkInfo: discoveryTools.TSChainNetworkInfo ): number {
     const imaState: state.TIMAState = state.get();
@@ -1029,6 +1089,8 @@ export async function checkCorrectnessOfMessagesToSign(
 ): Promise < void > {
     const imaState: state.TIMAState = state.get();
     let joMessageProxy: owaspUtils.ethersMod.ethers.Contract | null = null;
+    let joMessageProxys: owaspUtils.ethersMod.ethers.Contract[] | null = null;
+    let proxyAddress: string | null = null;
     let joAccount: state.TAccount | null = null;
     let joChainName: string | null = null;
     if( strDirection == "M2S" ) {
@@ -1044,23 +1106,39 @@ export async function checkCorrectnessOfMessagesToSign(
         if( ( !joExtraSignOpts?.chainNameDst ) )
             throw new Error( "Missing destination chain name for BLS signing" );
         joChainName = joExtraSignOpts.chainNameDst;
-        const ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider | null =
+        const ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider[] | null =
             ( joExtraSignOpts && "ethersProviderSrc" in joExtraSignOpts &&
             joExtraSignOpts.ethersProviderSrc )
                 ? joExtraSignOpts.ethersProviderSrc
                 : null;
-        if( !ethersProvider ) {
+        if( !ethersProvider || ethersProvider.length === 0 ) {
             throw new Error( "CRITICAL ERROR: No provider specified in extra signing options " +
                 `for checking messages of direction ${strDirection}` );
         }
-        joMessageProxy = new owaspUtils.ethersMod.ethers.Contract(
-            imaState.chainProperties.sc.joAbiIMA.message_proxy_chain_address,
-            imaState.chainProperties.sc.joAbiIMA.message_proxy_chain_abi,
-            ethersProvider );
+        joMessageProxys = ethersProvider.map( provider => {
+            const timeoutProvider =
+                new owaspUtils.ethersMod.ethers.providers.JsonRpcProvider(
+                    {
+                        ...provider.connection,
+                        timeout: nOutgoingMessageQueryTimeoutMilliseconds
+                    },
+                    provider.network
+                );
+            return new owaspUtils.ethersMod.ethers.Contract(
+                imaState.chainProperties.sc.joAbiIMA.message_proxy_chain_address,
+                imaState.chainProperties.sc.joAbiIMA.message_proxy_chain_abi,
+                timeoutProvider
+            );
+        } );
     } else {
         throw new Error( "CRITICAL ERROR: Failed checkCorrectnessOfMessagesToSign() with " +
             `unknown direction ${strDirection}` );
     }
+
+    if( joMessageProxy )
+        proxyAddress = joMessageProxy.address;
+    else
+        proxyAddress = imaState.chainProperties.sc.joAbiIMA.message_proxy_chain_address;
 
     const strCallerAccountAddress = joAccount.address();
     details.debug(
@@ -1069,7 +1147,7 @@ export async function checkCorrectnessOfMessagesToSign(
         "count is {}, message(s) to process are {}, first real message index is {}, messages " +
         "will be sent to chain name {}",
         strLogPrefix, strDirection, "verifyOutgoingMessageData",
-        joMessageProxy ? joMessageProxy.address : "<NullContract>",
+        proxyAddress ?? "<NullContract>",
         strCallerAccountAddress, jarrMessages.length, jarrMessages,
         nIdxCurrentMsgBlockStart, joChainName );
     let isBatchValidationFailed = false;
@@ -1106,14 +1184,26 @@ export async function checkCorrectnessOfMessagesToSign(
                     dstContract: joMessage.destinationContract,
                     data: joMessage.data
                 };
-                if( !joMessageProxy )
-                    throw new Error( "No message proxy available" );
-                const isValidMessage = await joMessageProxy.callStatic.verifyOutgoingMessageData(
-                    outgoingMessageData, { from: strCallerAccountAddress } );
-                details.trace(
-                    "{p}{bright} Got verification call result {}, real message index is: {}, " +
-                    "saved msgCounter is: {}", strLogPrefix, strDirection,
-                    isValidMessage, +idxMessage, outgoingMessageData.msgCounter );
+                let isValidMessage = false;
+                if( strDirection == "S2M" ) {
+                    if( !joMessageProxy )
+                        throw new Error( "No message proxy available" );
+
+                    isValidMessage = await joMessageProxy.callStatic.verifyOutgoingMessageData(
+                        outgoingMessageData, { from: strCallerAccountAddress } );
+                    details.trace(
+                        "{p}{bright} Got verification call result {}, real message index is: {}, " +
+                        "saved msgCounter is: {}", strLogPrefix, strDirection,
+                        isValidMessage, +idxMessage, outgoingMessageData.msgCounter );
+                } else {
+                    if( !joMessageProxys )
+                        throw new Error( "No S2S message proxies available" );
+                    isValidMessage = await safeQueryOutgoingMessageData(
+                        joMessageProxys, outgoingMessageData, { from: strCallerAccountAddress },
+                        details, strLogPrefix, strDirection
+                    );
+                }
+
                 if( !isValidMessage ) {
                     throw new Error( "Bad message detected, " +
                         `message is: ${JSON.stringify( joMessage )}` );
@@ -2416,16 +2506,14 @@ async function prepareS2sOfSkaleImaVerifyAndSign(
             "try again later" );
     }
 
-    let joSChainSrc: any = null; let strUrlSrcSChain: string | null = null;
-    for( let idxSChain = 0; idxSChain < arrSChainsCached.length; ++idxSChain ) {
-        const joSChain = arrSChainsCached[idxSChain];
-        if( joSChain.name.toString() == strSChainNameSrc.toString() ) {
-            joSChainSrc = joSChain;
-            strUrlSrcSChain = skaleObserver.pickRandomSChainUrl( joSChain );
-            break;
-        }
-    }
-    if( joSChainSrc == null || strUrlSrcSChain == null || strUrlSrcSChain.length == 0 ) {
+    const joSChainSrc = arrSChainsCached.find(
+        joSChain => joSChain.name.toString() == strSChainNameSrc.toString()
+    ) ?? null;
+    const arrUrlsSrcSChain: string[] | null = joSChainSrc?.nodes.map(
+        joNode => joNode.endpoints.ip.http.toString()
+    ) ?? null;
+
+    if( joSChainSrc == null || arrUrlsSrcSChain == null || arrUrlsSrcSChain.length == 0 ) {
         throw new Error( `Could not handle ${optsHandleVerifyAndSign.strDirection} ` +
             "skale_imaVerifyAndSign(2), failed to discover source chain access parameters, " +
             "try again later" );
@@ -2435,12 +2523,13 @@ async function prepareS2sOfSkaleImaVerifyAndSign(
             "IMA S2S signing request source ID does not match the discovered source chain" );
     }
     optsHandleVerifyAndSign.details.trace(
-        "{p}{bright} verification algorithm discovered source chain URL is {url}, chain name " +
-        "is {}, chain id is {}", optsHandleVerifyAndSign.strLogPrefix,
-        optsHandleVerifyAndSign.strDirection, strUrlSrcSChain,
+        "{p}{bright} verification algorithm discovered {} source chain node URL(s) {}, " +
+        "chain name is {}, chain id is {}", optsHandleVerifyAndSign.strLogPrefix,
+        optsHandleVerifyAndSign.strDirection, arrUrlsSrcSChain.length, arrUrlsSrcSChain,
         joSChainSrc.name, joSChainSrc.chainId );
     optsHandleVerifyAndSign.joExtraSignOpts = {
-        ethersProviderSrc: owaspUtils.getEthersProviderFromURL( strUrlSrcSChain ),
+        ethersProviderSrc: arrUrlsSrcSChain.map(
+            url => owaspUtils.getEthersProviderFromURL( url ) ),
         chainNameSrc: optsHandleVerifyAndSign.strFromChainName,
         chainNameDst: optsHandleVerifyAndSign.strToChainName,
         chainIdSrc: optsHandleVerifyAndSign.strFromChainID,
