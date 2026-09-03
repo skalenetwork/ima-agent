@@ -892,15 +892,6 @@ function areSameAddresses( valueA: any, valueB: any ): boolean {
     }
 }
 
-function areSameBytes( valueA: any, valueB: any ): boolean {
-    try {
-        return owaspUtils.ethersMod.ethers.utils.hexlify( valueA ).toLowerCase() ==
-            owaspUtils.ethersMod.ethers.utils.hexlify( valueB ).toLowerCase();
-    } catch ( err ) {
-        return false;
-    }
-}
-
 async function checkM2SMessageEventFinality(
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     bnBlockNumber: owaspUtils.ethersMod.ethers.BigNumber, arrEvents: any[],
@@ -927,7 +918,7 @@ async function checkM2SMessageEventFinality(
         throw new Error( "M2S message event is no longer in the canonical Mainnet block" );
     for( let idxEvent = 0; idxEvent < arrEvents.length; ++idxEvent ) {
         if( !arrEvents[idxEvent]?.blockHash ||
-            !areSameBytes( joBlock.hash, arrEvents[idxEvent].blockHash )
+            !owaspUtils.areSameBytes( joBlock.hash, arrEvents[idxEvent].blockHash )
         )
             throw new Error( "M2S message event is no longer in the canonical Mainnet block" );
     }
@@ -1062,7 +1053,7 @@ async function checkM2SMessageEvents(
             if( !joMatchingEventInfo )
                 throw new Error( strNoMatchingEventError );
             if(
-                !areSameBytes(
+                !owaspUtils.areSameBytes(
                     joMatchingEventInfo.destinationChainHash,
                     strDestinationChainHash ) ||
                 !areSameAddresses(
@@ -1070,7 +1061,7 @@ async function checkM2SMessageEvents(
                 !areSameAddresses(
                     joMatchingEventInfo.destinationContract,
                     joMessageInfo.joMessage.destinationContract ) ||
-                !areSameBytes(
+                !owaspUtils.areSameBytes(
                     joMatchingEventInfo.messageData, joMessageInfo.joMessage.data )
             )
                 throw new Error( strNoMatchingEventError );

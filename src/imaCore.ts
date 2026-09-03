@@ -772,7 +772,8 @@ async function checkOutgoingMessageEventInOneNode(
             if( owaspUtils.ensureStartsWith0x( joMessage.sender ).toLowerCase() ==
                     owaspUtils.ensureStartsWith0x( eventValuesByName.srcContract ).toLowerCase() &&
                 owaspUtils.ensureStartsWith0x( joMessage.destinationContract ).toLowerCase() ==
-                    owaspUtils.ensureStartsWith0x( eventValuesByName.dstContract ).toLowerCase()
+                    owaspUtils.ensureStartsWith0x( eventValuesByName.dstContract ).toLowerCase() &&
+                owaspUtils.areSameBytes( joMessage.data, eventValuesByName.data )
             ) {
                 bEventIsFound = true;
                 break;
