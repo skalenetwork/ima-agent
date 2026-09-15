@@ -93,7 +93,7 @@ jobs:
 
     - name: INIT - install Node JS
       run: |
-        curl -sL https://deb.nodesource.com/setup_18.x | sudo bash -
+        curl -sL https://deb.nodesource.com/setup_22.x | sudo bash -
         sudo apt-get install -y nodejs
         sudo ln -s /usr/bin/node /usr/local/bin/node || true
 
@@ -203,7 +203,7 @@ jobs:
 
     - name: INIT - install Node JS
       run: |
-        curl -sL https://deb.nodesource.com/setup_18.x | sudo bash -
+        curl -sL https://deb.nodesource.com/setup_22.x | sudo bash -
         sudo apt-get install -y nodejs
         sudo ln -s /usr/bin/node /usr/local/bin/node || true
 

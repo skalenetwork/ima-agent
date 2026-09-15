@@ -19,7 +19,7 @@ RUN ldconfig
 RUN curl -fsSL https://bun.sh/install | BUN_INSTALL=/usr bash -s "bun-v1.0.16"
 RUN bun --version
 
-RUN curl -sL https://deb.nodesource.com/setup_18.x | bash
+RUN curl -sL https://deb.nodesource.com/setup_22.x | bash
 RUN apt-get install --no-install-recommends -y nodejs
 RUN npm install npm --global
 RUN npm install --global yarn
