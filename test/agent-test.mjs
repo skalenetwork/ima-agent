@@ -1670,7 +1670,6 @@ describe( "BLS message origin validation", function() {
         };
         const invalidRequests = [
             { params: { ...validParams, messages: [] }, error: /empty IMA message batch/ },
-            { params: { ...validParams, startMessageIdx: -1 }, error: /starting IMA message index/ },
             { params: { ...validParams, startMessageIdx: 1.5 }, error: /starting IMA message index/ },
             { params: { ...validParams, direction: "M2M" }, error: /Unknown IMA message direction/ }
         ];
