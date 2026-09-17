@@ -2292,9 +2292,7 @@ function validateVerifyAndSignRequestRoute(
         throw new Error( "Cannot verify and sign an empty IMA message batch" );
 
     // Require a safe nonnegative index because it identifies the first message being signed.
-    if( !Number.isSafeInteger( optsHandleVerifyAndSign.nIdxCurrentMsgBlockStart ) ||
-        optsHandleVerifyAndSign.nIdxCurrentMsgBlockStart < 0
-    )
+    if( !Number.isSafeInteger( optsHandleVerifyAndSign.nIdxCurrentMsgBlockStart ) )
         throw new Error( "Invalid starting IMA message index" );
 
     // Require a supported direction because it selects the verification and hashing protocol.

@@ -470,13 +470,6 @@ jobs:
         node ./index.js
         cd ../..
 
-    - name: DIAGNOSTICS - SGX Wallet failure logs
-      if: failure()
-      run: |
-        docker compose -f comprehensive-test/sgxwallet/run_sgx_sim/docker-compose.yml ps --all || true
-        docker compose -f comprehensive-test/sgxwallet/run_sgx_sim/docker-compose.yml logs --no-color || true
-        tail -n 500 comprehensive-test/local_sgxwallet_output_log.txt || true
-
     - name: SHUTDOWN - stop SGX Wallet
       if: always()
       run: |
