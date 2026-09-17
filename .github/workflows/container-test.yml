@@ -1,7 +1,7 @@
 
 name: IMA container test
 
-on: 
+on:
   push:
     branches:
       - develop
@@ -14,7 +14,7 @@ on:
 
 env:
   SKALE_MANAGER_TAG: "1.12.0-develop.30"
-  
+
 jobs:
   cancel-runs:
     name: Cancel Previous Runs
@@ -185,7 +185,7 @@ jobs:
         curl -sL https://deb.nodesource.com/setup_22.x | sudo bash -
         sudo apt-get install -y nodejs
         sudo ln -s /usr/bin/node /usr/local/bin/node || true
-        
+
     - name: INIT - install Node utilities
       run: |
         sudo npm install --global npm
@@ -314,7 +314,7 @@ jobs:
       working-directory: ${{env.working-directory}}
       run: |
         cd comprehensive-test
-        cd engine 
+        cd engine
         yarn install
 
     - name: INIT - build IMA docker container
@@ -340,7 +340,7 @@ jobs:
         cd comprehensive-test
         git clone https://github.com/skalenetwork/sgxwallet.git --recursive
         cd sgxwallet
-        git checkout develop
+        git checkout 1.10.3
         git fetch
         git pull
         git branch
@@ -361,7 +361,7 @@ jobs:
         echo "version: '3'"                                 > docker-compose.yml
         echo 'services:'                                   >> docker-compose.yml
         echo '  sgxwallet:'                                >> docker-compose.yml
-        echo '    image: skalenetwork/sgxwallet_sim:1.83.0-develop.19'                          >> docker-compose.yml
+        echo '    image: skalenetwork/sgxwallet_sim:1.10.3'                          >> docker-compose.yml
         echo '    restart: unless-stopped'                 >> docker-compose.yml
         echo '    ports:'                                  >> docker-compose.yml
         echo '      - "1026:1026"'                         >> docker-compose.yml

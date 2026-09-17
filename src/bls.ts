@@ -890,10 +890,6 @@ async function checkM2SMessageEvents(
     ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider,
     joChainName: string, jarrMessages: any[], nIdxCurrentMsgBlockStart: number
 ): Promise < void > {
-    if( !ethersProvider )
-        throw new Error( "No Mainnet provider available for M2S event validation" );
-    if( !joMessageProxy )
-        throw new Error( "No Mainnet MessageProxy available for M2S event validation" );
     const strEventName = "OutgoingMessage";
     const strDestinationChainHash = owaspUtils.ethersMod.ethers.utils.id( joChainName );
     // Recheck finality at the signer boundary: RPC callers can bypass imaCore's transfer-side
@@ -1089,7 +1085,7 @@ export async function checkCorrectnessOfMessagesToSign(
                 "starting at {}, messages are: {}, error information: {err}, stack is:\n{stack}",
                 strLogPrefix, nIdxCurrentMsgBlockStart, jarrMessages, err, err );
         }
-    } else if( strDirection == "S2M" || strDirection == "S2S" ) {
+    } else {
         for( let i = 0; i < cnt; ++i ) {
             const joMessage = jarrMessages[i];
             const idxMessage = nIdxCurrentMsgBlockStart + i;
@@ -2296,8 +2292,7 @@ function validateVerifyAndSignRequestRoute(
         throw new Error( "Cannot verify and sign an empty IMA message batch" );
 
     // Require a safe nonnegative index because it identifies the first message being signed.
-    if( typeof optsHandleVerifyAndSign.nIdxCurrentMsgBlockStart !== "number" ||
-        !Number.isSafeInteger( optsHandleVerifyAndSign.nIdxCurrentMsgBlockStart ) ||
+    if( !Number.isSafeInteger( optsHandleVerifyAndSign.nIdxCurrentMsgBlockStart ) ||
         optsHandleVerifyAndSign.nIdxCurrentMsgBlockStart < 0
     )
         throw new Error( "Invalid starting IMA message index" );
