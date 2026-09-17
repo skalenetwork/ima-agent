@@ -443,7 +443,15 @@ jobs:
         node ./index.js
         cd ../..
 
+    - name: DIAGNOSTICS - SGX Wallet failure logs
+      if: failure()
+      run: |
+        docker compose -f comprehensive-test/sgxwallet/run_sgx_sim/docker-compose.yml ps --all || true
+        docker compose -f comprehensive-test/sgxwallet/run_sgx_sim/docker-compose.yml logs --no-color || true
+        tail -n 500 comprehensive-test/local_sgxwallet_output_log.txt || true
+
     - name: SHUTDOWN - stop SGX Wallet
+      if: always()
       run: |
         cd comprehensive-test
         cd sgxwallet/run_sgx_sim
@@ -452,11 +460,13 @@ jobs:
         cd ..
 
     - name: SHUTDOWN - stop transaction manager and redis
+      if: always()
       run: |
         docker stop $TM_CONTAINER_ID $REDIS_CONTAINER_ID || true
         docker rm $TM_CONTAINER_ID $REDIS_CONTAINER_ID || true
 
     - name: SHUTDOWN - zombie cleanup, if any
+      if: always()
       run: |
         killall -9 skaled node npx python python3 || true
         pkill -9 -f skaled || true
