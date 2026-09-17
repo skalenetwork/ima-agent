@@ -14,6 +14,8 @@ on:
 
 env:
   SKALE_MANAGER_TAG: "1.12.0-develop.30"
+  SGX_WALLET_TAG: "1.10.3"
+  SGX_WALLET_IMAGE_TAG: "1.10.3-stable.0"
 
 jobs:
   cancel-runs:
@@ -321,14 +323,8 @@ jobs:
       working-directory: ${{env.working-directory}}
       run: |
         cd comprehensive-test
-        git clone https://github.com/skalenetwork/sgxwallet.git --recursive
-        cd sgxwallet
-        git checkout 1.10.3
-        git fetch
-        git pull
-        git branch
-        git status
-        cd ..
+        git clone --branch "$SGX_WALLET_TAG" --single-branch \
+          https://github.com/skalenetwork/sgxwallet.git --recursive
         cd ..
 
     - name: INIT - update docker image SGX Wallet in the emulation mode
@@ -341,10 +337,9 @@ jobs:
         docker compose down
         echo " --------------------------- fixing sgx wallets docker config ----------------------------------------------------------------------------------------- "
         mv docker-compose.yml docker-compose.yml.old-previous || true
-        echo "version: '3'"                                 > docker-compose.yml
-        echo 'services:'                                   >> docker-compose.yml
+        echo 'services:'                                    > docker-compose.yml
         echo '  sgxwallet:'                                >> docker-compose.yml
-        echo '    image: skalenetwork/sgxwallet_sim:1.10.3'                          >> docker-compose.yml
+        echo "    image: skalenetwork/sgxwallet_sim:${SGX_WALLET_IMAGE_TAG}"        >> docker-compose.yml
         echo '    restart: unless-stopped'                 >> docker-compose.yml
         echo '    ports:'                                  >> docker-compose.yml
         echo '      - "1026:1026"'                         >> docker-compose.yml
