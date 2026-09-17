@@ -20,6 +20,7 @@
 
 from tools.utils import execute
 from os import chdir
+import json
 
 class Deployer:
     def __init__(self, config):
@@ -29,12 +30,14 @@ class Deployer:
         chdir(self.config.proxy_root)
         self._prepare_env_file()
         execute('yarn deploy-skale-manager-components')
+        self._append_skale_manager_address()
         execute('yarn deploy-to-both-chains')
 
     def deploy_mainnet(self):
         chdir(self.config.proxy_root)
         self._prepare_env_file()
         execute('yarn deploy-skale-manager-components')
+        self._append_skale_manager_address()
         execute('yarn deploy-to-mainnet')
 
     def deploy_schain(self, schain_name):
@@ -62,4 +65,11 @@ class Deployer:
 
         with open('.env', 'w') as dot_env:
             dot_env.write('\n'.join(env_file))
+
+    def _append_skale_manager_address(self):
+        with open('data/skaleManagerComponents.json') as skale_manager_file:
+            skale_manager = json.load(skale_manager_file)
+
+        with open('.env', 'a') as dot_env:
+            dot_env.write(f'\nSKALE_MANAGER_ADDRESS="{skale_manager["skale_manager_address"]}"')
 

@@ -40,7 +40,7 @@ jobs:
 
     - name: INIT - install Node JS
       run: |
-        curl -sL https://deb.nodesource.com/setup_18.x | sudo bash -
+        curl -sL https://deb.nodesource.com/setup_22.x | sudo bash -
         sudo apt-get install -y nodejs
         sudo ln -s /usr/bin/node /usr/local/bin/node || true
         
@@ -64,10 +64,10 @@ jobs:
         which node-gyp
         node-gyp --version
 
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v2
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
       with:
-        python-version: 3.8
+        python-version: '3.12'
 
     - name: Ensure deps are latest and build everything
       run: |
