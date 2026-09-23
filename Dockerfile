@@ -3,36 +3,33 @@ FROM ubuntu:jammy
 RUN apt-get update
 RUN apt-get install --no-install-recommends -yq software-properties-common
 RUN apt-get update
-RUN apt-get install --no-install-recommends -y build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev wget curl sudo git
+RUN apt-get install --no-install-recommends -y build-essential python3 python3-dev zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev wget curl unzip sudo git
 
-# NOTICE: we need to install SSL 1.1 manually here in order to make BLS command line tools working
-RUN echo "deb http://security.ubuntu.com/ubuntu focal-security main" | tee /etc/apt/sources.list.d/focal-security.list
-RUN apt-get update
-RUN apt-get install --no-install-recommends -y unzip curl wget
-# NOTICE: to remove extra dep above: sudo rm /etc/apt/sources.list.d/focal-security.list
-
-RUN wget https://www.openssl.org/source/old/1.1.0/openssl-1.1.0l.tar.gz
-RUN tar xfz openssl-1.1.0l.tar.gz 
-RUN cd openssl-1.1.0l && ./config && make && make install && cd ..
-RUN ldconfig
+# libBLS release binaries require the OpenSSL 1.1.1 symbol version. Ubuntu
+# Jammy only provides OpenSSL 3, so install the final OpenSSL 1.1.1 release as
+# a compatibility library.
+ARG OPENSSL_1_1_VERSION=1.1.1w
+RUN wget "https://www.openssl.org/source/old/1.1.1/openssl-${OPENSSL_1_1_VERSION}.tar.gz" \
+    && tar xfz "openssl-${OPENSSL_1_1_VERSION}.tar.gz" \
+    && cd "openssl-${OPENSSL_1_1_VERSION}" \
+    && ./config shared \
+    && make -j"$(nproc)" \
+    && make install_sw \
+    && cd .. \
+    && rm -rf "openssl-${OPENSSL_1_1_VERSION}" \
+        "openssl-${OPENSSL_1_1_VERSION}.tar.gz" \
+    && ldconfig
 
 RUN curl -fsSL https://bun.sh/install | BUN_INSTALL=/usr bash -s "bun-v1.0.16"
 RUN bun --version
 
-RUN curl -sL https://deb.nodesource.com/setup_18.x | bash
+RUN curl -sL https://deb.nodesource.com/setup_22.x | bash
 RUN apt-get install --no-install-recommends -y nodejs
 RUN npm install npm --global
 RUN npm install --global yarn
 RUN npm --version
 RUN yarn --version
 
-RUN curl -O https://www.python.org/ftp/python/3.7.3/Python-3.7.3.tar.xz
-RUN tar -xf Python-3.7.3.tar.xz
-RUN cd Python-3.7.3; ./configure --enable-optimizations; make -j 4 build_all; make altinstall; cd ..
-RUN python3.7 --version
-RUN which python3.7
-RUN rm -f /usr/bin/python3
-RUN ln -s /usr/local/bin/python3.7 /usr/bin/python3
 RUN python3 --version
 RUN which python3
 
@@ -44,11 +41,7 @@ COPY package.json package.json
 COPY runner runner
 COPY src src
 COPY src/pow src/build/pow
-RUN mkdir IMA
-COPY IMA/proxy IMA/proxy
-COPY IMA/package.json IMA/package.json
-COPY IMA/postinstall.sh IMA/postinstall.sh
-COPY IMA/VERSION IMA/VERSION
+COPY IMA IMA
 COPY package.json package.json
 COPY VERSION VERSION
 
@@ -61,6 +54,12 @@ COPY scripts/bls_binaries /ima/bls_binaries
 RUN chmod +x /ima/bls_binaries/bls_glue
 RUN chmod +x /ima/bls_binaries/hash_g1
 RUN chmod +x /ima/bls_binaries/verify_bls
+
+# Fail the build if a BLS binary has a missing library or symbol version.
+RUN for bin in bls_glue hash_g1 verify_bls; do \
+        ldd "/ima/bls_binaries/$bin" 2>&1 | tee /dev/stderr | grep -q "not found" \
+            && { echo "Unresolved dependency in $bin" >&2; exit 1; }; \
+    done; true
 
 RUN npm install -g node-gyp
 RUN which node-gyp
