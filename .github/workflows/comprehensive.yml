@@ -1,18 +1,26 @@
 
 name: Comprehensive test
 
-on: 
+on:
   push:
-    branches-ignore:
-      - 'docs-v*'
+    branches:
+      - develop
+      - beta
+      - stable
+      - '*.*.*'
   pull_request:
     branches-ignore:
       - 'docs-v*'
-  
+
+env:
+  SKALE_MANAGER_TAG: "1.13.1-stable.0"
+  SGX_WALLET_TAG: "1.10.3"
+  SGX_WALLET_IMAGE_TAG: "1.10.3-stable.0"
+
 jobs:
   cancel-runs:
     name: Cancel Previous Runs
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Cancel Previous Runs
         uses: styfle/cancel-workflow-action@0.9.1
@@ -20,15 +28,48 @@ jobs:
           access_token: ${{ github.token }}
   test-comprehensive:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
 
-    - uses: actions/checkout@v2
+    - name: DEBUG - Check disk space before cleanup
+      run: |
+        echo "============================================"
+        echo "Disk space BEFORE cleanup:"
+        echo "============================================"
+        df -h
+        echo "============================================"
+        echo "Disk usage summary:"
+        df -h / | awk 'NR==2 {print "Total: "$2", Used: "$3", Available: "$4", Use%: "$5}'
+        echo "============================================"
+
+    - name: Free Disk Space (Ubuntu)
+      uses: jlumbroso/free-disk-space@v1.3.1
+      with:
+        tool-cache: false
+        android: true
+        dotnet: true
+        haskell: true
+        large-packages: false
+        docker-images: false
+        swap-storage: false
+
+    - name: DEBUG - Check disk space after cleanup
+      run: |
+        echo "============================================"
+        echo "Disk space AFTER cleanup:"
+        echo "============================================"
+        df -h
+        echo "============================================"
+        echo "Disk usage summary:"
+        df -h / | awk 'NR==2 {print "Total: "$2", Used: "$3", Available: "$4", Use%: "$5}'
+        echo "============================================"
+
+    - uses: actions/checkout@v5
       with:
           submodules: recursive
 
-    - uses: oven-sh/setup-bun@v1
+    - uses: oven-sh/setup-bun@v2
 
     - name: INFO - github environment variable checks
       run: |
@@ -111,7 +152,7 @@ jobs:
         curl -fsSL https://get.docker.com -o install-docker.sh
         sudo sh install-docker.sh
         docker --version
-        docker-compose --version
+        docker compose --version
 
     - name: INIT - reconfigure docker and restart its daemon
       run: |
@@ -143,10 +184,10 @@ jobs:
 
     - name: INIT - install Node JS
       run: |
-        curl -sL https://deb.nodesource.com/setup_18.x | sudo bash -
+        curl -sL https://deb.nodesource.com/setup_22.x | sudo bash -
         sudo apt-get install -y nodejs
         sudo ln -s /usr/bin/node /usr/local/bin/node || true
-        
+
     - name: INIT - install Node utilities
       run: |
         sudo npm install --global npm
@@ -177,7 +218,8 @@ jobs:
       run: |
         export IMA_AGENT_ROOT_DIR=$(pwd)
         echo IMA_AGENT_ROOT_DIR = $IMA_AGENT_ROOT_DIR
-        git clone https://github.com/skalenetwork/comprehensive-test.git --recursive
+        git clone --branch main --single-branch \
+          https://github.com/skalenetwork/comprehensive-test.git --recursive
 
     - name: INIT - install Ethereum Main Net emulation
       working-directory: ${{env.working-directory}}
@@ -197,10 +239,10 @@ jobs:
         ./run.sh &> ../local_mainnet_output_log.txt &
         cd ../..
 
-    - name: INIT - Install PYTHON
-      uses: actions/setup-python@v2
+    - name: INIT - Install Python
+      uses: actions/setup-python@v5
       with:
-        python-version: 3.8
+        python-version: '3.12'
 
     - name: INIT - Install everything in IMA
       working-directory: ${{env.working-directory}}
@@ -259,7 +301,7 @@ jobs:
       working-directory: ${{env.working-directory}}
       run: |
         cd comprehensive-test
-        git clone https://github.com/skalenetwork/skale-manager.git --recursive
+        git clone --branch "$SKALE_MANAGER_TAG" --single-branch https://github.com/skalenetwork/skale-manager.git --recursive
         cd ..
 
     - name: INIT - install Skale Manager dependencies
@@ -274,21 +316,15 @@ jobs:
       working-directory: ${{env.working-directory}}
       run: |
         cd comprehensive-test
-        cd engine 
+        cd engine
         yarn install
 
     - name: INIT - download SGX Wallet
       working-directory: ${{env.working-directory}}
       run: |
         cd comprehensive-test
-        git clone https://github.com/skalenetwork/sgxwallet.git --recursive
-        cd sgxwallet
-        git checkout develop
-        git fetch
-        git pull
-        git branch
-        git status
-        cd ..
+        git clone --branch "$SGX_WALLET_TAG" --single-branch \
+          https://github.com/skalenetwork/sgxwallet.git --recursive
         cd ..
 
     - name: INIT - update docker image SGX Wallet in the emulation mode
@@ -298,13 +334,12 @@ jobs:
         cd sgxwallet/run_sgx_sim
         rm -rf ../../local_sgxwallet_output_log.txt &> /dev/null
         echo " --------------------------- stopping sgx wallet ------------------------------------------------------------------------------------------------------ "
-        docker-compose down
+        docker compose down
         echo " --------------------------- fixing sgx wallets docker config ----------------------------------------------------------------------------------------- "
         mv docker-compose.yml docker-compose.yml.old-previous || true
-        echo "version: '3'"                                 > docker-compose.yml
-        echo 'services:'                                   >> docker-compose.yml
+        echo 'services:'                                    > docker-compose.yml
         echo '  sgxwallet:'                                >> docker-compose.yml
-        echo '    image: skalenetwork/sgxwallet_sim:1.83.0-develop.19'                          >> docker-compose.yml
+        echo "    image: skalenetwork/sgxwallet_sim:${SGX_WALLET_IMAGE_TAG}"        >> docker-compose.yml
         echo '    restart: unless-stopped'                 >> docker-compose.yml
         echo '    ports:'                                  >> docker-compose.yml
         echo '      - "1026:1026"'                         >> docker-compose.yml
@@ -323,7 +358,7 @@ jobs:
         echo '        max-file: "4"'                       >> docker-compose.yml
         echo '    command: -s -y -V -d'                    >> docker-compose.yml
         echo " --------------------------- pulling sgx wallet ------------------------------------------------------------------------------------------------------- "
-        docker-compose pull
+        docker compose pull
         cd ../..
         cd ..
 
@@ -332,22 +367,25 @@ jobs:
       run: |
         cd comprehensive-test
         cd sgxwallet/run_sgx_sim
-        docker-compose up &> ../../local_sgxwallet_output_log.txt &
-        sleep 90
+        docker compose up &> ../../local_sgxwallet_output_log.txt &
         cd ../..
         cd ..
 
-    - name: INIT - check SGX Wallet has listening ports
+    - name: INIT - wait for SGX Wallet listening ports
       working-directory: ${{env.working-directory}}
       run: |
-        echo "sleeping 45 seconds..."
-        sleep 45
-        echo "checking port 1026 commonly used by SGX Wallet for HTTPS..."
-        sudo netstat -tulpn | grep 1026
-        echo "...Done"
-        echo "checking port 1027 commonly used by SGX Wallet for HTTP..."
-        sudo netstat -tulpn | grep 1027
-        echo "...Done"
+        deadline=$((SECONDS + 300))
+        until netstat -ltn | awk '$4 ~ /:1026$/ { found = 1 } END { exit !found }' && \
+              netstat -ltn | awk '$4 ~ /:1027$/ { found = 1 } END { exit !found }'; do
+          if (( SECONDS >= deadline )); then
+            echo "SGX Wallet did not open ports 1026 and 1027 within 300 seconds"
+            docker compose -f comprehensive-test/sgxwallet/run_sgx_sim/docker-compose.yml ps || true
+            tail -n 200 comprehensive-test/local_sgxwallet_output_log.txt || true
+            exit 1
+          fi
+          sleep 5
+        done
+        echo "SGX Wallet is listening on ports 1026 and 1027"
 
     - name: INIT - download transaction manager
       working-directory: ${{env.working-directory}}
@@ -406,19 +444,22 @@ jobs:
         cd ../..
 
     - name: SHUTDOWN - stop SGX Wallet
+      if: always()
       run: |
         cd comprehensive-test
         cd sgxwallet/run_sgx_sim
-        docker-compose down
+        docker compose down
         cd ../..
         cd ..
 
     - name: SHUTDOWN - stop transaction manager and redis
+      if: always()
       run: |
         docker stop $TM_CONTAINER_ID $REDIS_CONTAINER_ID || true
         docker rm $TM_CONTAINER_ID $REDIS_CONTAINER_ID || true
 
     - name: SHUTDOWN - zombie cleanup, if any
+      if: always()
       run: |
         killall -9 skaled node npx python python3 || true
         pkill -9 -f skaled || true
