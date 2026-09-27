@@ -602,8 +602,8 @@
                     "name": "message",
                     "components": [
                         {
-                            "type": "string",
-                            "name": "dstChain"
+                            "type": "bytes32",
+                            "name": "dstChainHash"
                         },
                         {
                             "type": "uint256",
