@@ -38,13 +38,13 @@ class SendERC721ToSchain(TestCase):
 
         address = self.blockchain.key_to_address(self.config.mainnet_key)
         mint_txn = self.erc721.functions.mint(address, self.tokenId)\
-            .buildTransaction({
+            .build_transaction({
                 'gas': 8000000,
                 'nonce': self.blockchain.get_transactions_count_on_mainnet(address)})
 
-        signed_txn = self.blockchain.web3_mainnet.eth.account.signTransaction(mint_txn,
+        signed_txn = self.blockchain.web3_mainnet.eth.account.sign_transaction(mint_txn,
                                                                               private_key=self.config.mainnet_key)
-        self.blockchain.web3_mainnet.eth.sendRawTransaction(signed_txn.rawTransaction)
+        self.blockchain.web3_mainnet.eth.send_raw_transaction(signed_txn.raw_transaction)
         self.blockchain.disableWhitelistERC721(self.config.mainnet_key, self.config.schain_name)
         self.blockchain.enableAutomaticDeployERC721(self.config.schain_key, "Mainnet")
 
