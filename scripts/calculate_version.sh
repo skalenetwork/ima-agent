@@ -18,13 +18,12 @@ fi
 
 if [[ $BRANCH == 'stable' ]]; then
     echo "$VERSION"
-    exit 1
+    exit 0
 fi
 
 git fetch --tags > /dev/null
 
 TAG=$BRANCH
-if [[ $BRANCH == v*.*.* ]]; then TAG='develop'; fi
 
 for (( NUMBER=0; ; NUMBER++ ))
 do

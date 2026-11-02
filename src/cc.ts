@@ -305,7 +305,7 @@ export function safeURL( arg?: any ): URL | null {
 }
 
 export function toIpv4Arr( s: string ): any[] | null {
-    // eslint-disable-next-line max-len
+    // eslint-disable-next-line @stylistic/max-len
     if( /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test( s ) ) {
         const arr = s.split( "." );
         if( ( !arr ) || arr.length !== 4 )
@@ -544,7 +544,7 @@ export function syntaxHighlightJSON( jo?: any, strKeyNamePrefix?: string ): stri
     strKeyNamePrefix = strKeyNamePrefix ?? "";
     jo = jo.replace( /&/g, "&amp;" ).replace( /</g, "&lt;" ).replace( />/g, "&gt;" );
     return jo.replace(
-    // eslint-disable-next-line max-len
+    // eslint-disable-next-line @stylistic/max-len
         /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g,
         function( match: any ): string {
             if( !gFlagIsEnabled )

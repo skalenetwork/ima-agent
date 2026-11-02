@@ -26,7 +26,12 @@ import mc from 'ethers-multicall-provider'
 import { type SkaleManagerAbi, type SChainImaAbi } from './interfaces'
 import { readJson } from './tools'
 
-import { SCHAIN_PROXY_PATH, MANAGER_ABI_PATH, NETWORKS_WITH_MULTICALL } from './constants'
+import {
+    SCHAIN_PROXY_PATH,
+    MANAGER_ABI_PATH,
+    NETWORKS_WITH_MULTICALL,
+    MULTICALL_MAX_DATA_LENGTH
+} from './constants'
 
 export function getSChainImaAbi(): SChainImaAbi {
     return readJson(SCHAIN_PROXY_PATH)
@@ -44,7 +49,7 @@ export async function getMainnetProvider(endpoint: string, multicall: boolean): 
     const nativeProvider = new JsonRpcProvider(endpoint)
     const network = await nativeProvider.getNetwork()
     return multicall && hasMulticall(network)
-        ? mc.MulticallWrapper.wrap(nativeProvider)
+        ? mc.MulticallWrapper.wrap(nativeProvider, MULTICALL_MAX_DATA_LENGTH)
         : nativeProvider
 }
 

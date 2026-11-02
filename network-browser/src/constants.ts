@@ -27,6 +27,7 @@ import { requiredEnv, booleanEnv, secondsEnv, optionalEnvNumber } from './envToo
 export const PORTS_PER_SCHAIN = 64
 export const DEFAULT_PING_DELAY = 10000
 export const DEFAULT_PING_ITERATIONS = 50000
+export const MULTICALL_MAX_DATA_LENGTH = 200000
 
 export const NETWORKS_WITH_MULTICALL = [
     1n, // mainnet

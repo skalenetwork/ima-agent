@@ -24,7 +24,6 @@
  */
 
 import express, { type Express, type NextFunction, type Request, type Response } from "express";
-import bodyParser from "body-parser";
 import * as ws from "ws";
 import * as owaspUtils from "./owaspUtils.js";
 import * as log from "./log.js";
@@ -271,8 +270,8 @@ function initJsonRpcServer(): void {
         return;
     const strLogPrefix = "JSON RPC: ";
     gExpressJsonRpcAppIMA = express();
-    gExpressJsonRpcAppIMA.use( bodyParser.urlencoded( { extended: true } ) );
-    gExpressJsonRpcAppIMA.use( bodyParser.json() );
+    gExpressJsonRpcAppIMA.use( express.urlencoded( { extended: true } ) );
+    gExpressJsonRpcAppIMA.use( express.json() );
     const errorHandler = function(
         err: Error, req: Request, res: Response, next: NextFunction ): void {
         if( err ) {

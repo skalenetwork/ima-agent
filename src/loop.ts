@@ -37,9 +37,8 @@ import * as imaBLS from "./bls.js";
 import * as skaleObserver from "./observer.js";
 import * as pwa from "./pwa.js";
 import * as state from "./state.js";
-import type * as worker_threads from "worker_threads";
+import type * as workerThreads from "worker_threads";
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 const __dirname: string = path.dirname( url.fileURLToPath( import.meta.url ) );
 
 export interface TExtraSignOpts {
@@ -166,7 +165,7 @@ export function checkTimeFraming(
             threadInfo.threadDescription(), err, "\n", err );
     }
     return true;
-};
+}
 
 async function singleTransferLoopPartOracle(
     optsLoop: TLoopOptions, strLogPrefix: string ): Promise<boolean> {
@@ -497,7 +496,7 @@ export async function singleTransferLoopWithRepeat(
         singleTransferLoopWithRepeat( optsLoop )
             .then( function(): void {} ).catch( function(): void {} );
     }, imaState.nLoopPeriodSeconds * 1000 );
-};
+}
 export async function runTransferLoop( optsLoop: TLoopOptions ): Promise<boolean> {
     const imaState: state.TIMAState = state.get();
     const isDelayFirstRun = owaspUtils.toBoolean( optsLoop.isDelayFirstRun );
@@ -513,7 +512,7 @@ export async function runTransferLoop( optsLoop: TLoopOptions ): Promise<boolean
 
 // Parallel thread based loop
 
-const gArrWorkers: worker_threads.Worker[] = [];
+const gArrWorkers: workerThreads.Worker[] = [];
 const gArrClients: networkLayer.OutOfWorkerSocketClientPipe[] = [];
 
 function constructChainProperties( opts: TParallelLoopRunOptions ): any {
