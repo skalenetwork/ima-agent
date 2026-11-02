@@ -1,28 +1,30 @@
 name: network-browser test
-on: [push]
+
+on: push
+
+permissions:
+  contents: read
+
 env:
-  ETH_PRIVATE_KEY: ${{ secrets.ETH_PRIVATE_KEY }}
-  MANAGER_TAG: "1.13.1-stable.0"
+  ETH_PRIVATE_KEY: '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
+  MANAGER_TAG: 1.14.0-stable.0
+
 jobs:
   test_network_browser:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           submodules: true
       - uses: oven-sh/setup-bun@v2
-      - name: Launch hardhat node
-        working-directory: hardhat-node
-        run: docker compose up -d
-      - name: Deploy manager contracts
-        run: |
-          bash ./helper-scripts/deploy_manager.sh
-          docker rmi -f skalenetwork/skale-manager:${{ env.MANAGER_TAG }}
-
-      - name: Install network-browser dependencies
-        working-directory: network-browser
-        run: bun i
-
+        with:
+          bun-version: 1.4.4
+      - name: Start Anvil
+        run: docker run -d --network host ghcr.io/foundry-rs/foundry:v1.8.7 "anvil --block-time 1"
+      - name: Deploy SKALE Manager
+        run: bash ./helper-scripts/deploy_manager.sh
       - name: Run network-browser tests
         working-directory: network-browser
-        run: bash run_tests.sh
+        run: |
+          bun install --frozen-lockfile
+          bash run_tests.sh

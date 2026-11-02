@@ -29,10 +29,8 @@ import * as log from "./log.js";
 import * as owaspUtils from "./owaspUtils.js";
 import * as childProcessModule from "child_process";
 import * as rpcCall from "./rpcCall.js";
-import * as shellMod from "shelljs";
 import * as imaUtils from "./utils.js";
 import * as imaHelperAPIs from "./imaHelperAPIs.js";
-import * as sha3Module from "sha3";
 import * as skaleObserver from "./observer.js";
 import * as discoveryTools from "./discoveryTools.js";
 import * as threadInfo from "./threadInfo.js";
@@ -171,11 +169,6 @@ export interface TSignU256Options {
     errGathering: Error | string | null
 }
 
-const anyShellMod: any = shellMod as any;
-const shell = anyShellMod.default;
-
-const Keccak = sha3Module.Keccak;
-
 function discoverBlsThreshold( joSChainNetworkInfo: discoveryTools.TSChainNetworkInfo ): number {
     const imaState: state.TIMAState = state.get();
     joSChainNetworkInfo = joSChainNetworkInfo || imaState.joSChainNetworkInfo;
@@ -297,10 +290,7 @@ function stringToKeccak256( s: string ): Uint8Array {
 }
 
 function arrayToKeccak256( arrBytes: Uint8Array ): Uint8Array {
-    const k = new Keccak( 256 );
-    k.update( imaUtils.toBuffer( arrBytes ) );
-    const h = k.digest( "hex" );
-    return imaUtils.hexToBytes( "0x" + h );
+    return imaUtils.hexToBytes( owaspUtils.ethersMod.ethers.utils.keccak256( arrBytes ) );
 }
 
 function keccak256Message(
@@ -332,7 +322,7 @@ function keccak256Message(
 }
 
 export function keccak256U256( u256: any, isHash: boolean ): string {
-    let arrBytes = new Uint8Array();
+    let arrBytes: Uint8Array = new Uint8Array();
     let bytesU256 = imaUtils.hexToBytes( u256 );
     bytesU256 = bytesU256.reverse();
     bytesU256 = imaUtils.bytesAlignLeftWithZeroes( bytesU256, 32 );
@@ -340,9 +330,8 @@ export function keccak256U256( u256: any, isHash: boolean ): string {
     arrBytes = imaUtils.bytesConcat( arrBytes, bytesU256 );
     let strMessageHash = "";
     if( isHash ) {
-        const hash = new Keccak( 256 );
-        hash.update( imaUtils.toBuffer( arrBytes ) );
-        strMessageHash = hash.digest( "hex" );
+        strMessageHash = owaspUtils.removeStarting0x(
+            owaspUtils.ethersMod.ethers.utils.keccak256( arrBytes ) );
     } else
         strMessageHash = "0x" + imaUtils.bytesToHex( arrBytes );
     return strMessageHash;
@@ -351,7 +340,7 @@ export function keccak256U256( u256: any, isHash: boolean ): string {
 export function keccak256ForPendingWorkAnalysis(
     nNodeNumber: number, strLoopWorkType: string, isStart: boolean, ts: any
 ): string {
-    let arrBytes = new Uint8Array();
+    let arrBytes: Uint8Array = new Uint8Array();
 
     let bytesU256 = imaUtils.hexToBytes( nNodeNumber );
     bytesU256 = bytesU256.reverse();
@@ -373,10 +362,7 @@ export function keccak256ForPendingWorkAnalysis(
     bytesU256 = bytesU256.reverse();
     arrBytes = imaUtils.bytesConcat( arrBytes, bytesU256 );
 
-    const hash = new Keccak( 256 );
-    hash.update( imaUtils.toBuffer( arrBytes ) );
-    const strMessageHash = hash.digest( "hex" );
-    return strMessageHash;
+    return owaspUtils.removeStarting0x( owaspUtils.ethersMod.ethers.utils.keccak256( arrBytes ) );
 }
 
 function splitSignatureShare( signatureShare: any ): any {
@@ -388,7 +374,7 @@ function splitSignatureShare( signatureShare: any ): any {
 
 function getBlsGlueTmpDir(): string {
     const strTmpDir = "/tmp/ima-bls-glue";
-    shell.mkdir( "-p", strTmpDir );
+    fs.mkdirSync( strTmpDir, { recursive: true } );
     return strTmpDir;
 }
 
@@ -420,7 +406,9 @@ function performBlsGlue(
     const strActionDir = allocBlsTmpActionDir();
     details.trace( "{p}{sunny} will work in {} director with {} sign results...",
         strLogPrefix, "performBlsGlue", strActionDir, arrSignResults.length );
-    const fnShellRestore = function(): void { shell.rm( "-rf", strActionDir ); };
+    const fnShellRestore = function(): void {
+        fs.rmSync( strActionDir, { recursive: true, force: true } );
+    };
     const strOutput = "";
     try {
         let strInput = "";
@@ -507,7 +495,9 @@ function performBlsGlueU256( details: log.TLogger, u256: any, arrSignResults: an
     const strActionDir = allocBlsTmpActionDir();
     details.trace( "{p}performBlsGlueU256 will work in {} director with {} sign results...",
         strLogPrefix, strActionDir, arrSignResults.length );
-    const fnShellRestore = function(): void { shell.rm( "-rf", strActionDir ); };
+    const fnShellRestore = function(): void {
+        fs.rmSync( strActionDir, { recursive: true, force: true } );
+    };
     let strOutput = "";
     try {
         let strInput = "";
@@ -595,7 +585,9 @@ function performBlsVerifyI(
     if( !checkBlsThresholdAndBlsParticipants( nThreshold, nParticipants, "BLS verify-I", details ) )
         return false;
     const strActionDir = allocBlsTmpActionDir();
-    const fnShellRestore = function(): void { shell.rm( "-rf", strActionDir ); };
+    const fnShellRestore = function(): void {
+        fs.rmSync( strActionDir, { recursive: true, force: true } );
+    };
     let strOutput = "";
     try {
         details.trace( "{p}BLS node #{} - first message nonce is {}",
@@ -659,7 +651,9 @@ function performBlsVerifyIU256(
         nThreshold, nParticipants, "BLS verify-I-U256", details ) )
         return false;
     const strActionDir = allocBlsTmpActionDir();
-    const fnShellRestore = function(): void { shell.rm( "-rf", strActionDir ); };
+    const fnShellRestore = function(): void {
+        fs.rmSync( strActionDir, { recursive: true, force: true } );
+    };
     let strOutput = "";
     try {
         const joMsg = { message: keccak256U256( u256, true ) };
@@ -711,7 +705,9 @@ function performBlsVerify(
     if( !checkBlsThresholdAndBlsParticipants( nThreshold, nParticipants, "BLS verify", details ) )
         return false;
     const strActionDir = allocBlsTmpActionDir();
-    const fnShellRestore = function(): void { shell.rm( "-rf", strActionDir ); };
+    const fnShellRestore = function(): void {
+        fs.rmSync( strActionDir, { recursive: true, force: true } );
+    };
     let strOutput = "";
     const strLogPrefix = `${strDirection}/BLS/Summary: "`;
     try {
@@ -779,7 +775,9 @@ function performBlsVerifyU256(
         nThreshold, nParticipants, "BLS verify-U256", details ) )
         return false;
     const strActionDir = allocBlsTmpActionDir();
-    const fnShellRestore = function(): void { shell.rm( "-rf", strActionDir ); };
+    const fnShellRestore = function(): void {
+        fs.rmSync( strActionDir, { recursive: true, force: true } );
+    };
     let strOutput = "";
     const strLogPrefix = "BLS u256/Summary: ";
     try {
@@ -2124,7 +2122,9 @@ export async function doVerifyReadyHash(
         nThreshold, nParticipants, "verify ready hash", details ) )
         return false;
     const strActionDir = allocBlsTmpActionDir();
-    const fnShellRestore = function(): void { shell.rm( "-rf", strActionDir ); };
+    const fnShellRestore = function(): void {
+        fs.rmSync( strActionDir, { recursive: true, force: true } );
+    };
     let strOutput = "";
     try {
         const joPublicKey = discoverPublicKeyByIndex(

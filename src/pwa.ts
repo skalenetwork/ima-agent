@@ -136,7 +136,7 @@ export async function checkOnLoopStart(
                             "allowed {} and exceeded by {} second(s)", walkNodeIndex, joProps.ts,
                             nUtcUnixTimeStamp, d, imaState.nTimeoutSecondsPWA,
                             d - imaState.nTimeoutSecondsPWA );
-                    };
+                    }
                     joProps.isInProgress = false;
                     joProps.ts = 0;
                     continue;

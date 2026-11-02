@@ -1,0 +1,11 @@
+[[IgnoredVulns]]
+id = "GHSA-848j-6mx2-7j84"
+reason = "elliptic 6.6.1 via ethers 5, no fixed release; nodes sign through SGX; removed by the ethers 6 migration"
+
+[[IgnoredVulns]]
+id = "GHSA-g3hv-75wg-m249"
+reason = "minimatch 10 in the eslint and mocha dev toolchain; the fix is minimatch 11, outside their ranges"
+
+[[IgnoredVulns]]
+id = "GHSA-3g3m-2fjr-6pw4"
+reason = "glob 13 in the mocha dev toolchain; the fix is glob 14, outside mocha's range"

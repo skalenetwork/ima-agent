@@ -21,7 +21,7 @@
  */
 
 import { JsonRpcProvider, id, toBeHex } from 'ethers'
-import { Logger, type ILogObj } from 'tslog'
+import { Logger, type ILogObj, type ISettingsParam } from 'tslog'
 
 import { readFileSync, writeFileSync, renameSync } from 'fs'
 import { BrowserTimeoutError } from './errors'
@@ -35,11 +35,10 @@ import {
 
 const log = new Logger<ILogObj>(getLoggerConfig('tools'))
 
-export function getLoggerConfig(moduleName: string): any {
+export function getLoggerConfig(moduleName: string): ISettingsParam<ILogObj> {
     return {
-        prettyLogTemplate: LOG_FORMAT,
+        pretty: { template: LOG_FORMAT, style: LOG_PRETTY },
         minLevel: LOG_LEVEL,
-        stylePrettyLogs: LOG_PRETTY,
         name: `snb::${moduleName}`
     }
 }

@@ -88,8 +88,8 @@ export async function reimbursementEstimateAmount(
             strLogPrefix, strReimbursementChain );
         const addressReceiver = joReceiverMainNet;
         const xWei =
-        await joCommunityPool.callStatic.getBalance(
-            addressReceiver, strReimbursementChain, { from: addressReceiver } );
+            await joCommunityPool.callStatic.getBalance(
+                addressReceiver, strReimbursementChain, { from: addressReceiver } );
         s = strLogPrefix + log.fmtSuccess( "Balance(wei): {}", xWei );
         if( isForcePrintOut )
             log.information( s );

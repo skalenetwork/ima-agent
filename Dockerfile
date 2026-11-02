@@ -1,72 +1,31 @@
-FROM ubuntu:jammy
+FROM node:24.22.2-bookworm-slim AS agent
+WORKDIR /ima/src
+COPY src ./
+RUN yarn install --frozen-lockfile && yarn build && yarn install --frozen-lockfile --production
 
-RUN apt-get update
-RUN apt-get install --no-install-recommends -yq software-properties-common
-RUN apt-get update
-RUN apt-get install --no-install-recommends -y build-essential python3 python3-dev zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev wget curl unzip sudo git
+FROM oven/bun:1.4.4 AS network-browser
+WORKDIR /ima/network-browser
+COPY network-browser ./
+RUN bun install --frozen-lockfile && bun run build:rollup && rm -rf node_modules && bun install --frozen-lockfile --production
 
-# libBLS release binaries require the OpenSSL 1.1.1 symbol version. Ubuntu
-# Jammy only provides OpenSSL 3, so install the final OpenSSL 1.1.1 release as
-# a compatibility library.
-ARG OPENSSL_1_1_VERSION=1.1.1w
-RUN wget "https://www.openssl.org/source/old/1.1.1/openssl-${OPENSSL_1_1_VERSION}.tar.gz" \
-    && tar xfz "openssl-${OPENSSL_1_1_VERSION}.tar.gz" \
-    && cd "openssl-${OPENSSL_1_1_VERSION}" \
-    && ./config shared \
-    && make -j"$(nproc)" \
-    && make install_sw \
-    && cd .. \
-    && rm -rf "openssl-${OPENSSL_1_1_VERSION}" \
-        "openssl-${OPENSSL_1_1_VERSION}.tar.gz" \
-    && ldconfig
-
-RUN curl -fsSL https://bun.sh/install | BUN_INSTALL=/usr bash -s "bun-v1.0.16"
-RUN bun --version
-
-RUN curl -sL https://deb.nodesource.com/setup_22.x | bash
-RUN apt-get install --no-install-recommends -y nodejs
-RUN npm install npm --global
-RUN npm install --global yarn
-RUN npm --version
-RUN yarn --version
-
-RUN python3 --version
-RUN which python3
-
-RUN mkdir /ima
+FROM ubuntu:24.04
+ARG LIB_BLS_VERSION=0.8.1
+ADD --chmod=755 --checksum=sha256:7943438696ee3dc7d7dd1d34e70fc5bf86da3945588c21511ac9afc5f9c5502a \
+    https://github.com/skalenetwork/libBLS/releases/download/${LIB_BLS_VERSION}/bls_glue /ima/bls_binaries/
+ADD --chmod=755 --checksum=sha256:33fdd8999edc359a1f511d40a5c2bc65128ad8871580095d5f7a47ebde7a6c4a \
+    https://github.com/skalenetwork/libBLS/releases/download/${LIB_BLS_VERSION}/hash_g1 /ima/bls_binaries/
+ADD --chmod=755 --checksum=sha256:c6d2ad34428865294359fdfcb0ab5f0a7c6ec6155891616fe3a1e7905d3ba4b7 \
+    https://github.com/skalenetwork/libBLS/releases/download/${LIB_BLS_VERSION}/verify_bls /ima/bls_binaries/
+COPY --from=agent /usr/local/bin/node /usr/local/bin/node
 WORKDIR /ima
-
-COPY package.json package.json
-
+COPY VERSION ./
 COPY runner runner
-COPY src src
-COPY src/pow src/build/pow
-COPY IMA IMA
-COPY package.json package.json
-COPY VERSION VERSION
-
-COPY network-browser network-browser
-RUN cd network-browser && bun install && bun build:rollup
-
-RUN mkdir /ima/bls_binaries
-COPY scripts/bls_binaries /ima/bls_binaries
-
-RUN chmod +x /ima/bls_binaries/bls_glue
-RUN chmod +x /ima/bls_binaries/hash_g1
-RUN chmod +x /ima/bls_binaries/verify_bls
-
-# Fail the build if a BLS binary has a missing library or symbol version.
-RUN for bin in bls_glue hash_g1 verify_bls; do \
-        ldd "/ima/bls_binaries/$bin" 2>&1 | tee /dev/stderr | grep -q "not found" \
-            && { echo "Unresolved dependency in $bin" >&2; exit 1; }; \
-    done; true
-
-RUN npm install -g node-gyp
-RUN which node-gyp
-RUN node-gyp --version
-
-WORKDIR /ima
-RUN yarn install
-RUN yarn rebuild
-
+COPY --from=agent /ima/src/package.json /ima/src/about.txt src/
+COPY --from=agent /ima/src/build src/build
+COPY --from=agent /ima/src/node_modules src/node_modules
+COPY --from=network-browser /ima/network-browser/package.json network-browser/
+COPY --from=network-browser /ima/network-browser/build network-browser/build
+COPY --from=network-browser /ima/network-browser/node_modules network-browser/node_modules
+RUN ! ldd /ima/bls_binaries/* /ima/src/build/pow 2>&1 | grep "not found"
+STOPSIGNAL SIGINT
 CMD ["bash", "/ima/runner/run.sh"]

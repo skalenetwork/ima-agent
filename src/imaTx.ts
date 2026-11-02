@@ -28,8 +28,7 @@ import * as url from "url";
 import * as childProcessModule from "child_process";
 import type * as state from "./state.js";
 
-import Redis from "ioredis";
-import * as ethereumJsUtilModule from "ethereumjs-util";
+import { Redis } from "ioredis";
 
 import * as log from "./log.js";
 
@@ -67,7 +66,6 @@ export interface TRunTimePayedCallOptions {
     callOpts: any
 }
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 const __dirname: string = path.dirname( url.fileURLToPath( import.meta.url ) );
 
 let redis: any = null;
@@ -469,7 +467,7 @@ export async function calculatePowNumber(
 ): Promise<any> {
     try {
         let _address = owaspUtils.ensureStartsWith0x( address );
-        _address = ethereumJsUtilModule.toChecksumAddress( _address );
+        _address = owaspUtils.ethersMod.ethers.utils.getAddress( _address );
         _address = owaspUtils.removeStarting0x( _address );
         const _nonce = owaspUtils.parseIntOrHex( nonce );
         const _gas = owaspUtils.parseIntOrHex( gas );
@@ -737,7 +735,7 @@ export class TransactionCustomizer {
         details.trace( "{p}Final amount of gas is {}", strLogPrefix, estimatedGas );
         return estimatedGas;
     }
-};
+}
 
 let gTransactionCustomizerMainNet: TransactionCustomizer | null = null;
 let gTransactionCustomizerSChain: TransactionCustomizer | null = null;

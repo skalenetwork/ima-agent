@@ -2,8 +2,7 @@ const { spawn } = require( "child_process" );
 
 function startProcess( command ) {
     // Start the process in a new process group
-    const parts = command.split( " " );
-    return spawn( parts[0], parts.slice( 1 ), { stdio: "inherit", shell: true, detached: true } );
+    return spawn( command, { stdio: "inherit", shell: true, detached: true } );
 }
 
 if( process.argv.length !== 4 ) {
@@ -44,8 +43,7 @@ function onChildExit( exitedIndex, exitedChild, otherChild, code, signal ) {
         exitedIndex, "is", getShortExitedChildDescription( exitedChild ),
         ", exit code is", code, "exit signal is", signal );
     terminateProcessGroup( otherChild );
-    // Exit with the code or signal of the process that ended first
-    process.exit( code || signal );
+    process.exit( code ?? 1 );
 }
 
 child1.on( "exit", function( code, signal ) { onChildExit( 1, process.argv[2], child2, code, signal ); } );

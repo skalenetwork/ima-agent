@@ -361,7 +361,7 @@ export interface TIMAState {
 
     haveOneTokenIdentifier: boolean
     haveArrayOfTokenIdentifiers: boolean
-};
+}
 
 let imaState: TIMAState | null = null;
 
