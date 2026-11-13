@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with:
-          node-version: 24.22.2
+          node-version: 24.22.3
       - run: corepack enable
       - uses: oven-sh/setup-bun@v2
         with:
@@ -42,11 +42,11 @@ jobs:
           submodules: true
       - uses: actions/setup-node@v7
         with:
-          node-version: 24.22.2
+          node-version: 24.22.3
       - run: corepack enable
       - uses: actions/setup-python@v7
         with:
-          python-version: '3.12'
+          python-version: '3.14'
       - name: Build agent
         working-directory: src
         run: |

@@ -8,4 +8,4 @@ reason = "minimatch 10 in the eslint and mocha dev toolchain; the fix is minimat
 
 [[IgnoredVulns]]
 id = "GHSA-3g3m-2fjr-6pw4"
-reason = "glob 13 in the mocha dev toolchain; the fix is glob 14, outside mocha's range"
+reason = "glob 13.0.7 in the mocha dev toolchain backports the fix, but the advisory only marks glob 14.0.2 as fixed, outside mocha's range"

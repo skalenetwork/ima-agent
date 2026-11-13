@@ -19,15 +19,15 @@
   "dependencies": {
     "ethers": "6.17.0",
     "ethers-multicall-provider": "^6.5.0",
-    "tslog": "^5.4.0"
+    "tslog": "^5.5.0"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^12.3.1",
     "bun-types": "^1.4.4",
     "eslint": "^10.14.0",
     "neostandard": "^0.14.1",
-    "prettier": "^3.9.10",
-    "rollup": "^4.67.4",
+    "prettier": "^3.10.1",
+    "rollup": "^4.68.2",
     "typescript": "6.0.3"
   }
 }

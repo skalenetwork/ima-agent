@@ -1,4 +1,4 @@
-FROM node:24.22.2-bookworm-slim AS agent
+FROM node:24.22.3-bookworm-slim AS agent
 WORKDIR /ima/src
 COPY src ./
 RUN yarn install --frozen-lockfile && yarn build && yarn install --frozen-lockfile --production

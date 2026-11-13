@@ -20,7 +20,7 @@ jobs:
         with:
           bun-version: 1.4.4
       - name: Start Anvil
-        run: docker run -d --network host ghcr.io/foundry-rs/foundry:v1.8.7 "anvil --block-time 1"
+        run: docker run -d --network host ghcr.io/foundry-rs/foundry:v1.9.0 "anvil --block-time 1"
       - name: Deploy SKALE Manager
         run: bash ./helper-scripts/deploy_manager.sh
       - name: Run network-browser tests

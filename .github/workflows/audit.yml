@@ -12,4 +12,4 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
-      - run: docker run --rm -v "$PWD:/src" ghcr.io/google/osv-scanner:v2.7.0 scan source -r --no-resolve --config /src/osv-scanner.toml /src
+      - run: docker run --rm -v "$PWD:/src" ghcr.io/google/osv-scanner:v2.7.1 scan source -r --no-resolve --config /src/osv-scanner.toml /src
