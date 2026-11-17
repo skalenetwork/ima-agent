@@ -16,7 +16,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  SKALE_MANAGER_TAG: 1.13.1-stable.0
+  SKALE_MANAGER_TAG: 1.14.0-stable.0
   SGX_WALLET_IMAGE_TAG: 1.10.3-stable.0
 
 jobs:
