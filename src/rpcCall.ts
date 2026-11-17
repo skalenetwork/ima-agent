@@ -24,8 +24,10 @@
  */
 
 import * as ws from "ws";
+import * as http from "http";
 import * as https from "https";
 import * as net from "net";
+import { text } from "stream/consumers";
 import { validateURL, isUrlWS } from "./owaspUtils.js";
 import * as log from "./log.js";
 
@@ -377,17 +379,22 @@ export async function doCall(
             } );
         } else {
             try {
-                const response = await fetch( joCall.url, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: strBody,
-                    signal: AbortSignal.timeout( gSecondsConnectionTimeout * 1000 )
+                const u = new URL( joCall.url );
+                const body = await new Promise < string >( ( resolve, reject ) => {
+                    const req = ( u.protocol === "https:" ? https : http ).request( u, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        signal: AbortSignal.timeout( gSecondsConnectionTimeout * 1000 )
+                    }, function( res: http.IncomingMessage ): void {
+                        if( res.statusCode !== 200 )
+                            log.warning( "REST call status code is {}", res.statusCode );
+                        text( res ).then( resolve, reject );
+                    } );
+                    req.on( "error", reject );
+                    req.end( strBody );
                 } );
-                const body = await response.text();
-                if( response.status !== 200 )
-                    log.warning( "REST call status code is {}", response.status );
 
                 joOut = JSON.parse( body );
                 errCall = null;
