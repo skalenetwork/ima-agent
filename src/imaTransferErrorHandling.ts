@@ -56,7 +56,6 @@ export function saveTransferError( strCategory: string, textLog: any, ts?: any )
 
 export function saveTransferSuccess( strCategory: string ): void {
     const catName = verifyTransferErrorCategoryName( strCategory );
-    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
     try { delete gMapTransferErrorCategories[catName]; } catch ( err ) { }
     saveTransferEvents.dispatchEvent(
         new UniversalDispatcherEvent(

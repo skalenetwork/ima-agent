@@ -36,14 +36,13 @@ import * as imaOracleOperations from "./imaOracleOperations.js";
 import * as imaTx from "./imaTx.js";
 import * as state from "./state.js";
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 const __dirname: string = path.dirname( url.fileURLToPath( import.meta.url ) );
 
 const gStrAppName = "IMA AGENT";
 const gStrVersion =
-    imaUtils.fileLoad( path.join( __dirname, "../VERSION" ), "N/A" ).toString().trim();
+    imaUtils.fileLoad( path.join( __dirname, "../../VERSION" ), "N/A" ).toString().trim();
 
-function att( ...args: any[] ): string { return log.fmtAttention( ...args ); };
+function att( ...args: any[] ): string { return log.fmtAttention( ...args ); }
 
 export function printAbout( isLog?: boolean ): boolean {
     isLog = isLog ?? false;

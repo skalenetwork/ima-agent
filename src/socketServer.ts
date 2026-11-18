@@ -74,7 +74,6 @@ export class SocketServer extends EventDispatcher {
                     _offAllPipeEventListeners();
                     _offAllPipeEventListeners = null;
                 }
-                // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                 delete self.mapAcceptedPipes[socket];
             };
             let _onPipeError: any = function( eventData: any ): void {
@@ -86,7 +85,6 @@ export class SocketServer extends EventDispatcher {
                     _offAllPipeEventListeners();
                     _offAllPipeEventListeners = null;
                 }
-                // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                 delete self.mapAcceptedPipes[socket];
             };
             let _onPipeMessage: any = function( eventData: any ): void {
@@ -170,4 +168,4 @@ export class SocketServer extends EventDispatcher {
         this.isDisposing = true;
         super.dispose();
     }
-};
+}

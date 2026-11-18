@@ -14,7 +14,7 @@ Required env variables:
 
 Optional env variables:
 
--   `MULTICALL` - use ethers multicall provider (default: `false`)
+-   `MULTICALL` - use ethers multicall provider (default: `true`)
 -   `CONNECTED_ONLY` - collect info only for connected chains (default: `true`)
 
 -   `POST_ERROR_DELAY` - delay before retry if error happened in browser loop (seconds, default: `5`)
@@ -39,12 +39,6 @@ Run in dev mode:
 bun dev
 ```
 
-Pre-commit hook:
-
-```bash
-bun pre
-```
-
 ## Build & run in production mode
 
 For target bun:
@@ -58,5 +52,5 @@ For target node:
 
 ```bash
 bun build:rollup
-node network-browser.js
+node build/index.js
 ```

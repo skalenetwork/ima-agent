@@ -78,7 +78,7 @@ export interface TLoggerMemory extends TLogger {
     isBeginningOfAccumulatedLog: TFunctionIsBeginningOfAccumulatedLog
     isLastLineEndsWithCarriageReturn: TFunctionIsLastLineEndsWithCarriageReturn
     clear: TFunctionClear
-};
+}
 
 let gArrStreams: TLogger[] = [];
 
@@ -260,7 +260,7 @@ export function globalStream(): TLogger {
         };
     }
     return gStreamGlobal;
-};
+}
 
 export function createStandardOutputStream(): TLogger | null {
     try {

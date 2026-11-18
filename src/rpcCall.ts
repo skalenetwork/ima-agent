@@ -24,9 +24,10 @@
  */
 
 import * as ws from "ws";
-import * as urllib from "urllib";
+import * as http from "http";
 import * as https from "https";
 import * as net from "net";
+import { text } from "stream/consumers";
 import { validateURL, isUrlWS } from "./owaspUtils.js";
 import * as log from "./log.js";
 
@@ -164,7 +165,7 @@ export async function doConnect(
             } );
             joCall.wsConn.on( "message", function incoming( data: any ) {
                 const joOut = JSON.parse( data );
-                if( joOut.id in joCall.mapPendingByCallID ) {
+                if( joCall.mapPendingByCallID.has( joOut.id ) ) {
                     const entry = joCall.mapPendingByCallID.get( joOut.id );
                     joCall.mapPendingByCallID.delete( joOut.id );
                     if( entry ) {
@@ -378,35 +379,22 @@ export async function doCall(
             } );
         } else {
             try {
-                const requestOpts = {
-                    method: "POST",
-                    timeout: gSecondsConnectionTimeout * 1000, // in milliseconds
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    content: strBody,
-                    rejectUnauthorized: false,
-                    // "requestCert": true,
-                    agent: false,
-                    httpsAgent: false,
-                    ca: ( joCall.joRpcOptions?.ca &&
-                        typeof joCall.joRpcOptions.ca === "string" )
-                        ? joCall.joRpcOptions.ca
-                        : null,
-                    cert: ( joCall.joRpcOptions?.cert &&
-                        typeof joCall.joRpcOptions.cert === "string" )
-                        ? joCall.joRpcOptions.cert
-                        : null,
-                    key: ( joCall.joRpcOptions?.key &&
-                        typeof joCall.joRpcOptions.key === "string" )
-                        ? joCall.joRpcOptions.key
-                        : null
-                };
-                const response =
-                    await urllib.request( joCall.url, requestOpts as urllib.RequestOptions );
-                const body = response.data.toString( "utf8" );
-                if( response?.statusCode !== 200 )
-                    log.warning( "REST call status code is {}", response.statusCode );
+                const u = new URL( joCall.url );
+                const body = await new Promise < string >( ( resolve, reject ) => {
+                    const req = ( u.protocol === "https:" ? https : http ).request( u, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        signal: AbortSignal.timeout( gSecondsConnectionTimeout * 1000 )
+                    }, function( res: http.IncomingMessage ): void {
+                        if( res.statusCode !== 200 )
+                            log.warning( "REST call status code is {}", res.statusCode );
+                        text( res ).then( resolve, reject );
+                    } );
+                    req.on( "error", reject );
+                    req.end( strBody );
+                } );
 
                 joOut = JSON.parse( body );
                 errCall = null;
@@ -474,7 +462,7 @@ export async function rpcCallCreate(
                             log.error(
                                 "{url} JSON RPC call(performer) error: {err}", strURL, err );
                         } );
-                    } ).then( function(): void {} ).catch( function(): void {} ); ;
+                    } ).then( function(): void {} ).catch( function(): void {} );
             } );
             return await promiseComplete.catch( function( err: Error | string ) {
                 log.error(
