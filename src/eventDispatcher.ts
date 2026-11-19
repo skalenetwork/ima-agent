@@ -36,7 +36,7 @@ export class UniversalDispatcherEvent {
             anyThis[key] = value;
         }
     }
-};
+}
 
 export class EventDispatcher {
     // see https://stackoverflow.com/questions/36675693/eventtarget-interface-in-safari
@@ -122,4 +122,4 @@ export class EventDispatcher {
         }
         return this;
     }
-};
+}

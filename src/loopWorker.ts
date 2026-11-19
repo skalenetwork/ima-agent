@@ -303,7 +303,7 @@ class ObserverServer extends SocketServer {
             }
         };
     }
-};
+}
 
 const acceptor = new networkLayer.InWorkerSocketServerAcceptor( workerData.url, doSendMessage );
 const server = new ObserverServer( acceptor );

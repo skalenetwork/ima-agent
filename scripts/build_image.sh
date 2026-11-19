@@ -16,7 +16,7 @@ LATEST_IMAGE_NAME=$REPO_NAME:latest
 if [ -z "$SKIP_BUILD" ]
 then   
 
-    docker build -t "$IMAGE_NAME" . || exit $?
+    docker build --platform linux/amd64 -t "$IMAGE_NAME" . || exit $?
 
     if [ "$RELEASE" = true ]
     then

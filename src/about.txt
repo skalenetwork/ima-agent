@@ -1,4 +1,3 @@
-IMA AGENT version 2.1.0
 GENERAL options:
     --help..................................Show this help info and exit.
     --version...............................Show version info and exit.

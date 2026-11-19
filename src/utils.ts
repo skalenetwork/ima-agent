@@ -32,7 +32,7 @@ import * as threadInfo from "./threadInfo.js";
 import type * as state from "./state.js";
 import type * as discoveryTools from "./discoveryTools.js";
 
-import { v4 as uuid } from "uuid";
+import { randomUUID as uuid } from "crypto";
 export { uuid };
 
 const ethersMod = owaspUtils.ethersMod;
@@ -344,10 +344,6 @@ export function bytesConcat( a1?: Uint8Array, a2?: Uint8Array ): Uint8Array {
     a1 = a1 ?? new Uint8Array();
     a2 = a2 ?? new Uint8Array();
     return concatUint8Arrays( a1, a2 );
-}
-
-export function toBuffer( ab?: any ): Buffer {
-    return Buffer.from( new Uint8Array( ab ) );
 }
 
 export function discoverCoinNameInJSON( jo?: any ): string {

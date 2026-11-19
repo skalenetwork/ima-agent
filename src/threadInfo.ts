@@ -23,10 +23,10 @@
  * @copyright SKALE Labs 2019-Present
  */
 
-import * as worker_threads from "worker_threads";
+import * as workerThreads from "worker_threads";
 import * as log from "./log.js";
 
-const Worker = worker_threads.Worker;
+const Worker = workerThreads.Worker;
 export { Worker };
 
 const joCustomThreadProperties: any = { };
@@ -37,11 +37,11 @@ export const sleep = async( milliseconds: number ): Promise<void> => {
 };
 
 export function getCurrentThreadID(): number {
-    return worker_threads.threadId;
+    return workerThreads.threadId;
 }
 
 export function isMainThread(): boolean {
-    return ( !!( worker_threads.isMainThread ) );
+    return ( !!( workerThreads.isMainThread ) );
 }
 
 export function threadDescription( isColorized?: boolean ): string {

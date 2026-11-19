@@ -74,7 +74,7 @@ export function createProgressiveEventsScanPlan(
     }
     if( arrProgressiveEventsScanPlan.length > 0 ) {
         const joLastPlan =
-        arrProgressiveEventsScanPlan[arrProgressiveEventsScanPlan.length - 1];
+            arrProgressiveEventsScanPlan[arrProgressiveEventsScanPlan.length - 1];
         if( !( joLastPlan.nBlockFrom == 0 && joLastPlan.nBlockTo == "latest" ) ) {
             arrProgressiveEventsScanPlan.push(
                 { nBlockFrom: 0, nBlockTo: "latest", type: "entire block range" } );

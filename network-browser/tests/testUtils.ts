@@ -8,16 +8,12 @@ import {
     getBytes,
     solidityPackedKeccak256,
     BytesLike,
-    hexlify,
+    dataSlice,
     id,
-    zeroPadValue,
     TransactionResponse
 } from 'ethers'
-import { ec } from 'elliptic'
 
 import { getMainnetManagerAbi } from '../src/contracts'
-
-const secp256k1EC = new ec('secp256k1')
 
 import { type SkaleManagerAbi } from '../src/interfaces'
 
@@ -212,10 +208,8 @@ function randNum(min: number, max: number): number {
 }
 
 function getPublicKey(wallet: Wallet): [BytesLike, BytesLike] {
-    const publicKey = secp256k1EC.keyFromPrivate(wallet.privateKey.slice(2)).getPublic()
-    const pubA = zeroPadValue(hexlify(publicKey.getX().toBuffer()), 32)
-    const pubB = zeroPadValue(hexlify(publicKey.getY().toBuffer()), 32)
-    return [pubA, pubB]
+    const publicKey = wallet.signingKey.publicKey
+    return [dataSlice(publicKey, 1, 33), dataSlice(publicKey, 33)]
 }
 
 function ipToHex(ip: string): string {

@@ -147,7 +147,6 @@ export class BasicServerAcceptor extends EventDispatcher {
                     pair.serverPipe = null;
                     pair.clientPipe = null;
                 }
-                // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                 delete this.mapClients[key.toString()];
             }
         }
@@ -191,7 +190,7 @@ export class BasicServerAcceptor extends EventDispatcher {
         }, 0 );
         return clientPipe;
     }
-};
+}
 
 export class BasicSocketPipe extends EventDispatcher {
     socketType: string;
@@ -364,7 +363,7 @@ export class BasicSocketPipe extends EventDispatcher {
 
     checkItself(): void {
     }
-};
+}
 
 export class NullSocketPipe extends BasicSocketPipe {
     constructor() {
@@ -394,7 +393,7 @@ export class NullSocketPipe extends BasicSocketPipe {
 
     flush(): void {
     }
-};
+}
 
 export const isRunningInWorker = function(): boolean {
     if( self.document === undefined )
@@ -571,7 +570,7 @@ export class InWorkerServerPipe extends BasicSocketPipe {
         this.performDisconnect();
         super.disconnect();
     }
-};
+}
 
 export class InWorkerSocketServerAcceptor extends BasicServerAcceptor {
     fnSend: any;
@@ -610,7 +609,6 @@ export class InWorkerSocketServerAcceptor extends BasicServerAcceptor {
             this.strEndPoint.length > 0
         ) {
             if( this.strEndPoint in gMapLocalServers )
-                // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                 delete gMapLocalServers[this.strEndPoint];
         }
         super.dispose();
@@ -640,7 +638,7 @@ export class InWorkerSocketServerAcceptor extends BasicServerAcceptor {
         pipe.receive( jo );
         return true;
     }
-};
+}
 
 export class OutOfWorkerSocketClientPipe extends BasicSocketPipe {
     worker: any;
@@ -672,7 +670,6 @@ export class OutOfWorkerSocketClientPipe extends BasicSocketPipe {
         this.isDisposing = true;
         this.performDisconnect();
         if( this.clientPort in gMapAwaitingInWorkerClients )
-            // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
             delete gMapAwaitingInWorkerClients[this.clientPort];
         super.dispose();
     }
@@ -681,7 +678,6 @@ export class OutOfWorkerSocketClientPipe extends BasicSocketPipe {
         if( !this.isConnected )
             return;
         this.isConnected = false;
-        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
         delete gMapConnectedInWorkerClients[this.clientPort.toString()];
         this.fnSend( this.worker, "inWorkerDisconnect", this.strEndPoint, this.clientPort, {} );
         this.dispatchEvent( new UniversalDispatcherEvent( "close", { socket: this } ) );
@@ -692,7 +688,6 @@ export class OutOfWorkerSocketClientPipe extends BasicSocketPipe {
     }
 
     performSuccessfulConnection(): void {
-        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
         delete gMapAwaitingInWorkerClients[this.clientPort];
         gMapConnectedInWorkerClients[this.clientPort.toString()] = this;
         this.isConnected = true;
@@ -721,7 +716,7 @@ export class OutOfWorkerSocketClientPipe extends BasicSocketPipe {
         this.performDisconnect();
         super.disconnect();
     }
-};
+}
 
 export class OutOfWorkerRelay extends EventDispatcher {
     strRelayName?: string;
@@ -749,7 +744,6 @@ export class OutOfWorkerRelay extends EventDispatcher {
         }
         self.acceptor = acceptor;
         self.fnCreateClient = fnCreateClient;
-        // eslint-disable-next-line max-lines-per-function
         self.onConnection_ = function( eventData: any ): void {
             const pipeIncoming: any = eventData.socket;
             let pipeOutgoing: any = null;
@@ -956,7 +950,7 @@ export class OutOfWorkerRelay extends EventDispatcher {
         if( this.acceptor )
             this.acceptor.flush();
     }
-};
+}
 
 export class OneToOneRelay extends EventDispatcher {
     strRelayName?: string;
@@ -1194,7 +1188,7 @@ export class OneToOneRelay extends EventDispatcher {
         if( this.pipeOutgoing )
             this.pipeOutgoing.flush();
     }
-};
+}
 
 export class DirectPipe extends BasicSocketPipe {
     socketType: string;
@@ -1283,7 +1277,7 @@ export class DirectPipe extends BasicSocketPipe {
         this.performDisconnect();
         super.disconnect();
     }
-};
+}
 
 export class LocalSocketServerPipe extends DirectPipe {
     constructor( counterPipe: any, acceptor: any, clientPort: number ) {
@@ -1305,7 +1299,7 @@ export class LocalSocketServerPipe extends DirectPipe {
     dispose(): void {
         super.dispose();
     }
-};
+}
 
 export class LocalSocketServerAcceptor extends BasicServerAcceptor {
     nextClientPort: number;
@@ -1345,12 +1339,11 @@ export class LocalSocketServerAcceptor extends BasicServerAcceptor {
             this.strEndPoint.length > 0
         ) {
             if( this.strEndPoint in gMapLocalServers )
-                // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                 delete gMapLocalServers[this.strEndPoint];
         }
         super.dispose();
     }
-};
+}
 
 export class LocalSocketClientPipe extends DirectPipe {
     constructor( strEndPoint: string ) {
@@ -1403,7 +1396,7 @@ export class LocalSocketClientPipe extends DirectPipe {
     dispose(): void {
         super.dispose();
     }
-};
+}
 
 export class WebSocketServerPipe extends BasicSocketPipe {
     clientNumber: number;
@@ -1526,7 +1519,7 @@ export class WebSocketServerPipe extends BasicSocketPipe {
         this.dispatchEvent(
             new UniversalDispatcherEvent( "message", { socket: this, message: jo } ) );
     }
-};
+}
 
 export class WebSocketServerAcceptor extends BasicServerAcceptor {
     wsServer: any;
@@ -1568,7 +1561,7 @@ export class WebSocketServerAcceptor extends BasicServerAcceptor {
         this.disposeNotifyClients();
         super.dispose();
     }
-};
+}
 
 export class WebSocketClientPipe extends BasicSocketPipe {
     wsConnection: any;
@@ -1751,7 +1744,7 @@ export class WebSocketClientPipe extends BasicSocketPipe {
         this.dispatchEvent(
             new UniversalDispatcherEvent( "message", { socket: this, message: jo } ) );
     }
-};
+}
 
 export class RTCConnection extends EventDispatcher {
     strSignalingServerURL: string | null;
@@ -2023,7 +2016,7 @@ export class RTCConnection extends EventDispatcher {
             );
         }
     }
-};
+}
 
 export class RTCActor extends RTCConnection {
     idSomebodyCreator: string | null;
@@ -2284,7 +2277,7 @@ export class RTCActor extends RTCConnection {
     onImpersonationComplete(): void { }
     // generic implementation should never be called
     onOtherSideIdentified( idSomebodyOtherSide: any, idOffer: any ): void { }
-};
+}
 
 export class RTCServerPeer extends RTCConnection {
     rtcCreator: any;
@@ -2356,7 +2349,6 @@ export class RTCServerPeer extends RTCConnection {
             if( this.idOffer && this.idOffer in this.rtcCreator.mapServerOffers ) {
                 if( settings.logging.net.signaling.offerUnregister )
                     console.log( "Unregister offer", this.idOffer, "(RTCServerPeer dispose)" );
-                // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                 delete this.rtcCreator.mapServerOffers[this.idOffer];
             }
             this.idOffer = 0;
@@ -2364,7 +2356,6 @@ export class RTCServerPeer extends RTCConnection {
         this.idOffer = 0;
         if( this.idSomebodyOtherSide != null ) {
             if( this.idSomebodyOtherSide in this.rtcCreator.mapServerPeers )
-                // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                 delete this.rtcCreator.mapServerPeers[this.idSomebodyOtherSide];
             this.idSomebodyOtherSide = null;
         }
@@ -2548,14 +2539,12 @@ export class RTCServerPeer extends RTCConnection {
                     console.log(
                         "Unregister offer", this.idOffer, "due to RTCServerPeer error:", err );
                 }
-                // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                 delete this.rtcCreator.mapServerOffers[this.idOffer];
             }
             this.idOffer = 0;
         }
         if( this.idSomebodyOtherSide != null ) {
             if( this.idSomebodyOtherSide in this.rtcCreator.mapServerPeers )
-                // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                 delete this.rtcCreator.mapServerPeers[this.idSomebodyOtherSide];
             this.idSomebodyOtherSide = null;
         }
@@ -2651,7 +2640,7 @@ export class RTCServerPeer extends RTCConnection {
             self.onError( "Failed to process ICE candidate: " + err );
         }
     }
-};
+}
 
 export class RTCCreator extends RTCActor {
     idOfferNext?: number;
@@ -2723,7 +2712,6 @@ export class RTCCreator extends RTCActor {
                 "Unregister offer", idOffer, "(onOtherSideIdentified in RTCCreator)"
             );
         }
-        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
         delete this.mapServerOffers[idOffer];
         this.mapServerPeers[idSomebodyOtherSide.toString()] = rtcPeer;
         rtcPeer.onOtherSideIdentified( idSomebodyOtherSide.toString() );
@@ -2890,7 +2878,7 @@ export class RTCCreator extends RTCActor {
             rtcPeer.onImpersonationCompleteForCreator();
         }
     }
-};
+}
 
 export class RTCJoiner extends RTCActor {
     idSomebodyOtherSide: any;
@@ -3215,7 +3203,7 @@ export class RTCJoiner extends RTCActor {
             break;
         } // switch( joMessage.method )
     }
-};
+}
 
 export class WebRTCServerPipe extends BasicSocketPipe {
     clientNumber?: number;
@@ -3326,7 +3314,7 @@ export class WebRTCServerPipe extends BasicSocketPipe {
         this.dispatchEvent(
             new UniversalDispatcherEvent( "message", { socket: this, message: jo } ) );
     }
-};
+}
 
 export class WebRTCServerAcceptor extends BasicServerAcceptor {
     strSignalingServerURL: string;
@@ -3491,7 +3479,6 @@ export class WebRTCServerAcceptor extends BasicServerAcceptor {
 
     detachPendingOffer( idOffer: any ): void {
         if( idOffer in this.mapPendingOffers )
-            // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
             delete this.mapPendingOffers[idOffer];
     }
 
@@ -3499,7 +3486,6 @@ export class WebRTCServerAcceptor extends BasicServerAcceptor {
         if( idOffer in this.mapPendingOffers ) {
             const rtcPeer = this.mapPendingOffers[idOffer];
             rtcPeer.dispose();
-            // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
             delete this.mapPendingOffers[idOffer];
         }
     }
@@ -3528,7 +3514,7 @@ export class WebRTCServerAcceptor extends BasicServerAcceptor {
             ++n )
             this.addPendingOffer();
     }
-};
+}
 
 export class WebRTCClientPipe extends BasicSocketPipe {
     strSignalingServerURL: string | null;
@@ -3717,4 +3703,4 @@ export class WebRTCClientPipe extends BasicSocketPipe {
                 "message",
                 { socket: this, message: jo } ) );
     }
-};
+}

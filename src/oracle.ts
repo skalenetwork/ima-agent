@@ -27,8 +27,6 @@ import * as log from "./log.js";
 import * as rpcCall from "./rpcCall.js";
 import * as threadInfo from "./threadInfo.js";
 import * as owaspUtils from "./owaspUtils.js";
-import * as sha3Module from "sha3";
-const Keccak: any = sha3Module.Keccak;
 export const gConstMinPowResultLimit: number = 10000;
 export const gConstMaxPowResultLimit: any = 100000;
 
@@ -59,10 +57,7 @@ export function findPowNumber(
         n = owaspUtils.toInteger( i );
         s = "{" + strRequestPart + ",\"time\":" + t + ",\"pow\":" + n + "}";
 
-        const hash = new Keccak( 256 );
-        hash.update( s );
-        let strHash = hash.digest( "hex" );
-        strHash = owaspUtils.ensureStartsWith0x( strHash );
+        const strHash = owaspUtils.ethersMod.ethers.utils.id( s );
 
         const f = owaspUtils.toBN( strHash );
         const r = gBigNumUpperPart.div( f );
