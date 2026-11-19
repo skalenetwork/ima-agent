@@ -1371,6 +1371,8 @@ describe( "BLS message origin validation", function() {
             let body = "";
             request.on( "data", function( chunk ) { body += chunk.toString(); } );
             request.on( "end", function() {
+                if( callResult === "hang" )
+                    return; // accept the request and never answer
                 const payload = JSON.parse( body );
                 const rpcResponse = { jsonrpc: "2.0", id: payload.id };
                 if( payload.method == "eth_chainId" )
@@ -1396,6 +1398,7 @@ describe( "BLS message origin validation", function() {
             nodeUrl,
             provider: owaspUtils.getEthersProviderFromURL( nodeUrl ),
             close: async function() {
+                server.closeAllConnections();
                 await new Promise( function( resolve, reject ) {
                     server.close( function( err ) { err ? reject( err ) : resolve(); } );
                 } );
@@ -1428,12 +1431,12 @@ describe( "BLS message origin validation", function() {
         }
     }
 
-    it( "accepts an S2S message when three of four nodes return true", async function() {
-        const trace = await checkS2sWithNodeResults( [true, true, true, false] );
-        assert.match( trace, /false on-chain/ );
-        assert.match( trace, /true provider results are 3 of 4, required 3/ );
-        assert.match( trace, /Got unified verification call result true/ );
-    } );
+    it( "accepts an S2S message on a three-of-four quorum without waiting for a hung node",
+        async function() {
+            const trace = await checkS2sWithNodeResults( [true, true, true, "hang"] );
+            assert.match( trace, /3 true and 0 failed provider results of 4, required 3/ );
+            assert.match( trace, /Got unified verification call result true/ );
+        } );
 
     it( "rejects an S2S message without a three-of-four node quorum", async function() {
         let rejection;
@@ -1448,8 +1451,15 @@ describe( "BLS message origin validation", function() {
         assert.match( rejection.details,
             /failure reason is: "missing revert data in call exception/ );
         assert.match( rejection.details, /node unavailable/ );
-        assert.match( rejection.details, /true provider results are 2 of 4, required 3/ );
+        assert.match( rejection.details, /2 failed provider results of 4, required 3/ );
         assert.match( rejection.details, /Got unified verification call result false/ );
+    } );
+
+    it( "keeps the single-node S2S check working", async function() {
+        const trace = await checkS2sWithNodeResults( [true] );
+        assert.match( trace, /1 true and 0 failed provider results of 1, required 1/ );
+        await assert.rejects(
+            checkS2sWithNodeResults( [false] ), /Correctness validation failed/ );
     } );
 
     it( "rejects an M2S message without a matching Mainnet event", async function() {

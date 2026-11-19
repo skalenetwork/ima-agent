@@ -179,31 +179,52 @@ async function safeQueryOutgoingMessageData(
     strLogPrefix: string,
     strDirection: string
 ): Promise<boolean> {
-    const arrResults = await Promise.all( joMessageProxys.map( async joMessageProxy => {
-        let isValidOnNode = false; let strReason = "false on-chain";
-        try {
-            isValidOnNode = ( await joMessageProxy.callStatic.verifyOutgoingMessageData(
-                outgoingMessageData, options ) ) === true;
-        } catch ( err ) {
-            strReason = owaspUtils.extractErrorMessage( err );
-        }
-        details.trace(
-            "{p}{bright} Got verification call result {} from provider {url}, real message " +
-            "index is: {}, failure reason is: {}", strLogPrefix, strDirection, isValidOnNode,
-            owaspUtils.ethersProviderToUrl( joMessageProxy.provider as
-                owaspUtils.ethersMod.ethers.providers.JsonRpcProvider ),
-            outgoingMessageData.msgCounter, isValidOnNode ? "none" : strReason );
-        return isValidOnNode;
-    } ) );
     const nRequiredTrueResults = Math.floor( 2 * joMessageProxys.length / 3 ) + 1;
-    const nTrueResults = arrResults.filter( isValidOnNode => isValidOnNode ).length;
-    const isValid = nTrueResults >= nRequiredTrueResults;
-    details.trace(
-        "{p}{bright} Got unified verification call result {}, real message index is: {}, " +
-        "true provider results are {} of {}, required {}",
-        strLogPrefix, strDirection, isValid, outgoingMessageData.msgCounter,
-        nTrueResults, joMessageProxys.length, nRequiredTrueResults );
-    return isValid;
+    const nMaxFailedResults = joMessageProxys.length - nRequiredTrueResults;
+    let nTrueResults = 0; let nFailedResults = 0; let isSettled = false;
+    // settle as soon as the quorum is reached or cannot be reached anymore,
+    // so a source node that never answers does not delay the result
+    return await new Promise<boolean>( resolve => {
+        const onNodeResult = (
+            joMessageProxy: owaspUtils.ethersMod.ethers.Contract,
+            isValidOnNode: boolean, strReason: string
+        ): void => {
+            if( isSettled )
+                return;
+            details.trace(
+                "{p}{bright} Got verification call result {} from provider {url}, real message " +
+                "index is: {}, failure reason is: {}", strLogPrefix, strDirection, isValidOnNode,
+                owaspUtils.ethersProviderToUrl( joMessageProxy.provider as
+                    owaspUtils.ethersMod.ethers.providers.JsonRpcProvider ),
+                outgoingMessageData.msgCounter, strReason );
+            if( isValidOnNode )
+                ++nTrueResults;
+            else
+                ++nFailedResults;
+            const isValid = nTrueResults >= nRequiredTrueResults;
+            if( !isValid && nFailedResults <= nMaxFailedResults )
+                return;
+            isSettled = true;
+            ( isValid ? details.trace : details.warning ).call( details,
+                "{p}{bright} Got unified verification call result {}, real message index is: " +
+                "{}, {} true and {} failed provider results of {}, required {}",
+                strLogPrefix, strDirection, isValid, outgoingMessageData.msgCounter,
+                nTrueResults, nFailedResults, joMessageProxys.length, nRequiredTrueResults );
+            resolve( isValid );
+        };
+        for( const joMessageProxy of joMessageProxys ) {
+            joMessageProxy.callStatic.verifyOutgoingMessageData(
+                outgoingMessageData, options
+            ).then(
+                ( isValidOnNode: any ) => {
+                    onNodeResult( joMessageProxy, isValidOnNode === true,
+                        isValidOnNode === true ? "none" : "false on-chain" );
+                },
+                ( err: any ) => {
+                    onNodeResult( joMessageProxy, false, owaspUtils.extractErrorMessage( err ) );
+                } );
+        }
+    } );
 }
 
 function discoverBlsThreshold( joSChainNetworkInfo: discoveryTools.TSChainNetworkInfo ): number {
