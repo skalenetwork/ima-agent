@@ -279,6 +279,26 @@ async function doDisconnect(
     }
 }
 
+export async function httpPostJson(
+    strURL: string, strBody: string, signal: AbortSignal ): Promise < string > {
+    const u = new URL( strURL );
+    return await new Promise < string >( ( resolve, reject ) => {
+        const req = ( u.protocol === "https:" ? https : http ).request( u, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            signal
+        }, function( res: http.IncomingMessage ): void {
+            if( res.statusCode !== 200 )
+                log.warning( "REST call status code is {}", res.statusCode );
+            text( res ).then( resolve, reject );
+        } );
+        req.on( "error", reject );
+        req.end( strBody );
+    } );
+}
+
 export async function doCall(
     joCall: TRPCCall, joIn: any, fn: TFunctionCallResultHandler ): Promise <void> {
     joIn = enrichTopLevelFieldsInJSON( joIn );
@@ -379,23 +399,8 @@ export async function doCall(
             } );
         } else {
             try {
-                const u = new URL( joCall.url );
-                const body = await new Promise < string >( ( resolve, reject ) => {
-                    const req = ( u.protocol === "https:" ? https : http ).request( u, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        signal: AbortSignal.timeout( gSecondsConnectionTimeout * 1000 )
-                    }, function( res: http.IncomingMessage ): void {
-                        if( res.statusCode !== 200 )
-                            log.warning( "REST call status code is {}", res.statusCode );
-                        text( res ).then( resolve, reject );
-                    } );
-                    req.on( "error", reject );
-                    req.end( strBody );
-                } );
-
+                const body = await httpPostJson( joCall.url, strBody,
+                    AbortSignal.timeout( gSecondsConnectionTimeout * 1000 ) );
                 joOut = JSON.parse( body );
                 errCall = null;
             } catch ( err ) {

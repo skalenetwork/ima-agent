@@ -1237,7 +1237,7 @@ export async function doAllS2S( // s-chain --> s-chain
                         joAccountSrc,
                         joAccountDst,
                         // local pre-check only, signers verify against a source node quorum
-                        ethersProviderSrc: [ ethersProviderSrc ],
+                        arrUrlsSrc: [ urlSrc ],
                         ethersProviderDst
                     };
                     joRuntimeOpts.idxChainKnownForS2S = idxSChain;

@@ -1396,7 +1396,11 @@ describe( "BLS message origin validation", function() {
         const nodeUrl = `http://127.0.0.1:${address.port}`;
         return {
             nodeUrl,
-            provider: owaspUtils.getEthersProviderFromURL( nodeUrl ),
+            countConnections: async function() {
+                return await new Promise( function( resolve ) {
+                    server.getConnections( function( err, count ) { resolve( count ); } );
+                } );
+            },
             close: async function() {
                 server.closeAllConnections();
                 await new Promise( function( resolve, reject ) {
@@ -1418,9 +1422,15 @@ describe( "BLS message origin validation", function() {
                     chainIdSrc: "123456",
                     chainNameDst: imaState.chainProperties.sc.strChainName,
                     chainIdDst: imaState.chainProperties.sc.chainId.toString(),
-                    ethersProviderSrc: nodes.map( function( node ) { return node.provider; } )
+                    arrUrlsSrc: nodes.map( function( node ) { return node.nodeUrl; } )
                 } );
-            return details.toString();
+            // give aborted requests time to reach the nodes as closed connections
+            await new Promise( function( resolve ) { setTimeout( resolve, 100 ); } );
+            return {
+                trace: details.toString(),
+                connections: await Promise.all(
+                    nodes.map( function( node ) { return node.countConnections(); } ) )
+            };
         } catch ( err ) {
             err.details = details.toString();
             throw err;
@@ -1433,9 +1443,11 @@ describe( "BLS message origin validation", function() {
 
     it( "accepts an S2S message on a three-of-four quorum without waiting for a hung node",
         async function() {
-            const trace = await checkS2sWithNodeResults( [true, true, true, "hang"] );
+            const { trace, connections } =
+                await checkS2sWithNodeResults( [true, true, true, "hang"] );
             assert.match( trace, /3 true and 0 failed provider results of 4, required 3/ );
             assert.match( trace, /Got unified verification call result true/ );
+            assert.equal( connections[3], 0, "connection to the hung node must be closed" );
         } );
 
     it( "rejects an S2S message without a three-of-four node quorum", async function() {
@@ -1448,15 +1460,13 @@ describe( "BLS message origin validation", function() {
         assert.ok( rejection );
         assert.match( rejection.message, /Correctness validation failed/ );
         assert.match( rejection.details, /false on-chain/ );
-        assert.match( rejection.details,
-            /failure reason is: "missing revert data in call exception/ );
         assert.match( rejection.details, /node unavailable/ );
         assert.match( rejection.details, /2 failed provider results of 4, required 3/ );
         assert.match( rejection.details, /Got unified verification call result false/ );
     } );
 
     it( "keeps the single-node S2S check working", async function() {
-        const trace = await checkS2sWithNodeResults( [true] );
+        const { trace } = await checkS2sWithNodeResults( [true] );
         assert.match( trace, /1 true and 0 failed provider results of 1, required 1/ );
         await assert.rejects(
             checkS2sWithNodeResults( [false] ), /Correctness validation failed/ );

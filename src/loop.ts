@@ -48,7 +48,7 @@ export interface TExtraSignOpts {
     chainIdDst: string
     joAccountSrc?: state.TAccount
     joAccountDst?: state.TAccount
-    ethersProviderSrc?: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider[]
+    arrUrlsSrc?: string[]
     ethersProviderDst?: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider
 }
 
