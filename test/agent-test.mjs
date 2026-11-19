@@ -25,6 +25,7 @@
 
 import * as assert from "assert";
 import * as fs from "fs";
+import * as http from "http";
 import * as os from "os";
 import * as path from "path";
 import * as url from "url";
@@ -1364,6 +1365,112 @@ describe( "BLS message origin validation", function() {
             ]
         };
     }
+
+    async function createS2sRpcNode( callResult ) {
+        const server = http.createServer( function( request, response ) {
+            let body = "";
+            request.on( "data", function( chunk ) { body += chunk.toString(); } );
+            request.on( "end", function() {
+                if( callResult === "hang" )
+                    return; // accept the request and never answer
+                const payload = JSON.parse( body );
+                const rpcResponse = { jsonrpc: "2.0", id: payload.id };
+                if( payload.method == "eth_chainId" )
+                    rpcResponse.result = "0x1";
+                else if( payload.method == "eth_call" ) {
+                    if( callResult instanceof Error ) {
+                        rpcResponse.error = { code: -32000, message: callResult.message };
+                    } else {
+                        rpcResponse.result = callResult
+                            ? "0x" + "0".repeat( 63 ) + "1"
+                            : "0x" + "0".repeat( 64 );
+                    }
+                } else
+                    rpcResponse.error = { code: -32601, message: "Method not found" };
+                response.writeHead( 200, { "Content-Type": "application/json" } );
+                response.end( JSON.stringify( rpcResponse ) );
+            } );
+        } );
+        await new Promise( function( resolve ) { server.listen( 0, "127.0.0.1", resolve ); } );
+        const address = server.address();
+        const nodeUrl = `http://127.0.0.1:${address.port}`;
+        return {
+            nodeUrl,
+            countConnections: async function() {
+                return await new Promise( function( resolve ) {
+                    server.getConnections( function( err, count ) { resolve( count ); } );
+                } );
+            },
+            close: async function() {
+                server.closeAllConnections();
+                await new Promise( function( resolve, reject ) {
+                    server.close( function( err ) { err ? reject( err ) : resolve(); } );
+                } );
+            }
+        };
+    }
+
+    async function checkS2sWithNodeResults( callResults ) {
+        const nodes = await Promise.all( callResults.map( createS2sRpcNode ) );
+        const previousVerbose = log.verboseGet();
+        const details = log.createMemoryStream();
+        log.verboseSet( log.verboseParse( "trace" ) );
+        try {
+            await imaBLS.checkCorrectnessOfMessagesToSign(
+                details, "S2S test: ", "S2S", [makeMessage()], messageIndex, {
+                    chainNameSrc: "source-schain",
+                    chainIdSrc: "123456",
+                    chainNameDst: imaState.chainProperties.sc.strChainName,
+                    chainIdDst: imaState.chainProperties.sc.chainId.toString(),
+                    arrUrlsSrc: nodes.map( function( node ) { return node.nodeUrl; } )
+                } );
+            // give aborted requests time to reach the nodes as closed connections
+            await new Promise( function( resolve ) { setTimeout( resolve, 100 ); } );
+            return {
+                trace: details.toString(),
+                connections: await Promise.all(
+                    nodes.map( function( node ) { return node.countConnections(); } ) )
+            };
+        } catch ( err ) {
+            err.details = details.toString();
+            throw err;
+        } finally {
+            log.verboseSet( previousVerbose );
+            details.close();
+            await Promise.all( nodes.map( function( node ) { return node.close(); } ) );
+        }
+    }
+
+    it( "accepts an S2S message on a three-of-four quorum without waiting for a hung node",
+        async function() {
+            const { trace, connections } =
+                await checkS2sWithNodeResults( [true, true, true, "hang"] );
+            assert.match( trace, /3 true and 0 failed provider results of 4, required 3/ );
+            assert.match( trace, /Got unified verification call result true/ );
+            assert.equal( connections[3], 0, "connection to the hung node must be closed" );
+        } );
+
+    it( "rejects an S2S message without a three-of-four node quorum", async function() {
+        let rejection;
+        try {
+            await checkS2sWithNodeResults( [true, true, false, new Error( "node unavailable" )] );
+        } catch ( err ) {
+            rejection = err;
+        }
+        assert.ok( rejection );
+        assert.match( rejection.message, /Correctness validation failed/ );
+        assert.match( rejection.details, /false on-chain/ );
+        assert.match( rejection.details, /node unavailable/ );
+        assert.match( rejection.details, /2 failed provider results of 4, required 3/ );
+        assert.match( rejection.details, /Got unified verification call result false/ );
+    } );
+
+    it( "keeps the single-node S2S check working", async function() {
+        const { trace } = await checkS2sWithNodeResults( [true] );
+        assert.match( trace, /1 true and 0 failed provider results of 1, required 1/ );
+        await assert.rejects(
+            checkS2sWithNodeResults( [false] ), /Correctness validation failed/ );
+    } );
 
     it( "rejects an M2S message without a matching Mainnet event", async function() {
         await assert.rejects(

@@ -169,6 +169,82 @@ export interface TSignU256Options {
     errGathering: Error | string | null
 }
 
+const nOutgoingMessageQueryTimeoutMilliseconds = 10_000;
+
+async function safeQueryOutgoingMessageData(
+    arrUrls: string[],
+    outgoingMessageData: any,
+    strFrom: string,
+    details: log.TLogger,
+    strLogPrefix: string,
+    strDirection: string
+): Promise<boolean> {
+    const imaState: state.TIMAState = state.get();
+    const joInterface = new owaspUtils.ethersMod.ethers.utils.Interface(
+        imaState.chainProperties.sc.joAbiIMA.message_proxy_chain_abi );
+    const strBody = JSON.stringify( rpcCall.enrichTopLevelFieldsInJSON( {
+        method: "eth_call",
+        params: [ {
+            from: strFrom,
+            to: imaState.chainProperties.sc.joAbiIMA.message_proxy_chain_address,
+            data: joInterface.encodeFunctionData(
+                "verifyOutgoingMessageData", [ outgoingMessageData ] )
+        }, "latest" ]
+    } ) );
+    const nRequiredTrueResults = Math.floor( 2 * arrUrls.length / 3 ) + 1;
+    const nMaxFailedResults = arrUrls.length - nRequiredTrueResults;
+    let nTrueResults = 0; let nFailedResults = 0; let isSettled = false;
+    // settle as soon as the quorum is reached or cannot be reached anymore and abort the
+    // requests still in flight, so a source node that never answers neither delays the
+    // result nor keeps a connection open
+    const abortController = new AbortController();
+    const signal = AbortSignal.any( [ abortController.signal,
+        AbortSignal.timeout( nOutgoingMessageQueryTimeoutMilliseconds ) ] );
+    return await new Promise<boolean>( resolve => {
+        const onNodeResult = (
+            strUrl: string, isValidOnNode: boolean, strReason: string
+        ): void => {
+            if( isSettled )
+                return;
+            details.trace(
+                "{p}{bright} Got verification call result {} from provider {url}, real message " +
+                "index is: {}, failure reason is: {}", strLogPrefix, strDirection, isValidOnNode,
+                strUrl, outgoingMessageData.msgCounter, strReason );
+            if( isValidOnNode )
+                ++nTrueResults;
+            else
+                ++nFailedResults;
+            const isValid = nTrueResults >= nRequiredTrueResults;
+            if( !isValid && nFailedResults <= nMaxFailedResults )
+                return;
+            isSettled = true;
+            abortController.abort();
+            ( isValid ? details.trace : details.warning ).call( details,
+                "{p}{bright} Got unified verification call result {}, real message index is: " +
+                "{}, {} true and {} failed provider results of {}, required {}",
+                strLogPrefix, strDirection, isValid, outgoingMessageData.msgCounter,
+                nTrueResults, nFailedResults, arrUrls.length, nRequiredTrueResults );
+            resolve( isValid );
+        };
+        for( const strUrl of arrUrls ) {
+            rpcCall.httpPostJson( strUrl, strBody, signal ).then( strAnswer => {
+                const joAnswer = JSON.parse( strAnswer );
+                if( joAnswer.error )
+                    throw new Error( JSON.stringify( joAnswer.error ) );
+                return joInterface.decodeFunctionResult(
+                    "verifyOutgoingMessageData", joAnswer.result )[0] === true;
+            } ).then(
+                isValidOnNode => {
+                    onNodeResult(
+                        strUrl, isValidOnNode, isValidOnNode ? "none" : "false on-chain" );
+                },
+                err => {
+                    onNodeResult( strUrl, false, owaspUtils.extractErrorMessage( err ) );
+                } );
+        }
+    } );
+}
+
 function discoverBlsThreshold( joSChainNetworkInfo: discoveryTools.TSChainNetworkInfo ): number {
     const imaState: state.TIMAState = state.get();
     joSChainNetworkInfo = joSChainNetworkInfo || imaState.joSChainNetworkInfo;
@@ -1023,6 +1099,7 @@ export async function checkCorrectnessOfMessagesToSign(
 ): Promise < void > {
     const imaState: state.TIMAState = state.get();
     let joMessageProxy: owaspUtils.ethersMod.ethers.Contract | null = null;
+    let arrUrlsSrc: string[] | null = null;
     let joAccount: state.TAccount | null = null;
     let joChainName: string | null = null;
     if( strDirection == "M2S" ) {
@@ -1038,19 +1115,11 @@ export async function checkCorrectnessOfMessagesToSign(
         if( ( !joExtraSignOpts?.chainNameDst ) )
             throw new Error( "Missing destination chain name for BLS signing" );
         joChainName = joExtraSignOpts.chainNameDst;
-        const ethersProvider: owaspUtils.ethersMod.ethers.providers.JsonRpcProvider | null =
-            ( joExtraSignOpts && "ethersProviderSrc" in joExtraSignOpts &&
-            joExtraSignOpts.ethersProviderSrc )
-                ? joExtraSignOpts.ethersProviderSrc
-                : null;
-        if( !ethersProvider ) {
+        arrUrlsSrc = joExtraSignOpts.arrUrlsSrc ?? null;
+        if( !arrUrlsSrc || arrUrlsSrc.length === 0 ) {
             throw new Error( "CRITICAL ERROR: No provider specified in extra signing options " +
                 `for checking messages of direction ${strDirection}` );
         }
-        joMessageProxy = new owaspUtils.ethersMod.ethers.Contract(
-            imaState.chainProperties.sc.joAbiIMA.message_proxy_chain_address,
-            imaState.chainProperties.sc.joAbiIMA.message_proxy_chain_abi,
-            ethersProvider );
     } else {
         throw new Error( "CRITICAL ERROR: Failed checkCorrectnessOfMessagesToSign() with " +
             `unknown direction ${strDirection}` );
@@ -1063,7 +1132,8 @@ export async function checkCorrectnessOfMessagesToSign(
         "count is {}, message(s) to process are {}, first real message index is {}, messages " +
         "will be sent to chain name {}",
         strLogPrefix, strDirection, "verifyOutgoingMessageData",
-        joMessageProxy ? joMessageProxy.address : "<NullContract>",
+        joMessageProxy?.address ??
+            imaState.chainProperties.sc.joAbiIMA.message_proxy_chain_address,
         strCallerAccountAddress, jarrMessages.length, jarrMessages,
         nIdxCurrentMsgBlockStart, joChainName );
     let isBatchValidationFailed = false;
@@ -1100,10 +1170,14 @@ export async function checkCorrectnessOfMessagesToSign(
                     dstContract: joMessage.destinationContract,
                     data: joMessage.data
                 };
-                if( !joMessageProxy )
+                if( !joMessageProxy && !arrUrlsSrc )
                     throw new Error( "No message proxy available" );
-                const isValidMessage = await joMessageProxy.callStatic.verifyOutgoingMessageData(
-                    outgoingMessageData, { from: strCallerAccountAddress } );
+                const isValidMessage = joMessageProxy
+                    ? await joMessageProxy.callStatic.verifyOutgoingMessageData(
+                        outgoingMessageData, { from: strCallerAccountAddress } )
+                    : await safeQueryOutgoingMessageData(
+                        arrUrlsSrc ?? [], outgoingMessageData,
+                        strCallerAccountAddress, details, strLogPrefix, strDirection );
                 details.trace(
                     "{p}{bright} Got verification call result {}, real message index is: {}, " +
                     "saved msgCounter is: {}", strLogPrefix, strDirection,
@@ -2409,16 +2483,16 @@ async function prepareS2sOfSkaleImaVerifyAndSign(
             "try again later" );
     }
 
-    let joSChainSrc: any = null; let strUrlSrcSChain: string | null = null;
+    let joSChainSrc: any = null; let arrUrlsSrcSChain: string[] = [];
     for( let idxSChain = 0; idxSChain < arrSChainsCached.length; ++idxSChain ) {
         const joSChain = arrSChainsCached[idxSChain];
         if( joSChain.name.toString() == strSChainNameSrc.toString() ) {
             joSChainSrc = joSChain;
-            strUrlSrcSChain = skaleObserver.pickRandomSChainUrl( joSChain );
+            arrUrlsSrcSChain = joSChain.nodes.map( joNode => joNode.endpoints.ip.http.toString() );
             break;
         }
     }
-    if( joSChainSrc == null || strUrlSrcSChain == null || strUrlSrcSChain.length == 0 ) {
+    if( joSChainSrc == null || arrUrlsSrcSChain.length == 0 ) {
         throw new Error( `Could not handle ${optsHandleVerifyAndSign.strDirection} ` +
             "skale_imaVerifyAndSign(2), failed to discover source chain access parameters, " +
             "try again later" );
@@ -2428,12 +2502,12 @@ async function prepareS2sOfSkaleImaVerifyAndSign(
             "IMA S2S signing request source ID does not match the discovered source chain" );
     }
     optsHandleVerifyAndSign.details.trace(
-        "{p}{bright} verification algorithm discovered source chain URL is {url}, chain name " +
+        "{p}{bright} verification algorithm discovered source chain URLs are {}, chain name " +
         "is {}, chain id is {}", optsHandleVerifyAndSign.strLogPrefix,
-        optsHandleVerifyAndSign.strDirection, strUrlSrcSChain,
+        optsHandleVerifyAndSign.strDirection, arrUrlsSrcSChain,
         joSChainSrc.name, joSChainSrc.chainId );
     optsHandleVerifyAndSign.joExtraSignOpts = {
-        ethersProviderSrc: owaspUtils.getEthersProviderFromURL( strUrlSrcSChain ),
+        arrUrlsSrc: arrUrlsSrcSChain,
         chainNameSrc: optsHandleVerifyAndSign.strFromChainName,
         chainNameDst: optsHandleVerifyAndSign.strToChainName,
         chainIdSrc: optsHandleVerifyAndSign.strFromChainID,
